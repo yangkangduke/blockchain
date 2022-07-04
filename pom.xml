@@ -26,7 +26,7 @@
         <guava.version>29.0-jre</guava.version>
         <mybatis.springboot.version>2.1.3</mybatis.springboot.version>
         <caffine.version>2.8.5</caffine.version>
-        <spring-cloud.version>Hoxton.SR7</spring-cloud.version>
+        <spring-cloud.version>2021.0.3</spring-cloud.version>
         <okhttp.version>4.8.1</okhttp.version>
         <web3j.version>5.0.0</web3j.version>
         <logstash-logback-encoder.version>6.4</logstash-logback-encoder.version>
