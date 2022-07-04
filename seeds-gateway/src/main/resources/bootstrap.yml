@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: seeds-gateway
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka_server:localhost:10100}/eureka

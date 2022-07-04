@@ -1,0 +1,46 @@
+server:
+  port: 10103
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/seeds_dev
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#  rabbitmq:
+#    addresses:
+#    username:
+#    password:
+#    publisher-confirms: true
+#    cache:
+#      connection:
+#        mode: connection
+#        size: 10
+#    listener:
+#      simple:
+
+management:
+  endpoints:
+    web:
+      base-path: /
+
+mybatis:
+  type-aliases-package*: com.seeds.uc.model
+
+redisson:
+  address: redis://localhost:6379
+  timeout: 5000
+  poolsize: 50
+  idlesize: 50
+
+uc:
+  sso:
+    redis:
+      keyExpireAfter: 259200
+
+# uc 文件存储目录
+file:
+  store:
+    location: /seeds-uc/files/
+
+

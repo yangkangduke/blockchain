@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: seeds-uc-service
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:10100/eureka/
