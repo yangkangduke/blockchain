@@ -742,7 +742,7 @@ create table t_market_kline_1mon_keos
 ) ENGINE = InnoDB
   DEFAULT CHARSET = UTF8MB4 COMMENT ='keos 1月K线';
 
----------------------
+
 --  FX
 
 -- kline tables usdcny
