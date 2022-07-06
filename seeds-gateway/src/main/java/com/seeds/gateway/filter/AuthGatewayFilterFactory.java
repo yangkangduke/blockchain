@@ -46,7 +46,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
         return (exchange, chain) -> {
             log.debug("get into auth gateway filter");
             String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_TOKEN);
-            if (StringUtils.isEmpty(token)) {
+            if (StringUtils.hasText(token)) {
                 log.debug("No token found from header, start getting from cookie");
                 HttpCookie tokenCookie = exchange.getRequest().getCookies().getFirst(HttpHeaders.USER_TOKEN);
                 if (tokenCookie != null) {
@@ -56,7 +56,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                     log.debug("no token found from cookie");
                 }
             }
-            if (StringUtils.isEmpty(token)) {
+            if (StringUtils.hasText(token)) {
                 log.debug("no token found from either cookie or header");
                 return failure(exchange);
             }

@@ -13,11 +13,11 @@ spring:
           predicates:
             - Path=/api/uc-public/**
         - id: seeds-uc-auth-service
-          uri: lb://seeds-uc-service
+          uri: http://localhost:8081/
           predicates:
             - Path=/api/auth/**
         - id: seeds-uc-service
-          uri: lb://seeds-uc-service
+          uri: http://192.168.1.1:8080/
           predicates:
             - Path=/api/uc/**
           filters:
