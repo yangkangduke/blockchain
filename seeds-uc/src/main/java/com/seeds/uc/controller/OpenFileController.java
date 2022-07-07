@@ -25,29 +25,29 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/uc/file")
 public class OpenFileController {
-    @Autowired
-    private StorageService storageService;
+//    @Autowired
+//    private StorageService storageService;
 
     @Autowired
     private FileMapper fileMapper;
 
-    @PostMapping("upload")
-    public GenericDto<String> uploadFile(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+//    @PostMapping("upload")
+//    public GenericDto<String> uploadFile(@RequestParam("file") MultipartFile multipartFile) throws IOException {
         // TODO 检查文件的格式，大小
 
-        Long uid = UserContext.getCurrentUserId();
-
-        // 将文件持久化
-        String uuid = RandomUtil.getUUID();
-        storageService.store(uuid, multipartFile.getInputStream());
-
-        // 存入DB
-        fileMapper.insert(File.builder()
-                .filename(multipartFile.getOriginalFilename())
-                .uid(uid)
-                .createdAt(System.currentTimeMillis())
-                .uuid(uuid)
-                .build());
-        return GenericDto.success(uuid);
-    }
+//        Long uid = UserContext.getCurrentUserId();
+//
+//        // 将文件持久化
+//        String uuid = RandomUtil.getUUID();
+//        storageService.store(uuid, multipartFile.getInputStream());
+//
+//        // 存入DB
+//        fileMapper.insert(File.builder()
+//                .filename(multipartFile.getOriginalFilename())
+//                .uid(uid)
+//                .createdAt(System.currentTimeMillis())
+//                .uuid(uuid)
+//                .build());
+//        return GenericDto.success(uuid);
+//    }
 }

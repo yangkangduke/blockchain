@@ -9,8 +9,4 @@ redisson:
   address: redis://localhost:6379
   database: 1
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:20100/eureka/
 

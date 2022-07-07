@@ -26,19 +26,19 @@ public class InterFileController {
 
     @Autowired
     private FileMapper fileMapper;
-    @Autowired
-    private StorageService storageService;
+//    @Autowired
+//    private StorageService storageService;
 
-    @GetMapping("download")
-    public ResponseEntity<Resource> downloadFile(@RequestParam("uuid") String uuid) {
-        File file = fileMapper.selectByUuid(uuid);
-
-        Resource resource = storageService.loadAsResource(uuid);
-
-        return ResponseEntity
-                .ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getFilename())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
-    }
+//    @GetMapping("download")
+//    public ResponseEntity<Resource> downloadFile(@RequestParam("uuid") String uuid) {
+//        File file = fileMapper.selectByUuid(uuid);
+//
+//        Resource resource = storageService.loadAsResource(uuid);
+//
+//        return ResponseEntity
+//                .ok()
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getFilename())
+//                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+//                .body(resource);
+//    }
 }

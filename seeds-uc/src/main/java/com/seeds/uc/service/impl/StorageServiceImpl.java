@@ -38,7 +38,7 @@ public class StorageServiceImpl implements StorageService {
 
     @PostConstruct
     public void init() throws IOException {
-        FileUtils.forceMkdir(this.rootLocation.toFile());
+//        FileUtils.forceMkdir(this.rootLocation.toFile());
     }
 
     @Override

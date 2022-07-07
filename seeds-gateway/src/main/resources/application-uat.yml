@@ -4,8 +4,3 @@ server:
 spring:
   redis:
     database: 1
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:20100/eureka

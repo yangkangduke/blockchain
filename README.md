@@ -14,5 +14,5 @@ redis
 kafka
 
 ## database
-mysql
+mysql8.0
 

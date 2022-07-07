@@ -21,29 +21,29 @@ public class UserLanguageServiceImpl implements UserLanguageService {
     @Autowired
     UserMapper userMapper;
 
-    @Autowired
-    UserService userService;
+//    @Autowired
+//    UserService userService;
 
     @Autowired
     CountryLanguageMapper countryLanguageMapper;
 
     @Override
     public Language getUserLanguageByUid(Long uid) {
-        UserDto userDto = userService.getUserByUid(uid);
-        // 看用户有没有country code，没有的话看kyc
-        CountryLanguage countryLanguage = null;
-        if (StringUtils.isNotBlank(userDto.getNationality())) {
-            countryLanguage = countryLanguageMapper.selectByCountryCode(userDto.getNationality());
-        }else if (StringUtils.isNotBlank(userDto.getCountryCode())){
-            countryLanguage = countryLanguageMapper.selectByCountryCode(userDto.getCountryCode());
-        }
-
-        if (countryLanguage != null) {
-            return countryLanguage.getLanguage();
-        } else {
-            // 登陆地也拿不到的时候，用英文
+//        UserDto userDto = userService.getUserByUid(uid);
+//        // 看用户有没有country code，没有的话看kyc
+//        CountryLanguage countryLanguage = null;
+//        if (StringUtils.isNotBlank(userDto.getNationality())) {
+//            countryLanguage = countryLanguageMapper.selectByCountryCode(userDto.getNationality());
+//        }else if (StringUtils.isNotBlank(userDto.getCountryCode())){
+//            countryLanguage = countryLanguageMapper.selectByCountryCode(userDto.getCountryCode());
+//        }
+//
+//        if (countryLanguage != null) {
+//            return countryLanguage.getLanguage();
+//        } else {
+//            // 登陆地也拿不到的时候，用英文
             return Language.DEFAULT;
-        }
+//        }
         // TODO  从kyc里拿国籍
 
         // TODO 当都拿不到的时候，拿最后一次登陆地的语言
