@@ -1,0 +1,60 @@
+spring:
+  redis:
+    host: localhost
+    port: 6379
+
+  cloud:
+    gateway:
+      routes:
+        - id: seeds-uc-public-service
+          uri: http://localhost:10103/
+          predicates:
+            - Path=/uc-public/**
+        - id: seeds-uc-auth-service
+          uri: http://localhost:8081/
+          predicates:
+            - Path=/api/auth/**
+        - id: seeds-uc-service
+          uri: http://192.168.1.1:8080/
+          predicates:
+            - Path=/api/uc/**
+          filters:
+            - Auth
+        - id: seeds-market-data-service
+          uri: lb://seeds-market-data-service
+          predicates:
+            - Path=/api/market/**
+        - id: seeds-account-service
+          uri: lb://seeds-account-service
+          predicates:
+            - Path=/api/account/**
+          filters:
+            - Auth
+        - id: seeds-trade-service
+          uri: lb://seeds-trade-service
+          predicates:
+            - Path=/api/trade/**
+          filters:
+            - Auth
+      loadbalancer:
+        use404: true
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods:
+              - GET
+              - HEAD
+              - PUT
+              - POST
+      default-filters:
+        - StripPrefix=1
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+        - AddResponseHeader=Access-Control-Allow-Credentials, true
+        - AddResponseHeader=Access-Control-Allow-Origin, *
+        - name: RequestRateLimiter
+          args:
+            key-resolver: '#{@defaultResolver}'
+            redis-rate-limiter.replenishRate: 5
+            redis-rate-limiter.burstCapacity: 10

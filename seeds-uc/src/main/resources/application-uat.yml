@@ -1,12 +1,3 @@
-server:
-  port: 20103
 
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/seeds_uat
-
-redisson:
-  address: redis://localhost:6379
-  database: 1
 
 
