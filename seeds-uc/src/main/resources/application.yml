@@ -2,25 +2,11 @@ server:
   port: 10103
 
 spring:
+  profiles:
+    active: local
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
-  datasource:
-    url: jdbc:mysql://localhost:3306/seeds_dev
-    username: root
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-#  rabbitmq:
-#    addresses:
-#    username:
-#    password:
-#    publisher-confirms: true
-#    cache:
-#      connection:
-#        mode: connection
-#        size: 10
-#    listener:
-#      simple:
 
 management:
   endpoints:
@@ -29,12 +15,6 @@ management:
 
 mybatis:
   type-aliases-package*: com.seeds.uc.model
-
-redisson:
-  address: redis://localhost:6379
-  timeout: 5000
-  poolsize: 50
-  idlesize: 50
 
 uc:
   sso:
