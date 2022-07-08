@@ -4,7 +4,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.service.CacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +20,7 @@ public class TestController {
     @Autowired
     CacheService cacheService;
 
-    @PostMapping("echo")
+    @GetMapping("/echo")
     public GenericDto<String> createTokenWithUserId() {
         return GenericDto.success("echo");
     }
