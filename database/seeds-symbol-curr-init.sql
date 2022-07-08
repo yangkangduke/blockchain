@@ -19,13 +19,14 @@ create table t_symbol(
 
 create table t_currency
 (
-    f_id         bigint(20) unsigned not null auto_increment comment 'primary key ID',
-    f_name     varchar(20)         not null default '' comment 'base currency',
-    f_code     varchar(100)         not null default '' comment 'quote currency',
-    f_status     int(2)              not null default 0 comment '1 上线， 0 已经下线',
-    f_exchange     int(2)         not null default 0 comment '1 可以交易， 0 停止交易',
-    f_created_at bigint(20) unsigned not null default '0' comment 'created timestamp',
-    f_updated_at bigint(20) unsigned not null default '0' comment 'update timestamp',
+    f_id                bigint(20) unsigned not null auto_increment comment 'primary key ID',
+    f_name              varchar(20)         not null default '' comment 'base currency',
+    f_display_name      varchar(200)         not null default '' comment 'display currency',
+    f_code              int(2)         not null default '' comment 'quote currency',
+    f_status            int(2)              not null default 0 comment '1 上线， 0 已经下线',
+    f_exchange          int(2)         not null default 0 comment '1 可以交易， 0 停止交易',
+    f_created_at        bigint(20) unsigned not null default '0' comment 'created timestamp',
+    f_updated_at        bigint(20) unsigned not null default '0' comment 'update timestamp',
     primary key (f_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = UTF8MB4 COMMENT ='币种信息';
