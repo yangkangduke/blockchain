@@ -22,7 +22,7 @@ create table t_currency
     f_id                bigint(20) unsigned not null auto_increment comment 'primary key ID',
     f_name              varchar(20)         not null default '' comment 'base currency',
     f_display_name      varchar(200)         not null default '' comment 'display currency',
-    f_code              int(2)         not null default '' comment 'quote currency',
+    f_code              int(2)         not null default 0 comment 'quote currency',
     f_status            int(2)              not null default 0 comment '1 上线， 0 已经下线',
     f_exchange          int(2)         not null default 0 comment '1 可以交易， 0 停止交易',
     f_created_at        bigint(20) unsigned not null default '0' comment 'created timestamp',
