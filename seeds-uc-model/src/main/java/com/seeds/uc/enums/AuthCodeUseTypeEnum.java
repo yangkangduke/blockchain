@@ -1,5 +1,6 @@
 package com.seeds.uc.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
@@ -188,6 +189,7 @@ public enum AuthCodeUseTypeEnum {
     public static final Set<AuthCodeUseTypeEnum> STRATEGY_VERIFY_IGNORE =
             EnumSet.of(VERIFY_SETTING_POLICY_BIND_PHONE, VERIFY_SETTING_POLICY_BIND_EMAIL, VERIFY_SETTING_POLICY_BIND_GA);
     @JsonValue
+    @EnumValue
     private final String code;
     private final String desc;
     private final String descCn;

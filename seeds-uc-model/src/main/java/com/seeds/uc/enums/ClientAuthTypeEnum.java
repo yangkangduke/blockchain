@@ -1,5 +1,6 @@
 package com.seeds.uc.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.seeds.common.exception.SeedsException;
@@ -31,6 +32,7 @@ public enum ClientAuthTypeEnum {
 
     public static Set<ClientAuthTypeEnum> NEED_SEND_CODE = EnumSet.of(PHONE, EMAIL);
     @JsonValue
+    @EnumValue
     private final Short code;
     private final String desc;
 

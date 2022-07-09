@@ -4,11 +4,10 @@
 jdk 1.8
 spring cloud version: 2021.0.3 
 spring boot version: 2.7.1
-mybatis
-mybatis plus ??? 
+mybatis plus version: 3.5.1
 
 ## cache: 
-redis
+redis version: 3.x
 
 ## message bus:
 kafka

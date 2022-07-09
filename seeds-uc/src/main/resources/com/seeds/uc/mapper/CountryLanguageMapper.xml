@@ -9,8 +9,7 @@
         -->
         <id column="f_id" jdbcType="BIGINT" property="id"/>
         <result column="f_area_code" jdbcType="VARCHAR" property="areaCode"/>
-        <result column="f_language" jdbcType="VARCHAR" property="language"
-                typeHandler="com.seeds.common.enums.handler.LanguageHandler"/>
+        <result column="f_language" jdbcType="VARCHAR" property="language"/>
         <result column="f_created_at" jdbcType="BIGINT" property="createdAt"/>
         <result column="f_updated_at" jdbcType="BIGINT" property="updatedAt"/>
     </resultMap>

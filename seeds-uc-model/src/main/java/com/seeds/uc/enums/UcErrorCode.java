@@ -1,5 +1,6 @@
 package com.seeds.uc.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
@@ -66,6 +67,7 @@ public enum UcErrorCode {
     ;
 
     @JsonValue
+    @EnumValue
     private Integer code;
     private String desc;
     private String descEn;

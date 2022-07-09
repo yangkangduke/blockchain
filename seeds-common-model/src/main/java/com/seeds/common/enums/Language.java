@@ -1,5 +1,6 @@
 package com.seeds.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.seeds.common.exception.SeedsException;
@@ -20,6 +21,7 @@ public enum Language {
     ;
 
     @JsonValue
+    @EnumValue
     private String code;
     private String desc;
     private String descCn;

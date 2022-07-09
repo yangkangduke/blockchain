@@ -13,9 +13,6 @@ management:
     web:
       base-path: /
 
-mybatis:
-  type-aliases-package*: com.seeds.uc.model
-
 uc:
   sso:
     redis:

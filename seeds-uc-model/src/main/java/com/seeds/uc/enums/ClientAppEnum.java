@@ -1,5 +1,6 @@
 package com.seeds.uc.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.seeds.common.exception.SeedsException;
@@ -19,6 +20,7 @@ public enum ClientAppEnum {
     ;
 
     @JsonValue
+    @EnumValue
     private Short code;
     private String desc;
     private String descCn;

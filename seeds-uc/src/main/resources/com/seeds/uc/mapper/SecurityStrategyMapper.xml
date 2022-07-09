@@ -10,8 +10,7 @@
         <id column="f_id" jdbcType="BIGINT" property="id"/>
         <result column="f_uid" jdbcType="BIGINT" property="uid"/>
         <result column="f_need_auth" jdbcType="TINYINT" property="needAuth"/>
-        <result column="f_auth_type" jdbcType="SMALLINT" property="authType"
-                typeHandler="com.seeds.uc.enums.handler.ClientAuthTypeHandler"/>
+        <result column="f_auth_type" jdbcType="SMALLINT" property="authType"/>
         <result column="f_created_at" jdbcType="BIGINT" property="createdAt"/>
         <result column="f_updated_at" jdbcType="BIGINT" property="updatedAt"/>
     </resultMap>

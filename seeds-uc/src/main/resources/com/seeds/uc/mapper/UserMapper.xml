@@ -9,10 +9,8 @@
         -->
         <id column="f_id" jdbcType="BIGINT" property="id"/>
         <result column="f_password" jdbcType="VARCHAR" property="password"/>
-        <result column="f_state" jdbcType="SMALLINT" property="state"
-                typeHandler="com.seeds.uc.enums.handler.ClientStateEnumHandler"/>
-        <result column="f_type" jdbcType="SMALLINT" property="type"
-                typeHandler="com.seeds.uc.enums.handler.ClientTypeEnumHandler"/>
+        <result column="f_state" jdbcType="SMALLINT" property="state"/>
+        <result column="f_type" jdbcType="SMALLINT" property="type"/>
         <result column="f_country_code" jdbcType="VARCHAR" property="countryCode"/>
         <result column="f_nationality" jdbcType="VARCHAR" property="nationality"/>
         <result column="f_phone" jdbcType="VARCHAR" property="phone"/>
