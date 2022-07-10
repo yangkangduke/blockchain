@@ -6,7 +6,8 @@ spring:
     active: local
   mvc:
     pathmatch:
-      matching-strategy: ANT_PATH_MATCHER
+      matching-strategy: ant_path_matcher
+
 
 management:
   endpoints:
@@ -23,4 +24,7 @@ file:
   store:
     location: /seeds-uc/files/
 
-
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true

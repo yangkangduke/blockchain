@@ -14,8 +14,6 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <!--swagger-->
-        <openapi.version>1.4.0</openapi.version>
     </properties>
 
     <dependencies>
@@ -61,9 +59,12 @@
         </dependency>
         <!--swagger-->
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-            <version>${openapi.version}</version>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
         </dependency>
     </dependencies>
 

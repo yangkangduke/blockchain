@@ -5,6 +5,8 @@ import com.seeds.uc.dto.CountryDto;
 import com.seeds.uc.dto.mapstruct.CountryDtoMapper;
 import com.seeds.uc.mapper.CountryMapper;
 import com.seeds.uc.model.Country;
+import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
+@Api(tags = "商品信息管理接口")
 @RequestMapping("/uc-public/")
 public class PublicDataController {
     @Autowired
@@ -29,6 +32,7 @@ public class PublicDataController {
     private CountryDtoMapper countryDtoMapper;
 
     @GetMapping("country/list")
+    @Operation(summary = "单个商品详情")
     public GenericDto<List<CountryDto>> getCountryList() {
         List<Country> countries = countryMapper.selectAll();
         return GenericDto.success(countryDtoMapper.countryToDto(countries));
