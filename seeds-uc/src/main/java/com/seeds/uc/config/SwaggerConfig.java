@@ -44,10 +44,10 @@ public class SwaggerConfig {
     @Bean
     public ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Swagger Test App Restful API")
-                .description("swagger test app restful api")
-                .termsOfServiceUrl("https://github.com/geekxingyun")
-                .contact(new Contact("技术宅星云","https://xingyun.blog.csdn.net","fairy_xingyun@hotmail.com"))
+                .title("seeds Restful API")
+                .description("swagger seeds app restful api")
+                .termsOfServiceUrl("xxx")
+                .contact(new Contact("yk","xx","819628513@qq.com"))
                 .version("1.0")
                 .build();
     }
