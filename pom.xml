@@ -26,6 +26,8 @@
         <spring-cloud.version>2021.0.3</spring-cloud.version>
         <commons-lang.version>2.6</commons-lang.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
+        <swagger.version>3.0.0</swagger.version>
+        <knife4j.version>3.0.2</knife4j.version>
     </properties>
 
     <groupId>com.seeds</groupId>
@@ -71,6 +73,17 @@
                 <artifactId>commons-lang</artifactId>
                 <version>${commons-lang.version}</version>
                 <scope>compile</scope>
+            </dependency>
+            <!--swagger-->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-boot-starter</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

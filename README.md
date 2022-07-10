@@ -15,3 +15,7 @@ kafka
 ## database
 mysql8.0
 
+## swagger
+swagger3.0
+访问地址：http://ip:port/项目名/swagger-ui/index.html
+增强版本：http://ip:port/项目名/doc.html
