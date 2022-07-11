@@ -16,7 +16,6 @@ create table t_symbol(
   insert into `t_symbol` (f_base_currency,f_quote_currency,f_status,f_exchange) values ('kLTC','kUSD',1,1);
   insert into `t_symbol` (f_base_currency,f_quote_currency,f_status,f_exchange) values ('kEOS','kUSD',1,1);
 
-
 create table t_currency
 (
     f_id                bigint(20) unsigned not null auto_increment comment 'primary key ID',
@@ -30,3 +29,4 @@ create table t_currency
     primary key (f_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = UTF8MB4 COMMENT ='币种信息';
+
