@@ -6,14 +6,10 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: seeds-uc
-          uri: http://192.168.1.6:10103/
+        - id: seeds-uc-public-service
+          uri: http://192.168.31.70:10103/
           predicates:
-            - Path=/seeds-uc/**
-          filters:
-            - SwaggerHeaderFilter
-      loadbalancer:
-        use404: true
+            - Path=/uc-public/**
       globalcors:
         cors-configurations:
           '[/**]':
@@ -25,6 +21,7 @@ spring:
               - PUT
               - POST
       default-filters:
+        - StripPrefix=1
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
         - AddResponseHeader=Access-Control-Allow-Credentials, true
         - AddResponseHeader=Access-Control-Allow-Origin, *

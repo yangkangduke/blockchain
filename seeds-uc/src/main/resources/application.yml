@@ -1,7 +1,6 @@
 server:
   port: 10103
-  servlet:
-    context-path: /seeds-uc
+
 
 spring:
   profiles:
