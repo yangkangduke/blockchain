@@ -7,6 +7,11 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+/**
+ * @author yk
+ * @email 819628513@qq.com
+ * @date 2022/07/09
+ */
 @Component
 public class SwaggerHeaderFilter extends AbstractGatewayFilterFactory {
     private static final String HEADER_NAME = "X-Forwarded-Prefix";

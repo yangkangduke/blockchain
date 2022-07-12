@@ -13,6 +13,12 @@ import springfox.documentation.swagger.web.SwaggerResourcesProvider;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author yk
+ * @email 819628513@qq.com
+ * @date 2022/07/09
+ */
+
 @Slf4j
 @Component
 @Primary
