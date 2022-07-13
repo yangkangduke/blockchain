@@ -1,5 +1,7 @@
 package com.seeds.gateway.service;
 
+import com.seeds.admin.constant.AdminRedisKeys;
+import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.uc.constant.UcRedisKeys;
 import com.seeds.uc.dto.redis.LoginUser;
 import lombok.extern.slf4j.Slf4j;
@@ -18,4 +20,7 @@ public class AuthService {
         return redissonClient.<LoginUser>getBucket(UcRedisKeys.getUcTokenKey(token)).get();
     }
 
+    public LoginAdminUser verifyAdmin(String token) {
+        return redissonClient.<LoginAdminUser>getBucket(AdminRedisKeys.getAdminUserTokenKey(token)).get();
+    }
 }
