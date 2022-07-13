@@ -28,6 +28,7 @@
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <swagger.version>3.0.0</swagger.version>
         <knife4j.version>3.0.2</knife4j.version>
+        <email.version>1.5</email.version>
     </properties>
 
     <groupId>com.seeds</groupId>
@@ -39,6 +40,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-email</artifactId>
+                <version>${email.version}</version>
+            </dependency>
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>

@@ -9,12 +9,8 @@ import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCode;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.service.*;
-import com.seeds.uc.service.CacheService;
-import com.seeds.uc.service.RiskControlService;
-import com.seeds.uc.service.SendCodeService;
-import com.seeds.uc.service.UserLanguageService;
+import com.seeds.uc.util.EMailUtil;
 import com.seeds.uc.util.RandomUtil;
-import com.seeds.uc.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,11 +112,7 @@ public class SendCodeServiceImpl implements SendCodeService {
         // generate a random code
         String otp = RandomUtil.getRandom6DigitsOTP();
 
-
-        Language language = languageService.getLanguage();
-
-        // TODO 发送邮件失败的处理
-        doSendEmailCode(address, otp, language, useTypeEnum);
+        EMailUtil.send(address, otp);
 
         // store the auth code in auth code bucket
         cacheService.putAuthCode(
