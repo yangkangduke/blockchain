@@ -1,11 +1,11 @@
-package com.seeds.admin.controller;
+package com.seeds.admin.web.sys.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.seeds.admin.dto.SysAdminUserDto;
-import com.seeds.admin.dto.request.AdminUserQuery;
-import com.seeds.admin.entity.SysAdminUserEntity;
+import com.seeds.admin.dto.response.SysAdminUserResp;
+import com.seeds.admin.dto.request.AdminUserReq;
+import com.seeds.admin.entity.sys.SysAdminUserEntity;
 import com.seeds.admin.enums.AdminErrorCode;
-import com.seeds.admin.service.SysAdminUserService;
+import com.seeds.admin.web.sys.service.SysAdminUserService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -30,13 +30,13 @@ public class AdminUserController {
 
     @PostMapping("page")
     @ApiOperation("分页")
-    public GenericDto<IPage<SysAdminUserDto>> queryPage(@RequestBody AdminUserQuery query){
+    public GenericDto<IPage<SysAdminUserResp>> queryPage(@RequestBody AdminUserReq query){
         return GenericDto.success(sysAdminUserService.queryPage(query));
     }
 
     @PostMapping("add")
     @ApiOperation("添加")
-    public GenericDto<SysAdminUserDto> add(@RequestBody SysAdminUserDto user){
+    public GenericDto<SysAdminUserResp> add(@RequestBody SysAdminUserResp user){
         if (StringUtils.isEmpty(user.getMobile()) && StringUtils.isEmpty(user.getAccount())) {
             return GenericDto.failure(AdminErrorCode.ERR_504_MISSING_ARGUMENTS.getDesc(), AdminErrorCode.ERR_504_MISSING_ARGUMENTS.getCode(), null);
         }

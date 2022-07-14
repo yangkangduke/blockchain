@@ -15,33 +15,36 @@ import java.util.Date;
  */
 @Component
 public class FieldMetaObjectHandler implements MetaObjectHandler {
-    private final static String CREATE_DATE = "createDate";
-    private final static String CREATOR = "creator";
-    private final static String UPDATE_DATE = "updateDate";
-    private final static String UPDATER = "updater";
+    private final static String CREATE_DATE = "createdAt";
+    private final static String CREATOR = "createdBy";
+    private final static String UPDATE_DATE = "updatedAt";
+    private final static String UPDATER = "updatedBy";
 
     @Override
     public void insertFill(MetaObject metaObject) {
         Long adminUserId = UserContext.getCurrentAdminUserId();
         Date date = new Date();
+        long time = date.getTime();
 
         //创建者
         strictInsertFill(metaObject, CREATOR, Long.class, adminUserId);
         //创建时间
-        strictInsertFill(metaObject, CREATE_DATE, Date.class, date);
+        strictInsertFill(metaObject, CREATE_DATE, Long.class, time);
         //更新者
         strictInsertFill(metaObject, UPDATER, Long.class, adminUserId);
         //更新时间
-        strictInsertFill(metaObject, UPDATE_DATE, Date.class, date);
+        strictInsertFill(metaObject, UPDATE_DATE, Long.class, time);
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
         Long adminUserId = UserContext.getCurrentAdminUserId();
+        Date date = new Date();
+        long time = date.getTime();
 
         //更新者
         strictUpdateFill(metaObject, UPDATER, Long.class, adminUserId);
         //更新时间
-        strictUpdateFill(metaObject, UPDATE_DATE, Date.class, new Date());
+        strictUpdateFill(metaObject, UPDATE_DATE, Long.class, time);
     }
 }

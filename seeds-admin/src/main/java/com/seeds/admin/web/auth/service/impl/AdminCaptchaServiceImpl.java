@@ -1,7 +1,7 @@
-package com.seeds.admin.service.impl;
+package com.seeds.admin.web.auth.service.impl;
 
-import com.seeds.admin.service.AdminCacheService;
-import com.seeds.admin.service.AdminCaptchaService;
+import com.seeds.admin.web.auth.service.AdminCacheService;
+import com.seeds.admin.web.auth.service.AdminCaptchaService;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 import org.springframework.beans.factory.annotation.Autowired;

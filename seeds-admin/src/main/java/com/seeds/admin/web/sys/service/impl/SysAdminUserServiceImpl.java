@@ -1,14 +1,14 @@
-package com.seeds.admin.service.impl;
+package com.seeds.admin.web.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.admin.dto.SysAdminUserDto;
-import com.seeds.admin.dto.request.AdminUserQuery;
-import com.seeds.admin.mapper.SysAdminUserMapper;
-import com.seeds.admin.entity.SysAdminUserEntity;
-import com.seeds.admin.service.SysAdminUserService;
+import com.seeds.admin.dto.response.SysAdminUserResp;
+import com.seeds.admin.dto.request.AdminUserReq;
+import com.seeds.admin.web.sys.mapper.SysAdminUserMapper;
+import com.seeds.admin.entity.sys.SysAdminUserEntity;
+import com.seeds.admin.web.sys.service.SysAdminUserService;
 import com.seeds.admin.utils.HashUtil;
 import com.seeds.admin.utils.RandomUtil;
 import org.springframework.beans.BeanUtils;
@@ -43,9 +43,9 @@ public class SysAdminUserServiceImpl extends ServiceImpl<SysAdminUserMapper, Sys
     }
 
     @Override
-    public SysAdminUserDto queryDtoById(Long userId) {
+    public SysAdminUserResp queryDtoById(Long userId) {
         SysAdminUserEntity adminUser = getById(userId);
-        SysAdminUserDto dto = new SysAdminUserDto();
+        SysAdminUserResp dto = new SysAdminUserResp();
         if (adminUser != null) {
             BeanUtils.copyProperties(adminUser, dto);
         }
@@ -58,7 +58,7 @@ public class SysAdminUserServiceImpl extends ServiceImpl<SysAdminUserMapper, Sys
     }
 
     @Override
-    public IPage<SysAdminUserDto> queryPage(AdminUserQuery query) {
+    public IPage<SysAdminUserResp> queryPage(AdminUserReq query) {
         QueryWrapper<SysAdminUserEntity> queryWrap = new QueryWrapper<>();
         queryWrap.eq("real_name", query.getNameOrMobile()).or().eq("mobile", query.getNameOrMobile());
         // todo 用户类型
@@ -69,14 +69,14 @@ public class SysAdminUserServiceImpl extends ServiceImpl<SysAdminUserMapper, Sys
             return page.convert(p -> null);
         }
         return page.convert(p -> {
-            SysAdminUserDto dto = new SysAdminUserDto();
+            SysAdminUserResp dto = new SysAdminUserResp();
             BeanUtils.copyProperties(p, dto);
             return dto;
         });
     }
 
     @Override
-    public SysAdminUserDto add(SysAdminUserDto user) {
+    public SysAdminUserResp add(SysAdminUserResp user) {
         SysAdminUserEntity adminUser = new SysAdminUserEntity();
         BeanUtils.copyProperties(user, adminUser);
         String salt = RandomUtil.getRandomSalt();

@@ -1,8 +1,8 @@
-package com.seeds.admin.service.impl;
+package com.seeds.admin.web.auth.service.impl;
 
 import com.seeds.admin.constant.AdminRedisKeys;
 import com.seeds.admin.dto.redis.LoginAdminUser;
-import com.seeds.admin.service.AdminCacheService;
+import com.seeds.admin.web.auth.service.AdminCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;

@@ -1,7 +1,8 @@
-package com.seeds.admin.entity;
+package com.seeds.admin.entity.sys;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.seeds.admin.entity.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,7 +16,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 @TableName("sys_user")
 public class SysAdminUserEntity extends BaseEntity {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 用户名

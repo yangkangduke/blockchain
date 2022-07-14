@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(value = "分页请求入参")
-public class PageQuery {
+public class PageReq {
 
     @ApiModelProperty(value = "当前页码")
     private Integer current;

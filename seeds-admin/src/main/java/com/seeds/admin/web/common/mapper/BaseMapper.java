@@ -1,4 +1,4 @@
-package com.seeds.admin.mapper;
+package com.seeds.admin.web.common.mapper;
 
 /**
  * 基础Dao

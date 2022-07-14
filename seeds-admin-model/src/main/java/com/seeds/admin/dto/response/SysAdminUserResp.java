@@ -1,4 +1,4 @@
-package com.seeds.admin.dto;
+package com.seeds.admin.dto.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,7 +12,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel(value = "系统用户信息")
-public class SysAdminUserDto {
+public class SysAdminUserResp {
 
 	/**
 	 * 用户名

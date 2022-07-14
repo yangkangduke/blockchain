@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel(value = "用户列表请求入参")
-public class AdminUserQuery extends PageQuery {
+public class AdminUserReq extends PageReq {
 
     @ApiModelProperty(value = "姓名/手机号")
     private String nameOrMobile;

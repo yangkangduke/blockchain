@@ -1,4 +1,4 @@
-package com.seeds.admin.service;
+package com.seeds.admin.web.auth.service;
 
 import com.seeds.admin.dto.redis.LoginAdminUser;
 

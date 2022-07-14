@@ -1,9 +1,9 @@
-package com.seeds.admin.service;
+package com.seeds.admin.web.sys.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.seeds.admin.dto.SysAdminUserDto;
-import com.seeds.admin.dto.request.AdminUserQuery;
-import com.seeds.admin.entity.SysAdminUserEntity;
+import com.seeds.admin.dto.response.SysAdminUserResp;
+import com.seeds.admin.dto.request.AdminUserReq;
+import com.seeds.admin.entity.sys.SysAdminUserEntity;
 
 /**
  * 系统用户
@@ -32,7 +32,7 @@ public interface SysAdminUserService {
      * @param userId 用户id
      * @return 系统用户信息
      */
-    SysAdminUserDto queryDtoById(Long userId);
+    SysAdminUserResp queryDtoById(Long userId);
 
     /**
      * 通过id查询系统用户
@@ -46,14 +46,14 @@ public interface SysAdminUserService {
      * @param query 查询条件
      * @return 系统用户信息
      */
-    IPage<SysAdminUserDto> queryPage(AdminUserQuery query);
+    IPage<SysAdminUserResp> queryPage(AdminUserReq query);
 
     /**
      * 添加系统用户
      * @param user 用户信息
      * @return 系统用户信息
      */
-    SysAdminUserDto add(SysAdminUserDto user);
+    SysAdminUserResp add(SysAdminUserResp user);
 
     /**
      * 修改密码

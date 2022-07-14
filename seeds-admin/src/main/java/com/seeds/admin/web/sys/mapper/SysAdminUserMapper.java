@@ -1,7 +1,7 @@
-package com.seeds.admin.mapper;
+package com.seeds.admin.web.sys.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.seeds.admin.entity.SysAdminUserEntity;
+import com.seeds.admin.entity.sys.SysAdminUserEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

@@ -1,18 +1,18 @@
-package com.seeds.admin.controller;
+package com.seeds.admin.web.auth.controller;
 
 import com.seeds.admin.constant.AdminRedisKeys;
-import com.seeds.admin.dto.SysAdminUserDto;
+import com.seeds.admin.dto.response.SysAdminUserResp;
 import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.admin.dto.request.AdminLoginReq;
 import com.seeds.admin.dto.request.AdminPasswordReq;
 import com.seeds.admin.dto.response.AdminLoginResp;
-import com.seeds.admin.entity.SysAdminUserEntity;
+import com.seeds.admin.entity.sys.SysAdminUserEntity;
 import com.seeds.admin.enums.AdminAuthTypeEnum;
 import com.seeds.admin.enums.AdminErrorCode;
 import com.seeds.admin.enums.AdminUserStatusEnum;
-import com.seeds.admin.service.AdminCacheService;
-import com.seeds.admin.service.AdminCaptchaService;
-import com.seeds.admin.service.SysAdminUserService;
+import com.seeds.admin.web.auth.service.AdminCacheService;
+import com.seeds.admin.web.auth.service.AdminCaptchaService;
+import com.seeds.admin.web.sys.service.SysAdminUserService;
 import com.seeds.admin.utils.HashUtil;
 import com.seeds.admin.utils.RandomUtil;
 import com.seeds.common.dto.GenericDto;
@@ -179,7 +179,7 @@ public class AdminAuthController {
 
     @GetMapping("userInfo")
     @ApiOperation(value = "登录用户信息")
-    public GenericDto<SysAdminUserDto> getUserInfo() {
+    public GenericDto<SysAdminUserResp> getUserInfo() {
         Long userId = UserContext.getCurrentAdminUserId();
         return GenericDto.success(sysAdminUserService.queryDtoById(userId));
     }

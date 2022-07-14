@@ -1,4 +1,4 @@
-package com.seeds.admin.service;
+package com.seeds.admin.web.auth.service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
