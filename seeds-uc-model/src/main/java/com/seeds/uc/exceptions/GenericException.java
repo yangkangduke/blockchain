@@ -17,7 +17,7 @@ public class GenericException extends RuntimeException {
     }
 
     public GenericException(UcErrorCode errorCode) {
-        super(errorCode.getDesc());
+        super(errorCode.getDescEn());
         this.errorCode = errorCode;
     }
 }

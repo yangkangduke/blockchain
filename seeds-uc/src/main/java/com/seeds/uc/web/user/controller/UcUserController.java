@@ -13,10 +13,10 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -58,9 +58,9 @@ public class UcUserController {
     @GetMapping("/register/account/verify")
     @ApiOperation(value = "账号重复性校验", notes = "账号重复性校验")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "account", value = "注册的邮箱账号", required = false),
+            @ApiImplicitParam(name = "account", value = "注册的邮箱账号", required = true),
     })
-    public GenericDto<Boolean> accountVerify(@Validated @NotBlank String account) {
+    public GenericDto<Boolean> accountVerify( @Valid @NotBlank @Email String account) {
         return GenericDto.success(iUcUserService.accountVerify(account));
     }
 
@@ -69,7 +69,7 @@ public class UcUserController {
      */
     @PostMapping("/register/createAccount")
     @ApiOperation(value = "注册用户", notes = "注册用户")
-    public GenericDto<LoginResp> createAccount(@RequestBody RegisterReq registerReq) {
+    public GenericDto<LoginResp> createAccount(@Valid @RequestBody RegisterReq registerReq) {
         return GenericDto.success(iUcUserService.createAccount(registerReq));
     }
 
@@ -96,7 +96,7 @@ public class UcUserController {
      */
     @PostMapping("/login/toEmailAccount")
     @ApiOperation(value = "登陆", notes = "登陆")
-    public GenericDto<LoginResp> login(@RequestBody LoginReq loginReq) {
+    public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
         return GenericDto.success(iUcUserService.login(loginReq));
     }
 

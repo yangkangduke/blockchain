@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -17,6 +18,7 @@ public class RegisterReq {
 
     @ApiModelProperty(value = "登陆账号", required = true)
     @NotBlank
+    @Email
     private String account;
     @ApiModelProperty(value = "密码", required = true)
     @NotBlank
