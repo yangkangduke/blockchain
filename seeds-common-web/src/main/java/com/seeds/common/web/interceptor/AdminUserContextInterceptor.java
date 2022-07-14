@@ -19,24 +19,25 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-public class UserContextInterceptor implements HandlerInterceptor {
+public class AdminUserContextInterceptor implements HandlerInterceptor {
 
     @Autowired
     private MappingJackson2HttpMessageConverter converter;
 
     private static final GenericDto<String> INVALID_TOKEN_RESPONSE = GenericDto.failure("Invalid token", 401);
 
+    @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String userIdStr = request.getHeader(HttpHeaders.INTERNAL_USER_ID);
+        String userIdStr = request.getHeader(HttpHeaders.ADMIN_USER_ID);
         if (StringUtils.isEmpty(userIdStr)) {
             writeFailureResponse(response);
             return false;
         }
         try {
-            UserContext.setCurrentUserId(Long.valueOf(userIdStr));
+            UserContext.setCurrentAdminUserId(Long.valueOf(userIdStr));
             return true;
         } catch (Exception e) {
-            log.error("Got invalid user id from header: {}", userIdStr);
+            log.error("Got admin user id from header: {}", userIdStr);
             writeFailureResponse(response);
             return false;
         }
@@ -50,9 +51,10 @@ public class UserContextInterceptor implements HandlerInterceptor {
         }
     }
 
+    @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
         log.debug("remove user context");
-        UserContext.removeCurrentUserId();
+        UserContext.removeCurrentAdminUserId();
     }
 
 }

@@ -1,0 +1,33 @@
+server:
+  port: 10105
+
+spring:
+  profiles:
+    active: local
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+
+management:
+  endpoints:
+    web:
+      base-path: /
+
+mybatis:
+  type-aliases-package*: com.seeds.admin.model
+
+admin:
+  sso:
+    redis:
+      keyExpireAfter: 259200
+
+# admin 文件存储目录
+file:
+  store:
+    location: /seeds-admin/files/
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
