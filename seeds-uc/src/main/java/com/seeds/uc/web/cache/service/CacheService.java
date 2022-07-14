@@ -3,6 +3,7 @@ package com.seeds.uc.web.cache.service;
 
 import com.seeds.uc.model.cache.constant.UcRedisKeys;
 import com.seeds.uc.model.cache.dto.AuthCode;
+import com.seeds.uc.model.cache.dto.AuthToken;
 import com.seeds.uc.model.cache.dto.LoginUser;
 import com.seeds.uc.model.send.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.model.user.enums.ClientAuthTypeEnum;
@@ -106,4 +107,25 @@ public class CacheService {
         RBucket<AuthCode> authCodeDtoRBucket = redisson.getBucket(key);
         return authCodeDtoRBucket.get();
     }
+
+    /**
+     * will insert once a auth type is verified and return a token
+     */
+    public void putAuthToken(String token,
+                             String secret,
+                             String accountName,
+                             ClientAuthTypeEnum authTypeEnum) {
+        Long expireAt = System.currentTimeMillis() + authTokenExpireAfter * 1000;
+        String key = UcRedisKeys.getUcAuthTokenKeyTemplate(token, authTypeEnum);
+        RBucket<AuthToken> authTokenRBucket = redisson.getBucket(key);
+        AuthToken authToken =
+                AuthToken.builder()
+                        .accountName(accountName)
+                        .secret(secret)
+                        .expireAt(expireAt)
+                        .build();
+        authTokenRBucket.set(authToken, authTokenExpireAfter, TimeUnit.SECONDS);
+        log.info("CacheService - putAuthToken - put key: {}, value: {}", key, authToken);
+    }
+
 }

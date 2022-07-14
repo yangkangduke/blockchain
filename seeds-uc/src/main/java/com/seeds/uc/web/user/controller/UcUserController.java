@@ -2,8 +2,9 @@ package com.seeds.uc.web.user.controller;
 
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.model.send.dto.request.BndEmailReq;
 import com.seeds.uc.model.send.dto.request.EmailCodeSendReq;
-import com.seeds.uc.model.send.dto.request.EmailCodeVerifyReq;
+import com.seeds.uc.model.user.dto.request.LoginReq;
 import com.seeds.uc.model.user.dto.request.RegisterReq;
 import com.seeds.uc.model.user.dto.response.LoginResp;
 import com.seeds.uc.web.user.service.IUcUserService;
@@ -36,21 +37,19 @@ public class UcUserController {
     /**
      * 发送邮箱验证码
      */
-    @PostMapping("/register/email-code/send")
+    @PostMapping("/bindEmail/emailCode/send")
     @ApiOperation(value = "发送邮箱验证码", notes = "发送邮箱验证码")
-    public GenericDto<Object> sendEmailCode(@Valid @RequestBody EmailCodeSendReq sendReq) {
-        iUcUserService.sendEmailCode(sendReq);
-        return GenericDto.success(null);
+    public GenericDto<Boolean> sendEmailCode(@Valid @RequestBody EmailCodeSendReq sendReq) {
+        return GenericDto.success(iUcUserService.sendEmailCode(sendReq));
     }
 
     /**
-     * 邮箱验证码校验
+     * 绑定邮箱
      */
-    @PostMapping("/register/email-code/verify")
-    @ApiOperation(value = "邮箱验证码校验", notes = "邮箱验证码校验")
-    public GenericDto<Object> verifyRegisterCode(@Valid @RequestBody EmailCodeVerifyReq verifyReq) {
-        iUcUserService.verifyRegisterCode(verifyReq);
-        return GenericDto.success(null);
+    @PostMapping("/bindEmail")
+    @ApiOperation(value = "绑定邮箱", notes = "绑定邮箱")
+    public GenericDto<Boolean> bindEmail(@Valid @RequestBody BndEmailReq bndEmailReq) {
+        return GenericDto.success(iUcUserService.bindEmail(bndEmailReq));
     }
 
     /**
@@ -59,7 +58,7 @@ public class UcUserController {
     @GetMapping("/register/account/verify")
     @ApiOperation(value = "账号重复性校验", notes = "账号重复性校验")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "account", value = "注册的邮箱账号" ,required = false),
+            @ApiImplicitParam(name = "account", value = "注册的邮箱账号", required = false),
     })
     public GenericDto<Boolean> accountVerify(@Validated @NotBlank String account) {
         return GenericDto.success(iUcUserService.accountVerify(account));
@@ -68,7 +67,7 @@ public class UcUserController {
     /**
      * 注册用户
      */
-    @PostMapping("/register/create-account")
+    @PostMapping("/register/createAccount")
     @ApiOperation(value = "注册用户", notes = "注册用户")
     public GenericDto<LoginResp> createAccount(@RequestBody RegisterReq registerReq) {
         return GenericDto.success(iUcUserService.createAccount(registerReq));
@@ -89,5 +88,16 @@ public class UcUserController {
     /**
      * metamask绑定账号
      */
+
+    /**
+     * 登陆
+     * @param loginReq
+     * @return
+     */
+    @PostMapping("/login/toEmailAccount")
+    @ApiOperation(value = "登陆", notes = "登陆")
+    public GenericDto<LoginResp> login(@RequestBody LoginReq loginReq) {
+        return GenericDto.success(iUcUserService.login(loginReq));
+    }
 
 }

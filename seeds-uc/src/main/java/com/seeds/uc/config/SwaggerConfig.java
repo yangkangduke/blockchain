@@ -39,6 +39,7 @@ import java.util.List;
 public class SwaggerConfig {
     /**
      * 配置基本信息
+     *
      * @return
      */
     @Bean
@@ -47,13 +48,14 @@ public class SwaggerConfig {
                 .title("seeds Restful API")
                 .description("swagger seeds app restful api")
                 .termsOfServiceUrl("xxx")
-                .contact(new Contact("yk","xx","819628513@qq.com"))
+                .contact(new Contact("yk", "xx", "819628513@qq.com"))
                 .version("1.0")
                 .build();
     }
 
     /**
      * 配置文档生成最佳实践
+     *
      * @param apiInfo
      * @return
      */
@@ -83,6 +85,7 @@ public class SwaggerConfig {
         boolean shouldRegisterLinksMapping = this.shouldRegisterLinksMapping(webEndpointProperties, environment, basePath);
         return new WebMvcEndpointHandlerMapping(endpointMapping, webEndpoints, endpointMediaTypes, corsProperties.toCorsConfiguration(), new EndpointLinksResolver(allEndpoints, basePath), shouldRegisterLinksMapping, null);
     }
+
     private boolean shouldRegisterLinksMapping(WebEndpointProperties webEndpointProperties, Environment environment, String basePath) {
         return webEndpointProperties.getDiscovery().isEnabled() && (StringUtils.hasText(basePath) || ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT));
     }

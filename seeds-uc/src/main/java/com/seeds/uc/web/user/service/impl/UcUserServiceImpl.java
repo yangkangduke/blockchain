@@ -4,8 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.model.cache.dto.AuthCode;
+import com.seeds.uc.model.send.dto.request.BndEmailReq;
 import com.seeds.uc.model.send.dto.request.EmailCodeSendReq;
-import com.seeds.uc.model.send.dto.request.EmailCodeVerifyReq;
+import com.seeds.uc.model.user.dto.request.LoginReq;
 import com.seeds.uc.model.user.dto.request.RegisterReq;
 import com.seeds.uc.model.user.dto.response.LoginResp;
 import com.seeds.uc.model.user.entity.UcUser;
@@ -22,6 +23,7 @@ import com.seeds.uc.web.user.service.IUcUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 /**
  * <p>
  * user table 服务实现类
@@ -44,10 +46,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @param sendReq
      */
     @Override
-    public void sendEmailCode(EmailCodeSendReq sendReq) {
+    public Boolean sendEmailCode(EmailCodeSendReq sendReq) {
         // todo 需要有登陆后的uctoken才能使用
         log.info("AuthController - sendEmailCode got request: {}", sendReq);
         sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
+
+        return true;
     }
 
     /**
@@ -56,7 +60,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @param verifyReq
      */
     @Override
-    public void verifyRegisterCode(EmailCodeVerifyReq verifyReq) {
+    public Boolean bindEmail(BndEmailReq verifyReq) {
         String email = verifyReq.getEmail();
         String code = verifyReq.getCode();
         AuthCode authCode = cacheService.getAuthCode(email, verifyReq.getUseType(), ClientAuthTypeEnum.EMAIL);
@@ -64,10 +68,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new GenericException(UcErrorCode.ERR_10033_WRONG_EMAIL_CODE);
         }
         // todo 需要添加数据到数据库
+        return true;
     }
 
     /**
      * 账号重复性校验
+     *
      * @param account
      * @return
      */
@@ -83,6 +89,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
     /**
      * 注册用户
+     *
      * @param registerReq
      * @return
      */
@@ -99,6 +106,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .password(password)
                 .createdAt(createTime)
                 .updatedAt(createTime)
+                .salt(salt)
                 .type(ClientTypeEnum.NORMAL)
                 .state(ClientStateEnum.NORMAL)
                 .build();
@@ -114,5 +122,32 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .build();
 
         return loginResp;
+    }
+
+    /**
+     * 登陆
+     * @param loginReq
+     * @return
+     */
+    @Override
+    public LoginResp login(LoginReq loginReq) {
+        String account = loginReq.getAccount();
+        UcUser ucUser = this.getOne(new QueryWrapper<UcUser>().lambda()
+                .eq(UcUser::getAccount, account));
+        if (ucUser == null) {
+            throw new GenericException("账号不存在");
+        }
+        String loginPassword = PasswordUtil.getPassword(loginReq.getPassword(), ucUser.getSalt());
+        if (!loginPassword.equals(ucUser.getPassword())) {
+            throw new GenericException(UcErrorCode.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT);
+        }
+        // 不需要2FA验证，直接下发uc token
+        String ucToken = RandomUtil.genRandomToken(ucUser.getId().toString());
+        // 将产生的uc token存入redis
+        cacheService.putUserWithTokenAndLoginName(ucToken, ucUser.getId(), account);
+
+        return LoginResp.builder()
+                .ucToken(ucToken)
+                .build();
     }
 }

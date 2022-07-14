@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @ApiModel(value = "邮箱验证码验证请求", description = "邮箱验证码验证请求")
-public class EmailCodeVerifyReq {
+public class BndEmailReq {
     @ApiModelProperty(value = "邮箱", required = true)
     @NotNull
     private String email;

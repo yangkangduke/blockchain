@@ -6,11 +6,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
- * @date 2020/7/25
+ * @author yk
+ * @email 819628513@qq.com
+ * @date 2022/07/13
  */
-@MapperScan({"com.seeds.uc.mapper","com.seeds.uc.web.*.mapper"})
+@MapperScan({"com.seeds.uc.mapper", "com.seeds.uc.web.*.mapper"})
 @EnableFeignClients(basePackages = "com.seeds")
 @SpringBootApplication(scanBasePackages = {"com.seeds"})
 public class UserCenterApplication {
