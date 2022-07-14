@@ -27,10 +27,10 @@ public class SysAdminUserDto {
 	private String realName;
 
 	/**
-	 * 新密码
+	 * 初始密码
 	 */
-	@ApiModelProperty("新密码")
-	private String newPassport;
+	@ApiModelProperty("初始密码")
+	private String initPassport;
 
 	/**
 	 * 头像

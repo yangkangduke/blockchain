@@ -29,6 +29,7 @@ public enum AdminErrorCode {
     ERR_10039_WRONG_GRAPHIC_AUTH_CODE(10039, "图形验证码错误", "graphic auth code wrong"),
     ERR_10051_PHONE_ALREADY_BEEN_USED(10051, "手机号已被使用", "phone number already been used"),
     ERR_10061_ACCOUNT_ALREADY_BEEN_USED(10061, "账号已存在，请更换账号", "account already existed, please change it"),
+    ERR_10043_WRONG_OLD_PASSWORD(10043, "原密码错误", "wrong old password"),
 
 
     ;

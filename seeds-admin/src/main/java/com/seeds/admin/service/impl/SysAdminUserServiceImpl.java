@@ -53,6 +53,11 @@ public class SysAdminUserServiceImpl extends ServiceImpl<SysAdminUserMapper, Sys
     }
 
     @Override
+    public SysAdminUserEntity queryById(Long userId) {
+        return getById(userId);
+    }
+
+    @Override
     public IPage<SysAdminUserDto> queryPage(AdminUserQuery query) {
         QueryWrapper<SysAdminUserEntity> queryWrap = new QueryWrapper<>();
         queryWrap.eq("real_name", query.getNameOrMobile()).or().eq("mobile", query.getNameOrMobile());
@@ -75,7 +80,7 @@ public class SysAdminUserServiceImpl extends ServiceImpl<SysAdminUserMapper, Sys
         SysAdminUserEntity adminUser = new SysAdminUserEntity();
         BeanUtils.copyProperties(user, adminUser);
         String salt = RandomUtil.getRandomSalt();
-        String password = HashUtil.sha256(user.getNewPassport() + salt);
+        String password = HashUtil.sha256(user.getInitPassport() + salt);
         adminUser.setPassword(password);
         adminUser.setSalt(salt);
         adminUser.setSuperAdmin(0);
@@ -83,5 +88,14 @@ public class SysAdminUserServiceImpl extends ServiceImpl<SysAdminUserMapper, Sys
         adminUser.setDeleteFlag(1);
         save(adminUser);
         return user;
+    }
+
+    @Override
+    public void updatePassword(SysAdminUserEntity adminUser, String newPassword) {
+        String salt = RandomUtil.getRandomSalt();
+        String password = HashUtil.sha256(newPassword + salt);
+        adminUser.setSalt(salt);
+        adminUser.setPassword(password);
+        updateById(adminUser);
     }
 }

@@ -4,6 +4,7 @@ import com.seeds.admin.constant.AdminRedisKeys;
 import com.seeds.admin.dto.SysAdminUserDto;
 import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.admin.dto.request.AdminLoginReq;
+import com.seeds.admin.dto.request.AdminPasswordReq;
 import com.seeds.admin.dto.response.AdminLoginResp;
 import com.seeds.admin.entity.SysAdminUserEntity;
 import com.seeds.admin.enums.AdminAuthTypeEnum;
@@ -21,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +47,9 @@ public class AdminAuthController {
 
     @Autowired
     private SysAdminUserService sysAdminUserService;
+
+    @Value("${admin.login.init.password:123456}")
+    private String initPassword;
 
     @PostMapping("/captcha")
     @ApiOperation(value = "生成图形验证码")
@@ -138,6 +143,37 @@ public class AdminAuthController {
     public GenericDto<Object> logout(HttpServletRequest request) {
         String token = request.getHeader(HttpHeaders.USER_TOKEN);
         adminCacheService.removeAdminUserByToken(token);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("changePassword")
+    @ApiOperation(value = "修改密码")
+    public GenericDto<Object> changePassword(HttpServletRequest request, AdminPasswordReq req) {
+        SysAdminUserEntity adminUser = sysAdminUserService.queryById(req.getUserId());
+        if (adminUser == null) {
+            return GenericDto.failure(AdminErrorCode.ERR_500_SYSTEM_BUSY.getDesc(), AdminErrorCode.ERR_500_SYSTEM_BUSY.getCode(), null);
+        }
+        String password = HashUtil.sha256(req.getOldPassword() + adminUser.getSalt());
+        if (!password.equals(adminUser.getPassword())) {
+            return GenericDto.failure(AdminErrorCode.ERR_10043_WRONG_OLD_PASSWORD.getDesc(), AdminErrorCode.ERR_10043_WRONG_OLD_PASSWORD.getCode(), null);
+        }
+        sysAdminUserService.updatePassword(adminUser, req.getNewPassword());
+        // 退出登录
+        logout(request);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("resetPassword")
+    @ApiOperation(value = "重置密码")
+    public GenericDto<Object> resetPassword(HttpServletRequest request) {
+        String userId = request.getHeader(HttpHeaders.ADMIN_USER_ID);
+        SysAdminUserEntity adminUser = sysAdminUserService.queryById(Long.valueOf(userId));
+        if (adminUser == null) {
+            return GenericDto.failure(AdminErrorCode.ERR_500_SYSTEM_BUSY.getDesc(), AdminErrorCode.ERR_500_SYSTEM_BUSY.getCode(), null);
+        }
+        sysAdminUserService.updatePassword(adminUser, initPassword);
+        // 退出登录
+        logout(request);
         return GenericDto.success(null);
     }
 

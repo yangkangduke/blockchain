@@ -35,6 +35,13 @@ public interface SysAdminUserService {
     SysAdminUserDto queryDtoById(Long userId);
 
     /**
+     * 通过id查询系统用户
+     * @param userId 用户id
+     * @return 系统用户信息
+     */
+    SysAdminUserEntity queryById(Long userId);
+
+    /**
      * 分页查询系统用户
      * @param query 查询条件
      * @return 系统用户信息
@@ -47,5 +54,12 @@ public interface SysAdminUserService {
      * @return 系统用户信息
      */
     SysAdminUserDto add(SysAdminUserDto user);
+
+    /**
+     * 修改密码
+     * @param adminUser 系统用户
+     * @param newPassword 新密码
+     */
+    void updatePassword(SysAdminUserEntity adminUser, String newPassword);
 
 }
