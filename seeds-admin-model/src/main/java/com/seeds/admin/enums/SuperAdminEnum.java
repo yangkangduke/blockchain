@@ -1,19 +1,19 @@
 package com.seeds.admin.enums;
 
 /**
- * 用户状态
+ * 超级管理员枚举
  *
  * @author hang.yu
- * @date 2022/7/13
+ * @since 2022/7/14
  */
-public enum AdminUserStatusEnum {
+public enum SuperAdminEnum {
 
-    DISABLE(0),
-    ENABLED(1);
+    YES(1),
+    NO(0);
 
     private int value;
 
-    AdminUserStatusEnum(int value) {
+    SuperAdminEnum(int value) {
         this.value = value;
     }
 

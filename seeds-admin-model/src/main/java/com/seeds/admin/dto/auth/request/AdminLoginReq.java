@@ -1,4 +1,4 @@
-package com.seeds.admin.dto.request;
+package com.seeds.admin.dto.auth.request;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -24,11 +24,11 @@ public class AdminLoginReq {
     private String mobile;
 
     @ApiModelProperty(value = "验证码")
-    @NotBlank(message = "验证码不能为空！")
+    @NotBlank(message = "Captcha cannot be empty")
     private String opt;
 
     @ApiModelProperty(value = "登录方式")
-    @NotBlank(message = "登录方式不能为空！")
+    @NotBlank(message = "Login method cannot be empty")
     private String authType;
 
 }

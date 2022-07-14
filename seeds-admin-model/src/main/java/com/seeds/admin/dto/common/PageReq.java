@@ -1,4 +1,4 @@
-package com.seeds.admin.dto.request;
+package com.seeds.admin.dto.common;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

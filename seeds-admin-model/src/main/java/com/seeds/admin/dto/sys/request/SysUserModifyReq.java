@@ -1,8 +1,10 @@
-package com.seeds.admin.dto.response;
+package com.seeds.admin.dto.sys.request;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * 系统用户
@@ -12,25 +14,20 @@ import lombok.Data;
  */
 @Data
 @ApiModel(value = "系统用户信息")
-public class SysAdminUserResp {
+public class SysUserModifyReq {
 
 	/**
-	 * 用户名
+	 * 用户编号
 	 */
-	@ApiModelProperty("用户名")
-	private String account;
+	@ApiModelProperty("用户编号")
+	@NotNull(message = "User id cannot be empty")
+	private Long id;
 
 	/**
 	 * 姓名
 	 */
 	@ApiModelProperty("姓名")
 	private String realName;
-
-	/**
-	 * 初始密码
-	 */
-	@ApiModelProperty("初始密码")
-	private String initPassport;
 
 	/**
 	 * 头像
@@ -61,23 +58,5 @@ public class SysAdminUserResp {
 	 */
 	@ApiModelProperty("部门ID")
 	private Long deptId;
-
-	/**
-	 * 超级管理员   0：否   1：是
-	 */
-	@ApiModelProperty("超级管理员   0：否   1：是")
-	private Integer superAdmin;
-
-	/**
-	 * 状态  0：停用   1：正常
-	 */
-	@ApiModelProperty("状态  0：停用   1：正常")
-	private Integer status;
-
-	/**
-	 * 删除标记  0：已删除   1：未删除
-	 */
-	@ApiModelProperty("删除标记  0：已删除   1：未删除")
-	private Integer deleteFlag;
 
 }
