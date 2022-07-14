@@ -2,17 +2,13 @@ package com.seeds.gateway.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.gateway.dto.ReactiveDto;
-import com.seeds.uc.constant.UcRedisKeys;
-import com.seeds.uc.dto.redis.LoginUser;
 import com.seeds.gateway.service.AuthService;
+import com.seeds.uc.model.cache.constant.UcRedisKeys;
+import com.seeds.uc.model.cache.dto.LoginUser;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.TimeUnit;

@@ -1,6 +1,5 @@
 package com.seeds.uc.util;
 
-import com.seeds.uc.constant.UcTestConstants;
 import lombok.extern.slf4j.Slf4j;
 
 import java.security.SecureRandom;
@@ -32,9 +31,9 @@ public class RandomUtil {
 
     // get random 6 digits OTP
     public static String getRandom6DigitsOTP() {
-//        int otp = SECURE_RANDOM.nextInt(999999);
-//        return String.format("%06d", otp);
-        return UcTestConstants.TEST_AUTH_CODE;
+        int otp = SECURE_RANDOM.nextInt(999999);
+        return String.format("%06d", otp);
+//        return UcTestConstants.TEST_AUTH_CODE;
     }
 
     // generate uuid

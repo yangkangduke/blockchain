@@ -31,6 +31,7 @@
         <swagger.version>3.0.0</swagger.version>
         <knife4j.version>3.0.2</knife4j.version>
         <email.version>1.5</email.version>
+        <hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
     </properties>
 
     <groupId>com.seeds</groupId>
@@ -42,6 +43,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate-validator.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-email</artifactId>

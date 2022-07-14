@@ -2,8 +2,8 @@ package com.seeds.gateway.service;
 
 import com.seeds.admin.constant.AdminRedisKeys;
 import com.seeds.admin.dto.redis.LoginAdminUser;
-import com.seeds.uc.constant.UcRedisKeys;
-import com.seeds.uc.dto.redis.LoginUser;
+import com.seeds.uc.model.cache.constant.UcRedisKeys;
+import com.seeds.uc.model.cache.dto.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;

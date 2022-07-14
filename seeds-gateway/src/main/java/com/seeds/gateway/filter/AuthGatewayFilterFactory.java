@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
-import com.seeds.uc.dto.redis.LoginUser;
+import com.seeds.uc.model.cache.dto.LoginUser;
 import com.seeds.gateway.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

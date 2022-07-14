@@ -1,6 +1,6 @@
 package com.seeds.uc.exceptions;
 
-import com.seeds.uc.enums.UcErrorCode;
+import com.seeds.uc.model.user.enums.UcErrorCode;
 import lombok.Getter;
 
 /**
