@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @author hang.yu
  * @date 2022/7/12
  */
-@MapperScan("com.seeds.admin.mapper")
+@MapperScan({"com.seeds.admin.mapper", "com.seeds.admin.web.*.mapper"})
 @EnableFeignClients(basePackages = "com.seeds")
 @SpringBootApplication(scanBasePackages = {"com.seeds"})
 public class AdminCenterApplication {

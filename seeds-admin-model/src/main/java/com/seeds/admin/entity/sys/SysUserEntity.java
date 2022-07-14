@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @TableName("sys_user")
-public class SysAdminUserEntity extends BaseEntity {
+public class SysUserEntity extends BaseEntity {
 
 	/**
 	 * 用户名

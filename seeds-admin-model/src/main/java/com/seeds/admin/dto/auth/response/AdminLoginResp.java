@@ -1,4 +1,4 @@
-package com.seeds.admin.dto.response;
+package com.seeds.admin.dto.auth.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

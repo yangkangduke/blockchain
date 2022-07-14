@@ -1,16 +1,16 @@
 package com.seeds.admin.web.sys.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.seeds.admin.entity.sys.SysAdminUserEntity;
+import com.seeds.admin.entity.sys.SysRoleUserEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 系统用户
+ * 系统角色用户
  *
  * @author hang.yu
- * @date 2022/7/13
+ * @date 2022/7/14
  */
 @Mapper
-public interface SysAdminUserMapper extends BaseMapper<SysAdminUserEntity> {
+public interface SysRoleUserMapper extends BaseMapper<SysRoleUserEntity> {
 
 }

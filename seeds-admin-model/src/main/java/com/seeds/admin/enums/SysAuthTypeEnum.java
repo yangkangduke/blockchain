@@ -8,7 +8,7 @@ import lombok.Getter;
  * @date 2022/7/13
  */
 @Getter
-public enum AdminAuthTypeEnum {
+public enum SysAuthTypeEnum {
 
     // 手机登录
     PHONE("1", "phone"),
@@ -19,12 +19,12 @@ public enum AdminAuthTypeEnum {
     private final String code;
     private final String desc;
 
-    AdminAuthTypeEnum(String code, String desc) {
+    SysAuthTypeEnum(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    public static AdminAuthTypeEnum from(String code) {
+    public static SysAuthTypeEnum from(String code) {
         switch (code) {
             case "1":
                 return PHONE;
