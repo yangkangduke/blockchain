@@ -1,4 +1,4 @@
-package com.seeds.uc.service;
+package com.seeds.uc.web.register.service;
 
 import com.seeds.uc.dto.request.EmailCodeSendReq;
 import com.seeds.uc.dto.request.EmailCodeVerifyReq;

@@ -1,9 +1,9 @@
-package com.seeds.uc.controller;
+package com.seeds.uc.web.register.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.request.EmailCodeSendReq;
 import com.seeds.uc.dto.request.EmailCodeVerifyReq;
-import com.seeds.uc.service.RegisterService;
+import com.seeds.uc.web.register.service.RegisterService;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

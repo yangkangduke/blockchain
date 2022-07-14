@@ -1,4 +1,4 @@
-package com.seeds.uc.web;
+package com.seeds.uc.config;
 
 import com.seeds.common.web.interceptor.UserContextInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;

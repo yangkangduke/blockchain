@@ -1,4 +1,4 @@
-package com.seeds.uc.service.impl;
+package com.seeds.uc.web.register.service.impl;
 
 import com.seeds.uc.dto.redis.AuthCode;
 import com.seeds.uc.dto.request.EmailCodeSendReq;
@@ -10,6 +10,7 @@ import com.seeds.uc.exceptions.LoginException;
 import com.seeds.uc.mapper.SecurityStrategyMapper;
 import com.seeds.uc.mapper.UserMapper;
 import com.seeds.uc.service.*;
+import com.seeds.uc.web.register.service.RegisterService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
