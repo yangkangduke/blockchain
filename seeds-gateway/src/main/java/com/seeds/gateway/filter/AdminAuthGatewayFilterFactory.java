@@ -2,9 +2,9 @@ package com.seeds.gateway.filter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
-import com.seeds.uc.model.cache.dto.LoginUser;
 import com.seeds.gateway.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +26,10 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
+
 @Slf4j
 @Component
-public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthGatewayFilterFactory.Config> {
+public class AdminAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AdminAuthGatewayFilterFactory.Config> {
 
     @Autowired
     private AuthService authService;
@@ -36,7 +37,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
     @Autowired
     private ObjectMapper objectMapper;
 
-    public AuthGatewayFilterFactory(AuthService authService, ObjectMapper objectMapper) {
+    public AdminAuthGatewayFilterFactory(AuthService authService, ObjectMapper objectMapper) {
         super(Config.class);
         this.authService = authService;
         this.objectMapper = objectMapper;
@@ -45,12 +46,14 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            log.debug("get into auth gateway filter");
             URI uri = exchange.getRequest().getURI();
-            log.info("URL信息: {}", uri);
-            // admin管理后台验证过滤
-            String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_TOKEN);
-            HttpCookie tokenCookie = exchange.getRequest().getCookies().getFirst(HttpHeaders.USER_TOKEN);
+            log.debug("url info: {}", uri);
+            if (uri.toString().contains(HttpHeaders.SEEDS_ADMIN_SERVICE)) {
+
+            }
+            log.debug("get into auth gateway filter");
+            String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ADMIN_USER_TOKEN);
+            HttpCookie tokenCookie = exchange.getRequest().getCookies().getFirst(HttpHeaders.ADMIN_USER_TOKEN);
             if (StringUtils.hasText(token)) {
                 log.debug("No token found from header, start getting from cookie");
                 if (tokenCookie != null) {
@@ -62,37 +65,37 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
             }
             if (StringUtils.hasText(token)) {
                 log.debug("no token found from either cookie or header");
-                return failure(exchange);
+                return adminFailure(exchange);
             }
-            LoginUser loginUser = authService.verify(token);
-            if (loginUser == null) {
-                return failure(exchange);
+            LoginAdminUser loginAdminUser = authService.verifyAdmin(token);
+            if (loginAdminUser == null) {
+                return adminFailure(exchange);
             } else {
-                log.debug("Verify success, got user: {}", loginUser);
-                return success(chain, exchange, loginUser.getUserId());
+                log.debug("Verify success, got admin user: {}", loginAdminUser);
+                return adminSuccess(chain, exchange, loginAdminUser.getUserId());
             }
         };
     }
 
-    private Mono<Void> success(GatewayFilterChain chain, ServerWebExchange exchange, Long userId) {
+    private Mono<Void> adminSuccess(GatewayFilterChain chain, ServerWebExchange exchange, Long userId) {
         ServerHttpRequest.Builder builder = exchange.getRequest().mutate();
-        builder.header(HttpHeaders.INTERNAL_USER_ID, String.valueOf(userId));
+        builder.header(HttpHeaders.ADMIN_USER_ID, String.valueOf(userId));
         return chain.filter(exchange.mutate().request(builder.build()).build());
     }
 
-    private Mono<Void> failure(ServerWebExchange exchange) {
+    private Mono<Void> adminFailure(ServerWebExchange exchange) {
         //unauthorized request to be blocked
         log.debug("token verify failed");
         ServerHttpResponse serverHttpResponse = exchange.getResponse();
         serverHttpResponse.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         DataBuffer buffer = serverHttpResponse.bufferFactory().wrap(getErrorBytes("Invalid token"));
-        HttpCookie httpCookie = exchange.getRequest().getCookies().getFirst(HttpHeaders.USER_TOKEN);
+        HttpCookie httpCookie = exchange.getRequest().getCookies().getFirst(HttpHeaders.ADMIN_USER_TOKEN);
         if (httpCookie != null) {
-            log.debug("remove cookie: {}", HttpHeaders.USER_TOKEN);
+            log.debug("remove cookie: {}", HttpHeaders.ADMIN_USER_TOKEN);
             ResponseCookie cookie = ResponseCookie.from(httpCookie.getName(), httpCookie.getValue())
                     .maxAge(0)
                     .build();
-            serverHttpResponse.getCookies().set(HttpHeaders.USER_TOKEN, cookie);
+            serverHttpResponse.getCookies().set(HttpHeaders.ADMIN_USER_TOKEN, cookie);
         }
         // set status
         ServerWebExchangeUtils.setResponseStatus(exchange, HttpStatus.OK);

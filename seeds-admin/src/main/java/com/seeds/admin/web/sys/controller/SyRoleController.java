@@ -7,7 +7,7 @@ import com.seeds.admin.dto.sys.request.SysRolePageReq;
 import com.seeds.admin.dto.sys.response.SysRoleResp;
 import com.seeds.admin.entity.sys.SysRoleEntity;
 import com.seeds.admin.enums.AdminErrorCode;
-import com.seeds.admin.web.common.controller.SysBaseApi;
+import com.seeds.admin.web.common.controller.AdminBaseController;
 import com.seeds.admin.web.sys.service.SysRoleService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
@@ -26,8 +26,8 @@ import java.util.Set;
  */
 @Slf4j
 @RestController
-@RequestMapping("/sys/role")
-public class SyRoleController extends SysBaseApi {
+@RequestMapping("/role")
+public class SyRoleController extends AdminBaseController {
 
     @Autowired
     private SysRoleService sysRoleService;
