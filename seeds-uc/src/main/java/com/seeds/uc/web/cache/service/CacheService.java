@@ -128,4 +128,15 @@ public class CacheService {
         log.info("CacheService - putAuthToken - put key: {}, value: {}", key, authToken);
     }
 
+    /**
+     * key uc:token:{userId}
+     * uc token 也会写在用户的cookie里
+     * 如果用户没有登陆活着已过期，会返回null
+     */
+    public LoginUser getUserByToken(String token) {
+        String key = UcRedisKeys.getUcTokenKey(token);
+        RBucket<LoginUser> value = redisson.getBucket(key);
+        return value.get();
+    }
+
 }

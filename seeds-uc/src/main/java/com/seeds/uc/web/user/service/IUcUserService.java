@@ -9,6 +9,8 @@ import com.seeds.uc.model.user.dto.request.RegisterReq;
 import com.seeds.uc.model.user.dto.response.LoginResp;
 import com.seeds.uc.model.user.entity.UcUser;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * <p>
  * user table 服务类
@@ -31,7 +33,7 @@ public interface IUcUserService extends IService<UcUser> {
      *
      * @param verifyReq
      */
-    Boolean bindEmail(BndEmailReq verifyReq);
+    Boolean bindEmail(BndEmailReq verifyReq, HttpServletRequest request);
 
     /**
      * 账号重复性校验

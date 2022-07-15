@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -47,8 +48,8 @@ public class InterUserController {
      */
     @PostMapping("/bindEmail")
     @ApiOperation(value = "绑定邮箱", notes = "绑定邮箱")
-    public GenericDto<Boolean> bindEmail(@Valid @RequestBody BndEmailReq bndEmailReq) {
-        return GenericDto.success(iUcUserService.bindEmail(bndEmailReq));
+    public GenericDto<Boolean> bindEmail(@Valid @RequestBody BndEmailReq bndEmailReq, HttpServletRequest request) {
+        return GenericDto.success(iUcUserService.bindEmail(bndEmailReq, request));
     }
 
     /**
