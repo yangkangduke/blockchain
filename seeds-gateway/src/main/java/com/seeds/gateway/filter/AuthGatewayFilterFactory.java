@@ -52,6 +52,9 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
             // admin管理后台验证过滤
             String token;
             HttpCookie tokenCookie;
+            if (uri.toString().contains("/v2/api-docs") || uri.toString().contains("/uc-open") ){
+                return success(chain, exchange, null);
+            }
             if (uri.toString().contains(HttpHeaders.SEEDS_ADMIN_SERVICE)) {
                 token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ADMIN_USER_TOKEN);
                 tokenCookie = exchange.getRequest().getCookies().getFirst(HttpHeaders.ADMIN_USER_TOKEN);
@@ -59,7 +62,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                 token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_TOKEN);
                 tokenCookie = exchange.getRequest().getCookies().getFirst(HttpHeaders.USER_TOKEN);
             }
-            if (StringUtils.hasText(token)) {
+            if (!StringUtils.hasText(token)) {
                 log.debug("No token found from header, start getting from cookie");
                 if (tokenCookie != null) {
                     log.debug("got token from cookie");
@@ -68,7 +71,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                     log.debug("no token found from cookie");
                 }
             }
-            if (StringUtils.hasText(token)) {
+            if (!StringUtils.hasText(token)) {
                 log.debug("no token found from either cookie or header");
                 return failure(exchange);
             }

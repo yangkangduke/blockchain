@@ -7,10 +7,21 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: seeds-uc-public-service
+        - id: seeds-uc-internal-service
           uri: http://192.168.1.6:10103/
           predicates:
-            - Path=/uc-public/**
+            - Path=/uc-internal/**
+          filters:
+            - Auth
+        - id: seeds-uc-open-service
+          uri: http://192.168.1.6:10103/
+          predicates:
+            - Path=/uc-open/**
+
+        - id: seeds-admin-public-service
+          uri: http://192.168.1.6:10105/
+          predicates:
+            - Path=/admin-public/**
       globalcors:
         cors-configurations:
           '[/**]':

@@ -2,6 +2,7 @@ package com.seeds.uc.web.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.model.cache.dto.AuthCode;
 import com.seeds.uc.model.send.dto.request.BndEmailReq;
@@ -9,6 +10,7 @@ import com.seeds.uc.model.send.dto.request.EmailCodeSendReq;
 import com.seeds.uc.model.user.dto.request.LoginReq;
 import com.seeds.uc.model.user.dto.request.RegisterReq;
 import com.seeds.uc.model.user.dto.response.LoginResp;
+import com.seeds.uc.model.user.entity.UcSecurityStrategy;
 import com.seeds.uc.model.user.entity.UcUser;
 import com.seeds.uc.model.user.enums.ClientAuthTypeEnum;
 import com.seeds.uc.model.user.enums.ClientStateEnum;
@@ -19,10 +21,13 @@ import com.seeds.uc.util.RandomUtil;
 import com.seeds.uc.web.cache.service.CacheService;
 import com.seeds.uc.web.send.service.SendCodeService;
 import com.seeds.uc.web.user.mapper.UcUserMapper;
+import com.seeds.uc.web.user.service.IUcSecurityStrategyService;
 import com.seeds.uc.web.user.service.IUcUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -34,11 +39,16 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@Transactional
 public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> implements IUcUserService {
     @Autowired
     private CacheService cacheService;
     @Autowired
     private SendCodeService sendCodeService;
+    @Autowired
+    private IUcSecurityStrategyService iUcSecurityStrategyService;
+    @Autowired
+    private RedissonClient redissonClient;
 
     /**
      * 发送邮箱验证码
@@ -67,8 +77,24 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         if (authCode == null || authCode.getCode() == null || !authCode.getCode().equals(code)) {
             throw new GenericException(UcErrorCode.ERR_10033_WRONG_EMAIL_CODE);
         }
-        // todo 需要添加数据到数据库
-        return true;
+        // 获取当前登陆人信息
+        Long currentUserId = UserContext.getCurrentUserId();
+        // 将邮箱绑定到uc_security_strategy
+        long createTime = System.currentTimeMillis();
+
+        // 修改邮箱信息到user表
+        this.updateById(UcUser.builder()
+                .email(email)
+                .id(currentUserId)
+                .build());
+
+        return   iUcSecurityStrategyService.save(UcSecurityStrategy.builder()
+                .uid(currentUserId)
+                .needAuth(true)
+                .authType(Integer.valueOf(ClientAuthTypeEnum.EMAIL.getCode()))
+                .createdAt(createTime)
+                .updatedAt(createTime)
+                .build());
     }
 
     /**

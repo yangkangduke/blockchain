@@ -4,21 +4,17 @@ package com.seeds.uc.web.user.controller;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.model.send.dto.request.BndEmailReq;
 import com.seeds.uc.model.send.dto.request.EmailCodeSendReq;
-import com.seeds.uc.model.user.dto.request.LoginReq;
-import com.seeds.uc.model.user.dto.request.RegisterReq;
-import com.seeds.uc.model.user.dto.response.LoginResp;
 import com.seeds.uc.web.user.service.IGoogleAuthService;
 import com.seeds.uc.web.user.service.IUcUserService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 /**
  * <p>
@@ -29,9 +25,9 @@ import javax.validation.constraints.NotBlank;
  * @since 2022-07-09
  */
 @RestController
-@RequestMapping("/user")
-@Api(tags = "用户相关接口")
-public class UcUserController {
+@RequestMapping("/uc-internal/user")
+@Api(tags = "用户internal相关接口")
+public class InterUserController {
     @Autowired
     private IUcUserService iUcUserService;
     @Autowired
@@ -52,29 +48,7 @@ public class UcUserController {
     @PostMapping("/bindEmail")
     @ApiOperation(value = "绑定邮箱", notes = "绑定邮箱")
     public GenericDto<Boolean> bindEmail(@Valid @RequestBody BndEmailReq bndEmailReq) {
-        // todo
         return GenericDto.success(iUcUserService.bindEmail(bndEmailReq));
-    }
-
-    /**
-     * 账号重复性校验
-     */
-    @GetMapping("/register/account/verify")
-    @ApiOperation(value = "账号重复性校验", notes = "账号重复性校验")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "account", value = "注册的邮箱账号", required = true),
-    })
-    public GenericDto<Boolean> accountVerify(@Valid @NotBlank @Email String account) {
-        return GenericDto.success(iUcUserService.accountVerify(account));
-    }
-
-    /**
-     * 注册用户
-     */
-    @PostMapping("/register/createAccount")
-    @ApiOperation(value = "注册用户", notes = "注册用户")
-    public GenericDto<LoginResp> createAccount(@Valid @RequestBody RegisterReq registerReq) {
-        return GenericDto.success(iUcUserService.createAccount(registerReq));
     }
 
     /**
@@ -119,31 +93,6 @@ public class UcUserController {
     @PostMapping("/bind/account")
     @ApiOperation(value = "metamask绑定账号", notes = "metamask绑定账号")
     public GenericDto<Boolean> bindAccount() {
-        // todo
-        return GenericDto.success(null);
-    }
-
-    /**
-     * 账号登陆
-     *
-     * @param loginReq
-     * @return
-     */
-    @PostMapping("/login/toEmailAccount")
-    @ApiOperation(value = "账号登陆", notes = "账号登陆")
-    public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
-        return GenericDto.success(iUcUserService.login(loginReq));
-    }
-
-    /**
-     * metamask登陆
-     *
-     * @param
-     * @return
-     */
-    @PostMapping("/login/toMetamask")
-    @ApiOperation(value = "metamask登陆", notes = "metamask登陆")
-    public GenericDto<Object> toMetamask() {
         // todo
         return GenericDto.success(null);
     }
