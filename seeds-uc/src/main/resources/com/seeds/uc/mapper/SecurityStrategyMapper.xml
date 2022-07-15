@@ -16,7 +16,8 @@
     </resultMap>
 
     <sql id="mainColumns">
-        f_id, f_uid, f_need_auth, f_auth_type, f_created_at, f_updated_at
+        f_id
+        , f_uid, f_need_auth, f_auth_type, f_created_at, f_updated_at
     </sql>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

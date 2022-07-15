@@ -1,32 +1,30 @@
 package com.seeds.uc.web.send.service.impl;
 
 
+import com.seeds.uc.exceptions.GenericException;
+import com.seeds.uc.model.cache.dto.AuthCode;
 import com.seeds.uc.model.send.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.model.user.enums.ClientAuthTypeEnum;
+import com.seeds.uc.model.user.enums.UcErrorCode;
 import com.seeds.uc.util.EMailUtil;
 import com.seeds.uc.util.RandomUtil;
 import com.seeds.uc.web.cache.service.CacheService;
 import com.seeds.uc.web.send.service.SendCodeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
- * @date 2020/8/2
+ * @author yk
+ * @email 819628513@qq.com
+ * @date 2022/07/13
  */
 @Slf4j
 @Service
 public class SendCodeServiceImpl implements SendCodeService {
     @Autowired
     private CacheService cacheService;
-
-
-    @Override
-    public void sendEmailWithTokenAndUseType(String token, AuthCodeUseTypeEnum useTypeEnum) {
-
-    }
 
     @Override
     public void sendEmailWithUseType(String address, AuthCodeUseTypeEnum useTypeEnum) {
@@ -45,6 +43,13 @@ public class SendCodeServiceImpl implements SendCodeService {
 
     @Override
     public String verifyEmailWithUseType(String address, String otp, AuthCodeUseTypeEnum useTypeEnum) {
-        return null;
+        AuthCode authCode =
+                cacheService.getAuthCode(address, useTypeEnum, ClientAuthTypeEnum.EMAIL);
+        if (authCode != null && StringUtils.isNotBlank(authCode.getCode()) && authCode.getCode().equals(otp)) {
+            String token = RandomUtil.genRandomToken(address);
+            cacheService.putAuthToken(token, null, address, ClientAuthTypeEnum.EMAIL);
+            return token;
+        }
+        throw new GenericException(UcErrorCode.ERR_10033_WRONG_EMAIL_CODE);
     }
 }

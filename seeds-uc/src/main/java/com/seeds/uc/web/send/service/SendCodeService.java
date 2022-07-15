@@ -3,13 +3,11 @@ package com.seeds.uc.web.send.service;
 import com.seeds.uc.model.send.enums.AuthCodeUseTypeEnum;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
- * @date 2020/8/1
+ * @author yk
+ * @email 819628513@qq.com
+ * @date 2022/07/13
  */
 public interface SendCodeService {
-
-    void sendEmailWithTokenAndUseType(String token, AuthCodeUseTypeEnum useTypeEnum);
 
     void sendEmailWithUseType(String address, AuthCodeUseTypeEnum useTypeEnum);
 

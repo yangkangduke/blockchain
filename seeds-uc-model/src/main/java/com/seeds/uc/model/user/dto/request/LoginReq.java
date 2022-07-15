@@ -13,8 +13,8 @@ import javax.validation.constraints.NotBlank;
  * @date 2022/07/13
  */
 @Data
-@ApiModel(value = "注册请求", description = "注册请求")
-public class RegisterReq {
+@ApiModel(value = "登陆请求", description = "登陆请求")
+public class LoginReq {
 
     @ApiModelProperty(value = "登陆账号", required = true)
     @NotBlank

@@ -27,7 +27,7 @@ public class EMailUtil {
     }
 
     public static void main(String[] args) {
-        EMailUtil.send("819628513@qq.com","123456");
+        EMailUtil.send("819628513@qq.com", "123456");
     }
 }
 

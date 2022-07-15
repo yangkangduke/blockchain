@@ -3,7 +3,8 @@ package com.seeds.uc.web.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.uc.model.send.dto.request.EmailCodeSendReq;
-import com.seeds.uc.model.send.dto.request.EmailCodeVerifyReq;
+import com.seeds.uc.model.send.dto.request.BndEmailReq;
+import com.seeds.uc.model.user.dto.request.LoginReq;
 import com.seeds.uc.model.user.dto.request.RegisterReq;
 import com.seeds.uc.model.user.dto.response.LoginResp;
 import com.seeds.uc.model.user.entity.UcUser;
@@ -20,18 +21,21 @@ public interface IUcUserService extends IService<UcUser> {
 
     /**
      * 发送邮箱验证码
+     *
      * @param sendReq
      */
-    void sendEmailCode(EmailCodeSendReq sendReq);
+    Boolean sendEmailCode(EmailCodeSendReq sendReq);
 
     /**
      * 邮箱验证码校验
+     *
      * @param verifyReq
      */
-    void verifyRegisterCode(EmailCodeVerifyReq verifyReq);
+    Boolean bindEmail(BndEmailReq verifyReq);
 
     /**
      * 账号重复性校验
+     *
      * @param account
      * @return
      */
@@ -39,8 +43,16 @@ public interface IUcUserService extends IService<UcUser> {
 
     /**
      * 注册用户
+     *
      * @param registerReq
      * @return
      */
     LoginResp createAccount(RegisterReq registerReq);
+
+    /**
+     * 登陆
+     * @param loginReq
+     * @return
+     */
+    LoginResp login(LoginReq loginReq);
 }

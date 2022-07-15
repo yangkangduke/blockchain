@@ -10,4 +10,3 @@ redisson:
   timeout: 5000
   poolsize: 50
   idlesize: 50
-  password: 123456

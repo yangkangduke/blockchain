@@ -5,6 +5,11 @@ import com.seeds.uc.model.send.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.model.user.enums.ClientAuthTypeEnum;
 import lombok.experimental.UtilityClass;
 
+/**
+ * @author yk
+ * @email 819628513@qq.com
+ * @date 2022/07/13
+ */
 @UtilityClass
 public class UcRedisKeys {
 

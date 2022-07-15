@@ -6,10 +6,12 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.constraints.Email;
+
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
- * @date 2020/7/31
+ * @author yk
+ * @email 819628513@qq.com
+ * @date 2022/07/13
  */
 @Data
 @Builder
@@ -19,6 +21,7 @@ public class LoginResp {
     @ApiModelProperty(value = "the real token for login proof")
     private String ucToken;
     @ApiModelProperty(value = "邮箱")
+    @Email
     private String email;
     private ClientAuthTypeEnum type;
 

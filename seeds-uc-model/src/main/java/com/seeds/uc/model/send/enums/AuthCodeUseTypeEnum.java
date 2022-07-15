@@ -8,9 +8,9 @@ import lombok.Getter;
 import java.util.Objects;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
- * @date 2020/8/1
+ * @author yk
+ * @email 819628513@qq.com
+ * @date 2022/07/13
  */
 @Getter
 public enum AuthCodeUseTypeEnum {
