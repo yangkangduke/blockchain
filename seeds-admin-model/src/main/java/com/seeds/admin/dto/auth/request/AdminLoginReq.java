@@ -27,7 +27,7 @@ public class AdminLoginReq {
     @NotBlank(message = "Captcha cannot be empty")
     private String opt;
 
-    @ApiModelProperty(value = "登录方式")
+    @ApiModelProperty(value = "登录方式，1 phone， 2 account")
     @NotBlank(message = "Login method cannot be empty")
     private String authType;
 

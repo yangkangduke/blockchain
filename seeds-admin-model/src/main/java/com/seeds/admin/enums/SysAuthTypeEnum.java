@@ -13,7 +13,7 @@ public enum SysAuthTypeEnum {
     // 手机登录
     PHONE("1", "phone"),
     // 密码登录
-    PASSWORD("2", "email"),
+    PASSWORD("2", "password"),
     ;
 
     private final String code;

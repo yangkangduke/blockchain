@@ -5,7 +5,7 @@ import com.seeds.admin.dto.sys.request.SysMenuModifyReq;
 import com.seeds.admin.dto.sys.response.SysMenuResp;
 import com.seeds.admin.entity.sys.SysMenuEntity;
 import com.seeds.admin.enums.AdminErrorCode;
-import com.seeds.admin.web.common.controller.SysBaseApi;
+import com.seeds.admin.web.common.controller.AdminBaseController;
 import com.seeds.admin.web.sys.service.SysMenuService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
@@ -24,8 +24,8 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/sys/menu")
-public class SyMenuController extends SysBaseApi {
+@RequestMapping("/menu")
+public class SyMenuController extends AdminBaseController {
 
     @Autowired
     private SysMenuService sysMenuService;

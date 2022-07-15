@@ -9,7 +9,7 @@ import com.seeds.admin.enums.AdminErrorCode;
 import com.seeds.admin.enums.SysUserStatusEnum;
 import com.seeds.admin.utils.HashUtil;
 import com.seeds.admin.web.auth.service.AdminCacheService;
-import com.seeds.admin.web.common.controller.SysBaseApi;
+import com.seeds.admin.web.common.controller.AdminBaseController;
 import com.seeds.admin.web.sys.service.SysRoleUserService;
 import com.seeds.admin.web.sys.service.SysUserService;
 import com.seeds.common.dto.GenericDto;
@@ -36,8 +36,8 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping("/sys/user")
-public class SysUserController extends SysBaseApi {
+@RequestMapping("/user")
+public class SysUserController extends AdminBaseController {
 
     @Value("${admin.login.init.password:123456}")
     private String initPassword;
