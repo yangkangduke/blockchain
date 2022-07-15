@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/dictType")
-public class SysDictTypeController {
+public class SysDictTypeController extends SysBaseApi {
 
     @Autowired
     private SysDictTypeService sysDictTypeService;

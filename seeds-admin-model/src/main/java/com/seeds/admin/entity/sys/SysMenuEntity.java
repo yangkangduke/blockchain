@@ -22,7 +22,7 @@ public class SysMenuEntity extends BaseEntity {
 	 * 父菜单ID，一级菜单为0
 	 */
 	@TableField("p_id")
-	private String pid;
+	private Long pid;
 
 	/**
 	 * 菜单编码

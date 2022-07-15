@@ -70,4 +70,17 @@ public interface SysMenuService {
      */
     List<SysMenuResp> queryByUserId(Integer type, Long userId);
 
+    /**
+     * 查询权限列表
+     * @return 权限列表
+     */
+    List<String> getPermissionsList();
+
+    /**
+     * 根据用户id查询权限列表
+     * @param userId 用户id
+     * @return 权限列表
+     */
+    List<String> getUserPermissionsList(Long userId);
+
 }

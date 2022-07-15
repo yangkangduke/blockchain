@@ -116,6 +116,37 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
         return convertToResp(list);
     }
 
+    @Override
+    public List<String> getPermissionsList() {
+        List<SysMenuEntity> list = list();
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+        return list.stream().map(SysMenuEntity::getPermissions).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getUserPermissionsList(Long userId) {
+        // 查询角色用户关联
+        List<SysRoleUserEntity> roleUser = sysRoleUserService.queryByUserId(userId);
+        if (CollectionUtils.isEmpty(roleUser)) {
+            return Collections.emptyList();
+        }
+        // 查询角色菜单关联
+        List<Long> roleIds = roleUser.stream().map(SysRoleUserEntity::getRoleId).collect(Collectors.toList());
+        List<Long> menuIds = sysRoleMenuService.queryMenuByRoleIds(roleIds);
+        if (CollectionUtils.isEmpty(menuIds)) {
+            return Collections.emptyList();
+        }
+        // 查询菜单
+        List<SysMenuEntity> menu = listByIds(menuIds);
+        if (CollectionUtils.isEmpty(menu)) {
+            return Collections.emptyList();
+        }
+        // 返回权限
+        return menu.stream().map(SysMenuEntity::getPermissions).collect(Collectors.toList());
+    }
+
     private List<SysMenuResp> convertToResp(List<SysMenuEntity> list) {
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();
