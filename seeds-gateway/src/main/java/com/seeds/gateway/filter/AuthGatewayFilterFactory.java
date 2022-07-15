@@ -48,7 +48,9 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
             log.debug("get into auth gateway filter");
             URI uri = exchange.getRequest().getURI();
             log.info("URL信息: {}", uri);
-            // admin管理后台验证过滤
+            if (uri.toString().contains("/v2/api-docs") || uri.toString().contains("/uc-open") ){
+                return success(chain, exchange, null);
+            }
             String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_TOKEN);
             HttpCookie tokenCookie = exchange.getRequest().getCookies().getFirst(HttpHeaders.USER_TOKEN);
             if (StringUtils.hasText(token)) {
@@ -60,7 +62,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                     log.debug("no token found from cookie");
                 }
             }
-            if (StringUtils.hasText(token)) {
+            if (!StringUtils.hasText(token)) {
                 log.debug("no token found from either cookie or header");
                 return failure(exchange);
             }

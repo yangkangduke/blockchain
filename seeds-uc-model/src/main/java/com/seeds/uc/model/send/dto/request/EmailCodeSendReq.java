@@ -21,7 +21,6 @@ public class EmailCodeSendReq {
     @ApiModelProperty(value = "邮箱", required = true)
     private String email;
     @ApiModelProperty(value = "用户类型", required = true)
-    @NotBlank
     private AuthCodeUseTypeEnum useType;
 
 }
