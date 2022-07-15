@@ -2,9 +2,9 @@ package com.seeds.uc.web.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.model.cache.dto.AuthCode;
+import com.seeds.uc.model.cache.dto.LoginUser;
 import com.seeds.uc.model.send.dto.request.BndEmailReq;
 import com.seeds.uc.model.send.dto.request.EmailCodeSendReq;
 import com.seeds.uc.model.user.dto.request.LoginReq;
@@ -18,6 +18,7 @@ import com.seeds.uc.model.user.enums.ClientTypeEnum;
 import com.seeds.uc.model.user.enums.UcErrorCode;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
+import com.seeds.uc.util.WebUtil;
 import com.seeds.uc.web.cache.service.CacheService;
 import com.seeds.uc.web.send.service.SendCodeService;
 import com.seeds.uc.web.user.mapper.UcUserMapper;
@@ -28,6 +29,8 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -70,7 +73,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @param verifyReq
      */
     @Override
-    public Boolean bindEmail(BndEmailReq verifyReq) {
+    public Boolean bindEmail(BndEmailReq verifyReq, HttpServletRequest request) {
         String email = verifyReq.getEmail();
         String code = verifyReq.getCode();
         AuthCode authCode = cacheService.getAuthCode(email, verifyReq.getUseType(), ClientAuthTypeEnum.EMAIL);
@@ -78,18 +81,20 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new GenericException(UcErrorCode.ERR_10033_WRONG_EMAIL_CODE);
         }
         // 获取当前登陆人信息
-        Long currentUserId = UserContext.getCurrentUserId();
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUser loginUser = cacheService.getUserByToken(loginToken);
+        Long userId = loginUser.getUserId();
         // 将邮箱绑定到uc_security_strategy
         long createTime = System.currentTimeMillis();
 
         // 修改邮箱信息到user表
         this.updateById(UcUser.builder()
                 .email(email)
-                .id(currentUserId)
+                .id(userId)
                 .build());
 
         return   iUcSecurityStrategyService.save(UcSecurityStrategy.builder()
-                .uid(currentUserId)
+                .uid(userId)
                 .needAuth(true)
                 .authType(Integer.valueOf(ClientAuthTypeEnum.EMAIL.getCode()))
                 .createdAt(createTime)
