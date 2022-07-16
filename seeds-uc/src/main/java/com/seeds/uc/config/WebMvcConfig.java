@@ -19,7 +19,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         List<String> patterns = new ArrayList<>();
         patterns.add("/uc-internal/**");
-        patterns.add("/uc-open/**");
         registry.addInterceptor(userContextInterceptor).addPathPatterns(patterns);
     }
 }
