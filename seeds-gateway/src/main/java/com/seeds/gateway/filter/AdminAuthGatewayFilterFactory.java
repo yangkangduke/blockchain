@@ -2,6 +2,7 @@ package com.seeds.gateway.filter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seeds.admin.constant.WhiteListPath;
 import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
@@ -47,10 +48,6 @@ public class AdminAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             URI uri = exchange.getRequest().getURI();
-            log.debug("url info: {}", uri);
-            if (uri.toString().contains(HttpHeaders.SEEDS_ADMIN_SERVICE)) {
-
-            }
             log.debug("get into auth gateway filter");
             String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ADMIN_USER_TOKEN);
             HttpCookie tokenCookie = exchange.getRequest().getCookies().getFirst(HttpHeaders.ADMIN_USER_TOKEN);
@@ -63,11 +60,13 @@ public class AdminAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     log.debug("no token found from cookie");
                 }
             }
-            if (StringUtils.hasText(token)) {
-                log.debug("no token found from either cookie or header");
-                return adminFailure(exchange);
-            }
             LoginAdminUser loginAdminUser = authService.verifyAdmin(token);
+            if (uri.toString().contains(WhiteListPath.DOC_API) || uri.getPath().startsWith(WhiteListPath.AUTH_RELATED)) {
+                if (loginAdminUser != null && loginAdminUser.getUserId() != null) {
+                    return adminSuccess(chain, exchange, loginAdminUser.getUserId());
+                }
+                return chain.filter(exchange);
+            }
             if (loginAdminUser == null) {
                 return adminFailure(exchange);
             } else {

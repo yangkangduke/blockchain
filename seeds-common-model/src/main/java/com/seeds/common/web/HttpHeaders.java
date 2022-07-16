@@ -21,11 +21,6 @@ public class HttpHeaders {
     public static final String ADMIN_USER_ID = "admin-user-id";
 
     /**
-     * 管理后台api
-     */
-    public static final String SEEDS_ADMIN_SERVICE = "/api/admin/";
-
-    /**
      * 管理后台用户token
      */
     public static final String ADMIN_USER_TOKEN = "seeds-admin-user-token";

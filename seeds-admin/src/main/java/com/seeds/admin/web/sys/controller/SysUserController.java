@@ -1,6 +1,7 @@
 package com.seeds.admin.web.sys.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.dto.auth.response.AdminUserResp;
 import com.seeds.admin.dto.sys.request.*;
 import com.seeds.admin.dto.sys.response.SysUserResp;
 import com.seeds.admin.entity.sys.SysRoleUserEntity;
@@ -14,6 +15,7 @@ import com.seeds.admin.web.sys.service.SysRoleUserService;
 import com.seeds.admin.web.sys.service.SysUserService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
+import com.seeds.common.web.context.UserContext;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
@@ -177,6 +179,13 @@ public class SysUserController extends AdminBaseController {
         }
         sysRoleUserService.assignRoles(req);
         return GenericDto.success(null);
+    }
+
+    @GetMapping("userInfo")
+    @ApiOperation(value = "登录用户信息")
+    public GenericDto<AdminUserResp> getUserInfo() {
+        Long userId = UserContext.getCurrentAdminUserId();
+        return GenericDto.success(sysUserService.queryLoginUserInfo(userId));
     }
 
 }

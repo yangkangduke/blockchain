@@ -1,7 +1,6 @@
 package com.seeds.admin.web.auth.controller;
 
 import com.seeds.admin.constant.AdminRedisKeys;
-import com.seeds.admin.dto.auth.response.AdminUserResp;
 import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.admin.dto.auth.request.AdminLoginReq;
 import com.seeds.admin.dto.auth.response.AdminLoginResp;
@@ -16,7 +15,6 @@ import com.seeds.admin.utils.HashUtil;
 import com.seeds.admin.utils.RandomUtil;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
-import com.seeds.common.web.context.UserContext;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -139,13 +137,6 @@ public class AdminAuthController {
         String token = request.getHeader(HttpHeaders.ADMIN_USER_TOKEN);
         adminCacheService.removeAdminUserByToken(token);
         return GenericDto.success(null);
-    }
-
-    @GetMapping("userInfo")
-    @ApiOperation(value = "登录用户信息")
-    public GenericDto<AdminUserResp> getUserInfo() {
-        Long userId = UserContext.getCurrentAdminUserId();
-        return GenericDto.success(sysUserService.queryLoginUserInfo(userId));
     }
 
 }
