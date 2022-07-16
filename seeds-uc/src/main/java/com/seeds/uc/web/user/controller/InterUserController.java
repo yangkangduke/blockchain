@@ -2,8 +2,11 @@ package com.seeds.uc.web.user.controller;
 
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.model.cache.dto.LoginUser;
 import com.seeds.uc.model.send.dto.request.BndEmailReq;
 import com.seeds.uc.model.send.dto.request.EmailCodeSendReq;
+import com.seeds.uc.util.WebUtil;
+import com.seeds.uc.web.cache.service.CacheService;
 import com.seeds.uc.web.user.service.IGoogleAuthService;
 import com.seeds.uc.web.user.service.IUcUserService;
 import io.swagger.annotations.Api;
@@ -33,6 +36,8 @@ public class InterUserController {
     private IUcUserService iUcUserService;
     @Autowired
     private IGoogleAuthService igoogleAuthService;
+    @Autowired
+    private CacheService cacheService;
 
     /**
      * 发送邮箱验证码
@@ -53,12 +58,12 @@ public class InterUserController {
     }
 
     /**
-     * GA Authentication生成QRcode
+     * GA Authentication生成QRBarcode
      */
-    @PostMapping("/genGaSecret")
-    @ApiOperation(value = "GA Authentication生成QRcode", notes = "GA Authentication生成QRcode")
-    public GenericDto<String> genGaSecret() {
-        return GenericDto.success(igoogleAuthService.genGaSecret());
+    @PostMapping("/getQRBarcode")
+    @ApiOperation(value = "GA Authentication生成QRBarcode", notes = "GA Authentication生成QRBarcode")
+    public GenericDto<String> getQRBarcode(String account, String remark, HttpServletRequest request) {
+        return GenericDto.success(igoogleAuthService.getQRBarcode(account, remark, request));
     }
 
     /**
@@ -66,8 +71,10 @@ public class InterUserController {
      */
     @PostMapping("/verifyUserCode")
     @ApiOperation(value = "GA Authentication 验证", notes = "GA Authentication 验证")
-    public GenericDto<Boolean> verifyUserCode(Long uid, String userInputCode) {
-        return GenericDto.success(igoogleAuthService.verifyUserCode(uid, userInputCode));
+    public GenericDto<Boolean> verifyUserCode(String userInputCode, HttpServletRequest request) {
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUser loginUser = cacheService.getUserByToken(loginToken);
+        return GenericDto.success(igoogleAuthService.verifyUserCode(loginUser.getUserId(), userInputCode));
     }
 
     /**
@@ -79,6 +86,7 @@ public class InterUserController {
         // todo
         return GenericDto.success(null);
     }
+
     /**
      * 用户绑定metamask
      */
@@ -88,6 +96,7 @@ public class InterUserController {
         // todo
         return GenericDto.success(null);
     }
+
     /**
      * metamask绑定账号
      */

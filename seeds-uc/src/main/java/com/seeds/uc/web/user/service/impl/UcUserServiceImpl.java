@@ -93,13 +93,13 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .id(userId)
                 .build());
 
-        return   iUcSecurityStrategyService.save(UcSecurityStrategy.builder()
+        return iUcSecurityStrategyService.saveOrUpdate(UcSecurityStrategy.builder()
                 .uid(userId)
                 .needAuth(true)
                 .authType(Integer.valueOf(ClientAuthTypeEnum.EMAIL.getCode()))
                 .createdAt(createTime)
                 .updatedAt(createTime)
-                .build());
+                .build(), new QueryWrapper<UcSecurityStrategy>().lambda().eq(UcSecurityStrategy::getUid, userId));
     }
 
     /**
@@ -157,6 +157,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
     /**
      * 登陆
+     *
      * @param loginReq
      * @return
      */

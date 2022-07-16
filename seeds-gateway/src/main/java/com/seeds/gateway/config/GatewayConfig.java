@@ -24,12 +24,5 @@ public class GatewayConfig {
             }
             return Mono.just(GatewayUtils.getClientIp(exchange));
         };
-//            // 上面报错暂时弄成ip限流
-//            return exchange -> Mono.just(
-//                    exchange.getRequest()
-//                            .getRemoteAddress()
-//                            .getHostName()
-//            );
-
     }
 }
