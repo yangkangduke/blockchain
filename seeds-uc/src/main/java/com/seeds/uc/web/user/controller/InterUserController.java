@@ -77,34 +77,5 @@ public class InterUserController {
         return GenericDto.success(igoogleAuthService.verifyUserCode(loginUser.getUserId(), userInputCode));
     }
 
-    /**
-     * metamask注册
-     */
-    @PostMapping("/register/metamask")
-    @ApiOperation(value = "metamask注册", notes = "metamask注册")
-    public GenericDto<Boolean> registerMetamask() {
-        // todo
-        return GenericDto.success(null);
-    }
-
-    /**
-     * 用户绑定metamask
-     */
-    @PostMapping("/bind/metamask")
-    @ApiOperation(value = "用户绑定metamask", notes = "用户绑定metamask")
-    public GenericDto<Boolean> bindMetamask() {
-        // todo
-        return GenericDto.success(null);
-    }
-
-    /**
-     * metamask绑定账号
-     */
-    @PostMapping("/bind/account")
-    @ApiOperation(value = "metamask绑定账号", notes = "metamask绑定账号")
-    public GenericDto<Boolean> bindAccount() {
-        // todo
-        return GenericDto.success(null);
-    }
 
 }

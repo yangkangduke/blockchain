@@ -32,6 +32,9 @@
         <knife4j.version>3.0.2</knife4j.version>
         <email.version>1.5</email.version>
         <p6spy.version>3.9.1</p6spy.version>
+        <web3j.spring-boot.version>1.6.0</web3j.spring-boot.version>
+        <okhttp.version>4.8.1</okhttp.version>
+        <web3j.version>5.0.0</web3j.version>
         <hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
     </properties>
 
@@ -44,6 +47,21 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.web3j</groupId>
+                <artifactId>core</artifactId>
+                <version>${web3j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.web3j</groupId>
+                <artifactId>web3j-spring-boot-starter</artifactId>
+                <version>${web3j.spring-boot.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>

@@ -49,12 +49,29 @@ public interface IUcUserService extends IService<UcUser> {
      * @param registerReq
      * @return
      */
-    LoginResp createAccount(RegisterReq registerReq);
+    LoginResp createAccount(RegisterReq registerReq, HttpServletRequest request);
 
     /**
      * 登陆
      * @param loginReq
      * @return
      */
-    LoginResp login(LoginReq loginReq);
+    LoginResp loginToEmailAccount(LoginReq loginReq);
+
+    /**
+     * metamask登陆
+     * @param publicAddress
+     * @param signature
+     * @param message
+     * @param request
+     */
+    LoginResp loginToMetamask(String publicAddress, String signature, String message, HttpServletRequest request);
+
+    /**
+     * metamask登陆获取随机数
+     * @return
+     */
+    String loginToMetamaskNonce(String publicAddress, HttpServletRequest request);
+
+
 }

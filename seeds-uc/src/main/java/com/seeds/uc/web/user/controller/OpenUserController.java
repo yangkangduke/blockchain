@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -52,8 +53,8 @@ public class OpenUserController {
      */
     @PostMapping("/register/createAccount")
     @ApiOperation(value = "注册账号用户", notes = "注册账号用户")
-    public GenericDto<LoginResp> createAccount(@Valid @RequestBody RegisterReq registerReq) {
-        return GenericDto.success(iUcUserService.createAccount(registerReq));
+    public GenericDto<LoginResp> createAccount(@Valid @RequestBody RegisterReq registerReq, HttpServletRequest request) {
+        return GenericDto.success(iUcUserService.createAccount(registerReq, request));
     }
 
     /**
@@ -64,20 +65,22 @@ public class OpenUserController {
      */
     @PostMapping("/login/toEmailAccount")
     @ApiOperation(value = "账号登陆", notes = "账号登陆")
-    public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
-        return GenericDto.success(iUcUserService.login(loginReq));
+    public GenericDto<LoginResp> loginToEmailAccount(@Valid @RequestBody LoginReq loginReq) {
+        return GenericDto.success(iUcUserService.loginToEmailAccount(loginReq));
     }
+
 
     /**
-     * metamask注册
+     * metamask登陆获取随机数
+     *
+     * @param
+     * @return
      */
-    @PostMapping("/register/metamask")
-    @ApiOperation(value = "metamask注册", notes = "metamask注册")
-    public GenericDto<Boolean> registerMetamask() {
-        // todo
-        return GenericDto.success(null);
+    @PostMapping("/login/toMetamask/nonce")
+    @ApiOperation(value = "metamask登陆-获取随机数", notes = "metamask-登陆获取随机数")
+    public GenericDto<String> loginToMetamaskNonce(String publicAddress, HttpServletRequest request) {
+        return GenericDto.success(iUcUserService.loginToMetamaskNonce(publicAddress, request));
     }
-
 
     /**
      * metamask登陆
@@ -87,9 +90,9 @@ public class OpenUserController {
      */
     @PostMapping("/login/toMetamask")
     @ApiOperation(value = "metamask登陆", notes = "metamask登陆")
-    public GenericDto<Object> toMetamask() {
-        // todo
-        return GenericDto.success(null);
+    public GenericDto<LoginResp> loginToMetamask(@Valid @NotBlank String publicAddress, @NotBlank String signature, String message, HttpServletRequest request) {
+        return GenericDto.success(iUcUserService.loginToMetamask(publicAddress, signature, message, request));
     }
+
 
 }

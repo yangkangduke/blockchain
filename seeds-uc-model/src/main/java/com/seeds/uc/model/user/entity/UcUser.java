@@ -71,6 +71,10 @@ public class UcUser implements Serializable {
 
     @ApiModelProperty("昵称")
     private String nickname;
+    @ApiModelProperty("钱包地址，metamask")
+    private String publicAddress;
+    @ApiModelProperty("随机数，metamask登陆时使用")
+    private String nonce;
 
 
 }
