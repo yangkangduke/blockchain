@@ -55,4 +55,17 @@ public class CommonExceptionHandler {
     ResponseEntity<GenericDto> handle(HttpServletRequest request, AuthException e) {
         return new ResponseEntity<>(GenericDto.failure("Auth error: " + e.getMessage(), 401), HttpStatus.OK);
     }
+
+    /**
+     * System exception
+     *
+     * @param request
+     * @param e
+     * @return
+     */
+    @ResponseBody
+    @ExceptionHandler(PermissionException.class)
+    ResponseEntity<GenericDto> handle(HttpServletRequest request, PermissionException e) {
+        return new ResponseEntity<>(GenericDto.failure("permission error: " + e.getMessage(), 403), HttpStatus.OK);
+    }
 }

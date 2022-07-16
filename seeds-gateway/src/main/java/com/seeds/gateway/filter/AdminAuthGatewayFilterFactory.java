@@ -8,6 +8,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
 import com.seeds.gateway.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -21,7 +22,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -51,7 +51,7 @@ public class AdminAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<
             log.debug("get into auth gateway filter");
             String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ADMIN_USER_TOKEN);
             HttpCookie tokenCookie = exchange.getRequest().getCookies().getFirst(HttpHeaders.ADMIN_USER_TOKEN);
-            if (StringUtils.hasText(token)) {
+            if (StringUtils.isEmpty(token)) {
                 log.debug("No token found from header, start getting from cookie");
                 if (tokenCookie != null) {
                     log.debug("got token from cookie");

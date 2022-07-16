@@ -1,6 +1,7 @@
 package com.seeds.admin.web.sys.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.sys.request.SysRoleAddReq;
 import com.seeds.admin.dto.sys.request.SysRoleModifyReq;
 import com.seeds.admin.dto.sys.request.SysRolePageReq;
@@ -13,7 +14,6 @@ import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,28 +34,28 @@ public class SyRoleController extends AdminBaseController {
 
     @PostMapping("page")
     @ApiOperation("分页")
-    @RequiresPermissions("sys:role:page")
+    @RequiredPermission("sys:role:page")
     public GenericDto<IPage<SysRoleResp>> queryPage(@RequestBody SysRolePageReq query){
         return GenericDto.success(sysRoleService.queryPage(query));
     }
 
     @GetMapping("list")
     @ApiOperation("列表")
-    @RequiresPermissions("sys:role:list")
+    @RequiredPermission("sys:role:list")
     public GenericDto<List<SysRoleResp>> list(){
         return GenericDto.success(sysRoleService.queryList());
     }
 
     @GetMapping("detail/{id}")
     @ApiOperation("信息")
-    @RequiresPermissions("sys:role:detail")
+    @RequiredPermission("sys:role:detail")
     public GenericDto<SysRoleResp> detail(@PathVariable("id") Long id){
         return GenericDto.success(sysRoleService.detail(id));
     }
 
     @PostMapping("add")
     @ApiOperation("添加")
-    @RequiresPermissions("sys:role:add")
+    @RequiredPermission("sys:role:add")
     public GenericDto<Object> add(@RequestBody SysRoleAddReq req){
         // 查重
         SysRoleEntity role = sysRoleService.queryByRoleCode(req.getRoleCode());
@@ -68,7 +68,7 @@ public class SyRoleController extends AdminBaseController {
 
     @PostMapping("modify")
     @ApiOperation("编辑")
-    @RequiresPermissions("sys:role:modify")
+    @RequiredPermission("sys:role:modify")
     public GenericDto<Object> modify(@RequestBody SysRoleModifyReq req){
         // 查重
         SysRoleEntity role = sysRoleService.queryByRoleCode(req.getRoleCode());
@@ -81,7 +81,7 @@ public class SyRoleController extends AdminBaseController {
 
     @PostMapping("delete")
     @ApiOperation("删除")
-    @RequiresPermissions("sys:role:delete")
+    @RequiredPermission("sys:role:delete")
     public GenericDto<Object> delete(@RequestBody Set<Long> ids){
         sysRoleService.batchDelete(ids);
         return GenericDto.success(null);

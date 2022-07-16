@@ -1,5 +1,6 @@
 package com.seeds.admin.web.sys.controller;
 
+import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.sys.request.SysMenuAddReq;
 import com.seeds.admin.dto.sys.request.SysMenuModifyReq;
 import com.seeds.admin.dto.sys.response.SysMenuResp;
@@ -11,7 +12,6 @@ import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -32,14 +32,14 @@ public class SyMenuController extends AdminBaseController {
 
     @GetMapping("list")
     @ApiOperation("列表")
-    @RequiresPermissions("sys:menu:list")
+    @RequiredPermission("sys:menu:list")
     public GenericDto<List<SysMenuResp>> list(Integer type){
         return GenericDto.success(sysMenuService.queryList(type));
     }
 
     @PostMapping("add")
     @ApiOperation("添加")
-    @RequiresPermissions("sys:menu:add")
+    @RequiredPermission("sys:menu:add")
     public GenericDto<Object> add(@RequestBody SysMenuAddReq req){
         // 查重
         SysMenuEntity menu = sysMenuService.queryByMenuCode(req.getCode());
@@ -52,14 +52,14 @@ public class SyMenuController extends AdminBaseController {
 
     @GetMapping("detail/{id}")
     @ApiOperation("信息")
-    @RequiresPermissions("sys:menu:detail")
+    @RequiredPermission("sys:menu:detail")
     public GenericDto<SysMenuResp> detail(@PathVariable("id") Long id){
         return GenericDto.success(sysMenuService.detail(id));
     }
 
     @PostMapping("modify")
     @ApiOperation("编辑")
-    @RequiresPermissions("sys:menu:modify")
+    @RequiredPermission("sys:menu:modify")
     public GenericDto<Object> modify(@RequestBody SysMenuModifyReq req){
         // 查重
         SysMenuEntity menu = sysMenuService.queryByMenuCode(req.getCode());
@@ -76,7 +76,7 @@ public class SyMenuController extends AdminBaseController {
 
     @PostMapping("delete/{id}")
     @ApiOperation("删除")
-    @RequiresPermissions("sys:menu:delete")
+    @RequiredPermission("sys:menu:delete")
     public GenericDto<Object> delete(@PathVariable("id") Long id){
         // 判断是否有子菜单或按钮
         List<SysMenuEntity> list = sysMenuService.queryListByPid(id);

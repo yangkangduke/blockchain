@@ -14,11 +14,15 @@ public class GatewayConfig {
     @Bean(name = "defaultResolver")
     public KeyResolver defaultResolver() {
         return exchange -> {
-            final String userId = exchange.getRequest().getHeaders().getFirst(HttpHeaders.INTERNAL_USER_ID);
+            String userId = exchange.getRequest().getHeaders().getFirst(HttpHeaders.INTERNAL_USER_ID);
             if (StringUtils.hasText(userId)) {
-                return Mono.just(GatewayUtils.getClientIp(exchange));
+                return Mono.just(userId);
             }
-            return Mono.just(userId);
+            userId = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ADMIN_USER_ID);
+            if (StringUtils.hasText(userId)) {
+                return Mono.just(userId);
+            }
+            return Mono.just(GatewayUtils.getClientIp(exchange));
         };
 //            // 上面报错暂时弄成ip限流
 //            return exchange -> Mono.just(

@@ -1,6 +1,7 @@
 package com.seeds.admin.web.sys.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.auth.response.AdminUserResp;
 import com.seeds.admin.dto.sys.request.*;
 import com.seeds.admin.dto.sys.response.SysUserResp;
@@ -20,7 +21,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
@@ -55,21 +55,21 @@ public class SysUserController extends AdminBaseController {
 
     @PostMapping("page")
     @ApiOperation("分页")
-    @RequiresPermissions("sys:user:page")
+    @RequiredPermission("sys:user:page")
     public GenericDto<IPage<SysUserResp>> queryPage(@RequestBody SysUserPageReq query){
         return GenericDto.success(sysUserService.queryPage(query));
     }
 
     @GetMapping("detail/{id}")
     @ApiOperation("信息")
-    @RequiresPermissions("sys:user:detail")
+    @RequiredPermission("sys:user:detail")
     public GenericDto<SysUserResp> detail(@PathVariable("id") Long id){
         return GenericDto.success(sysUserService.detail(id));
     }
 
     @PostMapping("add")
     @ApiOperation("添加")
-    @RequiresPermissions("sys:user:add")
+    @RequiredPermission("sys:user:add")
     public GenericDto<Object> add(@RequestBody SysUserAddReq req){
         if (StringUtils.isEmpty(req.getMobile()) && StringUtils.isEmpty(req.getAccount())) {
             return GenericDto.failure(AdminErrorCode.ERR_504_MISSING_ARGUMENTS.getDescEn(), AdminErrorCode.ERR_504_MISSING_ARGUMENTS.getCode(), null);
@@ -97,7 +97,7 @@ public class SysUserController extends AdminBaseController {
 
     @PostMapping("modify")
     @ApiOperation("编辑")
-    @RequiresPermissions("sys:user:modify")
+    @RequiredPermission("sys:user:modify")
     public GenericDto<Object> modify(@RequestBody SysUserModifyReq req){
         SysUserEntity adminUser = sysUserService.queryById(req.getId());
         if (adminUser == null) {
@@ -116,7 +116,7 @@ public class SysUserController extends AdminBaseController {
 
     @PostMapping("changePassword")
     @ApiOperation(value = "修改密码")
-    @RequiresPermissions("sys:user:changePassword")
+    @RequiredPermission("sys:user:changePassword")
     public GenericDto<Object> changePassword(HttpServletRequest request, SysUserPasswordReq req) {
         SysUserEntity adminUser = sysUserService.queryById(req.getUserId());
         if (adminUser == null) {
@@ -150,7 +150,7 @@ public class SysUserController extends AdminBaseController {
 
     @PostMapping("delete")
     @ApiOperation("删除")
-    @RequiresPermissions("sys:user:delete")
+    @RequiredPermission("sys:user:delete")
     public GenericDto<Object> delete(@RequestBody Set<Long> ids){
         sysUserService.batchDelete(ids);
         return GenericDto.success(null);
@@ -158,7 +158,7 @@ public class SysUserController extends AdminBaseController {
 
     @PostMapping("onOrOff/{status}")
     @ApiOperation("启用/停用")
-    @RequiresPermissions("sys:user:onOrOff")
+    @RequiredPermission("sys:user:onOrOff")
     public GenericDto<Object> enableOrDisable(@RequestBody Set<Long> ids, @PathVariable("status") Integer status){
         SysUserStatusEnum.from(status);
         sysUserService.enableOrDisable(ids, status);
@@ -167,7 +167,7 @@ public class SysUserController extends AdminBaseController {
 
     @PostMapping("assignRoles")
     @ApiOperation("分配角色")
-    @RequiresPermissions("sys:user:assignRoles")
+    @RequiredPermission("sys:user:assignRoles")
     public GenericDto<Object> assignRoles(@RequestBody SysUserRoleReq req){
         // 查重
         List<SysRoleUserEntity> roleUsers = sysRoleUserService.queryByUserId(req.getUserId());
