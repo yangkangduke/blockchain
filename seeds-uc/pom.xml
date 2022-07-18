@@ -25,11 +25,15 @@
     </properties>
 
     <dependencies>
+        <!-- spring cloud config 客户端包 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.seeds</groupId>
             <artifactId>seeds-uc-model</artifactId>
