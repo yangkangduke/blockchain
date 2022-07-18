@@ -1,10 +1,12 @@
 package com.seeds.common.web.interceptor;
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.redis.constant.RedisKeys;
 import com.seeds.common.web.HttpHeaders;
 import com.seeds.common.web.context.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -24,11 +26,24 @@ public class UserContextInterceptor implements HandlerInterceptor {
     @Autowired
     private MappingJackson2HttpMessageConverter converter;
 
+    @Autowired
+    private RedissonClient redissonClient;
+
     private static final GenericDto<String> INVALID_TOKEN_RESPONSE = GenericDto.failure("Invalid token", 401);
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String token = request.getHeader(HttpHeaders.USER_TOKEN);
+        if (StringUtils.isEmpty(token)) {
+            writeFailureResponse(response);
+            return false;
+        }
         String userIdStr = request.getHeader(HttpHeaders.INTERNAL_USER_ID);
         if (StringUtils.isEmpty(userIdStr)) {
+            writeFailureResponse(response);
+            return false;
+        }
+        String redisToken = redissonClient.<String>getBucket(RedisKeys.getUcLoginUidKey(Long.valueOf(userIdStr))).get();
+        if (!token.equals(redisToken)) {
             writeFailureResponse(response);
             return false;
         }
