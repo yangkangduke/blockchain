@@ -1,10 +1,9 @@
 spring:
   application:
-    name: seeds-gateway
-
+    name: seeds-gateway-service
   cloud:
     config:
-      uri: http://config:8888
+      uri: http://127.0.0.1:8888
       fail-fast: true
       username: user
       password: ${CONFIG_SERVER_PASSWORD:password}
@@ -13,3 +12,5 @@ spring:
         max-interval: 10000
         multiplier: 2
         max-attempts: 10
+      label: main-dev
+      profile: dev
