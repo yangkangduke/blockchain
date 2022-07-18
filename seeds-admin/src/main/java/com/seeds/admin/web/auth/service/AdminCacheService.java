@@ -44,4 +44,10 @@ public interface AdminCacheService {
      */
     void removeAdminUserByToken(String token);
 
+    /**
+     * 用用户编号来remove用户登陆态
+     * @param userId 用户编号
+     */
+    void removeAdminUserByUserId(Long userId);
+
 }

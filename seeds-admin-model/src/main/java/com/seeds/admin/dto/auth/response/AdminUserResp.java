@@ -43,9 +43,9 @@ public class AdminUserResp {
 	private String headUrl;
 
 	/**
-	 * 性别   0：男   1：女    2：保密
+	 * 性别   0：女  1：男  2：保密
 	 */
-	@ApiModelProperty("性别   0：男   1：女    2：保密")
+	@ApiModelProperty("性别   0：女  1：男  2：保密")
 	private Integer gender;
 
 	/**

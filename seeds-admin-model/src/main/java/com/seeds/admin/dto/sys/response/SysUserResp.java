@@ -75,9 +75,9 @@ public class SysUserResp {
 	private Long createdAt;
 
 	/**
-	 * 删除标记  0：已删除   1：未删除
+	 * 删除标记  1：已删除   0：未删除
 	 */
-	@ApiModelProperty("删除标记  0：已删除   1：未删除")
+	@ApiModelProperty("删除标记  1：已删除   0：未删除")
 	private Integer deleteFlag;
 
 }

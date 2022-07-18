@@ -20,13 +20,13 @@ public class SysRoleResp {
 	private Long id;
 
 	@ApiModelProperty(value = "角色名称")
-	private String name;
+	private String roleName;
 
 	@ApiModelProperty(value = "备注")
 	private String remark;
 
 	@ApiModelProperty(value = "创建时间")
-	private Long createAt;
+	private Long createdAt;
 
 	@ApiModelProperty(value = "菜单ID列表")
 	private List<Long> menuIdList;

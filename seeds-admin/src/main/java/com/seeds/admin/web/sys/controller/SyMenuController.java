@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author hang.yu
@@ -40,7 +42,7 @@ public class SyMenuController extends AdminBaseController {
     @PostMapping("add")
     @ApiOperation("添加")
     @RequiredPermission("sys:menu:add")
-    public GenericDto<Object> add(@RequestBody SysMenuAddReq req){
+    public GenericDto<Object> add(@Valid @RequestBody SysMenuAddReq req){
         // 查重
         SysMenuEntity menu = sysMenuService.queryByMenuCode(req.getCode());
         if (menu != null) {
@@ -60,10 +62,10 @@ public class SyMenuController extends AdminBaseController {
     @PostMapping("modify")
     @ApiOperation("编辑")
     @RequiredPermission("sys:menu:modify")
-    public GenericDto<Object> modify(@RequestBody SysMenuModifyReq req){
+    public GenericDto<Object> modify(@Valid @RequestBody SysMenuModifyReq req){
         // 查重
         SysMenuEntity menu = sysMenuService.queryByMenuCode(req.getCode());
-        if (menu != null) {
+        if (menu != null && !Objects.equals(req.getId(), menu.getId())) {
             return GenericDto.failure(AdminErrorCode.ERR_30001_MENU_ALREADY_EXIST.getDescEn(), AdminErrorCode.ERR_30001_MENU_ALREADY_EXIST.getCode(), null);
         }
         // 上级菜单不能为自身

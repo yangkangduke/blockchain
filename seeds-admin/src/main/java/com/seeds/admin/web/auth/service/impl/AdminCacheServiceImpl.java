@@ -88,6 +88,13 @@ public class AdminCacheServiceImpl implements AdminCacheService {
         value.delete();
     }
 
+    @Override
+    public void removeAdminUserByUserId(Long userId) {
+        String key = AdminRedisKeys.getAdminUserIdKey(userId);
+        String token = redisson.<String>getBucket(key).get();
+        removeAdminUserByToken(token);
+    }
+
     private void removeAdminUserLoginUidTokenMapping(Long uid) {
         String key = AdminRedisKeys.getAdminUserIdKey(uid);
         RBucket<String> value = redisson.getBucket(key);

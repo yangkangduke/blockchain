@@ -42,7 +42,7 @@ public class SysUserEntity extends BaseEntity {
 	private String headUrl;
 
 	/**
-	 * 性别   0：男   1：女    2：保密
+	 * 性别   0：女  1：男  2：保密
 	 */
 	@TableField("gender")
 	private Integer gender;
@@ -84,7 +84,7 @@ public class SysUserEntity extends BaseEntity {
 	private Integer status;
 
 	/**
-	 * 删除标记  0：已删除   1：未删除
+	 * 删除标记  1：已删除   0：未删除
 	 */
 	@TableField("delete_flag")
 	private Integer deleteFlag;

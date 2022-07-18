@@ -65,7 +65,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     @Override
     public IPage<SysUserResp> queryPage(SysUserPageReq query) {
         QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.eq(StringUtils.isNotBlank(query.getNameOrMobile()), "real_name", query.getNameOrMobile()).or().eq("mobile", query.getNameOrMobile());
+        queryWrap.eq(StringUtils.isNotBlank(query.getNameOrMobile()), "real_name", query.getNameOrMobile()).or().eq(StringUtils.isNotBlank(query.getNameOrMobile()), "mobile", query.getNameOrMobile());
         queryWrap.eq("delete_flag", 0);
         Page<SysUserEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysUserEntity> records = page(page, queryWrap).getRecords();
@@ -89,7 +89,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         adminUser.setSalt(salt);
         adminUser.setSuperAdmin(0);
         adminUser.setStatus(1);
-        adminUser.setDeleteFlag(1);
         save(adminUser);
     }
 
@@ -105,7 +104,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
         queryWrap.in("id", ids);
         queryWrap.eq("delete_flag", 0);
-        return list();
+        return list(queryWrap);
     }
 
     @Override

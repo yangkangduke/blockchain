@@ -3,6 +3,7 @@ package com.seeds.admin.web.sys.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.auth.response.AdminUserResp;
+import com.seeds.admin.dto.common.ListReq;
 import com.seeds.admin.dto.sys.request.*;
 import com.seeds.admin.dto.sys.response.SysUserResp;
 import com.seeds.admin.entity.sys.SysRoleUserEntity;
@@ -27,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -56,7 +58,7 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("page")
     @ApiOperation("分页")
     @RequiredPermission("sys:user:page")
-    public GenericDto<IPage<SysUserResp>> queryPage(@RequestBody SysUserPageReq query){
+    public GenericDto<IPage<SysUserResp>> queryPage(@Valid  @RequestBody SysUserPageReq query){
         return GenericDto.success(sysUserService.queryPage(query));
     }
 
@@ -70,7 +72,7 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("add")
     @ApiOperation("添加")
     @RequiredPermission("sys:user:add")
-    public GenericDto<Object> add(@RequestBody SysUserAddReq req){
+    public GenericDto<Object> add(@Valid @RequestBody SysUserAddReq req){
         if (StringUtils.isEmpty(req.getMobile()) && StringUtils.isEmpty(req.getAccount())) {
             return GenericDto.failure(AdminErrorCode.ERR_504_MISSING_ARGUMENTS.getDescEn(), AdminErrorCode.ERR_504_MISSING_ARGUMENTS.getCode(), null);
         }
@@ -98,7 +100,7 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("modify")
     @ApiOperation("编辑")
     @RequiredPermission("sys:user:modify")
-    public GenericDto<Object> modify(@RequestBody SysUserModifyReq req){
+    public GenericDto<Object> modify(@Valid @RequestBody SysUserModifyReq req){
         SysUserEntity adminUser = sysUserService.queryById(req.getId());
         if (adminUser == null) {
             return GenericDto.failure(AdminErrorCode.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCode.ERR_500_SYSTEM_BUSY.getCode(), null);
@@ -117,7 +119,7 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("changePassword")
     @ApiOperation(value = "修改密码")
     @RequiredPermission("sys:user:changePassword")
-    public GenericDto<Object> changePassword(HttpServletRequest request, SysUserPasswordReq req) {
+    public GenericDto<Object> changePassword(HttpServletRequest request, @Valid @RequestBody SysUserPasswordReq req) {
         SysUserEntity adminUser = sysUserService.queryById(req.getUserId());
         if (adminUser == null) {
             return GenericDto.failure(AdminErrorCode.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCode.ERR_500_SYSTEM_BUSY.getCode(), null);
@@ -127,14 +129,14 @@ public class SysUserController extends AdminBaseController {
             return GenericDto.failure(AdminErrorCode.ERR_10043_WRONG_OLD_PASSWORD.getDescEn(), AdminErrorCode.ERR_10043_WRONG_OLD_PASSWORD.getCode(), null);
         }
         sysUserService.updatePassword(adminUser, req.getNewPassword());
-        // 退出登录
-        String token = request.getHeader(HttpHeaders.ADMIN_USER_TOKEN);
-        adminCacheService.removeAdminUserByToken(token);
+        // 登出
+        adminCacheService.removeAdminUserByUserId(req.getUserId());
         return GenericDto.success(null);
     }
 
     @PostMapping("resetPassword")
     @ApiOperation(value = "重置密码")
+    @RequiredPermission("sys:user:resetPassword")
     public GenericDto<Object> resetPassword(HttpServletRequest request) {
         String userId = request.getHeader(HttpHeaders.ADMIN_USER_ID);
         SysUserEntity adminUser = sysUserService.queryById(Long.valueOf(userId));
@@ -142,7 +144,7 @@ public class SysUserController extends AdminBaseController {
             return GenericDto.failure(AdminErrorCode.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCode.ERR_500_SYSTEM_BUSY.getCode(), null);
         }
         sysUserService.updatePassword(adminUser, initPassword);
-        // 退出登录
+        // 登出
         String token = request.getHeader(HttpHeaders.ADMIN_USER_TOKEN);
         adminCacheService.removeAdminUserByToken(token);
         return GenericDto.success(null);
@@ -151,24 +153,26 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("delete")
     @ApiOperation("删除")
     @RequiredPermission("sys:user:delete")
-    public GenericDto<Object> delete(@RequestBody Set<Long> ids){
-        sysUserService.batchDelete(ids);
+    public GenericDto<Object> delete(@RequestBody ListReq req){
+        sysUserService.batchDelete(req.getIds());
         return GenericDto.success(null);
     }
 
     @PostMapping("onOrOff/{status}")
     @ApiOperation("启用/停用")
     @RequiredPermission("sys:user:onOrOff")
-    public GenericDto<Object> enableOrDisable(@RequestBody Set<Long> ids, @PathVariable("status") Integer status){
+    public GenericDto<Object> enableOrDisable(@RequestBody ListReq req, @PathVariable("status") Integer status){
         SysUserStatusEnum.from(status);
-        sysUserService.enableOrDisable(ids, status);
+        sysUserService.enableOrDisable(req.getIds(), status);
+        // 批量登出
+        req.getIds().forEach(p -> adminCacheService.removeAdminUserByUserId(p));
         return GenericDto.success(null);
     }
 
     @PostMapping("assignRoles")
     @ApiOperation("分配角色")
     @RequiredPermission("sys:user:assignRoles")
-    public GenericDto<Object> assignRoles(@RequestBody SysUserRoleReq req){
+    public GenericDto<Object> assignRoles(@Valid @RequestBody SysUserRoleReq req){
         // 查重
         List<SysRoleUserEntity> roleUsers = sysRoleUserService.queryByUserId(req.getUserId());
         if (!CollectionUtils.isEmpty(roleUsers)) {

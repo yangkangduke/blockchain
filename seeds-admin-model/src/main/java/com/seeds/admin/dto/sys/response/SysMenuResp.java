@@ -41,7 +41,7 @@ public class SysMenuResp extends TreeNode<SysMenuResp> {
 	private Integer sort;
 
 	@ApiModelProperty(value = "创建时间")
-	private Long createAt;
+	private Long createdAt;
 
 	@ApiModelProperty(value = "上级菜单名称")
 	private String parentName;

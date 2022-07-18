@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 
 /**
@@ -65,7 +66,7 @@ public class AdminAuthController {
      */
     @PostMapping("/login")
     @ApiOperation(value = "登录")
-    public GenericDto<AdminLoginResp> login(@RequestBody AdminLoginReq loginReq) {
+    public GenericDto<AdminLoginResp> login(@Valid @RequestBody AdminLoginReq loginReq) {
         String authType = loginReq.getAuthType();
         SysUserEntity adminUser = null;
         if (SysAuthTypeEnum.PHONE.getCode().equals(authType)) {

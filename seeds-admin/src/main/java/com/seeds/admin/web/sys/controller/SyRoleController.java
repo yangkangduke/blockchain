@@ -2,6 +2,7 @@ package com.seeds.admin.web.sys.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.annotation.RequiredPermission;
+import com.seeds.admin.dto.common.ListReq;
 import com.seeds.admin.dto.sys.request.SysRoleAddReq;
 import com.seeds.admin.dto.sys.request.SysRoleModifyReq;
 import com.seeds.admin.dto.sys.request.SysRolePageReq;
@@ -17,8 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 /**
  * @author hang.yu
@@ -35,7 +37,7 @@ public class SyRoleController extends AdminBaseController {
     @PostMapping("page")
     @ApiOperation("分页")
     @RequiredPermission("sys:role:page")
-    public GenericDto<IPage<SysRoleResp>> queryPage(@RequestBody SysRolePageReq query){
+    public GenericDto<IPage<SysRoleResp>> queryPage(@Valid @RequestBody SysRolePageReq query){
         return GenericDto.success(sysRoleService.queryPage(query));
     }
 
@@ -56,7 +58,7 @@ public class SyRoleController extends AdminBaseController {
     @PostMapping("add")
     @ApiOperation("添加")
     @RequiredPermission("sys:role:add")
-    public GenericDto<Object> add(@RequestBody SysRoleAddReq req){
+    public GenericDto<Object> add(@Valid @RequestBody SysRoleAddReq req){
         // 查重
         SysRoleEntity role = sysRoleService.queryByRoleCode(req.getRoleCode());
         if (role != null) {
@@ -69,10 +71,10 @@ public class SyRoleController extends AdminBaseController {
     @PostMapping("modify")
     @ApiOperation("编辑")
     @RequiredPermission("sys:role:modify")
-    public GenericDto<Object> modify(@RequestBody SysRoleModifyReq req){
+    public GenericDto<Object> modify(@Valid @RequestBody SysRoleModifyReq req){
         // 查重
         SysRoleEntity role = sysRoleService.queryByRoleCode(req.getRoleCode());
-        if (role != null) {
+        if (role != null && !Objects.equals(req.getId(), role.getId())) {
             return GenericDto.failure(AdminErrorCode.ERR_20001_ROLE_ALREADY_EXIST.getDescEn(), AdminErrorCode.ERR_20001_ROLE_ALREADY_EXIST.getCode(), null);
         }
         sysRoleService.modify(req);
@@ -82,8 +84,8 @@ public class SyRoleController extends AdminBaseController {
     @PostMapping("delete")
     @ApiOperation("删除")
     @RequiredPermission("sys:role:delete")
-    public GenericDto<Object> delete(@RequestBody Set<Long> ids){
-        sysRoleService.batchDelete(ids);
+    public GenericDto<Object> delete(@Valid @RequestBody ListReq ids){
+        sysRoleService.batchDelete(ids.getIds());
         return GenericDto.success(null);
     }
 

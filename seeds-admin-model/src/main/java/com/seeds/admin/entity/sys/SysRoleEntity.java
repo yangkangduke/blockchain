@@ -37,7 +37,7 @@ public class SysRoleEntity extends BaseEntity {
 	private String remark;
 
 	/**
-	 * 删除标记  0：已删除   1：未删除
+	 * 删除标记  1：已删除   0：未删除
 	 */
 	@TableField("delete_flag")
 	private Integer deleteFlag;

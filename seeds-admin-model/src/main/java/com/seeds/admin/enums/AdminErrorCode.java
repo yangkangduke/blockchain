@@ -36,7 +36,7 @@ public enum AdminErrorCode {
     ERR_20002_USER_ROLE_ALREADY_EXIST(20002, "该角色当前用户已存在", "The role already exists for the current user"),
 
     // menu
-    ERR_30001_MENU_ALREADY_EXIST(30001, "菜单已存在", "menu name already exist"),
+    ERR_30001_MENU_ALREADY_EXIST(30001, "菜单已存在", "menu code already exist"),
     ERR_30002_MENU_PARENT_ITSELF(30002, "上级菜单不能为自身", "Parent menu cannot be for itself"),
     ERR_30003_SUB_MENU_EXIST(30003, "存在下级菜单", "Subordinate menus exist"),
 
