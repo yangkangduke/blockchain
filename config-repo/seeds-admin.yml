@@ -6,6 +6,12 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  datasource:
+    url: jdbc:mysql://192.168.1.101:3306/seeds_admin
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
 management:
   endpoints:
     web:
@@ -28,3 +34,4 @@ springfox:
   documentation:
     swagger-ui:
       enabled: true
+
