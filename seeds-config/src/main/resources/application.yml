@@ -6,11 +6,12 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/AllenAi007/seeds-java.git #配置文件所在仓库
+          uri: https://github.com/AllenAi007/seeds-java
           username: 819628513@qq.com
           password: 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
-          label: main #配置文件分支
-          search-paths: config-repo  #配置文件所在根目录
+          search-paths: config-repo
+          default-label: main
+
 
 security:
   user:
