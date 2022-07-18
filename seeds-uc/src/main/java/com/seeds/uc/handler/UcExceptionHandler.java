@@ -23,6 +23,7 @@ import javax.validation.ValidationException;
 @Slf4j
 @ControllerAdvice
 public class UcExceptionHandler {
+
     @ResponseBody
     @ExceptionHandler(Throwable.class)
     ResponseEntity<GenericDto<String>> handle(Throwable e) {
@@ -59,7 +60,7 @@ public class UcExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GenericDto<String>> handle(MethodArgumentNotValidException e){
         return new ResponseEntity<>(
-                GenericDto.failure(e.getBindingResult().getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value()),
+                GenericDto.failure(e.getBindingResult().getFieldError().getField() + ":" + e.getBindingResult().getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
     }
 
