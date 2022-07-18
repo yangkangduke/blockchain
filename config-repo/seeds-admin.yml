@@ -1,14 +1,10 @@
 server:
-  port: 10103
-
+  port: 10105
 
 spring:
-  profiles:
-    active: local
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-
 
 management:
   endpoints:
@@ -16,17 +12,17 @@ management:
       base-path: /
 
 mybatis:
-  type-aliases-package*: com.seeds.uc.model
+  type-aliases-package*: com.seeds.admin.model
 
-uc:
+admin:
   sso:
     redis:
       keyExpireAfter: 259200
 
-# uc 文件存储目录
+# admin 文件存储目录
 file:
   store:
-    location: /seeds-uc/files/
+    location: /seeds-admin/files/
 
 springfox:
   documentation:
