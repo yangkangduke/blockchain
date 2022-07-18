@@ -9,7 +9,8 @@ spring:
           uri: https://github.com/AllenAi007/seeds-java.git #配置文件所在仓库
           username: 819628513@qq.com
           password: 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
-          search-paths: config  #配置文件所在根目录
+          label: main #配置文件分支
+          search-paths: config-repo  #配置文件所在根目录
 
 security:
   user:
