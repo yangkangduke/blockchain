@@ -1,9 +1,9 @@
 server:
-  port: 9999
+  port: 10100
 
 spring:
   application:
-    name: seeds-gateway-service
+    name: seeds-gateway
 
   cloud:
     gateway:
