@@ -20,7 +20,7 @@ spring:
             - Path=/uc-open/**
 
         - id: seeds-admin-public-service
-          uri: http://localhost:10105/
+          uri: http://localhost:10102/
           predicates:
             - Path=/admin-public/**
           filters:
