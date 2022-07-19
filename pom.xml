@@ -37,6 +37,8 @@
         <okhttp.version>4.8.1</okhttp.version>
         <web3j.version>5.0.0</web3j.version>
         <hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
+        <redission.version>3.13.2</redission.version>
+        <commons-io.version>2.11.0</commons-io.version>
     </properties>
 
     <groupId>com.seeds</groupId>
@@ -124,6 +126,16 @@
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>${redission.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
