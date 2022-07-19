@@ -34,3 +34,10 @@ springfox:
   documentation:
     swagger-ui:
       enabled: true
+
+redisson:
+  address: redis://192.168.1.101:6379
+  timeout: 5000
+  poolsize: 50
+  idlesize: 50
+  password: 123456
