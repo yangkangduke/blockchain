@@ -1,7 +1,7 @@
 package com.seeds.admin.web.auth.service.impl;
 
 import com.seeds.admin.entity.sys.SysUserEntity;
-import com.seeds.admin.enums.SuperAdminEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.web.auth.service.AdminShiroService;
 import com.seeds.admin.web.sys.service.SysMenuService;
 import com.seeds.admin.web.sys.service.SysUserService;
@@ -39,7 +39,7 @@ public class AdminShiroServiceImpl implements AdminShiroService {
         SysUserEntity user = sysUserService.queryById(userId);
         // 系统管理员，拥有最高权限
         List<String> permissionsList;
-        if(user.getSuperAdmin() == SuperAdminEnum.YES.value()) {
+        if(user.getSuperAdmin() == WhetherEnum.YES.value()) {
             permissionsList = sysMenuService.getPermissionsList();
         }else{
             permissionsList = sysMenuService.getUserPermissionsList(user.getId());

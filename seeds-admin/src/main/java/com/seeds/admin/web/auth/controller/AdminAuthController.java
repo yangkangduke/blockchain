@@ -7,7 +7,7 @@ import com.seeds.admin.dto.auth.response.AdminLoginResp;
 import com.seeds.admin.entity.sys.SysUserEntity;
 import com.seeds.admin.enums.SysAuthTypeEnum;
 import com.seeds.admin.enums.AdminErrorCode;
-import com.seeds.admin.enums.SysUserStatusEnum;
+import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.web.auth.service.AdminCacheService;
 import com.seeds.admin.web.auth.service.AdminCaptchaService;
 import com.seeds.admin.web.sys.service.SysUserService;
@@ -106,7 +106,7 @@ public class AdminAuthController {
             }
         }
         // 账号停用
-        if(SysUserStatusEnum.DISABLE.value() == adminUser.getStatus()){
+        if(SysStatusEnum.DISABLE.value() == adminUser.getStatus()){
             return GenericDto.failure(AdminErrorCode.ERR_10014_ACCOUNT_FROZEN.getDescEn(), AdminErrorCode.ERR_10014_ACCOUNT_FROZEN.getCode(), null);
         }
         // 下发token

@@ -9,7 +9,8 @@ import com.seeds.admin.dto.sys.request.SysUserAddReq;
 import com.seeds.admin.dto.sys.request.SysUserModifyReq;
 import com.seeds.admin.dto.sys.request.SysUserPageReq;
 import com.seeds.admin.dto.sys.response.SysUserResp;
-import com.seeds.admin.enums.SuperAdminEnum;
+import com.seeds.admin.enums.SysStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.web.sys.mapper.SysUserMapper;
 import com.seeds.admin.entity.sys.SysUserEntity;
 import com.seeds.admin.web.sys.service.SysMenuService;
@@ -65,7 +66,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     @Override
     public IPage<SysUserResp> queryPage(SysUserPageReq query) {
         QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.eq(StringUtils.isNotBlank(query.getNameOrMobile()), "real_name", query.getNameOrMobile()).or().eq(StringUtils.isNotBlank(query.getNameOrMobile()), "mobile", query.getNameOrMobile());
+        queryWrap.likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), "real_name", query.getNameOrMobile()).or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), "mobile", query.getNameOrMobile());
         queryWrap.eq("delete_flag", 0);
         Page<SysUserEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysUserEntity> records = page(page, queryWrap).getRecords();
@@ -87,8 +88,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         String password = HashUtil.sha256(user.getInitPassport() + salt);
         adminUser.setPassword(password);
         adminUser.setSalt(salt);
-        adminUser.setSuperAdmin(0);
-        adminUser.setStatus(1);
+        adminUser.setSuperAdmin(WhetherEnum.NO.value());
+        adminUser.setStatus(SysStatusEnum.ENABLED.value());
         save(adminUser);
     }
 
@@ -116,7 +117,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-        list.forEach(p -> p.setDeleteFlag(1));
+        list.forEach(p -> p.setDeleteFlag(WhetherEnum.YES.value()));
         updateBatchById(list);
     }
 
@@ -150,7 +151,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
             // 用户信息
             BeanUtils.copyProperties(user, resp);
             // 角色信息 菜单信息
-            if (SuperAdminEnum.YES.value() == user.getSuperAdmin()) {
+            if (WhetherEnum.YES.value() == user.getSuperAdmin()) {
                 // 超级管理员
                 resp.setRoleList(sysRoleService.queryList());
                 resp.setMenuList(sysMenuService.queryList(null));

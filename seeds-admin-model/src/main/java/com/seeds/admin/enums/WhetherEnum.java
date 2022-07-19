@@ -1,19 +1,19 @@
 package com.seeds.admin.enums;
 
 /**
- * 超级管理员枚举
+ * 是否枚举
  *
  * @author hang.yu
  * @since 2022/7/14
  */
-public enum SuperAdminEnum {
+public enum WhetherEnum {
 
     YES(1),
     NO(0);
 
     private int value;
 
-    SuperAdminEnum(int value) {
+    WhetherEnum(int value) {
         this.value = value;
     }
 

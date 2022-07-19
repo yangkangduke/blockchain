@@ -9,7 +9,7 @@ import com.seeds.admin.dto.sys.response.SysUserResp;
 import com.seeds.admin.entity.sys.SysRoleUserEntity;
 import com.seeds.admin.entity.sys.SysUserEntity;
 import com.seeds.admin.enums.AdminErrorCode;
-import com.seeds.admin.enums.SysUserStatusEnum;
+import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.utils.HashUtil;
 import com.seeds.admin.web.auth.service.AdminCacheService;
 import com.seeds.admin.web.common.controller.AdminBaseController;
@@ -162,7 +162,7 @@ public class SysUserController extends AdminBaseController {
     @ApiOperation("启用/停用")
     @RequiredPermission("sys:user:onOrOff")
     public GenericDto<Object> enableOrDisable(@RequestBody ListReq req, @PathVariable("status") Integer status){
-        SysUserStatusEnum.from(status);
+        SysStatusEnum.from(status);
         sysUserService.enableOrDisable(req.getIds(), status);
         // 批量登出
         req.getIds().forEach(p -> adminCacheService.removeAdminUserByUserId(p));
