@@ -69,6 +69,12 @@ public class SysUserController extends AdminBaseController {
         return GenericDto.success(sysUserService.detail(id));
     }
 
+    @GetMapping("brief/{mobile}")
+    @ApiOperation("简略信息")
+    public GenericDto<SysUserResp> brief(@PathVariable("mobile") String mobile){
+        return GenericDto.success(sysUserService.brief(mobile));
+    }
+
     @PostMapping("add")
     @ApiOperation("添加")
     @RequiredPermission("sys:user:add")

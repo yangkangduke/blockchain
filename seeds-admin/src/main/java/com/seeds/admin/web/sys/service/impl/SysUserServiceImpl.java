@@ -24,8 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 系统用户
@@ -46,7 +49,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     public SysUserEntity queryByMobile(String mobile) {
         QueryWrapper<SysUserEntity> query = new QueryWrapper<>();
         query.eq("mobile", mobile);
-        query.eq("delete_flag", 0);
+        query.eq("delete_flag", WhetherEnum.NO.value());
         return getOne(query);
     }
 
@@ -54,7 +57,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     public SysUserEntity queryByAccount(String account) {
         QueryWrapper<SysUserEntity> query = new QueryWrapper<>();
         query.eq("account", account);
-        query.eq("delete_flag", 0);
+        query.eq("delete_flag", WhetherEnum.NO.value());
         return getOne(query);
     }
 
@@ -66,8 +69,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     @Override
     public IPage<SysUserResp> queryPage(SysUserPageReq query) {
         QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), "real_name", query.getNameOrMobile()).or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), "mobile", query.getNameOrMobile());
-        queryWrap.eq("delete_flag", 0);
+        queryWrap.likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), "real_name", query.getNameOrMobile())
+                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), "mobile", query.getNameOrMobile());
+        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
         Page<SysUserEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysUserEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -104,8 +108,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     public List<SysUserEntity> queryByIds(Set<Long> ids) {
         QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
         queryWrap.in("id", ids);
-        queryWrap.eq("delete_flag", 0);
+        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
         return list(queryWrap);
+    }
+
+    @Override
+    public Map<Long, String> queryNameMapByIds(Set<Long> ids) {
+        List<SysUserEntity> sysUser = queryByIds(ids);
+        if (CollectionUtils.isEmpty(sysUser)) {
+            return Collections.emptyMap();
+        }
+        return sysUser.stream().collect(Collectors.toMap(SysUserEntity::getId, SysUserEntity::getRealName));
     }
 
     @Override
@@ -171,6 +184,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
             BeanUtils.copyProperties(user, resp);
         }
         return resp;
+    }
+
+    @Override
+    public SysUserResp brief(String mobile) {
+        QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
+        queryWrap.eq("mobile", mobile);
+        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+        SysUserEntity sysUser = getOne(queryWrap);
+        SysUserResp res = new SysUserResp();
+        if (sysUser != null) {
+            res.setMobile(mobile);
+            res.setId(sysUser.getId());
+            res.setRealName(sysUser.getRealName());
+        }
+        return res;
     }
 
 }

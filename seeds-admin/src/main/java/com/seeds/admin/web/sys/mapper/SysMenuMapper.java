@@ -5,7 +5,7 @@ import com.seeds.admin.entity.sys.SysMenuEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 系统用户
+ * 系统菜单
  *
  * @author hang.yu
  * @date 2022/7/13

@@ -10,6 +10,7 @@ import com.seeds.admin.dto.sys.request.SysRolePageReq;
 import com.seeds.admin.dto.sys.response.SysRoleResp;
 import com.seeds.admin.entity.sys.SysRoleEntity;
 import com.seeds.admin.entity.sys.SysRoleUserEntity;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.web.sys.mapper.SysRoleMapper;
 import com.seeds.admin.web.sys.service.SysRoleMenuService;
 import com.seeds.admin.web.sys.service.SysRoleService;
@@ -21,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -46,7 +44,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
     public IPage<SysRoleResp> queryPage(SysRolePageReq query) {
         QueryWrapper<SysRoleEntity> queryWrap = new QueryWrapper<>();
         queryWrap.eq(StringUtils.isNotBlank(query.getRoleName()), "roleName", query.getRoleName());
-        queryWrap.eq("delete_flag", 0);
+        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
         Page<SysRoleEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysRoleEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -63,7 +61,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
     public SysRoleEntity queryByRoleCode(String roleCode) {
         QueryWrapper<SysRoleEntity> query = new QueryWrapper<>();
         query.eq("role_code", roleCode);
-        query.eq("delete_flag", 0);
+        query.eq("delete_flag", WhetherEnum.NO.value());
         return getOne(query);
     }
 
@@ -71,7 +69,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
     public SysRoleEntity queryById(Long id) {
         QueryWrapper<SysRoleEntity> query = new QueryWrapper<>();
         query.eq("id", id);
-        query.eq("delete_flag", 0);
+        query.eq("delete_flag", WhetherEnum.NO.value());
         return getOne(query);
     }
 
@@ -122,7 +120,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
     @Override
     public List<SysRoleResp> queryList() {
         QueryWrapper<SysRoleEntity> query = new QueryWrapper<>();
-        query.eq("delete_flag", 0);
+        query.eq("delete_flag", WhetherEnum.NO.value());
         List<SysRoleEntity> list = list(query);
         return convertToResp(list);
     }

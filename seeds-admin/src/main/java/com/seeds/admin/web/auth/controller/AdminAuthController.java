@@ -68,7 +68,7 @@ public class AdminAuthController {
     @ApiOperation(value = "登录")
     public GenericDto<AdminLoginResp> login(@Valid @RequestBody AdminLoginReq loginReq) {
         String authType = loginReq.getAuthType();
-        SysUserEntity adminUser = null;
+        SysUserEntity adminUser;
         if (SysAuthTypeEnum.PHONE.getCode().equals(authType)) {
             // 手机号登录
             if (StringUtils.isEmpty(loginReq.getMobile())) {

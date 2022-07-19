@@ -1,5 +1,6 @@
 package com.seeds.admin.web.auth.service.impl;
 
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.web.auth.service.AdminCacheService;
 import com.seeds.admin.web.auth.service.AdminCaptchaService;
 import com.wf.captcha.SpecCaptcha;
@@ -34,7 +35,7 @@ public class AdminCaptchaServiceImpl implements AdminCaptchaService {
         response.setContentType("image/gif");
         response.setHeader("Pragma", "No-cache");
         response.setHeader("Cache-Control", "no-cache");
-        response.setDateHeader("Expires", 0);
+        response.setDateHeader("Expires", WhetherEnum.NO.value());
 
         //生成验证码
         SpecCaptcha captcha = new SpecCaptcha(150, 40);

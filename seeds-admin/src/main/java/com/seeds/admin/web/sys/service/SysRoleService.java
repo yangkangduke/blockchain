@@ -72,6 +72,7 @@ public interface SysRoleService {
 
     /**
      * 获取系统用户角色信息
+     * @param userId 角色id
      * @return 系统用户角色信息
      */
     List<SysRoleResp> queryByUserId(Long userId);

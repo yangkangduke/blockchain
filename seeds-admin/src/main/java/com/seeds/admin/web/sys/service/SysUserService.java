@@ -9,6 +9,7 @@ import com.seeds.admin.dto.sys.response.SysUserResp;
 import com.seeds.admin.entity.sys.SysUserEntity;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -69,6 +70,13 @@ public interface SysUserService {
     List<SysUserEntity> queryByIds(Set<Long> ids);
 
     /**
+     * 通过id批量查询系统用户名称
+     * @param ids 用户id
+     * @return 系统用户名称信息
+     */
+    Map<Long, String> queryNameMapByIds(Set<Long> ids);
+
+    /**
      * 批量删除用户
      * @param ids 用户编号集合
      */
@@ -101,5 +109,12 @@ public interface SysUserService {
      * @return 用户信息
      */
     SysUserResp detail(Long id);
+
+    /**
+     * 根据手机号获取用户简略信息
+     * @param mobile 用户手机号
+     * @return 用户简略信息
+     */
+    SysUserResp brief(String mobile);
 
 }
