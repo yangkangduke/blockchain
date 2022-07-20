@@ -9,6 +9,13 @@ spring:
     host: 54.168.239.215
     port: 6379
 
+redisson:
+  address: redis://54.168.239.215:6379
+  timeout: 5000
+  poolsize: 50
+  idlesize: 50
+  password: Seeds123!
+
   cloud:
     gateway:
       routes:
