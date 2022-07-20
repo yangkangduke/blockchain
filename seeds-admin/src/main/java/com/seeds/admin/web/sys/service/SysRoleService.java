@@ -7,8 +7,9 @@ import com.seeds.admin.dto.sys.request.SysRolePageReq;
 import com.seeds.admin.dto.sys.response.SysRoleResp;
 import com.seeds.admin.entity.sys.SysRoleEntity;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * 系统角色
@@ -34,10 +35,24 @@ public interface SysRoleService {
 
     /**
      * 通过id查询系统角色
-     * @param id 编号
+     * @param id 角色编号
      * @return 系统角色信息
      */
     SysRoleEntity queryById(Long id);
+
+    /**
+     * 通过id列表查询系统角色
+     * @param ids 角色id列表
+     * @return 系统角色信息
+     */
+    List<SysRoleEntity> queryByIds(Collection<Long> ids);
+
+    /**
+     * 通过id列表查询系统角色
+     * @param ids 角色id列表
+     * @return 系统角色信息
+     */
+    Map<Long, String> queryMapByIds(Collection<Long> ids);
 
     /**
      * 添加系统角色
@@ -55,7 +70,7 @@ public interface SysRoleService {
      * 批量删除系统角色
      * @param ids 角色id列表
      */
-    void batchDelete(Set<Long> ids);
+    void batchDelete(Collection<Long> ids);
 
     /**
      * 获取系统角色信息

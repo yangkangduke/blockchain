@@ -5,16 +5,21 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.auth.response.AdminUserResp;
+import com.seeds.admin.dto.common.SwitchReq;
 import com.seeds.admin.dto.sys.request.SysUserAddReq;
 import com.seeds.admin.dto.sys.request.SysUserModifyReq;
 import com.seeds.admin.dto.sys.request.SysUserPageReq;
+import com.seeds.admin.dto.sys.response.SysUserBriefResp;
 import com.seeds.admin.dto.sys.response.SysUserResp;
+import com.seeds.admin.entity.sys.SysRoleEntity;
+import com.seeds.admin.entity.sys.SysRoleUserEntity;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.web.sys.mapper.SysUserMapper;
 import com.seeds.admin.entity.sys.SysUserEntity;
 import com.seeds.admin.web.sys.service.SysMenuService;
 import com.seeds.admin.web.sys.service.SysRoleService;
+import com.seeds.admin.web.sys.service.SysRoleUserService;
 import com.seeds.admin.web.sys.service.SysUserService;
 import com.seeds.admin.utils.HashUtil;
 import com.seeds.admin.utils.RandomUtil;
@@ -24,10 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +46,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 
     @Autowired
     private SysRoleService sysRoleService;
+
+    @Autowired
+    private SysRoleUserService sysRoleUserService;
 
     @Override
     public SysUserEntity queryByMobile(String mobile) {
@@ -77,15 +82,37 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
+        Set<Long> userIds = records.stream().map(SysUserEntity::getId).collect(Collectors.toSet());
+        Map<Long, Set<Long>> roleUserMap = sysRoleUserService.queryMapByUserIds(userIds);
+        Set<Long> roleIds = new HashSet<>();
+        if (!CollectionUtils.isEmpty(roleUserMap.values())) {
+            roleUserMap.values().forEach(roleIds::addAll);
+        }
+        Map<Long, String> roleMap = sysRoleService.queryMapByIds(roleIds);
         return page.convert(p -> {
             SysUserResp resp = new SysUserResp();
             BeanUtils.copyProperties(p, resp);
+            StringBuilder str = new StringBuilder();
+            Set<Long> roleIdSet = roleUserMap.get(p.getId());
+            if (!CollectionUtils.isEmpty(roleIdSet)) {
+                resp.setRoleIds(new ArrayList<>(roleIdSet));
+                for (Long roleId : roleIdSet) {
+                    String roleName = roleMap.get(roleId);
+                    if (StringUtils.isEmpty(roleName)) {
+                        continue;
+                    }
+                    str.append(roleName).append(",");
+                }
+            }
+            if (str.length() > 0) {
+                resp.setRoleNameStr(str.substring(0, str.lastIndexOf(",")));
+            }
             return resp;
         });
     }
 
     @Override
-    public void add(SysUserAddReq user) {
+    public SysUserEntity add(SysUserAddReq user) {
         SysUserEntity adminUser = new SysUserEntity();
         BeanUtils.copyProperties(user, adminUser);
         String salt = RandomUtil.getRandomSalt();
@@ -95,17 +122,29 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         adminUser.setSuperAdmin(WhetherEnum.NO.value());
         adminUser.setStatus(SysStatusEnum.ENABLED.value());
         save(adminUser);
+        return adminUser;
     }
 
     @Override
-    public void modify(SysUserModifyReq user) {
+    public SysUserEntity modify(SysUserModifyReq user) {
         SysUserEntity adminUser = new SysUserEntity();
         BeanUtils.copyProperties(user, adminUser);
         updateById(adminUser);
+        return adminUser;
     }
 
     @Override
-    public List<SysUserEntity> queryByIds(Set<Long> ids) {
+    public void modifyById(SysUserEntity sysUser) {
+        updateById(sysUser);
+    }
+
+    @Override
+    public void batchModifyById(List<SysUserEntity> sysUsers) {
+        updateBatchById(sysUsers);
+    }
+
+    @Override
+    public List<SysUserEntity> queryByIds(Collection<Long> ids) {
         QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
         queryWrap.in("id", ids);
         queryWrap.eq("delete_flag", WhetherEnum.NO.value());
@@ -113,7 +152,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     }
 
     @Override
-    public Map<Long, String> queryNameMapByIds(Set<Long> ids) {
+    public Map<Long, String> queryNameMapByIds(Collection<Long> ids) {
         List<SysUserEntity> sysUser = queryByIds(ids);
         if (CollectionUtils.isEmpty(sysUser)) {
             return Collections.emptyMap();
@@ -122,7 +161,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     }
 
     @Override
-    public void batchDelete(Set<Long> ids) {
+    public void batchDelete(Collection<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return;
         }
@@ -144,16 +183,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     }
 
     @Override
-    public void enableOrDisable(Set<Long> ids, Integer status) {
-        if (CollectionUtils.isEmpty(ids)) {
+    public void enableOrDisable(List<SwitchReq> req) {
+        if (CollectionUtils.isEmpty(req)) {
             return;
         }
-        List<SysUserEntity> list = queryByIds(ids);
-        if (CollectionUtils.isEmpty(list)) {
-            return;
-        }
-        list.forEach(p -> p.setStatus(status));
-        updateBatchById(list);
+        List<SysUserEntity> sysUsers = new ArrayList<>();
+        req.forEach(p -> {
+            // 校验状态
+            SysStatusEnum.from(p.getStatus());
+            SysUserEntity sysUser = new SysUserEntity();
+            sysUser.setId(p.getId());
+            sysUser.setStatus(p.getStatus());
+            sysUsers.add(sysUser);
+        });
+        // 停用/启用用户
+        updateBatchById(sysUsers);
     }
 
     @Override
@@ -182,17 +226,28 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         SysUserResp resp = new SysUserResp();
         if (user != null) {
             BeanUtils.copyProperties(user, resp);
+            List<SysRoleUserEntity> sysRoleUser = sysRoleUserService.queryByUserId(user.getId());
+            if (!CollectionUtils.isEmpty(sysRoleUser)) {
+                StringBuilder str = new StringBuilder();
+                Set<Long> roleIds = sysRoleUser.stream().map(SysRoleUserEntity::getRoleId).collect(Collectors.toSet());
+                resp.setRoleIds(new ArrayList<>(roleIds));
+                List<SysRoleEntity> sysRole = sysRoleService.queryByIds(roleIds);
+                sysRole.forEach(p -> str.append(p.getRoleName()).append(","));
+                if (str.length() > 0) {
+                    resp.setRoleNameStr(str.substring(0, str.lastIndexOf(",")));
+                }
+            }
         }
         return resp;
     }
 
     @Override
-    public SysUserResp brief(String mobile) {
+    public SysUserBriefResp brief(String mobile) {
         QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
         queryWrap.eq("mobile", mobile);
         queryWrap.eq("delete_flag", WhetherEnum.NO.value());
         SysUserEntity sysUser = getOne(queryWrap);
-        SysUserResp res = new SysUserResp();
+        SysUserBriefResp res = new SysUserBriefResp();
         if (sysUser != null) {
             res.setMobile(mobile);
             res.setId(sysUser.getId());
