@@ -9,18 +9,18 @@ spring:
     gateway:
       routes:
         - id: seeds-uc-internal-service
-          uri: http://Seeds-uc:10103/
+          uri: http://127.0.0.1:10103/
           predicates:
             - Path=/uc-internal/**
           filters:
             - Auth
         - id: seeds-uc-open-service
-          uri: http://Seeds-uc:10103/
+          uri: http://127.0.0.1:10103/
           predicates:
             - Path=/uc-open/**
 
         - id: seeds-admin-public-service
-          uri: http://Seeds-admin:10102/
+          uri: http://127.0.0.1:10102/
           predicates:
             - Path=/admin-public/**
           filters:
