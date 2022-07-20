@@ -1,5 +1,5 @@
 spring:
   redis:
-    host: 192.168.1.101
+    host: ${MYSQL_HOST:seeds-mysql}
     port: 6379
-    password: 123456
+    password: Seeds123!
