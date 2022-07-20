@@ -1,0 +1,43 @@
+server:
+  port: 10101
+
+spring:
+  datasource:
+    url: jdbc:mysql://54.168.239.215:3306/seeds_uc
+    username: root
+    password: Seeds123!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+management:
+  endpoints:
+    web:
+      base-path: /
+
+mybatis:
+  type-aliases-package*: com.seeds.uc.model
+
+uc:
+  sso:
+    redis:
+      keyExpireAfter: 259200
+
+# uc 文件存储目录
+file:
+  store:
+    location: /seeds-uc/files/
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+redisson:
+  address: redis://54.168.239.215:6379
+  timeout: 5000
+  poolsize: 50
+  idlesize: 50
+  password: Seeds123!
