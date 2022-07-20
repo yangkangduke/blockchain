@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://192.168.1.101:3306/seeds_uc
+    url: jdbc:mysql://54.168.239.215:3306/seeds_uc
     username: root
-    password: 123456
+    password: Seeds123!
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   mvc:
@@ -36,8 +36,7 @@ springfox:
       enabled: true
 
 redisson:
-  address: redis://192.168.1.101:6379
+  address: redis://54.168.239.215:6379
   timeout: 5000
   poolsize: 50
   idlesize: 50
-  password: 123456
