@@ -5,6 +5,10 @@ spring:
   application:
     name: seeds-gateway
 
+  redis:
+    host: 54.168.239.215
+    port: 6379
+
   cloud:
     gateway:
       routes:
