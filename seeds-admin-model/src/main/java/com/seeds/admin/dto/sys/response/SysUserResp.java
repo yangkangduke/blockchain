@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 系统用户
  * 
@@ -55,6 +57,18 @@ public class SysUserResp {
 	 */
 	@ApiModelProperty("手机号")
 	private String mobile;
+
+	/**
+	 * 角色
+	 */
+	@ApiModelProperty("角色")
+	private String roleNameStr;
+
+	/**
+	 * 角色id列表
+	 */
+	@ApiModelProperty("角色id列表")
+	private List<Long> roleIds;
 
 	/**
 	 * 部门ID

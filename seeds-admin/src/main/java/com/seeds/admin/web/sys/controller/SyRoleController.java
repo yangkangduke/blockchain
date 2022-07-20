@@ -84,8 +84,8 @@ public class SyRoleController extends AdminBaseController {
     @PostMapping("delete")
     @ApiOperation("删除")
     @RequiredPermission("sys:role:delete")
-    public GenericDto<Object> delete(@Valid @RequestBody ListReq ids){
-        sysRoleService.batchDelete(ids.getIds());
+    public GenericDto<Object> delete(@Valid @RequestBody ListReq req){
+        sysRoleService.batchDelete(req.getIds());
         return GenericDto.success(null);
     }
 

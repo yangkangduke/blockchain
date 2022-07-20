@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @author hang.yu
@@ -18,8 +19,7 @@ public class SysUserRoleReq {
     @NotNull(message = "User id cannot be empty")
     private Long userId;
 
-    @ApiModelProperty(value = "角色id")
-    @NotNull(message = "Role id Password cannot be empty")
-    private Long roleId;
+    @ApiModelProperty(value = "角色id列表")
+    private List<Long> roleIds;
 
 }

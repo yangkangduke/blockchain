@@ -2,15 +2,17 @@ package com.seeds.admin.web.sys.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.dto.auth.response.AdminUserResp;
+import com.seeds.admin.dto.common.SwitchReq;
 import com.seeds.admin.dto.sys.request.SysUserAddReq;
 import com.seeds.admin.dto.sys.request.SysUserModifyReq;
 import com.seeds.admin.dto.sys.request.SysUserPageReq;
+import com.seeds.admin.dto.sys.response.SysUserBriefResp;
 import com.seeds.admin.dto.sys.response.SysUserResp;
 import com.seeds.admin.entity.sys.SysUserEntity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 系统用户
@@ -53,34 +55,46 @@ public interface SysUserService {
      * @param user 用户信息
      * @return 系统用户信息
      */
-    void add(SysUserAddReq user);
+    SysUserEntity add(SysUserAddReq user);
 
     /**
      * 修改系统用户
      * @param user 用户信息
      * @return 系统用户信息
      */
-    void modify(SysUserModifyReq user);
+    SysUserEntity modify(SysUserModifyReq user);
+
+    /**
+     * 通过用户id修改系统用户
+     * @param sysUser 用户信息
+     */
+    void modifyById(SysUserEntity sysUser);
+
+    /**
+     * 批量修改系统用户
+     * @param sysUsers 用户信息
+     */
+    void batchModifyById(List<SysUserEntity> sysUsers);
 
     /**
      * 通过id批量查询系统用户
      * @param ids 用户id
      * @return 系统用户信息
      */
-    List<SysUserEntity> queryByIds(Set<Long> ids);
+    List<SysUserEntity> queryByIds(Collection<Long> ids);
 
     /**
      * 通过id批量查询系统用户名称
      * @param ids 用户id
      * @return 系统用户名称信息
      */
-    Map<Long, String> queryNameMapByIds(Set<Long> ids);
+    Map<Long, String> queryNameMapByIds(Collection<Long> ids);
 
     /**
      * 批量删除用户
      * @param ids 用户编号集合
      */
-    void batchDelete(Set<Long> ids);
+    void batchDelete(Collection<Long> ids);
 
     /**
      * 修改密码
@@ -91,10 +105,9 @@ public interface SysUserService {
 
     /**
      * 批量启用/停用用户
-     * @param ids 用户编号集合
-     * @param status 状态
+     * @param req 用户编号和状态集合
      */
-    void enableOrDisable(Set<Long> ids, Integer status);
+    void enableOrDisable(List<SwitchReq> req);
 
     /**
      * 获取用户角色、菜单等信息
@@ -115,6 +128,6 @@ public interface SysUserService {
      * @param mobile 用户手机号
      * @return 用户简略信息
      */
-    SysUserResp brief(String mobile);
+    SysUserBriefResp brief(String mobile);
 
 }

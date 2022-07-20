@@ -28,6 +28,7 @@ public class SysMerchantModifyReq {
 	 * 商家名称
 	 */
 	@ApiModelProperty("商家名称")
+	@NotBlank(message = "Merchant name cannot be empty")
 	private String name;
 
 	/**

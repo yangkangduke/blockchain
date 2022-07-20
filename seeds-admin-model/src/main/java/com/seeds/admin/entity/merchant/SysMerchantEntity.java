@@ -48,4 +48,10 @@ public class SysMerchantEntity extends BaseEntity {
 	@TableField("url")
 	private String url;
 
+	/**
+	 * 删除标记  1：已删除   0：未删除
+	 */
+	@TableField("delete_flag")
+	private Integer deleteFlag;
+
 }
