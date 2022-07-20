@@ -1,0 +1,43 @@
+server:
+  port: 10102
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  datasource:
+    url: jdbc:mysql://192.168.1.101:3306/seeds_admin
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+management:
+  endpoints:
+    web:
+      base-path: /
+
+mybatis:
+  type-aliases-package*: com.seeds.admin.model
+
+admin:
+  sso:
+    redis:
+      keyExpireAfter: 259200
+
+# admin 文件存储目录
+file:
+  store:
+    location: /seeds-admin/files/
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+redisson:
+  address: redis://192.168.1.101:6379
+  timeout: 5000
+  poolsize: 50
+  idlesize: 50
+  password: 123456
