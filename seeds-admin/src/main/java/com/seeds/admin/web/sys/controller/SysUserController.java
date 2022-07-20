@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.auth.response.AdminUserResp;
 import com.seeds.admin.dto.common.ListReq;
+import com.seeds.admin.dto.common.SwitchReq;
 import com.seeds.admin.dto.sys.request.*;
+import com.seeds.admin.dto.sys.response.SysUserBriefResp;
 import com.seeds.admin.dto.sys.response.SysUserResp;
-import com.seeds.admin.entity.sys.SysRoleUserEntity;
 import com.seeds.admin.entity.sys.SysUserEntity;
 import com.seeds.admin.enums.AdminErrorCode;
-import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.utils.HashUtil;
 import com.seeds.admin.web.auth.service.AdminCacheService;
 import com.seeds.admin.web.common.controller.AdminBaseController;
@@ -24,15 +24,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author hang.yu
@@ -71,7 +68,7 @@ public class SysUserController extends AdminBaseController {
 
     @GetMapping("brief/{mobile}")
     @ApiOperation("简略信息")
-    public GenericDto<SysUserResp> brief(@PathVariable("mobile") String mobile){
+    public GenericDto<SysUserBriefResp> brief(@PathVariable("mobile") String mobile){
         return GenericDto.success(sysUserService.brief(mobile));
     }
 
@@ -164,30 +161,21 @@ public class SysUserController extends AdminBaseController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("onOrOff/{status}")
+    @PostMapping("switch")
     @ApiOperation("启用/停用")
-    @RequiredPermission("sys:user:onOrOff")
-    public GenericDto<Object> enableOrDisable(@RequestBody ListReq req, @PathVariable("status") Integer status){
-        SysStatusEnum.from(status);
-        sysUserService.enableOrDisable(req.getIds(), status);
+    @RequiredPermission("sys:user:switch")
+    public GenericDto<Object> enableOrDisable(@Valid @RequestBody List<SwitchReq> req){
+        sysUserService.enableOrDisable(req);
         // 批量登出
-        req.getIds().forEach(p -> adminCacheService.removeAdminUserByUserId(p));
+        req.forEach(p -> adminCacheService.removeAdminUserByUserId(p.getId()));
         return GenericDto.success(null);
     }
 
-    @PostMapping("assignRoles")
-    @ApiOperation("分配角色")
-    @RequiredPermission("sys:user:assignRoles")
-    public GenericDto<Object> assignRoles(@Valid @RequestBody SysUserRoleReq req){
-        // 查重
-        List<SysRoleUserEntity> roleUsers = sysRoleUserService.queryByUserId(req.getUserId());
-        if (!CollectionUtils.isEmpty(roleUsers)) {
-            Set<Long> roleIds = roleUsers.stream().map(SysRoleUserEntity::getRoleId).collect(Collectors.toSet());
-            if (roleIds.contains(req.getRoleId())) {
-                return GenericDto.failure(AdminErrorCode.ERR_20002_USER_ROLE_ALREADY_EXIST.getDescEn(), AdminErrorCode.ERR_20002_USER_ROLE_ALREADY_EXIST.getCode(), null);
-            }
-        }
-        sysRoleUserService.assignRoles(req);
+    @PostMapping("updateRoles")
+    @ApiOperation("授予/剥夺角色")
+    @RequiredPermission("sys:user:updateRoles")
+    public GenericDto<Object> updateRoles(@Valid @RequestBody SysUserRoleReq req){
+        sysRoleUserService.updateRoles(req);
         return GenericDto.success(null);
     }
 

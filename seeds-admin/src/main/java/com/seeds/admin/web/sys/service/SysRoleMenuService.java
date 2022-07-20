@@ -15,12 +15,14 @@ public interface SysRoleMenuService {
     /**
      * 通过角色编号查询菜单
      * @param roleId 角色编号
+     * @return 菜单列表
      */
     List<Long> queryMenuByRoleId(Long roleId);
 
     /**
      * 通过角色编号列表查询菜单
      * @param roleIds 角色编号列表
+     * @return 菜单列表
      */
     List<Long> queryMenuByRoleIds(Collection<Long> roleIds);
 

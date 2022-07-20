@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 
 /**
  * 系统商家
@@ -35,5 +37,8 @@ public class SysMerchantResp {
 
 	@ApiModelProperty(value = "网站地址")
 	private String url;
+
+	@ApiModelProperty(value = "用户列表")
+	private List<SysMerchantUserResp> users;
 
 }

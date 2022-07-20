@@ -2,9 +2,12 @@ package com.seeds.admin.web.merchant.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.annotation.RequiredPermission;
+import com.seeds.admin.dto.common.ListReq;
+import com.seeds.admin.dto.common.SwitchReq;
 import com.seeds.admin.dto.merchant.request.SysMerchantAddReq;
 import com.seeds.admin.dto.merchant.request.SysMerchantModifyReq;
 import com.seeds.admin.dto.merchant.request.SysMerchantPageReq;
+import com.seeds.admin.dto.merchant.request.SysMerchantUserAddReq;
 import com.seeds.admin.dto.merchant.response.SysMerchantResp;
 import com.seeds.admin.web.common.controller.AdminBaseController;
 import com.seeds.admin.web.merchant.service.SysMerchantService;
@@ -74,5 +77,46 @@ public class SyMerchantController extends AdminBaseController {
         sysMerchantService.delete(id);
         return GenericDto.success(null);
     }
+
+    @PostMapping("switch")
+    @ApiOperation("启用/停用")
+    @RequiredPermission("sys:merchant:switch")
+    public GenericDto<Object> enableOrDisable(@Valid @RequestBody List<SwitchReq> req){
+        sysMerchantService.enableOrDisable(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("addGame/{merchantId}")
+    @ApiOperation("添加游戏")
+    @RequiredPermission("sys:merchant:addGame")
+    public GenericDto<Object> addGame(@Valid @RequestBody ListReq req, @PathVariable("merchantId") Long merchantId){
+        sysMerchantService.addGame(req, merchantId);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("deleteGame/{merchantId}")
+    @ApiOperation("删除游戏")
+    @RequiredPermission("sys:merchant:deleteGame")
+    public GenericDto<Object> deleteGame(@Valid @RequestBody ListReq req, @PathVariable("merchantId") Long merchantId){
+        sysMerchantService.deleteGame(req, merchantId);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("addUser/{merchantId}")
+    @ApiOperation("添加用户")
+    @RequiredPermission("sys:merchant:addUser")
+    public GenericDto<Object> addUser(@Valid @RequestBody SysMerchantUserAddReq req, @PathVariable("merchantId") Long merchantId){
+        sysMerchantService.addUser(req, merchantId);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("deleteUser/{merchantId}")
+    @ApiOperation("删除用户")
+    @RequiredPermission("sys:merchant:deleteUser")
+    public GenericDto<Object> deleteUser(@Valid @RequestBody ListReq req, @PathVariable("merchantId") Long merchantId){
+        sysMerchantService.deleteUser(req, merchantId);
+        return GenericDto.success(null);
+    }
+
 
 }

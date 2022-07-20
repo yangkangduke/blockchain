@@ -74,6 +74,26 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
     }
 
     @Override
+    public List<SysRoleEntity> queryByIds(Collection<Long> ids) {
+        QueryWrapper<SysRoleEntity> query = new QueryWrapper<>();
+        query.in("id", ids);
+        query.eq("delete_flag", WhetherEnum.NO.value());
+        return list(query);
+    }
+
+    @Override
+    public Map<Long, String> queryMapByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        List<SysRoleEntity> list = queryByIds(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(SysRoleEntity::getId, SysRoleEntity::getRoleName));
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(SysRoleAddReq req) {
         // 保存角色
@@ -85,6 +105,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void modify(SysRoleModifyReq req) {
         // 更新角色
         SysRoleEntity role = new SysRoleEntity();
@@ -96,7 +117,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchDelete(Set<Long> ids) {
+    public void batchDelete(Collection<Long> ids) {
         // 删除角色
         removeByIds(ids);
         // 删除角色用户关系
