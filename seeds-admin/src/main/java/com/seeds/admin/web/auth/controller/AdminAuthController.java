@@ -15,6 +15,7 @@ import com.seeds.admin.utils.HashUtil;
 import com.seeds.admin.utils.RandomUtil;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,10 +29,12 @@ import javax.validation.Valid;
 import java.io.IOException;
 
 /**
+ * 登录认证
  * @author hang.yu
  * @date 2022/7/13
  */
 @Slf4j
+@Api("登录认证")
 @RestController
 @RequestMapping("/auth")
 public class AdminAuthController {

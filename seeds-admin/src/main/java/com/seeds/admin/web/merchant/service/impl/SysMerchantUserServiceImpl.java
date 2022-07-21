@@ -24,23 +24,20 @@ public class SysMerchantUserServiceImpl extends ServiceImpl<SysMerchantUserMappe
     @Override
     public void add(Long merchantId, Collection<Long> userIds) {
         // 排除已存在商家和用户的关系
-        List<SysMerchantUserEntity> merchantUserList = queryByMerchantId(merchantId);
-        Set<Long> userIdSet = new HashSet<>();
-        if (!CollectionUtils.isEmpty(merchantUserList)) {
-            userIdSet = merchantUserList.stream().map(SysMerchantUserEntity::getUserId)
-                    .filter(p -> !userIds.contains(p)).collect(Collectors.toSet());
+        Set<Long> existSet = queryUserIdByMerchantId(merchantId);
+        if (!CollectionUtils.isEmpty(existSet)) {
+            userIds = userIds.stream().filter(p -> !existSet.contains(p)).collect(Collectors.toSet());
         }
-        if (CollectionUtils.isEmpty(userIdSet)) {
+        if (CollectionUtils.isEmpty(userIds)) {
             return;
         }
         // 建立商家和用户关系
-        for (Long userId : userIdSet) {
+        for (Long userId : userIds) {
             SysMerchantUserEntity merchantUser = new SysMerchantUserEntity();
             merchantUser.setMerchantId(merchantId);
             merchantUser.setUserId(userId);
             save(merchantUser);
         }
-
     }
 
     @Override
@@ -48,6 +45,15 @@ public class SysMerchantUserServiceImpl extends ServiceImpl<SysMerchantUserMappe
         QueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<>();
         query.eq("merchant_id", merchantId);
         return list(query);
+    }
+
+    @Override
+    public Set<Long> queryUserIdByMerchantId(Long merchantId) {
+        List<SysMerchantUserEntity> list = queryByMerchantId(merchantId);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptySet();
+        }
+        return list.stream().map(SysMerchantUserEntity::getUserId).collect(Collectors.toSet());
     }
 
     @Override

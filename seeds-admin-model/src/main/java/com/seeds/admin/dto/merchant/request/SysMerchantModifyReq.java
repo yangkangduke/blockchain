@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 
 /**
@@ -21,8 +22,8 @@ public class SysMerchantModifyReq {
 	 * 商家id
 	 */
 	@ApiModelProperty("商家id")
-	@NotBlank(message = "Merchant id cannot be empty")
-	private String id;
+	@NotNull(message = "Merchant id cannot be empty")
+	private Long id;
 
 	/**
 	 * 商家名称

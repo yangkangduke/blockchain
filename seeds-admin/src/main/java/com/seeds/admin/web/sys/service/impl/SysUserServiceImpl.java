@@ -68,7 +68,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 
     @Override
     public SysUserEntity queryById(Long userId) {
-        return getById(userId);
+        QueryWrapper<SysUserEntity> query = new QueryWrapper<>();
+        query.eq("id", userId);
+        query.eq("delete_flag", WhetherEnum.NO.value());
+        return getOne(query);
     }
 
     @Override

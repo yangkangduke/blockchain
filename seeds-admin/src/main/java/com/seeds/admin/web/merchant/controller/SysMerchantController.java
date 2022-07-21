@@ -12,6 +12,7 @@ import com.seeds.admin.dto.merchant.response.SysMerchantResp;
 import com.seeds.admin.web.common.controller.AdminBaseController;
 import com.seeds.admin.web.merchant.service.SysMerchantService;
 import com.seeds.common.dto.GenericDto;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +23,15 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
+ * 商家管理
  * @author hang.yu
  * @date 2022/7/14
  */
 @Slf4j
+@Api("商家管理")
 @RestController
 @RequestMapping("/merchant")
-public class SyMerchantController extends AdminBaseController {
+public class SysMerchantController extends AdminBaseController {
 
     @Autowired
     private SysMerchantService sysMerchantService;

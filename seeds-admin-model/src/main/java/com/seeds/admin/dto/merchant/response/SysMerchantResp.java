@@ -1,5 +1,6 @@
 package com.seeds.admin.dto.merchant.response;
 
+import com.seeds.admin.dto.game.response.SysGameResp;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -40,5 +41,8 @@ public class SysMerchantResp {
 
 	@ApiModelProperty(value = "用户列表")
 	private List<SysMerchantUserResp> users;
+
+	@ApiModelProperty(value = "游戏列表列表")
+	private List<SysGameResp> games;
 
 }
