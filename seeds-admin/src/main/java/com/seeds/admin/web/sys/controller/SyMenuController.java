@@ -9,6 +9,7 @@ import com.seeds.admin.enums.AdminErrorCode;
 import com.seeds.admin.web.common.controller.AdminBaseController;
 import com.seeds.admin.web.sys.service.SysMenuService;
 import com.seeds.common.dto.GenericDto;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +22,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * 菜单管理
  * @author hang.yu
  * @date 2022/7/14
  */
 @Slf4j
+@Api("菜单管理")
 @RestController
 @RequestMapping("/menu")
 public class SyMenuController extends AdminBaseController {

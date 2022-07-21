@@ -20,7 +20,9 @@ import com.seeds.admin.entity.sys.SysRoleEntity;
 import com.seeds.admin.entity.sys.SysUserEntity;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.admin.web.game.service.SysGameService;
 import com.seeds.admin.web.merchant.mapper.SysMerchantMapper;
+import com.seeds.admin.web.merchant.service.SysMerchantGameService;
 import com.seeds.admin.web.merchant.service.SysMerchantService;
 import com.seeds.admin.web.merchant.service.SysMerchantUserService;
 import com.seeds.admin.web.sys.service.SysRoleService;
@@ -57,10 +59,16 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     private SysRoleService sysRoleService;
 
     @Autowired
+    private SysGameService sysGameService;
+
+    @Autowired
     private SysRoleUserService sysRoleUserService;
 
     @Autowired
     private SysMerchantUserService sysMerchantUserService;
+
+    @Autowired
+    private SysMerchantGameService sysMerchantGameService;
 
     @Override
     public List<SysMerchantResp> queryList() {
@@ -71,11 +79,11 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     }
 
     @Override
-    public List<SysMerchantEntity> queryByIds(Collection<Long> ids) {
+    public SysMerchantEntity queryById(Long id) {
         QueryWrapper<SysMerchantEntity> query = new QueryWrapper<>();
-        query.in("id", ids);
+        query.eq("id", id);
         query.eq("delete_flag", WhetherEnum.NO.value());
-        return list(query);
+        return getOne(query);
     }
 
 
@@ -136,13 +144,13 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     @Override
     public SysMerchantResp detail(Long id) {
         // 商家详情
-        SysMerchantEntity sysMerchant = getById(id);
+        SysMerchantEntity sysMerchant = queryById(id);
         SysMerchantResp resp = new SysMerchantResp();
         if (sysMerchant != null) {
             BeanUtils.copyProperties(sysMerchant, resp);
         }
-        // todo 游戏列表
-
+        // 游戏列表
+        resp.setGames(sysGameService.queryList(id));
         // 用户列表
         List<SysMerchantUserEntity> merchantUser = sysMerchantUserService.queryByMerchantId(id);
         if (!CollectionUtils.isEmpty(merchantUser)) {
@@ -162,7 +170,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     @Override
     public void modify(SysMerchantModifyReq req) {
         // 商家信息
-        SysMerchantEntity sysMerchant = getById(req.getId());
+        SysMerchantEntity sysMerchant = queryById(req.getId());
         if (sysMerchant == null) {
             return;
         }
@@ -184,7 +192,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         // 删除商家
-        SysMerchantEntity sysMerchant = getById(id);
+        SysMerchantEntity sysMerchant = queryById(id);
         if (sysMerchant == null) {
             return;
         }
@@ -198,8 +206,8 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
             // 删除商家用户
             deleteUserByIds(userIds);
         }
-        // todo 删除商家和游戏的关联
-
+        // 删除商家和游戏的关联
+        sysMerchantGameService.deleteByMerchantId(id);
     }
 
     @Override
@@ -252,13 +260,14 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
 
     @Override
     public void deleteGame(ListReq req, Long merchantId) {
-        // todo 删除商家和游戏的关联
-
+        // 删除商家和游戏的关联
+        sysMerchantGameService.deleteByMerchantIdAndGameIds(merchantId, req.getIds());
     }
 
     @Override
     public void addGame(ListReq req, Long merchantId) {
-        // todo 添加商家和游戏的关联
+        // 添加商家和游戏的关联
+        sysMerchantGameService.add(merchantId, req.getIds());
     }
 
     @Override

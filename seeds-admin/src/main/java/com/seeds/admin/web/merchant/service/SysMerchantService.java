@@ -11,7 +11,6 @@ import com.seeds.admin.dto.merchant.request.SysMerchantUserAddReq;
 import com.seeds.admin.dto.merchant.response.SysMerchantResp;
 import com.seeds.admin.entity.merchant.SysMerchantEntity;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -29,11 +28,11 @@ public interface SysMerchantService {
     List<SysMerchantResp> queryList();
 
     /**
-     * 通过id列表获取系统商家信息
-     * @param ids id列表
+     * 通过id获取系统商家信息
+     * @param id id
      * @return 系统商家信息
      */
-    List<SysMerchantEntity> queryByIds(Collection<Long> ids);
+    SysMerchantEntity queryById(Long id);
 
     /**
      * 分页获取系统商家信息

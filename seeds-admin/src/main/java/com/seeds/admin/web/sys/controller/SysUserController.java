@@ -18,6 +18,7 @@ import com.seeds.admin.web.sys.service.SysUserService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
 import com.seeds.common.web.context.UserContext;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +33,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * 用户管理
  * @author hang.yu
  * @date 2022/7/13
  */
 @Slf4j
+@Api("用户管理")
 @RestController
 @RequestMapping("/user")
 public class SysUserController extends AdminBaseController {
