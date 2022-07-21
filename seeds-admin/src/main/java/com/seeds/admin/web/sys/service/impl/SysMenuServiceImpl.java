@@ -16,7 +16,6 @@ import com.seeds.admin.web.sys.mapper.SysMenuMapper;
 import com.seeds.admin.web.sys.service.SysMenuService;
 import com.seeds.admin.web.sys.service.SysRoleMenuService;
 import com.seeds.admin.web.sys.service.SysRoleUserService;
-import com.seeds.admin.web.sys.service.SysUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,9 +34,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity> implements SysMenuService {
-
-    @Autowired
-    private SysUserService sysUserService;
 
     @Autowired
     private SysRoleMenuService sysRoleMenuService;
