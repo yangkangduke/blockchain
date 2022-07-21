@@ -48,6 +48,13 @@ public class SysMerchantUserServiceImpl extends ServiceImpl<SysMerchantUserMappe
     }
 
     @Override
+    public List<SysMerchantUserEntity> queryByMerchantIds(Collection<Long> merchantIds) {
+        QueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<>();
+        query.in("merchant_id", merchantIds);
+        return list(query);
+    }
+
+    @Override
     public Set<Long> queryUserIdByMerchantId(Long merchantId) {
         List<SysMerchantUserEntity> list = queryByMerchantId(merchantId);
         if (CollectionUtils.isEmpty(list)) {

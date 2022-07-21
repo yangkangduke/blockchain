@@ -13,32 +13,32 @@ import java.util.List;
 public class TreeNode<T> implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
-     * 主键
+     * 编码
      */
-    private Long id;
+    private String code;
     /**
-     * 上级ID
+     * 上级编码
      */
-    private Long pid;
+    private String parentCode;
     /**
      * 子节点列表
      */
     private List<T> children = new ArrayList<>();
 
-    public Long getId() {
-        return id;
+    public String getCode() {
+        return code;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public Long getPid() {
-        return pid;
+    public String getParentCode() {
+        return parentCode;
     }
 
-    public void setPid(Long pid) {
-        this.pid = pid;
+    public void setParentCode(String parentCode) {
+        this.parentCode = parentCode;
     }
 
     public List<T> getChildren() {

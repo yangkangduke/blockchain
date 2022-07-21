@@ -73,11 +73,11 @@ public class SysMerchantController extends AdminBaseController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("delete/{id}")
+    @PostMapping("delete")
     @ApiOperation("删除")
     @RequiredPermission("sys:merchant:delete")
-    public GenericDto<Object> delete(@PathVariable("id") Long id){
-        sysMerchantService.delete(id);
+    public GenericDto<Object> delete(@RequestBody ListReq req){
+        sysMerchantService.batchDelete(req);
         return GenericDto.success(null);
     }
 

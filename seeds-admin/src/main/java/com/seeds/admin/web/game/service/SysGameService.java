@@ -2,6 +2,7 @@ package com.seeds.admin.web.game.service;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.dto.common.ListReq;
 import com.seeds.admin.dto.common.SwitchReq;
 import com.seeds.admin.dto.game.request.SysGameAddReq;
 import com.seeds.admin.dto.game.request.SysGamePageReq;
@@ -68,10 +69,10 @@ public interface SysGameService {
     void modify(SysMerchantModifyReq req);
 
     /**
-     * 删除游戏
-     * @param id 游戏id
+     * 批量删除游戏
+     * @param req 游戏id列表
      */
-    void delete(Long id);
+    void batchDelete(ListReq req);
 
     /**
      * 批量上架/下架游戏

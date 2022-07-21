@@ -19,8 +19,11 @@ public class SysMenuResp extends TreeNode<SysMenuResp> {
 	@ApiModelProperty(value = "id")
 	private Long id;
 
-	@ApiModelProperty(value = "上级ID")
-	private Long pid;
+	@ApiModelProperty(value = "编码")
+	private String code;
+
+	@ApiModelProperty(value = "上级编码")
+	private String parentCode;
 
 	@ApiModelProperty(value = "菜单名称")
 	private String name;

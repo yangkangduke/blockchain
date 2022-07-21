@@ -11,6 +11,7 @@ import com.seeds.admin.dto.merchant.request.SysMerchantUserAddReq;
 import com.seeds.admin.dto.merchant.response.SysMerchantResp;
 import com.seeds.admin.entity.merchant.SysMerchantEntity;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -29,10 +30,17 @@ public interface SysMerchantService {
 
     /**
      * 通过id获取系统商家信息
-     * @param id id
+     * @param id 商家id
      * @return 系统商家信息
      */
     SysMerchantEntity queryById(Long id);
+
+    /**
+     * 通过id列表获取系统商家信息列表
+     * @param ids 商家id列表
+     * @return 系统商家信息列表
+     */
+    List<SysMerchantEntity> queryByIds(Collection<Long> ids);
 
     /**
      * 分页获取系统商家信息
@@ -61,10 +69,10 @@ public interface SysMerchantService {
     void modify(SysMerchantModifyReq req);
 
     /**
-     * 删除系统商家信息
-     * @param id 商家id
+     * 批量删除系统商家信息
+     * @param req 商家id列表
      */
-    void delete(Long id);
+    void batchDelete(ListReq req);
 
     /**
      * 批量启用/停用商家

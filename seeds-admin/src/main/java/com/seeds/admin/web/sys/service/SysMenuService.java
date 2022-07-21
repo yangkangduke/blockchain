@@ -1,11 +1,15 @@
 package com.seeds.admin.web.sys.service;
 
+import com.seeds.admin.dto.common.ListReq;
 import com.seeds.admin.dto.sys.request.SysMenuAddReq;
 import com.seeds.admin.dto.sys.request.SysMenuModifyReq;
+import com.seeds.admin.dto.sys.response.SysMenuBriefResp;
 import com.seeds.admin.dto.sys.response.SysMenuResp;
 import com.seeds.admin.entity.sys.SysMenuEntity;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -29,24 +33,31 @@ public interface SysMenuService {
     void modify(SysMenuModifyReq req);
 
     /**
-     * 删除系统菜单
-     * @param id 菜单编号
+     * 批量删除系统菜单
+     * @param req 菜单编号列表
      */
-    void delete(Long id);
+    void batchDelete(ListReq req);
 
     /**
-     * 查询子菜单
-     * @param id 菜单编号
-     * @return 子菜单
+     * 统计子菜单
+     * @param codes 菜单code列表
+     * @return 子菜单数目
      */
-    List<SysMenuEntity> queryListByPid(Long id);
+    Long countKidsByCodes(Collection<String> codes);
 
     /**
      * 查询菜单列表
      * @param type 菜单类型
      * @return 菜单列表
      */
-    List<SysMenuResp> queryList(Integer type);
+    List<SysMenuResp> queryRespList(Integer type);
+
+    /**
+     * 查询菜单列表
+     * @param type 菜单类型
+     * @return 菜单列表
+     */
+    List<SysMenuEntity> queryList(Integer type);
 
     /**
      * 菜单信息
@@ -54,6 +65,13 @@ public interface SysMenuService {
      * @return 菜单列表
      */
     SysMenuResp detail(Long id);
+
+    /**
+     * 菜单信息
+     * @param ids 菜单id列表
+     * @return 菜单code列表
+     */
+    Set<String> queryCodesByIds(Collection<Long> ids);
 
     /**
      * 菜单信息
@@ -74,13 +92,27 @@ public interface SysMenuService {
      * 查询权限列表
      * @return 权限列表
      */
-    List<String> getPermissionsList();
+    List<String> queryPermissionsList();
 
     /**
      * 根据用户id查询权限列表
      * @param userId 用户id
      * @return 权限列表
      */
-    List<String> getUserPermissionsList(Long userId);
+    List<String> queryUserPermissionsList(Long userId);
+
+    /**
+     * 根据用户id查询菜单列表
+     * @param userId 用户id
+     * @return 菜单列表
+     */
+    List<SysMenuEntity> queryMenuListByUserId(Long userId);
+
+    /**
+     * 获取用户有权限的菜单列表
+     * @param userId 用户id
+     * @return 菜单列表
+     */
+    List<SysMenuBriefResp> getUserMenuList(Long userId);
 
 }

@@ -65,9 +65,9 @@ public class SysMerchantGameServiceImpl extends ServiceImpl<SysMerchantGameMappe
     }
 
     @Override
-    public void deleteByMerchantId(Long merchantId) {
+    public void deleteByMerchantIds(Collection<Long> merchantIds) {
         QueryWrapper<SysMerchantGameEntity> query = new QueryWrapper<>();
-        query.eq("merchant_id", merchantId);
+        query.in("merchant_id", merchantIds);
         remove(query);
     }
 }

@@ -22,15 +22,15 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * 游戏管理
+ * NFT类别管理
  * @author hang.yu
  * @date 2022/7/21
  */
 @Slf4j
-@Api("游戏管理")
+@Api("NFT类别管理")
 @RestController
-@RequestMapping("/game")
-public class SysGameController extends AdminBaseController {
+@RequestMapping("/nftType")
+public class SysNftTypeController extends AdminBaseController {
 
     @Autowired
     private SysGameService sysGameService;

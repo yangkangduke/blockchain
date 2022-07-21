@@ -40,9 +40,9 @@ public class AdminShiroServiceImpl implements AdminShiroService {
         // 系统管理员，拥有最高权限
         List<String> permissionsList;
         if(user.getSuperAdmin() == WhetherEnum.YES.value()) {
-            permissionsList = sysMenuService.getPermissionsList();
+            permissionsList = sysMenuService.queryPermissionsList();
         }else{
-            permissionsList = sysMenuService.getUserPermissionsList(user.getId());
+            permissionsList = sysMenuService.queryUserPermissionsList(user.getId());
         }
 
         //用户权限列表

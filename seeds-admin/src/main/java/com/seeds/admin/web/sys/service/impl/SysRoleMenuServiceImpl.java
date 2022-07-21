@@ -47,9 +47,9 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
     }
 
     @Override
-    public void deleteByMenuId(Long menuId) {
+    public void deleteByMenuIds(Collection<Long> menuIds) {
         QueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<>();
-        query.eq("menu_id", menuId);
+        query.in("menu_id", menuIds);
         remove(query);
     }
 

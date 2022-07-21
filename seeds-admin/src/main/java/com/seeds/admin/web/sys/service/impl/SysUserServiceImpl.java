@@ -168,12 +168,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         if (CollectionUtils.isEmpty(ids)) {
             return;
         }
-        List<SysUserEntity> list = queryByIds(ids);
-        if (CollectionUtils.isEmpty(list)) {
-            return;
-        }
-        list.forEach(p -> p.setDeleteFlag(WhetherEnum.YES.value()));
-        updateBatchById(list);
+        ids.forEach(p -> {
+            SysUserEntity sysUser = new SysUserEntity();
+            sysUser.setId(p);
+            sysUser.setDeleteFlag(WhetherEnum.YES.value());
+            updateById(sysUser);
+        });
     }
 
     @Override
@@ -190,17 +190,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         if (CollectionUtils.isEmpty(req)) {
             return;
         }
-        List<SysUserEntity> sysUsers = new ArrayList<>();
         req.forEach(p -> {
             // 校验状态
             SysStatusEnum.from(p.getStatus());
             SysUserEntity sysUser = new SysUserEntity();
             sysUser.setId(p.getId());
             sysUser.setStatus(p.getStatus());
-            sysUsers.add(sysUser);
+            // 停用/启用用户
+            updateById(sysUser);
         });
-        // 停用/启用用户
-        updateBatchById(sysUsers);
     }
 
     @Override
@@ -214,7 +212,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
             if (WhetherEnum.YES.value() == user.getSuperAdmin()) {
                 // 超级管理员
                 resp.setRoleList(sysRoleService.queryList());
-                resp.setMenuList(sysMenuService.queryList(null));
+                resp.setMenuList(sysMenuService.queryRespList(null));
             } else {
                 resp.setRoleList(sysRoleService.queryByUserId(userId));
                 resp.setMenuList(sysMenuService.queryByUserId(null, userId));

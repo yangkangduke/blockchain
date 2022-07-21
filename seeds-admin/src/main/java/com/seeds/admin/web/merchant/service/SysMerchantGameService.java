@@ -44,10 +44,10 @@ public interface SysMerchantGameService {
     void deleteByMerchantIdAndGameIds(Long merchantId, Collection<Long> gameIds);
 
     /**
-     * 删除商户下所有与游戏的关联
-     * @param  merchantId  商家id
+     * 删除商户列表下所有与游戏的关联
+     * @param  merchantIds  商家id列表
      */
-    void deleteByMerchantId(Long merchantId);
+    void deleteByMerchantIds(Collection<Long> merchantIds);
 
 
 }

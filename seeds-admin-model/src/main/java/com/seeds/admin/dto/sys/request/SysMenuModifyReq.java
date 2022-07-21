@@ -26,11 +26,10 @@ public class SysMenuModifyReq {
 	private Long id;
 
 	/**
-	 * 父菜单ID，一级菜单为0
+	 * 父菜单code，一级菜单为空
 	 */
-	@ApiModelProperty("父菜单ID，一级菜单为0")
-	@NotNull(message = "Pid cannot be empty")
-	private Long pid;
+	@ApiModelProperty("父菜单code，一级菜单为空")
+	private String parentCode;
 
 	/**
 	 * 菜单编码

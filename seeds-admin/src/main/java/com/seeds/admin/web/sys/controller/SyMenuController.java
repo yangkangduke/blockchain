@@ -1,25 +1,28 @@
 package com.seeds.admin.web.sys.controller;
 
 import com.seeds.admin.annotation.RequiredPermission;
+import com.seeds.admin.dto.common.ListReq;
 import com.seeds.admin.dto.sys.request.SysMenuAddReq;
 import com.seeds.admin.dto.sys.request.SysMenuModifyReq;
+import com.seeds.admin.dto.sys.response.SysMenuBriefResp;
 import com.seeds.admin.dto.sys.response.SysMenuResp;
 import com.seeds.admin.entity.sys.SysMenuEntity;
 import com.seeds.admin.enums.AdminErrorCode;
 import com.seeds.admin.web.common.controller.AdminBaseController;
 import com.seeds.admin.web.sys.service.SysMenuService;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.context.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * 菜单管理
@@ -39,7 +42,7 @@ public class SyMenuController extends AdminBaseController {
     @ApiOperation("列表")
     @RequiredPermission("sys:menu:list")
     public GenericDto<List<SysMenuResp>> list(Integer type){
-        return GenericDto.success(sysMenuService.queryList(type));
+        return GenericDto.success(sysMenuService.queryRespList(type));
     }
 
     @PostMapping("add")
@@ -72,24 +75,34 @@ public class SyMenuController extends AdminBaseController {
             return GenericDto.failure(AdminErrorCode.ERR_30001_MENU_ALREADY_EXIST.getDescEn(), AdminErrorCode.ERR_30001_MENU_ALREADY_EXIST.getCode(), null);
         }
         // 上级菜单不能为自身
-        if (req.getId().equals(req.getPid())) {
+        if (req.getCode().equals(req.getParentCode())) {
             return GenericDto.failure(AdminErrorCode.ERR_30002_MENU_PARENT_ITSELF.getDescEn(), AdminErrorCode.ERR_30002_MENU_PARENT_ITSELF.getCode(), null);
         }
         sysMenuService.modify(req);
         return GenericDto.success(null);
     }
 
-    @PostMapping("delete/{id}")
+    @PostMapping("delete")
     @ApiOperation("删除")
     @RequiredPermission("sys:menu:delete")
-    public GenericDto<Object> delete(@PathVariable("id") Long id){
+    public GenericDto<Object> delete(@Valid @RequestBody ListReq req){
         // 判断是否有子菜单或按钮
-        List<SysMenuEntity> list = sysMenuService.queryListByPid(id);
-        if(!CollectionUtils.isEmpty(list)){
+        Set<Long> ids = req.getIds();
+        Long count = sysMenuService.countKidsByCodes(sysMenuService.queryCodesByIds(ids));
+        if(count > 0){
             return GenericDto.failure(AdminErrorCode.ERR_30003_SUB_MENU_EXIST.getDescEn(), AdminErrorCode.ERR_30003_SUB_MENU_EXIST.getCode(), null);
         }
-        sysMenuService.delete(id);
+        sysMenuService.batchDelete(req);
         return GenericDto.success(null);
+    }
+
+    @GetMapping("select")
+    @ApiOperation("角色菜单权限")
+    @RequiredPermission("sys:menu:select")
+    public GenericDto<List<SysMenuBriefResp>> select(){
+        // 获取登录用户
+        Long userId = UserContext.getCurrentAdminUserId();
+        return GenericDto.success(sysMenuService.getUserMenuList(userId));
     }
 
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.dto.common.ListReq;
 import com.seeds.admin.dto.common.SwitchReq;
 import com.seeds.admin.dto.game.request.SysGameAddReq;
 import com.seeds.admin.dto.game.request.SysGamePageReq;
@@ -117,25 +118,25 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     }
 
     @Override
-    public void delete(Long id) {
-        SysGameEntity sysGame = new SysGameEntity();
-        sysGame.setId(id);
-        sysGame.setDeleteFlag(WhetherEnum.YES.value());
-        updateById(sysGame);
+    public void batchDelete(ListReq req) {
+        req.getIds().forEach(p -> {
+            SysGameEntity sysGame = new SysGameEntity();
+            sysGame.setId(p);
+            sysGame.setDeleteFlag(WhetherEnum.YES.value());
+            updateById(sysGame);
+        });
     }
 
     @Override
     public void enableOrDisable(List<SwitchReq> req) {
-        List<SysGameEntity> sysGames = new ArrayList<>();
         req.forEach(p -> {
             // 校验状态
             SysStatusEnum.from(p.getStatus());
             SysGameEntity sysGame = new SysGameEntity();
             sysGame.setId(p.getId());
             sysGame.setStatus(p.getStatus());
-            sysGames.add(sysGame);
+            updateById(sysGame);
         });
-        updateBatchById(sysGames);
     }
 }
 

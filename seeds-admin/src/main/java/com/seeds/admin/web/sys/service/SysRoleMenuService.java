@@ -27,10 +27,10 @@ public interface SysRoleMenuService {
     List<Long> queryMenuByRoleIds(Collection<Long> roleIds);
 
     /**
-     * 通过菜单编号删除关联
-     * @param menuId 菜单编号
+     * 通过菜单编号列表删除关联
+     * @param menuIds 菜单编号列表
      */
-    void deleteByMenuId(Long menuId);
+    void deleteByMenuIds(Collection<Long> menuIds);
 
     /**
      * 保存或修改
