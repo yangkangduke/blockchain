@@ -64,7 +64,7 @@ public class SysNftTypeController extends AdminBaseController {
 
     @PostMapping("modify")
     @ApiOperation("编辑")
-    @RequiredPermission("sys:game:modify")
+    @RequiredPermission("sys:nftType:modify")
     public GenericDto<Object> modify(@Valid @RequestBody SysNftTypeModifyReq req) {
         // 查重
         SysNftTypeEntity nftType = sysNftTypeService.queryByTypeCode(req.getCode());
@@ -79,20 +79,20 @@ public class SysNftTypeController extends AdminBaseController {
         return GenericDto.success(null);
     }
 
-    /*@PostMapping("delete")
+    @PostMapping("delete")
     @ApiOperation("删除")
-    @RequiredPermission("sys:game:delete")
-    public GenericDto<Object> delete(@RequestBody ListReq req) {
-        sysGameService.batchDelete(req);
+    @RequiredPermission("sys:nftType:delete")
+    public GenericDto<Object> delete(@Valid @RequestBody ListReq req) {
+        sysNftTypeService.batchDelete(req);
         return GenericDto.success(null);
     }
 
     @PostMapping("switch")
     @ApiOperation("启用/停用")
-    @RequiredPermission("sys:game:switch")
+    @RequiredPermission("sys:nftType:switch")
     public GenericDto<Object> enableOrDisable(@Valid @RequestBody List<SwitchReq> req) {
-        sysGameService.enableOrDisable(req);
+        sysNftTypeService.enableOrDisable(req);
         return GenericDto.success(null);
-    }*/
+    }
 
 }

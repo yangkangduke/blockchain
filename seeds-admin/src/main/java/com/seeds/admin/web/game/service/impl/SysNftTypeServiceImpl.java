@@ -2,21 +2,26 @@ package com.seeds.admin.web.game.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.dto.common.ListReq;
+import com.seeds.admin.dto.common.SwitchReq;
 import com.seeds.admin.dto.game.request.SysNftTypeAddReq;
 import com.seeds.admin.dto.game.request.SysNftTypeModifyReq;
 import com.seeds.admin.dto.game.response.SysNftTypeResp;
 import com.seeds.admin.entity.game.SysNftTypeEntity;
+import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.utils.TreeUtils;
 import com.seeds.admin.web.game.mapper.SysNftTypeMapper;
 import com.seeds.admin.web.game.service.SysNftTypeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -79,6 +84,42 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
         query.eq("code", code);
         query.eq("delete_flag", WhetherEnum.NO.value());
         return getOne(query);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDelete(ListReq req) {
+        Set<Long> ids = req.getIds();
+        // 删除NFT类别
+        ids.forEach(p -> {
+            SysNftTypeEntity nftType = new SysNftTypeEntity();
+            nftType.setId(p);
+            nftType.setDeleteFlag(WhetherEnum.YES.value());
+            updateById(nftType);
+        });
+        removeBatchByIds(ids);
+        // todo 删除NFT类别和NFT的关联
+        // todo 删除NFT
+        // todo 删除NFT和游戏的关联
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void enableOrDisable(List<SwitchReq> req) {
+        // 停用/启用NFT类别
+        req.forEach(p -> {
+            // 校验状态
+            SysStatusEnum.from(p.getStatus());
+            SysNftTypeEntity nftType = new SysNftTypeEntity();
+            nftType.setId(p.getId());
+            nftType.setStatus(p.getStatus());
+            updateById(nftType);
+        });
+        // todo 停用/启用NFT类别和NFT的关联
+        // todo 停用/启用NFT
+        // todo 停用/启用NFT和游戏的关联
+
     }
 
     private List<SysNftTypeResp> convertToResp(List<SysNftTypeEntity> list) {

@@ -1,6 +1,8 @@
 package com.seeds.admin.web.game.service;
 
 
+import com.seeds.admin.dto.common.ListReq;
+import com.seeds.admin.dto.common.SwitchReq;
 import com.seeds.admin.dto.game.request.SysNftTypeAddReq;
 import com.seeds.admin.dto.game.request.SysNftTypeModifyReq;
 import com.seeds.admin.dto.game.response.SysNftTypeResp;
@@ -60,5 +62,18 @@ public interface SysNftTypeService {
      * @return 系统NFT类别
      */
     SysNftTypeEntity queryByTypeCode(String code);
+
+    /**
+     * 根据id列表批量删除
+     * @param req id列表
+     */
+    void batchDelete(ListReq req);
+
+    /**
+     * 批量停用/启用
+     * @param req id列表和状态
+     */
+    void enableOrDisable(List<SwitchReq> req);
+
 
 }
