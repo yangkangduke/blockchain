@@ -6,6 +6,7 @@ import com.seeds.admin.dto.sys.request.SysMenuModifyReq;
 import com.seeds.admin.dto.sys.response.SysMenuBriefResp;
 import com.seeds.admin.dto.sys.response.SysMenuResp;
 import com.seeds.admin.entity.sys.SysMenuEntity;
+import com.seeds.admin.entity.sys.SysUserEntity;
 
 import java.util.Collection;
 import java.util.List;
@@ -110,9 +111,9 @@ public interface SysMenuService {
 
     /**
      * 获取用户有权限的菜单列表
-     * @param userId 用户id
+     * @param user 用户
      * @return 菜单列表
      */
-    List<SysMenuBriefResp> getUserMenuList(Long userId);
+    List<SysMenuBriefResp> getUserMenuList(SysUserEntity user);
 
 }

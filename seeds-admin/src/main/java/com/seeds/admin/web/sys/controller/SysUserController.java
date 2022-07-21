@@ -58,27 +58,27 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("page")
     @ApiOperation("分页")
     @RequiredPermission("sys:user:page")
-    public GenericDto<IPage<SysUserResp>> queryPage(@Valid  @RequestBody SysUserPageReq query){
+    public GenericDto<IPage<SysUserResp>> queryPage(@Valid  @RequestBody SysUserPageReq query) {
         return GenericDto.success(sysUserService.queryPage(query));
     }
 
     @GetMapping("detail/{id}")
     @ApiOperation("信息")
     @RequiredPermission("sys:user:detail")
-    public GenericDto<SysUserResp> detail(@PathVariable("id") Long id){
+    public GenericDto<SysUserResp> detail(@PathVariable("id") Long id) {
         return GenericDto.success(sysUserService.detail(id));
     }
 
     @GetMapping("brief/{mobile}")
     @ApiOperation("简略信息")
-    public GenericDto<SysUserBriefResp> brief(@PathVariable("mobile") String mobile){
+    public GenericDto<SysUserBriefResp> brief(@PathVariable("mobile") String mobile) {
         return GenericDto.success(sysUserService.brief(mobile));
     }
 
     @PostMapping("add")
     @ApiOperation("添加")
     @RequiredPermission("sys:user:add")
-    public GenericDto<Object> add(@Valid @RequestBody SysUserAddReq req){
+    public GenericDto<Object> add(@Valid @RequestBody SysUserAddReq req) {
         if (StringUtils.isEmpty(req.getMobile()) && StringUtils.isEmpty(req.getAccount())) {
             return GenericDto.failure(AdminErrorCode.ERR_504_MISSING_ARGUMENTS.getDescEn(), AdminErrorCode.ERR_504_MISSING_ARGUMENTS.getCode(), null);
         }
@@ -106,7 +106,7 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("modify")
     @ApiOperation("编辑")
     @RequiredPermission("sys:user:modify")
-    public GenericDto<Object> modify(@Valid @RequestBody SysUserModifyReq req){
+    public GenericDto<Object> modify(@Valid @RequestBody SysUserModifyReq req) {
         SysUserEntity adminUser = sysUserService.queryById(req.getId());
         if (adminUser == null) {
             return GenericDto.failure(AdminErrorCode.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCode.ERR_500_SYSTEM_BUSY.getCode(), null);
@@ -159,7 +159,7 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("delete")
     @ApiOperation("删除")
     @RequiredPermission("sys:user:delete")
-    public GenericDto<Object> delete(@RequestBody ListReq req){
+    public GenericDto<Object> delete(@RequestBody ListReq req) {
         sysUserService.batchDelete(req.getIds());
         return GenericDto.success(null);
     }
@@ -167,7 +167,7 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("switch")
     @ApiOperation("启用/停用")
     @RequiredPermission("sys:user:switch")
-    public GenericDto<Object> enableOrDisable(@Valid @RequestBody List<SwitchReq> req){
+    public GenericDto<Object> enableOrDisable(@Valid @RequestBody List<SwitchReq> req) {
         sysUserService.enableOrDisable(req);
         // 批量登出
         req.forEach(p -> adminCacheService.removeAdminUserByUserId(p.getId()));
@@ -177,7 +177,7 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("updateRoles")
     @ApiOperation("授予/剥夺角色")
     @RequiredPermission("sys:user:updateRoles")
-    public GenericDto<Object> updateRoles(@Valid @RequestBody SysUserRoleReq req){
+    public GenericDto<Object> updateRoles(@Valid @RequestBody SysUserRoleReq req) {
         sysRoleUserService.updateRoles(req);
         return GenericDto.success(null);
     }

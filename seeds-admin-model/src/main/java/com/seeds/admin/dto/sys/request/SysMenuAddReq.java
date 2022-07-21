@@ -69,10 +69,4 @@ public class SysMenuAddReq {
 	@ApiModelProperty("排序")
 	private Integer sort;
 
-	/**
-	 * 上级菜单名称
-	 */
-	@ApiModelProperty("上级菜单名称")
-	private String parentName;
-
 }

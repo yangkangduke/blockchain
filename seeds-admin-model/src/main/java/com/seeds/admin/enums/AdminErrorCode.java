@@ -40,6 +40,10 @@ public enum AdminErrorCode {
     ERR_30002_MENU_PARENT_ITSELF(30002, "上级菜单不能为自身", "Parent menu cannot be for itself"),
     ERR_30003_SUB_MENU_EXIST(30003, "存在下级菜单", "Subordinate menus exist"),
 
+    // nft type
+    ERR_40001_NFT_TYPE_ALREADY_EXIST(40001, "NFT类别已存在", "NFT type code already exist"),
+    ERR_40002_NFT_TYPE_PARENT_ITSELF(40002, "上级NFT类别不能为自身", "Parent nft type cannot be for itself"),
+
     ;
 
     @JsonValue

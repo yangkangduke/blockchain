@@ -7,9 +7,11 @@ import com.seeds.admin.dto.sys.request.SysMenuModifyReq;
 import com.seeds.admin.dto.sys.response.SysMenuBriefResp;
 import com.seeds.admin.dto.sys.response.SysMenuResp;
 import com.seeds.admin.entity.sys.SysMenuEntity;
+import com.seeds.admin.entity.sys.SysUserEntity;
 import com.seeds.admin.enums.AdminErrorCode;
 import com.seeds.admin.web.common.controller.AdminBaseController;
 import com.seeds.admin.web.sys.service.SysMenuService;
+import com.seeds.admin.web.sys.service.SysUserService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import io.swagger.annotations.Api;
@@ -38,17 +40,20 @@ public class SyMenuController extends AdminBaseController {
     @Autowired
     private SysMenuService sysMenuService;
 
+    @Autowired
+    private SysUserService sysUserService;
+
     @GetMapping("list")
     @ApiOperation("列表")
     @RequiredPermission("sys:menu:list")
-    public GenericDto<List<SysMenuResp>> list(Integer type){
+    public GenericDto<List<SysMenuResp>> list(Integer type) {
         return GenericDto.success(sysMenuService.queryRespList(type));
     }
 
     @PostMapping("add")
     @ApiOperation("添加")
     @RequiredPermission("sys:menu:add")
-    public GenericDto<Object> add(@Valid @RequestBody SysMenuAddReq req){
+    public GenericDto<Object> add(@Valid @RequestBody SysMenuAddReq req) {
         // 查重
         SysMenuEntity menu = sysMenuService.queryByMenuCode(req.getCode());
         if (menu != null) {
@@ -61,14 +66,14 @@ public class SyMenuController extends AdminBaseController {
     @GetMapping("detail/{id}")
     @ApiOperation("信息")
     @RequiredPermission("sys:menu:detail")
-    public GenericDto<SysMenuResp> detail(@PathVariable("id") Long id){
+    public GenericDto<SysMenuResp> detail(@PathVariable("id") Long id) {
         return GenericDto.success(sysMenuService.detail(id));
     }
 
     @PostMapping("modify")
     @ApiOperation("编辑")
     @RequiredPermission("sys:menu:modify")
-    public GenericDto<Object> modify(@Valid @RequestBody SysMenuModifyReq req){
+    public GenericDto<Object> modify(@Valid @RequestBody SysMenuModifyReq req) {
         // 查重
         SysMenuEntity menu = sysMenuService.queryByMenuCode(req.getCode());
         if (menu != null && !Objects.equals(req.getId(), menu.getId())) {
@@ -85,7 +90,7 @@ public class SyMenuController extends AdminBaseController {
     @PostMapping("delete")
     @ApiOperation("删除")
     @RequiredPermission("sys:menu:delete")
-    public GenericDto<Object> delete(@Valid @RequestBody ListReq req){
+    public GenericDto<Object> delete(@Valid @RequestBody ListReq req) {
         // 判断是否有子菜单或按钮
         Set<Long> ids = req.getIds();
         Long count = sysMenuService.countKidsByCodes(sysMenuService.queryCodesByIds(ids));
@@ -99,10 +104,12 @@ public class SyMenuController extends AdminBaseController {
     @GetMapping("select")
     @ApiOperation("角色菜单权限")
     @RequiredPermission("sys:menu:select")
-    public GenericDto<List<SysMenuBriefResp>> select(){
+    public GenericDto<List<SysMenuBriefResp>> select() {
         // 获取登录用户
         Long userId = UserContext.getCurrentAdminUserId();
-        return GenericDto.success(sysMenuService.getUserMenuList(userId));
+        // 获取用户
+        SysUserEntity user = sysUserService.queryById(userId);
+        return GenericDto.success(sysMenuService.getUserMenuList(user));
     }
 
 }

@@ -40,28 +40,28 @@ public class SyRoleController extends AdminBaseController {
     @PostMapping("page")
     @ApiOperation("分页")
     @RequiredPermission("sys:role:page")
-    public GenericDto<IPage<SysRoleResp>> queryPage(@Valid @RequestBody SysRolePageReq query){
+    public GenericDto<IPage<SysRoleResp>> queryPage(@Valid @RequestBody SysRolePageReq query) {
         return GenericDto.success(sysRoleService.queryPage(query));
     }
 
     @GetMapping("list")
     @ApiOperation("列表")
     @RequiredPermission("sys:role:list")
-    public GenericDto<List<SysRoleResp>> list(){
+    public GenericDto<List<SysRoleResp>> list() {
         return GenericDto.success(sysRoleService.queryList());
     }
 
     @GetMapping("detail/{id}")
     @ApiOperation("信息")
     @RequiredPermission("sys:role:detail")
-    public GenericDto<SysRoleResp> detail(@PathVariable("id") Long id){
+    public GenericDto<SysRoleResp> detail(@PathVariable("id") Long id) {
         return GenericDto.success(sysRoleService.detail(id));
     }
 
     @PostMapping("add")
     @ApiOperation("添加")
     @RequiredPermission("sys:role:add")
-    public GenericDto<Object> add(@Valid @RequestBody SysRoleAddReq req){
+    public GenericDto<Object> add(@Valid @RequestBody SysRoleAddReq req) {
         // 查重
         SysRoleEntity role = sysRoleService.queryByRoleCode(req.getRoleCode());
         if (role != null) {
@@ -74,7 +74,7 @@ public class SyRoleController extends AdminBaseController {
     @PostMapping("modify")
     @ApiOperation("编辑")
     @RequiredPermission("sys:role:modify")
-    public GenericDto<Object> modify(@Valid @RequestBody SysRoleModifyReq req){
+    public GenericDto<Object> modify(@Valid @RequestBody SysRoleModifyReq req) {
         // 查重
         SysRoleEntity role = sysRoleService.queryByRoleCode(req.getRoleCode());
         if (role != null && !Objects.equals(req.getId(), role.getId())) {
@@ -87,7 +87,7 @@ public class SyRoleController extends AdminBaseController {
     @PostMapping("delete")
     @ApiOperation("删除")
     @RequiredPermission("sys:role:delete")
-    public GenericDto<Object> delete(@Valid @RequestBody ListReq req){
+    public GenericDto<Object> delete(@Valid @RequestBody ListReq req) {
         sysRoleService.batchDelete(req.getIds());
         return GenericDto.success(null);
     }

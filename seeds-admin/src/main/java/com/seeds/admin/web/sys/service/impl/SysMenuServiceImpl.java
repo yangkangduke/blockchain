@@ -173,15 +173,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
     }
 
     @Override
-    public List<SysMenuBriefResp> getUserMenuList(Long userId) {
+    public List<SysMenuBriefResp> getUserMenuList(SysUserEntity user) {
         List<SysMenuEntity> menuList;
-        // 获取用户
-        SysUserEntity user = sysUserService.queryById(userId);
         // 系统管理员，拥有最高权限
         if (user.getSuperAdmin() == WhetherEnum.YES.value()) {
             menuList = queryList(null);
         } else {
-            menuList = queryMenuListByUserId(userId);
+            menuList = queryMenuListByUserId(user.getId());
         }
         if (CollectionUtils.isEmpty(menuList)) {
             return Collections.emptyList();
