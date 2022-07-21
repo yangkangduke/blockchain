@@ -39,6 +39,7 @@
         <hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
         <redission.version>3.13.2</redission.version>
         <commons-io.version>2.11.0</commons-io.version>
+        <hutool.version>5.8.4</hutool.version>
     </properties>
 
     <groupId>com.seeds</groupId>
@@ -50,6 +51,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
