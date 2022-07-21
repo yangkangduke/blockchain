@@ -1,5 +1,5 @@
 server:
-  port: 10100
+  port: 80
 
 spring:
   application:
@@ -9,13 +9,13 @@ spring:
     gateway:
       routes:
         - id: seeds-uc-internal-service
-          uri: http://127.0.0.1:10103/
+          uri: http://127.0.0.1:10101/
           predicates:
             - Path=/uc-internal/**
           filters:
             - Auth
         - id: seeds-uc-open-service
-          uri: http://127.0.0.1:10103/
+          uri: http://127.0.0.1:10101/
           predicates:
             - Path=/uc-open/**
 

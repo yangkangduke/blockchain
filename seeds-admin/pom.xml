@@ -144,7 +144,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.seeds.uc.UserCenterApplication</mainClass>
+                    <mainClass>com.seeds.admin.AdminCenterApplication</mainClass>
                 </configuration>
             </plugin>
             <plugin>
