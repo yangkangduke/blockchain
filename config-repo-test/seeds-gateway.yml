@@ -9,7 +9,7 @@ spring:
     gateway:
       routes:
         - id: seeds-uc-public-service
-          uri: lb://seeds-uc-service
+          uri: http://127.0.0.1:10101/
           predicates:
             - Path=/api/uc-public/**
         - id: seeds-uc-auth-service
