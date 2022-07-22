@@ -9,7 +9,7 @@ spring:
           uri: https://github.com/AllenAi007/seeds-java
           username: 819628513@qq.com
           password: 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
-          search-paths: config-repo-dev
+          search-paths: config-repo-test
           default-label: main-dev
 
 
