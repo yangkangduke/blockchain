@@ -19,7 +19,14 @@ import java.util.List;
  */
 @Data
 @ApiModel(value = "系统NFT信息")
-public class SysNftAddReq {
+public class SysNftModifyReq {
+
+	/**
+	 * NFT的id
+	 */
+	@ApiModelProperty("NFT的id")
+	@NotNull(message = "NFT id cannot be empty")
+	private Long id;
 
 	/**
 	 * 游戏id

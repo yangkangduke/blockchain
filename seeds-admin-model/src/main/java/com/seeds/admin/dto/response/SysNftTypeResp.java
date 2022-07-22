@@ -34,8 +34,7 @@ public class SysNftTypeResp extends TreeNode<SysNftTypeResp> {
 	@ApiModelProperty(value = "创建时间")
 	private Long createdAt;
 
-	@ApiModelProperty(value = "上级菜单名称")
+	@ApiModelProperty(value = "上级类别名称")
 	private String parentName;
-
 
 }

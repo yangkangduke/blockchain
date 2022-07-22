@@ -38,7 +38,7 @@ public class RedisCacheConfig {
     @Value("${redisson.database:0}")
     int database;
 
-    @Bean("defaultRedisClient")
+    @Bean("adminRedisClient")
     public RedissonClient defaultClient() {
         Config config = new Config();
         SingleServerConfig serverConfig = config.useSingleServer();

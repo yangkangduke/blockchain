@@ -8,7 +8,9 @@ import com.seeds.admin.dto.request.SysNftTypeModifyReq;
 import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.entity.SysNftTypeEntity;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 系统NFT类别
@@ -19,10 +21,11 @@ import java.util.List;
 public interface SysNftTypeService {
 
     /**
-     * 获取系统NFT类别列表
-     * @return 系统NFT类别列表
+     * 通过NFT类别id列表获取NFT名称
+     * @param ids NFT类别id列表
+     * @return NFT类别名称
      */
-    List<SysNftTypeEntity> queryList();
+    Map<Long, String> queryNameMapByIds(Collection<Long> ids);
 
     /**
      * 根据id获取系统NFT类别
@@ -75,6 +78,5 @@ public interface SysNftTypeService {
      * @param req id列表和状态
      */
     void enableOrDisable(List<SwitchReq> req);
-
 
 }

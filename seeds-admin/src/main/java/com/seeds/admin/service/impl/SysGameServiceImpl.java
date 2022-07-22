@@ -56,7 +56,7 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     }
 
     @Override
-    public List<SysGameResp> queryList(Long merchantId) {
+    public List<SysGameResp> select(Long merchantId) {
         List<SysGameEntity> games;
         if (merchantId != null) {
             // 查询商家下的游戏

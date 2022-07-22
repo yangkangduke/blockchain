@@ -158,7 +158,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
             BeanUtils.copyProperties(sysMerchant, resp);
         }
         // 游戏列表
-        resp.setGames(sysGameService.queryList(id));
+        resp.setGames(sysGameService.select(id));
         // 用户列表
         List<SysMerchantUserEntity> merchantUser = sysMerchantUserService.queryByMerchantId(id);
         if (!CollectionUtils.isEmpty(merchantUser)) {
@@ -176,6 +176,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void modify(SysMerchantModifyReq req) {
         // 商家信息
         SysMerchantEntity sysMerchant = queryById(req.getId());

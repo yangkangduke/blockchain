@@ -2,7 +2,6 @@ package com.seeds.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.seeds.admin.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -45,6 +44,12 @@ public class SysNftEntity extends BaseEntity {
 	private Long gameId;
 
 	/**
+	 * 类别id
+	 */
+	@TableField("nft_type_id")
+	private Long nftTypeId;
+
+	/**
 	 * 价格
 	 */
 	@TableField("price")
@@ -56,13 +61,47 @@ public class SysNftEntity extends BaseEntity {
 	@TableField("status")
 	private Integer status;
 
-
 	/**
 	 * 归属人
 	 */
 	@TableField("owner")
 	private String owner;
 
+	/**
+	 * 合约地址
+	 */
+	@TableField("contract_address")
+	private String contractAddress;
+
+	/**
+	 * 令牌id
+	 */
+	@TableField("token_id")
+	private String tokenId;
+
+	/**
+	 * 令牌类型
+	 */
+	@TableField("token_standard")
+	private String tokenStandard;
+
+	/**
+	 * 区块链
+	 */
+	@TableField("blockChain")
+	private String blockChain;
+
+	/**
+	 * 元数据
+	 */
+	@TableField("metadata")
+	private String metadata;
+
+	/**
+	 * 创建人报酬比例
+	 */
+	@TableField("creator_fees")
+	private BigDecimal creatorFees;
 
 	/**
 	 * 删除标记  1：已删除   0：未删除

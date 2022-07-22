@@ -19,10 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -35,11 +33,16 @@ import java.util.Set;
 public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftTypeEntity> implements SysNftTypeService {
 
     @Override
-    public List<SysNftTypeEntity> queryList() {
-        QueryWrapper<SysNftTypeEntity> query = new QueryWrapper<>();
-        query.eq("delete_flag", WhetherEnum.NO.value());
-        query.orderByAsc("sort");
-        return list(query);
+    public Map<Long, String> queryNameMapByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        // 包含已删除的数据
+        List<SysNftTypeEntity> list = listByIds(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(SysNftTypeEntity::getId, SysNftTypeEntity::getName));
     }
 
     @Override

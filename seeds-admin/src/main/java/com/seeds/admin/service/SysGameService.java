@@ -34,7 +34,7 @@ public interface SysGameService {
      * @param merchantId 商家id
      * @return 系统游戏列表
      */
-    List<SysGameResp> queryList(Long merchantId);
+    List<SysGameResp> select(Long merchantId);
 
     /**
      * 通过游戏id列表获取系统游戏列表

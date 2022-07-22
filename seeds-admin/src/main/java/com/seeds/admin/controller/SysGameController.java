@@ -43,9 +43,9 @@ public class SysGameController extends AdminBaseController {
 
     @GetMapping("list/{merchantId}")
     @ApiOperation("列表")
-    @RequiredPermission("sys:game:list")
-    public GenericDto<List<SysGameResp>> list(@PathVariable("merchantId") Long merchantId) {
-        return GenericDto.success(sysGameService.queryList(merchantId));
+    @RequiredPermission("sys:game:select")
+    public GenericDto<List<SysGameResp>> select(@PathVariable("merchantId") Long merchantId) {
+        return GenericDto.success(sysGameService.select(merchantId));
     }
 
     @PostMapping("add")

@@ -34,7 +34,7 @@ import java.util.Set;
 @Api("菜单管理")
 @RestController
 @RequestMapping("/menu")
-public class SyMenuController extends AdminBaseController {
+public class SysMenuController extends AdminBaseController {
 
     @Autowired
     private SysMenuService sysMenuService;
