@@ -8,18 +8,16 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: seeds-uc-public-service
-          uri: http://127.0.0.1:10101
-          predicates:
-            - Path=/api/**
         - id: seeds-uc-auth-service
           uri: http://127.0.0.1:10101
           predicates:
             - Path=/api/auth/**
+            - Path=/api/**
         - id: seeds-uc-service
           uri: http://127.0.0.1:10101
           predicates:
             - Path=/api/uc/**
+            - Path=/api/**
           filters:
             - Auth
         - id: seeds-admin-public-service
