@@ -10,7 +10,7 @@ spring:
           username: 819628513@qq.com
           password: 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
           search-paths: config-repo-test
-          default-label: main-dev
+          default-label: main-dev-yk
 
 
 security:

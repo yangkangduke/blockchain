@@ -63,7 +63,6 @@ public class SwaggerConfig {
     public Docket createRestApi(ApiInfo apiInfo) {
         return new Docket(DocumentationType.OAS_30)
                 .apiInfo(apiInfo)
-                .groupName("SwaggerGroupOneAPI")
                 .select()
                 .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
                 .paths(PathSelectors.any())
