@@ -9,21 +9,21 @@ spring:
     gateway:
       routes:
         - id: seeds-uc-public-service
-          uri: http://127.0.0.1:10101/
+          uri: http://127.0.0.1:10101
           predicates:
             - Path=/api/**
         - id: seeds-uc-auth-service
-          uri: http://127.0.0.1:10101/
+          uri: http://127.0.0.1:10101
           predicates:
             - Path=/api/auth/**
         - id: seeds-uc-service
-          uri: http://127.0.0.1:10101/
+          uri: http://127.0.0.1:10101
           predicates:
             - Path=/api/uc/**
           filters:
             - Auth
         - id: seeds-admin-public-service
-          uri: http://127.0.0.1:10102/
+          uri: http://127.0.0.1:10102
           predicates:
             - Path=/admin-public/**
           filters:
