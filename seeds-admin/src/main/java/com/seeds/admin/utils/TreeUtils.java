@@ -1,6 +1,6 @@
 package com.seeds.admin.utils;
 
-import com.seeds.admin.dto.common.TreeNode;
+import com.seeds.admin.dto.TreeNode;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
