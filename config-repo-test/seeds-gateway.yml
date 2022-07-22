@@ -35,7 +35,7 @@ spring:
               - PUT
               - POST
       default-filters:
-        - StripPrefix=1
+        - StripPrefix=2
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
         - AddResponseHeader=Access-Control-Allow-Credentials, true
         - AddResponseHeader=Access-Control-Allow-Origin, *
