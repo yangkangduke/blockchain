@@ -1,6 +1,7 @@
 package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.uc.dto.request.AccountLoginReq;
 import com.seeds.uc.dto.request.MetaMaskLoginReq;
 import com.seeds.uc.dto.request.RegisterReq;
@@ -8,12 +9,14 @@ import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.service.IUcUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -28,6 +31,8 @@ public class AuthController {
 
     @Autowired
     private IUcUserService ucUserService;
+    @Autowired
+    private FileTemplate template;
 
     /**
      * 校验账号
@@ -93,5 +98,12 @@ public class AuthController {
             "3.调用/login/metamask验证签名信息，验证成功返回token")
     public GenericDto<LoginResp> loginMetaMask(@Valid @RequestBody MetaMaskLoginReq loginReq, HttpServletRequest request) {
         return GenericDto.success(ucUserService.loginMetaMask(loginReq, request));
+    }
+
+    @PostMapping("/test")
+    @ApiOperation(value = "文件上传", notes ="文件上传")
+    public GenericDto<LoginResp> test(@ApiParam(value = "attach", required = true) MultipartFile file) throws Exception {
+        template.putObject("s3demo", "fileName", file.getInputStream());
+        return GenericDto.success(null);
     }
 }
