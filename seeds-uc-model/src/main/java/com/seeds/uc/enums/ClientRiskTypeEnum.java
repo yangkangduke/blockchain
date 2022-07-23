@@ -12,7 +12,7 @@ import lombok.Getter;
  * @date 2020/8/2
  */
 @Getter
-public enum ClientRiskType {
+public enum ClientRiskTypeEnum {
     // 无风险
     @JsonProperty("0")
     NO_RISK((short) 0, "no risk"),
@@ -29,12 +29,12 @@ public enum ClientRiskType {
     private Short code;
     private String desc;
 
-    ClientRiskType(Short code, String desc) {
+    ClientRiskTypeEnum(Short code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    public static ClientRiskType from(Short code) {
+    public static ClientRiskTypeEnum from(Short code) {
         switch (code) {
             case 0:
                 return NO_RISK;

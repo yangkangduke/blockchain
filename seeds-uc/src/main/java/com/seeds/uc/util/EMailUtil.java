@@ -18,16 +18,13 @@ public class EMailUtil {
             email.addTo(sendTo);
             email.setFrom("819628513@qq.com", "Seeds");
             email.setAuthentication("819628513@qq.com", "notypapwvrocbfhb");
-            email.setSubject("Registration verification code");
-            email.setMsg("Registration verification code：" + code);
+            email.setSubject("Bind the email verification code");
+            email.setMsg("Bind the email verification code, note that it expires in 5 minutes:" + code);
             email.send();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        EMailUtil.send("819628513@qq.com", "123456");
-    }
 }
 

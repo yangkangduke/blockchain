@@ -2,10 +2,7 @@ package com.seeds.uc.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.uc.dto.request.BndEmailReq;
-import com.seeds.uc.dto.request.EmailCodeSendReq;
-import com.seeds.uc.dto.request.LoginReq;
-import com.seeds.uc.dto.request.RegisterReq;
+import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.model.UcUser;
 
@@ -22,18 +19,18 @@ import javax.servlet.http.HttpServletRequest;
 public interface IUcUserService extends IService<UcUser> {
 
     /**
-     * 发送邮箱验证码
+     * 发送验证码
      *
      * @param sendReq
      */
-    Boolean sendEmailCode(EmailCodeSendReq sendReq);
+    void sendCode(SendCodeReq sendReq);
 
     /**
      * 邮箱验证码校验
      *
      * @param verifyReq
      */
-    Boolean bindEmail(BndEmailReq verifyReq, HttpServletRequest request);
+    Boolean bindEmail(BindEmailReq verifyReq, HttpServletRequest request);
 
     /**
      * 账号重复性校验
@@ -41,7 +38,7 @@ public interface IUcUserService extends IService<UcUser> {
      * @param account
      * @return
      */
-    Boolean accountVerify(String account);
+    Boolean verifyAccount(String account);
 
     /**
      * 注册用户
@@ -49,29 +46,26 @@ public interface IUcUserService extends IService<UcUser> {
      * @param registerReq
      * @return
      */
-    LoginResp createAccount(RegisterReq registerReq, HttpServletRequest request);
+    LoginResp registerAccount(RegisterReq registerReq, HttpServletRequest request);
 
     /**
      * 登陆
-     * @param loginReq
+     * @param accountLoginReq
      * @return
      */
-    LoginResp loginToEmailAccount(LoginReq loginReq);
+    LoginResp loginAccount(AccountLoginReq accountLoginReq);
 
     /**
      * metamask登陆
-     * @param publicAddress
-     * @param signature
-     * @param message
      * @param request
      */
-    LoginResp loginToMetamask(String publicAddress, String signature, String message, HttpServletRequest request);
+    LoginResp loginMetaMask(MetaMaskLoginReq loginReq, HttpServletRequest request);
 
     /**
      * metamask登陆获取随机数
      * @return
      */
-    String loginToMetamaskNonce(String publicAddress, HttpServletRequest request);
+    String metamaskNonce(String publicAddress, HttpServletRequest request);
 
 
 }

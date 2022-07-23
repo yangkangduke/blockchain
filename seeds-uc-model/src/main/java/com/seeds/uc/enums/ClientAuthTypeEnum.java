@@ -17,15 +17,15 @@ import java.util.Set;
 @Getter
 public enum ClientAuthTypeEnum {
     UNKNOWN((short) 0, "unknown"),
-    // 手机验证
-    PHONE((short) 1, "phone"),
+    // 小狐狸钱包
+    METAMASK((short) 1, "metaMask"),
     // 邮箱验证
     EMAIL((short) 2, "email"),
     // 谷歌验证
     GA((short) 3, "ga"),
     ;
 
-    public static Set<ClientAuthTypeEnum> NEED_SEND_CODE = EnumSet.of(PHONE, EMAIL);
+    public static Set<ClientAuthTypeEnum> NEED_SEND_CODE = EnumSet.of(METAMASK, EMAIL);
     @EnumValue
     @JsonValue
     private final Short code;
@@ -39,7 +39,7 @@ public enum ClientAuthTypeEnum {
     public static ClientAuthTypeEnum from(Short code) {
         switch (code) {
             case 1:
-                return PHONE;
+                return METAMASK;
             case 2:
                 return EMAIL;
             case 3:
@@ -50,7 +50,7 @@ public enum ClientAuthTypeEnum {
     }
 
     public static String getAccountNameByAuthType(String phone, String email, ClientAuthTypeEnum authTypeEnum) {
-        if (PHONE.equals(authTypeEnum)) {
+        if (METAMASK.equals(authTypeEnum)) {
             return phone;
         } else if (EMAIL.equals(authTypeEnum)) {
             return email;

@@ -3,8 +3,9 @@ package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.LoginUser;
-import com.seeds.uc.dto.request.BndEmailReq;
-import com.seeds.uc.dto.request.EmailCodeSendReq;
+import com.seeds.uc.dto.request.BindEmailReq;
+import com.seeds.uc.dto.request.QRBarCodeReq;
+import com.seeds.uc.dto.request.SendCodeReq;
 import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.impl.CacheService;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 /**
  * <p>
@@ -30,51 +32,58 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("/uc")
-@Api(tags = "用户internal相关接口")
+@Api(tags = "uc接口")
 public class OpenUserController {
     @Autowired
-    private IUcUserService iUcUserService;
+    private IUcUserService ucUserService;
     @Autowired
-    private IGoogleAuthService igoogleAuthService;
+    private IGoogleAuthService googleAuthService;
     @Autowired
     private CacheService cacheService;
 
     /**
-     * 发送邮箱验证码
+     * 发送验证码
      */
-    @PostMapping("/bindEmail/emailCode/send")
-    @ApiOperation(value = "发送邮箱验证码", notes = "发送邮箱验证码")
-    public GenericDto<Boolean> sendEmailCode(@Valid @RequestBody EmailCodeSendReq sendReq) {
-        return GenericDto.success(iUcUserService.sendEmailCode(sendReq));
+    @PostMapping("send/code")
+    @ApiOperation(value = "发送验证码", notes = "绑定邮箱useType传BIND_EMAIL")
+    public GenericDto<Object> sendCode(@Valid @RequestBody SendCodeReq sendReq) {
+        ucUserService.sendCode(sendReq);
+        return GenericDto.success(null);
     }
 
     /**
      * 绑定邮箱
+     * 1.调用send/code接口发送邮箱验证码
+     * 2.调用/bind/email绑定邮箱接口
      */
-    @PostMapping("/bindEmail")
-    @ApiOperation(value = "绑定邮箱", notes = "绑定邮箱")
-    public GenericDto<Boolean> bindEmail(@Valid @RequestBody BndEmailReq bndEmailReq, HttpServletRequest request) {
-        return GenericDto.success(iUcUserService.bindEmail(bndEmailReq, request));
+    @PostMapping("/bind/email")
+    @ApiOperation(value = "绑定邮箱",
+            notes = "1.调用send/code接口发送邮箱验证码\n" +
+                    "2.调用/bind/email绑定邮箱接口")
+    public GenericDto<Boolean> bindEmail(@Valid @RequestBody BindEmailReq bndEmailReq, HttpServletRequest request) {
+        return GenericDto.success(ucUserService.bindEmail(bndEmailReq, request));
     }
 
     /**
-     * GA Authentication生成QRBarcode
+     * 生成QRBarcode
      */
-    @PostMapping("/getQRBarcode")
-    @ApiOperation(value = "GA Authentication生成QRBarcode", notes = "GA Authentication生成QRBarcode")
-    public GenericDto<String> getQRBarcode(String account, String remark, HttpServletRequest request) {
-        return GenericDto.success(igoogleAuthService.getQRBarcode(account, remark, request));
+    @PostMapping("/ga/QRBarcode")
+    @ApiOperation(value = "生成QRBarcode", notes = "生成QRBarcode")
+    public GenericDto<String> getQRBarcode(@Valid @RequestBody QRBarCodeReq qrBarCodeReq, HttpServletRequest request) {
+        return GenericDto.success(googleAuthService.getQRBarcode(qrBarCodeReq.getAccount(), qrBarCodeReq.getRemark(), request));
     }
 
     /**
-     * GA Authentication 验证
+     * GA验证code
+     * 1.调用/ga/QRBarcode生成code后
+     * 2.调用/ga/verifyCode验证code
      */
-    @PostMapping("/verifyUserCode")
-    @ApiOperation(value = "GA Authentication 验证", notes = "GA Authentication 验证")
-    public GenericDto<Boolean> verifyUserCode(String userInputCode, HttpServletRequest request) {
+    @PostMapping("/ga/verifyCode")
+    @ApiOperation(value = "GA验证code", notes = "GA验证code")
+    public GenericDto<Boolean> verifyCode(@Valid @NotBlank @RequestBody String code, HttpServletRequest request) {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUser loginUser = cacheService.getUserByToken(loginToken);
-        return GenericDto.success(igoogleAuthService.verifyUserCode(loginUser.getUserId(), userInputCode));
+        return GenericDto.success(googleAuthService.verifyUserCode(loginUser.getUserId(), code));
     }
 
 

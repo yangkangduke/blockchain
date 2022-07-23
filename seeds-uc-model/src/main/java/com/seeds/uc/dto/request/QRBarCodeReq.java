@@ -1,9 +1,9 @@
 package com.seeds.uc.dto.request;
 
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -12,15 +12,11 @@ import javax.validation.constraints.NotBlank;
  * @date 2022/07/13
  */
 @Data
-public class RegisterReq {
-
+public class QRBarCodeReq {
     @ApiModelProperty(value = "账号", required = true)
     @NotBlank
-    @Email
     private String account;
-    @ApiModelProperty(value = "密码", required = true)
-    @NotBlank
-    private String password;
-
+    @ApiModelProperty(value = "备注")
+    private String remark;
 
 }

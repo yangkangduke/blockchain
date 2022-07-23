@@ -4,22 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.uc.dto.AuthCode;
 import com.seeds.uc.dto.LoginUser;
-import com.seeds.uc.dto.request.BndEmailReq;
-import com.seeds.uc.dto.request.EmailCodeSendReq;
-import com.seeds.uc.dto.request.LoginReq;
-import com.seeds.uc.dto.request.RegisterReq;
+import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
-import com.seeds.uc.enums.ClientAuthTypeEnum;
-import com.seeds.uc.enums.ClientStateEnum;
-import com.seeds.uc.enums.ClientTypeEnum;
-import com.seeds.uc.enums.UcErrorCode;
-import com.seeds.uc.exceptions.GenericException;
+import com.seeds.uc.enums.*;
+import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.mapper.UcUserMapper;
 import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
+import com.seeds.uc.service.ISendCodeService;
 import com.seeds.uc.service.IUcSecurityStrategyService;
 import com.seeds.uc.service.IUcUserService;
-import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.util.CryptoUtils;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
@@ -48,24 +42,26 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Autowired
     private CacheService cacheService;
     @Autowired
-    private SendCodeService sendCodeService;
+    private ISendCodeService sendCodeService;
     @Autowired
     private IUcSecurityStrategyService iUcSecurityStrategyService;
     @Autowired
     private RedissonClient redissonClient;
 
     /**
-     * 发送邮箱验证码
+     * 发送验证码
      *
      * @param sendReq
      */
     @Override
-    public Boolean sendEmailCode(EmailCodeSendReq sendReq) {
-        // todo 需要有登陆后的uctoken才能使用
-        log.info("AuthController - sendEmailCode got request: {}", sendReq);
-        sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
+    public void sendCode(SendCodeReq sendReq) {
+        AuthCodeUseTypeEnum useType = sendReq.getUseType();
+        if (AuthCodeUseTypeEnum.BIND_EMAIL.equals(useType) ) {
+            sendCodeService.sendEmailWithUseType(sendReq.getAddress(), sendReq.getUseType());
+        } else {
+            throw new InvalidArgumentsException("incorrect type");
+        }
 
-        return true;
     }
 
     /**
@@ -74,12 +70,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @param verifyReq
      */
     @Override
-    public Boolean bindEmail(BndEmailReq verifyReq, HttpServletRequest request) {
+    public Boolean bindEmail(BindEmailReq verifyReq, HttpServletRequest request) {
         String email = verifyReq.getEmail();
         String code = verifyReq.getCode();
         AuthCode authCode = cacheService.getAuthCode(email, verifyReq.getUseType(), ClientAuthTypeEnum.EMAIL);
         if (authCode == null || authCode.getCode() == null || !authCode.getCode().equals(code)) {
-            throw new GenericException(UcErrorCode.ERR_10033_WRONG_EMAIL_CODE);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
         }
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
@@ -110,11 +106,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public Boolean accountVerify(String account) {
+    public Boolean verifyAccount(String account) {
         UcUser ucUser = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getAccount, account));
         if (ucUser != null) {
-            throw new GenericException(UcErrorCode.ERR_10061_EMAIL_ALREADY_BEEN_USED);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED);
         }
         return true;
     }
@@ -126,7 +122,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public LoginResp createAccount(RegisterReq registerReq, HttpServletRequest request) {
+    public LoginResp registerAccount(RegisterReq registerReq, HttpServletRequest request) {
         LoginUser loginUser = null;
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
@@ -135,7 +131,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         // loginUser不是null说明当前登陆的是metamsk,还要绑定metamsk
         String account = registerReq.getAccount();
-        this.accountVerify(account);
+        this.verifyAccount(account);
         String salt = RandomUtil.getRandomSalt();
         // 现在是password sha256之后的值，后面改成前端传密文且用非对称加密传
         String password = PasswordUtil.getPassword(registerReq.getPassword(), salt);
@@ -179,20 +175,20 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     /**
      * 登陆
      *
-     * @param loginReq
+     * @param accountLoginReq
      * @return
      */
     @Override
-    public LoginResp loginToEmailAccount(LoginReq loginReq) {
-        String account = loginReq.getAccount();
+    public LoginResp loginAccount(AccountLoginReq accountLoginReq) {
+        String account = accountLoginReq.getAccount();
         UcUser ucUser = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getAccount, account));
         if (ucUser == null) {
-            throw new GenericException("Account does not exist");
+            throw new InvalidArgumentsException("Account does not exist");
         }
-        String loginPassword = PasswordUtil.getPassword(loginReq.getPassword(), ucUser.getSalt());
+        String loginPassword = PasswordUtil.getPassword(accountLoginReq.getPassword(), ucUser.getSalt());
         if (!loginPassword.equals(ucUser.getPassword())) {
-            throw new GenericException(UcErrorCode.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT);
         }
         // 下发uc token
         String ucToken = RandomUtil.genRandomToken(ucUser.getId().toString());
@@ -207,27 +203,27 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     /**
      * metamask登陆
      *
-     * @param publicAddress
-     * @param signature
-     * @param message
      * @param request
      * @return
      */
     @Override
-    public LoginResp loginToMetamask(String publicAddress, String signature, String message, HttpServletRequest request) {
+    public LoginResp loginMetaMask(MetaMaskLoginReq loginReq, HttpServletRequest request) {
+        String publicAddress = loginReq.getPublicAddress();
+        String message = loginReq.getMessage();
+        String signature = loginReq.getSignature();
         // 地址合法性校验
         if (!WalletUtils.isValidAddress(publicAddress)) {
             // 不合法直接返回错误
-            throw new GenericException("Illegal address format");
+            throw new InvalidArgumentsException("Illegal address format");
         }
         // 校验签名信息
         if (!CryptoUtils.validate(signature, message, publicAddress)) {
-            throw new GenericException("Signature verification failed");
+            throw new InvalidArgumentsException("Signature verification failed");
         }
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getSalt, publicAddress));
         if (one == null) {
-            throw new GenericException("User does not exist");
+            throw new InvalidArgumentsException("User does not exist");
         }
         // 下发uc token
         String ucToken = RandomUtil.genRandomToken(one.getId().toString());
@@ -235,7 +231,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         cacheService.putUserWithTokenAndLoginName(ucToken, one.getId(), publicAddress);
 
         // 修改nonce
-        this.loginToMetamaskNonce(publicAddress, request);
+        this.metamaskNonce(publicAddress, request);
 
         return LoginResp.builder()
                 .ucToken(ucToken)
@@ -248,7 +244,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public String loginToMetamaskNonce(String publicAddress, HttpServletRequest request) {
+    public String metamaskNonce(String publicAddress, HttpServletRequest request) {
         LoginUser loginUser = null;
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);

@@ -1,17 +1,19 @@
 package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.uc.dto.request.LoginReq;
+import com.seeds.uc.dto.request.AccountLoginReq;
+import com.seeds.uc.dto.request.MetaMaskLoginReq;
 import com.seeds.uc.dto.request.RegisterReq;
 import com.seeds.uc.dto.response.LoginResp;
-import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -21,68 +23,75 @@ import javax.validation.constraints.NotBlank;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
+@Api(tags = "auth接口")
 public class AuthController {
 
     @Autowired
-    private IUcUserService iUcUserService;
-    @Autowired
-    private IGoogleAuthService igoogleAuthService;
+    private IUcUserService ucUserService;
 
     /**
-     * 账号重复性校验
+     * 校验账号
      */
-    @GetMapping("/register/account/verify")
-    @ApiOperation(value = "账号重复性校验", notes = "账号重复性校验")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "account", value = "注册的邮箱账号", required = true),
-    })
-    public GenericDto<Boolean> accountVerify(@Valid @NotBlank @Email String account) {
-        return GenericDto.success(iUcUserService.accountVerify(account));
+    @PostMapping("/register/check")
+    @ApiOperation(value = "校验账号", notes = "校验账号")
+    public GenericDto<Boolean> verifyAccount(@Valid @NotBlank @Email @RequestBody String account) {
+        return GenericDto.success(ucUserService.verifyAccount(account));
     }
 
     /**
-     * 注册账号用户
+     * 注册账号
+     * 1.调用/register/check接口校验账号
+     * 2.调用/register/account注册账号，
+     * 3.如果传了token就跟metaMask做绑定
      */
-    @PostMapping("/register/createAccount")
-    @ApiOperation(value = "注册账号用户", notes = "注册账号用户")
-    public GenericDto<LoginResp> createAccount(@Valid @RequestBody RegisterReq registerReq, HttpServletRequest request) {
-        return GenericDto.success(iUcUserService.createAccount(registerReq, request));
+    @PostMapping("/register/account")
+    @ApiOperation(value = "注册账号",
+            notes = "1.调用/register/check接口校验账号\n" +
+            "2.调用/register/account注册账号，\n" +
+            "3.如果传了token就跟metaMask做绑定")
+    public GenericDto<LoginResp> registerAccount(@Valid @RequestBody RegisterReq registerReq, HttpServletRequest request) {
+        return GenericDto.success(ucUserService.registerAccount(registerReq, request));
     }
 
     /**
      * 账号登陆
      *
-     * @param loginReq
+     * @param accountLoginReq
      * @return
      */
-    @PostMapping("/login/toEmailAccount")
+    @PostMapping("/login/account")
     @ApiOperation(value = "账号登陆", notes = "账号登陆")
-    public GenericDto<LoginResp> loginToEmailAccount(@Valid @RequestBody LoginReq loginReq) {
-        return GenericDto.success(iUcUserService.loginToEmailAccount(loginReq));
+    public GenericDto<LoginResp> loginAccount(@Valid @RequestBody AccountLoginReq accountLoginReq) {
+        return GenericDto.success(ucUserService.loginAccount(accountLoginReq));
     }
 
 
     /**
-     * metamask登陆获取随机数
+     * metamask获取随机数
      *
      * @param
      * @return
      */
-    @PostMapping("/login/toMetamask/nonce")
-    @ApiOperation(value = "metamask登陆-获取随机数", notes = "metamask-登陆获取随机数")
-    public GenericDto<String> loginToMetamaskNonce(String publicAddress, HttpServletRequest request) {
-        return GenericDto.success(iUcUserService.loginToMetamaskNonce(publicAddress, request));
+    @PostMapping("/metamask/nonce")
+    @ApiOperation(value = "metamask获取随机数", notes = "metamask获取随机数")
+    public GenericDto<String> metamaskNonce(@Valid @NotBlank @RequestBody String publicAddress, HttpServletRequest request) {
+        return GenericDto.success(ucUserService.metamaskNonce(publicAddress, request));
     }
 
     /**
      * metamask登陆
-     *
+     * 1.调用/metamask/nonce生成nonce
+     * 2.前端根据nonce生成签名信息
+     * 3.调用/login/metamask验证签名信息，验证成功返回token
      * @param
      * @return
      */
-    @PostMapping("/login/toMetamask")
-    @ApiOperation(value = "metamask登陆", notes = "metamask登陆")
-    public GenericDto<LoginResp> loginToMetamask(@Valid @NotBlank String publicAddress, @NotBlank String signature, String message, HttpServletRequest request) {
-        return GenericDto.success(iUcUserService.loginToMetamask(publicAddress, signature, message, request));
+    @PostMapping("/login/metamask")
+    @ApiOperation(value = "metamask登陆",
+            notes ="1.调用/metamask/nonce生成nonce\n" +
+            "2.前端根据nonce生成签名信息\n" +
+            "3.调用/login/metamask验证签名信息，验证成功返回token")
+    public GenericDto<LoginResp> loginMetaMask(@Valid @RequestBody MetaMaskLoginReq loginReq, HttpServletRequest request) {
+        return GenericDto.success(ucUserService.loginMetaMask(loginReq, request));
     }
 }

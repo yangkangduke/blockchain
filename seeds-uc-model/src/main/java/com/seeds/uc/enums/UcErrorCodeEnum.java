@@ -2,7 +2,6 @@ package com.seeds.uc.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Data;
 import lombok.Getter;
 
 /**
@@ -11,7 +10,7 @@ import lombok.Getter;
  * @date 2020/7/26
  */
 @Getter
-public enum UcErrorCode {
+public enum UcErrorCodeEnum {
     ERR_401_NOT_LOGGED_IN(401, "请先登录", "please login first"),
     ERR_500_SYSTEM_BUSY(500, "系统繁忙，请稍后再试...", "system busy, please try again later"),
     ERR_502_ILLEGAL_ARGUMENTS(502, "参数错误", "wrong arguments"),
@@ -73,7 +72,7 @@ public enum UcErrorCode {
     private String desc;
     private String descEn;
 
-    UcErrorCode(Integer code, String desc, String descEn) {
+    UcErrorCodeEnum(Integer code, String desc, String descEn) {
         this.code = code;
         this.desc = desc;
         this.descEn = descEn;

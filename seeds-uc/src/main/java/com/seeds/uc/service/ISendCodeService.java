@@ -7,7 +7,7 @@ import com.seeds.uc.enums.AuthCodeUseTypeEnum;
  * @email 819628513@qq.com
  * @date 2022/07/13
  */
-public interface SendCodeService {
+public interface ISendCodeService {
 
     void sendEmailWithUseType(String address, AuthCodeUseTypeEnum useTypeEnum);
 

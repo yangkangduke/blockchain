@@ -1,4 +1,4 @@
 package com.seeds.uc.service;
 
-public interface KycService {
+public interface IKycService {
 }

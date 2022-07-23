@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 @Transactional
 public class GoogleAuthServiceImpl implements IGoogleAuthService {
+
+    public static String format = "otpauth://totp/%s?secret=%s&issuer=%s";
     @Autowired
     UcUserMapper userMapper;
     @Autowired
@@ -35,7 +37,6 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
 
     @Override
     public String getQRBarcode(String account, String remark, HttpServletRequest request) {
-        String format = "otpauth://totp/%s?secret=%s&issuer=%s";
         String gaSecret = this.genGaSecret();
         // 将gaSecret保存到数据库中
         String loginToken = WebUtil.getTokenFromRequest(request);

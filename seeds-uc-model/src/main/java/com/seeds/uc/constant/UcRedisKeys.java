@@ -76,7 +76,7 @@ public class UcRedisKeys {
     public String getUcAuthCodeKeyWithAuthTypeAndUseType(String username,
                                                          AuthCodeUseTypeEnum useTypeEnum,
                                                          ClientAuthTypeEnum authTypeEnum) {
-        if (ClientAuthTypeEnum.PHONE.equals(authTypeEnum)) {
+        if (ClientAuthTypeEnum.METAMASK.equals(authTypeEnum)) {
             return String.format(UC_AUTH_PHONE_KEY_TEMPLATE, useTypeEnum.getBrief(), username);
         } else if (ClientAuthTypeEnum.EMAIL.equals(authTypeEnum)) {
             return String.format(UC_AUTH_EMAIL_KEY_TEMPLATE, useTypeEnum.getBrief(), username);
@@ -109,7 +109,7 @@ public class UcRedisKeys {
      * used for phone, email, ga bindings, set only when user ga verified
      */
     public String getUcAuthTokenKeyTemplate(String token, ClientAuthTypeEnum authTypeEnum) {
-        if (ClientAuthTypeEnum.PHONE.equals(authTypeEnum)) {
+        if (ClientAuthTypeEnum.METAMASK.equals(authTypeEnum)) {
             return String.format(UC_PHONE_AUTH_TOKEN_KEY_TEMPLATE, token);
         } else if (ClientAuthTypeEnum.EMAIL.equals(authTypeEnum)) {
             return String.format(UC_EMAIL_AUTH_TOKEN_KEY_TEMPLATE, token);

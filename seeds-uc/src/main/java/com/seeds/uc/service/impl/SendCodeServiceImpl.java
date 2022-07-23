@@ -3,10 +3,10 @@ package com.seeds.uc.service.impl;
 
 import com.seeds.uc.dto.AuthCode;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
-import com.seeds.uc.enums.UcErrorCode;
+import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
-import com.seeds.uc.service.SendCodeService;
+import com.seeds.uc.service.ISendCodeService;
 import com.seeds.uc.util.EMailUtil;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class SendCodeServiceImpl implements SendCodeService {
+public class SendCodeServiceImpl implements ISendCodeService {
     @Autowired
     private CacheService cacheService;
 
@@ -49,6 +49,6 @@ public class SendCodeServiceImpl implements SendCodeService {
             cacheService.putAuthToken(token, null, address, ClientAuthTypeEnum.EMAIL);
             return token;
         }
-        throw new GenericException(UcErrorCode.ERR_10033_WRONG_EMAIL_CODE);
+        throw new GenericException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
     }
 }

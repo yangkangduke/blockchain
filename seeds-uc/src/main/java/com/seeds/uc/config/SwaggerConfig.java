@@ -20,7 +20,6 @@ import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
@@ -45,11 +44,9 @@ public class SwaggerConfig {
     @Bean
     public ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("seeds Restful API")
-                .description("swagger seeds app restful api")
-                .termsOfServiceUrl("xxx")
-                .contact(new Contact("yk", "xx", "819628513@qq.com"))
-                .version("1.0")
+                .title("Seeds Restful API")
+                .description("swagger Seeds app restful api")
+                .version("0.0.1")
                 .build();
     }
 
