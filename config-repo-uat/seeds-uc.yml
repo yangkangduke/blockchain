@@ -25,6 +25,11 @@ uc:
     redis:
       keyExpireAfter: 259200
 
+# uc 文件存储目录
+file:
+  store:
+    location: /seeds-uc/files/
+
 springfox:
   documentation:
     swagger-ui:
@@ -36,10 +41,3 @@ redisson:
   poolsize: 50
   idlesize: 50
   password: Seeds123!
-
-
-file:
-  bucketName: s3demo # 上文创建的桶名称
-  local:
-    enable: true
-    base-path: /data
