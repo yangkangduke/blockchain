@@ -9,13 +9,9 @@ import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.service.IUcUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -102,7 +98,7 @@ public class AuthController {
 
     @PostMapping("/test")
     @ApiOperation(value = "文件上传", notes ="文件上传")
-    public GenericDto<LoginResp> test(@ApiParam(value = "attach", required = true) MultipartFile file) throws Exception {
+    public GenericDto<LoginResp> test(@RequestPart("file") MultipartFile file) throws Exception {
         template.putObject("s3demo", "fileName", file.getInputStream());
         return GenericDto.success(null);
     }

@@ -24,6 +24,7 @@ import com.seeds.common.web.oss.service.OssTemplate;
 import lombok.AllArgsConstructor;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,7 +47,8 @@ import java.util.Map;
 @RequestMapping("/oss")
 public class OssEndpoint {
 
-	private final OssTemplate template;
+	@Autowired
+	private OssTemplate template;
 
 	/**
 	 * Bucket Endpoints

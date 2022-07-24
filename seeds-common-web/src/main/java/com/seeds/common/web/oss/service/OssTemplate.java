@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -30,6 +32,8 @@ import java.util.*;
  * @since 1.0
  */
 @RequiredArgsConstructor
+@Component
+@Primary
 public class OssTemplate implements InitializingBean, FileTemplate {
 
 	private final FileProperties properties;

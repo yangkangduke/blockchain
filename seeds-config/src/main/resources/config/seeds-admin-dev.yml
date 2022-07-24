@@ -1,16 +1,16 @@
 server:
-  port: 10101
+  port: 10102
 
 spring:
-  datasource:
-    url: jdbc:mysql://192.168.1.101:3306/seeds_uc
-    username: root
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+
+  datasource:
+    url: jdbc:mysql://Seeds-mysql:3306/seeds_admin
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 management:
   endpoints:
@@ -18,17 +18,17 @@ management:
       base-path: /
 
 mybatis:
-  type-aliases-package*: com.seeds.uc.model
+  type-aliases-package*: com.seeds.admin.model
 
-uc:
+admin:
   sso:
     redis:
       keyExpireAfter: 259200
 
-# uc 文件存储目录
+# admin 文件存储目录
 file:
   store:
-    location: /seeds-uc/files/
+    location: /seeds-admin/files/
 
 springfox:
   documentation:
@@ -36,7 +36,7 @@ springfox:
       enabled: true
 
 redisson:
-  address: redis://192.168.1.101:6379
+  address: redis://Seeds-redis:6379
   timeout: 5000
   poolsize: 50
   idlesize: 50

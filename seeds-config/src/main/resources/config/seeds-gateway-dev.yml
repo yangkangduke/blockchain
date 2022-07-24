@@ -1,0 +1,47 @@
+server:
+  port: 9999
+
+spring:
+  application:
+    name: seeds-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: seeds-uc-auth-service
+          uri: http://127.0.0.1:10101
+          predicates:
+            - Path=/api/auth/**
+        - id: seeds-uc-service
+          uri: http://127.0.0.1:10101
+          predicates:
+            - Path=/api/uc/**
+          filters:
+            - Auth
+        - id: seeds-admin-public-service
+          uri: http://127.0.0.1:10102/
+          predicates:
+            - Path=/api/admin-public/**
+          filters:
+            - AdminAuth
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods:
+              - GET
+              - HEAD
+              - PUT
+              - POST
+      default-filters:
+        - StripPrefix=2
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+        - AddResponseHeader=Access-Control-Allow-Credentials, true
+        - AddResponseHeader=Access-Control-Allow-Origin, *
+        - name: RequestRateLimiter
+          args:
+            key-resolver: '#{@defaultResolver}'
+            redis-rate-limiter.replenishRate: 5
+            redis-rate-limiter.burstCapacity: 10
+

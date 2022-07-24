@@ -8,6 +8,7 @@ import com.seeds.common.web.oss.FileProperties;
 import com.seeds.common.web.oss.FileTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.InputStream;
