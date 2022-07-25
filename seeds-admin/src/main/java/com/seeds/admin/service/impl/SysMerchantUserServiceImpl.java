@@ -87,4 +87,25 @@ public class SysMerchantUserServiceImpl extends ServiceImpl<SysMerchantUserMappe
         return list(query);
     }
 
+    @Override
+    public List<SysMerchantUserEntity> queryByUserId(Long userId) {
+        QueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<>();
+        query.eq("user_id", userId);
+        return list(query);
+    }
+
+    @Override
+    public Set<Long> queryAllMerchantUserByUserId(Long userId) {
+        List<SysMerchantUserEntity> merchantUsers = queryByUserId(userId);
+        if (CollectionUtils.isEmpty(merchantUsers)) {
+            return Collections.emptySet();
+        }
+        Set<Long> merchantIds = merchantUsers.stream().map(SysMerchantUserEntity::getMerchantId).collect(Collectors.toSet());
+        List<SysMerchantUserEntity> list = queryByMerchantIds(merchantIds);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptySet();
+        }
+        return list.stream().map(SysMerchantUserEntity::getUserId).collect(Collectors.toSet());
+    }
+
 }

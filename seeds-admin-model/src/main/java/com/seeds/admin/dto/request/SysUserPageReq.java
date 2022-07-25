@@ -1,6 +1,5 @@
 package com.seeds.admin.dto.request;
 
-import com.seeds.admin.dto.request.PageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
