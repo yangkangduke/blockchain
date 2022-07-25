@@ -64,4 +64,18 @@ public interface SysMerchantUserService {
      */
     List<SysMerchantUserEntity> queryByUserIds(Collection<Long> userIds);
 
+    /**
+     * 通过用户id查询商家与用户关联
+     * @param  userId 用户id
+     * @return 商家与用户的关联
+     */
+    List<SysMerchantUserEntity> queryByUserId(Long userId);
+
+    /**
+     * 通过用户id查询所属商家下所有用户id
+     * @param  userId 用户id
+     * @return 所属商家下所有用户id
+     */
+    Set<Long> queryAllMerchantUserByUserId(Long userId);
+
 }

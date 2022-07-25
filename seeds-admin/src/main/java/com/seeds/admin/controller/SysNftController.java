@@ -1,6 +1,7 @@
 package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.annotation.DataFilter;
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
@@ -34,6 +35,7 @@ public class SysNftController extends AdminBaseController {
 
     @PostMapping("page")
     @ApiOperation("分页")
+    @DataFilter
     @RequiredPermission("sys:nft:page")
     public GenericDto<IPage<SysNftResp>> queryPage(@Valid @RequestBody SysNftPageReq query) {
         return GenericDto.success(sysNftService.queryPage(query));
