@@ -32,9 +32,6 @@ public class RedisCacheConfig {
     @Value("${redisson.password:}")
     String password;
 
-    @Value("${redisson.pingConnectionInterval:1000}")
-    int pingConnectionInterval;
-
     @Value("${redisson.database:0}")
     int database;
 
@@ -44,7 +41,6 @@ public class RedisCacheConfig {
         SingleServerConfig serverConfig = config.useSingleServer();
         serverConfig.setAddress(address);
         serverConfig.setTimeout(timeout);
-        serverConfig.setPingConnectionInterval(pingConnectionInterval);
         serverConfig.setConnectTimeout(timeout);
         serverConfig.setConnectionPoolSize(maxPoolSize);
         serverConfig.setConnectionMinimumIdleSize(minIdleSize);

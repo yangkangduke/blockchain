@@ -41,6 +41,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     private SysNftTypeService sysNftTypeService;
 
     @Autowired
+    private SysSequenceNoService sysSequenceNoService;
+
+    @Autowired
     private SysNftPropertiesService sysNftPropertiesService;
 
     @Override
@@ -83,7 +86,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         // 修改NFT
         SysNftEntity sysNft = new SysNftEntity();
         BeanUtils.copyProperties(req, sysNft);
-        updateById(sysNft);
+        // 生成NFT编号
+        sysNft.setNumber(sysSequenceNoService.generateNftNo());
+        save(sysNft);
         // 添加NFT属性
         addNftProperties(sysNft.getId(), req.getPropertiesList());
     }
@@ -115,7 +120,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         // 添加NFT
         SysNftEntity sysNft = new SysNftEntity();
         BeanUtils.copyProperties(req, sysNft);
-        save(sysNft);
+        updateById(sysNft);
         // 修改NFT属性
         addNftProperties(sysNft.getId(), req.getPropertiesList());
     }
