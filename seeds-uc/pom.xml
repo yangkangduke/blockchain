@@ -35,10 +35,6 @@
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-email</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.seeds</groupId>
             <artifactId>seeds-uc-model</artifactId>
             <version>${project.version}</version>

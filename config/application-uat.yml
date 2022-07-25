@@ -11,3 +11,9 @@ file:
     endpoint: http://127.0.0.1:9000
     access-key: seeds123!
     secret-key: seeds123!
+
+email:
+  host: smtp.qq.com
+  from: seeds<819628513@qq.com>
+  user: 819628513@qq.com
+  pass: notypapwvrocbfhb

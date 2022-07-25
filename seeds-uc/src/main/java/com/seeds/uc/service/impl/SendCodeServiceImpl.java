@@ -1,13 +1,16 @@
 package com.seeds.uc.service.impl;
 
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.extra.mail.MailAccount;
+import cn.hutool.extra.mail.MailUtil;
+import com.seeds.common.web.config.EmailProperties;
 import com.seeds.uc.dto.AuthCode;
+import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.GenericException;
-import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.service.ISendCodeService;
-import com.seeds.uc.util.EMailUtil;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -24,13 +27,21 @@ import org.springframework.stereotype.Service;
 public class SendCodeServiceImpl implements ISendCodeService {
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private EmailProperties emailProperties;
 
     @Override
     public String sendEmailWithUseType(String address, AuthCodeUseTypeEnum useTypeEnum) {
         // generate a random code
         String otp = RandomUtil.getRandom6DigitsOTP();
-        EMailUtil.send(address, otp);
-
+        MailAccount account = new MailAccount();
+        account.setHost(emailProperties.getHost());
+        account.setPort(25);
+        account.setAuth(true);
+        account.setFrom(emailProperties.getFrom());
+        account.setUser(emailProperties.getUser());
+        account.setPass(emailProperties.getPass());
+        MailUtil.send(account, CollUtil.newArrayList(address), "Bind the email verification code", "Bind the email verification code, note that it expires in 5 minutes:" + otp, false);
         // store the auth code in auth code bucket
         cacheService.putAuthCode(
                 address,
@@ -38,7 +49,7 @@ public class SendCodeServiceImpl implements ISendCodeService {
                 ClientAuthTypeEnum.EMAIL,
                 otp,
                 useTypeEnum);
-        return  "Bind the email verification code, note that it expires in 5 minutes:" + otp;
+        return "Bind the email verification code, note that it expires in 5 minutes:" + otp;
 
     }
 

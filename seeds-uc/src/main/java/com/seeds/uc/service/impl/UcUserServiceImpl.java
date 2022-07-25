@@ -45,8 +45,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     private ISendCodeService sendCodeService;
     @Autowired
     private IUcSecurityStrategyService iUcSecurityStrategyService;
-    @Autowired
-    private RedissonClient redissonClient;
 
     /**
      * 发送验证码

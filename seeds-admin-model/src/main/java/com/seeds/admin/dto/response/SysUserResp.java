@@ -1,5 +1,6 @@
 package com.seeds.admin.dto.response;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -93,5 +94,15 @@ public class SysUserResp {
 	 */
 	@ApiModelProperty("删除标记  1：已删除   0：未删除")
 	private Integer deleteFlag;
+	/**
+	 * 钱包地址，metamask
+	 */
+	@TableField("public_address")
+	private String publicAddress;
+	/**
+	 * metamask标记  0：未启用  1：启用
+	 */
+	@TableField("metamask_flag")
+	private Integer metamaskFlag;
 
 }
