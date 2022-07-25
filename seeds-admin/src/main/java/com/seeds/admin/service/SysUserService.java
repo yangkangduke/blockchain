@@ -131,4 +131,24 @@ public interface SysUserService extends IService<SysUserEntity> {
      */
     SysUserBriefResp brief(String mobile);
 
+    /**
+     * metamask获取随机数
+     * @param publicAddress
+     * @param adminUser
+     * @return
+     */
+    String metamaskNonce(String publicAddress, SysUserEntity adminUser);
+
+    /**
+     * 更新metamask信息
+     * @param adminUser
+     */
+    Boolean updateMetaMask(SysUserEntity adminUser);
+
+    /**
+     * 删除metaemask相关信息
+     * @param adminUser
+     * @return
+     */
+    Boolean deleteMetaMask(SysUserEntity adminUser);
 }

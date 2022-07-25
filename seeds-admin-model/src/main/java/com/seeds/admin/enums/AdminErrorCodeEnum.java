@@ -9,7 +9,7 @@ import lombok.Getter;
  * @date 2022/7/13
  */
 @Getter
-public enum AdminErrorCode {
+public enum AdminErrorCodeEnum {
 
     ERR_401_NOT_LOGGED_IN(401, "请先登录", "please login first"),
     ERR_500_SYSTEM_BUSY(500, "系统繁忙，请稍后再试...", "system busy, please try again later"),
@@ -52,7 +52,7 @@ public enum AdminErrorCode {
     private String desc;
     private String descEn;
 
-    AdminErrorCode(Integer code, String desc, String descEn) {
+    AdminErrorCodeEnum(Integer code, String desc, String descEn) {
         this.code = code;
         this.desc = desc;
         this.descEn = descEn;

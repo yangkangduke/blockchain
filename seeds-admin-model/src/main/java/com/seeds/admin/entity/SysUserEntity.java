@@ -87,5 +87,20 @@ public class SysUserEntity extends BaseEntity {
 	 */
 	@TableField("delete_flag")
 	private Integer deleteFlag;
+	/**
+	 * 钱包地址，metamask
+	 */
+	@TableField("public_address")
+	private String publicAddress;
+	/**
+	 * metamask标记  0：未启用  1：启用
+	 */
+	@TableField("metamask_flag")
+	private Integer metamaskFlag;
+	/**
+	 * 随机数，metamask验证时使用
+	 */
+	@TableField("nonce")
+	private String nonce;
 
 }

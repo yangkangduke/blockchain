@@ -3,21 +3,22 @@ package com.seeds.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.admin.dto.response.AdminUserResp;
 import com.seeds.admin.dto.request.SwitchReq;
 import com.seeds.admin.dto.request.SysUserAddReq;
 import com.seeds.admin.dto.request.SysUserModifyReq;
 import com.seeds.admin.dto.request.SysUserPageReq;
+import com.seeds.admin.dto.response.AdminUserResp;
 import com.seeds.admin.dto.response.SysUserBriefResp;
 import com.seeds.admin.dto.response.SysUserResp;
 import com.seeds.admin.entity.SysRoleEntity;
 import com.seeds.admin.entity.SysRoleUserEntity;
+import com.seeds.admin.entity.SysUserEntity;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysUserMapper;
-import com.seeds.admin.entity.SysUserEntity;
 import com.seeds.admin.service.SysMenuService;
 import com.seeds.admin.service.SysRoleService;
 import com.seeds.admin.service.SysRoleUserService;
@@ -256,6 +257,57 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
             res.setRealName(sysUser.getRealName());
         }
         return res;
+    }
+
+    /**
+     * metamask获取随机数
+     *
+     * @param publicAddress
+     * @param adminUser
+     * @return
+     */
+    @Override
+    public String metamaskNonce(String publicAddress, SysUserEntity adminUser) {
+        // 生成随机数
+        String randomSalt = RandomUtil.getRandomSalt();
+        // 存储在用户表上
+        Long id = adminUser.getId();
+        SysUserEntity sysUser = new SysUserEntity();
+        sysUser.setPublicAddress(publicAddress);
+        sysUser.setNonce(randomSalt);
+        sysUser.setId(id);
+        this.updateById(sysUser);
+        return randomSalt;
+    }
+
+    /**
+     * 更新metamask信息
+     *
+     * @param adminUser
+     */
+    @Override
+    public Boolean updateMetaMask(SysUserEntity adminUser) {
+        SysUserEntity sysUser = new SysUserEntity();
+        sysUser.setNonce(RandomUtil.getRandomSalt());
+        sysUser.setMetamaskFlag(SysStatusEnum.ENABLED.value());
+        return this.update(new QueryWrapper<SysUserEntity>().lambda()
+                .eq(SysUserEntity::getPublicAddress, adminUser.getPublicAddress())
+                .eq(SysUserEntity::getId, adminUser.getId()));
+    }
+
+    /**
+     * 删除metaemask相关信息
+     * @param adminUser
+     * @return
+     */
+    @Override
+    public Boolean deleteMetaMask(SysUserEntity adminUser) {
+        return this.update(
+                Wrappers.<SysUserEntity>lambdaUpdate()
+                        .set(SysUserEntity::getPublicAddress, null)
+                        .set(SysUserEntity::getNonce, null)
+                        .set(SysUserEntity::getMetamaskFlag, SysStatusEnum.DISABLE.value())
+        );
     }
 
 }

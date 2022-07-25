@@ -7,12 +7,15 @@ import com.seeds.admin.dto.response.AdminUserResp;
 import com.seeds.admin.dto.response.SysUserBriefResp;
 import com.seeds.admin.dto.response.SysUserResp;
 import com.seeds.admin.entity.SysUserEntity;
-import com.seeds.admin.enums.AdminErrorCode;
-import com.seeds.admin.utils.HashUtil;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
+import com.seeds.admin.exceptions.InvalidArgumentsException;
 import com.seeds.admin.service.AdminCacheService;
 import com.seeds.admin.service.SysRoleUserService;
 import com.seeds.admin.service.SysUserService;
+import com.seeds.admin.utils.CryptoUtils;
+import com.seeds.admin.utils.HashUtil;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.exception.SeedsException;
 import com.seeds.common.web.HttpHeaders;
 import com.seeds.common.web.context.UserContext;
 import io.swagger.annotations.Api;
@@ -22,14 +25,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.web3j.crypto.WalletUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * 用户管理
+ *
  * @author hang.yu
  * @date 2022/7/13
  */
@@ -54,7 +60,7 @@ public class SysUserController extends AdminBaseController {
     @PostMapping("page")
     @ApiOperation("分页")
     @RequiredPermission("sys:user:page")
-    public GenericDto<IPage<SysUserResp>> queryPage(@Valid  @RequestBody SysUserPageReq query) {
+    public GenericDto<IPage<SysUserResp>> queryPage(@Valid @RequestBody SysUserPageReq query) {
         return GenericDto.success(sysUserService.queryPage(query));
     }
 
@@ -76,7 +82,7 @@ public class SysUserController extends AdminBaseController {
     @RequiredPermission("sys:user:add")
     public GenericDto<Object> add(@Valid @RequestBody SysUserAddReq req) {
         if (StringUtils.isEmpty(req.getMobile()) && StringUtils.isEmpty(req.getAccount())) {
-            return GenericDto.failure(AdminErrorCode.ERR_504_MISSING_ARGUMENTS.getDescEn(), AdminErrorCode.ERR_504_MISSING_ARGUMENTS.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_504_MISSING_ARGUMENTS.getDescEn(), AdminErrorCodeEnum.ERR_504_MISSING_ARGUMENTS.getCode(), null);
         }
         if (StringUtils.isEmpty(req.getInitPassport())) {
             req.setInitPassport(initPassword);
@@ -85,14 +91,14 @@ public class SysUserController extends AdminBaseController {
         if (StringUtils.isNotBlank(req.getMobile())) {
             SysUserEntity adminUser = sysUserService.queryByMobile(req.getMobile());
             if (adminUser != null) {
-                return GenericDto.failure(AdminErrorCode.ERR_10051_PHONE_ALREADY_BEEN_USED.getDescEn(), AdminErrorCode.ERR_10051_PHONE_ALREADY_BEEN_USED.getCode(), null);
+                return GenericDto.failure(AdminErrorCodeEnum.ERR_10051_PHONE_ALREADY_BEEN_USED.getDescEn(), AdminErrorCodeEnum.ERR_10051_PHONE_ALREADY_BEEN_USED.getCode(), null);
             }
         }
         // 账号查重
         if (StringUtils.isNotBlank(req.getAccount())) {
             SysUserEntity adminUser = sysUserService.queryByAccount(req.getAccount());
             if (adminUser != null) {
-                return GenericDto.failure(AdminErrorCode.ERR_10061_ACCOUNT_ALREADY_BEEN_USED.getDescEn(), AdminErrorCode.ERR_10061_ACCOUNT_ALREADY_BEEN_USED.getCode(), null);
+                return GenericDto.failure(AdminErrorCodeEnum.ERR_10061_ACCOUNT_ALREADY_BEEN_USED.getDescEn(), AdminErrorCodeEnum.ERR_10061_ACCOUNT_ALREADY_BEEN_USED.getCode(), null);
             }
         }
         sysUserService.add(req);
@@ -105,13 +111,13 @@ public class SysUserController extends AdminBaseController {
     public GenericDto<Object> modify(@Valid @RequestBody SysUserModifyReq req) {
         SysUserEntity adminUser = sysUserService.queryById(req.getId());
         if (adminUser == null) {
-            return GenericDto.failure(AdminErrorCode.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCode.ERR_500_SYSTEM_BUSY.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
         }
         // 手机号查重
         if (StringUtils.isNotBlank(req.getMobile())) {
             SysUserEntity mobileAdminUser = sysUserService.queryByMobile(req.getMobile());
             if (!Objects.equals(adminUser.getId(), mobileAdminUser.getId())) {
-                return GenericDto.failure(AdminErrorCode.ERR_10051_PHONE_ALREADY_BEEN_USED.getDescEn(), AdminErrorCode.ERR_10051_PHONE_ALREADY_BEEN_USED.getCode(), null);
+                return GenericDto.failure(AdminErrorCodeEnum.ERR_10051_PHONE_ALREADY_BEEN_USED.getDescEn(), AdminErrorCodeEnum.ERR_10051_PHONE_ALREADY_BEEN_USED.getCode(), null);
             }
         }
         sysUserService.modify(req);
@@ -124,11 +130,11 @@ public class SysUserController extends AdminBaseController {
     public GenericDto<Object> changePassword(HttpServletRequest request, @Valid @RequestBody SysUserPasswordReq req) {
         SysUserEntity adminUser = sysUserService.queryById(req.getUserId());
         if (adminUser == null) {
-            return GenericDto.failure(AdminErrorCode.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCode.ERR_500_SYSTEM_BUSY.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
         }
         String password = HashUtil.sha256(req.getOldPassword() + adminUser.getSalt());
         if (!password.equals(adminUser.getPassword())) {
-            return GenericDto.failure(AdminErrorCode.ERR_10043_WRONG_OLD_PASSWORD.getDescEn(), AdminErrorCode.ERR_10043_WRONG_OLD_PASSWORD.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_10043_WRONG_OLD_PASSWORD.getDescEn(), AdminErrorCodeEnum.ERR_10043_WRONG_OLD_PASSWORD.getCode(), null);
         }
         sysUserService.updatePassword(adminUser, req.getNewPassword());
         // 登出
@@ -143,7 +149,7 @@ public class SysUserController extends AdminBaseController {
         String userId = request.getHeader(HttpHeaders.ADMIN_USER_ID);
         SysUserEntity adminUser = sysUserService.queryById(Long.valueOf(userId));
         if (adminUser == null) {
-            return GenericDto.failure(AdminErrorCode.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCode.ERR_500_SYSTEM_BUSY.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
         }
         sysUserService.updatePassword(adminUser, initPassword);
         // 登出
@@ -184,5 +190,77 @@ public class SysUserController extends AdminBaseController {
         Long userId = UserContext.getCurrentAdminUserId();
         return GenericDto.success(sysUserService.queryLoginUserInfo(userId));
     }
+
+    /**
+     * metamask获取随机数
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/metamask/nonce")
+    @ApiOperation(value = "metamask获取随机数", notes = "metamask获取随机数")
+    public GenericDto<String> metamaskNonce(@Valid @NotBlank @RequestBody String publicAddress, HttpServletRequest request) {
+        String userId = request.getHeader(HttpHeaders.ADMIN_USER_ID);
+        SysUserEntity adminUser = sysUserService.queryById(Long.valueOf(userId));
+        if (adminUser == null) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
+        }
+        return GenericDto.success(sysUserService.metamaskNonce(publicAddress, adminUser));
+    }
+
+    /**
+     * 绑定metamask
+     * 1.调用/metamask/nonce生成nonce
+     * 2.前端根据nonce生成签名信息
+     * 3.调用/enable/metamask验证签名信息
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/enable/metamask")
+    @ApiOperation(value = "绑定metamask",
+            notes = "1.调用/metamask/nonce生成nonce\n" +
+                    "2.前端根据nonce生成签名信息\n" +
+                    "3.调用/enable/metamask验证签名信息")
+    public GenericDto<Boolean> enableMetaMask(@Valid @RequestBody MetaMaskBindReq bindReq, HttpServletRequest request) {
+        String userId = request.getHeader(HttpHeaders.ADMIN_USER_ID);
+        SysUserEntity adminUser = sysUserService.queryById(Long.valueOf(userId));
+        if (adminUser == null) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
+        }
+        // 地址合法性校验
+        if (!WalletUtils.isValidAddress(bindReq.getPublicAddress())) {
+            // 不合法直接返回错误
+            throw new InvalidArgumentsException("Illegal address format");
+        }
+        // 校验签名信息
+        if (!CryptoUtils.validate(bindReq.getSignature(), bindReq.getMessage(), bindReq.getPublicAddress())) {
+            throw new InvalidArgumentsException("Signature verification failed");
+        }
+        // 更新nonce，metamaskflag
+        return GenericDto.success(sysUserService.updateMetaMask(adminUser));
+    }
+
+    /**
+     * 解除绑定metamask
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/disable/metamask")
+    @ApiOperation(value = "解除绑定metamask", notes = "解除绑定metamask")
+    public GenericDto<Boolean> disableMetaMask(@Valid @NotBlank @RequestBody String publicAddress, HttpServletRequest request) {
+        String userId = request.getHeader(HttpHeaders.ADMIN_USER_ID);
+        SysUserEntity adminUser = sysUserService.queryById(Long.valueOf(userId));
+        if (adminUser == null) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
+        }
+        if (publicAddress.equals(adminUser.getPublicAddress())) {
+            throw new SeedsException("The public address entered is incorrect ");
+        }
+        // 删除metamask相关信息
+        return GenericDto.success(sysUserService.deleteMetaMask(adminUser));
+    }
+
 
 }
