@@ -9,7 +9,7 @@ import com.seeds.uc.enums.AuthCodeUseTypeEnum;
  */
 public interface ISendCodeService {
 
-    void sendEmailWithUseType(String address, AuthCodeUseTypeEnum useTypeEnum);
+    String sendEmailWithUseType(String address, AuthCodeUseTypeEnum useTypeEnum);
 
     String verifyEmailWithUseType(String address, String otp, AuthCodeUseTypeEnum useTypeEnum);
 }

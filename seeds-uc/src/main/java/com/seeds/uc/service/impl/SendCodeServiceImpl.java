@@ -26,7 +26,7 @@ public class SendCodeServiceImpl implements ISendCodeService {
     private CacheService cacheService;
 
     @Override
-    public void sendEmailWithUseType(String address, AuthCodeUseTypeEnum useTypeEnum) {
+    public String sendEmailWithUseType(String address, AuthCodeUseTypeEnum useTypeEnum) {
         // generate a random code
         String otp = RandomUtil.getRandom6DigitsOTP();
         EMailUtil.send(address, otp);
@@ -38,6 +38,8 @@ public class SendCodeServiceImpl implements ISendCodeService {
                 ClientAuthTypeEnum.EMAIL,
                 otp,
                 useTypeEnum);
+        return  "Bind the email verification code, note that it expires in 5 minutes:" + otp;
+
     }
 
     @Override

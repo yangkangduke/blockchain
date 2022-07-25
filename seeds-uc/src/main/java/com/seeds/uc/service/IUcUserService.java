@@ -23,7 +23,7 @@ public interface IUcUserService extends IService<UcUser> {
      *
      * @param sendReq
      */
-    void sendCode(SendCodeReq sendReq);
+    String sendCode(SendCodeReq sendReq);
 
     /**
      * 邮箱验证码校验

@@ -54,10 +54,10 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @param sendReq
      */
     @Override
-    public void sendCode(SendCodeReq sendReq) {
+    public String sendCode(SendCodeReq sendReq) {
         AuthCodeUseTypeEnum useType = sendReq.getUseType();
         if (AuthCodeUseTypeEnum.BIND_EMAIL.equals(useType) ) {
-            sendCodeService.sendEmailWithUseType(sendReq.getAddress(), sendReq.getUseType());
+           return sendCodeService.sendEmailWithUseType(sendReq.getAddress(), sendReq.getUseType());
         } else {
             throw new InvalidArgumentsException("incorrect type");
         }

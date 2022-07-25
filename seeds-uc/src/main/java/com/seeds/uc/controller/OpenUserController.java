@@ -47,8 +47,7 @@ public class OpenUserController {
     @PostMapping("send/code")
     @ApiOperation(value = "发送验证码", notes = "绑定邮箱useType传BIND_EMAIL")
     public GenericDto<Object> sendCode(@Valid @RequestBody SendCodeReq sendReq) {
-        ucUserService.sendCode(sendReq);
-        return GenericDto.success(null);
+        return GenericDto.success(ucUserService.sendCode(sendReq));
     }
 
     /**
