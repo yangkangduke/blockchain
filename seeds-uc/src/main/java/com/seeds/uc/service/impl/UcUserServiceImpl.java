@@ -221,7 +221,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new InvalidArgumentsException("Signature verification failed");
         }
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
-                .eq(UcUser::getSalt, publicAddress));
+                .eq(UcUser::getPublicAddress, publicAddress));
         if (one == null) {
             throw new InvalidArgumentsException("User does not exist");
         }

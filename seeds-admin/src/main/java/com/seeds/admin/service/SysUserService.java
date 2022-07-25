@@ -1,6 +1,7 @@
 package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.response.AdminUserResp;
 import com.seeds.admin.dto.request.SwitchReq;
 import com.seeds.admin.dto.request.SysUserAddReq;
@@ -20,7 +21,7 @@ import java.util.Map;
  * @author hang.yu
  * @date 2022/7/13
  */
-public interface SysUserService {
+public interface SysUserService extends IService<SysUserEntity> {
 
     /**
      * 通过手机号查询系统用户
@@ -130,4 +131,24 @@ public interface SysUserService {
      */
     SysUserBriefResp brief(String mobile);
 
+    /**
+     * metamask获取随机数
+     * @param publicAddress
+     * @param adminUser
+     * @return
+     */
+    String metamaskNonce(String publicAddress, SysUserEntity adminUser);
+
+    /**
+     * 更新metamask信息
+     * @param adminUser
+     */
+    Boolean updateMetaMask(SysUserEntity adminUser);
+
+    /**
+     * 删除metaemask相关信息
+     * @param adminUser
+     * @return
+     */
+    Boolean deleteMetaMask(SysUserEntity adminUser);
 }

@@ -8,7 +8,7 @@ import com.seeds.admin.dto.request.SysRoleModifyReq;
 import com.seeds.admin.dto.request.SysRolePageReq;
 import com.seeds.admin.dto.response.SysRoleResp;
 import com.seeds.admin.entity.SysRoleEntity;
-import com.seeds.admin.enums.AdminErrorCode;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.service.SysRoleService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -64,7 +64,7 @@ public class SysRoleController extends AdminBaseController {
         // 查重
         SysRoleEntity role = sysRoleService.queryByRoleCode(req.getRoleCode());
         if (role != null) {
-            return GenericDto.failure(AdminErrorCode.ERR_20001_ROLE_ALREADY_EXIST.getDescEn(), AdminErrorCode.ERR_20001_ROLE_ALREADY_EXIST.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_20001_ROLE_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_20001_ROLE_ALREADY_EXIST.getCode(), null);
         }
         sysRoleService.add(req);
         return GenericDto.success(null);
@@ -77,7 +77,7 @@ public class SysRoleController extends AdminBaseController {
         // 查重
         SysRoleEntity role = sysRoleService.queryByRoleCode(req.getRoleCode());
         if (role != null && !Objects.equals(req.getId(), role.getId())) {
-            return GenericDto.failure(AdminErrorCode.ERR_20001_ROLE_ALREADY_EXIST.getDescEn(), AdminErrorCode.ERR_20001_ROLE_ALREADY_EXIST.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_20001_ROLE_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_20001_ROLE_ALREADY_EXIST.getCode(), null);
         }
         sysRoleService.modify(req);
         return GenericDto.success(null);

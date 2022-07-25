@@ -8,7 +8,7 @@ import com.seeds.admin.dto.response.SysMenuBriefResp;
 import com.seeds.admin.dto.response.SysMenuResp;
 import com.seeds.admin.entity.SysMenuEntity;
 import com.seeds.admin.entity.SysUserEntity;
-import com.seeds.admin.enums.AdminErrorCode;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.service.SysMenuService;
 import com.seeds.admin.service.SysUserService;
 import com.seeds.common.dto.GenericDto;
@@ -56,7 +56,7 @@ public class SysMenuController extends AdminBaseController {
         // 查重
         SysMenuEntity menu = sysMenuService.queryByMenuCode(req.getCode());
         if (menu != null) {
-            return GenericDto.failure(AdminErrorCode.ERR_30001_MENU_ALREADY_EXIST.getDescEn(), AdminErrorCode.ERR_30001_MENU_ALREADY_EXIST.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_30001_MENU_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_30001_MENU_ALREADY_EXIST.getCode(), null);
         }
         sysMenuService.add(req);
         return GenericDto.success(null);
@@ -76,11 +76,11 @@ public class SysMenuController extends AdminBaseController {
         // 查重
         SysMenuEntity menu = sysMenuService.queryByMenuCode(req.getCode());
         if (menu != null && !Objects.equals(req.getId(), menu.getId())) {
-            return GenericDto.failure(AdminErrorCode.ERR_30001_MENU_ALREADY_EXIST.getDescEn(), AdminErrorCode.ERR_30001_MENU_ALREADY_EXIST.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_30001_MENU_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_30001_MENU_ALREADY_EXIST.getCode(), null);
         }
         // 上级菜单不能为自身
         if (req.getCode().equals(req.getParentCode())) {
-            return GenericDto.failure(AdminErrorCode.ERR_30002_MENU_PARENT_ITSELF.getDescEn(), AdminErrorCode.ERR_30002_MENU_PARENT_ITSELF.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_30002_MENU_PARENT_ITSELF.getDescEn(), AdminErrorCodeEnum.ERR_30002_MENU_PARENT_ITSELF.getCode(), null);
         }
         sysMenuService.modify(req);
         return GenericDto.success(null);
@@ -94,7 +94,7 @@ public class SysMenuController extends AdminBaseController {
         Set<Long> ids = req.getIds();
         Long count = sysMenuService.countKidsByCodes(sysMenuService.queryCodesByIds(ids));
         if(count > 0){
-            return GenericDto.failure(AdminErrorCode.ERR_30003_SUB_MENU_EXIST.getDescEn(), AdminErrorCode.ERR_30003_SUB_MENU_EXIST.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_30003_SUB_MENU_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_30003_SUB_MENU_EXIST.getCode(), null);
         }
         sysMenuService.batchDelete(req);
         return GenericDto.success(null);

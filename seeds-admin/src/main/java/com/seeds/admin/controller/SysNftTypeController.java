@@ -7,7 +7,7 @@ import com.seeds.admin.dto.request.SysNftTypeAddReq;
 import com.seeds.admin.dto.request.SysNftTypeModifyReq;
 import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.entity.SysNftTypeEntity;
-import com.seeds.admin.enums.AdminErrorCode;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.service.SysNftTypeService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -48,7 +48,7 @@ public class SysNftTypeController extends AdminBaseController {
         // 查重
         SysNftTypeEntity nftType = sysNftTypeService.queryByTypeCode(req.getCode());
         if (nftType != null) {
-            return GenericDto.failure(AdminErrorCode.ERR_40001_NFT_TYPE_ALREADY_EXIST.getDescEn(), AdminErrorCode.ERR_40001_NFT_TYPE_ALREADY_EXIST.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_40001_NFT_TYPE_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_40001_NFT_TYPE_ALREADY_EXIST.getCode(), null);
         }
         sysNftTypeService.add(req);
         return GenericDto.success(null);
@@ -68,11 +68,11 @@ public class SysNftTypeController extends AdminBaseController {
         // 查重
         SysNftTypeEntity nftType = sysNftTypeService.queryByTypeCode(req.getCode());
         if (nftType != null) {
-            return GenericDto.failure(AdminErrorCode.ERR_40001_NFT_TYPE_ALREADY_EXIST.getDescEn(), AdminErrorCode.ERR_40001_NFT_TYPE_ALREADY_EXIST.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_40001_NFT_TYPE_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_40001_NFT_TYPE_ALREADY_EXIST.getCode(), null);
         }
         // 上级类别不能为自身
         if (req.getCode().equals(req.getParentCode())) {
-            return GenericDto.failure(AdminErrorCode.ERR_40002_NFT_TYPE_PARENT_ITSELF.getDescEn(), AdminErrorCode.ERR_40002_NFT_TYPE_PARENT_ITSELF.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_40002_NFT_TYPE_PARENT_ITSELF.getDescEn(), AdminErrorCodeEnum.ERR_40002_NFT_TYPE_PARENT_ITSELF.getCode(), null);
         }
         sysNftTypeService.modify(req);
         return GenericDto.success(null);
