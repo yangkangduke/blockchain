@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.entity.SysMerchantGameEntity;
@@ -42,8 +43,8 @@ public class SysMerchantGameServiceImpl extends ServiceImpl<SysMerchantGameMappe
 
     @Override
     public List<SysMerchantGameEntity> queryByMerchantId(Long merchantId) {
-        QueryWrapper<SysMerchantGameEntity> query = new QueryWrapper<>();
-        query.eq("merchant_id", merchantId);
+        LambdaQueryWrapper<SysMerchantGameEntity> query = new QueryWrapper<SysMerchantGameEntity>().lambda()
+                .eq(SysMerchantGameEntity::getMerchantId, merchantId);
         return list(query);
     }
 
@@ -58,16 +59,16 @@ public class SysMerchantGameServiceImpl extends ServiceImpl<SysMerchantGameMappe
 
     @Override
     public void deleteByMerchantIdAndGameIds(Long merchantId, Collection<Long> gameIds) {
-        QueryWrapper<SysMerchantGameEntity> query = new QueryWrapper<>();
-        query.eq("merchant_id", merchantId);
-        query.in("game_id", gameIds);
+        LambdaQueryWrapper<SysMerchantGameEntity> query = new QueryWrapper<SysMerchantGameEntity>().lambda()
+                .eq(SysMerchantGameEntity::getMerchantId, merchantId)
+                .in(SysMerchantGameEntity::getGameId, gameIds);
         remove(query);
     }
 
     @Override
     public void deleteByMerchantIds(Collection<Long> merchantIds) {
-        QueryWrapper<SysMerchantGameEntity> query = new QueryWrapper<>();
-        query.in("merchant_id", merchantIds);
+        LambdaQueryWrapper<SysMerchantGameEntity> query = new QueryWrapper<SysMerchantGameEntity>().lambda()
+                .in(SysMerchantGameEntity::getMerchantId, merchantIds);
         remove(query);
     }
 }

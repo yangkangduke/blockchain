@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -44,12 +45,12 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     public IPage<SysNftResp> queryPage(SysNftPageReq query) {
-        QueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.likeRight(StringUtils.isNotBlank(query.getName()), "name", query.getName());
-        queryWrap.eq(query.getGameId() != null, "game_id", query.getGameId());
-        queryWrap.eq(query.getGameId() != null, "status", query.getStatus());
-        queryWrap.eq(query.getNftTypeId() != null, "nft_type_id", query.getNftTypeId());
-        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftEntity::getName, query.getName())
+                .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId())
+                .eq(query.getGameId() != null, SysNftEntity::getStatus, query.getStatus())
+                .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
+                .eq(SysNftEntity::getDeleteFlag, WhetherEnum.NO.value());
         Page<SysNftEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysNftEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -70,9 +71,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     public SysNftEntity queryById(Long id) {
-        QueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.eq("id", id);
-        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                .eq(SysNftEntity::getId, id)
+                .eq(SysNftEntity::getDeleteFlag, WhetherEnum.NO.value());
         return getOne(queryWrap);
     }
 

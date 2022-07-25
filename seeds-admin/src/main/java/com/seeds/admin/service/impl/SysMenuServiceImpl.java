@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.ListReq;
@@ -67,8 +68,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
 
     @Override
     public Long countKidsByCodes(Collection<String> codes) {
-        QueryWrapper<SysMenuEntity> query = new QueryWrapper<>();
-        query.in("parent_code", codes);
+        LambdaQueryWrapper<SysMenuEntity> query = new QueryWrapper<SysMenuEntity>().lambda()
+                .in(SysMenuEntity::getParentCode, codes);
         return count(query);
     }
 
@@ -79,9 +80,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
 
     @Override
     public List<SysMenuEntity> queryList(Integer type) {
-        QueryWrapper<SysMenuEntity> query = new QueryWrapper<>();
-        query.eq(type != null,"type", type);
-        query.orderByAsc("sort");
+        LambdaQueryWrapper<SysMenuEntity> query = new QueryWrapper<SysMenuEntity>().lambda()
+                .eq(type != null,SysMenuEntity::getType, type)
+                .orderByAsc(SysMenuEntity::getSort);
         return list(query);
     }
 
@@ -101,8 +102,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
 
     @Override
     public Set<String> queryCodesByIds(Collection<Long> ids) {
-        QueryWrapper<SysMenuEntity> query = new QueryWrapper<>();
-        query.in("id", ids);
+        LambdaQueryWrapper<SysMenuEntity> query = new QueryWrapper<SysMenuEntity>().lambda()
+                .in(SysMenuEntity::getId, ids);
         List<SysMenuEntity> list = list(query);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptySet();
@@ -112,8 +113,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
 
     @Override
     public SysMenuEntity queryByMenuCode(String code) {
-        QueryWrapper<SysMenuEntity> query = new QueryWrapper<>();
-        query.eq("code", code);
+        LambdaQueryWrapper<SysMenuEntity> query = new QueryWrapper<SysMenuEntity>().lambda()
+                .eq(SysMenuEntity::getCode, code);
         return getOne(query);
     }
 

@@ -1,7 +1,7 @@
 package com.seeds.admin.service;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SwitchReq;
 import com.seeds.admin.dto.request.SysGameAddReq;
@@ -20,7 +20,7 @@ import java.util.Map;
  * @author hang.yu
  * @date 2022/7/21
  */
-public interface SysGameService {
+public interface SysGameService extends IService<SysGameEntity> {
 
     /**
      * 分页获取系统游戏信息

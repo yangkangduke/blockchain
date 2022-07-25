@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -42,9 +43,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
 
     @Override
     public IPage<SysRoleResp> queryPage(SysRolePageReq query) {
-        QueryWrapper<SysRoleEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.eq(StringUtils.isNotBlank(query.getRoleName()), "roleName", query.getRoleName());
-        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysRoleEntity> queryWrap = new QueryWrapper<SysRoleEntity>().lambda()
+                .eq(StringUtils.isNotBlank(query.getRoleName()), SysRoleEntity::getRoleName, query.getRoleName())
+                .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());
         Page<SysRoleEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysRoleEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -59,25 +60,25 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
 
     @Override
     public SysRoleEntity queryByRoleCode(String roleCode) {
-        QueryWrapper<SysRoleEntity> query = new QueryWrapper<>();
-        query.eq("role_code", roleCode);
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysRoleEntity> query = new QueryWrapper<SysRoleEntity>().lambda()
+                .eq(SysRoleEntity::getRoleCode, roleCode)
+                .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());
         return getOne(query);
     }
 
     @Override
     public SysRoleEntity queryById(Long id) {
-        QueryWrapper<SysRoleEntity> query = new QueryWrapper<>();
-        query.eq("id", id);
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysRoleEntity> query = new QueryWrapper<SysRoleEntity>().lambda()
+                .eq(SysRoleEntity::getId, id)
+                .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());
         return getOne(query);
     }
 
     @Override
     public List<SysRoleEntity> queryByIds(Collection<Long> ids) {
-        QueryWrapper<SysRoleEntity> query = new QueryWrapper<>();
-        query.in("id", ids);
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysRoleEntity> query = new QueryWrapper<SysRoleEntity>().lambda()
+                .in(SysRoleEntity::getId, ids)
+                .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());
         return list(query);
     }
 
@@ -140,8 +141,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
 
     @Override
     public List<SysRoleResp> queryList() {
-        QueryWrapper<SysRoleEntity> query = new QueryWrapper<>();
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysRoleEntity> query = new QueryWrapper<SysRoleEntity>().lambda()
+                .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());
         List<SysRoleEntity> list = list(query);
         return convertToResp(list);
     }

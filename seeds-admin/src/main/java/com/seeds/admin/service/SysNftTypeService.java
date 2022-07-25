@@ -1,6 +1,7 @@
 package com.seeds.admin.service;
 
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SwitchReq;
 import com.seeds.admin.dto.request.SysNftTypeAddReq;
@@ -18,7 +19,7 @@ import java.util.Map;
  * @author hang.yu
  * @date 2022/7/21
  */
-public interface SysNftTypeService {
+public interface SysNftTypeService extends IService<SysNftTypeEntity> {
 
     /**
      * 通过NFT类别id列表获取NFT名称

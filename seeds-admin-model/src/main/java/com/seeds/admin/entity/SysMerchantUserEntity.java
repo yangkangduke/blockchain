@@ -2,7 +2,6 @@ package com.seeds.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.seeds.admin.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,13 +18,13 @@ import lombok.EqualsAndHashCode;
 public class SysMerchantUserEntity extends BaseEntity {
 
 	/**
-	 * 角色ID
+	 * 商家ID
 	 */
 	@TableField("merchant_id")
 	private Long merchantId;
 
 	/**
-	 * 菜单ID
+	 * 用户ID
 	 */
 	@TableField("user_id")
 	private Long userId;

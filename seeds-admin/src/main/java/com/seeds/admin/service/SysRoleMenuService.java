@@ -1,5 +1,7 @@
 package com.seeds.admin.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.admin.entity.SysRoleMenuEntity;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/7/14
  */
-public interface SysRoleMenuService {
+public interface SysRoleMenuService extends IService<SysRoleMenuEntity> {
 
     /**
      * 通过角色编号查询菜单

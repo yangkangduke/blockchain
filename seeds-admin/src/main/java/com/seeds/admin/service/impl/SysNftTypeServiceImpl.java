@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.ListReq;
@@ -47,18 +48,18 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
 
     @Override
     public SysNftTypeEntity queryById(Long id) {
-        QueryWrapper<SysNftTypeEntity> query = new QueryWrapper<>();
-        query.eq("id", id);
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysNftTypeEntity> query = new QueryWrapper<SysNftTypeEntity>().lambda()
+                .eq(SysNftTypeEntity::getId, id)
+                .eq(SysNftTypeEntity::getDeleteFlag, WhetherEnum.NO.value());
         return getOne(query);
     }
 
     @Override
     public List<SysNftTypeResp> queryRespList(String name) {
-        QueryWrapper<SysNftTypeEntity> query = new QueryWrapper<>();
-        query.likeRight(StringUtils.isNotBlank(name), "name", name);
-        query.eq("delete_flag", WhetherEnum.NO.value());
-        query.orderByAsc("sort");
+        LambdaQueryWrapper<SysNftTypeEntity> query = new QueryWrapper<SysNftTypeEntity>().lambda()
+                .likeRight(StringUtils.isNotBlank(name), SysNftTypeEntity::getName, name)
+                .eq(SysNftTypeEntity::getDeleteFlag, WhetherEnum.NO.value())
+                .orderByAsc(SysNftTypeEntity::getSort);
         return convertToResp(list(query));
     }
 
@@ -88,9 +89,9 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
 
     @Override
     public SysNftTypeEntity queryByTypeCode(String code) {
-        QueryWrapper<SysNftTypeEntity> query = new QueryWrapper<>();
-        query.eq("code", code);
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysNftTypeEntity> query = new QueryWrapper<SysNftTypeEntity>().lambda()
+                .eq(SysNftTypeEntity::getCode, code)
+                .eq(SysNftTypeEntity::getDeleteFlag, WhetherEnum.NO.value());
         return getOne(query);
     }
 

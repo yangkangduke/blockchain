@@ -1,5 +1,6 @@
 package com.seeds.admin.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.entity.SysMerchantGameEntity;
 
 import java.util.Collection;
@@ -12,7 +13,7 @@ import java.util.Set;
  * @author hang.yu
  * @date 2022/7/21
  */
-public interface SysMerchantGameService {
+public interface SysMerchantGameService extends IService<SysMerchantGameEntity> {
 
     /**
      * 保存

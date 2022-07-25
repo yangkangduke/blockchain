@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -52,34 +53,34 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 
     @Override
     public SysUserEntity queryByMobile(String mobile) {
-        QueryWrapper<SysUserEntity> query = new QueryWrapper<>();
-        query.eq("mobile", mobile);
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysUserEntity> query = new QueryWrapper<SysUserEntity>().lambda()
+                .eq(SysUserEntity::getMobile, mobile)
+                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
         return getOne(query);
     }
 
     @Override
     public SysUserEntity queryByAccount(String account) {
-        QueryWrapper<SysUserEntity> query = new QueryWrapper<>();
-        query.eq("account", account);
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysUserEntity> query = new QueryWrapper<SysUserEntity>().lambda()
+                .eq(SysUserEntity::getAccount, account)
+                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
         return getOne(query);
     }
 
     @Override
     public SysUserEntity queryById(Long userId) {
-        QueryWrapper<SysUserEntity> query = new QueryWrapper<>();
-        query.eq("id", userId);
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysUserEntity> query = new QueryWrapper<SysUserEntity>().lambda()
+                .eq(SysUserEntity::getId, userId)
+                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
         return getOne(query);
     }
 
     @Override
     public IPage<SysUserResp> queryPage(SysUserPageReq query) {
-        QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), "real_name", query.getNameOrMobile())
-                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), "mobile", query.getNameOrMobile());
-        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
+                .likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysUserEntity::getRealName, query.getNameOrMobile())
+                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysUserEntity::getMobile, query.getNameOrMobile())
+                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
         Page<SysUserEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysUserEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -148,9 +149,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 
     @Override
     public List<SysUserEntity> queryByIds(Collection<Long> ids) {
-        QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.in("id", ids);
-        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
+                .in(SysUserEntity::getId, ids)
+                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
         return list(queryWrap);
     }
 
@@ -244,9 +245,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 
     @Override
     public SysUserBriefResp brief(String mobile) {
-        QueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.eq("mobile", mobile);
-        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
+                .eq(SysUserEntity::getMobile, mobile)
+                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
         SysUserEntity sysUser = getOne(queryWrap);
         SysUserBriefResp res = new SysUserBriefResp();
         if (sysUser != null) {

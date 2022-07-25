@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.entity.SysNftPropertiesEntity;
@@ -35,22 +36,22 @@ public class SysNftPropertiesServiceImpl extends ServiceImpl<SysNftPropertiesMap
 
     @Override
     public List<SysNftPropertiesEntity> queryByNftId(Long nftId) {
-        QueryWrapper<SysNftPropertiesEntity> query = new QueryWrapper<>();
-        query.eq("nft_id", nftId);
+        LambdaQueryWrapper<SysNftPropertiesEntity> query = new QueryWrapper<SysNftPropertiesEntity>().lambda()
+                .eq(SysNftPropertiesEntity::getNftId, nftId);
         return list(query);
     }
 
     @Override
     public void deleteByNftId(Long nftId) {
-        QueryWrapper<SysNftPropertiesEntity> query = new QueryWrapper<>();
-        query.eq("nft_id", nftId);
+        LambdaQueryWrapper<SysNftPropertiesEntity> query = new QueryWrapper<SysNftPropertiesEntity>().lambda()
+                .eq(SysNftPropertiesEntity::getNftId, nftId);
         remove(query);
     }
 
     @Override
     public void deleteByNftIs(Collection<Long> nftIds) {
-        QueryWrapper<SysNftPropertiesEntity> query = new QueryWrapper<>();
-        query.in("nft_id", nftIds);
+        LambdaQueryWrapper<SysNftPropertiesEntity> query = new QueryWrapper<SysNftPropertiesEntity>().lambda()
+                .in(SysNftPropertiesEntity::getNftId, nftIds);
         remove(query);
     }
 }

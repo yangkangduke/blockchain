@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.entity.SysRoleMenuEntity;
@@ -26,8 +27,8 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
     @Override
     public List<Long> queryMenuByRoleId(Long roleId) {
-        QueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<>();
-        query.eq("role_id", roleId);
+        LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
+                .eq(SysRoleMenuEntity::getRoleId, roleId);
         List<SysRoleMenuEntity> list = list(query);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();
@@ -37,8 +38,8 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
     @Override
     public List<Long> queryMenuByRoleIds(Collection<Long> roleIds) {
-        QueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<>();
-        query.in("role_id", roleIds);
+        LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
+               .in(SysRoleMenuEntity::getRoleId, roleIds);
         List<SysRoleMenuEntity> list = list(query);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();
@@ -48,8 +49,8 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
     @Override
     public void deleteByMenuIds(Collection<Long> menuIds) {
-        QueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<>();
-        query.in("menu_id", menuIds);
+        LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
+                .in(SysRoleMenuEntity::getMenuId, menuIds);
         remove(query);
     }
 
@@ -57,8 +58,8 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdate(Long roleId, Collection<Long> menuIds) {
         // 先删除角色菜单关系
-        QueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<>();
-        query.eq("role_id", roleId);
+        LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
+                .eq(SysRoleMenuEntity::getRoleId, roleId);
         remove(query);
         if (CollectionUtils.isEmpty(menuIds)) {
             return;
@@ -73,8 +74,8 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
     @Override
     public void deleteByRoleIds(Collection<Long> roleIds) {
-        QueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<>();
-        query.in("role_id", roleIds);
+        LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
+               .in(SysRoleMenuEntity::getRoleId, roleIds);
         remove(query);
     }
 }

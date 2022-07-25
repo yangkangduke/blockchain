@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.entity.SysMerchantUserEntity;
@@ -42,15 +43,15 @@ public class SysMerchantUserServiceImpl extends ServiceImpl<SysMerchantUserMappe
 
     @Override
     public List<SysMerchantUserEntity> queryByMerchantId(Long merchantId) {
-        QueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<>();
-        query.eq("merchant_id", merchantId);
+        LambdaQueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<SysMerchantUserEntity>().lambda()
+                .eq(SysMerchantUserEntity::getMerchantId, merchantId);
         return list(query);
     }
 
     @Override
     public List<SysMerchantUserEntity> queryByMerchantIds(Collection<Long> merchantIds) {
-        QueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<>();
-        query.in("merchant_id", merchantIds);
+        LambdaQueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<SysMerchantUserEntity>().lambda()
+                .in(SysMerchantUserEntity::getMerchantId, merchantIds);
         return list(query);
     }
 
@@ -65,8 +66,8 @@ public class SysMerchantUserServiceImpl extends ServiceImpl<SysMerchantUserMappe
 
     @Override
     public Map<Long, Set<Long>> queryMapByMerchantIds(Collection<Long> merchantIds) {
-        QueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<>();
-        query.in("merchant_id", merchantIds);
+        LambdaQueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<SysMerchantUserEntity>().lambda()
+                .in(SysMerchantUserEntity::getMerchantId, merchantIds);
         List<SysMerchantUserEntity> list = list(query);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyMap();
@@ -82,15 +83,15 @@ public class SysMerchantUserServiceImpl extends ServiceImpl<SysMerchantUserMappe
 
     @Override
     public List<SysMerchantUserEntity> queryByUserIds(Collection<Long> userIds) {
-        QueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<>();
-        query.in("user_id", userIds);
+        LambdaQueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<SysMerchantUserEntity>().lambda()
+                .in(SysMerchantUserEntity::getUserId, userIds);
         return list(query);
     }
 
     @Override
     public List<SysMerchantUserEntity> queryByUserId(Long userId) {
-        QueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<>();
-        query.eq("user_id", userId);
+        LambdaQueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<SysMerchantUserEntity>().lambda()
+                .eq(SysMerchantUserEntity::getUserId, userId);
         return list(query);
     }
 

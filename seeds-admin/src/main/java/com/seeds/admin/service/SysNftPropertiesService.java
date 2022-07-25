@@ -1,5 +1,6 @@
 package com.seeds.admin.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.entity.SysNftPropertiesEntity;
 
 import java.util.Collection;
@@ -11,7 +12,7 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/7/22
  */
-public interface SysNftPropertiesService {
+public interface SysNftPropertiesService extends IService<SysNftPropertiesEntity> {
 
     /**
      * 保存或修改

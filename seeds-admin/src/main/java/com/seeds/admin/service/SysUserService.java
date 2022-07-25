@@ -1,6 +1,7 @@
 package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.response.AdminUserResp;
 import com.seeds.admin.dto.request.SwitchReq;
 import com.seeds.admin.dto.request.SysUserAddReq;
@@ -20,7 +21,7 @@ import java.util.Map;
  * @author hang.yu
  * @date 2022/7/13
  */
-public interface SysUserService {
+public interface SysUserService extends IService<SysUserEntity> {
 
     /**
      * 通过手机号查询系统用户

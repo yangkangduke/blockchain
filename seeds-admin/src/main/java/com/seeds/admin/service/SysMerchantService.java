@@ -1,7 +1,7 @@
 package com.seeds.admin.service;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SwitchReq;
 import com.seeds.admin.dto.request.SysMerchantAddReq;
@@ -20,7 +20,7 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/7/19
  */
-public interface SysMerchantService {
+public interface SysMerchantService extends IService<SysMerchantEntity> {
 
     /**
      * 获取系统商家信息

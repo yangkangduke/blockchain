@@ -1,5 +1,6 @@
 package com.seeds.admin.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SysMenuAddReq;
 import com.seeds.admin.dto.request.SysMenuModifyReq;
@@ -19,7 +20,7 @@ import java.util.Set;
  * @author hang.yu
  * @date 2022/7/14
  */
-public interface SysMenuService {
+public interface SysMenuService extends IService<SysMenuEntity> {
 
     /**
      * 添加系统菜单

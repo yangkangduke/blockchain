@@ -1,6 +1,6 @@
 package com.seeds.admin.service;
 
-
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.SysUserRoleReq;
 import com.seeds.admin.entity.SysRoleUserEntity;
 
@@ -15,7 +15,7 @@ import java.util.Set;
  * @author hang.yu
  * @date 2022/7/14
  */
-public interface SysRoleUserService {
+public interface SysRoleUserService extends IService<SysRoleUserEntity> {
 
     /**
      * 根据角色id，删除角色用户关系

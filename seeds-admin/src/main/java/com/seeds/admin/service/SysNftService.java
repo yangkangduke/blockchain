@@ -1,6 +1,7 @@
 package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
@@ -14,7 +15,7 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/7/22
  */
-public interface SysNftService {
+public interface SysNftService extends IService<SysNftEntity> {
 
     /**
      * 分页获取系统NFT信息

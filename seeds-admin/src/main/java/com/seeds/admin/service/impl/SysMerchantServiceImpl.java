@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -73,34 +74,34 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
 
     @Override
     public List<SysMerchantResp> queryList() {
-        QueryWrapper<SysMerchantEntity> query = new QueryWrapper<>();
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysMerchantEntity> query = new QueryWrapper<SysMerchantEntity>().lambda()
+                .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
         List<SysMerchantEntity> list = list(query);
         return convertToResp(list);
     }
 
     @Override
     public SysMerchantEntity queryById(Long id) {
-        QueryWrapper<SysMerchantEntity> query = new QueryWrapper<>();
-        query.eq("id", id);
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysMerchantEntity> query = new QueryWrapper<SysMerchantEntity>().lambda()
+                .eq(SysMerchantEntity::getId, id)
+                .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
         return getOne(query);
     }
 
     @Override
     public List<SysMerchantEntity> queryByIds(Collection<Long> ids) {
-        QueryWrapper<SysMerchantEntity> query = new QueryWrapper<>();
-        query.in("id", ids);
-        query.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysMerchantEntity> query = new QueryWrapper<SysMerchantEntity>().lambda()
+                .in(SysMerchantEntity::getId, ids)
+                .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
         return list(query);
     }
 
     @Override
     public IPage<SysMerchantResp> queryPage(SysMerchantPageReq query) {
-        QueryWrapper<SysMerchantEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), "name", query.getNameOrMobile())
-                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), "mobile", query.getNameOrMobile());
-        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysMerchantEntity> queryWrap = new QueryWrapper<SysMerchantEntity>().lambda()
+                .likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysMerchantEntity::getName, query.getNameOrMobile())
+                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysMerchantEntity::getMobile, query.getNameOrMobile())
+                .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
         Page<SysMerchantEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysMerchantEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {

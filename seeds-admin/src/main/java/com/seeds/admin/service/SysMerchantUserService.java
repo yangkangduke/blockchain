@@ -1,6 +1,7 @@
 package com.seeds.admin.service;
 
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.entity.SysMerchantUserEntity;
 
 import java.util.Collection;
@@ -14,7 +15,7 @@ import java.util.Set;
  * @author hang.yu
  * @date 2022/7/20
  */
-public interface SysMerchantUserService {
+public interface SysMerchantUserService extends IService<SysMerchantUserEntity> {
 
     /**
      * 保存

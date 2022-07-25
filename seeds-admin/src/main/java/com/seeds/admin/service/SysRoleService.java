@@ -1,6 +1,7 @@
 package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.SysRoleAddReq;
 import com.seeds.admin.dto.request.SysRoleModifyReq;
 import com.seeds.admin.dto.request.SysRolePageReq;
@@ -17,7 +18,7 @@ import java.util.Map;
  * @author hang.yu
  * @date 2022/7/14
  */
-public interface SysRoleService {
+public interface SysRoleService extends IService<SysRoleEntity> {
 
     /**
      * 分页查询系统角色

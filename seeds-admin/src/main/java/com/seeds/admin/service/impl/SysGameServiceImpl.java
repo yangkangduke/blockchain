@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -40,9 +41,9 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
 
     @Override
     public IPage<SysGameResp> queryPage(SysGamePageReq query) {
-        QueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.likeRight(StringUtils.isNotBlank(query.getName()), "name", query.getName());
-        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName())
+                .eq(SysGameEntity::getDeleteFlag, WhetherEnum.NO.value());
         Page<SysGameEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysGameEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -63,8 +64,8 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             Set<Long> gameIds = sysMerchantGameService.queryGameIdByMerchantId(merchantId);
             games = queryByIds(gameIds);
         } else {
-            QueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<>();
-            queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+            LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
+                    .eq(SysGameEntity::getDeleteFlag, WhetherEnum.NO.value());
             games = list(queryWrap);
         }
         List<SysGameResp> respList = new ArrayList<>();
@@ -80,17 +81,17 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
 
     @Override
     public List<SysGameEntity> queryByIds(Collection<Long> ids) {
-        QueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
-        queryWrap.in("id", ids);
+        LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
+                .eq(SysGameEntity::getDeleteFlag, WhetherEnum.NO.value())
+                .in(SysGameEntity::getId, ids);
         return list(queryWrap);
     }
 
     @Override
     public SysGameEntity queryById(Long id) {
-        QueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<>();
-        queryWrap.eq("id", id);
-        queryWrap.eq("delete_flag", WhetherEnum.NO.value());
+        LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
+                .eq(SysGameEntity::getId, id)
+                .eq(SysGameEntity::getDeleteFlag, WhetherEnum.NO.value());
         return getOne(queryWrap);
     }
 
