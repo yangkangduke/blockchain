@@ -19,7 +19,6 @@ import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
 import com.seeds.uc.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,8 +53,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public String sendCode(SendCodeReq sendReq) {
         AuthCodeUseTypeEnum useType = sendReq.getUseType();
-        if (AuthCodeUseTypeEnum.BIND_EMAIL.equals(useType) ) {
-           return sendCodeService.sendEmailWithUseType(sendReq.getAddress(), sendReq.getUseType());
+        if (AuthCodeUseTypeEnum.BIND_EMAIL.equals(useType)) {
+            return sendCodeService.sendEmailWithUseType(sendReq.getAddress(), sendReq.getUseType());
         } else {
             throw new InvalidArgumentsException("incorrect type");
         }
@@ -154,8 +153,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .updatedAt(createTime)
                     .salt(salt).build();
 
-            this.saveOrUpdate(ucUser,new QueryWrapper<UcUser>().lambda()
-                    .eq(UcUser::getId,loginUser.getUserId()));
+            this.saveOrUpdate(ucUser, new QueryWrapper<UcUser>().lambda()
+                    .eq(UcUser::getId, loginUser.getUserId()));
         }
 
         Long id = ucUser.getId();
@@ -228,8 +227,16 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         // 将产生的uc token存入redis
         cacheService.putUserWithTokenAndLoginName(ucToken, one.getId(), publicAddress);
 
-        // 修改nonce
-        this.metamaskNonce(publicAddress, request);
+        // 修改user信息
+        long time = System.currentTimeMillis();
+        String nonce = RandomUtil.getRandomSalt();
+        UcUser ucUser = UcUser.builder()
+                .updatedAt(time)
+                .nonce(nonce)
+                .metamaskFlag(1)
+                .build();
+        this.update(ucUser, new QueryWrapper<UcUser>().lambda()
+                .eq(UcUser::getPublicAddress, publicAddress));
 
         return LoginResp.builder()
                 .ucToken(ucToken)
@@ -275,7 +282,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         return nonce;
     }
-
 
 
 }

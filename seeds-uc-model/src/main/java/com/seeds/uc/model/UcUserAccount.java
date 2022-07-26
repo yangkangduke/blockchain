@@ -19,11 +19,11 @@ import java.math.BigDecimal;
  * @author yk
  * @since 2022-07-26
  */
-@TableName("user_account")
-@ApiModel(value = "UserAccount对象", description = "用户账户表")
+@TableName("uc_user_account")
+@ApiModel(value = "UcUserAccount对象", description = "用户账户表")
 @Data
 @Builder
-public class UserAccount implements Serializable {
+public class UcUserAccount implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,24 +31,28 @@ public class UserAccount implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty("create time")
+    @ApiModelProperty("创建时间")
     private Long createTime;
 
-    @ApiModelProperty("update time")
+    @ApiModelProperty("修改时间")
     private Long updateTime;
 
-    @ApiModelProperty("version")
+    @ApiModelProperty("版本控制")
     private Long version;
 
+    @ApiModelProperty("账号类型 1 现货 ")
     private Integer accountType;
 
-    @ApiModelProperty("userId")
+    @ApiModelProperty("用户id")
     private Long userId;
 
+    @ApiModelProperty("币种")
     private String currency;
 
+    @ApiModelProperty("账户余额")
     private BigDecimal balance;
 
+    @ApiModelProperty("冻结金额")
     private BigDecimal freeze;
 
 }

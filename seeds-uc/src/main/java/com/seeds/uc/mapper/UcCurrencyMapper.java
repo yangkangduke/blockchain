@@ -1,16 +1,17 @@
 package com.seeds.uc.mapper;
 
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.seeds.uc.model.UserAccount;
+import com.seeds.uc.model.UcCurrency;
 
 /**
  * <p>
- * 用户账户表 Mapper 接口
+ * 币种信息 Mapper 接口
  * </p>
  *
  * @author yk
  * @since 2022-07-26
  */
-public interface UserAccountMapper extends BaseMapper<UserAccount> {
+public interface UcCurrencyMapper extends BaseMapper<UcCurrency> {
 
 }

@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.mapper.UcSecurityStrategyMapper;
 import com.seeds.uc.service.IUcSecurityStrategyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
  * @since 2022-07-15
  */
 @Service
+@Slf4j
+@Transactional
 public class UcSecurityStrategyServiceImpl extends ServiceImpl<UcSecurityStrategyMapper, UcSecurityStrategy> implements IUcSecurityStrategyService {
 
 }

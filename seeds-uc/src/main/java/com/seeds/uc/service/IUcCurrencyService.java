@@ -1,7 +1,7 @@
 package com.seeds.uc.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.uc.model.Currency;
+import com.seeds.uc.model.UcCurrency;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.seeds.uc.model.Currency;
  * @author yk
  * @since 2022-07-26
  */
-public interface ICurrencyService extends IService<Currency> {
+public interface IUcCurrencyService extends IService<UcCurrency> {
 
 }
