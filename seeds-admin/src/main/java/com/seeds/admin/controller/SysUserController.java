@@ -43,7 +43,7 @@ import java.util.Objects;
 @Api("用户管理")
 @RestController
 @RequestMapping("/user")
-public class SysUserController extends AdminBaseController {
+public class SysUserController {
 
     @Value("${admin.login.init.password:123456}")
     private String initPassword;

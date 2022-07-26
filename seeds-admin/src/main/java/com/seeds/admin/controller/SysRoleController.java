@@ -30,7 +30,7 @@ import java.util.Objects;
 @Api("角色管理")
 @RestController
 @RequestMapping("/role")
-public class SysRoleController extends AdminBaseController {
+public class SysRoleController {
 
     @Autowired
     private SysRoleService sysRoleService;

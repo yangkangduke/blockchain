@@ -3,6 +3,7 @@ package com.seeds.admin.handler;
 import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.exceptions.InvalidArgumentsException;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.exception.PermissionException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.binding.BindingException;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 
@@ -80,5 +82,17 @@ public class AdminExceptionHandler {
                 HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * System exception
+     *
+     * @param request
+     * @param e
+     * @return
+     */
+    @ResponseBody
+    @ExceptionHandler(PermissionException.class)
+    ResponseEntity<GenericDto> handle(HttpServletRequest request, PermissionException e) {
+        return new ResponseEntity<>(GenericDto.failure("permission error: " + e.getMessage(), 403), HttpStatus.OK);
+    }
 
 }

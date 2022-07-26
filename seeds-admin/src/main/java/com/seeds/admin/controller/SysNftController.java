@@ -27,7 +27,7 @@ import java.util.List;
 @Api("NFT管理")
 @RestController
 @RequestMapping("/nft")
-public class SysNftController extends AdminBaseController {
+public class SysNftController {
 
     @Autowired
     private SysNftService sysNftService;

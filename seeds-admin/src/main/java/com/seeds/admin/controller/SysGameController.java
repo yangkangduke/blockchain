@@ -28,7 +28,7 @@ import java.util.List;
 @Api("游戏管理")
 @RestController
 @RequestMapping("/game")
-public class SysGameController extends AdminBaseController {
+public class SysGameController {
 
     @Autowired
     private SysGameService sysGameService;

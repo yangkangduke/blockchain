@@ -29,7 +29,7 @@ import java.util.List;
 @Api("商家管理")
 @RestController
 @RequestMapping("/merchant")
-public class SysMerchantController extends AdminBaseController {
+public class SysMerchantController {
 
     @Autowired
     private SysMerchantService sysMerchantService;
