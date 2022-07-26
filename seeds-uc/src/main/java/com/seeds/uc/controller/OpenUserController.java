@@ -2,10 +2,12 @@ package com.seeds.uc.controller;
 
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.uc.dto.LoginUser;
 import com.seeds.uc.dto.request.BindEmailReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
 import com.seeds.uc.dto.request.SendCodeReq;
+import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.impl.CacheService;
@@ -15,8 +17,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -31,8 +34,7 @@ import javax.validation.constraints.NotBlank;
  * @since 2022-07-09
  */
 @RestController
-@RequestMapping("/uc")
-@Api(tags = "uc接口")
+@Api(tags = "用户相关接口")
 public class OpenUserController {
     @Autowired
     private IUcUserService ucUserService;
@@ -40,6 +42,8 @@ public class OpenUserController {
     private IGoogleAuthService googleAuthService;
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private FileTemplate template;
 
     /**
      * 发送验证码
@@ -85,5 +89,11 @@ public class OpenUserController {
         return GenericDto.success(googleAuthService.verifyUserCode(loginUser.getUserId(), code));
     }
 
+    @PostMapping("/test")
+    @ApiOperation(value = "文件上传", notes ="文件上传")
+    public GenericDto<LoginResp> test(@RequestPart("file") MultipartFile file) throws Exception {
+        template.putObject("s3demo", "fileName", file.getInputStream());
+        return GenericDto.success(null);
+    }
 
 }

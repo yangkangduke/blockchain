@@ -8,20 +8,16 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: seeds-uc-auth-service
-          uri: http://127.0.0.1:10101
-          predicates:
-            - Path=/api/auth/**
         - id: seeds-uc-service
           uri: http://127.0.0.1:10101
           predicates:
-            - Path=/api/uc/**
+            - Path=/uc/**
           filters:
             - Auth
-        - id: seeds-admin-public-service
+        - id: seeds-admin-service
           uri: http://127.0.0.1:10102
           predicates:
-            - Path=/api/admin-public/**
+            - Path=/admin/**
           filters:
             - AdminAuth
       globalcors:
@@ -35,7 +31,7 @@ spring:
               - PUT
               - POST
       default-filters:
-        - StripPrefix=2
+        - StripPrefix=1
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
         - AddResponseHeader=Access-Control-Allow-Credentials, true
         - AddResponseHeader=Access-Control-Allow-Origin, *
