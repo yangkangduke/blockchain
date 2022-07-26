@@ -20,6 +20,11 @@ management:
 mybatis:
   type-aliases-package*: com.seeds.admin.model
 
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 admin:
   sso:
     redis:
