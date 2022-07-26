@@ -30,6 +30,8 @@ import java.net.URI;
 @Component
 public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthGatewayFilterFactory.Config> {
 
+    public static String SWAGGER_URI = "/v2/api-docs";
+    public static String AUTH = "/auth/";
     @Autowired
     private AuthService authService;
 
@@ -48,7 +50,8 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
             log.debug("get into auth gateway filter");
             URI uri = exchange.getRequest().getURI();
             log.info("URL信息: {}", uri);
-            if (uri.toString().contains("/v2/api-docs") || uri.toString().contains("/uc-open") ){
+            // 不需要鉴权的
+            if (uri.toString().contains(SWAGGER_URI) || uri.toString().contains(AUTH) ){
                 return success(chain, exchange, null);
             }
             String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_TOKEN);

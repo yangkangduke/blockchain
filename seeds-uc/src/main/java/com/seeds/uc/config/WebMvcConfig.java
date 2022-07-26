@@ -22,7 +22,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         List<String> patterns = new ArrayList<>();
-        patterns.add("/uc-internal/**");
+        patterns.add("/uc/**");
         registry.addInterceptor(userContextInterceptor).addPathPatterns(patterns);
     }
 
