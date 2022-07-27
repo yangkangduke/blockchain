@@ -12,7 +12,7 @@ import lombok.Data;
  * @date 2022/7/21
  */
 @Data
-@ApiModel(value = "系统游戏信息")
+@ApiModel(value = "SysGameResp", description = "系统游戏信息")
 public class SysGameResp {
 
 	@ApiModelProperty(value = "id")

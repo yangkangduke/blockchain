@@ -11,7 +11,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-@ApiModel(value = "系统用户登录")
+@ApiModel(value = "AdminLoginResp", description = "系统用户登录")
 public class AdminLoginResp {
 
     /**

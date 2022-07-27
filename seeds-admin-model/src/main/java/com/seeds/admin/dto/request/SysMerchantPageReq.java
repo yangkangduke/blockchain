@@ -9,7 +9,7 @@ import lombok.Data;
  * @date 2022/7/19
  */
 @Data
-@ApiModel(value = "用户商家请求入参")
+@ApiModel(value = "SysMerchantPageReq", description = "用户商家请求入参")
 public class SysMerchantPageReq extends PageReq {
 
     @ApiModelProperty(value = "名称/联系方式")

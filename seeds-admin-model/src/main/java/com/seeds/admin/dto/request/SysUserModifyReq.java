@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
  * @date 2022/7/13
  */
 @Data
-@ApiModel(value = "系统用户信息")
+@ApiModel(value = "SysUserModifyReq", description = "系统用户信息")
 public class SysUserModifyReq {
 
 	/**

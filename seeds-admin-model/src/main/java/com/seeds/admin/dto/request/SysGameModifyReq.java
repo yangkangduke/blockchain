@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
  * @date 2022/7/21
  */
 @Data
-@ApiModel(value = "系统游戏信息")
+@ApiModel(value = "SysGameModifyReq", description = "系统游戏信息")
 public class SysGameModifyReq {
 
 	/**

@@ -13,7 +13,7 @@ import java.util.List;
  * @date 2022/7/14
  */
 @Data
-@ApiModel(value = "系统角色信息")
+@ApiModel(value = "SysRoleResp", description = "系统角色信息")
 public class SysRoleResp {
 
 	@ApiModelProperty(value = "id")

@@ -9,7 +9,7 @@ import lombok.Data;
  * @date 2022/7/22
  */
 @Data
-@ApiModel(value = "NFT分页请求入参")
+@ApiModel(value = "SysNftPageReq", description = "NFT分页请求入参")
 public class SysNftPageReq extends PageReq {
 
     @ApiModelProperty(value = "NFT名称")

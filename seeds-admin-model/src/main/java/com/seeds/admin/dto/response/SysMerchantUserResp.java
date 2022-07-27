@@ -11,7 +11,7 @@ import lombok.Data;
  * @date 2022/7/20
  */
 @Data
-@ApiModel(value = "系统商家用户信息")
+@ApiModel(value = "SysMerchantUserResp", description = "系统商家用户信息")
 public class SysMerchantUserResp {
 
     @ApiModelProperty(value = "用户名称")
@@ -21,6 +21,6 @@ public class SysMerchantUserResp {
     private String mobile;
 
     @ApiModelProperty(value = "状态")
-    private String status;
+    private Integer status;
 
 }

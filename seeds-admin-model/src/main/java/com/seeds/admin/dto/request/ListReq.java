@@ -8,7 +8,7 @@ import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
 @Data
-@ApiModel(value = "列表请求入参")
+@ApiModel(value = "ListReq", description = "列表请求入参")
 public class ListReq {
 
     @ApiModelProperty(value = "编号列表")

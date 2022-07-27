@@ -14,7 +14,7 @@ import java.util.List;
  * @date 2022/7/19
  */
 @Data
-@ApiModel(value = "系统商家信息")
+@ApiModel(value = "SysMerchantResp", description = "系统商家信息")
 public class SysMerchantResp {
 
 	@ApiModelProperty(value = "id")

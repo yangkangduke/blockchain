@@ -14,7 +14,7 @@ import java.util.List;
  * @date 2022/7/13
  */
 @Data
-@ApiModel(value = "系统用户信息")
+@ApiModel(value = "SysUserResp", description = "系统用户信息")
 public class SysUserResp {
 
 	/**

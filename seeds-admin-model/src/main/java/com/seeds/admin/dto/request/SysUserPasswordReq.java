@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
  * @date 2022/7/13
  */
 @Data
-@ApiModel(value = "后台用户密码")
+@ApiModel(value = "SysUserPasswordReq", description = "后台用户密码")
 public class SysUserPasswordReq {
 
     @ApiModelProperty(value = "用户id")

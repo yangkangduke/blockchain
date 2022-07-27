@@ -13,7 +13,7 @@ import java.util.List;
  * @date 2022/7/13
  */
 @Data
-@ApiModel(value = "登录用户信息")
+@ApiModel(value = "AdminUserResp", description = "登录用户信息")
 public class AdminUserResp {
 
 	/**

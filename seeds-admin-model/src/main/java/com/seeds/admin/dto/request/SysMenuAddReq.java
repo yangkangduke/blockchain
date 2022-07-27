@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
  * @date 2022/7/14
  */
 @Data
-@ApiModel(value = "系统菜单信息")
+@ApiModel(value = "SysMenuAddReq", description = "系统菜单信息")
 public class SysMenuAddReq {
 
 	/**
