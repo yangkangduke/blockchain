@@ -13,7 +13,7 @@ import lombok.Data;
  * @date 2022/7/14
  */
 @Data
-@ApiModel(value = "系统菜单信息")
+@ApiModel(value = "SysMenuResp", description = "系统菜单信息")
 public class SysMenuResp extends TreeNode<SysMenuResp> {
 
 	@ApiModelProperty(value = "id")

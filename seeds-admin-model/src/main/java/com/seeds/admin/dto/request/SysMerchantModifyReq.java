@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
  * @date 2022/7/19
  */
 @Data
-@ApiModel(value = "系统商家信息")
+@ApiModel(value = "SysMerchantModifyReq", description = "系统商家信息")
 public class SysMerchantModifyReq {
 
 	/**
@@ -31,12 +31,6 @@ public class SysMerchantModifyReq {
 	@ApiModelProperty("商家名称")
 	@NotBlank(message = "Merchant name cannot be empty")
 	private String name;
-
-	/**
-	 * 负责人id
-	 */
-	@ApiModelProperty("负责人id")
-	private Long leaderId;
 
 	/**
 	 * 负责人姓名

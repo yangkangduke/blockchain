@@ -13,7 +13,7 @@ import lombok.Data;
  * @date 2022/7/21
  */
 @Data
-@ApiModel(value = "系统NFT类别信息")
+@ApiModel(value = "SysNftTypeResp", description = "系统NFT类别信息")
 public class SysNftTypeResp extends TreeNode<SysNftTypeResp> {
 
 	@ApiModelProperty(value = "id")

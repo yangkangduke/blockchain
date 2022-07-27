@@ -155,9 +155,10 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         // 商家详情
         SysMerchantEntity sysMerchant = queryById(id);
         SysMerchantResp resp = new SysMerchantResp();
-        if (sysMerchant != null) {
-            BeanUtils.copyProperties(sysMerchant, resp);
+        if (sysMerchant == null) {
+            return resp;
         }
+        BeanUtils.copyProperties(sysMerchant, resp);
         // 游戏列表
         resp.setGames(sysGameService.select(id));
         // 用户列表
@@ -170,6 +171,9 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
                         SysMerchantUserResp userResp = new SysMerchantUserResp();
                         BeanUtils.copyProperties(p, userResp);
                         userRespList.add(userResp);
+                        if (Objects.equals(p.getId(), sysMerchant.getLeaderId())) {
+                            resp.setLeaderName(p.getRealName());
+                        }
                     });
             resp.setUsers(userRespList);
         }
@@ -184,18 +188,32 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         if (sysMerchant == null) {
             return;
         }
-        // 修改商家信息
         SysMerchantEntity merchant = new SysMerchantEntity();
         BeanUtils.copyProperties(req, merchant);
-        updateById(merchant);
         // 负责人信息变更
-        if (!req.getMobile().equals(sysMerchant.getMobile())) {
-            SysUserEntity user = new SysUserEntity();
-            user.setId(sysMerchant.getLeaderId());
-            user.setRealName(req.getLeaderName());
-            user.setMobile(req.getMobile());
-            sysUserService.modifyById(user);
+        SysUserEntity sysUser = sysUserService.queryByMobile(req.getMobile());
+        if (sysUser == null) {
+            sysUser = new SysUserEntity();
         }
+        sysUser.setRealName(req.getLeaderName());
+        sysUser.setMobile(req.getMobile());
+        sysUserService.saveOrUpdate(sysUser);
+        // 负责人信息变更
+        if (!Objects.equals(sysUser.getId(), sysMerchant.getId())) {
+            // 新增用户商家关系
+            sysMerchantUserService.add(req.getId(), Collections.singletonList(sysUser.getId()));
+            // 给用户分配角色
+            SysRoleEntity sysRole = sysRoleService.queryByRoleCode(roleCode);
+            if (sysRole != null) {
+                SysUserRoleReq userRole = new SysUserRoleReq();
+                userRole.setUserId(sysUser.getId());
+                userRole.setRoleIds(Collections.singletonList(sysRole.getId()));
+                sysRoleUserService.assignRoles(userRole);
+            }
+        }
+        // 修改商家信息
+        merchant.setLeaderId(sysUser.getId());
+        updateById(merchant);
     }
 
     @Override
@@ -215,7 +233,17 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
             // 删除商家和用户的关联
             sysMerchantUserService.batchDelete(sysMerchantUser);
             // 删除商家用户
-            deleteUserByIds(userIds, merchantIds);
+            userIds = screeningUsers(userIds, merchantIds);
+            if (!CollectionUtils.isEmpty(userIds)) {
+                userIds.forEach(p -> {
+                    SysUserEntity user = new SysUserEntity();
+                    user.setId(p);
+                    user.setDeleteFlag(WhetherEnum.YES.value());
+                    sysUserService.updateById(user);
+                });
+                // 删除用户和角色的关联
+                sysRoleUserService.deleteByUserIds(userIds);
+            }
         }
         // 删除商家和游戏的关联
         sysMerchantGameService.deleteByMerchantIds(merchantIds);
@@ -227,7 +255,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         Set<Long> merchantIds = req.stream().map(SwitchReq::getId).collect(Collectors.toSet());
         Map<Long, Set<Long>> merchantUserMap = sysMerchantUserService.queryMapByMerchantIds(merchantIds);
         List<SysMerchantEntity> sysMerchants = new ArrayList<>();
-        List<SwitchReq> userReqs = new ArrayList<>();
+        Set<Long> disableUsers = new HashSet<>();
         req.forEach(p -> {
             // 校验状态
             SysStatusEnum.from(p.getStatus());
@@ -237,18 +265,34 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
             sysMerchants.add(sysMerchant);
             Set<Long> userIds = merchantUserMap.get(p.getId());
             if (!CollectionUtils.isEmpty(userIds)) {
-                userIds.forEach(u -> {
-                    SwitchReq userReq = new SwitchReq();
-                    userReq.setId(u);
-                    userReq.setStatus(p.getStatus());
-                    userReqs.add(userReq);
-                });
+                if (SysStatusEnum.ENABLED.value() == p.getStatus()) {
+                    // 启用商家用户
+                    userIds.forEach(u -> {
+                        SysUserEntity user = new SysUserEntity();
+                        user.setId(u);
+                        user.setStatus(p.getStatus());
+                        sysUserService.updateById(user);
+                    });
+                } else {
+                    // 需要停用的商家用户
+                    disableUsers.addAll(userIds);
+                }
             }
         });
         // 停用/启用商家
         updateBatchById(sysMerchants);
-        // 停用/启用商家用户
-        sysUserService.enableOrDisable(userReqs);
+        if (!CollectionUtils.isEmpty(disableUsers)) {
+            // 停用商家用户
+            Set<Long> users = screeningUsers(disableUsers, merchantIds);
+            if (!CollectionUtils.isEmpty(users)) {
+                users.forEach(p -> {
+                    SysUserEntity user = new SysUserEntity();
+                    user.setId(p);
+                    user.setStatus(SysStatusEnum.DISABLE.value());
+                    sysUserService.updateById(user);
+                });
+            }
+        }
     }
 
     @Override
@@ -263,7 +307,17 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         // 删除商家和用户的关联
         sysMerchantUserService.batchDelete(deleteList);
         // 删除商家用户
-        deleteUserByIds(userIds, Sets.newHashSet(merchantId));
+        userIds = screeningUsers(userIds, Sets.newHashSet(merchantId));
+        if (!CollectionUtils.isEmpty(userIds)) {
+            userIds.forEach(p -> {
+                SysUserEntity user = new SysUserEntity();
+                user.setId(p);
+                user.setDeleteFlag(WhetherEnum.YES.value());
+                sysUserService.updateById(user);
+            });
+        }
+        // 删除用户和角色的关联
+        sysRoleUserService.deleteByUserIds(userIds);
     }
 
     @Override
@@ -306,7 +360,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         }
     }
 
-    private void deleteUserByIds(Set<Long> userIds, Set<Long> merchantIds){
+    private Set<Long> screeningUsers(Set<Long> userIds, Set<Long> merchantIds){
         // 排除同时在其他商家的用户
         List<SysMerchantUserEntity> merchantUsers = sysMerchantUserService.queryByUserIds(userIds);
         if (!CollectionUtils.isEmpty(merchantUsers)) {
@@ -314,27 +368,20 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
                     .map(SysMerchantUserEntity::getUserId).collect(Collectors.toSet());
             userIds = userIds.stream().filter(p -> !needUserIds.contains(p)).collect(Collectors.toSet());
         }
-        // 删除商家用户
-        if (!CollectionUtils.isEmpty(userIds)) {
-            List<SysUserEntity> users = new ArrayList<>();
-            userIds.forEach(p -> {
-                SysUserEntity user = new SysUserEntity();
-                user.setId(p);
-                user.setDeleteFlag(WhetherEnum.YES.value());
-                users.add(user);
-            });
-            sysUserService.batchModifyById(users);
-        }
+        return userIds;
     }
 
     private List<SysMerchantResp> convertToResp(List<SysMerchantEntity> list){
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();
         }
+        Set<Long> leaderIds = list.stream().map(SysMerchantEntity::getLeaderId).collect(Collectors.toSet());
+        Map<Long, String> userMap = sysUserService.queryNameMapByIds(leaderIds);
         List<SysMerchantResp> respList = new ArrayList<>();
         list.forEach(p -> {
             SysMerchantResp resp = new SysMerchantResp();
             BeanUtils.copyProperties(p, resp);
+            resp.setLeaderName(userMap.get(p.getLeaderId()));
             respList.add(resp);
         });
         return respList;

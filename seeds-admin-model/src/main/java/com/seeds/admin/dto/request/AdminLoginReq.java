@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
  * @date 2022/7/13
  */
 @Data
-@ApiModel(value = "登录表单")
+@ApiModel(value = "AdminLoginReq", description = "登录表单")
 public class AdminLoginReq {
 
     @ApiModelProperty(value = "账户")

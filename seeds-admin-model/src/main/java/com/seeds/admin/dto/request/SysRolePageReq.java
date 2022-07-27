@@ -9,7 +9,7 @@ import lombok.Data;
  * @date 2022/7/14
  */
 @Data
-@ApiModel(value = "用户角色请求入参")
+@ApiModel(value = "SysRolePageReq", description = "用户角色请求入参")
 public class SysRolePageReq extends PageReq {
 
     @ApiModelProperty(value = "角色名称")

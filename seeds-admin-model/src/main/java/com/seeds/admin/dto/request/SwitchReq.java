@@ -7,7 +7,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-@ApiModel(value = "停用/启用请求入参")
+@ApiModel(value = "SwitchReq", description = "停用/启用请求入参")
 public class SwitchReq {
 
     @ApiModelProperty(value = "编号")

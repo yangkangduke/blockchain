@@ -12,7 +12,7 @@ import lombok.Data;
  * @date 2022/7/20
  */
 @Data
-@ApiModel(value = "系统用户简略信息")
+@ApiModel(value = "SysUserBriefResp", description = "系统用户简略信息")
 public class SysUserBriefResp {
 
 	/**

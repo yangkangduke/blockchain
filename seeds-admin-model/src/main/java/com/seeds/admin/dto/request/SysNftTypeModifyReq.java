@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
  * @date 2022/7/21
  */
 @Data
-@ApiModel(value = "系统NFT类别信息")
+@ApiModel(value = "SysNftTypeModifyReq", description = "系统NFT类别信息")
 public class SysNftTypeModifyReq {
 
 	/**

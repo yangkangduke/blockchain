@@ -7,7 +7,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 @Data
-@ApiModel(value = "NFT属性")
+@ApiModel(value = "NftProperties", description = "NFT属性")
 public class NftProperties {
 
     /**

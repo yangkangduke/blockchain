@@ -9,7 +9,7 @@ import lombok.Data;
  * @date 2022/7/21
  */
 @Data
-@ApiModel(value = "游戏分页请求入参")
+@ApiModel(value = "SysGamePageReq", description = "游戏分页请求入参")
 public class SysGamePageReq extends PageReq {
 
     @ApiModelProperty(value = "名称")

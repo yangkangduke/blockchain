@@ -66,18 +66,6 @@ public interface SysUserService extends IService<SysUserEntity> {
     SysUserEntity modify(SysUserModifyReq user);
 
     /**
-     * 通过用户id修改系统用户
-     * @param sysUser 用户信息
-     */
-    void modifyById(SysUserEntity sysUser);
-
-    /**
-     * 批量修改系统用户
-     * @param sysUsers 用户信息
-     */
-    void batchModifyById(List<SysUserEntity> sysUsers);
-
-    /**
      * 通过id批量查询系统用户
      * @param ids 用户id
      * @return 系统用户信息

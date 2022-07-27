@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
  */
 
 @Data
-@ApiModel(value = "组织信息")
+@ApiModel(value = "SysOrgAddOrModifyReq", description = "组织信息")
 public class SysOrgAddOrModifyReq {
 
     @ApiModelProperty("主键id")

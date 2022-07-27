@@ -53,10 +53,10 @@ public class SysRoleUserServiceImpl extends ServiceImpl<SysRoleUserMapper, SysRo
     public void assignRoles(SysUserRoleReq req) {
         // 排除已存在用户角色关系
         List<SysRoleUserEntity> roleUserList = queryByUserId(req.getUserId());
-        Set<Long> roleIdSet = new HashSet<>();
+        Set<Long> roleIdSet = new HashSet<>(req.getRoleIds());
         if (!CollectionUtils.isEmpty(roleUserList)) {
-            roleIdSet = roleUserList.stream().map(SysRoleUserEntity::getRoleId)
-                    .filter(p -> !req.getRoleIds().contains(p)).collect(Collectors.toSet());
+            Set<Long> exitRoleIds = roleUserList.stream().map(SysRoleUserEntity::getRoleId).collect(Collectors.toSet());
+            roleIdSet = roleIdSet.stream().filter(p -> !exitRoleIds.contains(p)).collect(Collectors.toSet());
         }
         if (CollectionUtils.isEmpty(roleIdSet)) {
             return;

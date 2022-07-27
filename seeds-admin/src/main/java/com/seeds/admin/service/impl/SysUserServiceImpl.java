@@ -139,16 +139,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     }
 
     @Override
-    public void modifyById(SysUserEntity sysUser) {
-        updateById(sysUser);
-    }
-
-    @Override
-    public void batchModifyById(List<SysUserEntity> sysUsers) {
-        updateBatchById(sysUsers);
-    }
-
-    @Override
     public List<SysUserEntity> queryByIds(Collection<Long> ids) {
         LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
                 .in(SysUserEntity::getId, ids)

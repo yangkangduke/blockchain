@@ -15,7 +15,7 @@ import java.util.List;
  * @date 2022/7/14
  */
 @Data
-@ApiModel(value = "系统角色信息")
+@ApiModel(value = "SysRoleModifyReq", description = "系统角色信息")
 public class SysRoleModifyReq {
 
 	/**

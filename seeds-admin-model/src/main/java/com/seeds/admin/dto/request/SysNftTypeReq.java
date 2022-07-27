@@ -9,7 +9,7 @@ import lombok.Data;
  * @date 2022/7/21
  */
 @Data
-@ApiModel(value = "NFT类别请求入参")
+@ApiModel(value = "SysNftTypeReq", description = "NFT类别请求入参")
 public class SysNftTypeReq {
 
     @ApiModelProperty(value = "名称")

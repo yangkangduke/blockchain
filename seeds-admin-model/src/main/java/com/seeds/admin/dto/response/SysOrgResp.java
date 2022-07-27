@@ -16,7 +16,7 @@ import java.util.List;
  */
 
 @Data
-@ApiModel(value = "系统菜单信息")
+@ApiModel(value = "SysOrgResp", description = "系统菜单信息")
 public class SysOrgResp {
     @ApiModelProperty("主键id")
     private Long id;

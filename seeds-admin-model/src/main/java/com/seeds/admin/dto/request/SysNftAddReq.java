@@ -18,7 +18,7 @@ import java.util.List;
  * @date 2022/7/22
  */
 @Data
-@ApiModel(value = "系统NFT信息")
+@ApiModel(value = "SysNftAddReq", description = "系统NFT信息")
 public class SysNftAddReq {
 
 	/**
