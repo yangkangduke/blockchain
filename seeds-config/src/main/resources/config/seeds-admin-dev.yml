@@ -45,4 +45,4 @@ redisson:
   timeout: 10000
   poolsize: 50
   idlesize: 50
-  password: 123456
+  password: Seeds123!

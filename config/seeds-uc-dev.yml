@@ -35,7 +35,7 @@ redisson:
   timeout: 5000
   poolsize: 50
   idlesize: 50
-  password: 123456
+  password: Seeds123!
 
 resetpassword:
   url: http://localhost:9999/uc/auth/forgotPassword/verifyLink?encode=

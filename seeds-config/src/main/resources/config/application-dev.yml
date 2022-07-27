@@ -2,7 +2,7 @@ spring:
   redis:
     host: Seeds-redis
     port: 6379
-    password: 123456
+    password: Seeds123!
 
 file:
   bucketName: seeds # 上文创建的桶名称
