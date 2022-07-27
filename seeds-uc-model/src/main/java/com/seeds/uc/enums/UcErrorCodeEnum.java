@@ -15,10 +15,17 @@ public enum UcErrorCodeEnum {
     ERR_500_SYSTEM_BUSY(500, "系统繁忙，请稍后再试...", "system busy, please try again later"),
     ERR_502_ILLEGAL_ARGUMENTS(502, "参数错误", "wrong arguments"),
     ERR_504_MISSING_ARGUMENTS(504, "缺少参数", "missing arguments"),
+    // ga
+    ERR_14000_ACCOUNT_NOT(14000, "验证失败", "verification failed"),
+
+    //冲提币
+    ERR_13000_ACCOUNT_NOT(13000, "账号不存在", "Account does not exist"),
 
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),
     ERR_10002_INCOMPLETE_USER_INFO(10002, "用户信息不完整，请联系客服", "user info not complete, please contact customer service"),
+    ERR_10003_ADDRESS_INFO(10003, "非法地址格式", "Illegal address format"),
+    ERR_10004_SIGNATURE_INFO(10004, "签名验证失败", "Signature verification failed"),
     ERR_10005_SECURITY_STRATEGY_NOT_SET(10005, "您尚未设置安全策略", "you haven not set security strategy"),
     ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT(10013, "账号或密码错误", "account name or password incorrect"),
     ERR_10014_ACCOUNT_FROZEN(10014, "您的账户存在异常，已被锁定，请联系客服人员解决", "account has been locked please contact customer service"),

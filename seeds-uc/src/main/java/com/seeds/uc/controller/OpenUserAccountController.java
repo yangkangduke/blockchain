@@ -1,12 +1,14 @@
 package com.seeds.uc.controller;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.LoginUser;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.response.AccountActionResp;
+import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.service.IUcUserAccountService;
 import com.seeds.uc.service.IUcUserService;
@@ -52,9 +54,10 @@ public class OpenUserAccountController {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUser loginUser = cacheService.getUserByToken(loginToken);
         if (loginUser == null || ucUserService.getById(loginUser.getUserId()).getMetamaskFlag() != 1) {
-            throw new InvalidArgumentsException("Account does not exist");
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_13000_ACCOUNT_NOT);
         }
-        return GenericDto.success(ucUserAccountService.action(accountActionReq, loginUser));
+        ucUserAccountService.action(accountActionReq, loginUser);
+        return GenericDto.success(null);
     }
 
     /**
@@ -62,8 +65,11 @@ public class OpenUserAccountController {
      */
     @PostMapping("/action/history")
     @ApiOperation(value = "充/提币历史分页", notes = "充/提币历史分页")
-    public GenericDto<Page<AccountActionResp>> actionHistory(@RequestBody AccountActionHistoryReq historyReq) {
-        return GenericDto.success(ucUserAccountService.actionHistory(historyReq));
+    public GenericDto<IPage<AccountActionResp>> actionHistory(@RequestBody AccountActionHistoryReq historyReq) {
+        Page page = new Page();
+        page.setCurrent(historyReq.getCurrent());
+        page.setSize(historyReq.getSize());
+        return GenericDto.success(ucUserAccountService.actionHistory(page, historyReq));
     }
 
 }

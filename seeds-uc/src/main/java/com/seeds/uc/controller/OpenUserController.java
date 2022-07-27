@@ -63,8 +63,12 @@ public class OpenUserController {
     @ApiOperation(value = "绑定邮箱",
             notes = "1.调用send/code接口发送邮箱验证码\n" +
                     "2.调用/bind/email绑定邮箱接口")
-    public GenericDto<Boolean> bindEmail(@Valid @RequestBody BindEmailReq bndEmailReq, HttpServletRequest request) {
-        return GenericDto.success(ucUserService.bindEmail(bndEmailReq, request));
+    public GenericDto<Object> bindEmail(@Valid @RequestBody BindEmailReq bndEmailReq, HttpServletRequest request) {
+        // 获取当前登陆人信息
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUser loginUser = cacheService.getUserByToken(loginToken);
+        ucUserService.bindEmail(bndEmailReq, loginUser);
+        return GenericDto.success(null);
     }
 
     /**
@@ -73,7 +77,9 @@ public class OpenUserController {
     @PostMapping("/ga/QRBarcode")
     @ApiOperation(value = "生成QRBarcode", notes = "生成QRBarcode")
     public GenericDto<String> getQRBarcode(@Valid @RequestBody QRBarCodeReq qrBarCodeReq, HttpServletRequest request) {
-        return GenericDto.success(googleAuthService.getQRBarcode(qrBarCodeReq.getAccount(), qrBarCodeReq.getRemark(), request));
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUser loginUser = cacheService.getUserByToken(loginToken);
+        return GenericDto.success(googleAuthService.getQRBarcode(qrBarCodeReq.getAccount(), qrBarCodeReq.getRemark(), loginUser));
     }
 
     /**
@@ -83,14 +89,15 @@ public class OpenUserController {
      */
     @PostMapping("/ga/verifyCode")
     @ApiOperation(value = "GA验证code", notes = "GA验证code")
-    public GenericDto<Boolean> verifyCode(@Valid @NotBlank @RequestBody String code, HttpServletRequest request) {
+    public GenericDto<Object> verifyCode(@Valid @NotBlank @RequestBody String code, HttpServletRequest request) {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUser loginUser = cacheService.getUserByToken(loginToken);
-        return GenericDto.success(googleAuthService.verifyUserCode(loginUser.getUserId(), code));
+        googleAuthService.verifyUserCode(loginUser.getUserId(), code);
+        return GenericDto.success(null);
     }
 
     @PostMapping("/test")
-    @ApiOperation(value = "文件上传", notes ="文件上传")
+    @ApiOperation(value = "文件上传", notes = "文件上传")
     public GenericDto<LoginResp> test(@RequestPart("file") MultipartFile file) throws Exception {
         template.putObject("s3demo", "fileName", file.getInputStream());
         return GenericDto.success(null);

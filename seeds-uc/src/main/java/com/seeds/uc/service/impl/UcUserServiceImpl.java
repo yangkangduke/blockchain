@@ -17,14 +17,11 @@ import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.util.CryptoUtils;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
-import com.seeds.uc.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.crypto.WalletUtils;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -67,19 +64,15 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @param verifyReq
      */
     @Override
-    public Boolean bindEmail(BindEmailReq verifyReq, HttpServletRequest request) {
+    public void bindEmail(BindEmailReq verifyReq, LoginUser loginUser) {
+        Long userId = loginUser.getUserId();
+        long createTime = System.currentTimeMillis();
         String email = verifyReq.getEmail();
         String code = verifyReq.getCode();
         AuthCode authCode = cacheService.getAuthCode(email, verifyReq.getUseType(), ClientAuthTypeEnum.EMAIL);
         if (authCode == null || authCode.getCode() == null || !authCode.getCode().equals(code)) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
         }
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUser loginUser = cacheService.getUserByToken(loginToken);
-        Long userId = loginUser.getUserId();
-        // 将邮箱绑定到uc_security_strategy
-        long createTime = System.currentTimeMillis();
 
         // 修改邮箱信息到user表
         this.updateById(UcUser.builder()
@@ -87,7 +80,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .id(userId)
                 .build());
 
-        return iUcSecurityStrategyService.saveOrUpdate(UcSecurityStrategy.builder()
+        iUcSecurityStrategyService.saveOrUpdate(UcSecurityStrategy.builder()
                 .uid(userId)
                 .needAuth(true)
                 .authType(Integer.valueOf(ClientAuthTypeEnum.EMAIL.getCode()))
@@ -103,13 +96,13 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public Boolean verifyAccount(String account) {
+    public void verifyAccount(String account) {
         UcUser ucUser = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getAccount, account));
+
         if (ucUser != null) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED);
         }
-        return true;
     }
 
     /**
@@ -119,13 +112,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public LoginResp registerAccount(RegisterReq registerReq, HttpServletRequest request) {
-        LoginUser loginUser = null;
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        if (loginToken != null) {
-            loginUser = cacheService.getUserByToken(loginToken);
-        }
+    public LoginResp registerAccount(RegisterReq registerReq, LoginUser loginUser) {
         // loginUser不是null说明当前登陆的是metamsk,还要绑定metamsk
         String account = registerReq.getAccount();
         this.verifyAccount(account);
@@ -178,19 +165,21 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp loginAccount(AccountLoginReq accountLoginReq) {
         String account = accountLoginReq.getAccount();
+        String password = accountLoginReq.getPassword();
         UcUser ucUser = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getAccount, account));
         if (ucUser == null) {
-            throw new InvalidArgumentsException("Account does not exist");
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
         }
-        String loginPassword = PasswordUtil.getPassword(accountLoginReq.getPassword(), ucUser.getSalt());
-        if (!loginPassword.equals(ucUser.getPassword())) {
+        String loginPassword = PasswordUtil.getPassword(password, ucUser.getSalt());
+        if (!loginPassword.equals(password)) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT);
         }
         // 下发uc token
-        String ucToken = RandomUtil.genRandomToken(ucUser.getId().toString());
+        Long id = ucUser.getId();
+        String ucToken = RandomUtil.genRandomToken(id.toString());
         // 将产生的uc token存入redis
-        cacheService.putUserWithTokenAndLoginName(ucToken, ucUser.getId(), account);
+        cacheService.putUserWithTokenAndLoginName(ucToken, id, account);
 
         return LoginResp.builder()
                 .ucToken(ucToken)
@@ -200,27 +189,26 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     /**
      * metamask登陆
      *
-     * @param request
      * @return
      */
     @Override
-    public LoginResp loginMetaMask(MetaMaskLoginReq loginReq, HttpServletRequest request) {
+    public LoginResp loginMetaMask(MetaMaskLoginReq loginReq) {
         String publicAddress = loginReq.getPublicAddress();
         String message = loginReq.getMessage();
         String signature = loginReq.getSignature();
         // 地址合法性校验
         if (!WalletUtils.isValidAddress(publicAddress)) {
             // 不合法直接返回错误
-            throw new InvalidArgumentsException("Illegal address format");
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10003_ADDRESS_INFO);
         }
         // 校验签名信息
         if (!CryptoUtils.validate(signature, message, publicAddress)) {
-            throw new InvalidArgumentsException("Signature verification failed");
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_SIGNATURE_INFO);
         }
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getPublicAddress, publicAddress));
         if (one == null) {
-            throw new InvalidArgumentsException("User does not exist");
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
         }
         // 下发uc token
         String ucToken = RandomUtil.genRandomToken(one.getId().toString());
@@ -249,16 +237,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public String metamaskNonce(String publicAddress, HttpServletRequest request) {
-        LoginUser loginUser = null;
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        if (loginToken != null) {
-            loginUser = cacheService.getUserByToken(loginToken);
-        }
+    public String metamaskNonce(String publicAddress, LoginUser loginUser) {
         long createTime = System.currentTimeMillis();
         String nonce = RandomUtil.getRandomSalt();
-
         if (loginUser == null) {
             // 新建一个
             UcUser ucUser = UcUser.builder()
@@ -280,6 +261,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             this.update(ucUser, new QueryWrapper<UcUser>().lambda()
                     .eq(UcUser::getId, loginUser.getUserId()));
         }
+
         return nonce;
     }
 

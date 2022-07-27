@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional
 public class SendCodeServiceImpl implements ISendCodeService {
+    public static final String SUBJECT = "Bind the email verification code";
+    public static final String CONTENT = "Bind the email verification code, note that it expires in 5 minutes:";
     @Autowired
     private CacheService cacheService;
     @Autowired
@@ -43,22 +45,16 @@ public class SendCodeServiceImpl implements ISendCodeService {
         account.setFrom(emailProperties.getFrom());
         account.setUser(emailProperties.getUser());
         account.setPass(emailProperties.getPass());
-        MailUtil.send(account, CollUtil.newArrayList(address), "Bind the email verification code", "Bind the email verification code, note that it expires in 5 minutes:" + otp, false);
+        MailUtil.send(account, CollUtil.newArrayList(address), SUBJECT, CONTENT + otp, false);
         // store the auth code in auth code bucket
-        cacheService.putAuthCode(
-                address,
-                null,
-                ClientAuthTypeEnum.EMAIL,
-                otp,
-                useTypeEnum);
-        return "Bind the email verification code, note that it expires in 5 minutes:" + otp;
+        cacheService.putAuthCode(address, null, ClientAuthTypeEnum.EMAIL, otp, useTypeEnum);
+        return CONTENT + otp;
 
     }
 
     @Override
     public String verifyEmailWithUseType(String address, String otp, AuthCodeUseTypeEnum useTypeEnum) {
-        AuthCode authCode =
-                cacheService.getAuthCode(address, useTypeEnum, ClientAuthTypeEnum.EMAIL);
+        AuthCode authCode = cacheService.getAuthCode(address, useTypeEnum, ClientAuthTypeEnum.EMAIL);
         if (authCode != null && StringUtils.isNotBlank(authCode.getCode()) && authCode.getCode().equals(otp)) {
             String token = RandomUtil.genRandomToken(address);
             cacheService.putAuthToken(token, null, address, ClientAuthTypeEnum.EMAIL);

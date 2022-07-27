@@ -24,12 +24,12 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * @param loginUser
      * @return
      */
-    Void action(AccountActionReq accountActionReq, LoginUser loginUser);
+    void action(AccountActionReq accountActionReq, LoginUser loginUser);
 
     /**
      * 充/提币历史分页
      * @param historyReq
      * @return
      */
-    Page<AccountActionResp> actionHistory(AccountActionHistoryReq historyReq);
+    Page<AccountActionResp> actionHistory(Page page, AccountActionHistoryReq historyReq);
 }

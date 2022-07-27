@@ -2,11 +2,10 @@ package com.seeds.uc.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.uc.dto.LoginUser;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.model.UcUser;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -30,15 +29,15 @@ public interface IUcUserService extends IService<UcUser> {
      *
      * @param verifyReq
      */
-    Boolean bindEmail(BindEmailReq verifyReq, HttpServletRequest request);
+    void bindEmail(BindEmailReq verifyReq, LoginUser loginUser);
 
     /**
      * 账号重复性校验
-     *
+ L   *
      * @param account
      * @return
      */
-    Boolean verifyAccount(String account);
+    void verifyAccount(String account);
 
     /**
      * 注册用户
@@ -46,7 +45,7 @@ public interface IUcUserService extends IService<UcUser> {
      * @param registerReq
      * @return
      */
-    LoginResp registerAccount(RegisterReq registerReq, HttpServletRequest request);
+    LoginResp registerAccount(RegisterReq registerReq, LoginUser loginUser);
 
     /**
      * 登陆
@@ -57,15 +56,14 @@ public interface IUcUserService extends IService<UcUser> {
 
     /**
      * metamask登陆
-     * @param request
      */
-    LoginResp loginMetaMask(MetaMaskLoginReq loginReq, HttpServletRequest request);
+    LoginResp loginMetaMask(MetaMaskLoginReq loginReq);
 
     /**
      * metamask登陆获取随机数
      * @return
      */
-    String metamaskNonce(String publicAddress, HttpServletRequest request);
+    String metamaskNonce(String publicAddress, LoginUser loginUser);
 
 
 }
