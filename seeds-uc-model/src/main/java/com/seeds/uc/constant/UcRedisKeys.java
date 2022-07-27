@@ -32,6 +32,8 @@ public class UcRedisKeys {
 
     public final String UC_AUTH_EMAIL_KEY_TEMPLATE = UC_KEY_PREFIX + "code:email:%s:%s";
 
+    public final String UC_FORGOTPASSWORD_ACCOUNT_KEY_TEMPLATE = UC_KEY_PREFIX + "forgotPassword:account:%s";
+
 
     /**
      * Key: uc:2fa:{2faToken} -> Value: {TwoFactorAuth}
@@ -129,5 +131,9 @@ public class UcRedisKeys {
      */
     public String getUcGenerateGoogleAuthKeyTemplate(String token) {
         return String.format(UC_GENERATE_GOOGLE_AUTH_KEY_TEMPLATE, token);
+    }
+
+    public static String getUcKeyForgotPassword(String account) {
+        return String.format(UC_FORGOTPASSWORD_ACCOUNT_KEY_TEMPLATE, account);
     }
 }

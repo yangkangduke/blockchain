@@ -21,6 +21,11 @@ public enum UcErrorCodeEnum {
     //冲提币
     ERR_13000_ACCOUNT_NOT(13000, "账号不存在", "Account does not exist"),
 
+    // 忘记密码
+    ERR_15000_ACCOUNT_NOT(15000, "账号不存在", "Account does not exist"),
+    ERR_15001_ACCOUNT_VERIFICATION_FAILED(15001, "验证失败", "verification failed!"),
+    ERR_15002_LINK_EXPIRED(15002, "链接失效", "The current link has expired!"),
+
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),
     ERR_10002_INCOMPLETE_USER_INFO(10002, "用户信息不完整，请联系客服", "user info not complete, please contact customer service"),

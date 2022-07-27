@@ -2,9 +2,7 @@ package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.LoginUser;
-import com.seeds.uc.dto.request.AccountLoginReq;
-import com.seeds.uc.dto.request.MetaMaskLoginReq;
-import com.seeds.uc.dto.request.RegisterReq;
+import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.impl.CacheService;
@@ -13,10 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -113,5 +108,40 @@ public class AuthController {
     public GenericDto<LoginResp> loginMetaMask(@Valid @RequestBody MetaMaskLoginReq loginReq) {
         return GenericDto.success(ucUserService.loginMetaMask(loginReq));
     }
+
+    /**
+     * 忘记密码-发送邮件
+     * @return
+     */
+    @PostMapping("/forgotPassword/seedEmail")
+    @ApiOperation(value = "忘记密码-发送邮件",notes ="忘记密码-发送邮件")
+    public GenericDto<Object> forgotPasswordSeedEmail(@Valid @RequestBody ForgotPasswordReq forgotPasswordReq) {
+        ucUserService.forgotPasswordSeedEmail(forgotPasswordReq);
+        return GenericDto.success(null);
+    }
+
+    /**
+     * 忘记密码-验证链接
+     * @return
+     */
+    @GetMapping("/forgotPassword/verifyLink")
+    @ApiOperation(value = "忘记密码-验证链接",notes ="忘记密码-验证链接")
+    public GenericDto<Object> forgotPasswordVerifyLink(String encode) {
+        ucUserService.forgotPasswordVerifyLink(encode);
+        return GenericDto.success(null);
+    }
+
+    /**
+     * 忘记密码-修改密码
+     * @return
+     */
+    @PostMapping("/forgotPassword/changePassword")
+    @ApiOperation(value = "忘记密码-修改密码",notes ="忘记密码-修改密码")
+    public GenericDto<Object> forgotPasswordChangePassword(ChangePasswordReq changePasswordReq) {
+        ucUserService.forgotPasswordVerifyLink(changePasswordReq.getEncode());
+        ucUserService.forgotPasswordChangePassword(changePasswordReq);
+        return GenericDto.success(null);
+    }
+
 
 }
