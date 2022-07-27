@@ -35,16 +35,19 @@ public class AdminUserContextInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader(HttpHeaders.ADMIN_USER_TOKEN);
         if (StringUtils.isEmpty(token)) {
+            log.info("Token is empty");
             writeFailureResponse(response);
             return false;
         }
         String userIdStr = request.getHeader(HttpHeaders.ADMIN_USER_ID);
         if (StringUtils.isEmpty(userIdStr)) {
+            log.info("UserId is empty");
             writeFailureResponse(response);
             return false;
         }
         String redisToken = redissonClient.<String>getBucket(RedisKeys.getAdminUserIdKey(Long.valueOf(userIdStr))).get();
         if (!token.equals(redisToken)) {
+            log.info("Token is not right, redisToken={}, token={}", redisToken, token);
             writeFailureResponse(response);
             return false;
         }

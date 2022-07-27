@@ -1,6 +1,7 @@
 package com.seeds.admin.controller;
 
 import com.seeds.admin.annotation.RequiredPermission;
+import com.seeds.admin.annotation.SeedsOperationLog;
 import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SysOrgAddOrModifyReq;
 import com.seeds.admin.dto.response.SysOrgResp;
@@ -39,6 +40,7 @@ public class SysOrgController {
 
     @PostMapping("add")
     @ApiOperation("添加")
+    @SeedsOperationLog("添加组织")
     @RequiredPermission("sys:org:add")
     public GenericDto<Object> add(@Valid @RequestBody SysOrgAddOrModifyReq req) {
         orgService.add(req);
@@ -54,6 +56,7 @@ public class SysOrgController {
 
     @PutMapping("modify")
     @ApiOperation("编辑")
+    @SeedsOperationLog("编辑组织信息")
     @RequiredPermission("sys:org:modify")
     public GenericDto<Object> modify(@Valid @RequestBody SysOrgAddOrModifyReq req) {
         orgService.modify(req);
@@ -62,6 +65,7 @@ public class SysOrgController {
 
     @DeleteMapping("delete")
     @ApiOperation("删除")
+    @SeedsOperationLog("删除组织")
     @RequiredPermission("sys:org:delete")
     public GenericDto<Object> delete(@Valid @RequestBody ListReq req) {
         orgService.delete(req);

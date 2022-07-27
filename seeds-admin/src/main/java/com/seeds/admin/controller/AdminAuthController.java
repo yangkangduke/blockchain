@@ -8,6 +8,7 @@ import com.seeds.admin.entity.SysUserEntity;
 import com.seeds.admin.enums.SysAuthTypeEnum;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.enums.SysStatusEnum;
+import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.service.AdminCacheService;
 import com.seeds.admin.service.AdminCaptchaService;
 import com.seeds.admin.service.SysUserService;
@@ -20,7 +21,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,11 +48,13 @@ public class AdminAuthController {
     @Autowired
     private SysUserService sysUserService;
 
-    @PostMapping("/captcha")
+    @GetMapping("/captcha/{account}")
     @ApiOperation(value = "生成图形验证码")
-    public void captcha(HttpServletResponse response, String account) throws IOException {
+    public void captcha(HttpServletResponse response, @PathVariable("account") String account) throws IOException {
         // 账号不能为空
-        Assert.hasText(account, "Account cannot be empty");
+        if (StringUtils.isEmpty(account)) {
+            throw new GenericException("Account cannot be empty");
+        }
         //生成验证码
         adminCaptchaService.createCaptcha(response, account);
     }

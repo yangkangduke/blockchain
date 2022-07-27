@@ -84,7 +84,7 @@ public class AdminAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<
 
     private Mono<Void> adminFailure(ServerWebExchange exchange) {
         //unauthorized request to be blocked
-        log.debug("token verify failed");
+        log.info("token verify failed");
         ServerHttpResponse serverHttpResponse = exchange.getResponse();
         serverHttpResponse.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         DataBuffer buffer = serverHttpResponse.bufferFactory().wrap(getErrorBytes("Invalid token"));

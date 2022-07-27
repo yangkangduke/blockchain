@@ -37,7 +37,7 @@ springfox:
 
 redisson:
   address: redis://Seeds-redis:6379
-  timeout: 5000
+  timeout: 10000
   poolsize: 50
   idlesize: 50
   password: Seeds123!
