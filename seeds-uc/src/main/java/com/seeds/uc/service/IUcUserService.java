@@ -65,5 +65,21 @@ public interface IUcUserService extends IService<UcUser> {
      */
     String metamaskNonce(String publicAddress, LoginUser loginUser);
 
+    /**
+     * 忘记密码-发送邮件
+     * @param forgotPasswordReq
+     */
+    void forgotPasswordSeedEmail(ForgotPasswordReq forgotPasswordReq);
 
+    /**
+     * 忘记密码-验证链接
+     * @param encode
+     */
+    void forgotPasswordVerifyLink(String encode);
+
+    /**
+     * 忘记密码-修改密码
+     * @param changePasswordReq
+     */
+    void forgotPasswordChangePassword(ChangePasswordReq changePasswordReq);
 }

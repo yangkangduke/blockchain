@@ -36,3 +36,6 @@ redisson:
   poolsize: 50
   idlesize: 50
   password: 123456
+
+resetpassword:
+  url: http://localhost:9999/uc/auth/forgotPassword/verifyLink?encode=

@@ -4,9 +4,10 @@ package com.seeds.uc.service.impl;
 import com.seeds.uc.constant.UcRedisKeys;
 import com.seeds.uc.dto.AuthCode;
 import com.seeds.uc.dto.AuthToken;
+import com.seeds.uc.dto.ForgotPasswordCode;
 import com.seeds.uc.dto.LoginUser;
-import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
+import com.seeds.uc.enums.ClientAuthTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -106,6 +107,30 @@ public class CacheService {
         String key = UcRedisKeys.getUcAuthCodeKeyWithAuthTypeAndUseType(name, useType, authTypeEnum);
         RBucket<AuthCode> authCodeDtoRBucket = redisson.getBucket(key);
         return authCodeDtoRBucket.get();
+    }
+
+    /**
+     * key为用户名(邮箱)的cache，用于忘记密码功能校验
+     */
+    public void putForgotPasswordCode(String account, String email, long expireAt) {
+        String key = UcRedisKeys.getUcKeyForgotPassword(account);
+        ForgotPasswordCode forgotPasswordCode = ForgotPasswordCode.builder()
+                .key(key)
+                .email(email)
+                .account(account)
+                .expireAt(expireAt)
+                .build();
+        redisson.getBucket(forgotPasswordCode.getKey()).set(
+                forgotPasswordCode,
+                expireAt,
+                TimeUnit.MILLISECONDS);
+        log.info("CacheService - putAuthCodeByNameAndAuthTypeAndUseType - put key: {}, value: {}", key, email);
+    }
+
+    public ForgotPasswordCode getForgotPasswordCode(String account) {
+        String key = UcRedisKeys.getUcKeyForgotPassword(account);
+        RBucket<ForgotPasswordCode> redissonBucket = redisson.getBucket(key);
+        return redissonBucket.get();
     }
 
     /**

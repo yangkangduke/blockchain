@@ -1,8 +1,16 @@
 package com.seeds.uc.service.impl;
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.mail.MailAccount;
+import cn.hutool.extra.mail.MailUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.common.web.config.EmailProperties;
+import com.seeds.uc.config.ResetPasswordProperties;
 import com.seeds.uc.dto.AuthCode;
+import com.seeds.uc.dto.ForgotPasswordCode;
 import com.seeds.uc.dto.LoginUser;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
@@ -15,6 +23,7 @@ import com.seeds.uc.service.ISendCodeService;
 import com.seeds.uc.service.IUcSecurityStrategyService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.util.CryptoUtils;
+import com.seeds.uc.util.DigestUtil;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -35,12 +44,18 @@ import org.web3j.crypto.WalletUtils;
 @Slf4j
 @Transactional
 public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> implements IUcUserService {
+
+    public static final String EMAIL_CONTENT = "Reset password address, it will expire in 10 minutes：";
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private ResetPasswordProperties resetPasswordProperties;
     @Autowired
     private ISendCodeService sendCodeService;
     @Autowired
     private IUcSecurityStrategyService iUcSecurityStrategyService;
+    @Autowired
+    private EmailProperties emailProperties;
 
     /**
      * 发送验证码
@@ -172,7 +187,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
         }
         String loginPassword = PasswordUtil.getPassword(password, ucUser.getSalt());
-        if (!loginPassword.equals(password)) {
+        if (!loginPassword.equals(ucUser.getPassword())) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT);
         }
         // 下发uc token
@@ -263,6 +278,86 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
 
         return nonce;
+    }
+
+    /**
+     * 忘记密码-发送邮件
+     *
+     * @param forgotPasswordReq
+     */
+    @Override
+    public void forgotPasswordSeedEmail(ForgotPasswordReq forgotPasswordReq) {
+        String account = forgotPasswordReq.getAccount();
+        String email = account;
+        // 判断账号是否存在
+        UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
+                .eq(UcUser::getAccount, account));
+        if (one == null) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15000_ACCOUNT_NOT);
+        }
+        // 发送加密邮件 10分钟过期
+        long endTimes = System.currentTimeMillis() + 600 * 1000;
+        // 先加密，再url转码,顺序不能修改
+        String encode = Base64.encode(DigestUtil.Encrypt(account + ";" + email));
+        MailAccount mailAccount = new MailAccount();
+        mailAccount.setHost(emailProperties.getHost());
+        mailAccount.setPort(25);
+        mailAccount.setAuth(true);
+        mailAccount.setFrom(emailProperties.getFrom());
+        mailAccount.setUser(emailProperties.getUser());
+        mailAccount.setPass(emailProperties.getPass());
+        MailUtil.send(mailAccount, CollUtil.newArrayList(account), "forgot password", EMAIL_CONTENT + "<a>" + resetPasswordProperties.getUrl() + encode + "</a>", true);
+        cacheService.putForgotPasswordCode(account, email, endTimes);
+    }
+
+    /**
+     * 忘记密码-验证链接
+     *
+     * @param encode
+     */
+    @Override
+    public void forgotPasswordVerifyLink(String encode) {
+        if (StrUtil.isNotBlank(encode)) {
+            try {
+                String decodeStr = Base64.decodeStr(encode);
+                String decrypt = DigestUtil.Decrypt(decodeStr);
+                String[] split = decrypt.split(";");
+                String account = split[0];
+                String email = split[1];
+                long curtime = System.currentTimeMillis();
+                ForgotPasswordCode forgotPasswordCode = cacheService.getForgotPasswordCode(account);
+                if (forgotPasswordCode == null) {
+                    throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15001_ACCOUNT_VERIFICATION_FAILED);
+                }
+                if (forgotPasswordCode.getExpireAt() <= curtime) {
+                    throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15001_ACCOUNT_VERIFICATION_FAILED);
+                }
+                if (!forgotPasswordCode.getEmail().equals(email)) {
+                    throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15002_LINK_EXPIRED);
+                }
+            } catch (Exception e) {
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15002_LINK_EXPIRED);
+            }
+        } else {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15001_ACCOUNT_VERIFICATION_FAILED);
+        }
+    }
+
+    /**
+     * 忘记密码-修改密码
+     *
+     * @param changePasswordReq
+     */
+    @Override
+    public void forgotPasswordChangePassword(ChangePasswordReq changePasswordReq) {
+        String account = changePasswordReq.getAccount();
+        String salt = RandomUtil.getRandomSalt();
+        String password = PasswordUtil.getPassword(changePasswordReq.getPassword(), salt);
+        this.update(UcUser.builder()
+                .password(password)
+                .salt(salt)
+                .build(), new QueryWrapper<UcUser>().lambda()
+                .eq(UcUser::getAccount, account));
     }
 
 
