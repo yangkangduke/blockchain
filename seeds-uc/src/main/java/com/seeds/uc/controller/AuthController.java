@@ -1,11 +1,14 @@
 package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.dto.LoginUser;
 import com.seeds.uc.dto.request.AccountLoginReq;
 import com.seeds.uc.dto.request.MetaMaskLoginReq;
 import com.seeds.uc.dto.request.RegisterReq;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.service.IUcUserService;
+import com.seeds.uc.service.impl.CacheService;
+import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,8 @@ public class AuthController {
 
     @Autowired
     private IUcUserService ucUserService;
+    @Autowired
+    private CacheService cacheService;
 
 
     /**
@@ -35,8 +40,9 @@ public class AuthController {
      */
     @PostMapping("/register/check")
     @ApiOperation(value = "校验账号", notes = "校验账号")
-    public GenericDto<Boolean> verifyAccount(@Valid @NotBlank @Email @RequestBody String account) {
-        return GenericDto.success(ucUserService.verifyAccount(account));
+    public GenericDto<Object> verifyAccount(@Valid @NotBlank @Email @RequestBody String account) {
+        ucUserService.verifyAccount(account);
+        return GenericDto.success(null);
     }
 
     /**
@@ -51,7 +57,13 @@ public class AuthController {
             "2.调用/register/account注册账号，\n" +
             "3.如果传了token就跟metaMask做绑定")
     public GenericDto<LoginResp> registerAccount(@Valid @RequestBody RegisterReq registerReq, HttpServletRequest request) {
-        return GenericDto.success(ucUserService.registerAccount(registerReq, request));
+        LoginUser loginUser = null;
+        // 获取当前登陆人信息
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        if (loginToken != null) {
+            loginUser = cacheService.getUserByToken(loginToken);
+        }
+        return GenericDto.success(ucUserService.registerAccount(registerReq, loginUser));
     }
 
     /**
@@ -76,7 +88,13 @@ public class AuthController {
     @PostMapping("/metamask/nonce")
     @ApiOperation(value = "metamask获取随机数", notes = "metamask获取随机数")
     public GenericDto<String> metamaskNonce(@Valid @NotBlank @RequestBody String publicAddress, HttpServletRequest request) {
-        return GenericDto.success(ucUserService.metamaskNonce(publicAddress, request));
+        LoginUser loginUser = null;
+        // 获取当前登陆人信息
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        if (loginToken != null) {
+            loginUser = cacheService.getUserByToken(loginToken);
+        }
+        return GenericDto.success(ucUserService.metamaskNonce(publicAddress, loginUser));
     }
 
     /**
@@ -92,8 +110,8 @@ public class AuthController {
             notes ="1.调用/metamask/nonce生成nonce\n" +
             "2.前端根据nonce生成签名信息\n" +
             "3.调用/login/metamask验证签名信息，验证成功返回token")
-    public GenericDto<LoginResp> loginMetaMask(@Valid @RequestBody MetaMaskLoginReq loginReq, HttpServletRequest request) {
-        return GenericDto.success(ucUserService.loginMetaMask(loginReq, request));
+    public GenericDto<LoginResp> loginMetaMask(@Valid @RequestBody MetaMaskLoginReq loginReq) {
+        return GenericDto.success(ucUserService.loginMetaMask(loginReq));
     }
 
 }

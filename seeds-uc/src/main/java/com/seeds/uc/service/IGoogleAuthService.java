@@ -1,6 +1,6 @@
 package com.seeds.uc.service;
 
-import javax.servlet.http.HttpServletRequest;
+import com.seeds.uc.dto.LoginUser;
 
 /**
  * @author yk
@@ -9,11 +9,11 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface IGoogleAuthService {
 
-    String getQRBarcode(String account, String remark, HttpServletRequest request);
+    String getQRBarcode(String account, String remark, LoginUser loginUser);
 
     String genGaSecret();
 
-    boolean verifyUserCode(Long uid, String userInputCode);
+    void verifyUserCode(Long uid, String userInputCode);
 
     boolean verify(String userInputCode, String userSecret);
 }
