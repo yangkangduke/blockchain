@@ -6,6 +6,8 @@ import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
+import com.seeds.admin.entity.SysNftEntity;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.service.SysNftService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -44,6 +47,11 @@ public class SysNftController {
     @ApiOperation("添加")
     @RequiredPermission("sys:nft:add")
     public GenericDto<Object> add(@Valid @RequestBody SysNftAddReq req) {
+        // 查重
+        SysNftEntity nft = sysNftService.queryByContractAddress(req.getContractAddress());
+        if (nft != null) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_50001_NFT_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_50001_NFT_ALREADY_EXIST.getCode(), null);
+        }
         sysNftService.add(req);
         return GenericDto.success(null);
     }
@@ -59,6 +67,11 @@ public class SysNftController {
     @ApiOperation("编辑")
     @RequiredPermission("sys:nft:modify")
     public GenericDto<Object> modify(@Valid @RequestBody SysNftModifyReq req) {
+        // 查重
+        SysNftEntity nft = sysNftService.queryByContractAddress(req.getContractAddress());
+        if (nft != null && !Objects.equals(nft.getId(), req.getId())) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_50001_NFT_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_50001_NFT_ALREADY_EXIST.getCode(), null);
+        }
         sysNftService.modify(req);
         return GenericDto.success(null);
     }

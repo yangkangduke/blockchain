@@ -43,7 +43,10 @@ public enum AdminErrorCodeEnum {
     // nft type
     ERR_40001_NFT_TYPE_ALREADY_EXIST(40001, "NFT类别已存在", "NFT type code already exist"),
     ERR_40002_NFT_TYPE_PARENT_ITSELF(40002, "上级NFT类别不能为自身", "Parent nft type cannot be for itself"),
+    ERR_40003_SUB_NFT_TYPE_EXIST(40003, "存在下级NFT类别", "Subordinate nft type exist"),
 
+    // nft
+    ERR_50001_NFT_ALREADY_EXIST(50001, "NFT已存在", "NFT already exist"),
     ;
 
     @JsonValue

@@ -1,6 +1,5 @@
 package com.seeds.admin.service;
 
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SwitchReq;
@@ -12,6 +11,7 @@ import com.seeds.admin.entity.SysNftTypeEntity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 系统NFT类别
@@ -79,5 +79,20 @@ public interface SysNftTypeService extends IService<SysNftTypeEntity> {
      * @param req id列表和状态
      */
     void enableOrDisable(List<SwitchReq> req);
+
+    /**
+     * 统计子类别
+     * @param codes NFT类别code列表
+     * @return 子类别数目
+     */
+    Long countKidsByCodes(Set<String> codes);
+
+
+    /**
+     * NFT类别code列表
+     * @param ids NFT类别id列表
+     * @return NFT类别code列表
+     */
+    Set<String> queryCodesByIds(Set<Long> ids);
 
 }

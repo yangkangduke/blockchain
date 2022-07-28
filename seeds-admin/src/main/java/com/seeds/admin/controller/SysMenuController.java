@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * 菜单管理
@@ -90,9 +89,8 @@ public class SysMenuController {
     @RequiredPermission("sys:menu:delete")
     public GenericDto<Object> delete(@Valid @RequestBody ListReq req) {
         // 判断是否有子菜单或按钮
-        Set<Long> ids = req.getIds();
-        Long count = sysMenuService.countKidsByCodes(sysMenuService.queryCodesByIds(ids));
-        if(count > 0){
+        Long count = sysMenuService.countKidsByCodes(sysMenuService.queryCodesByIds(req.getIds()));
+        if (count > 0) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_30003_SUB_MENU_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_30003_SUB_MENU_EXIST.getCode(), null);
         }
         sysMenuService.batchDelete(req);

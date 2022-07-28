@@ -29,6 +29,13 @@ public class SysNftModifyReq {
 	private Long id;
 
 	/**
+	 * nft名称
+	 */
+	@ApiModelProperty("nft名称")
+	@NotNull(message = "nft name cannot be empty")
+	private String name;
+
+	/**
 	 * 游戏id
 	 */
 	@ApiModelProperty("游戏id")
@@ -62,13 +69,6 @@ public class SysNftModifyReq {
 	@ApiModelProperty("NFT价格")
 	@NotNull(message = "NFT price cannot be empty")
 	private BigDecimal price;
-
-	/**
-	 * NFT是否在售  0：否   1：是
-	 */
-	@ApiModelProperty("NFT是否在售  0：否   1：是")
-	@NotNull(message = "NFT status cannot be empty")
-	private Integer status;
 
 	/**
 	 * 合约地址

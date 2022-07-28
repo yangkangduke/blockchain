@@ -62,4 +62,11 @@ public interface SysNftService extends IService<SysNftEntity> {
      */
     void batchDelete(ListReq req);
 
+    /**
+     * 通过合约地址获取系统NFT信息
+     * @param contractAddress 合约地址
+     * @return 系统NFT信息
+     */
+    SysNftEntity queryByContractAddress(String contractAddress);
+
 }

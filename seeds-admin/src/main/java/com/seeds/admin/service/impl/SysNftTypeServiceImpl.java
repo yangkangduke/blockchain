@@ -110,7 +110,6 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void enableOrDisable(List<SwitchReq> req) {
         // 停用/启用NFT类别
         req.forEach(p -> {
@@ -121,6 +120,27 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
             nftType.setStatus(p.getStatus());
             updateById(nftType);
         });
+    }
+
+    @Override
+    public Long countKidsByCodes(Set<String> codes) {
+        LambdaQueryWrapper<SysNftTypeEntity> query = new QueryWrapper<SysNftTypeEntity>().lambda()
+                .in(SysNftTypeEntity::getParentCode, codes);
+        return count(query);
+    }
+
+    @Override
+    public Set<String> queryCodesByIds(Set<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptySet();
+        }
+        LambdaQueryWrapper<SysNftTypeEntity> query = new QueryWrapper<SysNftTypeEntity>().lambda()
+                .in(SysNftTypeEntity::getId, ids);
+        List<SysNftTypeEntity> list = list(query);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptySet();
+        }
+        return list.stream().map(SysNftTypeEntity::getCode).collect(Collectors.toSet());
     }
 
     private List<SysNftTypeResp> convertToResp(List<SysNftTypeEntity> list) {
@@ -134,7 +154,7 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
             respList.add(resp);
         }
         // 根节点为空
-        return TreeUtils.buildTree(respList);
+        return TreeUtils.build(respList);
     }
 }
 

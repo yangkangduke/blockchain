@@ -22,6 +22,14 @@ import java.util.List;
 public class SysNftAddReq {
 
 	/**
+	 * nft名称
+	 */
+	@ApiModelProperty("nft名称")
+	@NotNull(message = "nft name cannot be empty")
+	private String name;
+
+
+	/**
 	 * 游戏id
 	 */
 	@ApiModelProperty("游戏id")

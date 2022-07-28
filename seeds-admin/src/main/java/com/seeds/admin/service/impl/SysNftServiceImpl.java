@@ -8,8 +8,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
+import com.seeds.admin.entity.SysGameEntity;
 import com.seeds.admin.entity.SysNftEntity;
 import com.seeds.admin.entity.SysNftPropertiesEntity;
+import com.seeds.admin.entity.SysNftTypeEntity;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysNftMapper;
@@ -51,7 +53,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
                 .likeRight(StringUtils.isNotBlank(query.getName()), SysNftEntity::getName, query.getName())
                 .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId())
-                .eq(query.getGameId() != null, SysNftEntity::getStatus, query.getStatus())
+                .eq(query.getStatus() != null, SysNftEntity::getStatus, query.getStatus())
                 .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
                 .eq(SysNftEntity::getDeleteFlag, WhetherEnum.NO.value());
         Page<SysNftEntity> page = new Page<>(query.getCurrent(), query.getSize());
@@ -83,7 +85,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(SysNftAddReq req) {
-        // 修改NFT
+        // 添加NFT
         SysNftEntity sysNft = new SysNftEntity();
         BeanUtils.copyProperties(req, sysNft);
         // 生成NFT编号
@@ -100,6 +102,16 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         if (sysNft != null) {
             // NFT信息
             BeanUtils.copyProperties(sysNft, resp);
+            // 游戏信息
+            SysGameEntity sysGame = sysGameService.getById(sysNft.getId());
+            if (sysGame != null) {
+                resp.setGameName(sysGame.getName());
+            }
+            // NFT类别信息
+            SysNftTypeEntity sysNftType = sysNftTypeService.getById(sysNft.getNftTypeId());
+            if (sysNftType != null) {
+                resp.setTypeName(sysNftType.getName());
+            }
             // NFT属性信息
             List<SysNftPropertiesEntity> propertiesList = sysNftPropertiesService.queryByNftId(id);
             List<NftProperties> list = new ArrayList<>();
@@ -150,6 +162,14 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         });
         // 删除和NFT属性的关联
         sysNftPropertiesService.deleteByNftIs(ids);
+    }
+
+    @Override
+    public SysNftEntity queryByContractAddress(String contractAddress) {
+        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                .eq(SysNftEntity::getContractAddress, contractAddress)
+                .eq(SysNftEntity::getDeleteFlag, WhetherEnum.NO.value());
+        return getOne(queryWrap);
     }
 
     private void addNftProperties(Long nftId, List<NftProperties> propertiesList) {
