@@ -33,10 +33,10 @@ public class SysNftTypeController {
     @Autowired
     private SysNftTypeService sysNftTypeService;
 
-    @GetMapping("list/{name}")
+    @GetMapping("list")
     @ApiOperation("列表")
     @RequiredPermission("sys:nftType:list")
-    public GenericDto<List<SysNftTypeResp>> list(@PathVariable("name") String name) {
+    public GenericDto<List<SysNftTypeResp>> list(@RequestParam(required = false) String name) {
         return GenericDto.success(sysNftTypeService.queryRespList(name));
     }
 

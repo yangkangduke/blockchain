@@ -204,6 +204,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
             respList.add(resp);
         }
         // 菜单根节点为空
-        return TreeUtils.build(respList, "");
+        return TreeUtils.buildTree(respList);
     }
 }

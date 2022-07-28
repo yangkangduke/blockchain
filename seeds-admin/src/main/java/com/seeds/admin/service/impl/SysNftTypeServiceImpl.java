@@ -134,7 +134,7 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
             respList.add(resp);
         }
         // 根节点为空
-        return TreeUtils.build(respList, "");
+        return TreeUtils.buildTree(respList);
     }
 }
 

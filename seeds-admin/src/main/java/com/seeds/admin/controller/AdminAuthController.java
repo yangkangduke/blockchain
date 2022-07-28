@@ -50,13 +50,13 @@ public class AdminAuthController {
 
     @GetMapping("/captcha/{account}")
     @ApiOperation(value = "生成图形验证码")
-    public void captcha(HttpServletResponse response, @PathVariable("account") String account) throws IOException {
+    public void captcha(HttpServletResponse response, @PathVariable("account") String uuid) throws IOException {
         // 账号不能为空
-        if (StringUtils.isEmpty(account)) {
-            throw new GenericException("Account cannot be empty");
+        if (StringUtils.isEmpty(uuid)) {
+            throw new GenericException("uuid cannot be empty");
         }
         //生成验证码
-        adminCaptchaService.createCaptcha(response, account);
+        adminCaptchaService.createCaptcha(response, uuid);
     }
 
 
@@ -87,11 +87,11 @@ public class AdminAuthController {
             adminUser = sysUserService.queryByMobile(loginReq.getMobile());
         } else if (SysAuthTypeEnum.PASSWORD.getCode().equals(authType)) {
             // 账号密码登录
-            if (StringUtils.isEmpty(loginReq.getAccount()) || StringUtils.isEmpty(loginReq.getPassword())) {
+            if (StringUtils.isEmpty(loginReq.getAccount()) || StringUtils.isEmpty(loginReq.getPassword()) || StringUtils.isEmpty(loginReq.getUuid())) {
                 return GenericDto.failure(AdminErrorCodeEnum.ERR_504_MISSING_ARGUMENTS.getDescEn(), AdminErrorCodeEnum.ERR_504_MISSING_ARGUMENTS.getCode(), null);
             }
             // 验证码是否正确
-            boolean flag = adminCaptchaService.validateCaptcha(loginReq.getAccount(), loginReq.getOpt());
+            boolean flag = adminCaptchaService.validateCaptcha(loginReq.getUuid(), loginReq.getOpt());
             if (!flag) {
                 return GenericDto.failure(AdminErrorCodeEnum.ERR_10039_WRONG_GRAPHIC_AUTH_CODE.getDescEn(), AdminErrorCodeEnum.ERR_10039_WRONG_GRAPHIC_AUTH_CODE.getCode(), null);
             }

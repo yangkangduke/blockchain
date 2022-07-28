@@ -17,6 +17,9 @@ public class AdminLoginReq {
     @ApiModelProperty(value = "账户")
     private String account;
 
+    @ApiModelProperty(value = "唯一标识")
+    private String uuid;
+
     @ApiModelProperty(value = "密码")
     private String password;
 
