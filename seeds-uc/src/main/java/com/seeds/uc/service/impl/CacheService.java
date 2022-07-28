@@ -1,11 +1,11 @@
 package com.seeds.uc.service.impl;
 
 
-import com.seeds.uc.constant.UcRedisKeys;
-import com.seeds.uc.dto.AuthCode;
-import com.seeds.uc.dto.AuthToken;
-import com.seeds.uc.dto.ForgotPasswordCode;
-import com.seeds.uc.dto.LoginUser;
+import com.seeds.uc.constant.UcRedisKeysConstant;
+import com.seeds.uc.dto.AuthCodeDTO;
+import com.seeds.uc.dto.AuthTokenDTO;
+import com.seeds.uc.dto.ForgotPasswordCodeDTO;
+import com.seeds.uc.dto.LoginUserDTO;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -59,9 +59,9 @@ public class CacheService {
      */
     public void putUserWithTokenAndLoginName(String token, Long uid, String loginName) {
         Long expireAt = System.currentTimeMillis() + loginExpireAfter * 1000;
-        String key = UcRedisKeys.getUcTokenKey(token);
-        String loginUidKey = UcRedisKeys.getUcLoginUidKey(uid);
-        LoginUser loginUser = LoginUser.builder()
+        String key = UcRedisKeysConstant.getUcTokenKey(token);
+        String loginUidKey = UcRedisKeysConstant.getUcLoginUidKey(uid);
+        LoginUserDTO loginUser = LoginUserDTO.builder()
                 .userId(uid)
                 .loginName(loginName)
                 .expireAt(expireAt)
@@ -84,8 +84,8 @@ public class CacheService {
                             String code,
                             AuthCodeUseTypeEnum useType) {
         Long expireAt = System.currentTimeMillis() + authCodeExpireAfter * 1000;
-        String key = UcRedisKeys.getUcAuthCodeKeyWithAuthTypeAndUseType(name, useType, authType);
-        AuthCode authCode = AuthCode.builder()
+        String key = UcRedisKeysConstant.getUcAuthCodeKeyWithAuthTypeAndUseType(name, useType, authType);
+        AuthCodeDTO authCode = AuthCodeDTO.builder()
                 .authType(authType)
                 .code(code)
                 .expireAt(expireAt)
@@ -101,22 +101,22 @@ public class CacheService {
         log.info("CacheService - putAuthCodeByNameAndAuthTypeAndUseType - put key: {}, value: {}", key, authCode);
     }
 
-    public AuthCode getAuthCode(String name,
-                                AuthCodeUseTypeEnum useType,
-                                ClientAuthTypeEnum authTypeEnum) {
-        String key = UcRedisKeys.getUcAuthCodeKeyWithAuthTypeAndUseType(name, useType, authTypeEnum);
-        RBucket<AuthCode> authCodeDtoRBucket = redisson.getBucket(key);
+    public AuthCodeDTO getAuthCode(String name,
+                                   AuthCodeUseTypeEnum useType,
+                                   ClientAuthTypeEnum authTypeEnum) {
+        String key = UcRedisKeysConstant.getUcAuthCodeKeyWithAuthTypeAndUseType(name, useType, authTypeEnum);
+        RBucket<AuthCodeDTO> authCodeDtoRBucket = redisson.getBucket(key);
         return authCodeDtoRBucket.get();
     }
 
     /**
      * key为用户名(邮箱)的cache，用于忘记密码功能校验
      */
-    public void putForgotPasswordCode(String account, String email, long expireAt) {
-        String key = UcRedisKeys.getUcKeyForgotPassword(account);
-        ForgotPasswordCode forgotPasswordCode = ForgotPasswordCode.builder()
+    public void putForgotPasswordCode(String account, String otp, long expireAt) {
+        String key = UcRedisKeysConstant.getUcKeyForgotPassword(account);
+        ForgotPasswordCodeDTO forgotPasswordCode = ForgotPasswordCodeDTO.builder()
                 .key(key)
-                .email(email)
+                .code(otp)
                 .account(account)
                 .expireAt(expireAt)
                 .build();
@@ -124,12 +124,12 @@ public class CacheService {
                 forgotPasswordCode,
                 expireAt,
                 TimeUnit.MILLISECONDS);
-        log.info("CacheService - putAuthCodeByNameAndAuthTypeAndUseType - put key: {}, value: {}", key, email);
+        log.info("CacheService - putForgotPasswordCode - put key: {}, value: {}", key, otp);
     }
 
-    public ForgotPasswordCode getForgotPasswordCode(String account) {
-        String key = UcRedisKeys.getUcKeyForgotPassword(account);
-        RBucket<ForgotPasswordCode> redissonBucket = redisson.getBucket(key);
+    public ForgotPasswordCodeDTO getForgotPasswordCode(String account) {
+        String key = UcRedisKeysConstant.getUcKeyForgotPassword(account);
+        RBucket<ForgotPasswordCodeDTO> redissonBucket = redisson.getBucket(key);
         return redissonBucket.get();
     }
 
@@ -141,10 +141,10 @@ public class CacheService {
                              String accountName,
                              ClientAuthTypeEnum authTypeEnum) {
         Long expireAt = System.currentTimeMillis() + authTokenExpireAfter * 1000;
-        String key = UcRedisKeys.getUcAuthTokenKeyTemplate(token, authTypeEnum);
-        RBucket<AuthToken> authTokenRBucket = redisson.getBucket(key);
-        AuthToken authToken =
-                AuthToken.builder()
+        String key = UcRedisKeysConstant.getUcAuthTokenKeyTemplate(token, authTypeEnum);
+        RBucket<AuthTokenDTO> authTokenRBucket = redisson.getBucket(key);
+        AuthTokenDTO authToken =
+                AuthTokenDTO.builder()
                         .accountName(accountName)
                         .secret(secret)
                         .expireAt(expireAt)
@@ -158,9 +158,9 @@ public class CacheService {
      * uc token 也会写在用户的cookie里
      * 如果用户没有登陆活着已过期，会返回null
      */
-    public LoginUser getUserByToken(String token) {
-        String key = UcRedisKeys.getUcTokenKey(token);
-        RBucket<LoginUser> value = redisson.getBucket(key);
+    public LoginUserDTO getUserByToken(String token) {
+        String key = UcRedisKeysConstant.getUcTokenKey(token);
+        RBucket<LoginUserDTO> value = redisson.getBucket(key);
         return value.get();
     }
 

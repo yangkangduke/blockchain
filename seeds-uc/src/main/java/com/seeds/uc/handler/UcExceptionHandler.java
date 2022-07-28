@@ -46,10 +46,11 @@ public class UcExceptionHandler {
                 GenericDto.failure(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value()),
                 HttpStatus.UNPROCESSABLE_ENTITY);
     }
+
     //spring-context包里面的异常
     //实体对象前不加@RequestBody注解,单个对象内属性校验未通过抛出的异常类型
     @ExceptionHandler(BindingException.class)
-    public ResponseEntity<GenericDto<String>> handle(BindingException e){
+    public ResponseEntity<GenericDto<String>> handle(BindingException e) {
         return new ResponseEntity<>(
                 GenericDto.failure(e.getMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
@@ -58,7 +59,7 @@ public class UcExceptionHandler {
     //spring-context包里面的异常,实体对象前加@RequestBody注解,抛出的异常为该类异常
     //方法参数如果带有@RequestBody注解，那么spring mvc会使用RequestResponseBodyMethodProcessor      //对参数进行序列化,并对参数做校验
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<GenericDto<String>> handle(MethodArgumentNotValidException e){
+    public ResponseEntity<GenericDto<String>> handle(MethodArgumentNotValidException e) {
         return new ResponseEntity<>(
                 GenericDto.failure(e.getBindingResult().getFieldError().getField() + ":" + e.getBindingResult().getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
@@ -67,14 +68,14 @@ public class UcExceptionHandler {
     //实体对象前不加@RequestBody注解,校验方法参数或方法返回值时,未校验通过时抛出的异常
     //Validation-api包里面的异常
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<GenericDto<String>> handle(ValidationException e){
+    public ResponseEntity<GenericDto<String>> handle(ValidationException e) {
         return new ResponseEntity<>(
                 GenericDto.failure(e.getCause().getMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<GenericDto<String>> handle(ConstraintViolationException e){
+    public ResponseEntity<GenericDto<String>> handle(ConstraintViolationException e) {
         return new ResponseEntity<>(
                 GenericDto.failure(e.getCause().getMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);

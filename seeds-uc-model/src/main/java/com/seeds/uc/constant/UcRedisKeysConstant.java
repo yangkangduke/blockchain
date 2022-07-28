@@ -6,12 +6,14 @@ import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import lombok.experimental.UtilityClass;
 
 /**
+ * redis相关的key
+ *
  * @author yk
  * @email 819628513@qq.com
  * @date 2022/07/13
  */
 @UtilityClass
-public class UcRedisKeys {
+public class UcRedisKeysConstant {
 
     public final String UC_KEY_PREFIX = "uc:";
 
@@ -32,7 +34,8 @@ public class UcRedisKeys {
 
     public final String UC_AUTH_EMAIL_KEY_TEMPLATE = UC_KEY_PREFIX + "code:email:%s:%s";
 
-    public final String UC_FORGOTPASSWORD_ACCOUNT_KEY_TEMPLATE = UC_KEY_PREFIX + "forgotPassword:account:%s";
+    // 忘记密码
+    public final String UC_FORGOT_PASSWORD_ACCOUNT_KEY_TEMPLATE = UC_KEY_PREFIX + "forgotPassword:account:%s";
 
 
     /**
@@ -134,6 +137,6 @@ public class UcRedisKeys {
     }
 
     public static String getUcKeyForgotPassword(String account) {
-        return String.format(UC_FORGOTPASSWORD_ACCOUNT_KEY_TEMPLATE, account);
+        return String.format(UC_FORGOT_PASSWORD_ACCOUNT_KEY_TEMPLATE, account);
     }
 }

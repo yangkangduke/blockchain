@@ -2,7 +2,7 @@ package com.seeds.uc.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.uc.dto.LoginUser;
+import com.seeds.uc.dto.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.model.UcUser;
@@ -22,18 +22,19 @@ public interface IUcUserService extends IService<UcUser> {
      *
      * @param sendReq
      */
-    String sendCode(SendCodeReq sendReq);
+    String bindEmailSend(SendCodeReq sendReq);
 
     /**
      * 邮箱验证码校验
      *
      * @param verifyReq
      */
-    void bindEmail(BindEmailReq verifyReq, LoginUser loginUser);
+    void bindEmail(BindEmailReq verifyReq, LoginUserDTO loginUser);
 
     /**
      * 账号重复性校验
- L   *
+     * L   *
+     *
      * @param account
      * @return
      */
@@ -45,10 +46,11 @@ public interface IUcUserService extends IService<UcUser> {
      * @param registerReq
      * @return
      */
-    LoginResp registerAccount(RegisterReq registerReq, LoginUser loginUser);
+    LoginResp registerAccount(RegisterReq registerReq, LoginUserDTO loginUser);
 
     /**
      * 登陆
+     *
      * @param accountLoginReq
      * @return
      */
@@ -61,24 +63,28 @@ public interface IUcUserService extends IService<UcUser> {
 
     /**
      * metamask登陆获取随机数
+     *
      * @return
      */
-    String metamaskNonce(String publicAddress, LoginUser loginUser);
+    String metamaskNonce(String publicAddress, LoginUserDTO loginUser);
 
     /**
      * 忘记密码-发送邮件
+     *
      * @param forgotPasswordReq
      */
     void forgotPasswordSeedEmail(ForgotPasswordReq forgotPasswordReq);
 
     /**
      * 忘记密码-验证链接
+     *
      * @param encode
      */
     void forgotPasswordVerifyLink(String encode);
 
     /**
      * 忘记密码-修改密码
+     *
      * @param changePasswordReq
      */
     void forgotPasswordChangePassword(ChangePasswordReq changePasswordReq);

@@ -28,7 +28,7 @@ public class GeneratorCodeController {
                             .pathInfo(Collections.singletonMap(OutputFile.xml, "/Users/yk/generatorcode")); // 设置mapperXml生成路径
                 })
                 .strategyConfig(builder -> {
-                    builder.addInclude("uc_currency","uc_user_account_action_history","uc_user_account") // 设置需要生成的表名
+                    builder.addInclude("uc_currency", "uc_user_account_action_history", "uc_user_account") // 设置需要生成的表名
                             .addTablePrefix("t_", "c_"); // 设置过滤表前缀
                 })
                 .templateEngine(new FreemarkerTemplateEngine()) // 使用Freemarker引擎模板，默认的是Velocity引擎模板

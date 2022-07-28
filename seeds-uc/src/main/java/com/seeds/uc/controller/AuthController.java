@@ -1,7 +1,7 @@
 package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.uc.dto.LoginUser;
+import com.seeds.uc.dto.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.service.IUcUserService;
@@ -49,10 +49,10 @@ public class AuthController {
     @PostMapping("/register/account")
     @ApiOperation(value = "注册账号",
             notes = "1.调用/register/check接口校验账号\n" +
-            "2.调用/register/account注册账号，\n" +
-            "3.如果传了token就跟metaMask做绑定")
+                    "2.调用/register/account注册账号，\n" +
+                    "3.如果传了token就跟metaMask做绑定")
     public GenericDto<LoginResp> registerAccount(@Valid @RequestBody RegisterReq registerReq, HttpServletRequest request) {
-        LoginUser loginUser = null;
+        LoginUserDTO loginUser = null;
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         if (loginToken != null) {
@@ -83,7 +83,7 @@ public class AuthController {
     @PostMapping("/metamask/nonce")
     @ApiOperation(value = "metamask获取随机数", notes = "metamask获取随机数")
     public GenericDto<String> metamaskNonce(@Valid @NotBlank @RequestBody String publicAddress, HttpServletRequest request) {
-        LoginUser loginUser = null;
+        LoginUserDTO loginUser = null;
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         if (loginToken != null) {
@@ -97,24 +97,26 @@ public class AuthController {
      * 1.调用/metamask/nonce生成nonce
      * 2.前端根据nonce生成签名信息
      * 3.调用/login/metamask验证签名信息，验证成功返回token
+     *
      * @param
      * @return
      */
     @PostMapping("/login/metamask")
     @ApiOperation(value = "metamask登陆",
-            notes ="1.调用/metamask/nonce生成nonce\n" +
-            "2.前端根据nonce生成签名信息\n" +
-            "3.调用/login/metamask验证签名信息，验证成功返回token")
+            notes = "1.调用/metamask/nonce生成nonce\n" +
+                    "2.前端根据nonce生成签名信息\n" +
+                    "3.调用/login/metamask验证签名信息，验证成功返回token")
     public GenericDto<LoginResp> loginMetaMask(@Valid @RequestBody MetaMaskLoginReq loginReq) {
         return GenericDto.success(ucUserService.loginMetaMask(loginReq));
     }
 
     /**
      * 忘记密码-发送邮件
+     *
      * @return
      */
     @PostMapping("/forgotPassword/seedEmail")
-    @ApiOperation(value = "忘记密码-发送邮件",notes ="忘记密码-发送邮件")
+    @ApiOperation(value = "忘记密码-发送邮件", notes = "忘记密码-发送邮件")
     public GenericDto<Object> forgotPasswordSeedEmail(@Valid @RequestBody ForgotPasswordReq forgotPasswordReq) {
         ucUserService.forgotPasswordSeedEmail(forgotPasswordReq);
         return GenericDto.success(null);
@@ -122,10 +124,11 @@ public class AuthController {
 
     /**
      * 忘记密码-验证链接
+     *
      * @return
      */
     @GetMapping("/forgotPassword/verifyLink")
-    @ApiOperation(value = "忘记密码-验证链接",notes ="忘记密码-验证链接")
+    @ApiOperation(value = "忘记密码-验证链接", notes = "忘记密码-验证链接")
     public GenericDto<Object> forgotPasswordVerifyLink(String encode) {
         ucUserService.forgotPasswordVerifyLink(encode);
         return GenericDto.success(null);
@@ -133,10 +136,11 @@ public class AuthController {
 
     /**
      * 忘记密码-修改密码
+     *
      * @return
      */
     @PostMapping("/forgotPassword/changePassword")
-    @ApiOperation(value = "忘记密码-修改密码",notes ="忘记密码-修改密码")
+    @ApiOperation(value = "忘记密码-修改密码", notes = "忘记密码-修改密码")
     public GenericDto<Object> forgotPasswordChangePassword(ChangePasswordReq changePasswordReq) {
         ucUserService.forgotPasswordVerifyLink(changePasswordReq.getEncode());
         ucUserService.forgotPasswordChangePassword(changePasswordReq);

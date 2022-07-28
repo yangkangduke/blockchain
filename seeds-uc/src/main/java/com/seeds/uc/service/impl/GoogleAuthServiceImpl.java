@@ -1,7 +1,7 @@
 package com.seeds.uc.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.seeds.uc.dto.LoginUser;
+import com.seeds.uc.dto.LoginUserDTO;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
@@ -35,7 +35,7 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
     private IUcSecurityStrategyService iUcSecurityStrategyService;
 
     @Override
-    public String getQRBarcode(String account, String remark, LoginUser loginUser) {
+    public String getQRBarcode(String account, String remark, LoginUserDTO loginUser) {
         String gaSecret = this.genGaSecret();
         // 将gaSecret保存到数据库中
         userMapper.updateById(UcUser.builder()

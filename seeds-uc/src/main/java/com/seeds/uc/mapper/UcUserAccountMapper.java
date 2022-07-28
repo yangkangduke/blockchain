@@ -18,7 +18,8 @@ import org.apache.ibatis.annotations.Param;
 public interface UcUserAccountMapper extends BaseMapper<UcUserAccount> {
 
     /**
-     *  分页查询账户冲提币历史信息
+     * 分页查询账户冲提币历史信息
+     *
      * @param page
      * @param historyReq
      * @return

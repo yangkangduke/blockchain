@@ -4,7 +4,7 @@ package com.seeds.uc.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.uc.dto.LoginUser;
+import com.seeds.uc.dto.LoginUserDTO;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.response.AccountActionResp;
@@ -52,7 +52,7 @@ public class OpenUserAccountController {
     public GenericDto<Object> action(@Valid @RequestBody AccountActionReq accountActionReq, HttpServletRequest request) {
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUser loginUser = cacheService.getUserByToken(loginToken);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         if (loginUser == null || ucUserService.getById(loginUser.getUserId()).getMetamaskFlag() != 1) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_13000_ACCOUNT_NOT);
         }

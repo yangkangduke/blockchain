@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Data
 @Builder
-public class LoginUser implements Serializable {
+public class LoginUserDTO implements Serializable {
     private Long userId;
     private String loginName;
     private Long expireAt;

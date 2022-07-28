@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 @Data
 @Builder
-public class AuthCode implements Serializable {
+public class AuthCodeDTO implements Serializable {
     private String key;
     // login name, 可能是手机号可能是邮箱
     private String name;
