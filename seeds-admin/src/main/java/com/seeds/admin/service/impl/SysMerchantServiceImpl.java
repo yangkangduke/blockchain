@@ -190,7 +190,6 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         }
         SysMerchantEntity merchant = new SysMerchantEntity();
         BeanUtils.copyProperties(req, merchant);
-        // 负责人信息变更
         SysUserEntity sysUser = sysUserService.queryByMobile(req.getMobile());
         if (sysUser == null) {
             sysUser = new SysUserEntity();
@@ -254,7 +253,6 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     public void enableOrDisable(List<SwitchReq> req) {
         Set<Long> merchantIds = req.stream().map(SwitchReq::getId).collect(Collectors.toSet());
         Map<Long, Set<Long>> merchantUserMap = sysMerchantUserService.queryMapByMerchantIds(merchantIds);
-        List<SysMerchantEntity> sysMerchants = new ArrayList<>();
         Set<Long> disableUsers = new HashSet<>();
         req.forEach(p -> {
             // 校验状态
@@ -262,7 +260,8 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
             SysMerchantEntity sysMerchant = new SysMerchantEntity();
             sysMerchant.setId(p.getId());
             sysMerchant.setStatus(p.getStatus());
-            sysMerchants.add(sysMerchant);
+            // 停用/启用商家
+            updateById(sysMerchant);
             Set<Long> userIds = merchantUserMap.get(p.getId());
             if (!CollectionUtils.isEmpty(userIds)) {
                 if (SysStatusEnum.ENABLED.value() == p.getStatus()) {
@@ -279,8 +278,6 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
                 }
             }
         });
-        // 停用/启用商家
-        updateBatchById(sysMerchants);
         if (!CollectionUtils.isEmpty(disableUsers)) {
             // 停用商家用户
             Set<Long> users = screeningUsers(disableUsers, merchantIds);
