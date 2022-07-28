@@ -1,5 +1,6 @@
 package com.seeds.uc.dto.request;
 
+import com.seeds.uc.enums.ClientAuthTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -12,15 +13,16 @@ import javax.validation.constraints.NotBlank;
  * @date 2022/07/13
  */
 @Data
-public class AccountLoginReq {
+public class LoginReq {
 
     @ApiModelProperty(value = "账号", required = true)
     @NotBlank
     @Email
-    private String account;
+    private String email;
     @ApiModelProperty(value = "密码", required = true)
     @NotBlank
     private String password;
+    private ClientAuthTypeEnum authType;
 
 
 }

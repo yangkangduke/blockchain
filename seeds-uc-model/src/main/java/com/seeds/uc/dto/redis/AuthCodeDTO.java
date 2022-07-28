@@ -1,4 +1,4 @@
-package com.seeds.uc.dto;
+package com.seeds.uc.dto.redis;
 
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;

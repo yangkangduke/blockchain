@@ -1,6 +1,6 @@
 package com.seeds.uc.service;
 
-import com.seeds.uc.dto.LoginUserDTO;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 
 /**
  * @author yk
@@ -13,7 +13,7 @@ public interface IGoogleAuthService {
 
     String genGaSecret();
 
-    void verifyUserCode(Long uid, String userInputCode);
+    Boolean verifyUserCode(Long uid, String userInputCode);
 
     boolean verify(String userInputCode, String userSecret);
 }

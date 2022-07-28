@@ -1,4 +1,4 @@
-package com.seeds.uc.dto;
+package com.seeds.uc.dto.redis;
 
 import lombok.Builder;
 import lombok.Data;

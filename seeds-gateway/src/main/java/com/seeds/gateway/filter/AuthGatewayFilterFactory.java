@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
-import com.seeds.uc.dto.LoginUserDTO;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.gateway.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

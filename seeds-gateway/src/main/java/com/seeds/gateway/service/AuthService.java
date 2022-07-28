@@ -3,7 +3,7 @@ package com.seeds.gateway.service;
 import com.seeds.admin.constant.AdminRedisKeys;
 import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.uc.constant.UcRedisKeysConstant;
-import com.seeds.uc.dto.LoginUserDTO;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RedissonClient;

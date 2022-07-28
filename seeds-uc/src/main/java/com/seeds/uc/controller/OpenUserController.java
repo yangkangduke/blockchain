@@ -3,7 +3,7 @@ package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.oss.FileTemplate;
-import com.seeds.uc.dto.LoginUserDTO;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.BindEmailReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
 import com.seeds.uc.dto.request.SendCodeReq;

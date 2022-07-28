@@ -1,22 +1,17 @@
 package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.uc.dto.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.service.IUcUserService;
-import com.seeds.uc.service.impl.CacheService;
-import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Slf4j
 @RestController
@@ -26,51 +21,57 @@ public class AuthController {
 
     @Autowired
     private IUcUserService ucUserService;
-    @Autowired
-    private CacheService cacheService;
 
 
     /**
-     * 校验账号
+     * 注册邮箱账号-发送邮箱验证码
      */
-    @PostMapping("/register/check")
-    @ApiOperation(value = "校验账号", notes = "校验账号")
-    public GenericDto<Object> verifyAccount(@Valid @NotBlank @Email @RequestBody String account) {
-        ucUserService.verifyAccount(account);
+    @PostMapping("/register/emailSend")
+    @ApiOperation(value = "注册邮箱账号-发送邮箱验证码", notes = "注册邮箱账号-发送邮箱验证码")
+    public GenericDto<Object> registerEmailSend(@Valid @Email @RequestBody String email) {
+        ucUserService.registerEmailSend(email);
         return GenericDto.success(null);
     }
 
     /**
-     * 注册账号
-     * 1.调用/register/check接口校验账号
-     * 2.调用/register/account注册账号，
-     * 3.如果传了token就跟metaMask做绑定
+     * 注册邮箱账号
+     * 1.调用/register/emailSend 发送邮箱验证码，
+     * 2.调用/register/emailAccount 注册邮箱账号
      */
-    @PostMapping("/register/account")
-    @ApiOperation(value = "注册账号",
-            notes = "1.调用/register/check接口校验账号\n" +
-                    "2.调用/register/account注册账号，\n" +
-                    "3.如果传了token就跟metaMask做绑定")
-    public GenericDto<LoginResp> registerAccount(@Valid @RequestBody RegisterReq registerReq, HttpServletRequest request) {
-        LoginUserDTO loginUser = null;
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        if (loginToken != null) {
-            loginUser = cacheService.getUserByToken(loginToken);
-        }
-        return GenericDto.success(ucUserService.registerAccount(registerReq, loginUser));
+    @PostMapping("/register/emailAccount")
+    @ApiOperation(value = "注册邮箱账号",
+            notes = "1.调用/register/emailSend 发送邮箱验证码，\n" +
+                    "2.调用/register/emailAccount 注册邮箱账号")
+    public GenericDto<LoginResp> registerEmailAccount(@Valid @RequestBody RegisterReq registerReq) {
+        return GenericDto.success(ucUserService.registerEmailAccount(registerReq));
     }
 
     /**
      * 账号登陆
-     *
-     * @param accountLoginReq
+     * 1.调用/login 返回token
+     * 2.调用/2fa/login 返回ucToken
      * @return
      */
-    @PostMapping("/login/account")
-    @ApiOperation(value = "账号登陆", notes = "账号登陆")
-    public GenericDto<LoginResp> loginAccount(@Valid @RequestBody AccountLoginReq accountLoginReq) {
-        return GenericDto.success(ucUserService.loginAccount(accountLoginReq));
+    @PostMapping("/login")
+    @ApiOperation(value = "账号登陆", notes = "1.调用/login 返回token\n" +
+            "2.调用/2fa/login 返回ucToken")
+    public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
+        return GenericDto.success(ucUserService.login(loginReq));
+    }
+
+    /**
+     * 2fa登陆
+     *1.调用/login 返回token
+     *2.调用/2fa/login 返回ucToken
+     * @param loginReq
+     * @return
+     */
+    @PostMapping("/2fa/login")
+    @ApiOperation(value = "2fa登陆", notes = "1.调用/login 返回token\n" +
+            "2.调用/2fa/login 返回ucToken")
+    public GenericDto<LoginResp> twoFactorCheck(@RequestBody TwoFactorLoginReq loginReq) {
+        return GenericDto.success(ucUserService.twoFactorCheck(loginReq));
+
     }
 
 
@@ -82,32 +83,26 @@ public class AuthController {
      */
     @PostMapping("/metamask/nonce")
     @ApiOperation(value = "metamask获取随机数", notes = "metamask获取随机数")
-    public GenericDto<String> metamaskNonce(@Valid @NotBlank @RequestBody String publicAddress, HttpServletRequest request) {
-        LoginUserDTO loginUser = null;
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        if (loginToken != null) {
-            loginUser = cacheService.getUserByToken(loginToken);
-        }
-        return GenericDto.success(ucUserService.metamaskNonce(publicAddress, loginUser));
+    public GenericDto<String> metamaskNonce(@Valid @RequestBody MetaMaskReq metaMaskReq ) {
+        return GenericDto.success(ucUserService.metamaskNonce(metaMaskReq));
     }
 
     /**
-     * metamask登陆
+     * metamask验证
      * 1.调用/metamask/nonce生成nonce
      * 2.前端根据nonce生成签名信息
-     * 3.调用/login/metamask验证签名信息，验证成功返回token
+     * 3.调用/metamask/verify验证签名信息，验证成功返回token
      *
      * @param
      * @return
      */
-    @PostMapping("/login/metamask")
-    @ApiOperation(value = "metamask登陆",
+    @PostMapping("/metamask/verify")
+    @ApiOperation(value = "metamask验证",
             notes = "1.调用/metamask/nonce生成nonce\n" +
                     "2.前端根据nonce生成签名信息\n" +
-                    "3.调用/login/metamask验证签名信息，验证成功返回token")
-    public GenericDto<LoginResp> loginMetaMask(@Valid @RequestBody MetaMaskLoginReq loginReq) {
-        return GenericDto.success(ucUserService.loginMetaMask(loginReq));
+                    "3.调用/metamask/verify验证签名信息，验证成功返回token")
+    public GenericDto<LoginResp> metamaskVerify(@Valid @RequestBody MetaMaskReq metaMaskReq) {
+        return GenericDto.success(ucUserService.metamaskVerify(metaMaskReq));
     }
 
     /**

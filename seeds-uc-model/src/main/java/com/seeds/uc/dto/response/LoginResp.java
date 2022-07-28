@@ -18,6 +18,7 @@ public class LoginResp {
 
     @ApiModelProperty(value = "the real token for login proof")
     private String ucToken;
+    private String token;
     private String account;
     private ClientAuthTypeEnum type;
 

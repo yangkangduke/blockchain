@@ -1,5 +1,6 @@
 package com.seeds.uc.dto.request;
 
+import com.seeds.uc.enums.ClientAuthTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -17,4 +18,5 @@ public class ForgotPasswordReq {
     @NotBlank
     @Email
     private String account;
+    private ClientAuthTypeEnum authType;
 }

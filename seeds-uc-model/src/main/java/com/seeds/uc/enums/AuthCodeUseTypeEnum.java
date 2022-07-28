@@ -14,10 +14,14 @@ import java.util.Objects;
  */
 @Getter
 public enum AuthCodeUseTypeEnum {
+    // 登录
+    @JsonProperty("LOGIN")
+    LOGIN("LOGIN", "login", "登录", "login"),
+    @JsonProperty("LITE_LOGIN")
+    LITE_LOGIN("LITE_LOGIN", "lite login", "轻登陆", "lite.login"),
     @JsonProperty("REGISTER")
     REGISTER("REGISTER", "register", "注册", "reg"),
-    @JsonProperty("BIND_EMAIL")
-    BIND_EMAIL("BIND_EMAIL", "bind email", "绑定邮箱", "bind.email"),
+    REGISTER_EMAIL("REGISTER_EMAIL", "email register", "注册邮箱账号", "reg.email"),
     @JsonProperty("VERIFY_SETTING_POLICY")
     VERIFY_SETTING_POLICY("VERIFY_SETTING_POLICY", "verify setting policy", "验证安全策略", "vsp"),
     @JsonProperty("VERIFY_SETTING_POLICY_BIND_EMAIL")
