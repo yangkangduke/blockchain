@@ -59,6 +59,9 @@ public class SysMerchantGameServiceImpl extends ServiceImpl<SysMerchantGameMappe
 
     @Override
     public void deleteByMerchantIdAndGameIds(Long merchantId, Collection<Long> gameIds) {
+        if (CollectionUtils.isEmpty(gameIds) || merchantId == null) {
+            return;
+        }
         LambdaQueryWrapper<SysMerchantGameEntity> query = new QueryWrapper<SysMerchantGameEntity>().lambda()
                 .eq(SysMerchantGameEntity::getMerchantId, merchantId)
                 .in(SysMerchantGameEntity::getGameId, gameIds);
@@ -66,7 +69,20 @@ public class SysMerchantGameServiceImpl extends ServiceImpl<SysMerchantGameMappe
     }
 
     @Override
+    public void deleteByGameIds(Collection<Long> gameIds) {
+        if (CollectionUtils.isEmpty(gameIds)) {
+            return;
+        }
+        LambdaQueryWrapper<SysMerchantGameEntity> query = new QueryWrapper<SysMerchantGameEntity>().lambda()
+                .in(SysMerchantGameEntity::getGameId, gameIds);
+        remove(query);
+    }
+
+    @Override
     public void deleteByMerchantIds(Collection<Long> merchantIds) {
+        if (CollectionUtils.isEmpty(merchantIds)) {
+            return;
+        }
         LambdaQueryWrapper<SysMerchantGameEntity> query = new QueryWrapper<SysMerchantGameEntity>().lambda()
                 .in(SysMerchantGameEntity::getMerchantId, merchantIds);
         remove(query);

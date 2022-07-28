@@ -1,6 +1,5 @@
 package com.seeds.admin.service;
 
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.entity.SysMerchantUserEntity;
 
@@ -51,12 +50,6 @@ public interface SysMerchantUserService extends IService<SysMerchantUserEntity> 
      * @return  系统商家与用户关联
      */
     Map<Long, Set<Long>> queryMapByMerchantIds(Collection<Long> merchantIds);
-
-    /**
-     * 批量删除系统商家与用户关联
-     * @param  merchantUsers  商家与用户关联信息
-     */
-    void batchDelete(List<SysMerchantUserEntity> merchantUsers);
 
     /**
      * 通过用户id列表查询商家与用户关联

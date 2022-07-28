@@ -50,5 +50,11 @@ public interface SysMerchantGameService extends IService<SysMerchantGameEntity> 
      */
     void deleteByMerchantIds(Collection<Long> merchantIds);
 
+    /**
+     * 通过游戏id列表删除系统商家与游戏关联
+     * @param  gameIds  游戏id列表
+     */
+    void deleteByGameIds(Collection<Long> gameIds);
+
 
 }

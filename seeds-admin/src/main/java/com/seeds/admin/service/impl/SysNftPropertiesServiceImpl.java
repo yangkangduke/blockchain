@@ -50,6 +50,9 @@ public class SysNftPropertiesServiceImpl extends ServiceImpl<SysNftPropertiesMap
 
     @Override
     public void deleteByNftIs(Collection<Long> nftIds) {
+        if (CollectionUtils.isEmpty(nftIds)) {
+            return;
+        }
         LambdaQueryWrapper<SysNftPropertiesEntity> query = new QueryWrapper<SysNftPropertiesEntity>().lambda()
                 .in(SysNftPropertiesEntity::getNftId, nftIds);
         remove(query);

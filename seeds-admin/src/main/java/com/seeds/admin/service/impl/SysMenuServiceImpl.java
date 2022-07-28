@@ -102,6 +102,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
 
     @Override
     public Set<String> queryCodesByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptySet();
+        }
         LambdaQueryWrapper<SysMenuEntity> query = new QueryWrapper<SysMenuEntity>().lambda()
                 .in(SysMenuEntity::getId, ids);
         List<SysMenuEntity> list = list(query);

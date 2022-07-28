@@ -90,6 +90,9 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
 
     @Override
     public List<SysMerchantEntity> queryByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         LambdaQueryWrapper<SysMerchantEntity> query = new QueryWrapper<SysMerchantEntity>().lambda()
                 .in(SysMerchantEntity::getId, ids)
                 .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
@@ -230,7 +233,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         if (!CollectionUtils.isEmpty(sysMerchantUser)) {
             Set<Long> userIds = sysMerchantUser.stream().map(SysMerchantUserEntity::getUserId).collect(Collectors.toSet());
             // 删除商家和用户的关联
-            sysMerchantUserService.batchDelete(sysMerchantUser);
+            sysMerchantUserService.removeBatchByIds(sysMerchantUser);
             // 删除商家用户
             userIds = screeningUsers(userIds, merchantIds);
             if (!CollectionUtils.isEmpty(userIds)) {
@@ -295,14 +298,20 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(ListReq req, Long merchantId) {
-        Set<Long> userIds = req.getIds();
+        SysMerchantEntity sysMerchant = queryById(merchantId);
+        if (sysMerchant == null) {
+            return;
+        }
+        // 排除负责人
+        Set<Long> userIds = req.getIds().stream().filter(p -> !Objects.equals(p, sysMerchant.getLeaderId())).collect(Collectors.toSet());
         List<SysMerchantUserEntity> sysMerchantUser = sysMerchantUserService.queryByMerchantId(merchantId);
         if (CollectionUtils.isEmpty(sysMerchantUser)) {
             return;
         }
-        List<SysMerchantUserEntity> deleteList = sysMerchantUser.stream().filter(p -> req.getIds().contains(p.getUserId())).collect(Collectors.toList());
+        Set<Long> finalUserIds = userIds;
+        List<SysMerchantUserEntity> deleteList = sysMerchantUser.stream().filter(p -> finalUserIds.contains(p.getUserId())).collect(Collectors.toList());
         // 删除商家和用户的关联
-        sysMerchantUserService.batchDelete(deleteList);
+        sysMerchantUserService.removeBatchByIds(deleteList);
         // 删除商家用户
         userIds = screeningUsers(userIds, Sets.newHashSet(merchantId));
         if (!CollectionUtils.isEmpty(userIds)) {
@@ -358,6 +367,9 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     }
 
     private Set<Long> screeningUsers(Set<Long> userIds, Set<Long> merchantIds){
+        if (CollectionUtils.isEmpty(userIds)) {
+            return Collections.emptySet();
+        }
         // 排除同时在其他商家的用户
         List<SysMerchantUserEntity> merchantUsers = sysMerchantUserService.queryByUserIds(userIds);
         if (!CollectionUtils.isEmpty(merchantUsers)) {

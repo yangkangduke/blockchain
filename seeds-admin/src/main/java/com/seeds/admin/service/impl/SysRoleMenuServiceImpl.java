@@ -38,6 +38,9 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
     @Override
     public List<Long> queryMenuByRoleIds(Collection<Long> roleIds) {
+        if (CollectionUtils.isEmpty(roleIds)) {
+            return Collections.emptyList();
+        }
         LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
                .in(SysRoleMenuEntity::getRoleId, roleIds);
         List<SysRoleMenuEntity> list = list(query);
@@ -49,6 +52,9 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
     @Override
     public void deleteByMenuIds(Collection<Long> menuIds) {
+        if (CollectionUtils.isEmpty(menuIds)) {
+            return;
+        }
         LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
                 .in(SysRoleMenuEntity::getMenuId, menuIds);
         remove(query);
@@ -74,6 +80,9 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
     @Override
     public void deleteByRoleIds(Collection<Long> roleIds) {
+        if (CollectionUtils.isEmpty(roleIds)) {
+            return;
+        }
         LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
                .in(SysRoleMenuEntity::getRoleId, roleIds);
         remove(query);

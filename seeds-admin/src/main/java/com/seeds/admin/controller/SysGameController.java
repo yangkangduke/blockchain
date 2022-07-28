@@ -2,12 +2,8 @@ package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.annotation.RequiredPermission;
-import com.seeds.admin.dto.request.ListReq;
-import com.seeds.admin.dto.request.SwitchReq;
-import com.seeds.admin.dto.request.SysGameAddReq;
-import com.seeds.admin.dto.request.SysGamePageReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysGameResp;
-import com.seeds.admin.dto.request.SysMerchantModifyReq;
 import com.seeds.admin.service.SysGameService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -40,10 +36,10 @@ public class SysGameController {
         return GenericDto.success(sysGameService.queryPage(query));
     }
 
-    @GetMapping("list/{merchantId}")
-    @ApiOperation("列表")
+    @GetMapping("select")
+    @ApiOperation("选取")
     @RequiredPermission("sys:game:select")
-    public GenericDto<List<SysGameResp>> select(@PathVariable("merchantId") Long merchantId) {
+    public GenericDto<List<SysGameResp>> select(@RequestParam(required = false) Long merchantId) {
         return GenericDto.success(sysGameService.select(merchantId));
     }
 
@@ -65,7 +61,7 @@ public class SysGameController {
     @PostMapping("modify")
     @ApiOperation("编辑")
     @RequiredPermission("sys:game:modify")
-    public GenericDto<Object> modify(@Valid @RequestBody SysMerchantModifyReq req) {
+    public GenericDto<Object> modify(@Valid @RequestBody SysGameModifyReq req) {
         sysGameService.modify(req);
         return GenericDto.success(null);
     }

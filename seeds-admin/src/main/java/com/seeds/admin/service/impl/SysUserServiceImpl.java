@@ -140,6 +140,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 
     @Override
     public List<SysUserEntity> queryByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
                 .in(SysUserEntity::getId, ids)
                 .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());

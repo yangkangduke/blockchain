@@ -50,6 +50,9 @@ public class SysMerchantUserServiceImpl extends ServiceImpl<SysMerchantUserMappe
 
     @Override
     public List<SysMerchantUserEntity> queryByMerchantIds(Collection<Long> merchantIds) {
+        if (CollectionUtils.isEmpty(merchantIds)) {
+            return Collections.emptyList();
+        }
         LambdaQueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<SysMerchantUserEntity>().lambda()
                 .in(SysMerchantUserEntity::getMerchantId, merchantIds);
         return list(query);
@@ -66,6 +69,9 @@ public class SysMerchantUserServiceImpl extends ServiceImpl<SysMerchantUserMappe
 
     @Override
     public Map<Long, Set<Long>> queryMapByMerchantIds(Collection<Long> merchantIds) {
+        if (CollectionUtils.isEmpty(merchantIds)) {
+            return Collections.emptyMap();
+        }
         LambdaQueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<SysMerchantUserEntity>().lambda()
                 .in(SysMerchantUserEntity::getMerchantId, merchantIds);
         List<SysMerchantUserEntity> list = list(query);
@@ -77,12 +83,10 @@ public class SysMerchantUserServiceImpl extends ServiceImpl<SysMerchantUserMappe
     }
 
     @Override
-    public void batchDelete(List<SysMerchantUserEntity> merchantUsers) {
-        removeBatchByIds(merchantUsers);
-    }
-
-    @Override
     public List<SysMerchantUserEntity> queryByUserIds(Collection<Long> userIds) {
+        if (CollectionUtils.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
         LambdaQueryWrapper<SysMerchantUserEntity> query = new QueryWrapper<SysMerchantUserEntity>().lambda()
                 .in(SysMerchantUserEntity::getUserId, userIds);
         return list(query);

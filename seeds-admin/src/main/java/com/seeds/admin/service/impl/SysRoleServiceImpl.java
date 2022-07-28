@@ -76,6 +76,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
 
     @Override
     public List<SysRoleEntity> queryByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         LambdaQueryWrapper<SysRoleEntity> query = new QueryWrapper<SysRoleEntity>().lambda()
                 .in(SysRoleEntity::getId, ids)
                 .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());

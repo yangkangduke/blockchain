@@ -100,7 +100,7 @@ public class SysMenuController {
     }
 
     @GetMapping("select")
-    @ApiOperation("角色菜单权限")
+    @ApiOperation("选取")
     @RequiredPermission("sys:menu:select")
     public GenericDto<List<SysMenuBriefResp>> select() {
         // 获取登录用户

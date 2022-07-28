@@ -25,6 +25,9 @@ public class SysRoleUserServiceImpl extends ServiceImpl<SysRoleUserMapper, SysRo
 
     @Override
     public void deleteByRoleIds(Collection<Long> roleIds) {
+        if (CollectionUtils.isEmpty(roleIds)) {
+            return;
+        }
         LambdaQueryWrapper<SysRoleUserEntity> query = new QueryWrapper<SysRoleUserEntity>().lambda()
                 .in(SysRoleUserEntity::getRoleId, roleIds);
         remove(query);
@@ -39,6 +42,9 @@ public class SysRoleUserServiceImpl extends ServiceImpl<SysRoleUserMapper, SysRo
 
     @Override
     public Map<Long, Set<Long>> queryMapByUserIds(Collection<Long> userIds) {
+        if (CollectionUtils.isEmpty(userIds)) {
+            return Collections.emptyMap();
+        }
         LambdaQueryWrapper<SysRoleUserEntity> query = new QueryWrapper<SysRoleUserEntity>().lambda()
                 .in(SysRoleUserEntity::getUserId, userIds);
         List<SysRoleUserEntity> list = list(query);
@@ -91,6 +97,9 @@ public class SysRoleUserServiceImpl extends ServiceImpl<SysRoleUserMapper, SysRo
 
     @Override
     public void deleteByUserIds(Collection<Long> userIds) {
+        if (CollectionUtils.isEmpty(userIds)) {
+            return;
+        }
         LambdaQueryWrapper<SysRoleUserEntity> query = new QueryWrapper<SysRoleUserEntity>().lambda()
                 .in(SysRoleUserEntity::getUserId, userIds);
         remove(query);
