@@ -48,9 +48,9 @@ public class AdminAuthController {
     @Autowired
     private SysUserService sysUserService;
 
-    @GetMapping("/captcha/{account}")
+    @GetMapping("/captcha/{uuid}")
     @ApiOperation(value = "生成图形验证码")
-    public void captcha(HttpServletResponse response, @PathVariable("account") String uuid) throws IOException {
+    public void captcha(HttpServletResponse response, @PathVariable("uuid") String uuid) throws IOException {
         // 账号不能为空
         if (StringUtils.isEmpty(uuid)) {
             throw new GenericException("uuid cannot be empty");
