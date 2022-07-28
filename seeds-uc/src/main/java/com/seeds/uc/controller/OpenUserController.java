@@ -3,7 +3,7 @@ package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.oss.FileTemplate;
-import com.seeds.uc.dto.LoginUser;
+import com.seeds.uc.dto.LoginUserDTO;
 import com.seeds.uc.dto.request.BindEmailReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
 import com.seeds.uc.dto.request.SendCodeReq;
@@ -46,17 +46,17 @@ public class OpenUserController {
     private FileTemplate template;
 
     /**
-     * 发送验证码
+     * 绑定邮箱-发送验证码
      */
-    @PostMapping("send/code")
-    @ApiOperation(value = "发送验证码", notes = "绑定邮箱useType传BIND_EMAIL")
-    public GenericDto<Object> sendCode(@Valid @RequestBody SendCodeReq sendReq) {
-        return GenericDto.success(ucUserService.sendCode(sendReq));
+    @PostMapping("/bind/email/send")
+    @ApiOperation(value = "绑定邮箱-发送验证码", notes = "useType传BIND_EMAIL")
+    public GenericDto<Object> bindEmailSend(@Valid @RequestBody SendCodeReq sendReq) {
+        return GenericDto.success(ucUserService.bindEmailSend(sendReq));
     }
 
     /**
      * 绑定邮箱
-     * 1.调用send/code接口发送邮箱验证码
+     * 1.调用/bind/email/send接口发送邮箱验证码
      * 2.调用/bind/email绑定邮箱接口
      */
     @PostMapping("/bind/email")
@@ -66,7 +66,7 @@ public class OpenUserController {
     public GenericDto<Object> bindEmail(@Valid @RequestBody BindEmailReq bndEmailReq, HttpServletRequest request) {
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUser loginUser = cacheService.getUserByToken(loginToken);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         ucUserService.bindEmail(bndEmailReq, loginUser);
         return GenericDto.success(null);
     }
@@ -78,7 +78,7 @@ public class OpenUserController {
     @ApiOperation(value = "生成QRBarcode", notes = "生成QRBarcode")
     public GenericDto<String> getQRBarcode(@Valid @RequestBody QRBarCodeReq qrBarCodeReq, HttpServletRequest request) {
         String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUser loginUser = cacheService.getUserByToken(loginToken);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         return GenericDto.success(googleAuthService.getQRBarcode(qrBarCodeReq.getAccount(), qrBarCodeReq.getRemark(), loginUser));
     }
 
@@ -91,7 +91,7 @@ public class OpenUserController {
     @ApiOperation(value = "GA验证code", notes = "GA验证code")
     public GenericDto<Object> verifyCode(@Valid @NotBlank @RequestBody String code, HttpServletRequest request) {
         String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUser loginUser = cacheService.getUserByToken(loginToken);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         googleAuthService.verifyUserCode(loginUser.getUserId(), code);
         return GenericDto.success(null);
     }

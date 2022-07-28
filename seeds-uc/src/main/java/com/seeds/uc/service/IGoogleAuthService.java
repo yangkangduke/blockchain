@@ -1,6 +1,6 @@
 package com.seeds.uc.service;
 
-import com.seeds.uc.dto.LoginUser;
+import com.seeds.uc.dto.LoginUserDTO;
 
 /**
  * @author yk
@@ -9,7 +9,7 @@ import com.seeds.uc.dto.LoginUser;
  */
 public interface IGoogleAuthService {
 
-    String getQRBarcode(String account, String remark, LoginUser loginUser);
+    String getQRBarcode(String account, String remark, LoginUserDTO loginUser);
 
     String genGaSecret();
 

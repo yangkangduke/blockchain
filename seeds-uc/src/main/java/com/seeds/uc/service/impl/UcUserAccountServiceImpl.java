@@ -3,7 +3,7 @@ package com.seeds.uc.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.uc.dto.LoginUser;
+import com.seeds.uc.dto.LoginUserDTO;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.response.AccountActionResp;
@@ -40,7 +40,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      * @return
      */
     @Override
-    public void action(AccountActionReq accountActionReq, LoginUser loginUser) {
+    public void action(AccountActionReq accountActionReq, LoginUserDTO loginUser) {
         // 往用户账户表、用户账户行动历史表中添加数据 todo 等确认前端传的参数后调整
         UcUserAccountActionHistory history = UcUserAccountActionHistory.builder().build();
         BeanUtil.copyProperties(accountActionReq, history);

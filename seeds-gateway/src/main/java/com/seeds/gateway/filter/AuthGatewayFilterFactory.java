@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
-import com.seeds.uc.dto.LoginUser;
+import com.seeds.uc.dto.LoginUserDTO;
 import com.seeds.gateway.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +69,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                 log.debug("no token found from either cookie or header");
                 return failure(exchange);
             }
-            LoginUser loginUser = authService.verify(token);
+            LoginUserDTO loginUser = authService.verify(token);
             if (loginUser == null) {
                 return failure(exchange);
             } else {

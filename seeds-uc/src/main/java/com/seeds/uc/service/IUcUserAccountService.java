@@ -2,7 +2,7 @@ package com.seeds.uc.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.uc.dto.LoginUser;
+import com.seeds.uc.dto.LoginUserDTO;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.response.AccountActionResp;
@@ -20,14 +20,16 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
 
     /**
      * 冲/提币
+     *
      * @param accountActionReq
      * @param loginUser
      * @return
      */
-    void action(AccountActionReq accountActionReq, LoginUser loginUser);
+    void action(AccountActionReq accountActionReq, LoginUserDTO loginUser);
 
     /**
      * 充/提币历史分页
+     *
      * @param historyReq
      * @return
      */

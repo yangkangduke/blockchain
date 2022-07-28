@@ -17,6 +17,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "resetpassword")
 public class ResetPasswordProperties {
 
-	private String url;
+    private String url;
 
 }
