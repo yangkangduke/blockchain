@@ -1,16 +1,21 @@
 package com.seeds.uc.controller;
 
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
+import com.seeds.uc.dto.request.UcUserAddressReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
+import com.seeds.uc.mapper.UcUserAddressMapper;
+import com.seeds.uc.model.UcUserAddress;
 import com.seeds.uc.service.IUcUserAccountService;
+import com.seeds.uc.service.IUcUserAddressService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.impl.CacheService;
 import com.seeds.uc.util.WebUtil;
@@ -43,6 +48,8 @@ public class OpenUserAccountController {
     private CacheService cacheService;
     @Autowired
     private IUcUserService ucUserService;
+    @Autowired
+    private IUcUserAddressService ucUserAddressService;
 
     /**
      * 冲/提币
@@ -71,5 +78,23 @@ public class OpenUserAccountController {
         page.setSize(historyReq.getSize());
         return GenericDto.success(ucUserAccountService.actionHistory(page, historyReq));
     }
-
+    /**
+     * 创建地址
+     */
+    @PostMapping("/create/address")
+    @ApiOperation(value = "创建地址", notes = "创建地址")
+    public GenericDto<Object> createAddress(@RequestBody UcUserAddressReq addressReq, HttpServletRequest request) {
+        long currentTime = System.currentTimeMillis();
+        // 获取当前登陆人信息
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+        UcUserAddress build = UcUserAddress.builder()
+                .build();
+        BeanUtil.copyProperties(addressReq, build);
+        build.setUserId(loginUser.getUserId());
+        build.setCreateTime(currentTime);
+        build.setUpdateTime(currentTime);
+        ucUserAddressService.save(build);
+        return GenericDto.success(null);
+    }
 }

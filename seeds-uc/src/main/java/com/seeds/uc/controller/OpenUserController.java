@@ -5,9 +5,11 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.BindEmailReq;
+import com.seeds.uc.dto.request.MetaMaskReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
 import com.seeds.uc.dto.request.SendCodeReq;
 import com.seeds.uc.dto.response.LoginResp;
+import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.impl.CacheService;
@@ -45,31 +47,31 @@ public class OpenUserController {
     @Autowired
     private FileTemplate template;
 
-    /**
-     * 绑定邮箱-发送验证码
-     */
-    @PostMapping("/bind/email/send")
-    @ApiOperation(value = "绑定邮箱-发送验证码", notes = "useType传BIND_EMAIL")
-    public GenericDto<Object> bindEmailSend(@Valid @RequestBody SendCodeReq sendReq) {
-        return GenericDto.success(ucUserService.bindEmailSend(sendReq));
-    }
+//    /**
+//     * 绑定邮箱-发送验证码
+//     */
+//    @PostMapping("/bind/email/send")
+//    @ApiOperation(value = "绑定邮箱-发送验证码", notes = "useType传BIND_EMAIL")
+//    public GenericDto<Object> bindEmailSend(@Valid @RequestBody SendCodeReq sendReq) {
+//        return GenericDto.success(ucUserService.bindEmailSend(sendReq));
+//    }
 
-    /**
-     * 绑定邮箱
-     * 1.调用/bind/email/send接口发送邮箱验证码
-     * 2.调用/bind/email绑定邮箱接口
-     */
-    @PostMapping("/bind/email")
-    @ApiOperation(value = "绑定邮箱",
-            notes = "1.调用send/code接口发送邮箱验证码\n" +
-                    "2.调用/bind/email绑定邮箱接口")
-    public GenericDto<Object> bindEmail(@Valid @RequestBody BindEmailReq bndEmailReq, HttpServletRequest request) {
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        ucUserService.bindEmail(bndEmailReq, loginUser);
-        return GenericDto.success(null);
-    }
+//    /**
+//     * 绑定邮箱
+//     * 1.调用/bind/email/send接口发送邮箱验证码
+//     * 2.调用/bind/email绑定邮箱接口
+//     */
+//    @PostMapping("/bind/email")
+//    @ApiOperation(value = "绑定邮箱",
+//            notes = "1.调用send/code接口发送邮箱验证码\n" +
+//                    "2.调用/bind/email绑定邮箱接口")
+//    public GenericDto<Object> bindEmail(@Valid @RequestBody BindEmailReq bndEmailReq, HttpServletRequest request) {
+//        // 获取当前登陆人信息
+//        String loginToken = WebUtil.getTokenFromRequest(request);
+//        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+//        ucUserService.bindEmail(bndEmailReq, loginUser);
+//        return GenericDto.success(null);
+//    }
 
     /**
      * 生成QRBarcode
@@ -96,11 +98,45 @@ public class OpenUserController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("/test")
-    @ApiOperation(value = "文件上传", notes = "文件上传")
-    public GenericDto<LoginResp> test(@RequestPart("file") MultipartFile file) throws Exception {
-        template.putObject("s3demo", "fileName", file.getInputStream());
-        return GenericDto.success(null);
+    /**
+     * metamask获取随机数
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/metamask/nonce")
+    @ApiOperation(value = "metamask获取随机数", notes = "metamask获取随机数")
+    public GenericDto<String> metamaskNonce(@Valid @RequestBody MetaMaskReq metaMaskReq, HttpServletRequest request ) {
+        // 获取当前登陆人信息
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+        UcUser byId = ucUserService.getById(loginUser.getUserId());
+        return GenericDto.success(ucUserService.metamaskNonce(metaMaskReq, byId));
     }
+
+    /**
+     * metamask验证
+     * 1.调用/metamask/nonce生成nonce
+     * 2.前端根据nonce生成签名信息
+     * 3.调用/metamask/verify验证签名信息，验证成功返回token
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/metamask/verify")
+    @ApiOperation(value = "metamask验证",
+            notes = "1.调用/metamask/nonce生成nonce\n" +
+                    "2.前端根据nonce生成签名信息\n" +
+                    "3.调用/metamask/verify验证签名信息，验证成功返回token")
+    public GenericDto<LoginResp> metamaskVerify(@Valid @RequestBody MetaMaskReq metaMaskReq) {
+        return GenericDto.success(ucUserService.metamaskVerify(metaMaskReq));
+    }
+
+//    @PostMapping("/test")
+//    @ApiOperation(value = "文件上传", notes = "文件上传")
+//    public GenericDto<LoginResp> test(@RequestPart("file") MultipartFile file) throws Exception {
+//        template.putObject("s3demo", "fileName", file.getInputStream());
+//        return GenericDto.success(null);
+//    }
 
 }

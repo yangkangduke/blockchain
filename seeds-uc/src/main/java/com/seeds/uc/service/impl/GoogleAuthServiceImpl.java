@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class GoogleAuthServiceImpl implements IGoogleAuthService {
 
-    public static String format = "otpauth://totp/%s?secret=%s&issuer=%s";
+    public static final String format = "otpauth://totp/%s?secret=%s&issuer=%s";
     @Autowired
     UcUserMapper userMapper;
     @Autowired

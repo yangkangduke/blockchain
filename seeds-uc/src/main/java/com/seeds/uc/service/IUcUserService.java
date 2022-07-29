@@ -18,29 +18,6 @@ import com.seeds.uc.model.UcUser;
 public interface IUcUserService extends IService<UcUser> {
 
     /**
-     * 发送验证码
-     *
-     * @param sendReq
-     */
-    String bindEmailSend(SendCodeReq sendReq);
-
-    /**
-     * 邮箱验证码校验
-     *
-     * @param verifyReq
-     */
-    void bindEmail(BindEmailReq verifyReq, LoginUserDTO loginUser);
-
-    /**
-     * 账号重复性校验
-     * L   *
-     *
-     * @param account
-     * @return
-     */
-    void verifyAccount(String account);
-
-    /**
      * 注册邮箱账号
      *
      * @param registerReq
@@ -63,10 +40,9 @@ public interface IUcUserService extends IService<UcUser> {
 
     /**
      * metamask登陆获取随机数
-     *
      * @return
      */
-    String metamaskNonce(MetaMaskReq metaMaskReq);
+    String metamaskNonce(MetaMaskReq metaMaskReq, UcUser loginUser);
 
     /**
      * 忘记密码-发送邮件
@@ -95,5 +71,10 @@ public interface IUcUserService extends IService<UcUser> {
      */
     void registerEmailSend(String email);
 
+    /**
+     * 2fa校验
+     * @param loginReq
+     * @return
+     */
     LoginResp twoFactorCheck(TwoFactorLoginReq loginReq);
 }

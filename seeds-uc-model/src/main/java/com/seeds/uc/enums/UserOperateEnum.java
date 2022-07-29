@@ -16,6 +16,8 @@ public enum UserOperateEnum {
     REGISTER((short) 1, "register", "注册"),
     @JsonProperty("2")
     LOGIN((short) 2, "login", "登陆"),
+    @JsonProperty("3")
+    BIND((short) 3, "bind", "绑定"),
     ;
 
     @JsonValue

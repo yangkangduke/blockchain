@@ -59,27 +59,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Autowired
     private IGoogleAuthService googleAuthService;
 
-    /**
-     * 发送验证码
-     *
-     * @param sendReq
-     */
-    @Override
-    public String bindEmailSend(SendCodeReq sendReq) {
-        String address = sendReq.getAddress();
-        AuthCodeUseTypeEnum useType = sendReq.getUseType();
-        if ("AuthCodeUseTypeEnum.BIND_EMAIL".equals(useType)) {
-            String otp = RandomUtil.getRandom6DigitsOTP();
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(address), UcConstant.BIND_EMAIL_SUBJECT, UcConstant.BIND_EMAIL_CONTENT + otp, false);
-            // store the auth code in auth code bucket
-            cacheService.putAuthCode(address, null, ClientAuthTypeEnum.EMAIL, otp, useType);
-            return UcConstant.BIND_EMAIL_CONTENT + otp;
-        } else {
-            throw new InvalidArgumentsException("incorrect type");
-        }
-
-    }
-
     private MailAccount createMailAccount() {
         MailAccount account = new MailAccount();
         account.setHost(emailProperties.getHost());
@@ -91,38 +70,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return account;
     }
 
-    /**
-     * 邮箱验证码校验
-     *
-     * @param verifyReq
-     */
-    @Override
-    public void bindEmail(BindEmailReq verifyReq, LoginUserDTO loginUser) {
-        Long userId = loginUser.getUserId();
-        long createTime = System.currentTimeMillis();
-        String email = verifyReq.getEmail();
-        String code = verifyReq.getCode();
-        AuthCodeDTO authCode = cacheService.getAuthCode(email, verifyReq.getUseType(), ClientAuthTypeEnum.EMAIL);
-        if (authCode == null || authCode.getCode() == null || !authCode.getCode().equals(code)) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
-        }
-
-        // 修改邮箱信息到user表
-        this.updateById(UcUser.builder().email(email).id(userId).build());
-
-        ucSecurityStrategyService.saveOrUpdate(UcSecurityStrategy.builder().uid(userId).needAuth(true).authType(ClientAuthTypeEnum.EMAIL).createdAt(createTime).updatedAt(createTime).build(), new QueryWrapper<UcSecurityStrategy>().lambda().eq(UcSecurityStrategy::getUid, userId));
-    }
-
-    /**
-     * 账号重复性校验
-     *
-     * @param email
-     * @return
-     */
-    @Override
-    public void verifyAccount(String email) {
-
-    }
 
     /**
      * 注册邮箱账号
@@ -174,7 +121,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         // 校验code
         String code = registerReq.getCode();
         String email = registerReq.getEmail();
-        AuthCodeDTO authCode = cacheService.getAuthCode(email, AuthCodeUseTypeEnum.REGISTER_EMAIL, ClientAuthTypeEnum.EMAIL);
+        AuthCodeDTO authCode = cacheService.getAuthCode(email, AuthCodeUseTypeEnum.REGISTER, ClientAuthTypeEnum.EMAIL);
         if (authCode == null) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10036_AUTH_CODE_EXPIRED);
         }
@@ -316,7 +263,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public String metamaskNonce(MetaMaskReq metaMaskReq) {
+    public String metamaskNonce(MetaMaskReq metaMaskReq, UcUser loginUserDTO) {
         long currentTime = System.currentTimeMillis();
         String publicAddress = metaMaskReq.getPublicAddress();
         String nonce = null;
@@ -338,11 +285,14 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .nickname(publicAddress)
                     .build();
             this.save(ucUser);
-        }
-
-        // 登陆
-        if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.LOGIN)) {
+            // 登陆
+        }else if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.LOGIN)) {
             nonce = one.getNonce();
+        } else if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.BIND)) {
+            if (loginUserDTO != null) {
+                nonce = loginUserDTO.getNonce();
+            }
+
         }
         return nonce;
     }
@@ -424,10 +374,15 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     public void registerEmailSend(String email) {
         String otp = RandomUtil.getRandom6DigitsOTP();
         MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.REGISTER_EMAIL_SUBJECT, UcConstant.REGISTER_EMAIL_CONTENT + otp, false);
-        cacheService.putAuthCode(email, null, ClientAuthTypeEnum.EMAIL, otp, AuthCodeUseTypeEnum.REGISTER_EMAIL);
+        cacheService.putAuthCode(email, null, ClientAuthTypeEnum.EMAIL, otp, AuthCodeUseTypeEnum.REGISTER);
 
     }
 
+    /**
+     *  2fa校验
+     * @param loginReq
+     * @return
+     */
     @Override
     public LoginResp twoFactorCheck(TwoFactorLoginReq loginReq) {
         log.info("verifyTwoFactorLogin: {}", loginReq);
