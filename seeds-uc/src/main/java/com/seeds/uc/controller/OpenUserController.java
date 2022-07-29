@@ -4,10 +4,8 @@ package com.seeds.uc.controller;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.uc.dto.redis.LoginUserDTO;
-import com.seeds.uc.dto.request.BindEmailReq;
 import com.seeds.uc.dto.request.MetaMaskReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
-import com.seeds.uc.dto.request.SendCodeReq;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
@@ -44,34 +42,7 @@ public class OpenUserController {
     private IGoogleAuthService googleAuthService;
     @Autowired
     private CacheService cacheService;
-    @Autowired
-    private FileTemplate template;
 
-//    /**
-//     * 绑定邮箱-发送验证码
-//     */
-//    @PostMapping("/bind/email/send")
-//    @ApiOperation(value = "绑定邮箱-发送验证码", notes = "useType传BIND_EMAIL")
-//    public GenericDto<Object> bindEmailSend(@Valid @RequestBody SendCodeReq sendReq) {
-//        return GenericDto.success(ucUserService.bindEmailSend(sendReq));
-//    }
-
-//    /**
-//     * 绑定邮箱
-//     * 1.调用/bind/email/send接口发送邮箱验证码
-//     * 2.调用/bind/email绑定邮箱接口
-//     */
-//    @PostMapping("/bind/email")
-//    @ApiOperation(value = "绑定邮箱",
-//            notes = "1.调用send/code接口发送邮箱验证码\n" +
-//                    "2.调用/bind/email绑定邮箱接口")
-//    public GenericDto<Object> bindEmail(@Valid @RequestBody BindEmailReq bndEmailReq, HttpServletRequest request) {
-//        // 获取当前登陆人信息
-//        String loginToken = WebUtil.getTokenFromRequest(request);
-//        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-//        ucUserService.bindEmail(bndEmailReq, loginUser);
-//        return GenericDto.success(null);
-//    }
 
     /**
      * 生成QRBarcode
@@ -132,11 +103,5 @@ public class OpenUserController {
         return GenericDto.success(ucUserService.metamaskVerify(metaMaskReq));
     }
 
-//    @PostMapping("/test")
-//    @ApiOperation(value = "文件上传", notes = "文件上传")
-//    public GenericDto<LoginResp> test(@RequestPart("file") MultipartFile file) throws Exception {
-//        template.putObject("s3demo", "fileName", file.getInputStream());
-//        return GenericDto.success(null);
-//    }
 
 }

@@ -4,7 +4,6 @@ package com.seeds.uc.service.impl;
 import com.seeds.uc.constant.UcRedisKeysConstant;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
 import com.seeds.uc.dto.redis.AuthTokenDTO;
-import com.seeds.uc.dto.redis.ForgotPasswordCodeDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.redis.TwoFactorAuth;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
@@ -107,7 +106,6 @@ public class CacheService {
      * key为用户名(手机或邮箱)的cache，用于绑定账户等用到的验证码校验
      */
     public void putAuthCode(String name,
-                            String countryCode,
                             ClientAuthTypeEnum authType,
                             String code,
                             AuthCodeUseTypeEnum useType) {
@@ -119,7 +117,6 @@ public class CacheService {
                 .expireAt(expireAt)
                 .key(key)
                 .name(name)
-                .countryCode(countryCode)
                 .useType(useType)
                 .build();
         redisson.getBucket(authCode.getKey()).set(
@@ -137,29 +134,6 @@ public class CacheService {
         return authCodeDtoRBucket.get();
     }
 
-    /**
-     * key为用户名(邮箱)的cache，用于忘记密码功能校验
-     */
-    public void putForgotPasswordCode(String account, String otp, long expireAt) {
-        String key = UcRedisKeysConstant.getUcKeyForgotPassword(account);
-        ForgotPasswordCodeDTO forgotPasswordCode = ForgotPasswordCodeDTO.builder()
-                .key(key)
-                .code(otp)
-                .account(account)
-                .expireAt(expireAt)
-                .build();
-        redisson.getBucket(forgotPasswordCode.getKey()).set(
-                forgotPasswordCode,
-                expireAt,
-                TimeUnit.MILLISECONDS);
-        log.info("CacheService - putForgotPasswordCode - put key: {}, value: {}", key, otp);
-    }
-
-    public ForgotPasswordCodeDTO getForgotPasswordCode(String account) {
-        String key = UcRedisKeysConstant.getUcKeyForgotPassword(account);
-        RBucket<ForgotPasswordCodeDTO> redissonBucket = redisson.getBucket(key);
-        return redissonBucket.get();
-    }
 
     /**
      * will insert once a auth type is verified and return a token

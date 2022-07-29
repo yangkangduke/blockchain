@@ -65,7 +65,9 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
                 .authType(ClientAuthTypeEnum.GA)
                 .createdAt(createTime)
                 .updatedAt(createTime)
-                .build(), new QueryWrapper<UcSecurityStrategy>().lambda().eq(UcSecurityStrategy::getUid, uid));
+                .build(), new QueryWrapper<UcSecurityStrategy>().lambda()
+                .eq(UcSecurityStrategy::getUid, uid)
+                .eq(UcSecurityStrategy::getAuthType,ClientAuthTypeEnum.GA));
         return true;
     }
 

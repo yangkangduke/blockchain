@@ -1,6 +1,7 @@
 package com.seeds.uc.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.seeds.common.exception.SeedsException;
 import com.seeds.uc.exceptions.GenericException;
@@ -25,7 +26,7 @@ public enum ClientAuthTypeEnum {
     GA((short) 3, "ga"),
     ;
 
-    public static Set<ClientAuthTypeEnum> NEED_SEND_CODE = EnumSet.of(METAMASK, EMAIL);
+    public static Set<ClientAuthTypeEnum> NEED_SEND_CODE = EnumSet.of(GA, EMAIL);
     @EnumValue
     @JsonValue
     private final Short code;
@@ -49,9 +50,9 @@ public enum ClientAuthTypeEnum {
         }
     }
 
-    public static String getAccountNameByAuthType(String phone, String email, ClientAuthTypeEnum authTypeEnum) {
-        if (METAMASK.equals(authTypeEnum)) {
-            return phone;
+    public static String getAccountNameByAuthType(String ga, String email, ClientAuthTypeEnum authTypeEnum) {
+        if (GA.equals(authTypeEnum)) {
+            return ga;
         } else if (EMAIL.equals(authTypeEnum)) {
             return email;
         } else {

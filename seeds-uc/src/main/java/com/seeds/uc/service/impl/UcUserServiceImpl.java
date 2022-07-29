@@ -1,5 +1,6 @@
 package com.seeds.uc.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,9 +11,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.common.web.config.EmailProperties;
 import com.seeds.uc.config.ResetPasswordProperties;
 import com.seeds.uc.constant.UcConstant;
+import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
-import com.seeds.uc.dto.redis.ForgotPasswordCodeDTO;
-import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.redis.TwoFactorAuth;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
@@ -25,11 +25,13 @@ import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcSecurityStrategyService;
 import com.seeds.uc.service.IUcUserService;
+import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.util.CryptoUtils;
 import com.seeds.uc.util.DigestUtil;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +60,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     private EmailProperties emailProperties;
     @Autowired
     private IGoogleAuthService googleAuthService;
+    @Autowired
+    private SendCodeService sendCodeService;
 
     private MailAccount createMailAccount() {
         MailAccount account = new MailAccount();
@@ -80,7 +84,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp registerEmailAccount(RegisterReq registerReq) {
         String email = registerReq.getEmail();
-        this.registerEmailAccountCheck(registerReq);
+        sendCodeService.verifyEmailWithUseType(registerReq.getEmail(),registerReq.getCode(),AuthCodeUseTypeEnum.REGISTER);
+        // 校验账号重复
+        UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, email));
+        if (one != null) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED);
+        }
         String salt = RandomUtil.getRandomSalt();
         String password = PasswordUtil.getPassword(registerReq.getPassword(), salt);
         long currentTime = System.currentTimeMillis();
@@ -117,24 +126,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .build();
     }
 
-    private void registerEmailAccountCheck(RegisterReq registerReq) {
-        // 校验code
-        String code = registerReq.getCode();
-        String email = registerReq.getEmail();
-        AuthCodeDTO authCode = cacheService.getAuthCode(email, AuthCodeUseTypeEnum.REGISTER, ClientAuthTypeEnum.EMAIL);
-        if (authCode == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10036_AUTH_CODE_EXPIRED);
-        }
-        if (!authCode.getCode().equals(code)) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
-        }
-        // 校验账号重复
-        UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, email));
-        if (one != null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED);
-        }
-    }
-
     /**
      * 账号登陆
      *
@@ -144,46 +135,38 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     public LoginResp login(LoginReq loginReq) {
         // 校验账号、密码
         String account = loginReq.getEmail();
-        String password = loginReq.getPassword();
         ClientAuthTypeEnum authType = loginReq.getAuthType();
-        UcUser ucUser = this.getOne(new QueryWrapper<UcUser>().lambda()
-                .eq(UcUser::getEmail, account));
-
-        if (ucUser == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
-        }
-        String loginPassword = PasswordUtil.getPassword(password, ucUser.getSalt());
-        if (!loginPassword.equals(ucUser.getPassword())) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT);
-        }
+        UserDto userDto = this.verifyLogin(loginReq);
         // 产生2fa验证的token，用户进入2FA登陆阶段，前端再次call 2FA登陆接口需要带上2FA token
-        String token = RandomUtil.genRandomToken(ucUser.getId().toString());
+        String token = RandomUtil.genRandomToken(userDto.getUid().toString());
         if (authType.equals(ClientAuthTypeEnum.EMAIL)){
             // 发送邮件
             // generate a random code
-            String otp = RandomUtil.getRandom6DigitsOTP();
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(account), UcConstant.LOGIN_EMAIL_VERIFY_SUBJECT, UcConstant.LOGIN_EMAIL_VERIFY_CONTENT + otp, false);
+            sendCodeService.sendUserCodeByUseType(userDto, AuthCodeUseTypeEnum.LOGIN);
             // store the auth code in auth code bucket
-            cacheService.putAuthCode(
-                    ucUser.getEmail(),
-                    null,
-                    ClientAuthTypeEnum.EMAIL,
-                    otp,
-                    AuthCodeUseTypeEnum.LOGIN);
+            cacheService.put2FAInfoWithTokenAndUserAndAuthType(
+                    token,
+                    userDto.getUid(),
+                    userDto.getEmail(),
+                    ClientAuthTypeEnum.EMAIL);
+
             // 将2FA token存入redis，用户进入等待2FA验证态
             cacheService.put2FAInfoWithTokenAndUserAndAuthType(
                     token,
-                    ucUser.getId(),
-                    ucUser.getEmail(),
+                    userDto.getUid(),
+                    userDto.getEmail(),
                     ClientAuthTypeEnum.EMAIL);
+
             return LoginResp.builder()
                     .token(token)
                     .type(ClientAuthTypeEnum.EMAIL)
+                    .account(userDto.getEmail())
                     .build();
+
         } else if (authType.equals(ClientAuthTypeEnum.GA)){
             //检查用户现在有没有GA
             UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyService.getOne(new QueryWrapper<UcSecurityStrategy>().lambda()
-                    .eq(UcSecurityStrategy::getUid, ucUser.getId())
+                    .eq(UcSecurityStrategy::getUid, userDto.getUid())
                     .eq(UcSecurityStrategy::getNeedAuth, true)
                     .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.GA));
 
@@ -192,8 +175,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 // 将2FA token存入redis，用户进入等待2FA验证态
                 cacheService.put2FAInfoWithTokenAndUserAndAuthType(
                         token,
-                        ucUser.getId(),
-                        ucUser.getEmail(),
+                        userDto.getUid(),
+                        userDto.getEmail(),
                         ClientAuthTypeEnum.GA);
                 return LoginResp.builder()
                         .token(token)
@@ -298,28 +281,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     }
 
     /**
-     * 忘记密码-发送邮件
-     *
-     * @param forgotPasswordReq
-     */
-    @Override
-    public void forgotPasswordSeedEmail(ForgotPasswordReq forgotPasswordReq) {
-        String account = forgotPasswordReq.getAccount();
-        String otp = RandomUtil.getRandom6DigitsOTP();
-        // 判断账号是否存在
-        UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, account));
-        if (one == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15000_ACCOUNT_NOT);
-        }
-        // 发送加密邮件 10分钟过期
-        long endTimes = System.currentTimeMillis() + 600 * 1000;
-        // 先加密，再url转码,顺序不能修改
-        String encode = Base64.encode(DigestUtil.Encrypt(account + UcConstant.FORGOT_PASSWORD_EMAIL_LINK_SYMBOL + otp));
-        MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(account), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT + "<a>" + resetPasswordProperties.getUrl() + encode + "</a>", true);
-        cacheService.putForgotPasswordCode(account, otp, endTimes);
-    }
-
-    /**
      * 忘记密码-验证链接
      *
      * @param encode
@@ -334,14 +295,14 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 String account = split[0];
                 String code = split[1];
                 long curtime = System.currentTimeMillis();
-                ForgotPasswordCodeDTO forgotPasswordCode = cacheService.getForgotPasswordCode(account);
-                if (forgotPasswordCode == null) {
+                AuthCodeDTO authCode = cacheService.getAuthCode(account, AuthCodeUseTypeEnum.RESET_PASSWORD, ClientAuthTypeEnum.EMAIL);
+                if (authCode == null) {
                     throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15001_ACCOUNT_VERIFICATION_FAILED);
                 }
-                if (forgotPasswordCode.getExpireAt() <= curtime) {
+                if (authCode.getExpireAt() <= curtime) {
                     throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15001_ACCOUNT_VERIFICATION_FAILED);
                 }
-                if (!forgotPasswordCode.getCode().equals(code)) {
+                if (!authCode.getCode().equals(code)) {
                     throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15002_LINK_EXPIRED);
                 }
             } catch (Exception e) {
@@ -358,25 +319,13 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @param changePasswordReq
      */
     @Override
-    public void forgotPasswordChangePassword(ChangePasswordReq changePasswordReq) {
+    public void forgotPasswordReset(ChangePasswordReq changePasswordReq) {
         String account = changePasswordReq.getAccount();
         String salt = RandomUtil.getRandomSalt();
         String password = PasswordUtil.getPassword(changePasswordReq.getPassword(), salt);
         this.update(UcUser.builder().password(password).salt(salt).build(), new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, account));
     }
 
-    /**
-     * 注册邮箱账号-发送邮箱验证码
-     *
-     * @param email
-     */
-    @Override
-    public void registerEmailSend(String email) {
-        String otp = RandomUtil.getRandom6DigitsOTP();
-        MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.REGISTER_EMAIL_SUBJECT, UcConstant.REGISTER_EMAIL_CONTENT + otp, false);
-        cacheService.putAuthCode(email, null, ClientAuthTypeEnum.EMAIL, otp, AuthCodeUseTypeEnum.REGISTER);
-
-    }
 
     /**
      *  2fa校验
@@ -399,13 +348,19 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                                 twoFactorAuth.getAuthAccountName(),
                                 AuthCodeUseTypeEnum.LOGIN,
                                 twoFactorAuth.getAuthType());
-                if (authCode == null ||  authCode.getCode() == null || !authCode.getCode().equals(loginReq.getAuthCode()) ) {
-                    throw new LoginException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
+
+                log.info("verifyTwoFactorLogin - in redis twoFactorAuth:{} and authCode: {}", twoFactorAuth, authCode);
+                if (authCode == null) {
+                    throw new LoginException(UcErrorCodeEnum.ERR_10036_AUTH_CODE_EXPIRED);
+                }
+                if (!authCode.getCode().equals(loginReq.getAuthCode())) {
+                    throw new LoginException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
                 }
 
             } else {
-                throw new LoginException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
+                throw new LoginException(UcErrorCodeEnum.ERR_504_MISSING_ARGUMENTS);
             }
+
         } else {
             throw new LoginException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
         }
@@ -420,6 +375,33 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return  LoginResp.builder()
                         .ucToken(ucToken)
                         .build();
+    }
+
+    /**
+     * 校验登陆
+     * @param loginReq
+     * @return
+     */
+    @Override
+    public UserDto verifyLogin(LoginReq loginReq) {
+        // 校验账号、密码
+        String account = loginReq.getEmail();
+        String password = loginReq.getPassword();
+        UcUser ucUser = this.getOne(new QueryWrapper<UcUser>().lambda()
+                .eq(UcUser::getEmail, account));
+
+        if (ucUser == null) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
+        }
+        String loginPassword = PasswordUtil.getPassword(password, ucUser.getSalt());
+        if (!loginPassword.equals(ucUser.getPassword())) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT);
+        }
+        UserDto userDto = new UserDto();
+        BeanUtil.copyProperties(ucUser, userDto);
+        userDto.setAuthType(loginReq.getAuthType());
+        userDto.setUid(ucUser.getId());
+        return userDto;
     }
 
 

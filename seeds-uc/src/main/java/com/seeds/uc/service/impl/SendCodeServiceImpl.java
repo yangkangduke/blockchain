@@ -14,6 +14,8 @@ import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.GenericException;
+import com.seeds.uc.exceptions.SendAuthCodeException;
+import com.seeds.uc.mapper.UcUserMapper;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.SendCodeService;
@@ -37,7 +39,7 @@ public class SendCodeServiceImpl implements SendCodeService {
     @Autowired
     private EmailProperties emailProperties;
     @Autowired
-    private IUcUserService userService;
+    private UcUserMapper ucUserMapper;
     @Autowired
     private ResetPasswordProperties resetPasswordProperties;
 
@@ -51,8 +53,7 @@ public class SendCodeServiceImpl implements SendCodeService {
 
         doSendUserCode(userDto, otp, useTypeEnum);
 
-        String accountName =
-                ClientAuthTypeEnum.getAccountNameByAuthType(
+        String accountName =  ClientAuthTypeEnum.getAccountNameByAuthType(
                         userDto.getPhone(),
                         userDto.getEmail(),
                         userDto.getAuthType());
@@ -60,7 +61,6 @@ public class SendCodeServiceImpl implements SendCodeService {
         // store the auth code in auth code bucket
         cacheService.putAuthCode(
                 accountName,
-                userDto.getCountryCode(),
                 userDto.getAuthType(),
                 otp,
                 useTypeEnum);
@@ -76,7 +76,6 @@ public class SendCodeServiceImpl implements SendCodeService {
         // store the auth code in auth code bucket
         cacheService.putAuthCode(
                 address,
-                null,
                 ClientAuthTypeEnum.EMAIL,
                 otp,
                 useTypeEnum);
@@ -87,7 +86,7 @@ public class SendCodeServiceImpl implements SendCodeService {
         // 取出之前login时放入二次验证redis的dto拿到详细信息
         TwoFactorAuth twoFactorAuth = cacheService.get2FAInfoWithToken(token);
 
-        UcUser userDto = userService.getById(twoFactorAuth.getUserId());
+        UcUser userDto = ucUserMapper.selectById(twoFactorAuth.getUserId());
 
         // generate a random code
         String otp = RandomUtil.getRandom6DigitsOTP();
@@ -98,7 +97,6 @@ public class SendCodeServiceImpl implements SendCodeService {
         // store the auth code in auth code bucket
         cacheService.putAuthCode(
                 userDto.getEmail(),
-                null,
                 ClientAuthTypeEnum.EMAIL,
                 otp,
                 useTypeEnum);
@@ -107,8 +105,7 @@ public class SendCodeServiceImpl implements SendCodeService {
 
     @Override
     public String verifyEmailWithUseType(String address, String otp, AuthCodeUseTypeEnum useTypeEnum) {
-        AuthCodeDTO authCode =
-                cacheService.getAuthCode(address, useTypeEnum, ClientAuthTypeEnum.EMAIL);
+        AuthCodeDTO authCode = cacheService.getAuthCode(address, useTypeEnum, ClientAuthTypeEnum.EMAIL);
         if (authCode != null && StringUtils.isNotBlank(authCode.getCode()) && authCode.getCode().equals(otp)) {
             String token = RandomUtil.genRandomToken(address);
             cacheService.putAuthToken(token, null, address, ClientAuthTypeEnum.EMAIL);
@@ -140,6 +137,8 @@ public class SendCodeServiceImpl implements SendCodeService {
             MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT + "<a>" + resetPasswordProperties.getUrl() + encode + "</a>", true);
         } else if (useType.equals(AuthCodeUseTypeEnum.LOGIN)) {
             MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.LOGIN_EMAIL_VERIFY_SUBJECT, UcConstant.LOGIN_EMAIL_VERIFY_CONTENT + code, false);
+        } else {
+            throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
         }
 
         return true;

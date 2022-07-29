@@ -1,5 +1,6 @@
 package com.seeds.uc.dto.request;
 
+import com.seeds.uc.enums.ClientAuthTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -15,8 +16,11 @@ import javax.validation.constraints.NotBlank;
 public class ChangePasswordReq {
     @ApiModelProperty(value = "账号", required = true)
     @NotBlank
-    @Email
     private String account;
+    @NotBlank
     private String password;
-    private String encode;
+    @ApiModelProperty(value = "2emai 3ga")
+    private ClientAuthTypeEnum authTypeEnum;
+    @NotBlank
+    private String code;
 }

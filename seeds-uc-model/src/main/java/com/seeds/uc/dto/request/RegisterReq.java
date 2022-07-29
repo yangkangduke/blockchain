@@ -1,5 +1,6 @@
 package com.seeds.uc.dto.request;
 
+import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -24,6 +25,5 @@ public class RegisterReq {
     @ApiModelProperty(value = "密码", required = true)
     @NotBlank
     private String password;
-
 
 }

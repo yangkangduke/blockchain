@@ -11,10 +11,7 @@ import lombok.Data;
  */
 @Data
 public class AuthCodeSendReq {
-    @JsonProperty("account_name")
-    private String accountName;
     private String email;
-    @JsonProperty("use_type")
     private AuthCodeUseTypeEnum useType;
     // 二次验证再次发送sms的时候用到
     private String token;
