@@ -58,6 +58,7 @@ public class SysUserAddReq {
 	 * 手机号
 	 */
 	@ApiModelProperty("手机号")
+	@NotBlank(message = "Mobile cannot be empty")
 	private String mobile;
 
 	/**
