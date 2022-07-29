@@ -4,7 +4,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.gateway.dto.ReactiveDto;
 import com.seeds.gateway.service.AuthService;
 import com.seeds.uc.constant.UcRedisKeysConstant;
-import com.seeds.uc.dto.LoginUserDTO;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;

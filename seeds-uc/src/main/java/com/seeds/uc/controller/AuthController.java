@@ -1,22 +1,29 @@
 package com.seeds.uc.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.uc.dto.LoginUserDTO;
+import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
+import com.seeds.uc.enums.AuthCodeUseTypeEnum;
+import com.seeds.uc.enums.UcErrorCodeEnum;
+import com.seeds.uc.exceptions.InvalidArgumentsException;
+import com.seeds.uc.model.UcUser;
+import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
-import com.seeds.uc.service.impl.CacheService;
+import com.seeds.uc.service.SendCodeService;
+import com.seeds.uc.service.impl.GoogleAuthServiceImpl;
 import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Slf4j
 @RestController
@@ -27,50 +34,60 @@ public class AuthController {
     @Autowired
     private IUcUserService ucUserService;
     @Autowired
-    private CacheService cacheService;
+    private SendCodeService sendCodeService;
+    @Autowired
+    private IGoogleAuthService googleAuthService;
 
 
     /**
-     * 校验账号
+     * 注册邮箱账号-发送邮箱验证码
      */
-    @PostMapping("/register/check")
-    @ApiOperation(value = "校验账号", notes = "校验账号")
-    public GenericDto<Object> verifyAccount(@Valid @NotBlank @Email @RequestBody String account) {
-        ucUserService.verifyAccount(account);
+    @PostMapping("/register/emailSend")
+    @ApiOperation(value = "注册邮箱账号-发送邮箱验证码", notes = "注册邮箱账号-发送邮箱验证码")
+    public GenericDto<Object> registerEmailSend(@Valid @Email @RequestBody String email) {
+        ucUserService.registerEmailSend(email);
         return GenericDto.success(null);
     }
 
     /**
-     * 注册账号
-     * 1.调用/register/check接口校验账号
-     * 2.调用/register/account注册账号，
-     * 3.如果传了token就跟metaMask做绑定
+     * 注册邮箱账号
+     * 1.调用/register/emailSend 发送邮箱验证码，
+     * 2.调用/register/emailAccount 注册邮箱账号
      */
-    @PostMapping("/register/account")
-    @ApiOperation(value = "注册账号",
-            notes = "1.调用/register/check接口校验账号\n" +
-                    "2.调用/register/account注册账号，\n" +
-                    "3.如果传了token就跟metaMask做绑定")
-    public GenericDto<LoginResp> registerAccount(@Valid @RequestBody RegisterReq registerReq, HttpServletRequest request) {
-        LoginUserDTO loginUser = null;
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        if (loginToken != null) {
-            loginUser = cacheService.getUserByToken(loginToken);
-        }
-        return GenericDto.success(ucUserService.registerAccount(registerReq, loginUser));
+    @PostMapping("/register/emailAccount")
+    @ApiOperation(value = "注册邮箱账号",
+            notes = "1.调用/register/emailSend 发送邮箱验证码，\n" +
+                    "2.调用/register/emailAccount 注册邮箱账号")
+    public GenericDto<LoginResp> registerEmailAccount(@Valid @RequestBody RegisterReq registerReq) {
+        return GenericDto.success(ucUserService.registerEmailAccount(registerReq));
     }
 
     /**
      * 账号登陆
-     *
-     * @param accountLoginReq
+     * 1.调用/login 返回token
+     * 2.调用/2fa/login 返回ucToken
      * @return
      */
-    @PostMapping("/login/account")
-    @ApiOperation(value = "账号登陆", notes = "账号登陆")
-    public GenericDto<LoginResp> loginAccount(@Valid @RequestBody AccountLoginReq accountLoginReq) {
-        return GenericDto.success(ucUserService.loginAccount(accountLoginReq));
+    @PostMapping("/login")
+    @ApiOperation(value = "账号登陆", notes = "1.调用/login 返回token\n" +
+            "2.调用/2fa/login 返回ucToken")
+    public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
+        return GenericDto.success(ucUserService.login(loginReq));
+    }
+
+    /**
+     * 2fa登陆
+     *1.调用/login 返回token
+     *2.调用/2fa/login 返回ucToken
+     * @param loginReq
+     * @return
+     */
+    @PostMapping("/2fa/login")
+    @ApiOperation(value = "2fa登陆", notes = "1.调用/login 返回token\n" +
+            "2.调用/2fa/login 返回ucToken")
+    public GenericDto<LoginResp> twoFactorCheck(@RequestBody TwoFactorLoginReq loginReq) {
+        return GenericDto.success(ucUserService.twoFactorCheck(loginReq));
+
     }
 
 
@@ -82,32 +99,26 @@ public class AuthController {
      */
     @PostMapping("/metamask/nonce")
     @ApiOperation(value = "metamask获取随机数", notes = "metamask获取随机数")
-    public GenericDto<String> metamaskNonce(@Valid @NotBlank @RequestBody String publicAddress, HttpServletRequest request) {
-        LoginUserDTO loginUser = null;
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        if (loginToken != null) {
-            loginUser = cacheService.getUserByToken(loginToken);
-        }
-        return GenericDto.success(ucUserService.metamaskNonce(publicAddress, loginUser));
+    public GenericDto<String> metamaskNonce(@Valid @RequestBody MetaMaskReq metaMaskReq ) {
+        return GenericDto.success(ucUserService.metamaskNonce(metaMaskReq, null));
     }
 
     /**
-     * metamask登陆
+     * metamask验证
      * 1.调用/metamask/nonce生成nonce
      * 2.前端根据nonce生成签名信息
-     * 3.调用/login/metamask验证签名信息，验证成功返回token
+     * 3.调用/metamask/verify验证签名信息，验证成功返回token
      *
      * @param
      * @return
      */
-    @PostMapping("/login/metamask")
-    @ApiOperation(value = "metamask登陆",
+    @PostMapping("/metamask/verify")
+    @ApiOperation(value = "metamask验证",
             notes = "1.调用/metamask/nonce生成nonce\n" +
                     "2.前端根据nonce生成签名信息\n" +
-                    "3.调用/login/metamask验证签名信息，验证成功返回token")
-    public GenericDto<LoginResp> loginMetaMask(@Valid @RequestBody MetaMaskLoginReq loginReq) {
-        return GenericDto.success(ucUserService.loginMetaMask(loginReq));
+                    "3.调用/metamask/verify验证签名信息，验证成功返回token")
+    public GenericDto<LoginResp> metamaskVerify(@Valid @RequestBody MetaMaskReq metaMaskReq) {
+        return GenericDto.success(ucUserService.metamaskVerify(metaMaskReq));
     }
 
     /**
@@ -135,6 +146,25 @@ public class AuthController {
     }
 
     /**
+     * 忘记密码-ga验证
+     *
+     * @return
+     */
+    @PostMapping("/forgotPassword/gaVerify")
+    @ApiOperation(value = "忘记密码-ga验证", notes = "忘记密码-ga验证")
+    public GenericDto<Object> forgotPasswordGaVerify(String code,String email) {
+        // 通过email找到用户
+        UcUser one = ucUserService.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, email));
+        if (one == null) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
+        }
+        if (!googleAuthService.verify(code, one.getGaSecret())) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
+        }
+        return GenericDto.success(null);
+    }
+
+    /**
      * 忘记密码-修改密码
      *
      * @return
@@ -146,6 +176,40 @@ public class AuthController {
         ucUserService.forgotPasswordChangePassword(changePasswordReq);
         return GenericDto.success(null);
     }
+
+//    @PostMapping("email/send")
+//    public GenericDto<Object> sendEmailCode(@RequestBody AuthCodeSendReq sendReq, HttpServletRequest request) {
+//        log.info("AuthController - sendEmailCode got request: {}", sendReq);
+//        if (AuthCodeUseTypeEnum.CODE_NO_NEED_LOGIN_READ_REQUEST.contains(sendReq.getUseType())) {
+//            // 不需要登陆，请求里带邮箱，如: REGISTER
+//            sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
+//        } else if (AuthCodeUseTypeEnum.CODE_NO_NEED_LOGIN_READ_DB.contains(sendReq.getUseType())) {
+//            // 需要token(拒绝登陆后发的用于2FA的token)，邮箱从数据库查, 如：LOGIN
+//            sendCodeService.sendEmailWithTokenAndUseType(sendReq.getToken(), sendReq.getUseType());
+//        }
+////        else {
+////            // 需要登陆
+////            String loginToken = WebUtil.getTokenFromRequest(request);
+////            LoginUser loginUser = cacheService.getUserByToken(loginToken);
+////
+////            if (StringUtils.isBlank(loginToken) || loginUser == null) {
+////                throw new SendAuthCodeException(UcErrorCode.ERR_401_NOT_LOGGED_IN);
+////            }
+////            // TODO 邮箱需要检查是否已使用
+////            if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_REQUEST_SET.contains(sendReq.getUseType())) {
+////                sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
+////            } else if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_DB_SET.contains(sendReq.getUseType())) {
+////                // 需要登陆，但是手机号从DB里读
+////                UserDto userDto = userService.getUserByUid(loginUser.getUserId());
+////                sendCodeService.sendEmailWithUseType(userDto.getEmail(), sendReq.getUseType());
+////            } else {
+////                // 没有被录入的类型，直接抛错误，后面再加
+////                throw new SendAuthCodeException(UcErrorCode.ERR_502_ILLEGAL_ARGUMENTS);
+////            }
+////        }
+//
+//        return GenericDto.success(null);
+//    }
 
 
 }

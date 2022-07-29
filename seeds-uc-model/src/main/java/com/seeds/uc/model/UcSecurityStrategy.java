@@ -3,6 +3,7 @@ package com.seeds.uc.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.seeds.uc.enums.ClientAuthTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -36,8 +37,8 @@ public class UcSecurityStrategy implements Serializable {
     @ApiModelProperty("是否开启了验证")
     private Boolean needAuth;
 
-    @ApiModelProperty("验证的类型ClientAuthTypeEnum 1-phone, 2-email, 3-ga")
-    private Integer authType;
+    @ApiModelProperty("验证的类型ClientAuthTypeEnum 1-matemask, 2-email, 3-ga")
+    private ClientAuthTypeEnum authType;
 
     @ApiModelProperty("创建时间")
     private Long createdAt;

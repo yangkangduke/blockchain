@@ -16,8 +16,15 @@ public class UcConstant {
     public static final String FORGOT_PASSWORD_EMAIL_SUBJECT = "forgot password";
     public static final String FORGOT_PASSWORD_EMAIL_LINK_SYMBOL = ";";
 
+    // 注册邮箱账号
+    public static final String REGISTER_EMAIL_SUBJECT = "Register an account";
+    public static final String REGISTER_EMAIL_CONTENT = "Register the email verification code, note that it expires in 5 minutes:";
+
     // 绑定邮箱
     public static final String BIND_EMAIL_SUBJECT = "Bind the email verification code";
     public static final String BIND_EMAIL_CONTENT = "Bind the email verification code, note that it expires in 5 minutes:";
 
+    // 登陆2fa
+    public static final String LOGIN_EMAIL_VERIFY_SUBJECT = "2fa verification";
+    public static final String LOGIN_EMAIL_VERIFY_CONTENT = "2fa verification，note that it expires in 5 minutes:";
 }

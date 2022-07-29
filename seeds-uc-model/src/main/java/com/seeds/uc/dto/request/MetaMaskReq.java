@@ -1,9 +1,8 @@
 package com.seeds.uc.dto.request;
 
+import com.seeds.uc.enums.UserOperateEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import javax.validation.constraints.NotBlank;
 
 /**
  * @author yk
@@ -11,16 +10,15 @@ import javax.validation.constraints.NotBlank;
  * @date 2022/07/13
  */
 @Data
-public class MetaMaskLoginReq {
+public class MetaMaskReq {
 
-    @ApiModelProperty(value = "地址", required = true)
-    @NotBlank
+    @ApiModelProperty(value = "钱包地址", required = true)
     private String publicAddress;
-    @ApiModelProperty(value = "签名", required = true)
-    @NotBlank
     private String signature;
     @ApiModelProperty(value = "信息")
     private String message;
+    @ApiModelProperty(value = "类型", required = true)
+    private UserOperateEnum operateEnum;
 
 
 }

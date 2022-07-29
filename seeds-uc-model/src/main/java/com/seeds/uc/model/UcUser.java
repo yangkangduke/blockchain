@@ -2,7 +2,6 @@ package com.seeds.uc.model;
 
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.seeds.uc.enums.ClientStateEnum;
@@ -67,20 +66,12 @@ public class UcUser implements Serializable {
     @ApiModelProperty("create time")
     private Long createdAt;
 
-    @ApiModelProperty("登陆账号")
-    private String account;
-
     @ApiModelProperty("昵称")
     private String nickname;
     @ApiModelProperty("钱包地址，metamask")
     private String publicAddress;
     @ApiModelProperty("随机数，metamask登陆时使用")
     private String nonce;
-    /**
-     * metamask标记  0：未启用  1：启用
-     */
-    @TableField("metamask_flag")
-    private Integer metamaskFlag;
 
 
 }

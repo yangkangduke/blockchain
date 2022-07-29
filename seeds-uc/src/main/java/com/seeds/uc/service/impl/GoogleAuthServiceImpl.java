@@ -1,7 +1,7 @@
 package com.seeds.uc.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.seeds.uc.dto.LoginUserDTO;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class GoogleAuthServiceImpl implements IGoogleAuthService {
 
-    public static String format = "otpauth://totp/%s?secret=%s&issuer=%s";
+    public static final String format = "otpauth://totp/%s?secret=%s&issuer=%s";
     @Autowired
     UcUserMapper userMapper;
     @Autowired
@@ -52,7 +52,7 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
     }
 
     @Override
-    public void verifyUserCode(Long uid, String userInputCode) {
+    public Boolean verifyUserCode(Long uid, String userInputCode) {
         long createTime = System.currentTimeMillis();
         UcUser user = userMapper.selectById(uid);
         boolean verify = verify(userInputCode, user.getGaSecret());
@@ -62,10 +62,11 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
         iUcSecurityStrategyService.saveOrUpdate(UcSecurityStrategy.builder()
                 .uid(uid)
                 .needAuth(true)
-                .authType(Integer.valueOf(ClientAuthTypeEnum.GA.getCode()))
+                .authType(ClientAuthTypeEnum.GA)
                 .createdAt(createTime)
                 .updatedAt(createTime)
                 .build(), new QueryWrapper<UcSecurityStrategy>().lambda().eq(UcSecurityStrategy::getUid, uid));
+        return true;
     }
 
     @Override

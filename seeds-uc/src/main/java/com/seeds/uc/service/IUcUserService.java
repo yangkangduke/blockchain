@@ -2,7 +2,7 @@ package com.seeds.uc.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.uc.dto.LoginUserDTO;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.model.UcUser;
@@ -18,55 +18,31 @@ import com.seeds.uc.model.UcUser;
 public interface IUcUserService extends IService<UcUser> {
 
     /**
-     * 发送验证码
-     *
-     * @param sendReq
-     */
-    String bindEmailSend(SendCodeReq sendReq);
-
-    /**
-     * 邮箱验证码校验
-     *
-     * @param verifyReq
-     */
-    void bindEmail(BindEmailReq verifyReq, LoginUserDTO loginUser);
-
-    /**
-     * 账号重复性校验
-     * L   *
-     *
-     * @param account
-     * @return
-     */
-    void verifyAccount(String account);
-
-    /**
-     * 注册用户
+     * 注册邮箱账号
      *
      * @param registerReq
      * @return
      */
-    LoginResp registerAccount(RegisterReq registerReq, LoginUserDTO loginUser);
+    LoginResp registerEmailAccount(RegisterReq registerReq);
 
     /**
-     * 登陆
+     * 账号登陆
      *
      * @param accountLoginReq
      * @return
      */
-    LoginResp loginAccount(AccountLoginReq accountLoginReq);
+    LoginResp login(LoginReq accountLoginReq);
 
     /**
-     * metamask登陆
+     * metamask验证
      */
-    LoginResp loginMetaMask(MetaMaskLoginReq loginReq);
+    LoginResp metamaskVerify(MetaMaskReq metaMaskReq);
 
     /**
      * metamask登陆获取随机数
-     *
      * @return
      */
-    String metamaskNonce(String publicAddress, LoginUserDTO loginUser);
+    String metamaskNonce(MetaMaskReq metaMaskReq, UcUser loginUser);
 
     /**
      * 忘记密码-发送邮件
@@ -88,4 +64,17 @@ public interface IUcUserService extends IService<UcUser> {
      * @param changePasswordReq
      */
     void forgotPasswordChangePassword(ChangePasswordReq changePasswordReq);
+
+    /**
+     * 注册邮箱账号-发送邮箱验证码
+     * @param email
+     */
+    void registerEmailSend(String email);
+
+    /**
+     * 2fa校验
+     * @param loginReq
+     * @return
+     */
+    LoginResp twoFactorCheck(TwoFactorLoginReq loginReq);
 }

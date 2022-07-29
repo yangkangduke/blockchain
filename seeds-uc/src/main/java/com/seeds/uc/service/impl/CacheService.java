@@ -2,10 +2,11 @@ package com.seeds.uc.service.impl;
 
 
 import com.seeds.uc.constant.UcRedisKeysConstant;
-import com.seeds.uc.dto.AuthCodeDTO;
-import com.seeds.uc.dto.AuthTokenDTO;
-import com.seeds.uc.dto.ForgotPasswordCodeDTO;
-import com.seeds.uc.dto.LoginUserDTO;
+import com.seeds.uc.dto.redis.AuthCodeDTO;
+import com.seeds.uc.dto.redis.AuthTokenDTO;
+import com.seeds.uc.dto.redis.ForgotPasswordCodeDTO;
+import com.seeds.uc.dto.redis.LoginUserDTO;
+import com.seeds.uc.dto.redis.TwoFactorAuth;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,33 @@ public class CacheService {
 
     @Autowired
     private RedissonClient redisson;
+
+    /**
+     * key为2FA的token，用于账户安全的账户2FA校验
+     */
+    public void put2FAInfoWithTokenAndUserAndAuthType(String token,
+                                                      Long userId,
+                                                      String name,
+                                                      ClientAuthTypeEnum authTypeEnum) {
+        Long expireAt = System.currentTimeMillis() + twoFaCodeExpireAfter * 1000;
+        String key = UcRedisKeysConstant.getUcTwoFactorTokenKey(token);
+        RBucket<TwoFactorAuth> authDtoRBucket = redisson.getBucket(key);
+        TwoFactorAuth authDto =
+                TwoFactorAuth.builder()
+                        .userId(userId)
+                        .authAccountName(name)
+                        .authType(authTypeEnum)
+                        .expireAt(expireAt)
+                        .build();
+        authDtoRBucket.set(authDto, twoFaCodeExpireAfter, TimeUnit.SECONDS);
+        log.info("CacheService - putAuthCodeByNameAndAuthTypeAndUseType - put key: {}, value: {}", key, authDto);
+    }
+
+    public TwoFactorAuth get2FAInfoWithToken(String token) {
+        String key = UcRedisKeysConstant.getUcTwoFactorTokenKey(token);
+        RBucket<TwoFactorAuth> twoFactorAuthDto = redisson.getBucket(key);
+        return twoFactorAuthDto.get();
+    }
 
     /**
      * key uc:token:{userId}

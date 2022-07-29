@@ -14,10 +14,13 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class RegisterReq {
 
-    @ApiModelProperty(value = "账号", required = true)
+    @ApiModelProperty(value = "email", required = true)
     @NotBlank
     @Email
-    private String account;
+    private String email;
+    @ApiModelProperty(value = "验证码", required = true)
+    @NotBlank
+    private String code;
     @ApiModelProperty(value = "密码", required = true)
     @NotBlank
     private String password;
