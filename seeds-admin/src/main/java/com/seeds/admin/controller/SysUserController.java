@@ -81,25 +81,18 @@ public class SysUserController {
     @ApiOperation("添加")
     @RequiredPermission("sys:user:add")
     public GenericDto<Object> add(@Valid @RequestBody SysUserAddReq req) {
-        if (StringUtils.isEmpty(req.getMobile()) && StringUtils.isEmpty(req.getAccount())) {
-            return GenericDto.failure(AdminErrorCodeEnum.ERR_504_MISSING_ARGUMENTS.getDescEn(), AdminErrorCodeEnum.ERR_504_MISSING_ARGUMENTS.getCode(), null);
-        }
         if (StringUtils.isEmpty(req.getInitPassport())) {
             req.setInitPassport(initPassword);
         }
         // 手机号查重
-        if (StringUtils.isNotBlank(req.getMobile())) {
-            SysUserEntity adminUser = sysUserService.queryByMobile(req.getMobile());
-            if (adminUser != null) {
-                return GenericDto.failure(AdminErrorCodeEnum.ERR_10051_PHONE_ALREADY_BEEN_USED.getDescEn(), AdminErrorCodeEnum.ERR_10051_PHONE_ALREADY_BEEN_USED.getCode(), null);
-            }
+        SysUserEntity adminUser = sysUserService.queryByMobile(req.getMobile());
+        if (adminUser != null) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_10051_PHONE_ALREADY_BEEN_USED.getDescEn(), AdminErrorCodeEnum.ERR_10051_PHONE_ALREADY_BEEN_USED.getCode(), null);
         }
         // 账号查重
-        if (StringUtils.isNotBlank(req.getAccount())) {
-            SysUserEntity adminUser = sysUserService.queryByAccount(req.getAccount());
-            if (adminUser != null) {
-                return GenericDto.failure(AdminErrorCodeEnum.ERR_10061_ACCOUNT_ALREADY_BEEN_USED.getDescEn(), AdminErrorCodeEnum.ERR_10061_ACCOUNT_ALREADY_BEEN_USED.getCode(), null);
-            }
+        adminUser = sysUserService.queryByAccount(req.getAccount());
+        if (adminUser != null) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_10061_ACCOUNT_ALREADY_BEEN_USED.getDescEn(), AdminErrorCodeEnum.ERR_10061_ACCOUNT_ALREADY_BEEN_USED.getCode(), null);
         }
         sysUserService.add(req);
         return GenericDto.success(null);
@@ -127,7 +120,7 @@ public class SysUserController {
     @PostMapping("changePassword")
     @ApiOperation(value = "修改密码")
     @RequiredPermission("sys:user:changePassword")
-    public GenericDto<Object> changePassword(HttpServletRequest request, @Valid @RequestBody SysUserPasswordReq req) {
+    public GenericDto<Object> changePassword(@Valid @RequestBody SysUserPasswordReq req) {
         SysUserEntity adminUser = sysUserService.queryById(req.getUserId());
         if (adminUser == null) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
@@ -145,16 +138,14 @@ public class SysUserController {
     @PostMapping("resetPassword")
     @ApiOperation(value = "重置密码")
     @RequiredPermission("sys:user:resetPassword")
-    public GenericDto<Object> resetPassword(HttpServletRequest request) {
-        String userId = request.getHeader(HttpHeaders.ADMIN_USER_ID);
-        SysUserEntity adminUser = sysUserService.queryById(Long.valueOf(userId));
+    public GenericDto<Object> resetPassword(@RequestParam(name = "userId") Long userId) {
+        SysUserEntity adminUser = sysUserService.queryById(userId);
         if (adminUser == null) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
         }
         sysUserService.updatePassword(adminUser, initPassword);
         // 登出
-        String token = request.getHeader(HttpHeaders.ADMIN_USER_TOKEN);
-        adminCacheService.removeAdminUserByToken(token);
+        adminCacheService.removeAdminUserByUserId(userId);
         return GenericDto.success(null);
     }
 

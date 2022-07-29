@@ -3,6 +3,7 @@ package com.seeds.admin.controller;
 import com.seeds.admin.constant.AdminRedisKeys;
 import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.admin.dto.request.AdminLoginReq;
+import com.seeds.admin.dto.request.ForgetPasswordReq;
 import com.seeds.admin.dto.response.AdminLoginResp;
 import com.seeds.admin.entity.SysUserEntity;
 import com.seeds.admin.enums.SysAuthTypeEnum;
@@ -142,6 +143,23 @@ public class AdminAuthController {
     public GenericDto<Object> logout(HttpServletRequest request) {
         String token = request.getHeader(HttpHeaders.ADMIN_USER_TOKEN);
         adminCacheService.removeAdminUserByToken(token);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("forgetPassword")
+    @ApiOperation(value = "忘记密码")
+    public GenericDto<Object> forgetPassword(@Valid @RequestBody ForgetPasswordReq req) {
+        SysUserEntity sysUser = sysUserService.queryByMobile(req.getMobile());
+        if (sysUser == null) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_10021_PHONE_NUMBER_INCORRECT.getDescEn(), AdminErrorCodeEnum.ERR_10021_PHONE_NUMBER_INCORRECT.getCode(), null);
+        }
+        // 验证opt
+        boolean flag = adminCaptchaService.validateSmsCaptcha(req.getMobile(), req.getOpt());
+        if (!flag) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_10032_WRONG_SMS_CODE.getDescEn(), AdminErrorCodeEnum.ERR_10032_WRONG_SMS_CODE.getCode(), null);
+        }
+        // 修改密码
+        sysUserService.updatePassword(sysUser, req.getNewPassword());
         return GenericDto.success(null);
     }
 
