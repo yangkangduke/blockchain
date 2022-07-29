@@ -2,6 +2,7 @@ package com.seeds.admin.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.common.web.exception.AuthException;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,12 @@ public class FieldMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        Long adminUserId = UserContext.getCurrentAdminUserId();
+        Long adminUserId;
+        try {
+            adminUserId = UserContext.getCurrentAdminUserId();
+        } catch (AuthException e) {
+            adminUserId = 0L;
+        }
         Date date = new Date();
         long time = date.getTime();
 
