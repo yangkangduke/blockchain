@@ -1,5 +1,6 @@
 package com.seeds.uc.handler;
 
+import cn.hutool.extra.mail.MailException;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
@@ -37,6 +38,14 @@ public class UcExceptionHandler {
     @ExceptionHandler(GenericException.class)
     ResponseEntity<GenericDto<String>> handle(GenericException e) {
         return new ResponseEntity<>(GenericDto.failure(e.getMessage(), e.getErrorCode().getCode()), HttpStatus.OK);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(MailException.class)
+    ResponseEntity<GenericDto<String>> handle(MailException e) {
+        return new ResponseEntity<>(
+                GenericDto.failure(e.getMessage(), HttpStatus.BAD_REQUEST.value()),
+                HttpStatus.BAD_REQUEST);
     }
 
     @ResponseBody

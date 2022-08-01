@@ -161,7 +161,7 @@ public class AuthController {
      * @param sendReq
      * @return
      */
-    @ApiOperation(value = "发送邮件", notes = "发送邮件")
+    @ApiOperation(value = "发送邮件", notes = "useType的传值，注册：REGISTER，忘记密码：RESET_PASSWORD")
     @PostMapping("/email/send")
     public GenericDto<Object> sendEmailCode(@RequestBody AuthCodeSendReq sendReq) {
         log.info("AuthController - sendEmailCode got request: {}", sendReq);
