@@ -1,6 +1,7 @@
 package com.seeds.uc.handler;
 
 import cn.hutool.extra.mail.MailException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
@@ -8,11 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.binding.BindingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 
@@ -38,6 +41,25 @@ public class UcExceptionHandler {
     @ExceptionHandler(GenericException.class)
     ResponseEntity<GenericDto<String>> handle(GenericException e) {
         return new ResponseEntity<>(GenericDto.failure(e.getMessage(), e.getErrorCode().getCode()), HttpStatus.OK);
+    }
+
+    /**
+     * 请求参数类型转换异常（满足Cause是InvalidFormatException异常类型的条件），不需要打印堆栈信息
+     * <p>{@link HttpMessageNotReadableException} && {@link InvalidFormatException}</p>
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<GenericDto<String>> handleResultException(HttpMessageNotReadableException e) {
+        if(e.getCause() instanceof InvalidFormatException) {
+            return new ResponseEntity<>(
+                    GenericDto.failure("JSON parse error", HttpStatus.BAD_REQUEST.value()),
+                    HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity<>(
+                    GenericDto.failure("Internal Error", HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @ResponseBody

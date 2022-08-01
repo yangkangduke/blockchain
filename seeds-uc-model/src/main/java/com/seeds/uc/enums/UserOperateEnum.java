@@ -21,7 +21,6 @@ public enum UserOperateEnum {
     ;
 
     @JsonValue
-    @EnumValue
     private Short code;
     private String desc;
     private String descCn;

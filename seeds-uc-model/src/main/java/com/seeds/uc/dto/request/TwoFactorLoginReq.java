@@ -1,11 +1,13 @@
 package com.seeds.uc.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
 
 @Data
 public class TwoFactorLoginReq {
+    @NotBlank
     private String token;
-    @JsonProperty("auth_code")
+    @NotBlank
     private String authCode;
 }

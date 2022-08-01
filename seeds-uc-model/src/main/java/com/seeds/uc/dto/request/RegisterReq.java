@@ -16,7 +16,6 @@ import javax.validation.constraints.NotBlank;
 public class RegisterReq {
 
     @ApiModelProperty(value = "email", required = true)
-    @NotBlank
     @Email
     private String email;
     @ApiModelProperty(value = "验证码", required = true)

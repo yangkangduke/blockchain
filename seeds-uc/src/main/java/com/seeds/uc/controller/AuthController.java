@@ -71,7 +71,7 @@ public class AuthController {
     @PostMapping("/2fa/login")
     @ApiOperation(value = "2fa登陆", notes = "1.调用/login 返回token\n" +
             "2.调用/2fa/login 返回ucToken")
-    public GenericDto<LoginResp> twoFactorCheck(@RequestBody TwoFactorLoginReq loginReq) {
+    public GenericDto<LoginResp> twoFactorCheck(@Valid @RequestBody TwoFactorLoginReq loginReq) {
         return GenericDto.success(ucUserService.twoFactorCheck(loginReq));
 
     }
@@ -132,8 +132,8 @@ public class AuthController {
      * @return
      */
     @PostMapping("/forgotPassword/reset")
-    @ApiOperation(value = "忘记密码-重置密码", notes = "忘记密码-重置密码")
-    public GenericDto<Object> forgotPasswordReset(@RequestBody ChangePasswordReq changePasswordReq) {
+    @ApiOperation(value = "忘记密码-重置密码", notes = "authTypeEnum的值， 2:emai 3:ga)")
+    public GenericDto<Object> forgotPasswordReset(@Valid @RequestBody ChangePasswordReq changePasswordReq) {
         String code = changePasswordReq.getCode();
         String account = changePasswordReq.getAccount();
         ClientAuthTypeEnum authTypeEnum = changePasswordReq.getAuthTypeEnum();
@@ -163,7 +163,7 @@ public class AuthController {
      */
     @ApiOperation(value = "发送邮件", notes = "useType的传值，注册：REGISTER，忘记密码：RESET_PASSWORD")
     @PostMapping("/email/send")
-    public GenericDto<Object> sendEmailCode(@RequestBody AuthCodeSendReq sendReq) {
+    public GenericDto<Object> sendEmailCode(@Valid @RequestBody AuthCodeSendReq sendReq) {
         log.info("AuthController - sendEmailCode got request: {}", sendReq);
         // 注册
         if (AuthCodeUseTypeEnum.REGISTER.equals(sendReq.getUseType())) {

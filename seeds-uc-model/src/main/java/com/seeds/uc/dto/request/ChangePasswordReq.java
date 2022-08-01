@@ -19,7 +19,6 @@ public class ChangePasswordReq {
     private String account;
     @NotBlank
     private String password;
-    @ApiModelProperty(value = "2emai 3ga")
     private ClientAuthTypeEnum authTypeEnum;
     @NotBlank
     private String code;
