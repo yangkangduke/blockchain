@@ -132,7 +132,7 @@ public class AuthController {
      * @return
      */
     @PostMapping("/forgotPassword/reset")
-    @ApiOperation(value = "忘记密码-重置密码", notes = "authTypeEnum的值， 2:emai 3:ga)")
+    @ApiOperation(value = "忘记密码-重置密码", notes = "authTypeEnum的值， 2:emai 3:ga")
     public GenericDto<Object> forgotPasswordReset(@Valid @RequestBody ChangePasswordReq changePasswordReq) {
         String code = changePasswordReq.getCode();
         String account = changePasswordReq.getAccount();

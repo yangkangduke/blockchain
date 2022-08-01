@@ -36,6 +36,7 @@ public class UcUserAddress implements Serializable {
     private Long updateTime;
 
     @ApiModelProperty("版本")
+    @Version
     private Long version;
 
     private String currency;

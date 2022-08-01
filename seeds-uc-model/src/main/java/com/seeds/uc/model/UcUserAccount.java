@@ -3,6 +3,7 @@ package com.seeds.uc.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -38,6 +39,7 @@ public class UcUserAccount implements Serializable {
     private Long updateTime;
 
     @ApiModelProperty("版本控制")
+    @Version
     private Long version;
 
     @ApiModelProperty("账号类型 1 现货 ")
