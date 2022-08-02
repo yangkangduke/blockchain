@@ -2,7 +2,6 @@ package com.seeds.uc.controller;
 
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.MetaMaskReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
