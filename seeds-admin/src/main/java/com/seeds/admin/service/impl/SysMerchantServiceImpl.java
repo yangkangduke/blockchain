@@ -227,8 +227,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         if (CollectionUtils.isEmpty(sysMerchants)) {
             return;
         }
-        sysMerchants.forEach(p -> p.setDeleteFlag(WhetherEnum.YES.value()));
-        updateBatchById(sysMerchants);
+        removeBatchByIds(sysMerchants);
         List<SysMerchantUserEntity> sysMerchantUser = sysMerchantUserService.queryByMerchantIds(merchantIds);
         if (!CollectionUtils.isEmpty(sysMerchantUser)) {
             Set<Long> userIds = sysMerchantUser.stream().map(SysMerchantUserEntity::getUserId).collect(Collectors.toSet());
@@ -237,12 +236,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
             // 删除商家用户
             userIds = screeningUsers(userIds, merchantIds);
             if (!CollectionUtils.isEmpty(userIds)) {
-                userIds.forEach(p -> {
-                    SysUserEntity user = new SysUserEntity();
-                    user.setId(p);
-                    user.setDeleteFlag(WhetherEnum.YES.value());
-                    sysUserService.updateById(user);
-                });
+                sysUserService.removeBatchByIds(userIds);
                 // 删除用户和角色的关联
                 sysRoleUserService.deleteByUserIds(userIds);
             }
@@ -315,12 +309,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         // 删除商家用户
         userIds = screeningUsers(userIds, Sets.newHashSet(merchantId));
         if (!CollectionUtils.isEmpty(userIds)) {
-            userIds.forEach(p -> {
-                SysUserEntity user = new SysUserEntity();
-                user.setId(p);
-                user.setDeleteFlag(WhetherEnum.YES.value());
-                sysUserService.updateById(user);
-            });
+            sysUserService.removeByIds(userIds);
         }
         // 删除用户和角色的关联
         sysRoleUserService.deleteByUserIds(userIds);

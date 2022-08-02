@@ -121,12 +121,7 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     @Override
     public void batchDelete(ListReq req) {
         // 删除游戏
-        req.getIds().forEach(p -> {
-            SysGameEntity sysGame = new SysGameEntity();
-            sysGame.setId(p);
-            sysGame.setDeleteFlag(WhetherEnum.YES.value());
-            updateById(sysGame);
-        });
+        removeBatchByIds(req.getIds());
         // 删除商家和游戏的关联
         sysMerchantGameService.deleteByGameIds(req.getIds());
     }

@@ -19,10 +19,7 @@ import com.seeds.admin.entity.SysUserEntity;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysUserMapper;
-import com.seeds.admin.service.SysMenuService;
-import com.seeds.admin.service.SysRoleService;
-import com.seeds.admin.service.SysRoleUserService;
-import com.seeds.admin.service.SysUserService;
+import com.seeds.admin.service.*;
 import com.seeds.admin.utils.HashUtil;
 import com.seeds.admin.utils.RandomUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +45,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 
     @Autowired
     private SysRoleService sysRoleService;
+
+    @Autowired
+    private SysFileService sysFileService;
 
     @Autowired
     private SysRoleUserService sysRoleUserService;
@@ -81,6 +81,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
                 .likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysUserEntity::getRealName, query.getNameOrMobile())
                 .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysUserEntity::getMobile, query.getNameOrMobile())
+                .eq(query.getDeptId() != null, SysUserEntity::getDeptId, query.getDeptId())
                 .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
         Page<SysUserEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysUserEntity> records = page(page, queryWrap).getRecords();
@@ -163,12 +164,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         if (CollectionUtils.isEmpty(ids)) {
             return;
         }
-        ids.forEach(p -> {
-            SysUserEntity sysUser = new SysUserEntity();
-            sysUser.setId(p);
-            sysUser.setDeleteFlag(WhetherEnum.YES.value());
-            updateById(sysUser);
-        });
+        removeByIds(ids);
     }
 
     @Override
@@ -232,6 +228,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
                 if (str.length() > 0) {
                     resp.setRoleNameStr(str.substring(0, str.lastIndexOf(",")));
                 }
+            }
+            // 头像
+            if (StringUtils.isNotBlank(user.getObjectName())) {
+                resp.setHeadUrl(sysFileService.getFile(user.getObjectName()));
             }
         }
         return resp;

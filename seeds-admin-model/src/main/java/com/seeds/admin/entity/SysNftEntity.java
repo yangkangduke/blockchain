@@ -1,6 +1,7 @@
 package com.seeds.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,10 +27,16 @@ public class SysNftEntity extends BaseEntity {
 	private String number;
 
 	/**
-	 * 图片
+	 * 图片对象名
 	 */
-	@TableField("picture")
-	private String picture;
+	@TableField("object_name")
+	private String objectName;
+
+	/**
+	 * 图片文件id
+	 */
+	@TableField("file_id")
+	private Long fileId;
 
 	/**
 	 * 名称
@@ -106,6 +113,7 @@ public class SysNftEntity extends BaseEntity {
 	/**
 	 * 删除标记  1：已删除   0：未删除
 	 */
+	@TableLogic
 	@TableField("delete_flag")
 	private Integer deleteFlag;
 

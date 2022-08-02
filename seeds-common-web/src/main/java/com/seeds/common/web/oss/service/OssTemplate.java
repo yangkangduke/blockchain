@@ -175,7 +175,6 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 		// 上传
 		return amazonS3.putObject(bucketName, objectName, byteArrayInputStream, objectMetadata);
-
 	}
 
 	/**

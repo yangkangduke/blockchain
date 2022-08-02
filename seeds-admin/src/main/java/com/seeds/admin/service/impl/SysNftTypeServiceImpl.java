@@ -100,12 +100,6 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
     public void batchDelete(ListReq req) {
         Set<Long> ids = req.getIds();
         // 删除NFT类别
-        ids.forEach(p -> {
-            SysNftTypeEntity nftType = new SysNftTypeEntity();
-            nftType.setId(p);
-            nftType.setDeleteFlag(WhetherEnum.YES.value());
-            updateById(nftType);
-        });
         removeBatchByIds(ids);
     }
 

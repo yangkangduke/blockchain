@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -93,6 +96,22 @@ public class AdminCacheServiceImpl implements AdminCacheService {
         String key = AdminRedisKeys.getAdminUserIdKey(userId);
         String token = redisson.<String>getBucket(key).get();
         removeAdminUserByToken(token);
+    }
+
+    @Override
+    public String getFileUrlByObjectName(String objectName) {
+        String key = AdminRedisKeys.getAdminOssFileUrlKeyTemplate(objectName);
+        return redisson.<String>getBucket(key).get();
+    }
+
+    @Override
+    public void putFileUrlByObjectName(String objectName, String url, Integer expires) {
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_MONTH, expires);
+        String key = AdminRedisKeys.getAdminOssFileUrlKeyTemplate(objectName);
+        redisson.getBucket(key).set(url, calendar.getTime().getTime(), TimeUnit.SECONDS);
     }
 
     private void removeAdminUserLoginUidTokenMapping(Long uid) {

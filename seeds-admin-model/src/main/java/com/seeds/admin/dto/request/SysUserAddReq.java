@@ -37,10 +37,16 @@ public class SysUserAddReq {
 	private String initPassport;
 
 	/**
-	 * 头像
+	 * 头像对象名
 	 */
-	@ApiModelProperty("头像")
-	private String headUrl;
+	@ApiModelProperty("头像对象名")
+	private String objectName;
+
+	/**
+	 * 图片文件id
+	 */
+	@ApiModelProperty("图片文件id")
+	private Long fileId;
 
 	/**
 	 * 性别   0：男   1：女    2：保密
