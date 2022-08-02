@@ -12,7 +12,6 @@ import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.mapper.SysFileMapper;
 import com.seeds.admin.service.AdminCacheService;
 import com.seeds.admin.service.SysFileService;
-import com.seeds.common.web.oss.FileProperties;
 import com.seeds.common.web.oss.service.OssTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -38,11 +37,11 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
     @Value("${admin.oss.file.expires:1}")
     private Integer expires;
 
-    @Autowired
-    private OssTemplate template;
+    @Value("${admin.oss.bucket.name:admin}")
+    private String bucketName;
 
     @Autowired
-    private FileProperties fileProperties;
+    private OssTemplate template;
 
     @Autowired
     private AdminCacheService adminCacheService;
@@ -55,10 +54,10 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
         String objectName = IdUtil.simpleUUID() + StrUtil.DOT + FileUtil.extName(originalFilename);
         SysFileEntity sysFile = new SysFileEntity();
         try (InputStream inputStream = file.getInputStream()) {
-            template.putObject(fileProperties.getBucketName(), objectName, inputStream, file.getSize(), file.getContentType());
+            template.putObject(bucketName, objectName, inputStream, file.getSize(), file.getContentType());
             // 记录文件信息
             sysFile.setObjectName(objectName);
-            sysFile.setBucketName(fileProperties.getBucketName());
+            sysFile.setBucketName(bucketName);
             sysFile.setFileName(originalFilename);
             sysFile.setType(type);
             save(sysFile);
@@ -75,7 +74,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
 
     @Override
     public void download(HttpServletResponse response, String objectName) {
-        try (S3Object s3Object = template.getObject(fileProperties.getBucketName(), objectName)) {
+        try (S3Object s3Object = template.getObject(bucketName, objectName)) {
             response.setContentType("application/octet-stream; charset=UTF-8");
             IoUtil.copy(s3Object.getObjectContent(), response.getOutputStream());
         }
@@ -92,7 +91,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
             return url;
         }
         try {
-            url = template.getObjectURL(fileProperties.getBucketName(), objectName, expires);
+            url = template.getObjectURL(bucketName, objectName, expires);
             if (StringUtils.isNotBlank(url)) {
                 adminCacheService.putFileUrlByObjectName(objectName, url, expires);
             }
@@ -111,7 +110,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
             return;
         }
         try {
-            template.removeObject(fileProperties.getBucketName(), sysFile.getObjectName());
+            template.removeObject(bucketName, sysFile.getObjectName());
             removeById(fileId);
         }
         catch (Exception e) {
