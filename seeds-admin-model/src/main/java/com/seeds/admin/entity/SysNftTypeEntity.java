@@ -1,6 +1,7 @@
 package com.seeds.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -50,6 +51,7 @@ public class SysNftTypeEntity extends BaseEntity {
 	/**
 	 * 删除标记  1：已删除   0：未删除
 	 */
+	@TableLogic
 	@TableField("delete_flag")
 	private Integer deleteFlag;
 

@@ -15,4 +15,7 @@ public class SysUserPageReq extends PageReq {
     @ApiModelProperty(value = "姓名/手机号")
     private String nameOrMobile;
 
+    @ApiModelProperty(value = "部门id")
+    private Long deptId;
+
 }

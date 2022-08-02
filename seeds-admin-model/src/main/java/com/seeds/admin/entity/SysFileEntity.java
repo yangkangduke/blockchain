@@ -6,53 +6,46 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-
 /**
- * 商家
+ * 系统文件
  * 
  * @author hang.yu
- * @date 2022/7/19
+ * @date 2022/8/02
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName("sys_merchant")
-public class SysMerchantEntity extends BaseEntity {
+@TableName("sys_file")
+public class SysFileEntity extends BaseEntity {
 
 	/**
-	 * 商家名称
+	 * 对象名
 	 */
-	@TableField("name")
-	private String name;
+	@TableField("object_name")
+	private String objectName;
 
 	/**
-	 * 负责人id
+	 * 桶名
 	 */
-	@TableField("leader_id")
-	private Long leaderId;
+	@TableField("bucket_name")
+	private String bucketName;
 
 	/**
-	 * 联系方式
+	 * 文件名
 	 */
-	@TableField("mobile")
-	private String mobile;
+	@TableField("file_name")
+	private String fileName;
 
 	/**
-	 * 商家状态  0：停用   1：正常
+	 * 类型
 	 */
-	@TableField("status")
-	private Integer status;
-
-	/**
-	 * 网站地址
-	 */
-	@TableField("url")
-	private String url;
+	@TableField("type")
+	private String type;
 
 	/**
 	 * 删除标记  1：已删除   0：未删除
 	 */
-	@TableLogic
 	@TableField("delete_flag")
+	@TableLogic
 	private Integer deleteFlag;
 
 }

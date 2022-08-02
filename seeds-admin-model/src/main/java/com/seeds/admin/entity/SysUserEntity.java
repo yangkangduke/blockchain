@@ -1,6 +1,7 @@
 package com.seeds.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,10 +36,16 @@ public class SysUserEntity extends BaseEntity {
 	private String realName;
 
 	/**
-	 * 头像
+	 * 头像对象名
 	 */
-	@TableField("head_url")
-	private String headUrl;
+	@TableField("object_name")
+	private String objectName;
+
+	/**
+	 * 头像文件id
+	 */
+	@TableField("file_id")
+	private Long fileId;
 
 	/**
 	 * 性别   0：女  1：男  2：保密
@@ -85,18 +92,22 @@ public class SysUserEntity extends BaseEntity {
 	/**
 	 * 删除标记  1：已删除   0：未删除
 	 */
+	@TableLogic
 	@TableField("delete_flag")
 	private Integer deleteFlag;
+
 	/**
 	 * 钱包地址，metamask
 	 */
 	@TableField("public_address")
 	private String publicAddress;
+
 	/**
 	 * metamask标记  0：未启用  1：启用
 	 */
 	@TableField("metamask_flag")
 	private Integer metamaskFlag;
+
 	/**
 	 * 随机数，metamask验证时使用
 	 */

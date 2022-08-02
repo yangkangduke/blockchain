@@ -40,6 +40,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     private SysGameService sysGameService;
 
     @Autowired
+    private SysFileService sysFileService;
+
+    @Autowired
     private SysNftTypeService sysNftTypeService;
 
     @Autowired
@@ -70,6 +73,10 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             BeanUtils.copyProperties(p, resp);
             resp.setGameName(gameMap.get(p.getGameId()));
             resp.setTypeName(nftTypeMap.get(p.getNftTypeId()));
+            // 图片
+            if (StringUtils.isNotBlank(p.getObjectName())) {
+                resp.setPicture(sysFileService.getFile(p.getObjectName()));
+            }
             return resp;
         });
     }
@@ -123,6 +130,10 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 });
             }
             resp.setPropertiesList(list);
+            // 图片
+            if (StringUtils.isNotBlank(sysNft.getObjectName())) {
+                resp.setPicture(sysFileService.getFile(sysNft.getObjectName()));
+            }
         }
         return resp;
     }
@@ -154,12 +165,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     public void batchDelete(ListReq req) {
         Set<Long> ids = req.getIds();
         // 删除NFT
-        ids.forEach(p -> {
-            SysNftEntity nft = new SysNftEntity();
-            nft.setId(p);
-            nft.setDeleteFlag(WhetherEnum.YES.value());
-            updateById(nft);
-        });
+        removeBatchByIds(ids);
         // 删除和NFT属性的关联
         sysNftPropertiesService.deleteByNftIs(ids);
     }

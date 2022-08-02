@@ -13,6 +13,8 @@ public class AdminRedisKeys {
 
     public final String ADMIN_LOGIN_CAPTCHA_KEY_PREFIX = ADMIN_KEY_PREFIX + "login:captcha:%S";
 
+    public final String ADMIN_OSS_FILE_URL_KEY_PREFIX = ADMIN_KEY_PREFIX + "oss:file:url:%S";
+
     /**
      * 拼接管理后台用户token的key
      */
@@ -32,6 +34,13 @@ public class AdminRedisKeys {
      */
     public String getAdminLoginCaptchaKeyTemplate(String key) {
         return String.format(ADMIN_LOGIN_CAPTCHA_KEY_PREFIX, key);
+    }
+
+    /**
+     * 拼接文件链接缓存的key
+     */
+    public String getAdminOssFileUrlKeyTemplate(String key) {
+        return String.format(ADMIN_OSS_FILE_URL_KEY_PREFIX, key);
     }
 
 }
