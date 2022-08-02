@@ -32,6 +32,7 @@ public enum ClientAuthTypeEnum {
 
     public static Set<ClientAuthTypeEnum> NEED_SEND_CODE = EnumSet.of(GA, EMAIL);
     @JsonValue
+    @EnumValue
     private final Short code;
     private final String desc;
 
