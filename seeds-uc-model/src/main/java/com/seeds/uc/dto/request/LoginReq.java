@@ -22,7 +22,7 @@ public class LoginReq {
     @ApiModelProperty(value = "密码", required = true)
     @NotBlank
     private String password;
-    @ApiModelProperty(value = "2fa方式: email:2, ga:3")
+    @ApiModelProperty(value = "授权类型: 2-email, 3-ga")
     private ClientAuthTypeEnum authType;
 
 

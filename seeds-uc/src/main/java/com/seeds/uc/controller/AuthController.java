@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
@@ -140,6 +142,11 @@ public class AuthController {
         if (ClientAuthTypeEnum.EMAIL.equals(authTypeEnum)) {
             ucUserService.forgotPasswordVerifyLink(code, account);
         } else if (ClientAuthTypeEnum.GA.equals(authTypeEnum)) {
+            Pattern pattern = Pattern.compile("[0-9]*");
+            Matcher isNum = pattern.matcher(code);
+            if( !isNum.matches() ){
+               throw new InvalidArgumentsException("Please enter a number type code");
+            }
             UcUser one = ucUserService.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, account));
             if (one == null) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
@@ -161,7 +168,7 @@ public class AuthController {
      * @param sendReq
      * @return
      */
-    @ApiOperation(value = "发送邮件", notes = "useType的传值，注册：REGISTER，忘记密码：RESET_PASSWORD")
+    @ApiOperation(value = "发送邮件", notes = "发送邮件")
     @PostMapping("/email/send")
     public GenericDto<Object> sendEmailCode(@Valid @RequestBody AuthCodeSendReq sendReq) {
         log.info("AuthController - sendEmailCode got request: {}", sendReq);

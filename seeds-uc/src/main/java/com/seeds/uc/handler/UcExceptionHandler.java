@@ -57,9 +57,17 @@ public class UcExceptionHandler {
                     HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<>(
-                    GenericDto.failure("Internal Error", HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                    GenericDto.failure("Internal Error：" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @ResponseBody
+    @ExceptionHandler(NumberFormatException.class)
+    ResponseEntity<GenericDto<String>> handle(NumberFormatException e) {
+        return new ResponseEntity<>(
+                GenericDto.failure("String cannot be converted to number", HttpStatus.BAD_REQUEST.value()),
+                HttpStatus.BAD_REQUEST);
     }
 
     @ResponseBody
