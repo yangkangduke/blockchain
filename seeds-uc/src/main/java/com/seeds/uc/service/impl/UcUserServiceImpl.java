@@ -291,7 +291,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             try {
                 String decodeStr = Base64.decodeStr(encode);
                 String decrypt = DigestUtil.Decrypt(decodeStr);
-                String[] split = decrypt.split(UcConstant.FORGOT_PASSWORD_EMAIL_LINK_SYMBOL);
+                String[] split = decrypt.split(";");
                 String code = split[1];
                 long curtime = System.currentTimeMillis();
                 AuthCodeDTO authCode = cacheService.getAuthCode(account, AuthCodeUseTypeEnum.RESET_PASSWORD, ClientAuthTypeEnum.EMAIL);
