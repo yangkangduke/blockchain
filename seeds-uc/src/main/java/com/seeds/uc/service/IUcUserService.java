@@ -50,7 +50,7 @@ public interface IUcUserService extends IService<UcUser> {
      *
      * @param encode
      */
-    void forgotPasswordVerifyLink(String encode);
+    void forgotPasswordVerifyLink(String encode, String account);
 
     /**
      * 忘记密码-修改密码

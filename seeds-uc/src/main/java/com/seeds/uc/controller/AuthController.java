@@ -119,8 +119,8 @@ public class AuthController {
     @ApiOperation(value = "忘记密码-验证链接", notes = "1.调用/send/email 发送邮件链接\n" +
             "2.调用/forgotPassword/verifyLink 验证链接\n" +
             "3.调用/forgotPassword/reset 重置密码")
-    public GenericDto<Object> forgotPasswordVerifyLink(String encode) {
-        ucUserService.forgotPasswordVerifyLink(encode);
+    public GenericDto<Object> forgotPasswordVerifyLink(String encode, String account) {
+        ucUserService.forgotPasswordVerifyLink(encode, account);
         return GenericDto.success(null);
     }
 
@@ -132,13 +132,13 @@ public class AuthController {
      * @return
      */
     @PostMapping("/forgotPassword/reset")
-    @ApiOperation(value = "忘记密码-重置密码", notes = "authTypeEnum的值， 2:emai 3:ga")
+    @ApiOperation(value = "忘记密码-重置密码", notes = "忘记密码-重置密码")
     public GenericDto<Object> forgotPasswordReset(@Valid @RequestBody ChangePasswordReq changePasswordReq) {
         String code = changePasswordReq.getCode();
         String account = changePasswordReq.getAccount();
         ClientAuthTypeEnum authTypeEnum = changePasswordReq.getAuthTypeEnum();
         if (ClientAuthTypeEnum.EMAIL.equals(authTypeEnum)) {
-            ucUserService.forgotPasswordVerifyLink(code);
+            ucUserService.forgotPasswordVerifyLink(code, account);
         } else if (ClientAuthTypeEnum.GA.equals(authTypeEnum)) {
             UcUser one = ucUserService.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, account));
             if (one == null) {

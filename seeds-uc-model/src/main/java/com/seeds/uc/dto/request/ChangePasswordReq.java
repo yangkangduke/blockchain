@@ -19,6 +19,7 @@ public class ChangePasswordReq {
     private String account;
     @NotBlank
     private String password;
+    @ApiModelProperty(value = "email:2, ga:3", required = true)
     private ClientAuthTypeEnum authTypeEnum;
     @NotBlank
     private String code;

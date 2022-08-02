@@ -94,6 +94,7 @@ public class OpenUserController {
      * @param
      * @return
      */
+
     @PostMapping("/metamask/verify")
     @ApiOperation(value = "metamask验证",
             notes = "1.调用/metamask/nonce生成nonce\n" +

@@ -286,13 +286,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @param encode
      */
     @Override
-    public void forgotPasswordVerifyLink(String encode) {
+    public void forgotPasswordVerifyLink(String encode, String account) {
         if (StrUtil.isNotBlank(encode)) {
             try {
                 String decodeStr = Base64.decodeStr(encode);
                 String decrypt = DigestUtil.Decrypt(decodeStr);
                 String[] split = decrypt.split(UcConstant.FORGOT_PASSWORD_EMAIL_LINK_SYMBOL);
-                String account = split[0];
                 String code = split[1];
                 long curtime = System.currentTimeMillis();
                 AuthCodeDTO authCode = cacheService.getAuthCode(account, AuthCodeUseTypeEnum.RESET_PASSWORD, ClientAuthTypeEnum.EMAIL);
@@ -323,7 +322,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String account = changePasswordReq.getAccount();
         String salt = RandomUtil.getRandomSalt();
         String password = PasswordUtil.getPassword(changePasswordReq.getPassword(), salt);
-        this.update(UcUser.builder().password(password).salt(salt).build(), new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, account));
+        this.update(UcUser.builder().password(password).salt(salt).build(),
+                new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, account));
     }
 
 
