@@ -38,4 +38,4 @@ redisson:
   password: Seeds123!
 
 resetpassword:
-  url: http://localhost:9999/uc/auth/forgotPassword/verifyLink?encode=
+  url: http://localhost:9999/uc/auth/forgotPassword/verifyLink?encode={}&account={}

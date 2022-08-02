@@ -2,6 +2,7 @@ package com.seeds.uc.service.impl;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.StrFormatter;
 import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
 import com.seeds.common.web.config.EmailProperties;
@@ -131,12 +132,12 @@ public class SendCodeServiceImpl implements SendCodeService {
 
     private boolean doSendEmailCode(String email, String code, AuthCodeUseTypeEnum useType) {
         if (useType.equals(AuthCodeUseTypeEnum.REGISTER)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.REGISTER_EMAIL_SUBJECT, UcConstant.REGISTER_EMAIL_CONTENT + code, false);
+            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.REGISTER_EMAIL_SUBJECT, StrFormatter.format(UcConstant.REGISTER_EMAIL_CONTENT, 5, code), false);
         } else if (useType.equals(AuthCodeUseTypeEnum.RESET_PASSWORD)) {
-            String encode = Base64.encode(DigestUtil.Encrypt(email + UcConstant.FORGOT_PASSWORD_EMAIL_LINK_SYMBOL + code));
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT + "<a>" + resetPasswordProperties.getUrl() + encode + "</a>", true);
+            String encode = Base64.encode(DigestUtil.Encrypt(StrFormatter.format(UcConstant.FORGOT_PASSWORD_EMAIL_LINK_SYMBOL, email ,code)));
+            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT,5, StrFormatter.format(resetPasswordProperties.getUrl(),encode, email)), true);
         } else if (useType.equals(AuthCodeUseTypeEnum.LOGIN)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.LOGIN_EMAIL_VERIFY_SUBJECT, UcConstant.LOGIN_EMAIL_VERIFY_CONTENT + code, false);
+            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.LOGIN_EMAIL_VERIFY_SUBJECT, StrFormatter.format(UcConstant.LOGIN_EMAIL_VERIFY_CONTENT, 5, code), false);
         } else {
             throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
         }
