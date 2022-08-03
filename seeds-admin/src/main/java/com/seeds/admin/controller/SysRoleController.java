@@ -2,10 +2,7 @@ package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.annotation.RequiredPermission;
-import com.seeds.admin.dto.request.ListReq;
-import com.seeds.admin.dto.request.SysRoleAddReq;
-import com.seeds.admin.dto.request.SysRoleModifyReq;
-import com.seeds.admin.dto.request.SysRolePageReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysRoleResp;
 import com.seeds.admin.entity.SysRoleEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
@@ -87,6 +84,14 @@ public class SysRoleController {
     @RequiredPermission("sys:role:delete")
     public GenericDto<Object> delete(@Valid @RequestBody ListReq req) {
         sysRoleService.batchDelete(req.getIds());
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("assign")
+    @ApiOperation("分配")
+    @RequiredPermission("sys:role:assign")
+    public GenericDto<Object> assign(@Valid @RequestBody SysRoleAssignReq req) {
+        sysRoleService.assign(req);
         return GenericDto.success(null);
     }
 

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.SysRoleAddReq;
+import com.seeds.admin.dto.request.SysRoleAssignReq;
 import com.seeds.admin.dto.request.SysRoleModifyReq;
 import com.seeds.admin.dto.request.SysRolePageReq;
 import com.seeds.admin.dto.response.SysRoleResp;
@@ -163,6 +164,29 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
         Set<Long> roleIds = roleUser.stream().map(SysRoleUserEntity::getRoleId).collect(Collectors.toSet());
         List<SysRoleEntity> list = listByIds(roleIds);
         return convertToResp(list);
+    }
+
+    @Override
+    public void assign(SysRoleAssignReq req) {
+        List<Long> userIds = req.getUserIds();
+        List<SysRoleUserEntity> roleUsers = sysRoleUserService.queryByRoleId(req.getRoleId());
+        Set<Long> userIdSet;
+        if (CollectionUtils.isEmpty(roleUsers)) {
+            userIdSet = new HashSet<>(userIds);
+        } else {
+            // 排除已存在用户角色关系
+            Set<Long> existUsers = roleUsers.stream().map(SysRoleUserEntity::getUserId).collect(Collectors.toSet());
+            userIdSet = userIds.stream().filter(p -> !existUsers.contains(p)).collect(Collectors.toSet());
+        }
+        if (CollectionUtils.isEmpty(userIdSet)) {
+            return;
+        }
+        userIdSet.forEach(p -> {
+            SysRoleUserEntity roleUser = new SysRoleUserEntity();
+            roleUser.setRoleId(req.getRoleId());
+            roleUser.setUserId(p);
+            sysRoleUserService.save(roleUser);
+        });
     }
 
     private List<SysRoleResp> convertToResp(List<SysRoleEntity> list){

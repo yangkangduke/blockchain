@@ -3,6 +3,7 @@ package com.seeds.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.SysRoleAddReq;
+import com.seeds.admin.dto.request.SysRoleAssignReq;
 import com.seeds.admin.dto.request.SysRoleModifyReq;
 import com.seeds.admin.dto.request.SysRolePageReq;
 import com.seeds.admin.dto.response.SysRoleResp;
@@ -92,5 +93,11 @@ public interface SysRoleService extends IService<SysRoleEntity> {
      * @return 系统用户角色信息
      */
     List<SysRoleResp> queryByUserId(Long userId);
+
+    /**
+     * 给用户分配指定的角色
+     * @param req 角色id列表
+     */
+    void assign(SysRoleAssignReq req);
 
 }

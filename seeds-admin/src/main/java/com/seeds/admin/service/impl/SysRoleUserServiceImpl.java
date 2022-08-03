@@ -41,6 +41,13 @@ public class SysRoleUserServiceImpl extends ServiceImpl<SysRoleUserMapper, SysRo
     }
 
     @Override
+    public List<SysRoleUserEntity> queryByRoleId(Long roleId) {
+        LambdaQueryWrapper<SysRoleUserEntity> query = new QueryWrapper<SysRoleUserEntity>().lambda()
+                .eq(SysRoleUserEntity::getRoleId, roleId);
+        return list(query);
+    }
+
+    @Override
     public Map<Long, Set<Long>> queryMapByUserIds(Collection<Long> userIds) {
         if (CollectionUtils.isEmpty(userIds)) {
             return Collections.emptyMap();

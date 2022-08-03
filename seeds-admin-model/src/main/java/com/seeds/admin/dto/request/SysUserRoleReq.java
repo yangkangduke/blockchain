@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class SysUserRoleReq {
     private Long userId;
 
     @ApiModelProperty(value = "角色id列表")
+    @NotEmpty(message = "Role id list cannot be empty")
     private List<Long> roleIds;
 
 }
