@@ -13,7 +13,7 @@ file:
     secret-key: seeds123!
 
 email:
-  host: smtp.qq.com
-  from: seeds<819628513@qq.com>
-  user: 819628513@qq.com
-  pass: notypapwvrocbfhb
+  host: smtp.gmail.com
+  from: seeds<yangkang.duke@gmail.com>
+  user: yangkang.duke@gmail.com
+  pass: nfijtkbvgaflsprw
