@@ -18,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -143,10 +144,10 @@ public class AuthController {
      */
     @PostMapping("/forgotPassword/reset")
     @ApiOperation(value = "忘记密码-重置密码", notes = "忘记密码-重置密码")
-    public GenericDto<Object> forgotPasswordReset(@Valid @RequestBody ChangePasswordReq changePasswordReq) {
-        String code = changePasswordReq.getCode();
-        String account = changePasswordReq.getAccount();
-        ClientAuthTypeEnum authTypeEnum = changePasswordReq.getAuthTypeEnum();
+    public GenericDto<Object> forgotPasswordReset(@Valid @RequestBody ResetPasswordReq resetPasswordReq) {
+        String code = resetPasswordReq.getCode();
+        String account = resetPasswordReq.getAccount();
+        ClientAuthTypeEnum authTypeEnum = resetPasswordReq.getAuthTypeEnum();
         if (ClientAuthTypeEnum.EMAIL.equals(authTypeEnum)) {
             ucUserService.forgotPasswordVerifyLink(code, account);
         } else if (ClientAuthTypeEnum.GA.equals(authTypeEnum)) {
@@ -166,7 +167,7 @@ public class AuthController {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_504_MISSING_ARGUMENTS);
         }
 
-        ucUserService.forgotPasswordReset(changePasswordReq);
+        ucUserService.forgotPasswordReset(resetPasswordReq);
 
         return GenericDto.success(null);
     }
@@ -189,6 +190,9 @@ public class AuthController {
             sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
             // 忘记密码
         }  else if (AuthCodeUseTypeEnum.RESET_PASSWORD.equals(sendReq.getUseType())) {
+            sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
+            // 修改密码
+        } else if (AuthCodeUseTypeEnum.CHANGE_PASSWORD.equals(sendReq.getUseType())) {
             sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
         } else {
             throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);

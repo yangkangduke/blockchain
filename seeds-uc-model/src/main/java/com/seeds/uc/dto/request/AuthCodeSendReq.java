@@ -13,7 +13,7 @@ import lombok.Data;
 @Data
 public class AuthCodeSendReq {
     private String email;
-    @ApiModelProperty(value = "授权码使用类型：REGISTER-注册，RESET_PASSWORD-忘记密码", required = true)
+    @ApiModelProperty(value = "授权码使用类型：REGISTER-注册，RESET_PASSWORD-忘记密码，CHANGE_PASSWORD-修改密码", required = true)
     private AuthCodeUseTypeEnum useType;
     // 二次验证再次发送sms的时候用到
     private String token;

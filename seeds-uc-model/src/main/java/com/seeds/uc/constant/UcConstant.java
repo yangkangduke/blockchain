@@ -24,4 +24,8 @@ public class UcConstant {
     // 登陆2fa
     public static final String LOGIN_EMAIL_VERIFY_SUBJECT = "2fa verification";
     public static final String LOGIN_EMAIL_VERIFY_CONTENT = "2fa verification，note that it expires in {} minutes:{}";
+
+    // 修改密码
+    public static final String CHANGE_PASSWORD_EMAIL_SUBJECT = "change Password";
+    public static final String CHANGE_PASSWORD_EMAIL_CONTENT = "change Password verification code, note that it expires in {} minutes:{}";
 }

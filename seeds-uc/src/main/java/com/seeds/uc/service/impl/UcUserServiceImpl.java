@@ -2,15 +2,12 @@ package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.mail.MailAccount;
-import cn.hutool.extra.mail.MailUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.config.EmailProperties;
 import com.seeds.uc.config.ResetPasswordProperties;
-import com.seeds.uc.constant.UcConstant;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
@@ -18,7 +15,6 @@ import com.seeds.uc.dto.redis.TwoFactorAuth;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.ProfileResp;
-import com.seeds.uc.dto.response.UcSecurityStrategyResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.LoginException;
@@ -34,13 +30,10 @@ import com.seeds.uc.util.DigestUtil;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.crypto.WalletUtils;
-
-import java.util.List;
 
 /**
  * <p>
@@ -317,13 +310,13 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     /**
      * 忘记密码-修改密码
      *
-     * @param changePasswordReq
+     * @param resetPasswordReq
      */
     @Override
-    public void forgotPasswordReset(ChangePasswordReq changePasswordReq) {
-        String account = changePasswordReq.getAccount();
+    public void forgotPasswordReset(ResetPasswordReq resetPasswordReq) {
+        String account = resetPasswordReq.getAccount();
         String salt = RandomUtil.getRandomSalt();
-        String password = PasswordUtil.getPassword(changePasswordReq.getPassword(), salt);
+        String password = PasswordUtil.getPassword(resetPasswordReq.getPassword(), salt);
         this.update(UcUser.builder().password(password).salt(salt).build(),
                 new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, account));
     }
@@ -418,6 +411,38 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         BeanUtil.copyProperties(this.getById(userId), profileResp);
         profileResp.setSecurityStrategyList(ucSecurityStrategyService.getByUserId(userId));
         return profileResp;
+    }
+
+    /**
+     * 修改昵称
+     * @param nickname
+     * @param loginUser
+     */
+    @Override
+    public Boolean updateNickname(String nickname, LoginUserDTO loginUser) {
+        long currentTime = System.currentTimeMillis();
+        return this.updateById(UcUser.builder()
+                .id(loginUser.getUserId())
+                .nickname(nickname)
+                .updatedAt(currentTime)
+                .build());
+    }
+
+    /**
+     * 修改密码
+     * @param userId
+     * @param password
+     * @return
+     */
+    @Override
+    public Boolean updatePassword(Long userId, String password) {
+        long currentTimeMillis = System.currentTimeMillis();
+        String salt = RandomUtil.getRandomSalt();
+        return this.updateById(UcUser.builder()
+                        .id(userId)
+                        .updatedAt(currentTimeMillis)
+                        .password(PasswordUtil.getPassword(password, salt))
+                .build());
     }
 
 

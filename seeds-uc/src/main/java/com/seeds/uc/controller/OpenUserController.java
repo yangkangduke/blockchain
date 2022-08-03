@@ -3,20 +3,26 @@ package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.redis.LoginUserDTO;
+import com.seeds.uc.dto.request.ChangePasswordReq;
 import com.seeds.uc.dto.request.MetaMaskReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.ProfileResp;
+import com.seeds.uc.enums.ClientAuthTypeEnum;
+import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.enums.UserOperateEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
+import com.seeds.uc.exceptions.PasswordException;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.impl.CacheService;
+import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -118,6 +124,50 @@ public class OpenUserController {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         return GenericDto.success(ucUserService.getMyProfile(loginUser));
+    }
+
+    /**
+     * 修改昵称
+     * @return
+     */
+    @PutMapping("/change/nickname")
+    @ApiOperation(value = "修改昵称", notes = "修改昵称")
+    public GenericDto<Object> updateNickname(@Valid @NotBlank @RequestBody String nickname, HttpServletRequest request) {
+        // 获取当前登陆人信息
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+        return GenericDto.success(ucUserService.updateNickname(nickname, loginUser));
+    }
+
+    /**
+     * 修改密码 todo
+     * @return
+     */
+    @PutMapping("/change/password")
+    @ApiOperation(value = "修改密码", notes = "修改密码")
+    public GenericDto<Object> updatePassword(@Valid @NotBlank @RequestBody ChangePasswordReq changePasswordReq, HttpServletRequest request) {
+        String password = changePasswordReq.getPassword();
+        ClientAuthTypeEnum authTypeEnum = changePasswordReq.getAuthTypeEnum();
+        // 获取当前登陆人信息
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+        UcUser user = ucUserService.getById(loginUser.getUserId());
+        // 判断原密码是否正确
+        if (!password.equals(PasswordUtil.getPassword(user.getPassword(), user.getSalt()))) {
+            throw new PasswordException(UcErrorCodeEnum.ERR_10043_WRONG_OLD_PASSWORD);
+        }
+
+        // 判断code是否正确
+        if (authTypeEnum.equals(ClientAuthTypeEnum.EMAIL)) {
+
+        } else if (authTypeEnum.equals(ClientAuthTypeEnum.GA)) {
+
+        } else {
+
+        }
+        // 修改密码
+        ucUserService.updatePassword(user.getId(), password);
+        return GenericDto.success(null);
     }
 
 

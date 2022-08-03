@@ -12,17 +12,14 @@ import javax.validation.constraints.NotBlank;
  * @date 2022/07/13
  */
 @Data
-public class ChangePasswordReq {
-    @ApiModelProperty(value = "原密码", required = true)
+public class ResetPasswordReq {
+    @ApiModelProperty(value = "账号", required = true)
     @NotBlank
-    private String oldPassword;
+    private String account;
     @NotBlank
-    @ApiModelProperty(value = "新密码", required = true)
     private String password;
     @ApiModelProperty(value = "授权类型：2-email, 3-ga", required = true)
-    @NotBlank
     private ClientAuthTypeEnum authTypeEnum;
     @NotBlank
-    @ApiModelProperty(value = "验证码", required = true)
     private String code;
 }

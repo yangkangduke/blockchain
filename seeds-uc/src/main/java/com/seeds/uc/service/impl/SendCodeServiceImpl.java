@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author allen
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
  * @date 2020/8/2
  */
 @Slf4j
+@Transactional
 @Service
 public class SendCodeServiceImpl implements SendCodeService {
     @Autowired
@@ -142,6 +144,8 @@ public class SendCodeServiceImpl implements SendCodeService {
             MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT,5, StrFormatter.format(resetPasswordProperties.getUrl(),encode, email)), true);
         } else if (useType.equals(AuthCodeUseTypeEnum.LOGIN)) {
             MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.LOGIN_EMAIL_VERIFY_SUBJECT, StrFormatter.format(UcConstant.LOGIN_EMAIL_VERIFY_CONTENT, 5, code), false);
+        }  else if (useType.equals(AuthCodeUseTypeEnum.CHANGE_PASSWORD)) {
+            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.CHANGE_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.CHANGE_PASSWORD_EMAIL_CONTENT, 5, code), false);
         } else {
             throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
         }

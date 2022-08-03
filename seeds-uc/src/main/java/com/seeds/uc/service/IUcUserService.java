@@ -57,9 +57,9 @@ public interface IUcUserService extends IService<UcUser> {
     /**
      * 忘记密码-修改密码
      *
-     * @param changePasswordReq
+     * @param resetPasswordReq
      */
-    void forgotPasswordReset(ChangePasswordReq changePasswordReq);
+    void forgotPasswordReset(ResetPasswordReq resetPasswordReq);
 
     /**
      * 2fa校验
@@ -80,4 +80,19 @@ public interface IUcUserService extends IService<UcUser> {
      * @return
      */
     ProfileResp getMyProfile(LoginUserDTO loginUser);
+
+    /**
+     * 修改昵称
+     * @param nickname
+     * @param loginUser
+     */
+    Boolean updateNickname(String nickname, LoginUserDTO loginUser);
+
+    /**
+     * 修改密码
+     * @param userId
+     * @param password
+     * @return
+     */
+    Boolean updatePassword(Long userId, String password);
 }
