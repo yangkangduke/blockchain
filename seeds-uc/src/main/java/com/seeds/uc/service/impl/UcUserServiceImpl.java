@@ -68,18 +68,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Autowired
     private SendCodeService sendCodeService;
 
-    private MailAccount createMailAccount() {
-        MailAccount account = new MailAccount();
-        account.setHost(emailProperties.getHost());
-        account.setPort(25);
-        account.setAuth(true);
-        account.setFrom(emailProperties.getFrom());
-        account.setUser(emailProperties.getUser());
-        account.setPass(emailProperties.getPass());
-        return account;
-    }
-
-
     /**
      * 注册邮箱账号
      *

@@ -152,8 +152,8 @@ public class SendCodeServiceImpl implements SendCodeService {
     private MailAccount createMailAccount() {
         MailAccount account = new MailAccount();
         account.setHost(emailProperties.getHost());
-        account.setPort(25);
         account.setAuth(true);
+        account.setSslEnable(true);
         account.setFrom(emailProperties.getFrom());
         account.setUser(emailProperties.getUser());
         account.setPass(emailProperties.getPass());
