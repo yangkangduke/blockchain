@@ -7,6 +7,7 @@ import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
+import com.seeds.uc.enums.UserOperateEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.SendAuthCodeException;
 import com.seeds.uc.model.UcUser;
@@ -88,11 +89,18 @@ public class AuthController {
     @PostMapping("/metamask/nonce")
     @ApiOperation(value = "metamask获取随机数", notes = "metamask获取随机数")
     public GenericDto<String> metamaskNonce(@Valid @RequestBody MetaMaskReq metaMaskReq ) {
-        return GenericDto.success(ucUserService.metamaskNonce(metaMaskReq, null));
+        UcUser ucUser = ucUserService.getOne(new QueryWrapper<UcUser>().lambda()
+                .eq(UcUser::getPublicAddress, metaMaskReq.getPublicAddress()));
+        if (ucUser == null) {
+            metaMaskReq.setOperateEnum(UserOperateEnum.REGISTER);
+        } else {
+            metaMaskReq.setOperateEnum(UserOperateEnum.LOGIN);
+        }
+        return GenericDto.success(ucUserService.metamaskNonce(metaMaskReq, ucUser));
     }
 
     /**
-     * metamask验证
+     * metamask登陆
      * 1.调用/metamask/nonce生成nonce
      * 2.前端根据nonce生成签名信息
      * 3.调用/metamask/verify验证签名信息，验证成功返回token
@@ -101,7 +109,7 @@ public class AuthController {
      * @return
      */
     @PostMapping("/metamask/verify")
-    @ApiOperation(value = "metamask验证",
+    @ApiOperation(value = "metamask登陆",
             notes = "1.调用/metamask/nonce生成nonce\n" +
                     "2.前端根据nonce生成签名信息\n" +
                     "3.调用/metamask/verify验证签名信息，验证成功返回token")

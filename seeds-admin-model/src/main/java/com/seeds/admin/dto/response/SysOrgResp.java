@@ -1,5 +1,7 @@
 package com.seeds.admin.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,17 +18,21 @@ import java.util.List;
  */
 
 @Data
-@ApiModel(value = "SysOrgResp", description = "系统菜单信息")
+@ApiModel(value = "SysOrgResp", description = "系统组织信息")
 public class SysOrgResp {
+
+
     @ApiModelProperty("主键id")
     private Long id;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty("组织ID")
     private Long orgId;
 
     @ApiModelProperty("组织名称")
     private String orgName;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty("父级组织ID")
     private Long parentOrgId;
 
@@ -34,7 +40,7 @@ public class SysOrgResp {
     private String parentOrgName;
 
     @ApiModelProperty("负责人")
-    private String owner;
+    private String ownerName;
 
     @ApiModelProperty("备注")
 

@@ -47,7 +47,9 @@ public class SendCodeServiceImpl implements SendCodeService {
     @Override
     public void sendUserCodeByUseType(UserDto userDto, AuthCodeUseTypeEnum useTypeEnum) {
         // generate a random code
-        String otp = RandomUtil.getRandom6DigitsOTP();
+//        String otp = RandomUtil.getRandom6DigitsOTP();
+        // todo 后面换一下
+        String otp = "123456";
 
         // 设置此时登陆的安全项
         userDto.setAuthType(userDto.getAuthType());
@@ -70,8 +72,9 @@ public class SendCodeServiceImpl implements SendCodeService {
     @Override
     public void sendEmailWithUseType(String address, AuthCodeUseTypeEnum useTypeEnum) {
         // generate a random code
-        String otp = RandomUtil.getRandom6DigitsOTP();
-
+//        String otp = RandomUtil.getRandom6DigitsOTP();
+        // todo 后面换一下
+        String otp = "123456";
         doSendEmailCode(address, otp, useTypeEnum);
 
         // store the auth code in auth code bucket
@@ -90,8 +93,9 @@ public class SendCodeServiceImpl implements SendCodeService {
         UcUser userDto = ucUserMapper.selectById(twoFactorAuth.getUserId());
 
         // generate a random code
-        String otp = RandomUtil.getRandom6DigitsOTP();
-
+//        String otp = RandomUtil.getRandom6DigitsOTP();
+        // todo 后面换一下
+        String otp = "123456";
         // TODO发送
         sendEmailWithUseType(userDto.getEmail(), useTypeEnum);
 

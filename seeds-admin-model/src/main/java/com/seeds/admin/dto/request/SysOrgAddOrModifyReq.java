@@ -25,8 +25,11 @@ public class SysOrgAddOrModifyReq {
     @NotBlank(message = "orgName cannot be empty")
     private String orgName;
 
-    @ApiModelProperty("负责人")
-    private String owner;
+    @ApiModelProperty("负责人id")
+    private String ownerId;
+
+    @ApiModelProperty("负责人名字")
+    private String ownerName;
 
     @ApiModelProperty("备注")
     private String comments;

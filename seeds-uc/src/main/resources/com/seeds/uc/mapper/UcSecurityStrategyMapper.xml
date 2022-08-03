@@ -2,4 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seeds.uc.mapper.UcSecurityStrategyMapper">
 
+    <select id="getByUserId" resultType="com.seeds.uc.dto.response.UcSecurityStrategyResp">
+        SELECT
+            t.uid,
+            t.need_auth,
+            t.auth_type
+        FROM
+            uc_security_strategy t
+        WHERE t.uid = #{userId}
+    </select>
 </mapper>

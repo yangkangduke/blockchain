@@ -1,7 +1,10 @@
 package com.seeds.uc.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.seeds.uc.dto.response.UcSecurityStrategyResp;
 import com.seeds.uc.model.UcSecurityStrategy;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.seeds.uc.model.UcSecurityStrategy;
  */
 public interface UcSecurityStrategyMapper extends BaseMapper<UcSecurityStrategy> {
 
+    List<UcSecurityStrategyResp> getByUserId(Long userId);
 }
