@@ -134,8 +134,10 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp login(LoginReq loginReq) {
         // 校验账号、密码
-        String account = loginReq.getEmail();
         ClientAuthTypeEnum authType = loginReq.getAuthType();
+        if (authType == null) {
+            throw new InvalidArgumentsException("Please enter authType");
+        }
         UserDto userDto = this.verifyLogin(loginReq);
         // 产生2fa验证的token，用户进入2FA登陆阶段，前端再次call 2FA登陆接口需要带上2FA token
         String token = RandomUtil.genRandomToken(userDto.getUid().toString());
@@ -270,11 +272,16 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             this.save(ucUser);
             // 登陆
         }else if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.LOGIN)) {
-            nonce = one.getNonce();
-        } else if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.BIND)) {
-            if (loginUserDTO != null) {
-                nonce = loginUserDTO.getNonce();
+            if (one == null) {
+                throw new InvalidArgumentsException("Please register or bind first");
             }
+            nonce = one.getNonce();
+            // 绑定
+        } else if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.BIND)) {
+            if (loginUserDTO == null || loginUserDTO.getNonce() == null) {
+                throw new InvalidArgumentsException("Please login");
+            }
+            nonce = loginUserDTO.getNonce();
 
         }
         return nonce;
