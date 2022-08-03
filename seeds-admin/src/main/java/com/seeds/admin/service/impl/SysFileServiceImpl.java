@@ -56,6 +56,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
         try (InputStream inputStream = file.getInputStream()) {
             template.putObject(bucketName, objectName, inputStream, file.getSize(), file.getContentType());
             // 记录文件信息
+            sysFile.setFileSize(file.getSize());
             sysFile.setObjectName(objectName);
             sysFile.setBucketName(bucketName);
             sysFile.setFileName(originalFilename);

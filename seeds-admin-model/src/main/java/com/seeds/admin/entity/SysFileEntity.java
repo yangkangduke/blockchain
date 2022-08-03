@@ -42,6 +42,12 @@ public class SysFileEntity extends BaseEntity {
 	private String type;
 
 	/**
+	 * 类型
+	 */
+	@TableField("file_size")
+	private Long fileSize;
+
+	/**
 	 * 删除标记  1：已删除   0：未删除
 	 */
 	@TableField("delete_flag")
