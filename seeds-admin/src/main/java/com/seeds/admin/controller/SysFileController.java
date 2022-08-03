@@ -38,9 +38,8 @@ public class SysFileController {
     @GetMapping("download/{objectName}")
     @ApiOperation("下载")
     @RequiredPermission("sys:file:download")
-    public GenericDto<Object> download(HttpServletResponse response, @PathVariable String objectName) {
+    public void download(HttpServletResponse response, @PathVariable String objectName) {
         sysFileService.download(response, objectName);
-        return GenericDto.success(null);
     }
 
     @GetMapping("link/{objectName}")
