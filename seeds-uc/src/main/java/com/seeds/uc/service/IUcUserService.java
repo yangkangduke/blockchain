@@ -3,8 +3,10 @@ package com.seeds.uc.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.uc.dto.UserDto;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
+import com.seeds.uc.dto.response.ProfileResp;
 import com.seeds.uc.model.UcUser;
 
 /**
@@ -71,4 +73,11 @@ public interface IUcUserService extends IService<UcUser> {
      * @param loginReq
      */
     UserDto verifyLogin(LoginReq loginReq);
+
+    /**
+     * 获取用户信息
+     * @param loginUser
+     * @return
+     */
+    ProfileResp getMyProfile(LoginUserDTO loginUser);
 }

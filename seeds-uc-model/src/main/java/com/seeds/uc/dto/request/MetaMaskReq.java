@@ -17,7 +17,7 @@ public class MetaMaskReq {
     private String signature;
     @ApiModelProperty(value = "信息")
     private String message;
-    @ApiModelProperty(value = "操作类型: 1-注册,  2-登陆 , 3-绑定", required = true)
+    @ApiModelProperty(value = "操作类型: 1-注册,  2-登陆", required = true , hidden = true)
     private UserOperateEnum operateEnum;
 
 

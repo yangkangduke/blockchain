@@ -1,7 +1,10 @@
 package com.seeds.uc.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.uc.dto.response.UcSecurityStrategyResp;
 import com.seeds.uc.model.UcSecurityStrategy;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,10 @@ import com.seeds.uc.model.UcSecurityStrategy;
  */
 public interface IUcSecurityStrategyService extends IService<UcSecurityStrategy> {
 
+    /**
+     * 根据用户id获取用户的策略
+     * @param userId
+     * @return
+     */
+    List<UcSecurityStrategyResp> getByUserId(Long userId);
 }

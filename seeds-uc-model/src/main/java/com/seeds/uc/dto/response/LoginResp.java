@@ -18,8 +18,11 @@ public class LoginResp {
 
     @ApiModelProperty(value = "the real token for login proof")
     private String ucToken;
+    @ApiModelProperty(value = "2fa时使用")
     private String token;
+    @ApiModelProperty(value = "账号")
     private String account;
+    @ApiModelProperty(value = "授权类型: 2-email, 3-ga")
     private ClientAuthTypeEnum type;
 
 }

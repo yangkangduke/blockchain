@@ -13,9 +13,12 @@ import com.seeds.uc.config.ResetPasswordProperties;
 import com.seeds.uc.constant.UcConstant;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.redis.TwoFactorAuth;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
+import com.seeds.uc.dto.response.ProfileResp;
+import com.seeds.uc.dto.response.UcSecurityStrategyResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.LoginException;
@@ -36,6 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.crypto.WalletUtils;
+
+import java.util.List;
 
 /**
  * <p>
@@ -134,14 +139,32 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp login(LoginReq loginReq) {
         // 校验账号、密码
-        ClientAuthTypeEnum authType = loginReq.getAuthType();
-        if (authType == null) {
-            throw new InvalidArgumentsException("Please enter authType");
-        }
+//        ClientAuthTypeEnum authType = loginReq.getAuthType();
+//        if (authType == null) {
+//            throw new InvalidArgumentsException("Please enter authType");
+//        }
         UserDto userDto = this.verifyLogin(loginReq);
         // 产生2fa验证的token，用户进入2FA登陆阶段，前端再次call 2FA登陆接口需要带上2FA token
         String token = RandomUtil.genRandomToken(userDto.getUid().toString());
-        if (authType.equals(ClientAuthTypeEnum.EMAIL)){
+        //检查用户现在有没有GA
+        UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyService.getOne(new QueryWrapper<UcSecurityStrategy>().lambda()
+                .eq(UcSecurityStrategy::getUid, userDto.getUid())
+                .eq(UcSecurityStrategy::getNeedAuth, true)
+                .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.GA));
+
+        // 存在就使用ga
+        if (ucSecurityStrategy != null ) {
+            // 将2FA token存入redis，用户进入等待2FA验证态
+            cacheService.put2FAInfoWithTokenAndUserAndAuthType(
+                    token,
+                    userDto.getUid(),
+                    userDto.getEmail(),
+                    ClientAuthTypeEnum.GA);
+            return LoginResp.builder()
+                    .token(token)
+                    .type(ClientAuthTypeEnum.GA)
+                    .build();
+        } else {
             // 发送邮件
             // generate a random code
             sendCodeService.sendUserCodeByUseType(userDto, AuthCodeUseTypeEnum.LOGIN);
@@ -164,31 +187,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .type(ClientAuthTypeEnum.EMAIL)
                     .account(userDto.getEmail())
                     .build();
-
-        } else if (authType.equals(ClientAuthTypeEnum.GA)){
-            //检查用户现在有没有GA
-            UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyService.getOne(new QueryWrapper<UcSecurityStrategy>().lambda()
-                    .eq(UcSecurityStrategy::getUid, userDto.getUid())
-                    .eq(UcSecurityStrategy::getNeedAuth, true)
-                    .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.GA));
-
-            // 存在就使用ga
-            if (ucSecurityStrategy != null ) {
-                // 将2FA token存入redis，用户进入等待2FA验证态
-                cacheService.put2FAInfoWithTokenAndUserAndAuthType(
-                        token,
-                        userDto.getUid(),
-                        userDto.getEmail(),
-                        ClientAuthTypeEnum.GA);
-                return LoginResp.builder()
-                        .token(token)
-                        .type(ClientAuthTypeEnum.GA)
-                        .build();
-            } else {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10005_SECURITY_STRATEGY_NOT_SET);
-            }
-        } else {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_504_MISSING_ARGUMENTS);
         }
 
     }
@@ -212,13 +210,20 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10003_ADDRESS_INFO);
         }
         // 校验签名信息
-        if (!CryptoUtils.validate(signature, message, publicAddress)) {
+        try{
+            if (!CryptoUtils.validate(signature, message, publicAddress)) {
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_SIGNATURE_INFO);
+            }
+        } catch (Exception e) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_SIGNATURE_INFO);
         }
+
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getPublicAddress, publicAddress));
-
-        if (operateEnum.equals(UserOperateEnum.REGISTER)) {
+        if (one == null) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_SIGNATURE_INFO);
+        }
+        if (operateEnum.equals(UserOperateEnum.REGISTER) || operateEnum.equals(UserOperateEnum.BIND) ) {
             ucSecurityStrategyService.save(UcSecurityStrategy.builder()
                     .needAuth(true)
                     .uid(one.getId())
@@ -252,37 +257,39 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         long currentTime = System.currentTimeMillis();
         String publicAddress = metaMaskReq.getPublicAddress();
         String nonce = null;
-        UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
-                .eq(UcUser::getPublicAddress, publicAddress));
-        // 注册
-        if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.REGISTER)) {
-            if (one != null) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10029_METAMASK_EXIST);
+
+        // 登陆/注册
+        if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.REGISTER) || metaMaskReq.getOperateEnum().equals(UserOperateEnum.LOGIN)) {
+            if (loginUserDTO == null) {
+                nonce = RandomUtil.getRandomSalt();
+                UcUser ucUser = UcUser.builder()
+                        .createdAt(currentTime)
+                        .updatedAt(currentTime)
+                        .type(ClientTypeEnum.NORMAL)
+                        .state(ClientStateEnum.NORMAL)
+                        .publicAddress(publicAddress)
+                        .nonce(nonce)
+                        .nickname(publicAddress)
+                        .build();
+                this.save(ucUser);
+            } else {
+                nonce = loginUserDTO.getNonce();
             }
-            nonce = RandomUtil.getRandomSalt();
-            UcUser ucUser = UcUser.builder()
-                    .createdAt(currentTime)
-                    .updatedAt(currentTime)
-                    .type(ClientTypeEnum.NORMAL)
-                    .state(ClientStateEnum.NORMAL)
-                    .publicAddress(publicAddress)
-                    .nonce(nonce)
-                    .nickname(publicAddress)
-                    .build();
-            this.save(ucUser);
-            // 登陆
-        }else if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.LOGIN)) {
-            if (one == null) {
-                throw new InvalidArgumentsException("Please register or bind first");
-            }
-            nonce = one.getNonce();
+
             // 绑定
         } else if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.BIND)) {
-            if (loginUserDTO == null || loginUserDTO.getNonce() == null) {
+            if (loginUserDTO == null) {
                 throw new InvalidArgumentsException("Please login");
             }
-            nonce = loginUserDTO.getNonce();
-
+            // 修改用户信息
+            nonce = RandomUtil.getRandomSalt();
+            UcUser ucUser = UcUser.builder()
+                    .updatedAt(currentTime)
+                    .publicAddress(publicAddress)
+                    .nonce(nonce)
+                    .id(loginUserDTO.getId())
+                    .build();
+            this.updateById(ucUser);
         }
         return nonce;
     }
@@ -406,9 +413,23 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         UserDto userDto = new UserDto();
         BeanUtil.copyProperties(ucUser, userDto);
-        userDto.setAuthType(loginReq.getAuthType());
+        userDto.setAuthType(ClientAuthTypeEnum.EMAIL);
         userDto.setUid(ucUser.getId());
         return userDto;
+    }
+
+    /**
+     * 获取用户信息
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public ProfileResp getMyProfile(LoginUserDTO loginUser) {
+        ProfileResp profileResp = ProfileResp.builder().build();
+        Long userId = loginUser.getUserId();
+        BeanUtil.copyProperties(this.getById(userId), profileResp);
+        profileResp.setSecurityStrategyList(ucSecurityStrategyService.getByUserId(userId));
+        return profileResp;
     }
 
 
