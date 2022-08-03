@@ -35,8 +35,14 @@ public class SysOrgEntity extends BaseEntity {
     /**
      * 负责人
      */
-    @TableField(value = "owner")
-    private String owner;
+    @TableField(value = "owner_id")
+    private String ownerId;
+
+    /**
+     * 负责人
+     */
+    @TableField(value = "owner_name")
+    private String ownerName;
 
     /**
      * 备注
