@@ -77,6 +77,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             if (StringUtils.isNotBlank(p.getObjectName())) {
                 resp.setPicture(sysFileService.getFile(p.getObjectName()));
             }
+            // 价格
+            resp.setPrice(p.getPrice() + p.getUnit());
             return resp;
         });
     }
@@ -134,6 +136,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             if (StringUtils.isNotBlank(sysNft.getObjectName())) {
                 resp.setPicture(sysFileService.getFile(sysNft.getObjectName()));
             }
+            // 价格
+            resp.setPrice(sysNft.getPrice() + sysNft.getUnit());
         }
         return resp;
     }

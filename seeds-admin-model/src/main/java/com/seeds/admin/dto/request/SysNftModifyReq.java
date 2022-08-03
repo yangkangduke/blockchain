@@ -78,6 +78,13 @@ public class SysNftModifyReq {
 	private BigDecimal price;
 
 	/**
+	 * NFT价格单位 USDC
+	 */
+	@ApiModelProperty("NFT价格单位")
+	@NotBlank(message = "NFT price unit cannot be empty")
+	private String unit;
+
+	/**
 	 * 合约地址
 	 */
 	@ApiModelProperty("合约地址")

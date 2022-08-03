@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * 系统角色
@@ -29,6 +29,6 @@ public class SysRoleResp {
 	private Long createdAt;
 
 	@ApiModelProperty(value = "菜单ID列表")
-	private List<Long> menuIdList;
+	private Set<Long> menuIdList;
 
 }

@@ -5,6 +5,8 @@ import com.seeds.admin.entity.SysRoleMenuEntity;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 系统角色菜单
@@ -19,7 +21,7 @@ public interface SysRoleMenuService extends IService<SysRoleMenuEntity> {
      * @param roleId 角色编号
      * @return 菜单列表
      */
-    List<Long> queryMenuByRoleId(Long roleId);
+    Set<Long> queryMenuByRoleId(Long roleId);
 
     /**
      * 通过角色编号列表查询菜单
@@ -27,6 +29,13 @@ public interface SysRoleMenuService extends IService<SysRoleMenuEntity> {
      * @return 菜单列表
      */
     List<Long> queryMenuByRoleIds(Collection<Long> roleIds);
+
+    /**
+     * 通过角色编号列表查询菜单
+     * @param roleIds 角色编号列表
+     * @return 菜单列表
+     */
+    Map<Long, Set<Long>> queryMenuMapByRoleIds(Collection<Long> roleIds);
 
     /**
      * 通过菜单编号列表删除关联

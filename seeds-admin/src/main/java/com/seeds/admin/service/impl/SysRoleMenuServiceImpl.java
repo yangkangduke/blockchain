@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,14 +24,14 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
 
     @Override
-    public List<Long> queryMenuByRoleId(Long roleId) {
+    public Set<Long> queryMenuByRoleId(Long roleId) {
         LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
                 .eq(SysRoleMenuEntity::getRoleId, roleId);
         List<SysRoleMenuEntity> list = list(query);
         if (CollectionUtils.isEmpty(list)) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
-        return list.stream().map(SysRoleMenuEntity::getMenuId).collect(Collectors.toList());
+        return list.stream().map(SysRoleMenuEntity::getMenuId).collect(Collectors.toSet());
     }
 
     @Override
@@ -48,6 +46,21 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
             return Collections.emptyList();
         }
         return list.stream().map(SysRoleMenuEntity::getMenuId).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<Long, Set<Long>> queryMenuMapByRoleIds(Collection<Long> roleIds) {
+        if (CollectionUtils.isEmpty(roleIds)) {
+            return Collections.emptyMap();
+        }
+        LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
+                .in(SysRoleMenuEntity::getRoleId, roleIds);
+        List<SysRoleMenuEntity> list = list(query);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.groupingBy(SysRoleMenuEntity::getRoleId,
+                Collectors.mapping(SysRoleMenuEntity::getMenuId, Collectors.toSet())));
     }
 
     @Override
