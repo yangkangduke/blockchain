@@ -13,7 +13,7 @@ import java.util.List;
  * @date 2022/8/03
  */
 @Data
-@ApiModel(value = "SysUserRoleReq", description = "角色分配用户")
+@ApiModel(value = "SysRoleAssignReq", description = "角色分配用户")
 public class SysRoleAssignReq {
 
     @ApiModelProperty(value = "用户id列表")
