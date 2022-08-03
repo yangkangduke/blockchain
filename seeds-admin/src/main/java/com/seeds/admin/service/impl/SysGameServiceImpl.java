@@ -11,6 +11,7 @@ import com.seeds.admin.entity.SysGameEntity;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysGameMapper;
+import com.seeds.admin.service.SysFileService;
 import com.seeds.admin.service.SysGameService;
 import com.seeds.admin.service.SysMerchantGameService;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,9 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     @Autowired
     private SysMerchantGameService sysMerchantGameService;
 
+    @Autowired
+    private SysFileService sysFileService;
+
     @Override
     public IPage<SysGameResp> queryPage(SysGamePageReq query) {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
@@ -48,6 +52,11 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         return page.convert(p -> {
             SysGameResp resp = new SysGameResp();
             BeanUtils.copyProperties(p, resp);
+            resp.setPrice(p.getPrice() + p.getUnit());
+            // 图片
+            if (StringUtils.isNotBlank(p.getPictureObjectName())) {
+                resp.setPicture(sysFileService.getFile(p.getPictureObjectName()));
+            }
             return resp;
         });
     }
@@ -107,6 +116,15 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         SysGameResp resp = new SysGameResp();
         if (sysGame != null) {
             BeanUtils.copyProperties(sysGame, resp);
+            resp.setPrice(sysGame.getPrice() + sysGame.getUnit());
+            // 图片
+            if (StringUtils.isNotBlank(sysGame.getPictureObjectName())) {
+                resp.setPicture(sysFileService.getFile(sysGame.getPictureObjectName()));
+            }
+            // 视频
+            if (StringUtils.isNotBlank(sysGame.getVideoObjectName())) {
+                resp.setVideo(sysFileService.getFile(sysGame.getVideoObjectName()));
+            }
         }
         return resp;
     }

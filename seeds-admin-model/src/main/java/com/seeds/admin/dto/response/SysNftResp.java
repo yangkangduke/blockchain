@@ -4,8 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 
 /**
  * 系统NFT
@@ -36,7 +34,7 @@ public class SysNftResp {
 	private String typeName;
 
 	@ApiModelProperty(value = "价格")
-	private BigDecimal price;
+	private String price;
 
 	@ApiModelProperty(value = "是否在售  0：否   1：是")
 	private Integer status;

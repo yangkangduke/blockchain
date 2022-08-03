@@ -51,9 +51,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
+        // 查询角色对应的菜单
+        Set<Long> roleIds = records.stream().map(SysRoleEntity::getId).collect(Collectors.toSet());
+        Map<Long, Set<Long>> menuMap = sysRoleMenuService.queryMenuMapByRoleIds(roleIds);
         return page.convert(p -> {
             SysRoleResp resp = new SysRoleResp();
             BeanUtils.copyProperties(p, resp);
+            resp.setMenuIdList(menuMap.get(p.getId()));
             return resp;
         });
     }

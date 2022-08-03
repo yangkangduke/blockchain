@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
+
 
 /**
  * 游戏
@@ -25,10 +27,82 @@ public class SysGameEntity extends BaseEntity {
 	private String name;
 
 	/**
-	 * 游戏地址
+	 * 简介
 	 */
-	@TableField("url")
-	private String url;
+	@TableField("brief")
+	private String brief;
+
+	/**
+	 * 价格
+	 */
+	@TableField("price")
+	private BigDecimal price;
+
+	/**
+	 * 单位 USDC
+	 */
+	@TableField("unit")
+	private String unit;
+
+	/**
+	 * 官方网址
+	 */
+	@TableField("official_url")
+	private String officialUrl;
+
+	/**
+	 * 下载地址
+	 */
+	@TableField("download_url")
+	private String downloadUrl;
+
+	/**
+	 * 社区地址
+	 */
+	@TableField("community_url")
+	private String communityUrl;
+
+	/**
+	 * 开发者
+	 */
+	@TableField("developer")
+	private String developer;
+
+	/**
+	 * 图片对象名称
+	 */
+	@TableField("picture_object_name")
+	private String pictureObjectName;
+
+	/**
+	 * 图片文件id
+	 */
+	@TableField("picture_file_id")
+	private Long pictureFileId;
+
+	/**
+	 * 视频对象名称
+	 */
+	@TableField("video_object_name")
+	private String videoObjectName;
+
+	/**
+	 * 视频文件id
+	 */
+	@TableField("video_file_id")
+	private Long videoFileId;
+
+	/**
+	 * 是否允许评论  0：不允许   1：允许
+	 */
+	@TableField("comments_allowed")
+	private Integer commentsAllowed;
+
+	/**
+	 * 介绍
+	 */
+	@TableField("introduction")
+	private String introduction;
 
 	/**
 	 * 游戏状态  0：下架   1：正常

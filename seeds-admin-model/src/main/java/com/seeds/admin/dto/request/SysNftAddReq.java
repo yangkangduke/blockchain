@@ -28,7 +28,6 @@ public class SysNftAddReq {
 	@NotNull(message = "nft name cannot be empty")
 	private String name;
 
-
 	/**
 	 * 游戏id
 	 */
@@ -70,6 +69,13 @@ public class SysNftAddReq {
 	@ApiModelProperty("NFT价格")
 	@NotNull(message = "NFT price cannot be empty")
 	private BigDecimal price;
+
+	/**
+	 * 单位 USDC
+	 */
+	@ApiModelProperty("NFT价格单位")
+	@NotBlank(message = "NFT price unit cannot be empty")
+	private String unit;
 
 	/**
 	 * NFT是否在售  0：否   1：是

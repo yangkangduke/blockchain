@@ -38,7 +38,7 @@ public class SysNftDetailResp {
 	private String typeName;
 
 	@ApiModelProperty(value = "价格")
-	private BigDecimal price;
+	private String price;
 
 	@ApiModelProperty(value = "是否在售  0：否   1：是")
 	private Integer status;
@@ -69,7 +69,5 @@ public class SysNftDetailResp {
 
 	@ApiModelProperty("NFT属性列表")
 	private List<NftProperties> propertiesList;
-
-	// todo nft交易信息
 
 }
