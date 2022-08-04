@@ -47,8 +47,13 @@ public enum AdminErrorCodeEnum {
 
     // nft
     ERR_50001_NFT_ALREADY_EXIST(50001, "NFT已存在", "NFT already exist"),
-    ;
 
+    // dict type
+    ERR_60001_DICT_TYPE_ALREADY_EXIST(60001,"字典类别已经存在","Dict type code already exist"),
+    ERR_60002_DICT_TYPE_PARENT_ITSELF(60002,"上级字典类别不能为自身","Parent dict type cannot be for itself"),
+    ERR_60003_SUB_DICT_TYPE_EXIST(60003,"存在下级字典类别","Subordinate dict type exist"),
+
+    ;
     @JsonValue
     @EnumValue
     private Integer code;
