@@ -28,7 +28,7 @@ import javax.validation.Valid;
  * @date 2022/7/13
  */
 @Slf4j
-@Api("小狐狸钱包")
+@Api(tags = "小狐狸钱包")
 @RestController
 @RequestMapping("/metamask")
 public class SysMetaMaskController {
