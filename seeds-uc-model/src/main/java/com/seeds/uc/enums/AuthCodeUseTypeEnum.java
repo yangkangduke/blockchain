@@ -27,6 +27,8 @@ public enum AuthCodeUseTypeEnum {
     RESET_PASSWORD("RESET_PASSWORD", "reset password", "重置密码", "reset.pwd"),
     @JsonProperty("CHANGE_PASSWORD")
     CHANGE_PASSWORD("CHANGE_PASSWORD", "change password", "修改密码", "change.pwd"),
+    @JsonProperty("CHANGE_EMAIL")
+    CHANGE_EMAIL("CHANGE_EMAIL", "change email", "修改邮箱", "change.email"),
     @JsonProperty("BIND_PHONE")
     BIND_PHONE("BIND_PHONE", "bind phone", "绑定手机", "bind.phone"),
     @JsonProperty("REBIND_PHONE")

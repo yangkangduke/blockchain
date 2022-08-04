@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional
 public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, UcUserAccount> implements IUcUserAccountService {
+
     @Autowired
     private IUcUserAccountActionHistoryService ucUserAccountActionHistoryService;
 

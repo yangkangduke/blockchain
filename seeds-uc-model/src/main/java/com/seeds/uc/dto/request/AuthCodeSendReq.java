@@ -12,9 +12,10 @@ import lombok.Data;
  */
 @Data
 public class AuthCodeSendReq {
+    @ApiModelProperty(value = "需要登陆并且从DB中取的不需要传该参数")
     private String email;
     @ApiModelProperty(value = "授权码使用类型：REGISTER-注册，RESET_PASSWORD-忘记密码，CHANGE_PASSWORD-修改密码", required = true)
     private AuthCodeUseTypeEnum useType;
-    // 二次验证再次发送sms的时候用到
+    @ApiModelProperty(value = "二次验证再次发送sms的时候用到")
     private String token;
 }

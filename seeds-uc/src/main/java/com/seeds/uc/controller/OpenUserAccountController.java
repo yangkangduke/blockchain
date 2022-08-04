@@ -40,8 +40,9 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("/account")
-@Api(tags = "用户账号相关接口")
+@Api(tags = "账号")
 public class OpenUserAccountController {
+
     @Autowired
     private IUcUserAccountService ucUserAccountService;
     @Autowired

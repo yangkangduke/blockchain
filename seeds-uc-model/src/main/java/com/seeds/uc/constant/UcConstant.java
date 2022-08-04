@@ -28,4 +28,9 @@ public class UcConstant {
     // 修改密码
     public static final String CHANGE_PASSWORD_EMAIL_SUBJECT = "change Password";
     public static final String CHANGE_PASSWORD_EMAIL_CONTENT = "change Password verification code, note that it expires in {} minutes:{}";
+
+    // 修改邮箱
+    public static final String CHANGE_EMAIL_EMAIL_SUBJECT = "change email";
+    public static final String CHANGE_EMAIL_EMAIL_CONTENT = "change email verification code, note that it expires in {} minutes:{}";
+
 }

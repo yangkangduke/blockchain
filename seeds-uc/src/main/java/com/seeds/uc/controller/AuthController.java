@@ -2,6 +2,7 @@ package com.seeds.uc.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
@@ -14,6 +15,8 @@ import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.SendCodeService;
+import com.seeds.uc.service.impl.CacheService;
+import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
-@Api(tags = "auth相关接口")
+@Api(tags = "auth")
 @RequestMapping("/auth")
 public class AuthController {
 
@@ -37,6 +41,8 @@ public class AuthController {
     private SendCodeService sendCodeService;
     @Autowired
     private IGoogleAuthService googleAuthService;
+    @Autowired
+    private CacheService cacheService;
 
 
     /**
@@ -130,8 +136,8 @@ public class AuthController {
     @ApiOperation(value = "忘记密码-验证链接", notes = "1.调用/send/email 发送邮件链接\n" +
             "2.调用/forgotPassword/verifyLink 验证链接\n" +
             "3.调用/forgotPassword/reset 重置密码")
-    public GenericDto<Object> forgotPasswordVerifyLink(String encode, String account) {
-        ucUserService.forgotPasswordVerifyLink(encode, account);
+    public GenericDto<Object> forgotPasswordVerifyLink(@Valid ForgotPasswordVerifyReq forgotPasswordVerifyReq) {
+        ucUserService.forgotPasswordVerifyLink(forgotPasswordVerifyReq.getEncode(), forgotPasswordVerifyReq.getAccount());
         return GenericDto.success(null);
     }
 
@@ -160,7 +166,11 @@ public class AuthController {
             if (one == null) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
             }
-            if (!googleAuthService.verify(code, one.getGaSecret())) {
+            try {
+                if (!googleAuthService.verify(code, one.getGaSecret())) {
+                    throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
+                }
+            } catch (Exception e) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
             }
         } else {
@@ -179,11 +189,10 @@ public class AuthController {
      */
     @ApiOperation(value = "发送邮件", notes = "发送邮件")
     @PostMapping("/email/send")
-    public GenericDto<Object> sendEmailCode(@Valid @RequestBody AuthCodeSendReq sendReq) {
+    public GenericDto<Object> sendEmailCode(@Valid @RequestBody AuthCodeSendReq sendReq, HttpServletRequest request) {
         log.info("AuthController - sendEmailCode got request: {}", sendReq);
         // 注册
         if (AuthCodeUseTypeEnum.REGISTER.equals(sendReq.getUseType())) {
-            // 不需要登陆，请求里带邮箱，如: REGISTER
             sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
             // 登陆
         } else if (AuthCodeUseTypeEnum.LOGIN.equals(sendReq.getUseType())) {
@@ -191,12 +200,24 @@ public class AuthController {
             // 忘记密码
         }  else if (AuthCodeUseTypeEnum.RESET_PASSWORD.equals(sendReq.getUseType())) {
             sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
-            // 修改密码
-        } else if (AuthCodeUseTypeEnum.CHANGE_PASSWORD.equals(sendReq.getUseType())) {
-            sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
         } else {
-            throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
+            // 需要登陆的，从db中读
+            String loginToken = WebUtil.getTokenFromRequest(request);
+            LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+            UcUser user = ucUserService.getById(loginUser.getUserId());
+            // 修改密码
+            if (AuthCodeUseTypeEnum.CHANGE_PASSWORD.equals(sendReq.getUseType())) {
+                sendCodeService.sendEmailWithUseType(user.getEmail(), sendReq.getUseType());
+             // 修改邮箱
+            } else if (AuthCodeUseTypeEnum.CHANGE_EMAIL.equals(sendReq.getUseType())) {
+                sendCodeService.sendEmailWithUseType(user.getEmail(), sendReq.getUseType());
+            } else {
+                throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
+            }
+
         }
+
+
 
 //        if (AuthCodeUseTypeEnum.CODE_NO_NEED_LOGIN_READ_REQUEST.contains(sendReq.getUseType())) {
 //            // 不需要登陆，请求里带邮箱，如: REGISTER

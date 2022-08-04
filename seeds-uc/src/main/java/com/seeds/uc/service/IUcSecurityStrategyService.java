@@ -3,6 +3,7 @@ package com.seeds.uc.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.uc.dto.response.UcSecurityStrategyResp;
 import com.seeds.uc.model.UcSecurityStrategy;
+import com.seeds.uc.model.UcUser;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface IUcSecurityStrategyService extends IService<UcSecurityStrategy>
      * @return
      */
     List<UcSecurityStrategyResp> getByUserId(Long userId);
+
+
 }

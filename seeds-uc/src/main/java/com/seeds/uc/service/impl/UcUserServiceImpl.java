@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.config.EmailProperties;
@@ -18,6 +19,7 @@ import com.seeds.uc.dto.response.ProfileResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.LoginException;
+import com.seeds.uc.mapper.UcSecurityStrategyMapper;
 import com.seeds.uc.mapper.UcUserMapper;
 import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
@@ -51,11 +53,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Autowired
     private CacheService cacheService;
     @Autowired
-    private ResetPasswordProperties resetPasswordProperties;
-    @Autowired
-    private IUcSecurityStrategyService ucSecurityStrategyService;
-    @Autowired
-    private EmailProperties emailProperties;
+    private UcSecurityStrategyMapper ucSecurityStrategyMapper;
     @Autowired
     private IGoogleAuthService googleAuthService;
     @Autowired
@@ -70,7 +68,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp registerEmailAccount(RegisterReq registerReq) {
         String email = registerReq.getEmail();
-        sendCodeService.verifyEmailWithUseType(registerReq.getEmail(),registerReq.getCode(),AuthCodeUseTypeEnum.REGISTER);
+        sendCodeService.verifyEmailWithUseType(registerReq.getEmail(), registerReq.getCode(), AuthCodeUseTypeEnum.REGISTER);
         // 校验账号重复
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, email));
         if (one != null) {
@@ -92,7 +90,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         this.save(ucUser);
         Long id = ucUser.getId();
 
-        ucSecurityStrategyService.save(UcSecurityStrategy.builder()
+        ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
                 .uid(id)
                 .needAuth(true)
                 .authType(ClientAuthTypeEnum.EMAIL)
@@ -127,14 +125,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         UserDto userDto = this.verifyLogin(loginReq);
         // 产生2fa验证的token，用户进入2FA登陆阶段，前端再次call 2FA登陆接口需要带上2FA token
         String token = RandomUtil.genRandomToken(userDto.getUid().toString());
-        //检查用户现在有没有GA
-        UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyService.getOne(new QueryWrapper<UcSecurityStrategy>().lambda()
-                .eq(UcSecurityStrategy::getUid, userDto.getUid())
-                .eq(UcSecurityStrategy::getNeedAuth, true)
-                .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.GA));
-
-        // 存在就使用ga
-        if (ucSecurityStrategy != null ) {
+        // 检查用户现在有没有GA,存在就使用ga
+        if (this.verifyGa(userDto.getUid())) {
             // 将2FA token存入redis，用户进入等待2FA验证态
             cacheService.put2FAInfoWithTokenAndUserAndAuthType(
                     token,
@@ -205,7 +197,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_SIGNATURE_INFO);
         }
         if (operateEnum.equals(UserOperateEnum.REGISTER) || operateEnum.equals(UserOperateEnum.BIND) ) {
-            ucSecurityStrategyService.save(UcSecurityStrategy.builder()
+            ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
                     .needAuth(true)
                     .uid(one.getId())
                     .authType(ClientAuthTypeEnum.METAMASK)
@@ -331,10 +323,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     public LoginResp twoFactorCheck(TwoFactorLoginReq loginReq) {
         log.info("verifyTwoFactorLogin: {}", loginReq);
         TwoFactorAuth twoFactorAuth = cacheService.get2FAInfoWithToken(loginReq.getToken());
+        UcUser user = this.getById(twoFactorAuth.getUserId());
         if (twoFactorAuth != null && twoFactorAuth.getAuthAccountName() != null) {
             // GA验证
             if (ClientAuthTypeEnum.GA.equals(twoFactorAuth.getAuthType())) {
-                if (!googleAuthService.verifyUserCode(twoFactorAuth.getUserId(), loginReq.getAuthCode())) {
+                if (!googleAuthService.verify(loginReq.getAuthCode(), user.getGaSecret())) {
                     throw new LoginException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
                 }
             } else if (ClientAuthTypeEnum.EMAIL.equals(twoFactorAuth.getAuthType())) {
@@ -360,7 +353,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new LoginException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
         }
 
-        UcUser user = this.getById(twoFactorAuth.getUserId());
         // 用户验证通过，产生uc token
         String ucToken = RandomUtil.genRandomToken(user.getId().toString());
 
@@ -409,7 +401,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         ProfileResp profileResp = ProfileResp.builder().build();
         Long userId = loginUser.getUserId();
         BeanUtil.copyProperties(this.getById(userId), profileResp);
-        profileResp.setSecurityStrategyList(ucSecurityStrategyService.getByUserId(userId));
+        profileResp.setSecurityStrategyList(ucSecurityStrategyMapper.getByUserId(userId));
         return profileResp;
     }
 
@@ -441,8 +433,60 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return this.updateById(UcUser.builder()
                         .id(userId)
                         .updatedAt(currentTimeMillis)
+                        .salt(salt)
                         .password(PasswordUtil.getPassword(password, salt))
                 .build());
+    }
+
+    /**
+     * 修改邮箱
+     * @param email
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public Boolean updateEmail(String email, LoginUserDTO loginUser) {
+        long currentTimeMillis = System.currentTimeMillis();
+        return this.updateById(UcUser.builder()
+                .id(loginUser.getUserId())
+                .updatedAt(currentTimeMillis)
+                .email(email)
+                .build());
+    }
+
+    /**
+     * 删除ga
+     * @param ucUser
+     */
+    @Override
+    public void deleteGa(UcUser ucUser) {
+
+        this.update(new LambdaUpdateWrapper<UcUser>()
+                .set(UcUser::getGaSecret,null)
+                .eq(UcUser::getId, ucUser.getId())
+        );
+
+        ucSecurityStrategyMapper.delete(new QueryWrapper<UcSecurityStrategy>().lambda()
+                .eq(UcSecurityStrategy::getUid, ucUser.getId())
+                .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.GA)
+        );
+    }
+
+    /**
+     * 验证是否有ga
+     * @param userId
+     * @return
+     */
+    @Override
+    public Boolean verifyGa(Long userId) {
+        UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyMapper.selectOne(new QueryWrapper<UcSecurityStrategy>().lambda()
+                .eq(UcSecurityStrategy::getUid, userId)
+                .eq(UcSecurityStrategy::getNeedAuth, true)
+                .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.GA));
+        if (ucSecurityStrategy != null) {
+            return true;
+        }
+        return false;
     }
 
 
