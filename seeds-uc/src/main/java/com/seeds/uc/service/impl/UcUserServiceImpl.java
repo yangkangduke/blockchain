@@ -176,21 +176,21 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         // 地址合法性校验
         if (!WalletUtils.isValidAddress(publicAddress)) {
             // 不合法直接返回错误
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10003_ADDRESS_INFO);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10003_METAMASK_ADDRESS);
         }
         // 校验签名信息
         try{
             if (!CryptoUtils.validate(signature, message, publicAddress)) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_SIGNATURE_INFO);
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_METAMASK_SIGNATURE);
             }
         } catch (Exception e) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_SIGNATURE_INFO);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_METAMASK_SIGNATURE);
         }
 
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getPublicAddress, publicAddress));
         if (one == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_SIGNATURE_INFO);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_METAMASK_SIGNATURE);
         }
         if (operateEnum.equals(UserOperateEnum.REGISTER) || operateEnum.equals(UserOperateEnum.BIND) ) {
             ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()

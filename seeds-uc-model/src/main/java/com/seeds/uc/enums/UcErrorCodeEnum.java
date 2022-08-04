@@ -25,12 +25,12 @@ public enum UcErrorCodeEnum {
     ERR_15000_ACCOUNT_NOT(15000, "账号不存在", "Account does not exist"),
     ERR_15001_ACCOUNT_VERIFICATION_FAILED(15001, "验证失败", "verification failed!"),
     ERR_15002_LINK_EXPIRED(15002, "链接失效", "The current link has expired!"),
-
+    //meatamask
+    ERR_10003_METAMASK_ADDRESS(10003, "非法地址格式", "Illegal address format"),
+    ERR_10004_METAMASK_SIGNATURE(10004, "签名验证失败", "Signature verification failed"),
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),
     ERR_10002_INCOMPLETE_USER_INFO(10002, "用户信息不完整，请联系客服", "user info not complete, please contact customer service"),
-    ERR_10003_ADDRESS_INFO(10003, "非法地址格式", "Illegal address format"),
-    ERR_10004_SIGNATURE_INFO(10004, "签名验证失败", "Signature verification failed"),
     ERR_10005_SECURITY_STRATEGY_NOT_SET(10005, "您尚未设置安全策略", "you haven not set security strategy"),
     ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT(10013, "账号或密码错误", "account name or password incorrect"),
     ERR_10014_ACCOUNT_FROZEN(10014, "您的账户存在异常，已被锁定，请联系客服人员解决", "account has been locked please contact customer service"),

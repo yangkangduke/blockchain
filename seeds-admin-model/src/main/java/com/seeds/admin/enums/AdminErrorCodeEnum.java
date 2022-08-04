@@ -15,7 +15,10 @@ public enum AdminErrorCodeEnum {
     ERR_500_SYSTEM_BUSY(500, "系统繁忙，请稍后再试...", "system busy, please try again later"),
     ERR_502_ILLEGAL_ARGUMENTS(502, "参数错误", "wrong arguments"),
     ERR_504_MISSING_ARGUMENTS(504, "缺少参数", "missing arguments"),
-
+    //meatamask
+    ERR_70001_METAMASK_ADDRESS(70001, "非法地址格式", "Illegal address format"),
+    ERR_70002_METAMASK_SIGNATURE(70002, "签名验证失败", "Signature verification failed"),
+    ERR_70003_METAMASK_UNBIND_REPEATEDLY(70003, "重复解除绑定", "Unbind repeatedly"),
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),
     ERR_10002_INCOMPLETE_USER_INFO(10002, "用户信息不完整，请联系客服", "user info not complete, please contact customer service"),

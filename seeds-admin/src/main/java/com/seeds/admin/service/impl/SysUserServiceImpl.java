@@ -16,6 +16,7 @@ import com.seeds.admin.dto.response.SysUserResp;
 import com.seeds.admin.entity.SysRoleEntity;
 import com.seeds.admin.entity.SysRoleUserEntity;
 import com.seeds.admin.entity.SysUserEntity;
+import com.seeds.admin.enums.MetaMaskFlagEnum;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysUserMapper;
@@ -256,19 +257,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
      * metamask获取随机数
      *
      * @param publicAddress
-     * @param adminUser
      * @return
      */
     @Override
-    public String metamaskNonce(String publicAddress, SysUserEntity adminUser) {
+    public String metamaskNonce(String publicAddress, Long userId) {
         // 生成随机数
         String randomSalt = RandomUtil.getRandomSalt();
-        // 存储在用户表上
-        Long id = adminUser.getId();
         SysUserEntity sysUser = new SysUserEntity();
         sysUser.setPublicAddress(publicAddress);
         sysUser.setNonce(randomSalt);
-        sysUser.setId(id);
+        sysUser.setId(userId);
         this.updateById(sysUser);
         return randomSalt;
     }
@@ -276,30 +274,28 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     /**
      * 更新metamask信息
      *
-     * @param adminUser
      */
     @Override
-    public Boolean updateMetaMask(SysUserEntity adminUser) {
+    public Boolean updateMetaMask(Long userId) {
         SysUserEntity sysUser = new SysUserEntity();
         sysUser.setNonce(RandomUtil.getRandomSalt());
-        sysUser.setMetamaskFlag(SysStatusEnum.ENABLED.value());
-        return this.update(new QueryWrapper<SysUserEntity>().lambda()
-                .eq(SysUserEntity::getPublicAddress, adminUser.getPublicAddress())
-                .eq(SysUserEntity::getId, adminUser.getId()));
+        sysUser.setMetamaskFlag(MetaMaskFlagEnum.ENABLED.value());
+        return this.update(sysUser, new QueryWrapper<SysUserEntity>().lambda()
+                .eq(SysUserEntity::getId, userId));
     }
 
     /**
      * 删除metaemask相关信息
-     * @param adminUser
+     * @param userId
      * @return
      */
     @Override
-    public Boolean deleteMetaMask(SysUserEntity adminUser) {
+    public Boolean deleteMetaMask(Long userId) {
         return this.update(
                 Wrappers.<SysUserEntity>lambdaUpdate()
                         .set(SysUserEntity::getPublicAddress, null)
                         .set(SysUserEntity::getNonce, null)
-                        .set(SysUserEntity::getMetamaskFlag, SysStatusEnum.DISABLE.value())
+                        .set(SysUserEntity::getMetamaskFlag, MetaMaskFlagEnum.DISABLE.value())
         );
     }
 

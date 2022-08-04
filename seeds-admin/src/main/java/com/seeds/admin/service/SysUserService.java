@@ -125,18 +125,17 @@ public interface SysUserService extends IService<SysUserEntity> {
      * @param adminUser
      * @return
      */
-    String metamaskNonce(String publicAddress, SysUserEntity adminUser);
+    String metamaskNonce(String publicAddress, Long userId);
 
     /**
      * 更新metamask信息
-     * @param adminUser
      */
-    Boolean updateMetaMask(SysUserEntity adminUser);
+    Boolean updateMetaMask(Long userId);
 
     /**
      * 删除metaemask相关信息
-     * @param adminUser
+     * @param userId
      * @return
      */
-    Boolean deleteMetaMask(SysUserEntity adminUser);
+    Boolean deleteMetaMask(Long userId);
 }

@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 
 /**
  * @author yk
@@ -12,15 +11,15 @@ import java.io.Serializable;
  * @date 2022/07/13
  */
 @Data
-public class MetaMaskBindReq implements Serializable {
+public class MetaMaskReq {
 
-    @ApiModelProperty(value = "地址", required = true)
+    @ApiModelProperty(value = "钱包地址", required = true)
     @NotBlank
     private String publicAddress;
-    @ApiModelProperty(value = "签名", required = true)
-    @NotBlank
+    @ApiModelProperty(value = "签名")
     private String signature;
     @ApiModelProperty(value = "信息")
     private String message;
+
 
 }
