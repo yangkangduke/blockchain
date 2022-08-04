@@ -125,14 +125,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         UserDto userDto = this.verifyLogin(loginReq);
         // 产生2fa验证的token，用户进入2FA登陆阶段，前端再次call 2FA登陆接口需要带上2FA token
         String token = RandomUtil.genRandomToken(userDto.getUid().toString());
-        //检查用户现在有没有GA
-        UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyMapper.selectOne(new QueryWrapper<UcSecurityStrategy>().lambda()
-                .eq(UcSecurityStrategy::getUid, userDto.getUid())
-                .eq(UcSecurityStrategy::getNeedAuth, true)
-                .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.GA));
-
-        // 存在就使用ga
-        if (ucSecurityStrategy != null ) {
+        // 检查用户现在有没有GA,存在就使用ga
+        if (this.verifyGa(userDto.getUid())) {
             // 将2FA token存入redis，用户进入等待2FA验证态
             cacheService.put2FAInfoWithTokenAndUserAndAuthType(
                     token,
@@ -476,6 +470,23 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .eq(UcSecurityStrategy::getUid, ucUser.getId())
                 .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.GA)
         );
+    }
+
+    /**
+     * 验证是否有ga
+     * @param userId
+     * @return
+     */
+    @Override
+    public Boolean verifyGa(Long userId) {
+        UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyMapper.selectOne(new QueryWrapper<UcSecurityStrategy>().lambda()
+                .eq(UcSecurityStrategy::getUid, userId)
+                .eq(UcSecurityStrategy::getNeedAuth, true)
+                .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.GA));
+        if (ucSecurityStrategy != null) {
+            return true;
+        }
+        return false;
     }
 
 

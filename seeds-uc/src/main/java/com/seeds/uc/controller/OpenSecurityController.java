@@ -2,18 +2,20 @@ package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.redis.LoginUserDTO;
+import com.seeds.uc.dto.request.GaReq;
 import com.seeds.uc.dto.request.MetaMaskReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
+import com.seeds.uc.dto.request.UpdateEmailReq;
 import com.seeds.uc.dto.response.LoginResp;
+import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.enums.UserOperateEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
-import com.seeds.uc.exceptions.LoginException;
 import com.seeds.uc.exceptions.SecuritySettingException;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
-import com.seeds.uc.service.IUcSecurityStrategyService;
 import com.seeds.uc.service.IUcUserService;
+import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.service.impl.CacheService;
 import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
@@ -44,6 +46,8 @@ public class OpenSecurityController {
     private IGoogleAuthService googleAuthService;
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private SendCodeService sendCodeService;
 
     /**
      * 生成QRBarcode
@@ -67,10 +71,10 @@ public class OpenSecurityController {
     @PostMapping("/ga/verifyCode")
     @ApiOperation(value = "绑定ga", notes = "1.调用/ga/QRBarcode生成gaSecret\n" +
             "2.调用/ga/verifyCode验证code")
-    public GenericDto<Object> verifyCode(@Valid @NotBlank @RequestBody String code, HttpServletRequest request) {
+    public GenericDto<Object> verifyCode(@Valid @RequestBody GaReq gaReq, HttpServletRequest request) {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        googleAuthService.verifyUserCode(loginUser.getUserId(), code);
+        googleAuthService.verifyUserCode(loginUser.getUserId(), gaReq.getCode());
         return GenericDto.success(null);
     }
 
@@ -79,11 +83,11 @@ public class OpenSecurityController {
      */
     @PostMapping("/ga/unbind")
     @ApiOperation(value = "解除绑定ga", notes = "解除绑定ga")
-    public GenericDto<Object> gaUnbind(@Valid @NotBlank @RequestBody String code, HttpServletRequest request) {
+    public GenericDto<Object> gaUnbind(@Valid @RequestBody GaReq gaReq, HttpServletRequest request) {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         UcUser ucUser = ucUserService.getById(loginUser.getUserId());
-        if (!googleAuthService.verify(code, ucUser.getGaSecret())) {
+        if (!googleAuthService.verify(gaReq.getCode(), ucUser.getGaSecret())) {
             throw new SecuritySettingException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
         }
 
@@ -134,13 +138,20 @@ public class OpenSecurityController {
      */
     @PutMapping("/change/email")
     @ApiOperation(value = "修改邮箱", notes = "修改邮箱")
-    public GenericDto<Object> updateEmail(@Valid @NotBlank @RequestBody String email, HttpServletRequest request) {
+    public GenericDto<Object> updateEmail(@Valid @RequestBody UpdateEmailReq updateEmailReq, HttpServletRequest request) {
+        String email = updateEmailReq.getEmail();
+        String code = updateEmailReq.getCode();
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+        UcUser ucUser = ucUserService.getById(loginUser.getUserId());
         // 判断是否有ga
+        if (ucUserService.verifyGa(loginUser.getUserId())) {
+            throw new InvalidArgumentsException("You cannot modify your email address after binding Google authentication");
+        }
         // 验证email的code
-        // 修改邮箱 todo，看之前发邮件取的是哪里的邮箱地址
+        sendCodeService.verifyEmailWithUseType(ucUser.getEmail(), code, AuthCodeUseTypeEnum.CHANGE_EMAIL);
+        // 修改邮箱
         return GenericDto.success(ucUserService.updateEmail(email, loginUser));
     }
 }

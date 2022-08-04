@@ -109,4 +109,11 @@ public interface IUcUserService extends IService<UcUser> {
      * @param ucUser
      */
     void deleteGa(UcUser ucUser);
+
+    /**
+     * 验证是否有ga
+     * @param userId
+     * @return
+     */
+    Boolean verifyGa(Long userId);
 }

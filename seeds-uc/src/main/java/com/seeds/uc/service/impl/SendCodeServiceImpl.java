@@ -144,8 +144,10 @@ public class SendCodeServiceImpl implements SendCodeService {
             MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT,5, StrFormatter.format(resetPasswordProperties.getUrl(),encode, email)), true);
         } else if (useType.equals(AuthCodeUseTypeEnum.LOGIN)) {
             MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.LOGIN_EMAIL_VERIFY_SUBJECT, StrFormatter.format(UcConstant.LOGIN_EMAIL_VERIFY_CONTENT, 5, code), false);
-        }  else if (useType.equals(AuthCodeUseTypeEnum.CHANGE_PASSWORD)) {
+        } else if (useType.equals(AuthCodeUseTypeEnum.CHANGE_PASSWORD)) {
             MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.CHANGE_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.CHANGE_PASSWORD_EMAIL_CONTENT, 5, code), false);
+        } else if (useType.equals(AuthCodeUseTypeEnum.CHANGE_EMAIL)) {
+            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.CHANGE_EMAIL_EMAIL_SUBJECT, StrFormatter.format(UcConstant.CHANGE_EMAIL_EMAIL_CONTENT, 5, code), false);
         } else {
             throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
         }

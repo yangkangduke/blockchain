@@ -5,6 +5,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.ChangePasswordReq;
 import com.seeds.uc.dto.request.MetaMaskReq;
+import com.seeds.uc.dto.request.NickNameReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.ProfileResp;
@@ -27,9 +28,7 @@ import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -74,11 +73,11 @@ public class OpenUserController {
      */
     @PutMapping("/change/nickname")
     @ApiOperation(value = "修改昵称", notes = "修改昵称")
-    public GenericDto<Object> updateNickname(@Valid @NotBlank @RequestBody String nickname, HttpServletRequest request) {
+    public GenericDto<Object> updateNickname(@Valid @RequestBody NickNameReq nickNameReq, HttpServletRequest request) {
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        return GenericDto.success(ucUserService.updateNickname(nickname, loginUser));
+        return GenericDto.success(ucUserService.updateNickname(nickNameReq.getNickname(), loginUser));
     }
 
     /**
@@ -87,7 +86,7 @@ public class OpenUserController {
      */
     @PutMapping("/change/password")
     @ApiOperation(value = "修改密码", notes = "修改密码")
-    public GenericDto<Object> updatePassword(@Valid @NotBlank @RequestBody ChangePasswordReq changePasswordReq, HttpServletRequest request) {
+    public GenericDto<Object> updatePassword(@Valid @RequestBody ChangePasswordReq changePasswordReq, HttpServletRequest request) {
         String password = changePasswordReq.getPassword();
         String oldPassword = changePasswordReq.getOldPassword();
         ClientAuthTypeEnum authTypeEnum = changePasswordReq.getAuthTypeEnum();

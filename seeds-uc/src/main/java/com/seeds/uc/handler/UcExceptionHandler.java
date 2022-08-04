@@ -33,7 +33,7 @@ public class UcExceptionHandler {
     ResponseEntity<GenericDto<String>> handle(Throwable e) {
         log.error("General Exception:", e);
         return new ResponseEntity<>(
-                GenericDto.failure("Internal Error" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                GenericDto.failure("Internal Error:" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
