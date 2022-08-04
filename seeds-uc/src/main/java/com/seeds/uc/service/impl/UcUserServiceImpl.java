@@ -6,9 +6,6 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.common.dto.GenericDto;
-import com.seeds.common.web.config.EmailProperties;
-import com.seeds.uc.config.ResetPasswordProperties;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
@@ -24,7 +21,6 @@ import com.seeds.uc.mapper.UcUserMapper;
 import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
-import com.seeds.uc.service.IUcSecurityStrategyService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.util.CryptoUtils;
@@ -252,7 +248,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             // 绑定
         } else if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.BIND)) {
             if (loginUserDTO == null) {
-                throw new InvalidArgumentsException("Please login");
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_401_NOT_LOGGED_IN);
             }
             // 修改用户信息
             nonce = RandomUtil.getRandomSalt();

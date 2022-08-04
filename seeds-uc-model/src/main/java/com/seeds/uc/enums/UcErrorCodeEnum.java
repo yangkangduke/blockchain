@@ -38,6 +38,7 @@ public enum UcErrorCodeEnum {
     ERR_10019_ACCOUNT_IN_HIBERNATION(10019, "因为您长期未访问，所以已转至休眠账户。如需使用请在PC网页登录并解除休眠状态。", "account in hibernation status, please unlock by login on PC"),
     ERR_10021_PHONE_NUMBER_INCORRECT(10021, "手机号不正确，请重新输入", "phone number incorrect"),
     ERR_10022_EMAIL_INCORRECT(10022, "邮箱不正确，请重新输入", "email incorrect"),
+    ERR_10023_TOKEN_EXPIRED(10023, "token已经过期", "token has expired"),
 
     // registration codes
     ERR_10026_PHONE_EMAIL_CANNOT_BOTH_EMPTY(10026, "手机和邮箱不能同时为空", "phone and email cannot all be empty"),

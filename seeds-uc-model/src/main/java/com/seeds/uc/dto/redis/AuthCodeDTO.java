@@ -1,7 +1,7 @@
 package com.seeds.uc.dto.redis;
 
-import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
+import com.seeds.uc.enums.ClientAuthTypeEnum;
 import lombok.Builder;
 import lombok.Data;
 

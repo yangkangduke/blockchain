@@ -15,10 +15,10 @@ import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.GenericException;
+import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.SendAuthCodeException;
 import com.seeds.uc.mapper.UcUserMapper;
 import com.seeds.uc.model.UcUser;
-import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.util.DigestUtil;
 import com.seeds.uc.util.RandomUtil;
@@ -91,7 +91,9 @@ public class SendCodeServiceImpl implements SendCodeService {
     public void sendEmailWithTokenAndUseType(String token, AuthCodeUseTypeEnum useTypeEnum) {
         // 取出之前login时放入二次验证redis的dto拿到详细信息
         TwoFactorAuth twoFactorAuth = cacheService.get2FAInfoWithToken(token);
-
+        if (twoFactorAuth == null) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
+        }
         UcUser userDto = ucUserMapper.selectById(twoFactorAuth.getUserId());
 
         // generate a random code
