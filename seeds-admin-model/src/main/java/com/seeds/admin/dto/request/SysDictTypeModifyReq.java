@@ -29,6 +29,7 @@ public class SysDictTypeModifyReq {
     @NotBlank(message = "DicType code cannot be empty")
     private String dictCode;
 
+
     /**
      * 字典名称
      */
