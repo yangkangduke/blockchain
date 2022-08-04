@@ -30,8 +30,6 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
     @Autowired
     UcUserMapper userMapper;
     @Autowired
-    private CacheService cacheService;
-    @Autowired
     private IUcSecurityStrategyService iUcSecurityStrategyService;
 
     @Override
@@ -73,7 +71,13 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
 
     @Override
     public boolean verify(String userInputCode, String userSecret) {
-        GoogleAuthenticator googleAuthenticator = new GoogleAuthenticator();
-        return googleAuthenticator.authorize(userSecret, Integer.parseInt(userInputCode.replaceFirst("0*", "")));
+        boolean authorize;
+        try {
+            GoogleAuthenticator googleAuthenticator = new GoogleAuthenticator();
+            authorize = googleAuthenticator.authorize(userSecret, Integer.parseInt(userInputCode.replaceFirst("0*", "")));
+        } catch (Exception e) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
+        }
+        return authorize;
     }
 }

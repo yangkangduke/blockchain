@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
-@Api(tags = "auth相关接口")
+@Api(tags = "auth")
 @RequestMapping("/auth")
 public class AuthController {
 
@@ -160,7 +160,11 @@ public class AuthController {
             if (one == null) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
             }
-            if (!googleAuthService.verify(code, one.getGaSecret())) {
+            try {
+                if (!googleAuthService.verify(code, one.getGaSecret())) {
+                    throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
+                }
+            } catch (Exception e) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
             }
         } else {

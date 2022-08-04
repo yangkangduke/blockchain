@@ -8,14 +8,19 @@ import com.seeds.uc.dto.request.MetaMaskReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.ProfileResp;
+import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.enums.UserOperateEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
+import com.seeds.uc.exceptions.LoginException;
 import com.seeds.uc.exceptions.PasswordException;
+import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
+import com.seeds.uc.service.IUcSecurityStrategyService;
 import com.seeds.uc.service.IUcUserService;
+import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.service.impl.CacheService;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.WebUtil;
@@ -39,7 +44,7 @@ import javax.validation.constraints.NotBlank;
  * @since 2022-07-09
  */
 @RestController
-@Api(tags = "用户相关接口")
+@Api(tags = "用户")
 public class OpenUserController {
     @Autowired
     private IUcUserService ucUserService;
@@ -47,71 +52,8 @@ public class OpenUserController {
     private IGoogleAuthService googleAuthService;
     @Autowired
     private CacheService cacheService;
-
-
-    /**
-     * 生成QRBarcode
-     */
-    @PostMapping("/ga/QRBarcode")
-    @ApiOperation(value = "生成QRBarcode", notes = "生成QRBarcode")
-    public GenericDto<String> getQRBarcode(@Valid @RequestBody QRBarCodeReq qrBarCodeReq, HttpServletRequest request) {
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        if (!qrBarCodeReq.getAccount().equals(loginUser.getLoginName())) {
-            throw new InvalidArgumentsException("Account is incorrect");
-        }
-        return GenericDto.success(googleAuthService.getQRBarcode(qrBarCodeReq.getAccount(), qrBarCodeReq.getRemark(), loginUser));
-    }
-
-    /**
-     * GA验证code
-     * 1.调用/ga/QRBarcode生成code后
-     * 2.调用/ga/verifyCode验证code
-     */
-    @PostMapping("/ga/verifyCode")
-    @ApiOperation(value = "GA验证code", notes = "GA验证code")
-    public GenericDto<Object> verifyCode(@Valid @NotBlank @RequestBody String code, HttpServletRequest request) {
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        googleAuthService.verifyUserCode(loginUser.getUserId(), code);
-        return GenericDto.success(null);
-    }
-
-    /**
-     * 绑定metamask-获取随机数
-     *
-     * @param
-     * @return
-     */
-    @PostMapping("/bindMetamask/nonce")
-    @ApiOperation(value = "绑定metamask-获取随机数", notes = "绑定metamask-获取随机数")
-    public GenericDto<String> metamaskNonce(@Valid @RequestBody MetaMaskReq metaMaskReq, HttpServletRequest request ) {
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        UcUser user = ucUserService.getById(loginUser.getUserId());
-        metaMaskReq.setOperateEnum(UserOperateEnum.BIND);
-        return GenericDto.success(ucUserService.metamaskNonce(metaMaskReq, user));
-    }
-
-    /**
-     * 绑定metamask-验证
-     * 1.调用/bindMetamask/nonce生成nonce
-     * 2.前端根据nonce生成签名信息
-     * 3.调用/bindMetamask/verify验证签名信息，验证成功返回token
-     *
-     * @param
-     * @return
-     */
-
-    @PostMapping("/bindMetamask/verify")
-    @ApiOperation(value = "绑定metamask-验证",
-            notes = "1.调用/bindMetamask/nonce生成nonce\n" +
-                    "2.前端根据nonce生成签名信息\n" +
-                    "3.调用/bindMetamask/verify验证签名信息，验证成功返回token")
-    public GenericDto<LoginResp> metamaskVerify(@Valid @RequestBody MetaMaskReq metaMaskReq) {
-        return GenericDto.success(ucUserService.metamaskVerify(metaMaskReq));
-    }
+    @Autowired
+    private SendCodeService sendCodeService;
 
     /**
      * 获取用户信息
@@ -140,34 +82,37 @@ public class OpenUserController {
     }
 
     /**
-     * 修改密码 todo
+     * 修改密码
      * @return
      */
     @PutMapping("/change/password")
     @ApiOperation(value = "修改密码", notes = "修改密码")
     public GenericDto<Object> updatePassword(@Valid @NotBlank @RequestBody ChangePasswordReq changePasswordReq, HttpServletRequest request) {
         String password = changePasswordReq.getPassword();
+        String oldPassword = changePasswordReq.getOldPassword();
         ClientAuthTypeEnum authTypeEnum = changePasswordReq.getAuthTypeEnum();
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         UcUser user = ucUserService.getById(loginUser.getUserId());
         // 判断原密码是否正确
-        if (!password.equals(PasswordUtil.getPassword(user.getPassword(), user.getSalt()))) {
+        if (!user.getPassword().equals(PasswordUtil.getPassword(oldPassword, user.getSalt()))) {
             throw new PasswordException(UcErrorCodeEnum.ERR_10043_WRONG_OLD_PASSWORD);
         }
 
         // 判断code是否正确
         if (authTypeEnum.equals(ClientAuthTypeEnum.EMAIL)) {
+            sendCodeService.verifyEmailWithUseType(user.getEmail(), changePasswordReq.getCode(), AuthCodeUseTypeEnum.CHANGE_PASSWORD);
 
         } else if (authTypeEnum.equals(ClientAuthTypeEnum.GA)) {
-
+            if (!googleAuthService.verify(changePasswordReq.getCode(), user.getGaSecret())) {
+                throw new LoginException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+            }
         } else {
-
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_504_MISSING_ARGUMENTS);
         }
         // 修改密码
-        ucUserService.updatePassword(user.getId(), password);
-        return GenericDto.success(null);
+        return GenericDto.success(ucUserService.updatePassword(user.getId(), password));
     }
 
 

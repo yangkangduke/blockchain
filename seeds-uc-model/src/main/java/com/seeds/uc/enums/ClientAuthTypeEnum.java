@@ -28,6 +28,8 @@ public enum ClientAuthTypeEnum {
     // 谷歌验证
     @JsonProperty("3")
     GA((short) 3, "ga"),
+    @JsonProperty("4")
+    PHONE((short) 4, "phone"),
     ;
 
     public static Set<ClientAuthTypeEnum> NEED_SEND_CODE = EnumSet.of(GA, EMAIL);

@@ -81,7 +81,7 @@ public class UcRedisKeysConstant {
     public String getUcAuthCodeKeyWithAuthTypeAndUseType(String username,
                                                          AuthCodeUseTypeEnum useTypeEnum,
                                                          ClientAuthTypeEnum authTypeEnum) {
-        if (ClientAuthTypeEnum.METAMASK.equals(authTypeEnum)) {
+        if (ClientAuthTypeEnum.PHONE.equals(authTypeEnum)) {
             return String.format(UC_AUTH_PHONE_KEY_TEMPLATE, useTypeEnum.getBrief(), username);
         } else if (ClientAuthTypeEnum.EMAIL.equals(authTypeEnum)) {
             return String.format(UC_AUTH_EMAIL_KEY_TEMPLATE, useTypeEnum.getBrief(), username);

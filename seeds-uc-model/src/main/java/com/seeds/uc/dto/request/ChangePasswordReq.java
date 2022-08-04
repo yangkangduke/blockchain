@@ -20,7 +20,6 @@ public class ChangePasswordReq {
     @ApiModelProperty(value = "新密码", required = true)
     private String password;
     @ApiModelProperty(value = "授权类型：2-email, 3-ga", required = true)
-    @NotBlank
     private ClientAuthTypeEnum authTypeEnum;
     @NotBlank
     @ApiModelProperty(value = "验证码", required = true)

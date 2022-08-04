@@ -95,4 +95,18 @@ public interface IUcUserService extends IService<UcUser> {
      * @return
      */
     Boolean updatePassword(Long userId, String password);
+
+    /**
+     * 修改邮箱
+     * @param email
+     * @param loginUser
+     * @return
+     */
+    Boolean updateEmail(String email, LoginUserDTO loginUser);
+
+    /**
+     * 删除ga
+     * @param ucUser
+     */
+    void deleteGa(UcUser ucUser);
 }
