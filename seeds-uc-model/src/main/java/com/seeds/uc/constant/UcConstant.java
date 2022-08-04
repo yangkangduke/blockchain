@@ -1,6 +1,5 @@
 package com.seeds.uc.constant;
 
-import cn.hutool.core.text.StrFormatter;
 import lombok.experimental.UtilityClass;
 
 /**

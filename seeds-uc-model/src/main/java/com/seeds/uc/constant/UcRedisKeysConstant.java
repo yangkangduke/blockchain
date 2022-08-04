@@ -1,8 +1,8 @@
 package com.seeds.uc.constant;
 
+import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.exceptions.GenericException;
-import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import lombok.experimental.UtilityClass;
 
 /**

@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 /**
  * @program: seeds-java

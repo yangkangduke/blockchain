@@ -12,7 +12,6 @@ import com.seeds.uc.dto.request.UcUserAddressReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
-import com.seeds.uc.mapper.UcUserAddressMapper;
 import com.seeds.uc.model.UcUserAddress;
 import com.seeds.uc.service.IUcUserAccountService;
 import com.seeds.uc.service.IUcUserAddressService;

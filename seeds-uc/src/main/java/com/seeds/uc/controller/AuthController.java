@@ -21,7 +21,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +67,11 @@ public class AuthController {
     @ApiOperation(value = "账号登陆", notes = "1.调用/login 返回token\n" +
             "2.调用/2fa/login 返回ucToken")
     public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
-        return GenericDto.success(ucUserService.login(loginReq));
+        LoginResp login = ucUserService.login(loginReq);
+        if (login.getUcToken() == null) {
+            return GenericDto.failure(null, UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getCode(), login);
+        }
+        return GenericDto.success(login);
     }
 
     /**
@@ -196,7 +199,7 @@ public class AuthController {
             sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
             // 登陆
         } else if (AuthCodeUseTypeEnum.LOGIN.equals(sendReq.getUseType())) {
-            sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
+            sendCodeService.sendEmailWithTokenAndUseType(sendReq.getToken(), sendReq.getUseType());
             // 忘记密码
         }  else if (AuthCodeUseTypeEnum.RESET_PASSWORD.equals(sendReq.getUseType())) {
             sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
