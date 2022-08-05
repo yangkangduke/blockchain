@@ -17,8 +17,6 @@ public class UcRedisKeysConstant {
 
     public final String UC_KEY_PREFIX = "uc:";
 
-    public final String ADMIN_OSS_FILE_URL_KEY_PREFIX = UC_KEY_PREFIX + "oss:file:url:%s";
-
     /**
      * Key: uc:token:{ucToken} -> Value: {UserDto}
      * ucToken is the token returned when user login success
@@ -142,10 +140,4 @@ public class UcRedisKeysConstant {
         return String.format(UC_FORGOT_PASSWORD_ACCOUNT_KEY_TEMPLATE, account);
     }
 
-    /**
-     * 拼接文件链接缓存的key
-     */
-    public String getOssFileUrlKeyTemplate(String key) {
-        return String.format(ADMIN_OSS_FILE_URL_KEY_PREFIX, key);
-    }
 }

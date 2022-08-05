@@ -18,26 +18,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface IUcFileService extends IService<UcFile> {
 
-
-    /**
-     * 下载文件
-     * @param response 响应头
-     * @param objectName 对象名称
-     */
-    void download(HttpServletResponse response, String objectName);
-
-    /**
-     * 获取文件
-     * @param objectName 对象名称
-     * @return 文件链接
-     */
-    String getFile(String objectName);
-
     /**
      * 根据id删除文件信息
-     * @param fileId 文件id
      */
-    void delete(Long fileId);
+    Boolean deleteFile(Long id) throws Exception;
 
     /**
      * 上传
@@ -45,4 +29,12 @@ public interface IUcFileService extends IService<UcFile> {
      * @return
      */
     GenericDto<UcFileResp> upload(MultipartFile file);
+
+    /**
+     * 读取文件
+     * @param bucket 桶名称
+     * @param objectName 文件名称
+     * @param response 输出流
+     */
+    void getFile(String bucket, String objectName, HttpServletResponse response);
 }

@@ -42,67 +42,40 @@ import java.util.Map;
 @Transactional
 public class UcFileServiceImpl extends ServiceImpl<UcFileMapper, UcFile> implements IUcFileService {
 
-    @Value("${uc.oss.file.expires:1}")
-    private Integer expires;
-
-    @Value("${uc.oss.bucket.name:admin}")
-    private String bucketName;
-
-    @Autowired
-    private OssTemplate template;
-    @Autowired
-    private CacheService cacheService;
     @Autowired
     private FileProperties properties;
     @Autowired
     private FileTemplate fileTemplate;
 
+    /**
+     * 读取文件
+     * @param bucket
+     * @param objectName
+     * @param response
+     */
     @Override
-    public void download(HttpServletResponse response, String objectName) {
-        try (S3Object s3Object = template.getObject(bucketName, objectName)) {
+    public void getFile(String bucket, String objectName, HttpServletResponse response) {
+        try (S3Object s3Object = fileTemplate.getObject(bucket, objectName)) {
             response.setContentType("application/octet-stream; charset=UTF-8");
-            response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(objectName, "UTF-8"));
             IoUtil.copy(s3Object.getObjectContent(), response.getOutputStream());
         }
         catch (Exception e) {
-            log.error("文件下载失败，objectName={}", objectName);
+            log.error("文件读取异常: {}", e.getLocalizedMessage());
         }
     }
 
-    @Override
-    public String getFile(String objectName) {
-        // 先从Redis中获取
-        String url = cacheService.getFileUrlByObjectName(objectName);
-        if (StringUtils.isNotBlank(url)) {
-            return url;
-        }
-        try {
-            url = template.getObjectURL(bucketName, objectName, expires);
-            if (StringUtils.isNotBlank(url)) {
-                cacheService.putFileUrlByObjectName(objectName, url, expires);
-            }
-        }
-        catch (Exception e) {
-            log.error("获取文件失败，objectName={}", objectName);
-        }
-        return url;
-    }
 
+    /**
+     * 根据id删除文件信息
+     * @param id
+     * @return
+     * @throws Exception
+     */
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void delete(Long fileId) {
-        UcFile ucFile = getById(fileId);
-        if (ucFile == null) {
-            return;
-        }
-        try {
-            template.removeObject(bucketName, ucFile.getObjectName());
-            removeById(fileId);
-        }
-        catch (Exception e) {
-            log.error("删除文件失败，objectName={}", ucFile.getObjectName());
-            throw new GenericException("File delete failed");
-        }
+    public Boolean deleteFile(Long id) throws Exception {
+        UcFile file = this.getById(id);
+        fileTemplate.removeObject(properties.getBucketName(), file.getObjectName());
+        return this.removeById(id);
     }
 
     /**

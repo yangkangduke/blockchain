@@ -2,6 +2,7 @@ package com.seeds.uc.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -57,6 +58,7 @@ public class UcFile implements Serializable {
     private Long updatedAt;
 
     @ApiModelProperty("删除标记  1：已删除   0：未删除")
+    @TableLogic
     private Boolean deleteFlag;
 
 }

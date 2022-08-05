@@ -44,7 +44,8 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	 * 创建bucket
 	 * @param bucketName bucket名称
 	 */
-	@SneakyThrows
+	@Override
+    @SneakyThrows
 	public void createBucket(String bucketName) {
 		if (!amazonS3.doesBucketExistV2(bucketName)) {
 			amazonS3.createBucket((bucketName));
@@ -58,6 +59,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	 * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBuckets">AWS
 	 * API Documentation</a>
 	 */
+	@Override
 	@SneakyThrows
 	public List<Bucket> getAllBuckets() {
 		return amazonS3.listBuckets();
@@ -79,6 +81,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	 * "http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucket">AWS API
 	 * Documentation</a>
 	 */
+	@Override
 	@SneakyThrows
 	public void removeBucket(String bucketName) {
 		amazonS3.deleteBucket(bucketName);
@@ -93,6 +96,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	 * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjects">AWS
 	 * API Documentation</a>
 	 */
+	@Override
 	@SneakyThrows
 	public List<S3ObjectSummary> getAllObjectsByPrefix(String bucketName, String prefix, boolean recursive) {
 		ObjectListing objectListing = amazonS3.listObjects(bucketName, prefix);
@@ -125,6 +129,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	 * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObject">AWS
 	 * API Documentation</a>
 	 */
+	@Override
 	@SneakyThrows
 	public S3Object getObject(String bucketName, String objectName) {
 		return amazonS3.getObject(bucketName, objectName);
@@ -137,6 +142,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	 * @param stream 文件流
 	 * @throws Exception
 	 */
+	@Override
 	public void putObject(String bucketName, String objectName, InputStream stream) throws Exception {
 		putObject(bucketName, objectName, stream, stream.available(), "application/octet-stream");
 	}
@@ -149,6 +155,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	 * @param contextType 文件类型
 	 * @throws Exception
 	 */
+	@Override
 	public void putObject(String bucketName, String objectName, InputStream stream, String contextType)
 			throws Exception {
 		putObject(bucketName, objectName, stream, stream.available(), contextType);
@@ -199,6 +206,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	 * "http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObject">AWS API
 	 * Documentation</a>
 	 */
+	@Override
 	public void removeObject(String bucketName, String objectName) throws Exception {
 		amazonS3.deleteObject(bucketName, objectName);
 	}

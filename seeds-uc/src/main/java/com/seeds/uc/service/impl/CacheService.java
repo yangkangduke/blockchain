@@ -55,22 +55,6 @@ public class CacheService {
     @Autowired
     private RedissonClient redisson;
 
-
-
-    public String getFileUrlByObjectName(String objectName) {
-        String key = UcRedisKeysConstant.getOssFileUrlKeyTemplate(objectName);
-        return redisson.<String>getBucket(key).get();
-    }
-
-    public void putFileUrlByObjectName(String objectName, String url, Integer expires) {
-        Date date = new Date();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-        calendar.add(Calendar.DAY_OF_MONTH, expires);
-        String key = UcRedisKeysConstant.getOssFileUrlKeyTemplate(objectName);
-        redisson.getBucket(key).set(url, calendar.getTime().getTime(), TimeUnit.SECONDS);
-    }
-
     /**
      * key为2FA的token，用于账户安全的账户2FA校验
      */
