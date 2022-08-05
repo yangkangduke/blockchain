@@ -22,10 +22,7 @@ import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -41,6 +38,7 @@ import javax.validation.Valid;
 @RestController
 @Api(tags = "用户")
 public class OpenUserController {
+
     @Autowired
     private IUcUserService ucUserService;
     @Autowired
@@ -61,6 +59,20 @@ public class OpenUserController {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         return GenericDto.success(ucUserService.getMyProfile(loginUser));
+    }
+
+    /**
+     * 退出登陆
+     * @param request
+     * @return
+     */
+    @PostMapping("/logout")
+    @ApiOperation(value = "退出登陆", notes = "退出登陆")
+    public GenericDto<Object> logout(HttpServletRequest request) {
+        String token = WebUtil.getTokenFromRequest(request);
+
+        cacheService.removeUserByToken(token);
+        return GenericDto.success(null);
     }
 
     /**

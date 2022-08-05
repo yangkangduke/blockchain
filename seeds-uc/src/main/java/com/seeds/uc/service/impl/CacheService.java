@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,6 +54,22 @@ public class CacheService {
 
     @Autowired
     private RedissonClient redisson;
+
+
+
+    public String getFileUrlByObjectName(String objectName) {
+        String key = UcRedisKeysConstant.getOssFileUrlKeyTemplate(objectName);
+        return redisson.<String>getBucket(key).get();
+    }
+
+    public void putFileUrlByObjectName(String objectName, String url, Integer expires) {
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_MONTH, expires);
+        String key = UcRedisKeysConstant.getOssFileUrlKeyTemplate(objectName);
+        redisson.getBucket(key).set(url, calendar.getTime().getTime(), TimeUnit.SECONDS);
+    }
 
     /**
      * key为2FA的token，用于账户安全的账户2FA校验
@@ -166,4 +185,26 @@ public class CacheService {
         return value.get();
     }
 
+    // 用uid来remove用户登陆态
+    public void removeUserByUid(Long uid) {
+        String key = UcRedisKeysConstant.getUcLoginUidKey(uid);
+        RBucket<String> value = redisson.getBucket(key);
+        String token = value.get();
+        removeUserByToken(token);
+        value.delete();
+    }
+
+    // 用token来remove用户登陆态
+    public void removeUserByToken(String token) {
+        String key = UcRedisKeysConstant.getUcTokenKey(token);
+        RBucket<LoginUserDTO> value = redisson.getBucket(key);
+        removeUserLoginUidTokenMapping(value.get().getUserId());
+        value.delete();
+    }
+
+    private void removeUserLoginUidTokenMapping(Long uid) {
+        String key = UcRedisKeysConstant.getUcLoginUidKey(uid);
+        RBucket<String> value = redisson.getBucket(key);
+        value.delete();
+    }
 }
