@@ -17,10 +17,10 @@ import javax.validation.constraints.NotBlank;
 @Builder
 public class UpdateEmailReq {
 
-    @ApiModelProperty("邮箱")
+    @ApiModelProperty("新邮箱")
     @Email
     private String email;
-    @ApiModelProperty("验证码")
+    @ApiModelProperty("旧邮箱发的验证码")
     @NotBlank
     private String code;
 }

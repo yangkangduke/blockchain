@@ -55,6 +55,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Autowired
     private SendCodeService sendCodeService;
 
+
     /**
      * 注册邮箱账号
      *

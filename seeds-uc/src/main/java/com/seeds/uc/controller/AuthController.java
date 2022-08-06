@@ -69,7 +69,7 @@ public class AuthController {
     public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
         LoginResp login = ucUserService.login(loginReq);
         if (login.getUcToken() == null) {
-            return GenericDto.failure(null, UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getCode(), login);
+            return GenericDto.failure(UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getDescEn(), UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getCode(), login);
         }
         return GenericDto.success(login);
     }
