@@ -11,6 +11,8 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class UcConstant {
+    public static final String GA_ISSUER = "dev.seeds.com";
+
     // 忘记密码
     public static final String FORGOT_PASSWORD_EMAIL_CONTENT = "Reset password, note that it expires in {} minutes:<a>{}</a>";
     public static final String FORGOT_PASSWORD_EMAIL_SUBJECT = "forgot password";

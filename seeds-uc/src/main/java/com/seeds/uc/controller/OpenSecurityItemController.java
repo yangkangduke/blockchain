@@ -1,25 +1,35 @@
 package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.context.UserContext;
+import com.seeds.uc.constant.UcConstant;
+import com.seeds.uc.dto.redis.AuthTokenDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.GaReq;
 import com.seeds.uc.dto.request.MetaMaskReq;
 import com.seeds.uc.dto.request.QRBarCodeReq;
 import com.seeds.uc.dto.request.UpdateEmailReq;
+import com.seeds.uc.dto.request.security.item.GaSecurityItemReq;
+import com.seeds.uc.dto.response.GoogleAuthResp;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
+import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.enums.UserOperateEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
+import com.seeds.uc.exceptions.SecurityItemException;
 import com.seeds.uc.exceptions.SecuritySettingException;
+import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
+import com.seeds.uc.service.IUcSecurityStrategyService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.service.impl.CacheService;
 import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,34 +55,56 @@ public class OpenSecurityItemController {
     private CacheService cacheService;
     @Autowired
     private SendCodeService sendCodeService;
+    @Autowired
+    private IUcSecurityStrategyService ucSecurityStrategyService;
 
-    /**
-     * 生成QRBarcode
-     */
-    @PostMapping("/ga/QRBarcode")
-    @ApiOperation(value = "生成QRBarcode", notes = "生成QRBarcode")
-    public GenericDto<String> getQRBarcode(@Valid @RequestBody QRBarCodeReq qrBarCodeReq, HttpServletRequest request) {
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        if (!qrBarCodeReq.getAccount().equals(loginUser.getLoginName())) {
-            throw new InvalidArgumentsException("Account is incorrect");
+    @PostMapping("/ga/bind")
+    @ApiOperation(value = "绑定ga",
+            notes = "1.调用/security/item/ga/generate获取key " +
+                    "2.调用/code/ga/verify验证码的验证并获取authToken " +
+                    "3.调用/security/item/ga/bind")
+    public GenericDto<Object> bindGA(@RequestBody GaSecurityItemReq securityItemReq) {
+        AuthTokenDTO gaAuthToken =
+                cacheService.getAuthTokenDetailWithToken(securityItemReq.getGaToken(), ClientAuthTypeEnum.GA);
+        if (gaAuthToken == null
+                || StringUtils.isBlank(gaAuthToken.getSecret())) {
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
         }
-        return GenericDto.success(googleAuthService.getQRBarcode(qrBarCodeReq.getAccount(), qrBarCodeReq.getRemark(), loginUser));
+
+        Long uid = UserContext.getCurrentUserId();
+        ucUserService.updateById(UcUser.builder()
+                        .id(uid)
+                        .gaSecret(gaAuthToken.getSecret())
+                .build());
+
+        // 绑定之后set 安全项
+        ucSecurityStrategyService.save(
+                UcSecurityStrategy.builder()
+                        .authType(ClientAuthTypeEnum.GA)
+                        .createdAt(System.currentTimeMillis())
+                        .needAuth(true)
+                        .uid(uid)
+                        .updatedAt(System.currentTimeMillis())
+                        .build());
+
+        return GenericDto.success(null);
     }
 
-    /**
-     * 绑定ga
-     * 1.调用/ga/QRBarcode生成gaSecret
-     * 2.调用/ga/verifyCode验证code
-     */
-    @PostMapping("/ga/verifyCode")
-    @ApiOperation(value = "绑定ga", notes = "1.调用/ga/QRBarcode生成gaSecret\n" +
-            "2.调用/ga/verifyCode验证code")
-    public GenericDto<Object> verifyCode(@Valid @RequestBody GaReq gaReq, HttpServletRequest request) {
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        googleAuthService.verifyUserCode(loginUser.getUserId(), gaReq.getCode());
-        return GenericDto.success(null);
+    @ApiOperation(value = "生成ga的secret", notes = "生成ga的secret")
+    @GetMapping("/ga/generate")
+    public GenericDto<GoogleAuthResp> generateGa(HttpServletRequest request) {
+        // 用uc token 拿用户的登录名
+        String token = WebUtil.getTokenFromRequest(request);
+        LoginUserDTO loginUser = cacheService.getUserByToken(token);
+
+        String secret = googleAuthService.genGaSecret();
+        cacheService.putGenerateGoogleAuth(token, secret);
+        return GenericDto.success(
+                GoogleAuthResp.builder()
+                        .gaKey(secret)
+                        .exchangeName(UcConstant.GA_ISSUER)
+                        .loginName(loginUser.getLoginName())
+                        .build());
     }
 
     /**

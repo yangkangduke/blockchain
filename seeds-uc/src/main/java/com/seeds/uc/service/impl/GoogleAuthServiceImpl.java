@@ -26,22 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class GoogleAuthServiceImpl implements IGoogleAuthService {
 
-    public static final String format = "otpauth://totp/%s?secret=%s&issuer=%s";
     @Autowired
     UcUserMapper userMapper;
-    @Autowired
-    private IUcSecurityStrategyService iUcSecurityStrategyService;
 
-    @Override
-    public String getQRBarcode(String account, String remark, LoginUserDTO loginUser) {
-        String gaSecret = this.genGaSecret();
-        // 将gaSecret保存到数据库中
-        userMapper.updateById(UcUser.builder()
-                .gaSecret(gaSecret)
-                .id(loginUser.getUserId())
-                .build());
-        return String.format(format, account, gaSecret, remark);
-    }
 
     @Override
     public String genGaSecret() {
@@ -51,22 +38,8 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
 
     @Override
     public Boolean verifyUserCode(Long uid, String userInputCode) {
-        long createTime = System.currentTimeMillis();
         UcUser user = userMapper.selectById(uid);
-        boolean verify = verify(userInputCode, user.getGaSecret());
-        if (!verify) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
-        }
-        iUcSecurityStrategyService.saveOrUpdate(UcSecurityStrategy.builder()
-                .uid(uid)
-                .needAuth(true)
-                .authType(ClientAuthTypeEnum.GA)
-                .createdAt(createTime)
-                .updatedAt(createTime)
-                .build(), new QueryWrapper<UcSecurityStrategy>().lambda()
-                .eq(UcSecurityStrategy::getUid, uid)
-                .eq(UcSecurityStrategy::getAuthType,ClientAuthTypeEnum.GA));
-        return true;
+        return verify(userInputCode, user.getGaSecret());
     }
 
     @Override

@@ -9,8 +9,6 @@ import com.seeds.uc.dto.redis.LoginUserDTO;
  */
 public interface IGoogleAuthService {
 
-    String getQRBarcode(String account, String remark, LoginUserDTO loginUser);
-
     String genGaSecret();
 
     Boolean verifyUserCode(Long uid, String userInputCode);

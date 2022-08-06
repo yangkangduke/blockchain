@@ -2,10 +2,7 @@ package com.seeds.uc.service.impl;
 
 
 import com.seeds.uc.constant.UcRedisKeysConstant;
-import com.seeds.uc.dto.redis.AuthCodeDTO;
-import com.seeds.uc.dto.redis.AuthTokenDTO;
-import com.seeds.uc.dto.redis.LoginUserDTO;
-import com.seeds.uc.dto.redis.TwoFactorAuth;
+import com.seeds.uc.dto.redis.*;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -190,5 +187,34 @@ public class CacheService {
         String key = UcRedisKeysConstant.getUcLoginUidKey(uid);
         RBucket<String> value = redisson.getBucket(key);
         value.delete();
+    }
+
+    /**
+     * will insert once generate a ga
+     */
+    public void putGenerateGoogleAuth(String token,
+                                      String secret) {
+        Long expireAt = System.currentTimeMillis() + googleAuthExpireAfter * 1000;
+        String key = UcRedisKeysConstant.getUcGenerateGoogleAuthKeyTemplate(token);
+        RBucket<GenGoogleAuth> genGoogleAuthRBucket = redisson.getBucket(key);
+        GenGoogleAuth genGoogleAuth =
+                GenGoogleAuth.builder()
+                        .secret(secret)
+                        .expireAt(expireAt)
+                        .build();
+        genGoogleAuthRBucket.set(genGoogleAuth, googleAuthExpireAfter, TimeUnit.SECONDS);
+        log.info("CacheService - putGenerateGoogleAuth - put key: {}, value: {}", key, genGoogleAuth);
+    }
+
+    public GenGoogleAuth getGenerateGoogleAuth(String token) {
+        String key = UcRedisKeysConstant.getUcGenerateGoogleAuthKeyTemplate(token);
+        RBucket<GenGoogleAuth> genGoogleAuthRBucket = redisson.getBucket(key);
+        return genGoogleAuthRBucket.get();
+    }
+
+    public AuthTokenDTO getAuthTokenDetailWithToken(String token, ClientAuthTypeEnum authTypeEnum) {
+        String key = UcRedisKeysConstant.getUcAuthTokenKeyTemplate(token, authTypeEnum);
+        RBucket<AuthTokenDTO> googleAuthRBucket = redisson.getBucket(key);
+        return googleAuthRBucket.get();
     }
 }
