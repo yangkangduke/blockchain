@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
+import com.seeds.uc.dto.redis.GenMetamaskAuth;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.redis.TwoFactorAuth;
 import com.seeds.uc.dto.request.*;
@@ -28,6 +29,7 @@ import com.seeds.uc.util.DigestUtil;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -174,24 +176,28 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String signature = metaMaskReq.getSignature();
         UserOperateEnum operateEnum = metaMaskReq.getOperateEnum();
         long currentTime = System.currentTimeMillis();
+        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
+        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce())) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
+        }
         // 地址合法性校验
         if (!WalletUtils.isValidAddress(publicAddress)) {
             // 不合法直接返回错误
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10003_METAMASK_ADDRESS);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS);
         }
         // 校验签名信息
         try{
             if (!CryptoUtils.validate(signature, message, publicAddress)) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_METAMASK_SIGNATURE);
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
             }
         } catch (Exception e) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_METAMASK_SIGNATURE);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
         }
 
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getPublicAddress, publicAddress));
         if (one == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10004_METAMASK_SIGNATURE);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
         }
         if (operateEnum.equals(UserOperateEnum.REGISTER) || operateEnum.equals(UserOperateEnum.BIND) ) {
             ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()

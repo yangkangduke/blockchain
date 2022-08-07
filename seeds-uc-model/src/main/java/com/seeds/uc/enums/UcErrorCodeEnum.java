@@ -11,10 +11,12 @@ import lombok.Getter;
  */
 @Getter
 public enum UcErrorCodeEnum {
+
     ERR_401_NOT_LOGGED_IN(401, "请先登录", "please login first"),
     ERR_500_SYSTEM_BUSY(500, "系统繁忙，请稍后再试...", "system busy, please try again later"),
     ERR_502_ILLEGAL_ARGUMENTS(502, "参数错误", "wrong arguments"),
     ERR_504_MISSING_ARGUMENTS(504, "缺少参数", "missing arguments"),
+
     // ga
     ERR_14000_ACCOUNT_NOT(14000, "验证失败", "verification failed"),
 
@@ -25,9 +27,12 @@ public enum UcErrorCodeEnum {
     ERR_15000_ACCOUNT_NOT(15000, "账号不存在", "Account does not exist"),
     ERR_15001_ACCOUNT_VERIFICATION_FAILED(15001, "验证失败", "verification failed!"),
     ERR_15002_LINK_EXPIRED(15002, "链接失效", "The current link has expired!"),
+
     //meatamask
-    ERR_10003_METAMASK_ADDRESS(10003, "非法地址格式", "Illegal address format"),
-    ERR_10004_METAMASK_SIGNATURE(10004, "签名验证失败", "Signature verification failed"),
+    ERR_16001_METAMASK_ADDRESS(16001, "非法地址格式", "Illegal address format"),
+    ERR_16002_METAMASK_SIGNATURE(16002, "签名验证失败", "Signature verification failed"),
+    ERR_16003_METAMASK_NONCE_EXPIRED(16003, "nonce已经过期", "nonce has expired"),
+
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),
     ERR_10002_INCOMPLETE_USER_INFO(10002, "用户信息不完整，请联系客服", "user info not complete, please contact customer service"),

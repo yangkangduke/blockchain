@@ -49,6 +49,10 @@ public class CacheService {
     @Value("${uc.ga.expire:300}")
     private Integer googleAuthExpireAfter;
 
+    // nonce生成，绑定 的过期时间
+    @Value("${uc.metamask.expire:300}")
+    private Integer metamaskAuthExpireAfter;
+
     @Autowired
     private RedissonClient redisson;
 
@@ -70,7 +74,7 @@ public class CacheService {
                         .expireAt(expireAt)
                         .build();
         authDtoRBucket.set(authDto, twoFaCodeExpireAfter, TimeUnit.SECONDS);
-        log.info("CacheService - putAuthCodeByNameAndAuthTypeAndUseType - put key: {}, value: {}", key, authDto);
+        log.info("CacheService - put2FAInfoWithTokenAndUserAndAuthType - put key: {}, value: {}", key, authDto);
     }
 
     public TwoFactorAuth get2FAInfoWithToken(String token) {
@@ -99,7 +103,7 @@ public class CacheService {
         // set uid -> token
         redisson.getBucket(loginUidKey).set(token, loginExpireAfter, TimeUnit.SECONDS);
 
-        log.info("CacheService - putUserWithToken - put key: {}, value: {}", key, loginUser);
+        log.info("CacheService - putUserWithTokenAndLoginName - put key: {}, value: {}", key, loginUser);
     }
 
     /**
@@ -123,7 +127,7 @@ public class CacheService {
                 authCode,
                 authCodeExpireAfter,
                 TimeUnit.SECONDS);
-        log.info("CacheService - putAuthCodeByNameAndAuthTypeAndUseType - put key: {}, value: {}", key, authCode);
+        log.info("CacheService - putAuthCode - put key: {}, value: {}", key, authCode);
     }
 
     public AuthCodeDTO getAuthCode(String name,
@@ -216,5 +220,24 @@ public class CacheService {
         String key = UcRedisKeysConstant.getUcAuthTokenKeyTemplate(token, authTypeEnum);
         RBucket<AuthTokenDTO> googleAuthRBucket = redisson.getBucket(key);
         return googleAuthRBucket.get();
+    }
+
+    public void putGenerateMetamaskAuth(String publicAddress,
+                                        String nonce) {
+        Long expireAt = System.currentTimeMillis() + metamaskAuthExpireAfter * 1000;
+        String key = UcRedisKeysConstant.getUcGenerateMetamaskAuthKeyTemplate(publicAddress);
+        RBucket<GenMetamaskAuth> genMetamaskAuthRBucket = redisson.getBucket(key);
+        GenMetamaskAuth genMetamaskAuth =
+                GenMetamaskAuth.builder()
+                        .nonce(nonce)
+                        .expireAt(expireAt)
+                        .build();
+        genMetamaskAuthRBucket.set(genMetamaskAuth, metamaskAuthExpireAfter, TimeUnit.SECONDS);
+        log.info("CacheService - putGenerateMetamaskAuth - put key: {}, value: {}", key, genMetamaskAuth);
+    }
+    public GenMetamaskAuth getGenerateMetamaskAuth(String token) {
+        String key = UcRedisKeysConstant.getUcGenerateMetamaskAuthKeyTemplate(token);
+        RBucket<GenMetamaskAuth> genMetamaskAuthRBucket = redisson.getBucket(key);
+        return genMetamaskAuthRBucket.get();
     }
 }

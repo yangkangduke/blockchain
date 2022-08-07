@@ -51,6 +51,7 @@ public class UcRedisKeysConstant {
      * if a verification passed, insert one of these
      */
     public final String UC_PHONE_AUTH_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "phone:token:%s";
+    public final String UC_METAMASK_AUTH_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "metamask:token:%s";
     public final String UC_EMAIL_AUTH_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "email:token:%s";
     public final String UC_GOOGLE_AUTH_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "ga:token:%s";
 
@@ -58,6 +59,8 @@ public class UcRedisKeysConstant {
      * if a ga secret is generated, insert one with user token
      */
     public final String UC_GENERATE_GOOGLE_AUTH_KEY_TEMPLATE = UC_KEY_PREFIX + "ga:user.token:%s";
+
+    public final String UC_GENERATE_METAMASK_AUTH_KEY_TEMPLATE = UC_KEY_PREFIX + "metamask:user.token:%s";
 
 
     /**
@@ -115,7 +118,7 @@ public class UcRedisKeysConstant {
      */
     public String getUcAuthTokenKeyTemplate(String token, ClientAuthTypeEnum authTypeEnum) {
         if (ClientAuthTypeEnum.METAMASK.equals(authTypeEnum)) {
-            return String.format(UC_PHONE_AUTH_TOKEN_KEY_TEMPLATE, token);
+            return String.format(UC_METAMASK_AUTH_TOKEN_KEY_TEMPLATE, token);
         } else if (ClientAuthTypeEnum.EMAIL.equals(authTypeEnum)) {
             return String.format(UC_EMAIL_AUTH_TOKEN_KEY_TEMPLATE, token);
         } else if (ClientAuthTypeEnum.GA.equals(authTypeEnum)) {
@@ -134,6 +137,10 @@ public class UcRedisKeysConstant {
      */
     public String getUcGenerateGoogleAuthKeyTemplate(String token) {
         return String.format(UC_GENERATE_GOOGLE_AUTH_KEY_TEMPLATE, token);
+    }
+
+    public String getUcGenerateMetamaskAuthKeyTemplate(String token) {
+        return String.format(UC_GENERATE_METAMASK_AUTH_KEY_TEMPLATE, token);
     }
 
     public static String getUcKeyForgotPassword(String account) {

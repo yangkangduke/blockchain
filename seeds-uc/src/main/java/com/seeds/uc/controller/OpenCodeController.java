@@ -3,6 +3,7 @@ package com.seeds.uc.controller;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.redis.GenGoogleAuth;
+import com.seeds.uc.dto.request.AuthCodeVerifyReq;
 import com.seeds.uc.dto.request.GoogleAuthVerifyReq;
 import com.seeds.uc.dto.response.TokenResp;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
@@ -32,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Slf4j
 @RestController
-@Api(tags = "验证码")
+@Api(tags = "code验证")
 @RequestMapping("/code")
 public class OpenCodeController {
 
@@ -66,5 +67,20 @@ public class OpenCodeController {
                             .build());
         }
         throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+    }
+
+    @ApiOperation(value = "email验证", notes = "email验证")
+    @PostMapping("/email/verify")
+    public GenericDto<Object> verifyEmailCode(@RequestBody AuthCodeVerifyReq verifyReq) {
+        log.info("OpenCodeController - verifyEmailCode got request: {}", verifyReq);
+        String token =
+                sendCodeService.verifyEmailWithUseType(
+                        verifyReq.getEmail(),
+                        verifyReq.getEmailCode(),
+                        verifyReq.getUseType());
+        return GenericDto.success(
+                TokenResp.builder()
+                        .token(token)
+                        .build());
     }
 }

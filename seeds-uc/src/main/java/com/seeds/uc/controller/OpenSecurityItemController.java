@@ -1,5 +1,6 @@
 package com.seeds.uc.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.constant.UcConstant;
@@ -7,8 +8,8 @@ import com.seeds.uc.dto.redis.AuthTokenDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.GaReq;
 import com.seeds.uc.dto.request.MetaMaskReq;
-import com.seeds.uc.dto.request.QRBarCodeReq;
 import com.seeds.uc.dto.request.UpdateEmailReq;
+import com.seeds.uc.dto.request.security.item.EmailSecurityItemReq;
 import com.seeds.uc.dto.request.security.item.GaSecurityItemReq;
 import com.seeds.uc.dto.response.GoogleAuthResp;
 import com.seeds.uc.dto.response.LoginResp;
@@ -26,6 +27,8 @@ import com.seeds.uc.service.IUcSecurityStrategyService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.service.impl.CacheService;
+import com.seeds.uc.util.PasswordUtil;
+import com.seeds.uc.util.RandomUtil;
 import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -60,9 +63,10 @@ public class OpenSecurityItemController {
 
     @PostMapping("/ga/bind")
     @ApiOperation(value = "绑定ga",
-            notes = "1.调用/security/item/ga/generate获取key " +
-                    "2.调用/code/ga/verify验证码的验证并获取authToken " +
-                    "3.调用/security/item/ga/bind")
+            notes = "1.调用/security/item/ga/generate获取gakey " +
+                    "2.手机扫码添加上gakey（secret） " +
+                    "3.调用/code/ga/verify验证码的验证并获取gaToken " +
+                    "4.调用/security/item/ga/bind绑定ga")
     public GenericDto<Object> bindGA(@RequestBody GaSecurityItemReq securityItemReq) {
         AuthTokenDTO gaAuthToken =
                 cacheService.getAuthTokenDetailWithToken(securityItemReq.getGaToken(), ClientAuthTypeEnum.GA);
@@ -151,7 +155,6 @@ public class OpenSecurityItemController {
      * @param
      * @return
      */
-
     @PostMapping("/bindMetamask/verify")
     @ApiOperation(value = "绑定metamask-验证",
             notes = "1.调用/bindMetamask/nonce生成nonce\n" +
@@ -159,6 +162,49 @@ public class OpenSecurityItemController {
                     "3.调用/bindMetamask/verify验证签名信息，验证成功返回token")
     public GenericDto<LoginResp> metamaskVerify(@Valid @RequestBody MetaMaskReq metaMaskReq) {
         return GenericDto.success(ucUserService.metamaskVerify(metaMaskReq));
+    }
+
+    @PostMapping("/email/bind")
+    @ApiOperation(value = "绑定邮箱",
+            notes = "调用方法/auth/email/send, 参数use_type=BIND_EMAIL, 发送邮箱验证码\n" +
+                    "调用方法/code/email/verify, 参数use_type=BIND_EMAIL, 进行邮箱的验证, 获取到email_token.\n" +
+                    "调用/security/item/email/bind")
+    public GenericDto<Object> bindEmail(@RequestBody EmailSecurityItemReq securityItemReq) {
+        AuthTokenDTO emailAuthToken =
+                cacheService.getAuthTokenDetailWithToken(securityItemReq.getEmailToken(), ClientAuthTypeEnum.EMAIL);
+        if (emailAuthToken == null
+                || StringUtils.isBlank(emailAuthToken.getAccountName())) {
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+        }
+
+        String accountName = emailAuthToken.getAccountName();
+        Long uid = UserContext.getCurrentUserId();
+        // 检查account name 是否已经存在
+        UcUser checkUser = ucUserService.getOne(new QueryWrapper<UcUser>().lambda()
+                .eq(UcUser::getEmail, accountName));
+        if (checkUser != null) {
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED);
+        }
+        String salt = RandomUtil.getRandomSalt();
+        String password = PasswordUtil.getPassword(securityItemReq.getPassword(), salt);
+        ucUserService.updateById(UcUser.builder()
+                        .id(uid)
+                        .salt(salt)
+                        .password(password)
+                        .email(accountName)
+                .build());
+
+        // 绑定之后set 安全项
+        ucSecurityStrategyService.save(
+                UcSecurityStrategy.builder()
+                        .authType(ClientAuthTypeEnum.EMAIL)
+                        .createdAt(System.currentTimeMillis())
+                        .needAuth(true)
+                        .uid(uid)
+                        .updatedAt(System.currentTimeMillis())
+                        .build());
+
+        return GenericDto.success(null);
     }
 
     /**

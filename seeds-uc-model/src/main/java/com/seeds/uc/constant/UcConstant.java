@@ -34,4 +34,8 @@ public class UcConstant {
     public static final String CHANGE_EMAIL_EMAIL_SUBJECT = "change email";
     public static final String CHANGE_EMAIL_EMAIL_CONTENT = "change email verification code, note that it expires in {} minutes:{}";
 
+    // 绑定邮箱
+    public static final String BIND_EMAIL_EMAIL_SUBJECT = "bind email";
+    public static final String BIND_EMAIL_EMAIL_CONTENT = "bind email verification code, note that it expires in {} minutes:{}";
+
 }

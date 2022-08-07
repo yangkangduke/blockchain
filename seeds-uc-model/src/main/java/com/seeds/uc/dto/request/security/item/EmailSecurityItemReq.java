@@ -10,9 +10,10 @@ import lombok.Data;
  */
 @Data
 public class EmailSecurityItemReq {
-    private String email;
+//    private String email;
     @JsonProperty("email_token")
     private String emailToken;
-    @JsonProperty("auth_token")
-    private String authToken;
+    private String password;
+//    @JsonProperty("auth_token")
+//    private String authToken;
 }

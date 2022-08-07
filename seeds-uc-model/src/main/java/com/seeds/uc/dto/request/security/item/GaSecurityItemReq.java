@@ -14,6 +14,6 @@ public class GaSecurityItemReq {
     private String gaCode;
     @JsonProperty("ga_token")
     private String gaToken;
-    @JsonProperty("auth_token")
-    private String authToken;
+//    @JsonProperty("auth_token")
+//    private String authToken;
 }
