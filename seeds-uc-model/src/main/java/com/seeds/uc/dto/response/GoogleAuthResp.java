@@ -12,10 +12,7 @@ import lombok.Data;
 @Data
 @Builder
 public class GoogleAuthResp {
-    @JsonProperty("login_name")
     private String loginName;
-    @JsonProperty("ga_key")
     private String gaKey;
-    @JsonProperty("exchange_name")
     private String exchangeName;
 }

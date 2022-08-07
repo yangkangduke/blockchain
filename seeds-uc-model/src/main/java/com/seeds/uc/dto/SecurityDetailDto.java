@@ -13,11 +13,8 @@ import lombok.Data;
 @Builder
 public class SecurityDetailDto {
     private String metamask;
-    @JsonProperty("metamask_state")
     private Boolean metamaskState;
     private String email;
-    @JsonProperty("email_state")
     private Boolean emailState;
-    @JsonProperty("ga_state")
     private Boolean gaState;
 }

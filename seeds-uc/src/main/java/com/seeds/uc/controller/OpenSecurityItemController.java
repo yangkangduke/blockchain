@@ -13,6 +13,7 @@ import com.seeds.uc.dto.request.security.item.EmailSecurityItemReq;
 import com.seeds.uc.dto.request.security.item.GaSecurityItemReq;
 import com.seeds.uc.dto.response.GoogleAuthResp;
 import com.seeds.uc.dto.response.LoginResp;
+import com.seeds.uc.dto.response.MetamaskAuthResp;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
@@ -129,39 +130,28 @@ public class OpenSecurityItemController {
         return GenericDto.success(null);
     }
 
-    /**
-     * 绑定metamask-获取随机数
-     *
-     * @param
-     * @return
-     */
-    @PostMapping("/bindMetamask/nonce")
-    @ApiOperation(value = "绑定metamask-获取随机数", notes = "绑定metamask-获取随机数")
-    public GenericDto<String> metamaskNonce(@Valid @RequestBody MetaMaskReq metaMaskReq, HttpServletRequest request ) {
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        UcUser user = ucUserService.getById(loginUser.getUserId());
-        metaMaskReq.setOperateEnum(UserOperateEnum.BIND);
-        return GenericDto.success(ucUserService.metamaskNonce(metaMaskReq, user));
+    @ApiOperation(value = "生成metamask的nonce", notes = "生成metamask的nonce")
+    @PostMapping("/metamask/generateNonce")
+    public GenericDto<MetamaskAuthResp> generateNonce(@Valid @RequestBody MetaMaskReq metaMaskReq) {
+        String nonce = RandomUtil.getRandomSalt();
+        cacheService.putGenerateMetamaskAuth(metaMaskReq.getPublicAddress(), nonce);
+        return GenericDto.success(
+                MetamaskAuthResp.builder()
+                        .nonce(nonce)
+                        .publicAddress(metaMaskReq.getPublicAddress())
+                        .build());
     }
 
-    /**
-     * 绑定metamask-验证
-     * 1.调用/bindMetamask/nonce生成nonce
-     * 2.前端根据nonce生成签名信息
-     * 3.调用/bindMetamask/verify验证签名信息，验证成功返回token
-     *
-     * @param
-     * @return
-     */
-    @PostMapping("/bindMetamask/verify")
-    @ApiOperation(value = "绑定metamask-验证",
-            notes = "1.调用/bindMetamask/nonce生成nonce\n" +
+    @PostMapping("/bind/metamask")
+    @ApiOperation(value = "绑定metamask",
+            notes = "1.调用/security/item/metamask/generateNonce生成nonce\n" +
                     "2.前端根据nonce生成签名信息\n" +
-                    "3.调用/bindMetamask/verify验证签名信息，验证成功返回token")
-    public GenericDto<LoginResp> metamaskVerify(@Valid @RequestBody MetaMaskReq metaMaskReq) {
-        return GenericDto.success(ucUserService.metamaskVerify(metaMaskReq));
+                    "3.调用/security/item/bind/metamask绑定")
+    public GenericDto<Object> metamaskVerify(@Valid @RequestBody MetaMaskReq metaMaskReq, HttpServletRequest request) {
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+        ucUserService.bindMetamask(metaMaskReq, loginUser.getUserId());
+        return GenericDto.success(null);
     }
 
     @PostMapping("/email/bind")

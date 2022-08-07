@@ -14,10 +14,7 @@ import lombok.Data;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SecurityStrategyDto {
-    @JsonProperty("verify_metamask")
     private Boolean verifyMetamask;
-    @JsonProperty("verify_email")
     private Boolean verifyEmail;
-    @JsonProperty("verify_ga")
     private Boolean verifyGA;
 }

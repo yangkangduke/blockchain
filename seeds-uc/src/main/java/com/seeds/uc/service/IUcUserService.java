@@ -36,15 +36,11 @@ public interface IUcUserService extends IService<UcUser> {
     LoginResp login(LoginReq accountLoginReq);
 
     /**
-     * metamask验证
+     * metamask登陆
      */
-    LoginResp metamaskVerify(MetaMaskReq metaMaskReq);
+    LoginResp metamaskLogin(MetaMaskReq metaMaskReq);
 
-    /**
-     * metamask登陆获取随机数
-     * @return
-     */
-    String metamaskNonce(MetaMaskReq metaMaskReq, UcUser loginUser);
+    void bindMetamask(MetaMaskReq metaMaskReq, Long uId);
 
 
     /**

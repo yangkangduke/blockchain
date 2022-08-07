@@ -165,19 +165,18 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
 
     /**
-     * metamask验证
+     * metamask登陆
      *
      * @return
      */
     @Override
-    public LoginResp metamaskVerify(MetaMaskReq metaMaskReq) {
+    public LoginResp metamaskLogin(MetaMaskReq metaMaskReq) {
         String publicAddress = metaMaskReq.getPublicAddress();
-        String message = metaMaskReq.getMessage();
+        String nonce = metaMaskReq.getNonce();
         String signature = metaMaskReq.getSignature();
-        UserOperateEnum operateEnum = metaMaskReq.getOperateEnum();
         long currentTime = System.currentTimeMillis();
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
-        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce())) {
+        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !nonce.equals(genMetamaskAuth.getNonce())) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
         }
         // 地址合法性校验
@@ -187,7 +186,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         // 校验签名信息
         try{
-            if (!CryptoUtils.validate(signature, message, publicAddress)) {
+            if (!CryptoUtils.validate(signature, nonce, publicAddress)) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
             }
         } catch (Exception e) {
@@ -196,10 +195,28 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getPublicAddress, publicAddress));
+        Long userId;
         if (one == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+            // 新增
+            UcUser ucUser = UcUser.builder()
+                    .nickname(publicAddress)
+                    .publicAddress(publicAddress)
+                    .nonce(genMetamaskAuth.getNonce())
+                    .state(ClientStateEnum.NORMAL)
+                    .type(ClientTypeEnum.NORMAL)
+                    .createdAt(currentTime)
+                    .updatedAt(currentTime)
+                    .build();
+            this.save(ucUser);
+            userId = ucUser.getId();
+        } else {
+            userId = one.getId();
         }
-        if (operateEnum.equals(UserOperateEnum.REGISTER) || operateEnum.equals(UserOperateEnum.BIND) ) {
+        UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyMapper.selectOne(new QueryWrapper<UcSecurityStrategy>().lambda()
+                .eq(UcSecurityStrategy::getUid, userId)
+                .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.METAMASK));
+        if (ucSecurityStrategy == null) {
+            // 新增
             ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
                     .needAuth(true)
                     .uid(one.getId())
@@ -213,62 +230,54 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String ucToken = RandomUtil.genRandomToken(one.getId().toString());
         // 将产生的uc token存入redis
         cacheService.putUserWithTokenAndLoginName(ucToken, one.getId(), publicAddress);
-        // 修改user信息
-        this.update(UcUser.builder()
-                .updatedAt(currentTime)
-                .nonce(RandomUtil.getRandomSalt())
-                .build(), new QueryWrapper<UcUser>().lambda()
-                .eq(UcUser::getPublicAddress, publicAddress));
 
         return LoginResp.builder().ucToken(ucToken).build();
     }
 
-    /**
-     * metamask获取随机数
-     *
-     * @return
-     */
+
     @Override
-    public String metamaskNonce(MetaMaskReq metaMaskReq, UcUser loginUserDTO) {
-        long currentTime = System.currentTimeMillis();
+    public void bindMetamask(MetaMaskReq metaMaskReq, Long uId) {
         String publicAddress = metaMaskReq.getPublicAddress();
-        String nonce = null;
-
-        // 登陆/注册
-        if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.REGISTER) || metaMaskReq.getOperateEnum().equals(UserOperateEnum.LOGIN)) {
-            if (loginUserDTO == null) {
-                nonce = RandomUtil.getRandomSalt();
-                UcUser ucUser = UcUser.builder()
-                        .createdAt(currentTime)
-                        .updatedAt(currentTime)
-                        .type(ClientTypeEnum.NORMAL)
-                        .state(ClientStateEnum.NORMAL)
-                        .publicAddress(publicAddress)
-                        .nonce(nonce)
-                        .nickname(publicAddress)
-                        .build();
-                this.save(ucUser);
-            } else {
-                nonce = loginUserDTO.getNonce();
-            }
-
-            // 绑定
-        } else if (metaMaskReq.getOperateEnum().equals(UserOperateEnum.BIND)) {
-            if (loginUserDTO == null) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_401_NOT_LOGGED_IN);
-            }
-            // 修改用户信息
-            nonce = RandomUtil.getRandomSalt();
-            UcUser ucUser = UcUser.builder()
-                    .updatedAt(currentTime)
-                    .publicAddress(publicAddress)
-                    .nonce(nonce)
-                    .id(loginUserDTO.getId())
-                    .build();
-            this.updateById(ucUser);
+        String nonce = metaMaskReq.getNonce();
+        String signature = metaMaskReq.getSignature();
+        long currentTime = System.currentTimeMillis();
+        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
+        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !nonce.equals(genMetamaskAuth.getNonce())) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
         }
-        return nonce;
+        // 地址合法性校验
+        if (!WalletUtils.isValidAddress(publicAddress)) {
+            // 不合法直接返回错误
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS);
+        }
+        // 校验签名信息
+        try{
+            if (!CryptoUtils.validate(signature, nonce, publicAddress)) {
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+            }
+        } catch (Exception e) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+        }
+
+        // 修改
+        UcUser ucUser = UcUser.builder()
+                .id(uId)
+                .publicAddress(publicAddress)
+                .nonce(genMetamaskAuth.getNonce())
+                .updatedAt(currentTime)
+                .build();
+        this.updateById(ucUser);
+
+        ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
+                .needAuth(true)
+                .uid(ucUser.getId())
+                .authType(ClientAuthTypeEnum.METAMASK)
+                .createdAt(currentTime)
+                .updatedAt(currentTime)
+                .build());
+
     }
+
 
     /**
      * 忘记密码-验证链接

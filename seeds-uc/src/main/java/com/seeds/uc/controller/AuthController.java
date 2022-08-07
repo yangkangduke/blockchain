@@ -2,25 +2,15 @@ package com.seeds.uc.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.web.context.UserContext;
-import com.seeds.uc.constant.UcConstant;
-import com.seeds.uc.dto.redis.AuthTokenDTO;
-import com.seeds.uc.dto.redis.GenGoogleAuth;
-import com.seeds.uc.dto.redis.GenMetamaskAuth;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
-import com.seeds.uc.dto.request.security.item.GaSecurityItemReq;
-import com.seeds.uc.dto.response.GoogleAuthResp;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.MetamaskAuthResp;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
-import com.seeds.uc.enums.UserOperateEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
-import com.seeds.uc.exceptions.SecurityItemException;
 import com.seeds.uc.exceptions.SendAuthCodeException;
-import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
@@ -31,7 +21,6 @@ import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -101,28 +90,8 @@ public class AuthController {
 
     }
 
-
-    /**
-     * metamask获取随机数
-     *
-     * @param
-     * @return
-     */
-    @PostMapping("/metamask/nonce")
-    @ApiOperation(value = "metamask获取随机数", notes = "metamask获取随机数")
-    public GenericDto<String> metamaskNonce(@Valid @RequestBody MetaMaskReq metaMaskReq ) {
-        UcUser ucUser = ucUserService.getOne(new QueryWrapper<UcUser>().lambda()
-                .eq(UcUser::getPublicAddress, metaMaskReq.getPublicAddress()));
-        if (ucUser == null) {
-            metaMaskReq.setOperateEnum(UserOperateEnum.REGISTER);
-        } else {
-            metaMaskReq.setOperateEnum(UserOperateEnum.LOGIN);
-        }
-        return GenericDto.success(ucUserService.metamaskNonce(metaMaskReq, ucUser));
-    }
-
     @ApiOperation(value = "生成metamask的nonce", notes = "生成metamask的nonce")
-    @GetMapping("/metamask/generateNonce")
+    @PostMapping("/metamask/generateNonce")
     public GenericDto<MetamaskAuthResp> generateNonce(@Valid @RequestBody MetaMaskReq metaMaskReq) {
         String nonce = RandomUtil.getRandomSalt();
         cacheService.putGenerateMetamaskAuth(metaMaskReq.getPublicAddress(), nonce);
@@ -147,8 +116,8 @@ public class AuthController {
             notes = "1.调用/metamask/generateNonce生成nonce" +
                     "2.前端根据nonce生成签名信息" +
                     "3.调用/metamask/login登陆验证签名信息，验证成功返回token")
-    public GenericDto<LoginResp> metamaskVerify(@Valid @RequestBody MetaMaskReq metaMaskReq) {
-        return GenericDto.success(ucUserService.metamaskVerify(metaMaskReq));
+    public GenericDto<LoginResp> metamaskLogin(@Valid @RequestBody MetaMaskReq metaMaskReq) {
+        return GenericDto.success(ucUserService.metamaskLogin(metaMaskReq));
     }
 
     /**

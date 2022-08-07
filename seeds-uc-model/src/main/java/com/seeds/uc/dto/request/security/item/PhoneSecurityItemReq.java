@@ -10,11 +10,8 @@ import lombok.Data;
  */
 @Data
 public class PhoneSecurityItemReq {
-    @JsonProperty("country_code")
     private String countryCode;
     private String phone;
-    @JsonProperty("phone_token")
     private String phoneToken;
-    @JsonProperty("auth_token")
     private String authToken;
 }

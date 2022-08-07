@@ -11,8 +11,6 @@ import lombok.Data;
  */
 @Data
 public class GoogleAuthVerifyReq {
-    @JsonProperty("ga_code")
     private String gaCode;
-//    @JsonProperty("use_type")
 //    private AuthCodeUseTypeEnum useType;
 }
