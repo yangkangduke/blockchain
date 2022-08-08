@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProfileResp {
+public class UserInfoResp {
 
     @ApiModelProperty("Primary Key")
     private Long id;

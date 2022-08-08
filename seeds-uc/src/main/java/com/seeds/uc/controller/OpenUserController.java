@@ -5,7 +5,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.ChangePasswordReq;
 import com.seeds.uc.dto.request.NickNameReq;
-import com.seeds.uc.dto.response.ProfileResp;
+import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
@@ -54,7 +54,7 @@ public class OpenUserController {
      */
     @GetMapping("/info")
     @ApiOperation(value = "获取用户信息", notes = "获取用户信息")
-    public GenericDto<ProfileResp> getInfo(HttpServletRequest request) {
+    public GenericDto<UserInfoResp> getInfo(HttpServletRequest request) {
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);

@@ -6,7 +6,7 @@ import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
-import com.seeds.uc.dto.response.ProfileResp;
+import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.model.UcUser;
 
 /**
@@ -75,7 +75,7 @@ public interface IUcUserService extends IService<UcUser> {
      * @param loginUser
      * @return
      */
-    ProfileResp getInfo(LoginUserDTO loginUser);
+    UserInfoResp getInfo(LoginUserDTO loginUser);
 
     /**
      * 修改昵称

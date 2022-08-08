@@ -28,9 +28,9 @@ import javax.validation.ValidationException;
 public class UcExceptionHandler {
 
     @ResponseBody
-    @ExceptionHandler(Throwable.class)
-    ResponseEntity<GenericDto<String>> handle(Throwable e) {
-        log.error("General Exception:", e);
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<GenericDto<String>> handle(Exception e) {
+        log.error("Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure("Internal Error:" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
@@ -51,7 +51,7 @@ public class UcExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<GenericDto<String>> handleResultException(HttpMessageNotReadableException e) {
-        log.error("General Exception:", e);
+        log.error("HttpMessageNotReadableException Exception:", e);
         if(e.getCause() instanceof InvalidFormatException) {
             return new ResponseEntity<>(
                     GenericDto.failure("JSON parse error", HttpStatus.BAD_REQUEST.value()),
@@ -64,27 +64,9 @@ public class UcExceptionHandler {
     }
 
     @ResponseBody
-    @ExceptionHandler(NumberFormatException.class)
-    ResponseEntity<GenericDto<String>> handle(NumberFormatException e) {
-        log.error("General Exception:", e);
-        return new ResponseEntity<>(
-                GenericDto.failure("String cannot be converted to number", HttpStatus.BAD_REQUEST.value()),
-                HttpStatus.BAD_REQUEST);
-    }
-
-    @ResponseBody
-    @ExceptionHandler(MailException.class)
-    ResponseEntity<GenericDto<String>> handle(MailException e) {
-        log.error("General Exception:", e);
-        return new ResponseEntity<>(
-                GenericDto.failure(e.getMessage(), HttpStatus.BAD_REQUEST.value()),
-                HttpStatus.BAD_REQUEST);
-    }
-
-    @ResponseBody
     @ExceptionHandler(InvalidArgumentsException.class)
     ResponseEntity<GenericDto<String>> handle(InvalidArgumentsException e) {
-        log.error("General Exception:", e);
+        log.error("InvalidArguments Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value()),
                 HttpStatus.UNPROCESSABLE_ENTITY);
@@ -94,7 +76,7 @@ public class UcExceptionHandler {
     //实体对象前不加@RequestBody注解,单个对象内属性校验未通过抛出的异常类型
     @ExceptionHandler(BindingException.class)
     public ResponseEntity<GenericDto<String>> handle(BindingException e) {
-        log.error("General Exception:", e);
+        log.error("Binding Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
@@ -104,7 +86,7 @@ public class UcExceptionHandler {
     //方法参数如果带有@RequestBody注解，那么spring mvc会使用RequestResponseBodyMethodProcessor      //对参数进行序列化,并对参数做校验
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GenericDto<String>> handle(MethodArgumentNotValidException e) {
-        log.error("General Exception:", e);
+        log.error("MethodArgumentNotValid Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getBindingResult().getFieldError().getField() + ":" + e.getBindingResult().getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
@@ -114,7 +96,7 @@ public class UcExceptionHandler {
     //Validation-api包里面的异常
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<GenericDto<String>> handle(ValidationException e) {
-        log.error("General Exception:", e);
+        log.error("Validation Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getCause().getMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
@@ -122,7 +104,7 @@ public class UcExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<GenericDto<String>> handle(ConstraintViolationException e) {
-        log.error("General Exception:", e);
+        log.error("ConstraintViolation Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getCause().getMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);

@@ -4,6 +4,7 @@ import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.exceptions.InvalidArgumentsException;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.exception.PermissionException;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.binding.BindingException;
 import org.springframework.http.HttpStatus;
@@ -27,11 +28,10 @@ import javax.validation.ValidationException;
 public class AdminExceptionHandler {
 
     @ResponseBody
-    @ExceptionHandler(Throwable.class)
-    ResponseEntity<GenericDto<String>> handle(Throwable e) {
-        log.error("General Exception:", e);
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<GenericDto<String>> handle(Exception e) {
         return new ResponseEntity<>(
-                GenericDto.failure("Internal Error", HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                GenericDto.failure("Internal Error:" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

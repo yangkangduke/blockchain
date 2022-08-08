@@ -15,6 +15,7 @@
         <module>seeds-common-model</module>
         <module>seeds-common-web</module>
         <module>seeds-uc-model</module>
+        <module>seeds-uc-api</module>
         <module>seeds-uc</module>
         <module>seeds-gateway</module>
         <module>seeds-admin</module>

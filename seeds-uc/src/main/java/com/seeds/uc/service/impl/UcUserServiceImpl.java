@@ -13,7 +13,7 @@ import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.redis.TwoFactorAuth;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
-import com.seeds.uc.dto.response.ProfileResp;
+import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.LoginException;
@@ -409,12 +409,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public ProfileResp getInfo(LoginUserDTO loginUser) {
-        ProfileResp profileResp = ProfileResp.builder().build();
+    public UserInfoResp getInfo(LoginUserDTO loginUser) {
+        UserInfoResp userInfoResp = UserInfoResp.builder().build();
         Long userId = loginUser.getUserId();
-        BeanUtil.copyProperties(this.getById(userId), profileResp);
-        profileResp.setSecurityStrategyList(ucSecurityStrategyMapper.getByUserId(userId));
-        return profileResp;
+        BeanUtil.copyProperties(this.getById(userId), userInfoResp);
+        userInfoResp.setSecurityStrategyList(ucSecurityStrategyMapper.getByUserId(userId));
+        return userInfoResp;
     }
 
     /**

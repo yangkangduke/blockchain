@@ -11,6 +11,10 @@ import com.seeds.admin.service.SysUserService;
 import com.seeds.admin.utils.CryptoUtils;
 import com.seeds.admin.utils.WebUtil;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.dto.request.LoginReq;
+import com.seeds.uc.dto.response.LoginResp;
+import com.seeds.uc.dto.response.UserInfoResp;
+import com.seeds.uc.feign.RemoteUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +41,8 @@ public class SysMetaMaskController {
     private SysUserService sysUserService;
     @Autowired
     private AdminCacheService adminCacheService;
+    @Autowired
+    private RemoteUserService remoteUserService;
 
     /**
      * metamask获取随机数
@@ -112,5 +118,11 @@ public class SysMetaMaskController {
         return GenericDto.success(sysUserService.deleteMetaMask(sysUserEntity.getId()));
     }
 
+    @PostMapping("/test")
+    @ApiOperation(value = "test", notes = "test")
+    public GenericDto<Object> test(@Valid @RequestBody LoginReq loginReq) {
+        GenericDto<LoginResp> login = remoteUserService.login(loginReq);
+        return GenericDto.success(login);
+    }
 
 }
