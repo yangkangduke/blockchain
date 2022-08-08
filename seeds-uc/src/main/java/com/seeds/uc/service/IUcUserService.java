@@ -75,7 +75,7 @@ public interface IUcUserService extends IService<UcUser> {
      * @param loginUser
      * @return
      */
-    ProfileResp getMyProfile(LoginUserDTO loginUser);
+    ProfileResp getInfo(LoginUserDTO loginUser);
 
     /**
      * 修改昵称

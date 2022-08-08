@@ -131,7 +131,7 @@ public class OpenSecurityItemController {
     }
 
     @ApiOperation(value = "生成metamask的nonce", notes = "生成metamask的nonce")
-    @PostMapping("/metamask/generateNonce")
+    @PostMapping("/metamask/generate-nonce")
     public GenericDto<MetamaskAuthResp> generateNonce(@Valid @RequestBody MetaMaskReq metaMaskReq) {
         String nonce = RandomUtil.getRandomSalt();
         cacheService.putGenerateMetamaskAuth(metaMaskReq.getPublicAddress(), nonce);
@@ -144,7 +144,7 @@ public class OpenSecurityItemController {
 
     @PostMapping("/bind/metamask")
     @ApiOperation(value = "绑定metamask",
-            notes = "1.调用/security/item/metamask/generateNonce生成nonce\n" +
+            notes = "1.调用/security/item/metamask/generate-nonce生成nonce\n" +
                     "2.前端根据nonce生成签名信息\n" +
                     "3.调用/security/item/bind/metamask绑定")
     public GenericDto<Object> metamaskVerify(@Valid @RequestBody MetaMaskReq metaMaskReq, HttpServletRequest request) {

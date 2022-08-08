@@ -409,7 +409,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public ProfileResp getMyProfile(LoginUserDTO loginUser) {
+    public ProfileResp getInfo(LoginUserDTO loginUser) {
         ProfileResp profileResp = ProfileResp.builder().build();
         Long userId = loginUser.getUserId();
         BeanUtil.copyProperties(this.getById(userId), profileResp);

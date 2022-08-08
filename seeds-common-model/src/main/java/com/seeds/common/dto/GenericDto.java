@@ -8,13 +8,9 @@ import lombok.Data;
 @Builder
 public class GenericDto<T> {
 
-    @JsonProperty("success")
     private boolean success;
-    @JsonProperty("code")
     private int code;
-    @JsonProperty("message")
     private String message;
-    @JsonProperty("data")
     private T data;
 
     public static <T> GenericDto<T> success(T data) {

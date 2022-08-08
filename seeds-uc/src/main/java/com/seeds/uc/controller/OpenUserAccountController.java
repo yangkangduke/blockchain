@@ -81,7 +81,7 @@ public class OpenUserAccountController {
     /**
      * 创建地址
      */
-    @PostMapping("/create/address")
+    @PostMapping("/address/init")
     @ApiOperation(value = "创建地址", notes = "创建地址")
     public GenericDto<Object> createAddress(@RequestBody UcUserAddressReq addressReq, HttpServletRequest request) {
         long currentTime = System.currentTimeMillis();

@@ -48,12 +48,12 @@ public class AuthController {
     /**
      * 注册邮箱账号
      * 1.调用/email/send 发送邮箱验证码，
-     * 2.调用/register/emailAccount 注册邮箱账号
+     * 2.调用/register/email 注册邮箱账号
      */
-    @PostMapping("/register/emailAccount")
+    @PostMapping("/register/email")
     @ApiOperation(value = "注册邮箱账号",
             notes = "1.调用/email/send 发送邮箱验证码，\n" +
-                    "2.调用/register/emailAccount 注册邮箱账号")
+                    "2.调用/register/email 注册邮箱账号")
     public GenericDto<LoginResp> registerEmailAccount(@Valid @RequestBody RegisterReq registerReq) {
         return GenericDto.success(ucUserService.registerEmailAccount(registerReq));
     }
@@ -91,7 +91,7 @@ public class AuthController {
     }
 
     @ApiOperation(value = "生成metamask的nonce", notes = "生成metamask的nonce")
-    @PostMapping("/metamask/generateNonce")
+    @PostMapping("/metamask/generate-nonce")
     public GenericDto<MetamaskAuthResp> generateNonce(@Valid @RequestBody MetaMaskReq metaMaskReq) {
         String nonce = RandomUtil.getRandomSalt();
         cacheService.putGenerateMetamaskAuth(metaMaskReq.getPublicAddress(), nonce);
@@ -123,15 +123,15 @@ public class AuthController {
     /**
      * 忘记密码-验证链接
      * 1.调用/send/email 发送邮件链接
-     * 2.调用/forgotPassword/verifyLink 验证链接
-     * 3.调用/forgotPassword/changePassword 重置密码
+     * 2.调用/forgot-password/verify-link 验证链接
+     * 3.调用/forgot-password/change-password 重置密码
      *
      * @return
      */
-    @GetMapping("/forgotPassword/verifyLink")
+    @GetMapping("/forgot-password/verify-link")
     @ApiOperation(value = "忘记密码-验证链接", notes = "1.调用/send/email 发送邮件链接\n" +
-            "2.调用/forgotPassword/verifyLink 验证链接\n" +
-            "3.调用/forgotPassword/reset 重置密码")
+            "2.调用/forgot-password/verify-link 验证链接\n" +
+            "3.调用/forgot-password/reset 重置密码")
     public GenericDto<Object> forgotPasswordVerifyLink(@Valid ForgotPasswordVerifyReq forgotPasswordVerifyReq) {
         ucUserService.forgotPasswordVerifyLink(forgotPasswordVerifyReq.getEncode(), forgotPasswordVerifyReq.getAccount());
         return GenericDto.success(null);
@@ -144,7 +144,7 @@ public class AuthController {
      * 2.调用/forgotPassword/reset 重置密码
      * @return
      */
-    @PostMapping("/forgotPassword/reset")
+    @PostMapping("/forgot-password/reset")
     @ApiOperation(value = "忘记密码-重置密码", notes = "忘记密码-重置密码")
     public GenericDto<Object> forgotPasswordReset(@Valid @RequestBody ResetPasswordReq resetPasswordReq) {
         String code = resetPasswordReq.getCode();

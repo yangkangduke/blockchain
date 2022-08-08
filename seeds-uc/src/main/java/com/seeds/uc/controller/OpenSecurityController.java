@@ -50,8 +50,8 @@ public class OpenSecurityController {
     @Autowired
     UcSecurityStrategyMapper securityStrategyMapper;
 
-    @GetMapping("/get")
-    @ApiOperation(value = "获取策略", notes = "获取策略")
+    @GetMapping("/state")
+    @ApiOperation(value = "获取安全策略状态", notes = "获取安全策略状态")
     public GenericDto<SecurityDetailDto> getSecurityDetail() {
         Long uid = UserContext.getCurrentUserId();
         List<UcSecurityStrategy> securityStrategyList =
@@ -74,8 +74,8 @@ public class OpenSecurityController {
                         .build());
     }
 
-    @GetMapping("/strategy/get")
-    @ApiOperation(value = "获取策略状态", notes = "获取策略状态")
+    @GetMapping("/strategy/state")
+    @ApiOperation(value = "获取安全策略验证状态", notes = "获取安全策略验证状态")
     public GenericDto<SecurityStrategyDto> getSecurityStrategy() {
         Long uid = UserContext.getCurrentUserId();
         List<UcSecurityStrategy> securityStrategyList =
