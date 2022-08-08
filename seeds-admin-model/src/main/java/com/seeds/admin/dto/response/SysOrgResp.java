@@ -39,7 +39,10 @@ public class SysOrgResp {
     @ApiModelProperty("父级组织名称")
     private String parentOrgName;
 
-    @ApiModelProperty("负责人")
+    @ApiModelProperty("负责人id")
+    private String ownerId;
+
+    @ApiModelProperty("负责人名字")
     private String ownerName;
 
     @ApiModelProperty("备注")
