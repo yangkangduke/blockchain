@@ -140,12 +140,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             // 发送邮件
             // generate a random code
             sendCodeService.sendUserCodeByUseType(userDto, AuthCodeUseTypeEnum.LOGIN);
-            // store the auth code in auth code bucket
-            cacheService.put2FAInfoWithTokenAndUserAndAuthType(
-                    token,
-                    userDto.getUid(),
-                    userDto.getEmail(),
-                    ClientAuthTypeEnum.EMAIL);
 
             // 将2FA token存入redis，用户进入等待2FA验证态
             cacheService.put2FAInfoWithTokenAndUserAndAuthType(
@@ -172,13 +166,13 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp metamaskLogin(MetaMaskReq metaMaskReq) {
         String publicAddress = metaMaskReq.getPublicAddress();
-        String nonce = metaMaskReq.getNonce();
+        String message = metaMaskReq.getMessage();
         String signature = metaMaskReq.getSignature();
         long currentTime = System.currentTimeMillis();
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
-        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !nonce.equals(genMetamaskAuth.getNonce())) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
-        }
+//        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) ) {
+//            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
+//        }
         // 地址合法性校验
         if (!WalletUtils.isValidAddress(publicAddress)) {
             // 不合法直接返回错误
@@ -186,7 +180,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         // 校验签名信息
         try{
-            if (!CryptoUtils.validate(signature, nonce, publicAddress)) {
+            if (!CryptoUtils.validate(signature, message, publicAddress)) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
             }
         } catch (Exception e) {
@@ -237,44 +231,44 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
     @Override
     public void bindMetamask(MetaMaskReq metaMaskReq, Long uId) {
-        String publicAddress = metaMaskReq.getPublicAddress();
-        String nonce = metaMaskReq.getNonce();
-        String signature = metaMaskReq.getSignature();
-        long currentTime = System.currentTimeMillis();
-        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
-        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !nonce.equals(genMetamaskAuth.getNonce())) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
-        }
-        // 地址合法性校验
-        if (!WalletUtils.isValidAddress(publicAddress)) {
-            // 不合法直接返回错误
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS);
-        }
-        // 校验签名信息
-        try{
-            if (!CryptoUtils.validate(signature, nonce, publicAddress)) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
-            }
-        } catch (Exception e) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
-        }
-
-        // 修改
-        UcUser ucUser = UcUser.builder()
-                .id(uId)
-                .publicAddress(publicAddress)
-                .nonce(genMetamaskAuth.getNonce())
-                .updatedAt(currentTime)
-                .build();
-        this.updateById(ucUser);
-
-        ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
-                .needAuth(true)
-                .uid(ucUser.getId())
-                .authType(ClientAuthTypeEnum.METAMASK)
-                .createdAt(currentTime)
-                .updatedAt(currentTime)
-                .build());
+//        String publicAddress = metaMaskReq.getPublicAddress();
+//        String nonce = metaMaskReq.getNonce();
+//        String signature = metaMaskReq.getSignature();
+//        long currentTime = System.currentTimeMillis();
+//        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
+//        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !nonce.equals(genMetamaskAuth.getNonce())) {
+//            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
+//        }
+//        // 地址合法性校验
+//        if (!WalletUtils.isValidAddress(publicAddress)) {
+//            // 不合法直接返回错误
+//            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS);
+//        }
+//        // 校验签名信息
+//        try{
+//            if (!CryptoUtils.validate(signature, nonce, publicAddress)) {
+//                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+//            }
+//        } catch (Exception e) {
+//            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+//        }
+//
+//        // 修改
+//        UcUser ucUser = UcUser.builder()
+//                .id(uId)
+//                .publicAddress(publicAddress)
+//                .nonce(genMetamaskAuth.getNonce())
+//                .updatedAt(currentTime)
+//                .build();
+//        this.updateById(ucUser);
+//
+//        ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
+//                .needAuth(true)
+//                .uid(ucUser.getId())
+//                .authType(ClientAuthTypeEnum.METAMASK)
+//                .createdAt(currentTime)
+//                .updatedAt(currentTime)
+//                .build());
 
     }
 
