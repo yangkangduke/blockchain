@@ -56,6 +56,8 @@ public enum AdminErrorCodeEnum {
     ERR_60002_DICT_TYPE_PARENT_ITSELF(60002,"上级字典类别不能为自身","Parent dict type cannot be for itself"),
     ERR_60003_SUB_DICT_TYPE_EXIST(60003,"存在下级字典类别","Subordinate dict type exist"),
 
+    // gameComments
+    ERR_70001_GAME_COMMENTS_ALREADY_EXIST(70001, "您已经评价过该游戏", "you has commented on the game"),
     ;
     @JsonValue
     @EnumValue
