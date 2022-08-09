@@ -115,10 +115,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp login(LoginReq loginReq) {
         // 校验账号、密码
-//        ClientAuthTypeEnum authType = loginReq.getAuthType();
-//        if (authType == null) {
-//            throw new InvalidArgumentsException("Please enter authType");
-//        }
         UserDto userDto = this.verifyLogin(loginReq);
         // 产生2fa验证的token，用户进入2FA登陆阶段，前端再次call 2FA登陆接口需要带上2FA token
         String token = RandomUtil.genRandomToken(userDto.getUid().toString());
@@ -337,6 +333,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     public LoginResp twoFactorCheck(TwoFactorLoginReq loginReq) {
         log.info("verifyTwoFactorLogin: {}", loginReq);
         TwoFactorAuth twoFactorAuth = cacheService.get2FAInfoWithToken(loginReq.getToken());
+        if (twoFactorAuth == null) {
+            throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
+        }
         UcUser user = this.getById(twoFactorAuth.getUserId());
         if (twoFactorAuth != null && twoFactorAuth.getAuthAccountName() != null) {
             // GA验证

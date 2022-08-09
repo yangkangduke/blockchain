@@ -21,8 +21,6 @@ public class LoginReq {
     @ApiModelProperty(value = "密码", required = true)
     @NotBlank
     private String password;
-//    @ApiModelProperty(value = "授权类型: 2-email, 3-ga", required = true)
-//    private ClientAuthTypeEnum authType;
 
 
 }
