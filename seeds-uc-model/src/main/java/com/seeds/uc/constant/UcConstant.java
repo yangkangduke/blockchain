@@ -14,9 +14,12 @@ public class UcConstant {
     public static final String GA_ISSUER = "dev.seeds.com";
 
     // 忘记密码
-    public static final String FORGOT_PASSWORD_EMAIL_CONTENT = "Reset password, note that it expires in {} minutes:<a>{}</a>";
-    public static final String FORGOT_PASSWORD_EMAIL_SUBJECT = "forgot password";
-    public static final String FORGOT_PASSWORD_EMAIL_LINK_SYMBOL = "{};{}";
+    public static final String FORGOT_PASSWORD_EMAIL_SUBJECT = "Reset password";
+    public static final String FORGOT_PASSWORD_EMAIL_CONTENT = "Reset password verification code, note that it expires in {} minutes:{}";
+
+    // 重置GA
+    public static final String RESET_GA_EMAIL_SUBJECT = "Reset ga";
+    public static final String RESET_GA_EMAIL_CONTENT = "Reset ga verification code, note that it expires in {} minutes:{}";
 
     // 注册邮箱账号
     public static final String REGISTER_EMAIL_SUBJECT = "Register an account";

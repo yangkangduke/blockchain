@@ -1,7 +1,8 @@
 package com.seeds.uc.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.dto.redis.AuthCodeDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
@@ -26,8 +27,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
@@ -45,11 +44,6 @@ public class AuthController {
     private CacheService cacheService;
 
 
-    /**
-     * 注册邮箱账号
-     * 1.调用/email/send 发送邮箱验证码，
-     * 2.调用/register/email 注册邮箱账号
-     */
     @PostMapping("/register/email")
     @ApiOperation(value = "注册邮箱账号",
             notes = "1.调用/email/send 发送邮箱验证码，\n" +
@@ -58,12 +52,7 @@ public class AuthController {
         return GenericDto.success(ucUserService.registerEmailAccount(registerReq));
     }
 
-    /**
-     * 账号登陆
-     * 1.调用/login 返回token
-     * 2.调用/2fa/login 返回ucToken
-     * @return
-     */
+
     @PostMapping("/login")
     @ApiOperation(value = "账号登陆", notes = "1.调用/login 返回token\n" +
             "2.调用/2fa/login 返回ucToken")
@@ -75,13 +64,6 @@ public class AuthController {
         return GenericDto.success(login);
     }
 
-    /**
-     * 2fa登陆
-     *1.调用/login 返回token
-     *2.调用/2fa/login 返回ucToken
-     * @param loginReq
-     * @return
-     */
     @PostMapping("/2fa/login")
     @ApiOperation(value = "2fa登陆", notes = "1.调用/login 返回token\n" +
             "2.调用/2fa/login 返回ucToken")
@@ -102,15 +84,6 @@ public class AuthController {
                         .build());
     }
 
-    /**
-     * metamask登陆
-     * 1.调用/metamask/generateNonce生成nonce
-     * 2.前端根据nonce生成签名信息
-     * 3.调用/metamask/login登陆验证签名信息，验证成功返回token
-     *
-     * @param
-     * @return
-     */
     @PostMapping("/metamask/login")
     @ApiOperation(value = "metamask登陆",
             notes = "1.调用/metamask/generateNonce生成nonce" +
@@ -120,52 +93,36 @@ public class AuthController {
         return GenericDto.success(ucUserService.metamaskLogin(metaMaskReq));
     }
 
-    /**
-     * 忘记密码-验证链接
-     * 1.调用/send/email 发送邮件链接
-     * 2.调用/forgot-password/verify-link 验证链接
-     * 3.调用/forgot-password/change-password 重置密码
-     *
-     * @return
-     */
-    @GetMapping("/forgot-password/verify-link")
-    @ApiOperation(value = "忘记密码-验证链接", notes = "1.调用/send/email 发送邮件链接\n" +
-            "2.调用/forgot-password/verify-link 验证链接\n" +
-            "3.调用/forgot-password/reset 重置密码")
-    public GenericDto<Object> forgotPasswordVerifyLink(@Valid ForgotPasswordVerifyReq forgotPasswordVerifyReq) {
-        ucUserService.forgotPasswordVerifyLink(forgotPasswordVerifyReq.getEncode(), forgotPasswordVerifyReq.getAccount());
-        return GenericDto.success(null);
+
+    @PostMapping("/forgot-password/reset")
+    @ApiOperation(value = "忘记密码-重置密码", notes = "1.调用auth/email/send 传authType=RESET_PASSWORD获取邮箱验证码 " +
+            "2.调用/auth/forgot-password/reset 重置邮箱账号的密码")
+    public GenericDto<LoginResp> forgotPasswordReset(@Valid @RequestBody ResetPasswordReq resetPasswordReq) {
+        String code = resetPasswordReq.getCode();
+        String email = resetPasswordReq.getEmail();
+        ucUserService.forgotPasswordVerify(code, email);
+        return GenericDto.success(ucUserService.forgotPasswordReset(resetPasswordReq));
     }
 
 
-    /**
-     * 忘记密码-重置密码
-     * 1.通过邮件链接code/或者ga验证code
-     * 2.调用/forgotPassword/reset 重置密码
-     * @return
-     */
-    @PostMapping("/forgot-password/reset")
-    @ApiOperation(value = "忘记密码-重置密码", notes = "忘记密码-重置密码")
-    public GenericDto<Object> forgotPasswordReset(@Valid @RequestBody ResetPasswordReq resetPasswordReq) {
-        String code = resetPasswordReq.getCode();
-        String account = resetPasswordReq.getAccount();
-        ClientAuthTypeEnum authTypeEnum = resetPasswordReq.getAuthTypeEnum();
-        if (ClientAuthTypeEnum.EMAIL.equals(authTypeEnum)) {
-            ucUserService.forgotPasswordVerifyLink(code, account);
-        } else if (ClientAuthTypeEnum.GA.equals(authTypeEnum)) {
-            UcUser one = ucUserService.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, account));
-            if (one == null) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
-            }
-            if (!googleAuthService.verify(code, one.getGaSecret())) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
-            }
-        } else {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_504_MISSING_ARGUMENTS);
+    @PostMapping("/reset/ga")
+    @ApiOperation(value = "重置GA", notes = "1.调用auth/email/send 传authType=RESET_GA获取邮箱验证码 \" +\n" +
+            "            \"2.调用/auth/reset/ga 重置GA")
+    public GenericDto<Object> resetGa(@Valid @RequestBody ResetGaReq resetGaReq) {
+        String email = resetGaReq.getEmail();
+        String code = resetGaReq.getCode();
+        // 验证邮箱和验证码是否正确
+        AuthCodeDTO authCode = cacheService.getAuthCode(email, AuthCodeUseTypeEnum.RESET_GA, ClientAuthTypeEnum.EMAIL);
+        if (authCode == null || !code.equals(authCode.getCode())) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
         }
-
-        ucUserService.forgotPasswordReset(resetPasswordReq);
-
+        // 查看email是否存在
+        UcUser one = ucUserService.getOne(new LambdaQueryWrapper<UcUser>().eq(UcUser::getEmail, email));
+        if (one == null) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
+        }
+        // 删除已经绑定的ga
+        ucUserService.deleteGa(one);
         return GenericDto.success(null);
     }
 
@@ -186,6 +143,9 @@ public class AuthController {
             sendCodeService.sendEmailWithTokenAndUseType(sendReq.getToken(), sendReq.getUseType());
             // 忘记密码
         }  else if (AuthCodeUseTypeEnum.RESET_PASSWORD.equals(sendReq.getUseType())) {
+            sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
+            // 重置ga
+        } else if (AuthCodeUseTypeEnum.RESET_GA.equals(sendReq.getUseType())) {
             sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
         } else {
             // 需要登陆的，从db中读

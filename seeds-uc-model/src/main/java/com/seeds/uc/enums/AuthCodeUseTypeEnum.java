@@ -24,6 +24,8 @@ public enum AuthCodeUseTypeEnum {
     REGISTER("REGISTER", "register", "注册", "reg"),
     @JsonProperty("RESET_PASSWORD")
     RESET_PASSWORD("RESET_PASSWORD", "reset password", "重置密码", "reset.pwd"),
+    @JsonProperty("RESET_GA")
+    RESET_GA("RESET_GA", "reset ga", "重置谷歌认证", "reset.ga"),
     @JsonProperty("CHANGE_PASSWORD")
     CHANGE_PASSWORD("CHANGE_PASSWORD", "change password", "修改密码", "change.pwd"),
     @JsonProperty("CHANGE_EMAIL")

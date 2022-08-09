@@ -1,15 +1,10 @@
 package com.seeds.uc.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.seeds.uc.dto.redis.LoginUserDTO;
-import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.mapper.UcUserMapper;
-import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
-import com.seeds.uc.service.IUcSecurityStrategyService;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +44,7 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
             GoogleAuthenticator googleAuthenticator = new GoogleAuthenticator();
             authorize = googleAuthenticator.authorize(userSecret, Integer.parseInt(userInputCode.replaceFirst("0*", "")));
         } catch (Exception e) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_GA_VERIFICATION_FAILED);
         }
         return authorize;
     }

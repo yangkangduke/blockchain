@@ -44,18 +44,18 @@ public interface IUcUserService extends IService<UcUser> {
 
 
     /**
-     * 忘记密码-验证链接
+     * 忘记密码-验证
      *
-     * @param encode
+     * @param code
      */
-    void forgotPasswordVerifyLink(String encode, String account);
+    void forgotPasswordVerify(String code, String email);
 
     /**
-     * 忘记密码-修改密码
+     * 忘记密码-重置密码
      *
      * @param resetPasswordReq
      */
-    void forgotPasswordReset(ResetPasswordReq resetPasswordReq);
+    LoginResp forgotPasswordReset(ResetPasswordReq resetPasswordReq);
 
     /**
      * 2fa校验

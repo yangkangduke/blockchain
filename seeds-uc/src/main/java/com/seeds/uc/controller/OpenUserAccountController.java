@@ -61,7 +61,7 @@ public class OpenUserAccountController {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         if (loginUser == null ) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_13000_ACCOUNT_NOT);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
         }
         ucUserAccountService.action(accountActionReq, loginUser);
         return GenericDto.success(null);

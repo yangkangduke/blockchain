@@ -16,6 +16,6 @@ public class MetaMaskReq {
     private String publicAddress;
     @ApiModelProperty(value = "签名")
     private String signature;
-    private String message;
+    private String nonce;
 
 }

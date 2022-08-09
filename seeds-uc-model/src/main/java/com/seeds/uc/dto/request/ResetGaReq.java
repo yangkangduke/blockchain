@@ -12,13 +12,10 @@ import javax.validation.constraints.NotBlank;
  * @date 2022/07/13
  */
 @Data
-public class ResetPasswordReq {
+public class ResetGaReq {
     @ApiModelProperty(value = "账号", required = true)
     @Email
     private String email;
-    @NotBlank
-    @ApiModelProperty(value = "新密码", required = true)
-    private String password;
     @NotBlank
     @ApiModelProperty(value = "邮箱验证码", required = true)
     private String code;

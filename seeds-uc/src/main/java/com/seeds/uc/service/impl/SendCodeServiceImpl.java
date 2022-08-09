@@ -142,8 +142,9 @@ public class SendCodeServiceImpl implements SendCodeService {
         if (useType.equals(AuthCodeUseTypeEnum.REGISTER)) {
             MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.REGISTER_EMAIL_SUBJECT, StrFormatter.format(UcConstant.REGISTER_EMAIL_CONTENT, 5, code), false);
         } else if (useType.equals(AuthCodeUseTypeEnum.RESET_PASSWORD)) {
-            String encode = Base64.encode(DigestUtil.Encrypt(StrFormatter.format(UcConstant.FORGOT_PASSWORD_EMAIL_LINK_SYMBOL, email ,code)));
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT,5, StrFormatter.format(resetPasswordProperties.getUrl(),encode, email)), true);
+            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT,5, code), false);
+        } else if (useType.equals(AuthCodeUseTypeEnum.RESET_GA)) {
+            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.RESET_GA_EMAIL_SUBJECT, StrFormatter.format(UcConstant.RESET_GA_EMAIL_CONTENT,5, code), false);
         } else if (useType.equals(AuthCodeUseTypeEnum.LOGIN)) {
             MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.LOGIN_EMAIL_VERIFY_SUBJECT, StrFormatter.format(UcConstant.LOGIN_EMAIL_VERIFY_CONTENT, 5, code), false);
         } else if (useType.equals(AuthCodeUseTypeEnum.CHANGE_PASSWORD)) {

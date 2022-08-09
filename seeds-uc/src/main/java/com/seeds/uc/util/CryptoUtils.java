@@ -29,14 +29,7 @@ public class CryptoUtils {
      * @return
      */
     public static boolean validate(String signature, String message, String address) {
-        //参考 eth_sign in https://github.com/ethereum/wiki/wiki/JSON-RPC
-        // eth_sign
-        // The sign method calculates an Ethereum specific signature with:
-        //    sign(keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))).
-        //
-        // By adding a prefix to the message makes the calculated signature recognisable as an Ethereum specific signature.
-        // This prevents misuse where a malicious DApp can sign arbitrary data (e.g. transaction) and use the signature to
-        // impersonate the victim.
+
         String prefix = PERSONAL_MESSAGE_PREFIX + message.length();
         byte[] msgHash = Hash.sha3((prefix + message).getBytes());
 

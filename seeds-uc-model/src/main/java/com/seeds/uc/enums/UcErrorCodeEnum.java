@@ -18,15 +18,10 @@ public enum UcErrorCodeEnum {
     ERR_504_MISSING_ARGUMENTS(504, "缺少参数", "missing arguments"),
 
     // ga
-    ERR_14000_ACCOUNT_NOT(14000, "验证失败", "verification failed"),
+    ERR_14000_GA_VERIFICATION_FAILED(14000, "谷歌验证失败", "Google verification failed"),
 
-    //冲提币
-    ERR_13000_ACCOUNT_NOT(13000, "账号不存在", "Account does not exist"),
-
-    // 忘记密码
-    ERR_15000_ACCOUNT_NOT(15000, "账号不存在", "Account does not exist"),
-    ERR_15001_ACCOUNT_VERIFICATION_FAILED(15001, "验证失败", "verification failed!"),
-    ERR_15002_LINK_EXPIRED(15002, "链接失效", "The current link has expired!"),
+    // email
+    ERR_17000_EMAIL_VERIFICATION_FAILED(17000, "邮箱验证码不正确", "Email verification code is incorrect"),
 
     //meatamask
     ERR_16001_METAMASK_ADDRESS(16001, "非法地址格式", "Illegal address format"),

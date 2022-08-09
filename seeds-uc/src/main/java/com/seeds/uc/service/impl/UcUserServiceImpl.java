@@ -1,8 +1,7 @@
 package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -25,7 +24,6 @@ import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.util.CryptoUtils;
-import com.seeds.uc.util.DigestUtil;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -166,13 +164,13 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp metamaskLogin(MetaMaskReq metaMaskReq) {
         String publicAddress = metaMaskReq.getPublicAddress();
-        String message = metaMaskReq.getMessage();
+        String nonce = metaMaskReq.getNonce();
         String signature = metaMaskReq.getSignature();
         long currentTime = System.currentTimeMillis();
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
-//        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) ) {
-//            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
-//        }
+        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !genMetamaskAuth.getNonce().equals(nonce)) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
+        }
         // 地址合法性校验
         if (!WalletUtils.isValidAddress(publicAddress)) {
             // 不合法直接返回错误
@@ -180,7 +178,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         // 校验签名信息
         try{
-            if (!CryptoUtils.validate(signature, message, publicAddress)) {
+            if (!CryptoUtils.validate(signature, nonce, publicAddress)) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
             }
         } catch (Exception e) {
@@ -205,7 +203,13 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             userId = ucUser.getId();
         } else {
             userId = one.getId();
+            this.updateById(UcUser.builder()
+                    .id(userId)
+                    .nonce(genMetamaskAuth.getNonce())
+                    .updatedAt(currentTime)
+                    .build());
         }
+
         UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyMapper.selectOne(new QueryWrapper<UcSecurityStrategy>().lambda()
                 .eq(UcSecurityStrategy::getUid, userId)
                 .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.METAMASK));
@@ -231,92 +235,96 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
     @Override
     public void bindMetamask(MetaMaskReq metaMaskReq, Long uId) {
-//        String publicAddress = metaMaskReq.getPublicAddress();
-//        String nonce = metaMaskReq.getNonce();
-//        String signature = metaMaskReq.getSignature();
-//        long currentTime = System.currentTimeMillis();
-//        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
-//        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !nonce.equals(genMetamaskAuth.getNonce())) {
-//            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
-//        }
-//        // 地址合法性校验
-//        if (!WalletUtils.isValidAddress(publicAddress)) {
-//            // 不合法直接返回错误
-//            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS);
-//        }
-//        // 校验签名信息
-//        try{
-//            if (!CryptoUtils.validate(signature, nonce, publicAddress)) {
-//                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
-//            }
-//        } catch (Exception e) {
-//            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
-//        }
-//
-//        // 修改
-//        UcUser ucUser = UcUser.builder()
-//                .id(uId)
-//                .publicAddress(publicAddress)
-//                .nonce(genMetamaskAuth.getNonce())
-//                .updatedAt(currentTime)
-//                .build();
-//        this.updateById(ucUser);
-//
-//        ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
-//                .needAuth(true)
-//                .uid(ucUser.getId())
-//                .authType(ClientAuthTypeEnum.METAMASK)
-//                .createdAt(currentTime)
-//                .updatedAt(currentTime)
-//                .build());
+        String publicAddress = metaMaskReq.getPublicAddress();
+        String nonce = metaMaskReq.getNonce();
+        String signature = metaMaskReq.getSignature();
+        long currentTime = System.currentTimeMillis();
+        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
+        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !nonce.equals(genMetamaskAuth.getNonce())) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
+        }
+        // 地址合法性校验
+        if (!WalletUtils.isValidAddress(publicAddress)) {
+            // 不合法直接返回错误
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS);
+        }
+        // 校验签名信息
+        try{
+            if (!CryptoUtils.validate(signature, nonce, publicAddress)) {
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+            }
+        } catch (Exception e) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+        }
+
+        // 修改
+        UcUser ucUser = UcUser.builder()
+                .id(uId)
+                .publicAddress(publicAddress)
+                .nonce(genMetamaskAuth.getNonce())
+                .updatedAt(currentTime)
+                .build();
+        this.updateById(ucUser);
+
+        ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
+                .needAuth(true)
+                .uid(ucUser.getId())
+                .authType(ClientAuthTypeEnum.METAMASK)
+                .createdAt(currentTime)
+                .updatedAt(currentTime)
+                .build());
 
     }
 
 
     /**
-     * 忘记密码-验证链接
+     * 忘记密码-验证
      *
-     * @param encode
+     * @param code
      */
     @Override
-    public void forgotPasswordVerifyLink(String encode, String account) {
-        if (StrUtil.isNotBlank(encode)) {
-            try {
-                String decodeStr = Base64.decodeStr(encode);
-                String decrypt = DigestUtil.Decrypt(decodeStr);
-                String[] split = decrypt.split(";");
-                String code = split[1];
-                long curtime = System.currentTimeMillis();
-                AuthCodeDTO authCode = cacheService.getAuthCode(account, AuthCodeUseTypeEnum.RESET_PASSWORD, ClientAuthTypeEnum.EMAIL);
-                if (authCode == null) {
-                    throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15001_ACCOUNT_VERIFICATION_FAILED);
-                }
-                if (authCode.getExpireAt() <= curtime) {
-                    throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15001_ACCOUNT_VERIFICATION_FAILED);
-                }
-                if (!authCode.getCode().equals(code)) {
-                    throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15002_LINK_EXPIRED);
-                }
-            } catch (Exception e) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15002_LINK_EXPIRED);
-            }
-        } else {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_15001_ACCOUNT_VERIFICATION_FAILED);
+    public void forgotPasswordVerify(String code, String email) {
+        AuthCodeDTO authCode = cacheService.getAuthCode(email, AuthCodeUseTypeEnum.RESET_PASSWORD, ClientAuthTypeEnum.EMAIL);
+        if (authCode == null || !code.equals(authCode.getCode())) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
         }
+        // 查看email是否存在
+        UcUser one = this.getOne(new LambdaQueryWrapper<UcUser>().eq(UcUser::getEmail, email));
+        if (one == null) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
+        }
+
     }
 
     /**
-     * 忘记密码-修改密码
+     * 忘记密码-重置密码
      *
      * @param resetPasswordReq
      */
     @Override
-    public void forgotPasswordReset(ResetPasswordReq resetPasswordReq) {
-        String account = resetPasswordReq.getAccount();
+    public LoginResp forgotPasswordReset(ResetPasswordReq resetPasswordReq) {
+        String email = resetPasswordReq.getEmail();
         String salt = RandomUtil.getRandomSalt();
         String password = PasswordUtil.getPassword(resetPasswordReq.getPassword(), salt);
-        this.update(UcUser.builder().password(password).salt(salt).build(),
-                new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, account));
+        UcUser one = this.getOne(new LambdaQueryWrapper<UcUser>()
+                .eq(UcUser::getEmail, email));
+        UcUser user = UcUser.builder()
+                .password(password)
+                .salt(salt)
+                .id(one.getId())
+                .build();
+        this.updateById(user);
+        Long userId = user.getId();
+        // 注册完成，生成uc token给用户
+        String ucToken = RandomUtil.genRandomToken(userId.toString());
+        // 将token存入redis，用户进入登陆态
+        cacheService.putUserWithTokenAndLoginName(ucToken, userId, email);
+
+        return LoginResp.builder()
+                .ucToken(ucToken)
+                .type(ClientAuthTypeEnum.EMAIL)
+                .account(email)
+                .build();
     }
 
 
@@ -356,7 +364,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             }
 
         } else {
-            throw new LoginException(UcErrorCodeEnum.ERR_14000_ACCOUNT_NOT);
+            throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
         }
 
         // 用户验证通过，产生uc token
