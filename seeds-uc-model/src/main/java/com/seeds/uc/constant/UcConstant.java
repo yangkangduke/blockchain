@@ -21,6 +21,10 @@ public class UcConstant {
     public static final String RESET_GA_EMAIL_SUBJECT = "Reset ga";
     public static final String RESET_GA_EMAIL_CONTENT = "Reset ga verification code, note that it expires in {} minutes:{}";
 
+    // 绑定GA
+    public static final String BINGD_GA_EMAIL_SUBJECT = "Bind ga";
+    public static final String BINGD_GA_EMAIL_CONTENT = "Bind ga verification code, note that it expires in {} minutes:{}";
+
     // 注册邮箱账号
     public static final String REGISTER_EMAIL_SUBJECT = "Register an account";
     public static final String REGISTER_EMAIL_CONTENT = "Register the email verification code, note that it expires in {} minutes:{}";

@@ -10,7 +10,6 @@ import lombok.Data;
  */
 @Data
 public class GaSecurityItemReq {
-    private String gaCode;
     private String gaToken;
-//    private String authToken;
+    private String authToken;
 }

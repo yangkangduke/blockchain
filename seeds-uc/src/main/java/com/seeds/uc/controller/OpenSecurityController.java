@@ -10,7 +10,13 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.SecurityDetailDto;
 import com.seeds.uc.dto.SecurityStrategyDto;
+import com.seeds.uc.dto.UserDto;
+import com.seeds.uc.dto.redis.AuthCodeDTO;
+import com.seeds.uc.dto.request.SecuritySettingReq;
+import com.seeds.uc.dto.response.TokenResp;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
+import com.seeds.uc.enums.UcErrorCodeEnum;
+import com.seeds.uc.exceptions.SecuritySettingException;
 import com.seeds.uc.mapper.UcSecurityStrategyMapper;
 import com.seeds.uc.mapper.UcUserMapper;
 import com.seeds.uc.model.UcSecurityStrategy;
@@ -18,13 +24,13 @@ import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.impl.CacheService;
+import com.seeds.uc.util.RandomUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -95,5 +101,45 @@ public class OpenSecurityController {
                         .build());
     }
 
+    @PostMapping("strategy/verify")
+    public GenericDto<Object> verifySecurityStrategy(@RequestBody SecuritySettingReq securitySettingReq) {
+
+        // 拿到安全策略
+        Long uid = UserContext.getCurrentUserId();
+        List<UcSecurityStrategy> securityStrategyList =
+                securityStrategyMapper.listByUid(uid);
+
+        Map<ClientAuthTypeEnum, UcSecurityStrategy> strategyEnumMap =
+                securityStrategyList
+                        .stream()
+                        .collect(Collectors.toMap(UcSecurityStrategy::getAuthType, v -> v));
+        Optional<UcSecurityStrategy> metamaskStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.METAMASK));
+        Optional<UcSecurityStrategy> emailStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.EMAIL));
+        Optional<UcSecurityStrategy> gaStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.GA));
+
+        UcUser ucUser = userService.getById(uid);
+
+        if (emailStrategy.isPresent() && emailStrategy.get().getNeedAuth()) {
+            AuthCodeDTO emailAuthCode =
+                    cacheService.getAuthCode(
+                            ucUser.getEmail(),
+                            securitySettingReq.getUseType(),
+                            ClientAuthTypeEnum.EMAIL);
+            if (emailAuthCode == null
+                    || StringUtils.isBlank(emailAuthCode.getCode())
+                    || !securitySettingReq.getEmailCode().equals(emailAuthCode.getCode())) {
+                throw new SecuritySettingException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+            }
+        }
+//        if (gaStrategy.isPresent() && gaStrategy.get().getNeedAuth()
+//                && (StringUtils.isBlank(securitySettingReq.getGaCode())
+//                || googleAuthService.verifyUserCode(uid, securitySettingReq.getGaCode()))) {
+//            throw new SecuritySettingException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+//        }
+
+        String authToken = RandomUtil.genRandomToken(uid.toString());
+        cacheService.putSecurityAuthTokenWithUidAndUseType(authToken, uid, securitySettingReq.getUseType());
+        return GenericDto.success(TokenResp.builder().token(authToken).build());
+    }
 
 }

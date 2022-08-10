@@ -6,6 +6,7 @@ import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.constant.UcConstant;
 import com.seeds.uc.dto.redis.AuthTokenDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
+import com.seeds.uc.dto.redis.SecurityAuth;
 import com.seeds.uc.dto.request.GaReq;
 import com.seeds.uc.dto.request.MetaMaskReq;
 import com.seeds.uc.dto.request.UpdateEmailReq;
@@ -64,16 +65,24 @@ public class OpenSecurityItemController {
 
     @PostMapping("/ga/bind")
     @ApiOperation(value = "绑定ga",
-            notes = "1.调用/security/item/ga/generate获取gakey " +
-                    "2.手机扫码添加上gakey（secret） " +
-                    "3.调用/code/ga/verify验证码的验证并获取gaToken " +
-                    "4.调用/security/item/ga/bind绑定ga")
+            notes = "1.调用/security/item/ga/generate获取gaKey " +
+                    "2.使用手机扫码添加上gaKey" +
+                    "3.调用/code/ga/verify验证验证码并获取gaToken " +
+                    "4.调用/email/send发送邮件，参数use_type=VERIFY_SETTING_POLICY_BIND_GA" +
+                    "5.调用/security/strategy/verify, 参数use_type=VERIFY_SETTING_POLICY_BIND_GA, 进行安全验证, 获取到authToken" +
+                    "6.调用/security/item/ga/bind绑定ga")
     public GenericDto<Object> bindGA(@RequestBody GaSecurityItemReq securityItemReq) {
         AuthTokenDTO gaAuthToken =
                 cacheService.getAuthTokenDetailWithToken(securityItemReq.getGaToken(), ClientAuthTypeEnum.GA);
         if (gaAuthToken == null
                 || StringUtils.isBlank(gaAuthToken.getSecret())) {
             throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+        }
+
+        SecurityAuth securityAuth =
+                cacheService.getSecurityAuthWithToken(securityItemReq.getAuthToken());
+        if (securityAuth == null) {
+            throw new SecuritySettingException(UcErrorCodeEnum.ERR_10210_SECURITY_VERIFY_ERROR);
         }
 
         Long uid = UserContext.getCurrentUserId();
@@ -112,9 +121,6 @@ public class OpenSecurityItemController {
                         .build());
     }
 
-    /**
-     * 解除绑定ga
-     */
     @PostMapping("/ga/unbind")
     @ApiOperation(value = "解除绑定ga", notes = "解除绑定ga")
     public GenericDto<Object> gaUnbind(@Valid @RequestBody GaReq gaReq, HttpServletRequest request) {

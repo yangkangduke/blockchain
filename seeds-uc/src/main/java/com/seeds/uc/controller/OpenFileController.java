@@ -33,10 +33,7 @@ public class OpenFileController {
     @Autowired
     private IUcFileService ucFileService;
 
-    /**
-     * 分页查询
-     * @return
-     */
+
     @ApiOperation(value = "分页查询", notes = "分页查询")
     @GetMapping("/page")
     public GenericDto<Page<UcFile>> getSysFilePage(UcFileQueryResp fileQueryResp) {
@@ -48,34 +45,18 @@ public class OpenFileController {
         return GenericDto.success(ucFileService.page(page, Wrappers.query(ucFile)));
     }
 
-    /**
-     * 上传文件 文件名采用uuid,避免原始文件名中带"-"符号导致下载的时候解析出现异常
-     * @param file 资源
-     */
     @PostMapping("/upload")
     @ApiOperation(value = "上传文件", notes = "上传文件")
     public GenericDto<UcFileResp> upload(@RequestPart("file") MultipartFile file) {
         return ucFileService.upload(file);
     }
 
-    /**
-     * 获取文件
-     * @param bucket 桶名称
-     * @param objectName 文件空间/名称
-     * @param response
-     * @return
-     */
     @GetMapping("/{bucket}/{objectName}")
     @ApiOperation(value = "获取文件", notes = "获取文件")
     public void file(@PathVariable String bucket, @PathVariable String objectName, HttpServletResponse response) {
         ucFileService.getFile(bucket, objectName, response);
     }
 
-    /**
-     * 删除文件
-     * @param id
-     * @return
-     */
     @DeleteMapping("delete/{id}")
     @ApiOperation(value = "删除文件", notes = "删除文件")
     public GenericDto<Boolean> delete(@PathVariable Long id) throws Exception {

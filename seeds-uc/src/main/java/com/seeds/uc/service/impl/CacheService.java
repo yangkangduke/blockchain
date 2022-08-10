@@ -240,4 +240,29 @@ public class CacheService {
         RBucket<GenMetamaskAuth> genMetamaskAuthRBucket = redisson.getBucket(key);
         return genMetamaskAuthRBucket.get();
     }
+
+    /**
+     * key 为 authCode 的token，用于账户安全项如metamask， email， ga的改动的策略验证
+     */
+    public void putSecurityAuthTokenWithUidAndUseType(String token,
+                                                      Long uid,
+                                                      AuthCodeUseTypeEnum useTypeEnum) {
+        Long expireAt = System.currentTimeMillis() + securityAuthTokenExpireAfter * 1000;
+        String key = UcRedisKeysConstant.getUcSecurityAuthTokenKeyTemplate(token);
+        RBucket<SecurityAuth> securityAuthRBucket = redisson.getBucket(key);
+        SecurityAuth authToken =
+                SecurityAuth.builder()
+                        .uid(uid)
+                        .useType(useTypeEnum)
+                        .expireAt(expireAt)
+                        .build();
+        securityAuthRBucket.set(authToken, securityAuthTokenExpireAfter, TimeUnit.SECONDS);
+        log.info("CacheService - putSecurityAuthTokenWithUidAndUseType - put key: {}, value: {}", key, authToken);
+    }
+
+    public SecurityAuth getSecurityAuthWithToken(String token) {
+        String key = UcRedisKeysConstant.getUcSecurityAuthTokenKeyTemplate(token);
+        RBucket<SecurityAuth> securityAuthRBucket = redisson.getBucket(key);
+        return securityAuthRBucket.get();
+    }
 }

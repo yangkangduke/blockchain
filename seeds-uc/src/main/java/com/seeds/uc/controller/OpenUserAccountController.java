@@ -51,9 +51,6 @@ public class OpenUserAccountController {
     @Autowired
     private IUcUserAddressService ucUserAddressService;
 
-    /**
-     * 冲/提币
-     */
     @PostMapping("/action")
     @ApiOperation(value = "冲/提币", notes = "冲/提币")
     public GenericDto<Object> action(@Valid @RequestBody AccountActionReq accountActionReq, HttpServletRequest request) {
@@ -67,9 +64,6 @@ public class OpenUserAccountController {
         return GenericDto.success(null);
     }
 
-    /**
-     * 充/提币历史分页
-     */
     @PostMapping("/action/history")
     @ApiOperation(value = "充/提币历史分页", notes = "充/提币历史分页")
     public GenericDto<IPage<AccountActionResp>> actionHistory(@RequestBody AccountActionHistoryReq historyReq) {
@@ -78,9 +72,7 @@ public class OpenUserAccountController {
         page.setSize(historyReq.getSize());
         return GenericDto.success(ucUserAccountService.actionHistory(page, historyReq));
     }
-    /**
-     * 创建地址
-     */
+
     @PostMapping("/address/init")
     @ApiOperation(value = "创建地址", notes = "创建地址")
     public GenericDto<Object> createAddress(@RequestBody UcUserAddressReq addressReq, HttpServletRequest request) {

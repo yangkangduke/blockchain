@@ -50,8 +50,7 @@ public class OpenCodeController {
 
     @PostMapping("/ga/verify")
     @ApiOperation(value = "ga验证", notes = "ga验证")
-    public GenericDto<TokenResp> verifyGoogleAuth(HttpServletRequest request,
-                                                  @RequestBody GoogleAuthVerifyReq authVerifyReq) {
+    public GenericDto<TokenResp> verifyGoogleAuth(HttpServletRequest request, @RequestBody GoogleAuthVerifyReq authVerifyReq) {
         // 用uc token 拿用户的登录名
         String token = WebUtil.getTokenFromRequest(request);
         GenGoogleAuth genGoogleAuth = cacheService.getGenerateGoogleAuth(token);

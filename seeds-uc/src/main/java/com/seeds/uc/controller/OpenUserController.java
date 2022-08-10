@@ -48,10 +48,7 @@ public class OpenUserController {
     @Autowired
     private SendCodeService sendCodeService;
 
-    /**
-     * 获取用户信息
-     * @return
-     */
+
     @GetMapping("/info")
     @ApiOperation(value = "获取用户信息", notes = "获取用户信息")
     public GenericDto<UserInfoResp> getInfo(HttpServletRequest request) {
@@ -61,11 +58,6 @@ public class OpenUserController {
         return GenericDto.success(ucUserService.getInfo(loginUser));
     }
 
-    /**
-     * 退出登陆
-     * @param request
-     * @return
-     */
     @PostMapping("/logout")
     @ApiOperation(value = "退出登陆", notes = "退出登陆")
     public GenericDto<Object> logout(HttpServletRequest request) {
@@ -75,10 +67,6 @@ public class OpenUserController {
         return GenericDto.success(null);
     }
 
-    /**
-     * 修改昵称
-     * @return
-     */
     @PutMapping("/change/nickname")
     @ApiOperation(value = "修改昵称", notes = "修改昵称")
     public GenericDto<Object> updateNickname(@Valid @RequestBody NickNameReq nickNameReq, HttpServletRequest request) {
@@ -88,10 +76,7 @@ public class OpenUserController {
         return GenericDto.success(ucUserService.updateNickname(nickNameReq.getNickname(), loginUser));
     }
 
-    /**
-     * 修改密码
-     * @return
-     */
+
     @PutMapping("/change/password")
     @ApiOperation(value = "修改密码", notes = "修改密码")
     public GenericDto<Object> updatePassword(@Valid @RequestBody ChangePasswordReq changePasswordReq, HttpServletRequest request) {

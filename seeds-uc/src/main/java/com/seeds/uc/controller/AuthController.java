@@ -22,6 +22,7 @@ import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -126,11 +127,6 @@ public class AuthController {
         return GenericDto.success(null);
     }
 
-    /**
-     * 发送邮件
-     * @param sendReq
-     * @return
-     */
     @ApiOperation(value = "发送邮件", notes = "发送邮件")
     @PostMapping("/email/send")
     public GenericDto<Object> sendEmailCode(@Valid @RequestBody AuthCodeSendReq sendReq, HttpServletRequest request) {
@@ -151,6 +147,9 @@ public class AuthController {
             // 需要登陆的，从db中读
             String loginToken = WebUtil.getTokenFromRequest(request);
             LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+            if (StringUtils.isBlank(loginToken) || loginUser == null) {
+                throw new SendAuthCodeException(UcErrorCodeEnum.ERR_401_NOT_LOGGED_IN);
+            }
             UcUser user = ucUserService.getById(loginUser.getUserId());
             // 修改密码
             if (AuthCodeUseTypeEnum.CHANGE_PASSWORD.equals(sendReq.getUseType())) {
@@ -158,10 +157,10 @@ public class AuthController {
              // 修改邮箱
             } else if (AuthCodeUseTypeEnum.CHANGE_EMAIL.equals(sendReq.getUseType())) {
                 sendCodeService.sendEmailWithUseType(user.getEmail(), sendReq.getUseType());
-                // 绑定邮箱
-            }  if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_REQUEST_SET.contains(sendReq.getUseType())) {
+                // 绑定邮箱、绑定ga
+            } else if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_REQUEST_SET.contains(sendReq.getUseType())) {
                 sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
-            } else {
+            }else {
                 throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
             }
 
