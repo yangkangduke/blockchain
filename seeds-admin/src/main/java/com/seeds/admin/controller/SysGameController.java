@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysGameResp;
+import com.seeds.admin.entity.SysGameEntity;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.service.SysGameService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 游戏管理
@@ -47,6 +50,10 @@ public class SysGameController {
     @ApiOperation("添加")
     @RequiredPermission("sys:game:add")
     public GenericDto<Object> add(@Valid @RequestBody SysGameAddReq req) {
+        SysGameEntity game = sysGameService.queryByOfficialUrl(req.getOfficialUrl());
+        if (game != null) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_80002_GAME_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_80002_GAME_ALREADY_EXIST.getCode(), null);
+        }
         sysGameService.add(req);
         return GenericDto.success(null);
     }
@@ -62,6 +69,10 @@ public class SysGameController {
     @ApiOperation("编辑")
     @RequiredPermission("sys:game:modify")
     public GenericDto<Object> modify(@Valid @RequestBody SysGameModifyReq req) {
+        SysGameEntity game = sysGameService.queryByOfficialUrl(req.getOfficialUrl());
+        if (game != null && !Objects.equals(req.getId(), game.getId())) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_80002_GAME_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_80002_GAME_ALREADY_EXIST.getCode(), null);
+        }
         sysGameService.modify(req);
         return GenericDto.success(null);
     }

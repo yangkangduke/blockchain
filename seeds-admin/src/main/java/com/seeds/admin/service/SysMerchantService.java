@@ -108,4 +108,11 @@ public interface SysMerchantService extends IService<SysMerchantEntity> {
      */
     void addUser(SysMerchantUserAddReq req, Long merchantId);
 
+    /**
+     * 通过网址获取系统商家信息
+     * @param url 商家url
+     * @return 系统商家信息
+     */
+    SysMerchantEntity queryByUrl(String url);
+
 }

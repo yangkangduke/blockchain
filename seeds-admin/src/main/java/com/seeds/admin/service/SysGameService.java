@@ -84,4 +84,11 @@ public interface SysGameService extends IService<SysGameEntity> {
      */
     Map<Long, String> queryMapByIds(Collection<Long> ids);
 
+    /**
+     * 通过游戏官方网址列表获取系统游戏名称列表
+     * @param officialUrl 官方网址
+     * @return 系统游戏
+     */
+    SysGameEntity queryByOfficialUrl(String officialUrl);
+
 }

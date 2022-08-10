@@ -15,10 +15,7 @@ public enum AdminErrorCodeEnum {
     ERR_500_SYSTEM_BUSY(500, "系统繁忙，请稍后再试...", "system busy, please try again later"),
     ERR_502_ILLEGAL_ARGUMENTS(502, "参数错误", "wrong arguments"),
     ERR_504_MISSING_ARGUMENTS(504, "缺少参数", "missing arguments"),
-    //meatamask
-    ERR_70001_METAMASK_ADDRESS(70001, "非法地址格式", "Illegal address format"),
-    ERR_70002_METAMASK_SIGNATURE(70002, "签名验证失败", "Signature verification failed"),
-    ERR_70003_METAMASK_UNBIND_REPEATEDLY(70003, "重复解除绑定", "Unbind repeatedly"),
+
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),
     ERR_10002_INCOMPLETE_USER_INFO(10002, "用户信息不完整，请联系客服", "user info not complete, please contact customer service"),
@@ -43,21 +40,28 @@ public enum AdminErrorCodeEnum {
     ERR_30002_MENU_PARENT_ITSELF(30002, "上级菜单不能为自身", "Parent menu cannot be for itself"),
     ERR_30003_SUB_MENU_EXIST(30003, "存在下级菜单", "Subordinate menus exist"),
 
-    // nft type
+    // nft
     ERR_40001_NFT_TYPE_ALREADY_EXIST(40001, "NFT类别已存在", "NFT type code already exist"),
     ERR_40002_NFT_TYPE_PARENT_ITSELF(40002, "上级NFT类别不能为自身", "Parent nft type cannot be for itself"),
     ERR_40003_SUB_NFT_TYPE_EXIST(40003, "存在下级NFT类别", "Subordinate nft type exist"),
+    ERR_40004_NFT_ALREADY_EXIST(40004, "NFT已存在", "NFT already exist"),
 
-    // nft
-    ERR_50001_NFT_ALREADY_EXIST(50001, "NFT已存在", "NFT already exist"),
+    // merchant
+    ERR_50001_MERCHANT_ALREADY_EXIST(50001, "商家已存在", "Merchant already exist"),
 
     // dict type
     ERR_60001_DICT_TYPE_ALREADY_EXIST(60001,"字典类别已经存在","Dict type code already exist"),
     ERR_60002_DICT_TYPE_PARENT_ITSELF(60002,"上级字典类别不能为自身","Parent dict type cannot be for itself"),
     ERR_60003_SUB_DICT_TYPE_EXIST(60003,"存在下级字典类别","Subordinate dict type exist"),
 
-    // gameComments
-    ERR_70001_GAME_COMMENTS_ALREADY_EXIST(70001, "您已经评价过该游戏", "you has commented on the game"),
+    // meatamask
+    ERR_70001_METAMASK_ADDRESS(70001, "非法地址格式", "Illegal address format"),
+    ERR_70002_METAMASK_SIGNATURE(70002, "签名验证失败", "Signature verification failed"),
+    ERR_70003_METAMASK_UNBIND_REPEATEDLY(70003, "重复解除绑定", "Unbind repeatedly"),
+
+    // game
+    ERR_80001_GAME_COMMENTS_ALREADY_EXIST(80001, "您已经评价过该游戏", "you has commented on the game"),
+    ERR_80002_GAME_ALREADY_EXIST(80002, "游戏已经存在", "Game already exist"),
     ;
     @JsonValue
     @EnumValue

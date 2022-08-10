@@ -168,5 +168,13 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         }
         return sysGames.stream().collect(Collectors.toMap(SysGameEntity::getId, SysGameEntity::getName));
     }
+
+    @Override
+    public SysGameEntity queryByOfficialUrl(String officialUrl) {
+        LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
+                .eq(SysGameEntity::getOfficialUrl, officialUrl)
+                .eq(SysGameEntity::getDeleteFlag, WhetherEnum.NO.value());
+        return getOne(queryWrap);
+    }
 }
 

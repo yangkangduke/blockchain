@@ -66,7 +66,7 @@ public class SysGameCommentsServiceImpl extends ServiceImpl<SysGameCommentsMappe
         SysGameCommentsEntity one = getOne(wrapper);
         if (null != one) {
             // 用户已经评价过该游戏
-            throw new GenericException(AdminErrorCodeEnum.ERR_70001_GAME_COMMENTS_ALREADY_EXIST);
+            throw new GenericException(AdminErrorCodeEnum.ERR_80001_GAME_COMMENTS_ALREADY_EXIST);
         }
 
         SysGameCommentsEntity entity = new SysGameCommentsEntity();

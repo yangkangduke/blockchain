@@ -9,6 +9,8 @@ import com.seeds.admin.dto.request.SysMerchantModifyReq;
 import com.seeds.admin.dto.request.SysMerchantPageReq;
 import com.seeds.admin.dto.request.SysMerchantUserAddReq;
 import com.seeds.admin.dto.response.SysMerchantResp;
+import com.seeds.admin.entity.SysMerchantEntity;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.service.SysMerchantService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 商家管理
@@ -52,6 +55,10 @@ public class SysMerchantController {
     @ApiOperation("添加")
     @RequiredPermission("sys:merchant:add")
     public GenericDto<Object> add(@Valid @RequestBody SysMerchantAddReq req) {
+        SysMerchantEntity merchant = sysMerchantService.queryByUrl(req.getUrl());
+        if (merchant != null) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_50001_MERCHANT_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_50001_MERCHANT_ALREADY_EXIST.getCode(), null);
+        }
         sysMerchantService.add(req);
         return GenericDto.success(null);
     }
@@ -67,6 +74,10 @@ public class SysMerchantController {
     @ApiOperation("编辑")
     @RequiredPermission("sys:merchant:modify")
     public GenericDto<Object> modify(@Valid @RequestBody SysMerchantModifyReq req) {
+        SysMerchantEntity merchant = sysMerchantService.queryByUrl(req.getUrl());
+        if (merchant != null && !Objects.equals(merchant.getId(), req.getId())) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_50001_MERCHANT_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_50001_MERCHANT_ALREADY_EXIST.getCode(), null);
+        }
         sysMerchantService.modify(req);
         return GenericDto.success(null);
     }
