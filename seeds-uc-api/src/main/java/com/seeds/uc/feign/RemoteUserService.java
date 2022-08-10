@@ -6,7 +6,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.request.LoginReq;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.UserInfoResp;
-import com.seeds.uc.enums.UcErrorCodeEnum;
+import com.seeds.uc.feign.interceptor.FeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ import javax.validation.Valid;
  * @author yk
  * @date 2022/8/8
  */
-@FeignClient(name = "remoteUserService", url = "127.0.0.1:10101")
+@FeignClient(name = "remoteUserService", url = "127.0.0.1:10101", configuration = {FeignInnerRequestInterceptor.class})
 public interface RemoteUserService {
 
 

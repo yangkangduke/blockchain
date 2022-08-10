@@ -47,6 +47,8 @@ public class AdminAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
+            // 通过网关的为外部调用
+            exchange.getRequest().mutate().header(HttpHeaders.INNER_REQUEST, Boolean.FALSE.toString());
             URI uri = exchange.getRequest().getURI();
             log.debug("get into auth gateway filter");
             String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ADMIN_USER_TOKEN);

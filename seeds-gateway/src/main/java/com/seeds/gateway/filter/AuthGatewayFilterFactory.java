@@ -47,6 +47,8 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
+            // 通过网关的为外部调用
+            exchange.getRequest().mutate().header(HttpHeaders.INNER_REQUEST, Boolean.FALSE.toString());
             log.debug("get into auth gateway filter");
             URI uri = exchange.getRequest().getURI();
             log.info("URL信息: {}", uri);
