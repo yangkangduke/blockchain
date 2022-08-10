@@ -135,7 +135,9 @@ public enum AuthCodeUseTypeEnum {
 
     // 不需要登陆，需要发的手机号/邮箱号从请求里读
     public static final Set<AuthCodeUseTypeEnum> CODE_NO_NEED_LOGIN_READ_REQUEST =
-            EnumSet.of(REGISTER);
+            EnumSet.of(REGISTER,
+                    RESET_PASSWORD,
+                    RESET_GA);
     // 不需要登陆，需要发的手机号/邮箱号从DB里读
     public static final Set<AuthCodeUseTypeEnum> CODE_NO_NEED_LOGIN_READ_DB =
             EnumSet.of(LOGIN);
@@ -157,10 +159,12 @@ public enum AuthCodeUseTypeEnum {
             EnumSet.of(BIND_PHONE, REBIND_PHONE);
     // 发email code的时候，需要登陆，且邮箱从request里读的类型
     public static final Set<AuthCodeUseTypeEnum> EMAIL_NEED_LOGIN_READ_REQUEST_SET =
-            EnumSet.of(BIND_EMAIL);
+            EnumSet.of(BIND_EMAIL,
+                    CHANGE_EMAIL);
     // 发email code的时候，需要登陆，且邮箱从DB里读的类型
     public static final Set<AuthCodeUseTypeEnum> EMAIL_NEED_LOGIN_READ_DB_SET =
             EnumSet.of(VERIFY_SETTING_POLICY_BIND_PHONE,
+                    CHANGE_PASSWORD,
                     VERIFY_SETTING_POLICY_REBIND_PHONE,
                     VERIFY_SETTING_POLICY_BIND_GA,
                     VERIFY_SETTING_POLICY_REBIND_GA,

@@ -16,11 +16,8 @@ import javax.validation.constraints.NotBlank;
 @Data
 @Builder
 public class UpdateEmailReq {
-
-    @ApiModelProperty("新邮箱")
-    @Email
-    private String email;
-    @ApiModelProperty("旧邮箱发的验证码")
     @NotBlank
-    private String code;
+    private String authToken;
+    @NotBlank
+    private String gaCode;
 }

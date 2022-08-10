@@ -208,26 +208,27 @@ public class OpenSecurityItemController {
         return GenericDto.success(null);
     }
 
-    /**
-     * 修改邮箱
-     * @return
-     */
     @PutMapping("/change/email")
-    @ApiOperation(value = "修改邮箱", notes = "修改邮箱")
+    @ApiOperation(value = "修改邮箱", notes = "1.调用/auth/email/send发送邮箱验证码 参数userType=CHANGE_EMAIL " +
+            "2.调用/code/email/verify验证code，参数userType=CHANGE_EMAIL，返回authToken " +
+            "3.调用/security/item/change/email修改邮箱")
     public GenericDto<Object> updateEmail(@Valid @RequestBody UpdateEmailReq updateEmailReq, HttpServletRequest request) {
-        String email = updateEmailReq.getEmail();
-        String code = updateEmailReq.getCode();
+        String authToken = updateEmailReq.getAuthToken();
+        String gaCode = updateEmailReq.getGaCode();
+
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         UcUser ucUser = ucUserService.getById(loginUser.getUserId());
-        // 判断是否有ga
-        if (ucUserService.verifyGa(loginUser.getUserId())) {
-            throw new InvalidArgumentsException("You cannot modify your email address after binding Google authentication");
+        AuthTokenDTO authTokenDTO = cacheService.getAuthTokenDetailWithToken(authToken, ClientAuthTypeEnum.EMAIL);
+        if (authTokenDTO == null || authTokenDTO.getAccountName() == null) {
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
         }
-        // 验证email的code
-        sendCodeService.verifyEmailWithUseType(ucUser.getEmail(), code, AuthCodeUseTypeEnum.CHANGE_EMAIL);
+        if (!googleAuthService.verifyUserCode(ucUser.getId(), gaCode)) {
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+        }
+
         // 修改邮箱
-        return GenericDto.success(ucUserService.updateEmail(email, loginUser));
+        return GenericDto.success(ucUserService.updateEmail(authTokenDTO.getAccountName(), loginUser));
     }
 }

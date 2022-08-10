@@ -12,7 +12,6 @@ import lombok.Data;
 @Data
 public class AuthCodeVerifyReq {
     private AuthCodeUseTypeEnum useType;
-
     private String email;
     private String emailCode;
 

@@ -131,18 +131,12 @@ public class AuthController {
     @PostMapping("/email/send")
     public GenericDto<Object> sendEmailCode(@Valid @RequestBody AuthCodeSendReq sendReq, HttpServletRequest request) {
         log.info("AuthController - sendEmailCode got request: {}", sendReq);
-        // 注册
-        if (AuthCodeUseTypeEnum.REGISTER.equals(sendReq.getUseType())) {
+        if (AuthCodeUseTypeEnum.CODE_NO_NEED_LOGIN_READ_REQUEST.contains(sendReq.getUseType())) {
+            // 不需要登陆，请求里带邮箱，如: REGISTER
             sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
-            // 登陆
-        } else if (AuthCodeUseTypeEnum.LOGIN.equals(sendReq.getUseType())) {
+        } else if (AuthCodeUseTypeEnum.CODE_NO_NEED_LOGIN_READ_DB.contains(sendReq.getUseType())) {
+            // 需要token(拒绝登陆后发的用于2FA的token)，邮箱从数据库查, 如：LOGIN
             sendCodeService.sendEmailWithTokenAndUseType(sendReq.getToken(), sendReq.getUseType());
-            // 忘记密码
-        }  else if (AuthCodeUseTypeEnum.RESET_PASSWORD.equals(sendReq.getUseType())) {
-            sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
-            // 重置ga
-        } else if (AuthCodeUseTypeEnum.RESET_GA.equals(sendReq.getUseType())) {
-            sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
         } else {
             // 需要登陆的，从db中读
             String loginToken = WebUtil.getTokenFromRequest(request);
@@ -151,54 +145,17 @@ public class AuthController {
                 throw new SendAuthCodeException(UcErrorCodeEnum.ERR_401_NOT_LOGGED_IN);
             }
             UcUser user = ucUserService.getById(loginUser.getUserId());
-            // 修改密码
-            if (AuthCodeUseTypeEnum.CHANGE_PASSWORD.equals(sendReq.getUseType())) {
-                sendCodeService.sendEmailWithUseType(user.getEmail(), sendReq.getUseType());
-             // 修改邮箱
-            } else if (AuthCodeUseTypeEnum.CHANGE_EMAIL.equals(sendReq.getUseType())) {
-                sendCodeService.sendEmailWithUseType(user.getEmail(), sendReq.getUseType());
-                // 绑定邮箱
-            } else if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_REQUEST_SET.contains(sendReq.getUseType())) {
+            // 绑定邮箱、修改邮箱
+            if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_REQUEST_SET.contains(sendReq.getUseType())) {
                 sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
-                // 绑定ga
+                // 绑定ga、修改密码
             } else if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_DB_SET.contains(sendReq.getUseType())) {
-                sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
+                sendCodeService.sendEmailWithUseType(user.getEmail(), sendReq.getUseType());
             } else {
                 throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
             }
 
         }
-
-
-
-//        if (AuthCodeUseTypeEnum.CODE_NO_NEED_LOGIN_READ_REQUEST.contains(sendReq.getUseType())) {
-//            // 不需要登陆，请求里带邮箱，如: REGISTER
-//            sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
-//        } else if (AuthCodeUseTypeEnum.CODE_NO_NEED_LOGIN_READ_DB.contains(sendReq.getUseType())) {
-//            // 需要token(拒绝登陆后发的用于2FA的token)，邮箱从数据库查, 如：LOGIN
-//            sendCodeService.sendEmailWithTokenAndUseType(sendReq.getToken(), sendReq.getUseType());
-//        }
-//        else {
-//            // 需要登陆
-//            String loginToken = WebUtil.getTokenFromRequest(request);
-//            LoginUser loginUser = cacheService.getUserByToken(loginToken);
-//
-//            if (StringUtils.isBlank(loginToken) || loginUser == null) {
-//                throw new SendAuthCodeException(UcErrorCode.ERR_401_NOT_LOGGED_IN);
-//            }
-//            // TODO 邮箱需要检查是否已使用
-//            if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_REQUEST_SET.contains(sendReq.getUseType())) {
-//                sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
-//            } else if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_DB_SET.contains(sendReq.getUseType())) {
-//                // 需要登陆，但是手机号从DB里读
-//                UserDto userDto = userService.getUserByUid(loginUser.getUserId());
-//                sendCodeService.sendEmailWithUseType(userDto.getEmail(), sendReq.getUseType());
-//            } else {
-//                // 没有被录入的类型，直接抛错误，后面再加
-//                throw new SendAuthCodeException(UcErrorCode.ERR_502_ILLEGAL_ARGUMENTS);
-//            }
-//        }
-
         return GenericDto.success(null);
     }
 
