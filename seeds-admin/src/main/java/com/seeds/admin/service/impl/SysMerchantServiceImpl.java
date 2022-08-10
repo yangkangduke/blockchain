@@ -355,6 +355,14 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         }
     }
 
+    @Override
+    public SysMerchantEntity queryByUrl(String url) {
+        LambdaQueryWrapper<SysMerchantEntity> query = new QueryWrapper<SysMerchantEntity>().lambda()
+                .eq(SysMerchantEntity::getUrl, url)
+                .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
+        return getOne(query);
+    }
+
     private Set<Long> screeningUsers(Set<Long> userIds, Set<Long> merchantIds){
         if (CollectionUtils.isEmpty(userIds)) {
             return Collections.emptySet();

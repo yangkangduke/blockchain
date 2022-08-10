@@ -49,6 +49,7 @@ public class SysMerchantAddReq {
 	 * 网址
 	 */
 	@ApiModelProperty("网址")
+	@NotBlank(message = "Merchant url cannot be empty")
 	private String url;
 
 	/**

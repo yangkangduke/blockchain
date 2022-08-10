@@ -50,7 +50,7 @@ public class SysNftController {
         // 查重
         SysNftEntity nft = sysNftService.queryByContractAddress(req.getContractAddress());
         if (nft != null) {
-            return GenericDto.failure(AdminErrorCodeEnum.ERR_50001_NFT_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_50001_NFT_ALREADY_EXIST.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_40004_NFT_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_40004_NFT_ALREADY_EXIST.getCode(), null);
         }
         sysNftService.add(req);
         return GenericDto.success(null);
@@ -70,7 +70,7 @@ public class SysNftController {
         // 查重
         SysNftEntity nft = sysNftService.queryByContractAddress(req.getContractAddress());
         if (nft != null && !Objects.equals(nft.getId(), req.getId())) {
-            return GenericDto.failure(AdminErrorCodeEnum.ERR_50001_NFT_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_50001_NFT_ALREADY_EXIST.getCode(), null);
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_40004_NFT_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_40004_NFT_ALREADY_EXIST.getCode(), null);
         }
         sysNftService.modify(req);
         return GenericDto.success(null);
