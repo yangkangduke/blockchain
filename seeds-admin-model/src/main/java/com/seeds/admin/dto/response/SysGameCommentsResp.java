@@ -33,6 +33,12 @@ public class SysGameCommentsResp {
     private String ucUserId;
 
     /**
+     * uc端用户id
+     */
+    @ApiModelProperty("uc端用户名字")
+    private String ucUserName;
+
+    /**
      * 评价时间
      */
     @ApiModelProperty("评价时间")

@@ -32,6 +32,10 @@ public class SysGameCommentsAddOrModifyReq {
     @NotBlank(message = "ucUserId can not be empty")
     private String ucUserId;
 
+    @ApiModelProperty(value = "uc端用户名字", required = true)
+    @NotBlank(message = "ucUserName can not be empty")
+    private String ucUserName;
+
     @ApiModelProperty(value = "用户评价，10-1024个字符", required = true)
     @NotBlank(message = " the number of words must be between 10 and 1024")
     @Size(min = 10, max = 1024)
