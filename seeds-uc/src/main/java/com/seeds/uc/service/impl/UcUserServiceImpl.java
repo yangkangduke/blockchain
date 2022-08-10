@@ -160,11 +160,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp metamaskLogin(MetaMaskReq metaMaskReq) {
         String publicAddress = metaMaskReq.getPublicAddress();
-        String nonce = metaMaskReq.getNonce();
         String signature = metaMaskReq.getSignature();
+        String message = metaMaskReq.getMessage();
         long currentTime = System.currentTimeMillis();
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
-        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !genMetamaskAuth.getNonce().equals(nonce)) {
+        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) ) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
         }
         // 地址合法性校验
@@ -174,7 +174,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         // 校验签名信息
         try{
-            if (!CryptoUtils.validate(signature, nonce, publicAddress)) {
+            if (!CryptoUtils.validate(signature, message, publicAddress)) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
             }
         } catch (Exception e) {
@@ -232,11 +232,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public void bindMetamask(MetaMaskReq metaMaskReq, Long uId) {
         String publicAddress = metaMaskReq.getPublicAddress();
-        String nonce = metaMaskReq.getNonce();
+        String message = metaMaskReq.getMessage();
         String signature = metaMaskReq.getSignature();
         long currentTime = System.currentTimeMillis();
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
-        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !nonce.equals(genMetamaskAuth.getNonce())) {
+        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce())) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
         }
         // 地址合法性校验
@@ -246,7 +246,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         // 校验签名信息
         try{
-            if (!CryptoUtils.validate(signature, nonce, publicAddress)) {
+            if (!CryptoUtils.validate(signature, message, publicAddress)) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
             }
         } catch (Exception e) {
