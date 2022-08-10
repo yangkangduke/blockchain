@@ -14,6 +14,7 @@ import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
 import com.seeds.uc.dto.request.SecuritySettingReq;
 import com.seeds.uc.dto.response.TokenResp;
+import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.SecuritySettingException;
@@ -102,6 +103,7 @@ public class OpenSecurityController {
     }
 
     @PostMapping("strategy/verify")
+    @ApiOperation(value = "验证安全项", notes = "验证安全项")
     public GenericDto<Object> verifySecurityStrategy(@RequestBody SecuritySettingReq securitySettingReq) {
 
         // 拿到安全策略
@@ -119,18 +121,21 @@ public class OpenSecurityController {
 
         UcUser ucUser = userService.getById(uid);
 
-        if (emailStrategy.isPresent() && emailStrategy.get().getNeedAuth()) {
-            AuthCodeDTO emailAuthCode =
-                    cacheService.getAuthCode(
-                            ucUser.getEmail(),
-                            securitySettingReq.getUseType(),
-                            ClientAuthTypeEnum.EMAIL);
-            if (emailAuthCode == null
-                    || StringUtils.isBlank(emailAuthCode.getCode())
-                    || !securitySettingReq.getEmailCode().equals(emailAuthCode.getCode())) {
-                throw new SecuritySettingException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+        if (AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_BIND_GA.equals(securitySettingReq.getUseType())) {
+            if (emailStrategy.isPresent() && emailStrategy.get().getNeedAuth()) {
+                AuthCodeDTO emailAuthCode =
+                        cacheService.getAuthCode(
+                                ucUser.getEmail(),
+                                securitySettingReq.getUseType(),
+                                ClientAuthTypeEnum.EMAIL);
+                if (emailAuthCode == null
+                        || StringUtils.isBlank(emailAuthCode.getCode())
+                        || !securitySettingReq.getEmailCode().equals(emailAuthCode.getCode())) {
+                    throw new SecuritySettingException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+                }
             }
         }
+
 //        if (gaStrategy.isPresent() && gaStrategy.get().getNeedAuth()
 //                && (StringUtils.isBlank(securitySettingReq.getGaCode())
 //                || googleAuthService.verifyUserCode(uid, securitySettingReq.getGaCode()))) {

@@ -107,8 +107,8 @@ public class AuthController {
 
 
     @PostMapping("/reset/ga")
-    @ApiOperation(value = "重置GA", notes = "1.调用auth/email/send 传authType=RESET_GA获取邮箱验证码 \" +\n" +
-            "            \"2.调用/auth/reset/ga 重置GA")
+    @ApiOperation(value = "重置GA", notes = "1.调用auth/email/send 传authType=RESET_GA获取邮箱验证码" +
+            "2.调用/auth/reset/ga 重置GA")
     public GenericDto<Object> resetGa(@Valid @RequestBody ResetGaReq resetGaReq) {
         String email = resetGaReq.getEmail();
         String code = resetGaReq.getCode();
@@ -157,10 +157,13 @@ public class AuthController {
              // 修改邮箱
             } else if (AuthCodeUseTypeEnum.CHANGE_EMAIL.equals(sendReq.getUseType())) {
                 sendCodeService.sendEmailWithUseType(user.getEmail(), sendReq.getUseType());
-                // 绑定邮箱、绑定ga
+                // 绑定邮箱
             } else if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_REQUEST_SET.contains(sendReq.getUseType())) {
                 sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
-            }else {
+                // 绑定ga
+            } else if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_DB_SET.contains(sendReq.getUseType())) {
+                sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
+            } else {
                 throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
             }
 

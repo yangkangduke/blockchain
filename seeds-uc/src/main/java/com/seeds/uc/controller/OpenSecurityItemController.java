@@ -68,8 +68,8 @@ public class OpenSecurityItemController {
             notes = "1.调用/security/item/ga/generate获取gaKey " +
                     "2.使用手机扫码添加上gaKey" +
                     "3.调用/code/ga/verify验证验证码并获取gaToken " +
-                    "4.调用/email/send发送邮件，参数use_type=VERIFY_SETTING_POLICY_BIND_GA" +
-                    "5.调用/security/strategy/verify, 参数use_type=VERIFY_SETTING_POLICY_BIND_GA, 进行安全验证, 获取到authToken" +
+                    "4.调用/email/send发送邮件，参数useType=VERIFY_SETTING_POLICY_BIND_GA" +
+                    "5.调用/security/strategy/verify, 参数useType=VERIFY_SETTING_POLICY_BIND_GA, 进行安全验证, 获取到authToken" +
                     "6.调用/security/item/ga/bind绑定ga")
     public GenericDto<Object> bindGA(@RequestBody GaSecurityItemReq securityItemReq) {
         AuthTokenDTO gaAuthToken =
