@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.constant.UcConstant;
+import com.seeds.uc.dto.redis.AuthCodeDTO;
 import com.seeds.uc.dto.redis.AuthTokenDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.redis.SecurityAuth;
@@ -122,13 +123,17 @@ public class OpenSecurityItemController {
     }
 
     @PostMapping("/ga/unbind")
-    @ApiOperation(value = "解除绑定ga", notes = "解除绑定ga")
+    @ApiOperation(value = "解除绑定ga", notes = "1.调用auth/email/send 传authType=RESET_GA获取邮箱验证码" +
+            "2.调用/security/item/ga/unbind 解除绑定GA")
     public GenericDto<Object> gaUnbind(@Valid @RequestBody GaReq gaReq, HttpServletRequest request) {
+        String emailCode = gaReq.getEmailCode();
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         UcUser ucUser = ucUserService.getById(loginUser.getUserId());
-        if (!googleAuthService.verify(gaReq.getCode(), ucUser.getGaSecret())) {
-            throw new SecuritySettingException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+        // 验证邮箱和验证码是否正确
+        AuthCodeDTO authCode = cacheService.getAuthCode(ucUser.getEmail(), AuthCodeUseTypeEnum.RESET_GA, ClientAuthTypeEnum.EMAIL);
+        if (authCode == null || !emailCode.equals(authCode.getCode())) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
         }
 
         // 清空ga信息
