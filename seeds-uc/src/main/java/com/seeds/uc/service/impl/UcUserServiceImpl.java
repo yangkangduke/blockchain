@@ -159,6 +159,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      */
     @Override
     public LoginResp metamaskLogin(MetaMaskReq metaMaskReq) {
+        // todo 还需要校验code
         String publicAddress = metaMaskReq.getPublicAddress();
         String signature = metaMaskReq.getSignature();
         String message = metaMaskReq.getMessage();
@@ -221,11 +222,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
 
         // 下发uc token
-        String ucToken = RandomUtil.genRandomToken(one.getId().toString());
+        String ucToken = RandomUtil.genRandomToken(userId.toString());
         // 将产生的uc token存入redis
-        cacheService.putUserWithTokenAndLoginName(ucToken, one.getId(), publicAddress);
-
-
+        cacheService.putUserWithTokenAndLoginName(ucToken, userId, publicAddress);
 
         return LoginResp.builder().ucToken(ucToken).build();
     }
