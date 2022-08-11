@@ -55,8 +55,8 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    @ApiOperation(value = "账号登陆", notes = "1.调用/auth/login接口，返回token和type " +
-            "2.调用/auth/2fa/login，参数authCode填的值根据上一个接口返回的type来决定，如果是2就填email的验证码，如果是3就填ga的验证码， 返回的ucToken就是登陆成功的凭证 ")
+    @ApiOperation(value = "账号登陆", notes = "1.调用/auth/login接口，返回token和authType " +
+            "2.调用/auth/2fa/login，参数authCode填的值根据上一个接口返回的authType来决定，如果是2就填email的验证码，如果是3就填ga的验证码， 返回的ucToken就是登陆成功的凭证 ")
     public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
         LoginResp login = ucUserService.login(loginReq);
         if (login.getUcToken() == null) {
@@ -66,8 +66,8 @@ public class AuthController {
     }
 
     @PostMapping("/2fa/login")
-    @ApiOperation(value = "2fa登陆", notes = "1.调用/auth/login接口，返回token和type " +
-            "2.调用/auth/2fa/login，参数authCode填的值根据上一个接口返回的type来决定，如果是2就填email的验证码，如果是3就填ga的验证码， 返回的ucToken就是登陆成功的凭证 ")
+    @ApiOperation(value = "2fa登陆", notes = "1.调用/auth/login接口，返回token和authType " +
+            "2.调用/auth/2fa/login，参数authCode填的值根据上一个接口返回的authType来决定，如果是2就填email的验证码，如果是3就填ga的验证码， 返回的ucToken就是登陆成功的凭证 ")
     public GenericDto<LoginResp> twoFactorCheck(@Valid @RequestBody TwoFactorLoginReq loginReq) {
         return GenericDto.success(ucUserService.twoFactorCheck(loginReq));
 

@@ -171,15 +171,24 @@ public class OpenSecurityItemController {
 
     @PostMapping("/email/bind")
     @ApiOperation(value = "绑定邮箱",
-            notes = "1.调用方法/auth/email/send, 参数use_type=BIND_EMAIL, 发送邮箱验证码 " +
-                    "2.调用方法/code/email/verify, 参数use_type=BIND_EMAIL, 进行邮箱的验证, 获取到emailToken " +
-                    "3.调用/security/item/email/bind")
+            notes = "1.调用/auth/email/send, 参数use_type=BIND_EMAIL, 发送邮箱验证码 " +
+                    "2.调用/code/email/verify, 参数use_type=BIND_EMAIL, 进行邮箱的验证, 获取到emailToken " +
+                    "3.调用/auth/metamask/generate-nonce 获取随机数 " +
+                    "4.调用/code/metamask/verify 验证签名，返回authToken " +
+                    "5.调用/security/item/email/bind 绑定邮箱 ")
     public GenericDto<Object> bindEmail(@RequestBody EmailSecurityItemReq securityItemReq) {
-        AuthTokenDTO emailAuthToken =
-                cacheService.getAuthTokenDetailWithToken(securityItemReq.getEmailToken(), ClientAuthTypeEnum.EMAIL);
+        String authToken = securityItemReq.getAuthToken();
+        String emailToken = securityItemReq.getEmailToken();
+        AuthTokenDTO emailAuthToken = cacheService.getAuthTokenDetailWithToken(emailToken, ClientAuthTypeEnum.EMAIL);
         if (emailAuthToken == null
                 || StringUtils.isBlank(emailAuthToken.getAccountName())) {
             throw new SecurityItemException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+        }
+
+        // 验证authToken
+        AuthTokenDTO authTokenDTO = cacheService.getAuthTokenDetailWithToken(authToken, ClientAuthTypeEnum.METAMASK);
+        if (authTokenDTO == null) {
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_16004_METAMASK_VERIFY_EXPIRED);
         }
 
         String accountName = emailAuthToken.getAccountName();

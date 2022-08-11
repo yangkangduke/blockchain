@@ -23,6 +23,6 @@ public class LoginResp {
     @ApiModelProperty(value = "账号")
     private String account;
     @ApiModelProperty(value = "授权类型: 2-email, 3-ga")
-    private ClientAuthTypeEnum type;
+    private ClientAuthTypeEnum authType;
 
 }

@@ -99,7 +99,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
         return LoginResp.builder()
                 .ucToken(ucToken)
-                .type(ClientAuthTypeEnum.EMAIL)
+                .authType(ClientAuthTypeEnum.EMAIL)
                 .account(email)
                 .build();
     }
@@ -125,7 +125,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     ClientAuthTypeEnum.GA);
             return LoginResp.builder()
                     .token(token)
-                    .type(ClientAuthTypeEnum.GA)
+                    .authType(ClientAuthTypeEnum.GA)
                     .build();
         } else {
             // 发送邮件
@@ -141,7 +141,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
             return LoginResp.builder()
                     .token(token)
-                    .type(ClientAuthTypeEnum.EMAIL)
+                    .authType(ClientAuthTypeEnum.EMAIL)
                     .account(userDto.getEmail())
                     .build();
         }
@@ -280,7 +280,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
         return LoginResp.builder()
                 .ucToken(ucToken)
-                .type(ClientAuthTypeEnum.EMAIL)
+                .authType(ClientAuthTypeEnum.EMAIL)
                 .account(email)
                 .build();
     }
