@@ -63,6 +63,11 @@ public enum AdminErrorCodeEnum {
     // game
     ERR_80001_GAME_COMMENTS_ALREADY_EXIST(80001, "您已经评价过该游戏", "you has commented on the game"),
     ERR_80002_GAME_ALREADY_EXIST(80002, "游戏已经存在", "Game already exist"),
+
+
+    // block chain
+
+    ERR_90001_FAIL_TO_EXECUTE_ON_CHAIN(90001,"区块链操作失败", "chain operation failed")
     ;
     @JsonValue
     @EnumValue
