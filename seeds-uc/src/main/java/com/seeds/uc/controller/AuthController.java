@@ -159,5 +159,18 @@ public class AuthController {
         return GenericDto.success(null);
     }
 
-
+    @GetMapping("/refreshToken/{refreshToken}")
+    @ApiOperation(value = "刷新ucToken")
+    public GenericDto<String> refreshUcToken(@PathVariable("refreshToken") String refreshToken) {
+        LoginUserDTO loginUser = cacheService.getUserByRefreshToken(refreshToken);
+        if (loginUser == null) {
+            return GenericDto.failure(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED.getDescEn(), UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED.getCode(), null);
+        }
+        Long userId = loginUser.getUserId();
+        // 生成uc token给用户
+        String ucToken = RandomUtil.genRandomToken(userId.toString());
+        // 将token存入redis，用户进入登陆态
+        cacheService.putUserWithTokenAndLoginName(ucToken, userId, loginUser.getLoginName());
+        return GenericDto.success(ucToken);
+    }
 }

@@ -24,5 +24,7 @@ public class LoginResp {
     private String account;
     @ApiModelProperty(value = "授权类型: 2-email, 3-ga")
     private ClientAuthTypeEnum type;
+    @ApiModelProperty(value = "用于刷新token")
+    private String refreshToken;
 
 }

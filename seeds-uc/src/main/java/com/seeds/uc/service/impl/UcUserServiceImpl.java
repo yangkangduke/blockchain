@@ -92,16 +92,10 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .updatedAt(currentTime)
                 .build());
 
-        // 注册完成，生成uc token给用户
-        String ucToken = RandomUtil.genRandomToken(id.toString());
-        // 将token存入redis，用户进入登陆态
-        cacheService.putUserWithTokenAndLoginName(ucToken, id, email);
-
-        return LoginResp.builder()
-                .ucToken(ucToken)
-                .type(ClientAuthTypeEnum.EMAIL)
-                .account(email)
-                .build();
+        LoginResp loginResp = buildLoginResponse(id, email);
+        loginResp.setAccount(email);
+        loginResp.setType(ClientAuthTypeEnum.EMAIL);
+        return loginResp;
     }
 
     /**
@@ -200,12 +194,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .build());
         }
 
-        // 下发uc token
-        String ucToken = RandomUtil.genRandomToken(userId.toString());
-        // 将产生的uc token存入redis
-        cacheService.putUserWithTokenAndLoginName(ucToken, userId, publicAddress);
-
-        return LoginResp.builder().ucToken(ucToken).build();
+        return buildLoginResponse(userId, publicAddress);
     }
 
     /**
@@ -273,16 +262,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .build();
         this.updateById(user);
         Long userId = user.getId();
-        // 注册完成，生成uc token给用户
-        String ucToken = RandomUtil.genRandomToken(userId.toString());
-        // 将token存入redis，用户进入登陆态
-        cacheService.putUserWithTokenAndLoginName(ucToken, userId, email);
 
-        return LoginResp.builder()
-                .ucToken(ucToken)
-                .type(ClientAuthTypeEnum.EMAIL)
-                .account(email)
-                .build();
+        LoginResp loginResp = buildLoginResponse(userId, email);
+        loginResp.setType(ClientAuthTypeEnum.EMAIL);
+        loginResp.setAccount(email);
+        return loginResp;
     }
 
 
@@ -328,15 +312,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
         }
 
-        // 用户验证通过，产生uc token
-        String ucToken = RandomUtil.genRandomToken(user.getId().toString());
-
-        // 将产生的uc token存入redis
-        cacheService.putUserWithTokenAndLoginName(ucToken, user.getId(), twoFactorAuth.getAuthAccountName());
-
-        return  LoginResp.builder()
-                        .ucToken(ucToken)
-                        .build();
+        return buildLoginResponse(user.getId(), twoFactorAuth.getAuthAccountName());
     }
 
     /**
@@ -496,5 +472,21 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return true;
     }
 
+    private LoginResp buildLoginResponse(Long userId, String email) {
+        // 生成uc token给用户
+        String ucToken = RandomUtil.genRandomToken(userId.toString());
+        // 将token存入redis，用户进入登陆态
+        cacheService.putUserWithTokenAndLoginName(ucToken, userId, email);
+
+        // 生成refresh token给用户
+        String refreshToken = RandomUtil.genRandomToken(ucToken);
+        // 将refresh token存入redis
+        cacheService.putUserRefreshToken(refreshToken, userId, email);
+
+        return LoginResp.builder()
+                .ucToken(ucToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 
 }

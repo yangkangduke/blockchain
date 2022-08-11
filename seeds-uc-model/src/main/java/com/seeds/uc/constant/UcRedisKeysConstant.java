@@ -23,6 +23,12 @@ public class UcRedisKeysConstant {
      */
     public final String UC_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "token:%s";
 
+    /**
+     * Key: uc:refresh:token:{refreshToken} -> Value: {UserDto}
+     * refreshToken is Used to refresh the token
+     */
+    public final String UC_REFRESH_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "refresh:token:%s";
+
     // uid -> login token
     public final String UC_LOGIN_UID_KEY_TEMPLATE = UC_KEY_PREFIX + "login:uid:%s";
 
@@ -68,6 +74,13 @@ public class UcRedisKeysConstant {
      */
     public String getUcTokenKey(String token) {
         return String.format(UC_TOKEN_KEY_TEMPLATE, token);
+    }
+
+    /**
+     * return uc:token:{refreshToken} used to refresh the token
+     */
+    public String getUcRefreshTokenKey(String refreshToken) {
+        return String.format(UC_REFRESH_TOKEN_KEY_TEMPLATE, refreshToken);
     }
 
     /**

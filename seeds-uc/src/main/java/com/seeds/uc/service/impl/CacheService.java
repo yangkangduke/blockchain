@@ -12,9 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,8 +23,12 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class CacheService {
+
     @Value("${uc.sso.redis.expire:259200}")
     private Integer loginExpireAfter;
+
+    @Value("${uc.sso.redis.refresh.expire:604800}")
+    private Integer refreshExpireAfter;
 
     // auth code
     @Value("${uc.code.auth.expire:300}")
@@ -107,6 +108,23 @@ public class CacheService {
     }
 
     /**
+     * key uc:refresh:token:{refreshToken}
+     * refreshToken用来重新生成ucToken
+     */
+    public void putUserRefreshToken(String refreshToken, Long uid, String loginName) {
+        Long expireAt = System.currentTimeMillis() + refreshExpireAfter * 1000;
+        String key = UcRedisKeysConstant.getUcRefreshTokenKey(refreshToken);
+        LoginUserDTO loginUser = LoginUserDTO.builder()
+                .userId(uid)
+                .loginName(loginName)
+                .expireAt(expireAt)
+                .build();
+
+        redisson.getBucket(key).set(loginUser, refreshExpireAfter, TimeUnit.SECONDS);
+        log.info("CacheService - putUserRefreshToken - put key: {}, value: {}", key, loginUser);
+    }
+
+    /**
      * key为用户名(手机或邮箱)的cache，用于绑定账户等用到的验证码校验
      */
     public void putAuthCode(String name,
@@ -166,6 +184,16 @@ public class CacheService {
      */
     public LoginUserDTO getUserByToken(String token) {
         String key = UcRedisKeysConstant.getUcTokenKey(token);
+        RBucket<LoginUserDTO> value = redisson.getBucket(key);
+        return value.get();
+    }
+
+    /**
+     * key uc:refresh:token:{refreshToken}
+     * 如果refresh已过期，会返回null
+     */
+    public LoginUserDTO getUserByRefreshToken(String refreshToken) {
+        String key = UcRedisKeysConstant.getUcRefreshTokenKey(refreshToken);
         RBucket<LoginUserDTO> value = redisson.getBucket(key);
         return value.get();
     }
