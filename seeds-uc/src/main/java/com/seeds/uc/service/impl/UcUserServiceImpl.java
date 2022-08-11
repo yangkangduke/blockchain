@@ -213,7 +213,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             // 新增
             ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
                     .needAuth(true)
-                    .uid(one.getId())
+                    .uid(userId)
                     .authType(ClientAuthTypeEnum.METAMASK)
                     .createdAt(currentTime)
                     .updatedAt(currentTime)
@@ -224,6 +224,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String ucToken = RandomUtil.genRandomToken(one.getId().toString());
         // 将产生的uc token存入redis
         cacheService.putUserWithTokenAndLoginName(ucToken, one.getId(), publicAddress);
+
+
 
         return LoginResp.builder().ucToken(ucToken).build();
     }
