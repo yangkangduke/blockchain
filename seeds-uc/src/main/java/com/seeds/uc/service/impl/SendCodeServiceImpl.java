@@ -55,8 +55,8 @@ public class SendCodeServiceImpl implements SendCodeService {
 
         // 设置此时登陆的安全项
         userDto.setAuthType(userDto.getAuthType());
-
-        doSendUserCode(userDto, otp, useTypeEnum);
+        // todo 暂时不发邮件
+//        doSendUserCode(userDto, otp, useTypeEnum);
 
         String accountName =  ClientAuthTypeEnum.getAccountNameByAuthType(
                         userDto.getPhone(),
