@@ -82,7 +82,7 @@ public class OpenUserController {
     public GenericDto<Object> updatePassword(@Valid @RequestBody ChangePasswordReq changePasswordReq, HttpServletRequest request) {
         String password = changePasswordReq.getPassword();
         String oldPassword = changePasswordReq.getOldPassword();
-        ClientAuthTypeEnum authTypeEnum = changePasswordReq.getAuthTypeEnum();
+        ClientAuthTypeEnum authType = changePasswordReq.getAuthType();
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
@@ -93,10 +93,10 @@ public class OpenUserController {
         }
 
         // 判断code是否正确
-        if (authTypeEnum.equals(ClientAuthTypeEnum.EMAIL)) {
+        if (authType.equals(ClientAuthTypeEnum.EMAIL)) {
             sendCodeService.verifyEmailWithUseType(user.getEmail(), changePasswordReq.getCode(), AuthCodeUseTypeEnum.CHANGE_PASSWORD);
 
-        } else if (authTypeEnum.equals(ClientAuthTypeEnum.GA)) {
+        } else if (authType.equals(ClientAuthTypeEnum.GA)) {
             if (!googleAuthService.verify(changePasswordReq.getCode(), user.getGaSecret())) {
                 throw new LoginException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
             }

@@ -94,7 +94,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
         LoginResp loginResp = buildLoginResponse(id, email);
         loginResp.setAccount(email);
-        loginResp.setType(ClientAuthTypeEnum.EMAIL);
+        loginResp.setAuthType(ClientAuthTypeEnum.EMAIL);
         return loginResp;
     }
 
@@ -119,11 +119,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     ClientAuthTypeEnum.GA);
             return LoginResp.builder()
                     .token(token)
-                    .type(ClientAuthTypeEnum.GA)
+                    .authType(ClientAuthTypeEnum.GA)
                     .build();
         } else {
             // 发送邮件
             // generate a random code
+            // todo 暂时不发邮件
             sendCodeService.sendUserCodeByUseType(userDto, AuthCodeUseTypeEnum.LOGIN);
 
             // 将2FA token存入redis，用户进入等待2FA验证态
@@ -135,7 +136,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
             return LoginResp.builder()
                     .token(token)
-                    .type(ClientAuthTypeEnum.EMAIL)
+                    .authType(ClientAuthTypeEnum.EMAIL)
                     .account(userDto.getEmail())
                     .build();
         }
@@ -264,7 +265,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         Long userId = user.getId();
 
         LoginResp loginResp = buildLoginResponse(userId, email);
-        loginResp.setType(ClientAuthTypeEnum.EMAIL);
+        loginResp.setAuthType(ClientAuthTypeEnum.EMAIL);
         loginResp.setAccount(email);
         return loginResp;
     }
