@@ -3,6 +3,7 @@ package com.seeds.uc.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.uc.dto.UserDto;
+import com.seeds.uc.dto.redis.AuthTokenDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
@@ -25,7 +26,7 @@ public interface IUcUserService extends IService<UcUser> {
      * @param registerReq
      * @return
      */
-    LoginResp registerEmailAccount(RegisterReq registerReq);
+    LoginResp registerEmail(RegisterReq registerReq);
 
     /**
      * 账号登陆
@@ -38,9 +39,13 @@ public interface IUcUserService extends IService<UcUser> {
     /**
      * metamask登陆
      */
-    LoginResp metamaskLogin(MetaMaskReq metaMaskReq);
+    LoginResp metamaskLogin(MetamaskVerifyReq metamaskVerifyReq);
 
-    void bindMetamask(MetaMaskReq metaMaskReq, Long uId);
+    /**
+     * 绑定metamask
+     * @param uId
+     */
+    void bindMetamask(AuthTokenDTO authTokenDTO, Long uId);
 
 
     /**
@@ -112,4 +117,11 @@ public interface IUcUserService extends IService<UcUser> {
      * @return
      */
     Boolean verifyGa(Long userId);
+
+    /**
+     * 验证metamask签名
+     * @param verifyReq
+     * @return
+     */
+    Boolean verifyMetamask(MetamaskVerifyReq verifyReq);
 }

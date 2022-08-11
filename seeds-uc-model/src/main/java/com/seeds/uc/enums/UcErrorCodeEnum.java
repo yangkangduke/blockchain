@@ -27,6 +27,8 @@ public enum UcErrorCodeEnum {
     ERR_16001_METAMASK_ADDRESS(16001, "非法地址格式", "Illegal address format"),
     ERR_16002_METAMASK_SIGNATURE(16002, "签名验证失败", "Signature verification failed"),
     ERR_16003_METAMASK_NONCE_EXPIRED(16003, "nonce已经过期", "nonce has expired"),
+    ERR_16004_METAMASK_VERIFY_EXPIRED(16004, "metamask签名验证过期", "metamask signature verification expired"),
+
 
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),

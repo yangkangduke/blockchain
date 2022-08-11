@@ -1,6 +1,5 @@
 package com.seeds.uc.dto.request;
 
-import com.seeds.uc.enums.UserOperateEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -10,7 +9,7 @@ import lombok.Data;
  * @date 2022/07/13
  */
 @Data
-public class MetaMaskReq {
+public class MetamaskVerifyReq {
 
     @ApiModelProperty(value = "钱包地址", required = true)
     private String publicAddress;

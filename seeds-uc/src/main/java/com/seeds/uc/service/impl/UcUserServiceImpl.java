@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.uc.dto.UserDto;
-import com.seeds.uc.dto.redis.AuthCodeDTO;
-import com.seeds.uc.dto.redis.GenMetamaskAuth;
-import com.seeds.uc.dto.redis.LoginUserDTO;
-import com.seeds.uc.dto.redis.TwoFactorAuth;
+import com.seeds.uc.dto.redis.*;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.UserInfoResp;
@@ -63,7 +60,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public LoginResp registerEmailAccount(RegisterReq registerReq) {
+    public LoginResp registerEmail(RegisterReq registerReq) {
         String email = registerReq.getEmail();
         sendCodeService.verifyEmailWithUseType(registerReq.getEmail(), registerReq.getCode(), AuthCodeUseTypeEnum.REGISTER);
         // 校验账号重复
@@ -158,30 +155,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public LoginResp metamaskLogin(MetaMaskReq metaMaskReq) {
-        // todo 还需要校验code
-        String publicAddress = metaMaskReq.getPublicAddress();
-        String signature = metaMaskReq.getSignature();
-        String message = metaMaskReq.getMessage();
+    public LoginResp metamaskLogin(MetamaskVerifyReq metamaskVerifyReq) {
+        String publicAddress = metamaskVerifyReq.getPublicAddress();
+        this.verifyMetamask(metamaskVerifyReq);
         long currentTime = System.currentTimeMillis();
-        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
-        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) ) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
-        }
-        // 地址合法性校验
-        if (!WalletUtils.isValidAddress(publicAddress)) {
-            // 不合法直接返回错误
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS);
-        }
-        // 校验签名信息
-        try{
-            if (!CryptoUtils.validate(signature, message, publicAddress)) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
-            }
-        } catch (Exception e) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
-        }
 
+        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(publicAddress);
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getPublicAddress, publicAddress));
         Long userId;
@@ -229,36 +208,18 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return LoginResp.builder().ucToken(ucToken).build();
     }
 
-
+    /**
+     * 绑定metamask
+     * @param uId
+     */
     @Override
-    public void bindMetamask(MetaMaskReq metaMaskReq, Long uId) {
-        String publicAddress = metaMaskReq.getPublicAddress();
-        String message = metaMaskReq.getMessage();
-        String signature = metaMaskReq.getSignature();
+    public void bindMetamask(AuthTokenDTO authTokenDTO, Long uId) {
         long currentTime = System.currentTimeMillis();
-        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(metaMaskReq.getPublicAddress());
-        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce())) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
-        }
-        // 地址合法性校验
-        if (!WalletUtils.isValidAddress(publicAddress)) {
-            // 不合法直接返回错误
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS);
-        }
-        // 校验签名信息
-        try{
-            if (!CryptoUtils.validate(signature, message, publicAddress)) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
-            }
-        } catch (Exception e) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
-        }
-
         // 修改
         UcUser ucUser = UcUser.builder()
                 .id(uId)
-                .publicAddress(publicAddress)
-                .nonce(genMetamaskAuth.getNonce())
+                .publicAddress(authTokenDTO.getAccountName())
+                .nonce(authTokenDTO.getSecret())
                 .updatedAt(currentTime)
                 .build();
         this.updateById(ucUser);
@@ -501,6 +462,38 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             return true;
         }
         return false;
+    }
+
+    /**
+     * 验证metamask签名
+     * @param verifyReq
+     * @return
+     */
+    @Override
+    public Boolean verifyMetamask(MetamaskVerifyReq verifyReq) {
+        // todo 还需要校验code
+        String publicAddress = verifyReq.getPublicAddress();
+        String signature = verifyReq.getSignature();
+        String message = verifyReq.getMessage();
+
+        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(verifyReq.getPublicAddress());
+        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) ) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
+        }
+        // 地址合法性校验
+        if (!WalletUtils.isValidAddress(publicAddress)) {
+            // 不合法直接返回错误
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS);
+        }
+        // 校验签名信息
+        try{
+            if (!CryptoUtils.validate(signature, message, publicAddress)) {
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+            }
+        } catch (Exception e) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+        }
+        return true;
     }
 
 

@@ -5,6 +5,7 @@ import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.redis.GenGoogleAuth;
 import com.seeds.uc.dto.request.AuthCodeVerifyReq;
 import com.seeds.uc.dto.request.GoogleAuthVerifyReq;
+import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.response.TokenResp;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
@@ -70,7 +71,7 @@ public class OpenCodeController {
 
     @ApiOperation(value = "email验证", notes = "email验证")
     @PostMapping("/email/verify")
-    public GenericDto<Object> verifyEmailCode(@RequestBody AuthCodeVerifyReq verifyReq) {
+    public GenericDto<TokenResp> verifyEmailCode(@RequestBody AuthCodeVerifyReq verifyReq) {
         log.info("OpenCodeController - verifyEmailCode got request: {}", verifyReq);
         String token =
                 sendCodeService.verifyEmailWithUseType(
@@ -80,6 +81,20 @@ public class OpenCodeController {
         return GenericDto.success(
                 TokenResp.builder()
                         .token(token)
+                        .build());
+    }
+
+    @ApiOperation(value = "metamask验证", notes = "metamask验证")
+    @PostMapping("/metamask/verify")
+    public GenericDto<TokenResp> verifyMetamask(@RequestBody MetamaskVerifyReq verifyReq) {
+        log.info("OpenCodeController - verifyMetamask got request: {}", verifyReq);
+        userService.verifyMetamask(verifyReq);
+
+        String authToken = RandomUtil.genRandomToken(UserContext.getCurrentUserId().toString());
+        cacheService.putAuthToken(authToken, verifyReq.getMessage(), verifyReq.getPublicAddress(), ClientAuthTypeEnum.METAMASK);
+        return GenericDto.success(
+                TokenResp.builder()
+                        .token(authToken)
                         .build());
     }
 }

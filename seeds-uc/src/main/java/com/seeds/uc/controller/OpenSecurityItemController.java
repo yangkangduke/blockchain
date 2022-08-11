@@ -9,17 +9,16 @@ import com.seeds.uc.dto.redis.AuthTokenDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.redis.SecurityAuth;
 import com.seeds.uc.dto.request.GaReq;
-import com.seeds.uc.dto.request.MetaMaskReq;
+import com.seeds.uc.dto.request.MetamaskBindReq;
+import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.request.UpdateEmailReq;
 import com.seeds.uc.dto.request.security.item.EmailSecurityItemReq;
 import com.seeds.uc.dto.request.security.item.GaSecurityItemReq;
 import com.seeds.uc.dto.response.GoogleAuthResp;
-import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.MetamaskAuthResp;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
-import com.seeds.uc.enums.UserOperateEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.SecurityItemException;
 import com.seeds.uc.exceptions.SecuritySettingException;
@@ -67,10 +66,10 @@ public class OpenSecurityItemController {
     @PostMapping("/ga/bind")
     @ApiOperation(value = "绑定ga",
             notes = "1.调用/security/item/ga/generate获取gaKey " +
-                    "2.使用手机扫码添加上gaKey" +
+                    "2.使用手机扫码添加上gaKey " +
                     "3.调用/code/ga/verify验证验证码并获取gaToken " +
-                    "4.调用/email/send发送邮件，参数useType=VERIFY_SETTING_POLICY_BIND_GA" +
-                    "5.调用/security/strategy/verify, 参数useType=VERIFY_SETTING_POLICY_BIND_GA, 进行安全验证, 获取到authToken" +
+                    "4.调用/email/send发送邮件，参数useType=VERIFY_SETTING_POLICY_BIND_GA " +
+                    "5.调用/security/strategy/verify, 参数useType=VERIFY_SETTING_POLICY_BIND_GA, 进行安全验证, 获取到authToken " +
                     "6.调用/security/item/ga/bind绑定ga")
     public GenericDto<Object> bindGA(@RequestBody GaSecurityItemReq securityItemReq) {
         AuthTokenDTO gaAuthToken =
@@ -123,8 +122,8 @@ public class OpenSecurityItemController {
     }
 
     @PostMapping("/ga/unbind")
-    @ApiOperation(value = "解除绑定ga", notes = "1.调用auth/email/send 传authType=RESET_GA获取邮箱验证码" +
-            "2.调用/security/item/ga/unbind 解除绑定GA")
+    @ApiOperation(value = "解除绑定ga", notes = "1.调用auth/email/send 传authType=RESET_GA获取邮箱验证码 " +
+            "2.调用/security/item/ga/unbind 解除绑定GA ")
     public GenericDto<Object> gaUnbind(@Valid @RequestBody GaReq gaReq, HttpServletRequest request) {
         String emailCode = gaReq.getEmailCode();
         String loginToken = WebUtil.getTokenFromRequest(request);
@@ -141,35 +140,40 @@ public class OpenSecurityItemController {
         return GenericDto.success(null);
     }
 
-    @ApiOperation(value = "生成metamask的nonce", notes = "生成metamask的nonce")
-    @PostMapping("/metamask/generate-nonce")
-    public GenericDto<MetamaskAuthResp> generateNonce(@Valid @RequestBody MetaMaskReq metaMaskReq) {
-        String nonce = RandomUtil.getRandomSalt();
-        cacheService.putGenerateMetamaskAuth(metaMaskReq.getPublicAddress(), nonce);
-        return GenericDto.success(
-                MetamaskAuthResp.builder()
-                        .nonce(nonce)
-                        .publicAddress(metaMaskReq.getPublicAddress())
-                        .build());
-    }
 
     @PostMapping("/bind/metamask")
     @ApiOperation(value = "绑定metamask",
-            notes = "1.调用/security/item/metamask/generate-nonce生成nonce\n" +
-                    "2.前端根据nonce生成签名信息\n" +
-                    "3.调用/security/item/bind/metamask绑定")
-    public GenericDto<Object> metamaskVerify(@Valid @RequestBody MetaMaskReq metaMaskReq, HttpServletRequest request) {
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        ucUserService.bindMetamask(metaMaskReq, loginUser.getUserId());
+            notes = "1.调用/auth/metamask/generate-nonce生成nonce " +
+                    "2.前端根据nonce生成签名信息 " +
+                    "3.调用/code/metamask/verify 验证签名信息，返回authToken " +
+                    "4.调用/auth/email/send 参数authType=BIND_METAMASK 获取邮箱验证码 " +
+                    "5.调用/security/item/bind/metamask绑定 ")
+    public GenericDto<Object> metamaskBind(@Valid @RequestBody MetamaskBindReq bindReq) {
+        String authToken = bindReq.getAuthToken();
+        String emailCode = bindReq.getEmailCode();
+        Long currentUserId = UserContext.getCurrentUserId();
+        // 验证authToken
+        AuthTokenDTO authTokenDTO = cacheService.getAuthTokenDetailWithToken(authToken, ClientAuthTypeEnum.METAMASK);
+        if (authTokenDTO == null) {
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_16004_METAMASK_VERIFY_EXPIRED);
+        }
+        UcUser ucUser = ucUserService.getById(currentUserId);
+        // 验证emailCode
+        AuthCodeDTO authCode = cacheService.getAuthCode(ucUser.getEmail(), AuthCodeUseTypeEnum.BIND_METAMASK, ClientAuthTypeEnum.EMAIL);
+        if (authCode == null || !emailCode.equals(authCode.getCode())) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
+        }
+
+        // 绑定
+        ucUserService.bindMetamask(authTokenDTO, currentUserId);
         return GenericDto.success(null);
     }
 
     @PostMapping("/email/bind")
     @ApiOperation(value = "绑定邮箱",
-            notes = "调用方法/auth/email/send, 参数use_type=BIND_EMAIL, 发送邮箱验证码\n" +
-                    "调用方法/code/email/verify, 参数use_type=BIND_EMAIL, 进行邮箱的验证, 获取到email_token.\n" +
-                    "调用/security/item/email/bind")
+            notes = "1.调用方法/auth/email/send, 参数use_type=BIND_EMAIL, 发送邮箱验证码 " +
+                    "2.调用方法/code/email/verify, 参数use_type=BIND_EMAIL, 进行邮箱的验证, 获取到emailToken " +
+                    "3.调用/security/item/email/bind")
     public GenericDto<Object> bindEmail(@RequestBody EmailSecurityItemReq securityItemReq) {
         AuthTokenDTO emailAuthToken =
                 cacheService.getAuthTokenDetailWithToken(securityItemReq.getEmailToken(), ClientAuthTypeEnum.EMAIL);
@@ -211,7 +215,7 @@ public class OpenSecurityItemController {
     @PutMapping("/change/email")
     @ApiOperation(value = "修改邮箱", notes = "1.调用/auth/email/send发送邮箱验证码 参数userType=CHANGE_EMAIL " +
             "2.调用/code/email/verify验证code，参数userType=CHANGE_EMAIL，返回authToken " +
-            "3.调用/security/item/change/email修改邮箱")
+            "3.调用/security/item/change/email修改邮箱 ")
     public GenericDto<Object> updateEmail(@Valid @RequestBody UpdateEmailReq updateEmailReq, HttpServletRequest request) {
         String authToken = updateEmailReq.getAuthToken();
         String gaCode = updateEmailReq.getGaCode();

@@ -47,16 +47,16 @@ public class AuthController {
 
     @PostMapping("/register/email")
     @ApiOperation(value = "注册邮箱账号",
-            notes = "1.调用/email/send 发送邮箱验证码，\n" +
-                    "2.调用/register/email 注册邮箱账号")
+            notes = "1.调用/auth/email/send 发送邮箱验证码 参数authType=REGISTER " +
+                    "2.调用/auth/register/email 注册邮箱账号 ")
     public GenericDto<LoginResp> registerEmailAccount(@Valid @RequestBody RegisterReq registerReq) {
-        return GenericDto.success(ucUserService.registerEmailAccount(registerReq));
+        return GenericDto.success(ucUserService.registerEmail(registerReq));
     }
 
 
     @PostMapping("/login")
-    @ApiOperation(value = "账号登陆", notes = "1.调用/login 返回token\n" +
-            "2.调用/2fa/login 返回ucToken")
+    @ApiOperation(value = "账号登陆", notes = "1.调用/auth/login接口，返回token和type " +
+            "2.调用/auth/2fa/login，参数authCode填的值根据上一个接口返回的type来决定，如果是2就填email的验证码，如果是3就填ga的验证码， 返回的ucToken就是登陆成功的凭证 ")
     public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
         LoginResp login = ucUserService.login(loginReq);
         if (login.getUcToken() == null) {
@@ -66,8 +66,8 @@ public class AuthController {
     }
 
     @PostMapping("/2fa/login")
-    @ApiOperation(value = "2fa登陆", notes = "1.调用/login 返回token\n" +
-            "2.调用/2fa/login 返回ucToken")
+    @ApiOperation(value = "2fa登陆", notes = "1.调用/auth/login接口，返回token和type " +
+            "2.调用/auth/2fa/login，参数authCode填的值根据上一个接口返回的type来决定，如果是2就填email的验证码，如果是3就填ga的验证码， 返回的ucToken就是登陆成功的凭证 ")
     public GenericDto<LoginResp> twoFactorCheck(@Valid @RequestBody TwoFactorLoginReq loginReq) {
         return GenericDto.success(ucUserService.twoFactorCheck(loginReq));
 
@@ -75,29 +75,29 @@ public class AuthController {
 
     @ApiOperation(value = "生成metamask的nonce", notes = "生成metamask的nonce")
     @PostMapping("/metamask/generate-nonce")
-    public GenericDto<MetamaskAuthResp> generateNonce(@Valid @RequestBody MetaMaskReq metaMaskReq) {
+    public GenericDto<MetamaskAuthResp> generateNonce(@Valid @RequestBody MetamaskVerifyReq metamaskVerifyReq) {
         String nonce = RandomUtil.getRandomSalt();
-        cacheService.putGenerateMetamaskAuth(metaMaskReq.getPublicAddress(), nonce);
+        cacheService.putGenerateMetamaskAuth(metamaskVerifyReq.getPublicAddress(), nonce);
         return GenericDto.success(
                 MetamaskAuthResp.builder()
                         .nonce(nonce)
-                        .publicAddress(metaMaskReq.getPublicAddress())
+                        .publicAddress(metamaskVerifyReq.getPublicAddress())
                         .build());
     }
 
     @PostMapping("/metamask/login")
     @ApiOperation(value = "metamask登陆",
-            notes = "1.调用/metamask/generateNonce生成nonce" +
-                    "2.前端根据nonce生成签名信息" +
-                    "3.调用/metamask/login登陆验证签名信息，验证成功返回token")
-    public GenericDto<LoginResp> metamaskLogin(@Valid @RequestBody MetaMaskReq metaMaskReq) {
-        return GenericDto.success(ucUserService.metamaskLogin(metaMaskReq));
+            notes = "1.调用/auth/metamask/generateNonce生成nonce " +
+                    "2.前端根据nonce生成签名信息 " +
+                    "3.调用/auth/metamask/login登陆验证签名信息，验证成功返回ucToken ")
+    public GenericDto<LoginResp> metamaskLogin(@Valid @RequestBody MetamaskVerifyReq metamaskVerifyReq) {
+        return GenericDto.success(ucUserService.metamaskLogin(metamaskVerifyReq));
     }
 
 
     @PostMapping("/forgot-password/reset")
-    @ApiOperation(value = "忘记密码-重置密码", notes = "1.调用auth/email/send 传authType=RESET_PASSWORD获取邮箱验证码 " +
-            "2.调用/auth/forgot-password/reset 重置邮箱账号的密码")
+    @ApiOperation(value = "忘记密码-重置密码", notes = "1.调用/auth/email/send 参数authType=RESET_PASSWORD获取邮箱验证码 " +
+            "2.调用/auth/forgot-password/reset 重置邮箱账号的密码 ")
     public GenericDto<LoginResp> forgotPasswordReset(@Valid @RequestBody ResetPasswordReq resetPasswordReq) {
         String code = resetPasswordReq.getCode();
         String email = resetPasswordReq.getEmail();
@@ -107,8 +107,8 @@ public class AuthController {
 
 
     @PostMapping("/reset/ga")
-    @ApiOperation(value = "重置GA", notes = "1.调用auth/email/send 传authType=RESET_GA获取邮箱验证码" +
-            "2.调用/auth/reset/ga 重置GA")
+    @ApiOperation(value = "重置GA", notes = "1.调用/auth/email/send 参数authType=RESET_GA获取邮箱验证码 " +
+            "2.调用/auth/reset/ga 重置GA ")
     public GenericDto<Object> resetGa(@Valid @RequestBody ResetGaReq resetGaReq) {
         String email = resetGaReq.getEmail();
         String code = resetGaReq.getCode();
@@ -127,7 +127,7 @@ public class AuthController {
         return GenericDto.success(null);
     }
 
-    @ApiOperation(value = "发送邮件", notes = "发送邮件")
+    @ApiOperation(value = "发送邮件", notes = "由于网络问题发送邮件暂时关闭，调用该接口后默认发送的邮箱验证码是123456")
     @PostMapping("/email/send")
     public GenericDto<Object> sendEmailCode(@Valid @RequestBody AuthCodeSendReq sendReq, HttpServletRequest request) {
         log.info("AuthController - sendEmailCode got request: {}", sendReq);
@@ -148,7 +148,7 @@ public class AuthController {
             // 绑定邮箱、修改邮箱
             if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_REQUEST_SET.contains(sendReq.getUseType())) {
                 sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
-                // 绑定ga、修改密码
+                // 绑定ga、修改密码、绑定metamask
             } else if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_DB_SET.contains(sendReq.getUseType())) {
                 sendCodeService.sendEmailWithUseType(user.getEmail(), sendReq.getUseType());
             } else {

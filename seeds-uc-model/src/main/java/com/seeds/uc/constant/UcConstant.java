@@ -45,4 +45,8 @@ public class UcConstant {
     public static final String BIND_EMAIL_EMAIL_SUBJECT = "bind email";
     public static final String BIND_EMAIL_EMAIL_CONTENT = "bind email verification code, note that it expires in {} minutes:{}";
 
+    // 绑定metamask
+    public static final String BIND_METAMASK_EMAIL_SUBJECT = "bind metamask";
+    public static final String BIND_METAMASK_EMAIL_CONTENT = "bind metamask verification code, note that it expires in {} minutes:{}";
+
 }

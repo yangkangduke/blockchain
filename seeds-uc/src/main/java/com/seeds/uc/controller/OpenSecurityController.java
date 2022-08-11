@@ -82,7 +82,7 @@ public class OpenSecurityController {
     }
 
     @GetMapping("/strategy/state")
-    @ApiOperation(value = "获取安全策略验证状态", notes = "获取安全策略验证状态")
+    @ApiOperation(value = "获取安全策略的验证状态", notes = "获取安全策略的验证状态")
     public GenericDto<SecurityStrategyDto> getSecurityStrategy() {
         Long uid = UserContext.getCurrentUserId();
         List<UcSecurityStrategy> securityStrategyList =
@@ -103,7 +103,7 @@ public class OpenSecurityController {
     }
 
     @PostMapping("strategy/verify")
-    @ApiOperation(value = "验证安全项", notes = "验证安全项")
+    @ApiOperation(value = "验证安全项", notes = "验证安全项，根据类型判断验证哪些安全项，全部验证成功后，发放authToken ")
     public GenericDto<Object> verifySecurityStrategy(@RequestBody SecuritySettingReq securitySettingReq) {
 
         // 拿到安全策略

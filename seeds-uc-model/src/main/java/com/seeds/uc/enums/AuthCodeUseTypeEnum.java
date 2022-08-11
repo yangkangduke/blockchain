@@ -36,6 +36,8 @@ public enum AuthCodeUseTypeEnum {
     REBIND_PHONE("REBIND_PHONE", "rebind phone", "重新绑定手机", "rebind.phone"),
     @JsonProperty("BIND_EMAIL")
     BIND_EMAIL("BIND_EMAIL", "bind email", "绑定邮箱", "bind.email"),
+    @JsonProperty("BIND_METAMASK")
+    BIND_METAMASK("BIND_METAMASK", "bind metamask", "绑定小狐狸钱包", "bind.metamask"),
     @JsonProperty("RESET_PHONE")
     RESET_PHONE("RESET_PHONE", "reset phone", "重置手机", "rst.phone"),
     @JsonProperty("VERIFY_SETTING_POLICY")
@@ -174,6 +176,7 @@ public enum AuthCodeUseTypeEnum {
                     VERIFY_SETTING_POLICY_DISABLE_GA_POLICY,
                     VERIFY_SETTING_POLICY_REBIND_PHONE,
                     VERIFY_SETTING_POLICY_WITHDRAW,
+                    BIND_METAMASK,
                     VERIFY_SETTING_POLICY_WITHDRAW_ADD_ADDRESS
             );
     // security setting 时Phone相关的use type
