@@ -8,13 +8,14 @@ public interface ChainNftService {
     String uploadImage(MultipartFile image);
 
     String uploadMetadata(String imageFileHash, ChainMintNftReq request);
+
     String updateMetadata(String imageFileHash, ChainUpdateNftReq request);
 
     boolean mintNft(String metadataFileHash);
 
     String getMetadataFileImageHash(String tokenId);
 
-    boolean updateNftAttribute(String metadataFileHash);
+    boolean updateNftAttribute(String tokenId, String metadataFileHash);
 
-    boolean burnNft();
+    boolean burnNft(String tokenId);
 }

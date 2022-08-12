@@ -45,8 +45,13 @@ public class ChainNftServiceImpl implements ChainNftService {
     }
 
     @Override
-    public String updateMetadata(String imageFileHash, ChainUpdateNftReq request) {
-        return null;
+    public String updateMetadata(String imageFileHash, ChainUpdateNftReq updateRequest) {
+        ChainMintNftReq request = ChainMintNftReq.builder()
+                .name(updateRequest.getName())
+                .description(updateRequest.getDescription())
+                .attributes(updateRequest.getAttributes())
+                .build();
+        return uploadMetadata(imageFileHash, request);
     }
 
 
@@ -59,23 +64,19 @@ public class ChainNftServiceImpl implements ChainNftService {
     @Override
     public String getMetadataFileImageHash(String tokenId) {
         // get uri with token id
-        gameItemsService.getUri(new BigInteger(tokenId));
+        String uri = gameItemsService.getUri(new BigInteger(tokenId));
 
-        // get current metadata file
-
-        // get the image hash from the metadata
-        return null;
+        // get image hash of current metadata file
+        return ipfsService.getImageString(uri.substring(7));
     }
 
     @Override
-    public boolean updateNftAttribute(String metadataFileHash) {
-        // update nft with new uri
-        return false;
+    public boolean updateNftAttribute(String tokenId, String metadataFileHash) {
+        return gameItemsService.updateNftAttribute(new BigInteger(tokenId), "ipfs://" + metadataFileHash);
     }
 
     @Override
-    public boolean burnNft() {
-
-        return false;
+    public boolean burnNft(String tokenId) {
+        return gameItemsService.burnNft(tokenId);
     }
 }

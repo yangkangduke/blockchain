@@ -9,4 +9,6 @@ public interface IpfsService {
     String pinFile(MultipartFile file);
 
     String pinJson(PinataPinJsonRequest request);
+
+    String getImageString(String ipfsHash);
 }

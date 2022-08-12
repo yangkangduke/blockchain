@@ -45,9 +45,10 @@ public class ChainNftController {
     @PostMapping("/update-nft")
     public GenericDto<Object> updateNftAttribute(@RequestBody ChainUpdateNftReq request) {
         String imageFileHash = chainNftService.getMetadataFileImageHash(request.getTokenId());
+
         String metadataFileHash = chainNftService.updateMetadata(imageFileHash, request);
 
-        boolean status = chainNftService.updateNftAttribute(metadataFileHash);
+        boolean status = chainNftService.updateNftAttribute(request.getTokenId(), metadataFileHash);
 
         if (status) {
             return GenericDto.success(null);
@@ -58,7 +59,7 @@ public class ChainNftController {
 
     @PostMapping("/burn-nft")
     public GenericDto<Object> burnNft(@RequestBody ChainBurnNftReq request) {
-        boolean status = chainNftService.burnNft();
+        boolean status = chainNftService.burnNft(request.getTokenId());
 
         if (status) {
             return GenericDto.success(null);

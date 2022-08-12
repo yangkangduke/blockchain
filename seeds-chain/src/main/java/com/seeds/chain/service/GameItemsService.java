@@ -8,4 +8,6 @@ public interface GameItemsService {
     boolean mintNft(String uri);
 
     boolean updateNftAttribute(BigInteger tokenId, String newUri);
+
+    boolean burnNft(String tokenId);
 }
