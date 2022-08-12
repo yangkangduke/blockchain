@@ -448,13 +448,13 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      */
     @Override
     public Boolean verifyMetamask(MetamaskVerifyReq verifyReq) {
-        // todo 还需要校验code
         String publicAddress = verifyReq.getPublicAddress();
         String signature = verifyReq.getSignature();
         String message = verifyReq.getMessage();
-
+        String[] split = message.split(":");
+        String nonce =  split[1];
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(verifyReq.getPublicAddress());
-        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) ) {
+        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !genMetamaskAuth.getNonce().equals(nonce) ) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
         }
         // 地址合法性校验
