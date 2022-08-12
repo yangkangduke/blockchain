@@ -1,5 +1,6 @@
 package com.seeds.chain.service.impl;
 
+import com.seeds.chain.config.PinataConfig;
 import com.seeds.chain.feign.PinataApiService;
 import com.seeds.chain.feign.PinataCloudService;
 import com.seeds.chain.feign.request.PinataPinJsonRequest;
@@ -23,20 +24,23 @@ public class PinataServiceImpl implements IpfsService {
     @Autowired
     PinataCloudService pinataCloudService;
 
+    @Autowired
+    PinataConfig pinataConfig;
+
     @Override
     public Object testAuth() {
-        GenericDto<Object> result = pinataApiService.authenticate();
+        GenericDto<Object> result = pinataApiService.authenticate(pinataConfig.getApiKey(), pinataConfig.getApiSecret());
         return result.getMessage();
     }
 
     @Override
     public String pinFile(MultipartFile file) {
-        PinataPinResponse result = pinataApiService.pinFile(file);
+        PinataPinResponse result = pinataApiService.pinFile(pinataConfig.getApiKey(), pinataConfig.getApiSecret(), file);
         return result.getIpfsHash();
     }
     @Override
     public String pinJson(PinataPinJsonRequest request) {
-        PinataPinResponse result = pinataApiService.pinJson(request);
+        PinataPinResponse result = pinataApiService.pinJson(pinataConfig.getApiKey(), pinataConfig.getApiSecret(), request);
         return result.getIpfsHash();
     }
 
