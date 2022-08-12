@@ -27,7 +27,7 @@ import java.util.Objects;
  * @date 2022/7/22
  */
 @Slf4j
-@Api("NFT管理")
+@Api(tags = "NFT管理")
 @RestController
 @RequestMapping("/nft")
 public class SysNftController {

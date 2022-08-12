@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
  * @date 2022/7/21
  */
 @Slf4j
-@Api("NFT类别管理")
+@Api(tags = "NFT类别管理")
 @RestController
-@RequestMapping("/nftType")
+@RequestMapping("/nft-type")
 public class SysNftTypeController {
 
     @Autowired

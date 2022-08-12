@@ -26,7 +26,7 @@ import java.util.List;
  * @date: 2022/8/8
  */
 @Slf4j
-@Api("游戏评论管理")
+@Api(tags = "游戏评论管理")
 @RestController
 @RequestMapping("/game-comments")
 public class SysGameCommentsController {

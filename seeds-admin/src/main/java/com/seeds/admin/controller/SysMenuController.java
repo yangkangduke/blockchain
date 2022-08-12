@@ -29,7 +29,7 @@ import java.util.Objects;
  * @date 2022/7/14
  */
 @Slf4j
-@Api("菜单管理")
+@Api(tags = "菜单管理")
 @RestController
 @RequestMapping("/menu")
 public class SysMenuController {

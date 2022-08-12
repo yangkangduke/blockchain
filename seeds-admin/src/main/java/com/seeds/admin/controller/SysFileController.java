@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  * @date 2022/8/02
  */
 @Slf4j
-@Api("系统文件")
+@Api(tags = "系统文件")
 @RestController
 @RequestMapping("/file")
 public class SysFileController {
@@ -35,18 +35,11 @@ public class SysFileController {
         return GenericDto.success(sysFileService.upload(file, type));
     }
 
-    @GetMapping("download/{objectName}")
+    @GetMapping("download/{bucketName}/{objectName}")
     @ApiOperation("下载")
     @RequiredPermission("sys:file:download")
-    public void download(HttpServletResponse response, @PathVariable String objectName) {
-        sysFileService.download(response, objectName);
-    }
-
-    @GetMapping("link/{objectName}")
-    @ApiOperation("链接")
-    @RequiredPermission("sys:file:link")
-    public GenericDto<String> getFile(@PathVariable String objectName) {
-        return GenericDto.success(sysFileService.getFile(objectName));
+    public void download(HttpServletResponse response, @PathVariable String bucketName, @PathVariable String objectName) {
+        sysFileService.download(response, bucketName, objectName);
     }
 
     @PostMapping("delete/{fileId}")

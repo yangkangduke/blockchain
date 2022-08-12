@@ -24,7 +24,7 @@ import java.util.Objects;
  * @date 2022/7/14
  */
 @Slf4j
-@Api("角色管理")
+@Api(tags = "角色管理")
 @RestController
 @RequestMapping("/role")
 public class SysRoleController {

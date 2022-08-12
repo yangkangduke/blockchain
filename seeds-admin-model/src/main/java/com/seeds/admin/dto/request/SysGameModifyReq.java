@@ -83,11 +83,11 @@ public class SysGameModifyReq {
 	private String developer;
 
 	/**
-	 * 图片对象名称
+	 * 图片链接
 	 */
-	@ApiModelProperty("图片对象名称")
-	@NotBlank(message = "Picture object name cannot be empty")
-	private String pictureObjectName;
+	@ApiModelProperty("图片链接")
+	@NotBlank(message = "Picture url cannot be empty")
+	private String pictureUrl;
 
 	/**
 	 * 图片文件id
@@ -97,11 +97,11 @@ public class SysGameModifyReq {
 	private Long pictureFileId;
 
 	/**
-	 * 视频对象名称
+	 * 视频链接
 	 */
-	@ApiModelProperty("视频对象名称")
-	@NotBlank(message = "Video object name cannot be empty")
-	private String videoObjectName;
+	@ApiModelProperty("视频链接")
+	@NotBlank(message = "Video url cannot be empty")
+	private String videoUrl;
 
 	/**
 	 * 视频文件id

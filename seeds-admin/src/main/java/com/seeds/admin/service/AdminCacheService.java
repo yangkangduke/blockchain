@@ -50,19 +50,4 @@ public interface AdminCacheService {
      */
     void removeAdminUserByUserId(Long userId);
 
-    /**
-     * 根据对象名称获取文件链接
-     * @param objectName 对象名称
-     * @return 文件链接
-     */
-    String getFileUrlByObjectName(String objectName);
-
-    /**
-     * 缓存文件链接
-     * @param objectName 对象名称
-     * @param url 文件链接
-     * @param expires 过期时间（月）
-     */
-    void putFileUrlByObjectName(String objectName, String url, Integer expires);
-
 }

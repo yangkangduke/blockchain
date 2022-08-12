@@ -36,10 +36,10 @@ public class SysUserEntity extends BaseEntity {
 	private String realName;
 
 	/**
-	 * 头像对象名
+	 * 头像链接
 	 */
-	@TableField("object_name")
-	private String objectName;
+	@TableField("url")
+	private String url;
 
 	/**
 	 * 头像文件id

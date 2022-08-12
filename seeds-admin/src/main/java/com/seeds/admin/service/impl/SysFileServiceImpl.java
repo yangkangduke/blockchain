@@ -10,13 +10,11 @@ import com.seeds.admin.dto.response.SysFileResp;
 import com.seeds.admin.entity.SysFileEntity;
 import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.mapper.SysFileMapper;
-import com.seeds.admin.service.AdminCacheService;
 import com.seeds.admin.service.SysFileService;
-import com.seeds.common.web.oss.service.OssTemplate;
+import com.seeds.common.web.oss.FileProperties;
+import com.seeds.common.web.oss.FileTemplate;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,27 +33,22 @@ import java.net.URLEncoder;
 @Service
 public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity> implements SysFileService {
 
-    @Value("${admin.oss.file.expires:1}")
-    private Integer expires;
-
-    @Value("${admin.oss.bucket.name:admin}")
-    private String bucketName;
+    @Autowired
+    private FileProperties properties;
 
     @Autowired
-    private OssTemplate template;
-
-    @Autowired
-    private AdminCacheService adminCacheService;
+    private FileTemplate template;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SysFileResp upload(MultipartFile file, String type) {
         // 上传文件到oss
+        String bucketName = properties.getBucketName();
         String originalFilename = file.getOriginalFilename();
-        String objectName = IdUtil.simpleUUID() + StrUtil.DOT + FileUtil.extName(originalFilename);
+        String objectName = type + "/" + IdUtil.simpleUUID() + StrUtil.DOT + FileUtil.extName(originalFilename);
         SysFileEntity sysFile = new SysFileEntity();
         try (InputStream inputStream = file.getInputStream()) {
-            template.putObject(bucketName, objectName, inputStream, file.getSize(), file.getContentType());
+            template.putObject(bucketName, objectName, inputStream, file.getContentType());
             // 记录文件信息
             sysFile.setFileSize(file.getSize());
             sysFile.setObjectName(objectName);
@@ -71,11 +64,13 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
         SysFileResp res = new SysFileResp();
         res.setFileId(sysFile.getId());
         res.setObjectName(objectName);
+        res.setBucketName(properties.getBucketName());
+        res.setUrl(String.format("/admin/file/download/%s/%s", properties.getBucketName(), objectName));
         return res;
     }
 
     @Override
-    public void download(HttpServletResponse response, String objectName) {
+    public void download(HttpServletResponse response, String bucketName, String objectName) {
         try (S3Object s3Object = template.getObject(bucketName, objectName)) {
             response.setContentType("application/octet-stream; charset=UTF-8");
             response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(objectName, "UTF-8"));
@@ -87,25 +82,6 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
     }
 
     @Override
-    public String getFile(String objectName) {
-        // 先从Redis中获取
-        String url = adminCacheService.getFileUrlByObjectName(objectName);
-        if (StringUtils.isNotBlank(url)) {
-            return url;
-        }
-        try {
-            url = template.getObjectURL(bucketName, objectName, expires);
-            if (StringUtils.isNotBlank(url)) {
-                adminCacheService.putFileUrlByObjectName(objectName, url, expires);
-            }
-        }
-        catch (Exception e) {
-            log.error("获取文件失败，objectName={}", objectName);
-        }
-        return url;
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long fileId) {
         SysFileEntity sysFile = getById(fileId);
@@ -113,7 +89,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
             return;
         }
         try {
-            template.removeObject(bucketName, sysFile.getObjectName());
+            template.removeObject(properties.getBucketName(), sysFile.getObjectName());
             removeById(fileId);
         }
         catch (Exception e) {

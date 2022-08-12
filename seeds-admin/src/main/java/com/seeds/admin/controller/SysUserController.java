@@ -8,15 +8,11 @@ import com.seeds.admin.dto.response.SysUserBriefResp;
 import com.seeds.admin.dto.response.SysUserResp;
 import com.seeds.admin.entity.SysUserEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
-import com.seeds.admin.exceptions.InvalidArgumentsException;
 import com.seeds.admin.service.AdminCacheService;
 import com.seeds.admin.service.SysRoleUserService;
 import com.seeds.admin.service.SysUserService;
-import com.seeds.admin.utils.CryptoUtils;
 import com.seeds.admin.utils.HashUtil;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.exception.SeedsException;
-import com.seeds.common.web.HttpHeaders;
 import com.seeds.common.web.context.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,11 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import org.web3j.crypto.WalletUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +33,7 @@ import java.util.Objects;
  * @date 2022/7/13
  */
 @Slf4j
-@Api("用户管理")
+@Api(tags = "用户管理")
 @RestController
 @RequestMapping("/user")
 public class SysUserController {
@@ -117,7 +110,7 @@ public class SysUserController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("changePassword")
+    @PostMapping("change-password")
     @ApiOperation(value = "修改密码")
     @RequiredPermission("sys:user:changePassword")
     public GenericDto<Object> changePassword(@Valid @RequestBody SysUserPasswordReq req) {
@@ -135,7 +128,7 @@ public class SysUserController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("resetPassword")
+    @PostMapping("reset-password")
     @ApiOperation(value = "重置密码")
     @RequiredPermission("sys:user:resetPassword")
     public GenericDto<Object> resetPassword(@RequestParam(name = "userId") Long userId) {
@@ -167,7 +160,7 @@ public class SysUserController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("updateRoles")
+    @PostMapping("update-roles")
     @ApiOperation("授予/剥夺角色")
     @RequiredPermission("sys:user:updateRoles")
     public GenericDto<Object> updateRoles(@Valid @RequestBody SysUserRoleReq req) {
@@ -175,7 +168,7 @@ public class SysUserController {
         return GenericDto.success(null);
     }
 
-    @GetMapping("userInfo")
+    @GetMapping("user-info")
     @ApiOperation(value = "登录用户信息")
     public GenericDto<AdminUserResp> getUserInfo() {
         Long userId = UserContext.getCurrentAdminUserId();

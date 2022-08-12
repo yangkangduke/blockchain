@@ -50,11 +50,11 @@ public class SysNftModifyReq {
 	private Long nftTypeId;
 
 	/**
-	 * NFT图片对象名
+	 * NFT图片链接
 	 */
-	@ApiModelProperty("NFT图片对象名")
-	@NotBlank(message = "NFT picture object name cannot be empty")
-	private String objectName;
+	@ApiModelProperty("NFT图片链接")
+	@NotBlank(message = "NFT picture url cannot be empty")
+	private String url;
 
 	/**
 	 * 图片文件id

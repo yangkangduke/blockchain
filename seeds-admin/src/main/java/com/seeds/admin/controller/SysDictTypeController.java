@@ -23,9 +23,9 @@ import java.util.Objects;
  * @date 2022/7/13
  */
 @Slf4j
-@Api("字典类型")
+@Api(tags = "字典类型")
 @RestController
-@RequestMapping("/dictType")
+@RequestMapping("/dict-type")
 public class SysDictTypeController {
 
     @Autowired

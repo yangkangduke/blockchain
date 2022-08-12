@@ -23,7 +23,7 @@ import java.util.List;
  * @date: 2022/7/22
  */
 @Slf4j
-@Api("组织管理")
+@Api(tags = "组织管理")
 @RestController
 @RequestMapping("/org")
 public class SysOrgController {

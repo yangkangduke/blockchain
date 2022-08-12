@@ -13,7 +13,6 @@ import com.seeds.admin.utils.WebUtil;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.request.LoginReq;
 import com.seeds.uc.dto.response.LoginResp;
-import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.feign.RemoteUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

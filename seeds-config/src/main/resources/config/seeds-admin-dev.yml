@@ -32,6 +32,7 @@ admin:
 
 # admin 文件存储目录
 file:
+  bucketName: admin
   store:
     location: /seeds-admin/files/
 

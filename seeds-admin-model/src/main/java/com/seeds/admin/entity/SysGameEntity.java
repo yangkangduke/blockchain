@@ -69,10 +69,10 @@ public class SysGameEntity extends BaseEntity {
 	private String developer;
 
 	/**
-	 * 图片对象名称
+	 * 图片链接
 	 */
-	@TableField("picture_object_name")
-	private String pictureObjectName;
+	@TableField("picture_url")
+	private String pictureUrl;
 
 	/**
 	 * 图片文件id
@@ -81,10 +81,10 @@ public class SysGameEntity extends BaseEntity {
 	private Long pictureFileId;
 
 	/**
-	 * 视频对象名称
+	 * 视频链接
 	 */
-	@TableField("video_object_name")
-	private String videoObjectName;
+	@TableField("video_url")
+	private String videoUrl;
 
 	/**
 	 * 视频文件id

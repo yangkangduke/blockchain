@@ -74,9 +74,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             resp.setGameName(gameMap.get(p.getGameId()));
             resp.setTypeName(nftTypeMap.get(p.getNftTypeId()));
             // 图片
-            if (StringUtils.isNotBlank(p.getObjectName())) {
-                resp.setPicture(sysFileService.getFile(p.getObjectName()));
-            }
+            resp.setPicture(p.getUrl());
             // 价格
             resp.setPrice(p.getPrice() + p.getUnit());
             return resp;
@@ -133,9 +131,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             }
             resp.setPropertiesList(list);
             // 图片
-            if (StringUtils.isNotBlank(sysNft.getObjectName())) {
-                resp.setPicture(sysFileService.getFile(sysNft.getObjectName()));
-            }
+            resp.setPicture(sysNft.getUrl());
             // 价格
             resp.setPrice(sysNft.getPrice() + sysNft.getUnit());
         }

@@ -24,7 +24,7 @@ import java.util.Objects;
  * @date 2022/7/21
  */
 @Slf4j
-@Api("游戏管理")
+@Api(tags = "游戏管理")
 @RestController
 @RequestMapping("/game")
 public class SysGameController {

@@ -21,4 +21,10 @@ public class SysFileResp {
 	@ApiModelProperty(value = "对象名")
 	private String objectName;
 
+	@ApiModelProperty(value = "桶")
+	private String bucketName;
+
+	@ApiModelProperty(value = "url")
+	private String url;
+
 }

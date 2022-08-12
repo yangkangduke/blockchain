@@ -35,7 +35,7 @@ import java.io.IOException;
  * @date 2022/7/13
  */
 @Slf4j
-@Api("登录认证")
+@Api(tags = "登录认证")
 @RestController
 @RequestMapping("/auth")
 public class AdminAuthController {
@@ -146,7 +146,7 @@ public class AdminAuthController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("forgetPassword")
+    @PostMapping("forget-password")
     @ApiOperation(value = "忘记密码")
     public GenericDto<Object> forgetPassword(@Valid @RequestBody ForgetPasswordReq req) {
         SysUserEntity sysUser = sysUserService.queryByMobile(req.getMobile());

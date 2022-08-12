@@ -54,9 +54,7 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             BeanUtils.copyProperties(p, resp);
             resp.setPrice(p.getPrice() + p.getUnit());
             // 图片
-            if (StringUtils.isNotBlank(p.getPictureObjectName())) {
-                resp.setPicture(sysFileService.getFile(p.getPictureObjectName()));
-            }
+            resp.setPicture(p.getPictureUrl());
             return resp;
         });
     }
@@ -118,13 +116,9 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             BeanUtils.copyProperties(sysGame, resp);
             resp.setPrice(sysGame.getPrice() + sysGame.getUnit());
             // 图片
-            if (StringUtils.isNotBlank(sysGame.getPictureObjectName())) {
-                resp.setPicture(sysFileService.getFile(sysGame.getPictureObjectName()));
-            }
+            resp.setPicture(sysGame.getPictureUrl());
             // 视频
-            if (StringUtils.isNotBlank(sysGame.getVideoObjectName())) {
-                resp.setVideo(sysFileService.getFile(sysGame.getVideoObjectName()));
-            }
+            resp.setVideo(sysGame.getVideoUrl());
         }
         return resp;
     }

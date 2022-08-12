@@ -27,16 +27,10 @@ public interface SysFileService extends IService<SysFileEntity> {
     /**
      * 下载文件
      * @param response 响应头
+     * @param bucketName 桶的名称
      * @param objectName 对象名称
      */
-    void download(HttpServletResponse response, String objectName);
-
-    /**
-     * 获取文件
-     * @param objectName 对象名称
-     * @return 文件链接
-     */
-    String getFile(String objectName);
+    void download(HttpServletResponse response, String bucketName, String objectName);
 
     /**
      * 根据id删除文件信息

@@ -231,9 +231,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
                 }
             }
             // 头像
-            if (StringUtils.isNotBlank(user.getObjectName())) {
-                resp.setHeadUrl(sysFileService.getFile(user.getObjectName()));
-            }
+            resp.setHeadUrl(user.getUrl());
         }
         return resp;
     }

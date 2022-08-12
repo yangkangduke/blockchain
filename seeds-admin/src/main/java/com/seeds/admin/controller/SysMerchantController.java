@@ -29,7 +29,7 @@ import java.util.Objects;
  * @date 2022/7/14
  */
 @Slf4j
-@Api("商家管理")
+@Api(tags = "商家管理")
 @RestController
 @RequestMapping("/merchant")
 public class SysMerchantController {
@@ -98,7 +98,7 @@ public class SysMerchantController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("addGame/{merchantId}")
+    @PostMapping("add-game/{merchantId}")
     @ApiOperation("添加游戏")
     @RequiredPermission("sys:merchant:addGame")
     public GenericDto<Object> addGame(@Valid @RequestBody ListReq req, @PathVariable("merchantId") Long merchantId) {
@@ -106,7 +106,7 @@ public class SysMerchantController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("deleteGame/{merchantId}")
+    @PostMapping("delete-game/{merchantId}")
     @ApiOperation("删除游戏")
     @RequiredPermission("sys:merchant:deleteGame")
     public GenericDto<Object> deleteGame(@Valid @RequestBody ListReq req, @PathVariable("merchantId") Long merchantId) {
@@ -114,7 +114,7 @@ public class SysMerchantController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("addUser/{merchantId}")
+    @PostMapping("add-user/{merchantId}")
     @ApiOperation("添加用户")
     @RequiredPermission("sys:merchant:addUser")
     public GenericDto<Object> addUser(@Valid @RequestBody SysMerchantUserAddReq req, @PathVariable("merchantId") Long merchantId) {
@@ -122,7 +122,7 @@ public class SysMerchantController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("deleteUser/{merchantId}")
+    @PostMapping("delete-user/{merchantId}")
     @ApiOperation("删除用户")
     @RequiredPermission("sys:merchant:deleteUser")
     public GenericDto<Object> deleteUser(@Valid @RequestBody ListReq req, @PathVariable("merchantId") Long merchantId) {

@@ -27,10 +27,10 @@ public class SysNftEntity extends BaseEntity {
 	private String number;
 
 	/**
-	 * 图片对象名
+	 * 图片链接
 	 */
-	@TableField("object_name")
-	private String objectName;
+	@TableField("url")
+	private String url;
 
 	/**
 	 * 图片文件id

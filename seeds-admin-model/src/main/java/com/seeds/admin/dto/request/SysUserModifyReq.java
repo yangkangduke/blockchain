@@ -30,10 +30,10 @@ public class SysUserModifyReq {
 	private String realName;
 
 	/**
-	 * 头像对象名
+	 * 头像链接
 	 */
-	@ApiModelProperty("头像对象名")
-	private String objectName;
+	@ApiModelProperty("头像链接")
+	private String url;
 
 	/**
 	 * 图片文件id
