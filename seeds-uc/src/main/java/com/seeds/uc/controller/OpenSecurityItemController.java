@@ -1,5 +1,6 @@
 package com.seeds.uc.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
@@ -132,7 +133,7 @@ public class OpenSecurityItemController {
         // 验证邮箱和验证码是否正确
         AuthCodeDTO authCode = cacheService.getAuthCode(ucUser.getEmail(), AuthCodeUseTypeEnum.RESET_GA, ClientAuthTypeEnum.EMAIL);
         if (authCode == null || !emailCode.equals(authCode.getCode())) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
         }
 
         // 清空ga信息
@@ -161,9 +162,14 @@ public class OpenSecurityItemController {
         // 验证emailCode
         AuthCodeDTO authCode = cacheService.getAuthCode(ucUser.getEmail(), AuthCodeUseTypeEnum.BIND_METAMASK, ClientAuthTypeEnum.EMAIL);
         if (authCode == null || !emailCode.equals(authCode.getCode())) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
         }
+        // 校验是否已经绑定过了
+        if (null != ucUserService.getOne(new LambdaQueryWrapper<UcUser>()
+                .eq(UcUser::getPublicAddress, authTokenDTO.getSecret()))) {
 
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10029_METAMASK_EXIST);
+        }
         // 绑定
         ucUserService.bindMetamask(authTokenDTO, currentUserId);
         return GenericDto.success(null);
@@ -239,6 +245,10 @@ public class OpenSecurityItemController {
         }
         if (!googleAuthService.verifyUserCode(ucUser.getId(), gaCode)) {
             throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+        }
+        // 判断是否已经存在该邮箱账号
+        if (null != ucUserService.getOne(new LambdaQueryWrapper<UcUser>().eq(UcUser::getEmail, authTokenDTO.getAccountName()))) {
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED);
         }
 
         // 修改邮箱
