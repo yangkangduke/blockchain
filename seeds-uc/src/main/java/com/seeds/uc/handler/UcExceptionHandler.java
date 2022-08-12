@@ -40,7 +40,9 @@ public class UcExceptionHandler {
     @ExceptionHandler(GenericException.class)
     ResponseEntity<GenericDto<String>> handle(GenericException e) {
         log.error("General Exception:", e);
-        return new ResponseEntity<>(GenericDto.failure(e.getMessage(), e.getErrorCode().getCode()), HttpStatus.OK);
+        return new ResponseEntity<>(
+                GenericDto.failure(e.getMessage(), e.getErrorCode().getCode()),
+                HttpStatus.OK);
     }
 
     /**
@@ -55,7 +57,7 @@ public class UcExceptionHandler {
         if(e.getCause() instanceof InvalidFormatException) {
             return new ResponseEntity<>(
                     GenericDto.failure("JSON parse error", HttpStatus.BAD_REQUEST.value()),
-                    HttpStatus.BAD_REQUEST);
+                    HttpStatus.OK);
         } else {
             return new ResponseEntity<>(
                     GenericDto.failure("Internal Error：" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
@@ -69,7 +71,7 @@ public class UcExceptionHandler {
         log.error("InvalidArguments Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value()),
-                HttpStatus.UNPROCESSABLE_ENTITY);
+                HttpStatus.OK);
     }
 
     //spring-context包里面的异常
@@ -79,7 +81,7 @@ public class UcExceptionHandler {
         log.error("Binding Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getMessage(), HttpStatus.BAD_REQUEST.value()),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.OK);
     }
 
     //spring-context包里面的异常,实体对象前加@RequestBody注解,抛出的异常为该类异常
@@ -89,7 +91,7 @@ public class UcExceptionHandler {
         log.error("MethodArgumentNotValid Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getBindingResult().getFieldError().getField() + ":" + e.getBindingResult().getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value()),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.OK);
     }
 
     //实体对象前不加@RequestBody注解,校验方法参数或方法返回值时,未校验通过时抛出的异常
@@ -99,7 +101,7 @@ public class UcExceptionHandler {
         log.error("Validation Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getCause().getMessage(), HttpStatus.BAD_REQUEST.value()),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.OK);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -107,7 +109,7 @@ public class UcExceptionHandler {
         log.error("ConstraintViolation Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getCause().getMessage(), HttpStatus.BAD_REQUEST.value()),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.OK);
     }
 
 
