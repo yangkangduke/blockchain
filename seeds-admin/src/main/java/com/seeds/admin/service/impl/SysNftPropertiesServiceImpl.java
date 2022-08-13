@@ -31,7 +31,6 @@ public class SysNftPropertiesServiceImpl extends ServiceImpl<SysNftPropertiesMap
         if (CollectionUtils.isEmpty(nftPropertiesList)) {
             return;
         }
-        nftPropertiesList.forEach(p -> p.setNftId(nftId));
         saveBatch(nftPropertiesList);
     }
 

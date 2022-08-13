@@ -1,6 +1,5 @@
 package com.seeds.admin.dto.response;
 
-import com.seeds.admin.dto.request.NftProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -46,8 +45,8 @@ public class SysNftDetailResp {
 	@ApiModelProperty(value = "创建时间")
 	private Long createdAt;
 
-	@ApiModelProperty(value = "归属人")
-	private String owner;
+	@ApiModelProperty(value = "归属人名称")
+	private String ownerName;
 
 	@ApiModelProperty("合约地址")
 	private String contractAddress;
@@ -68,6 +67,6 @@ public class SysNftDetailResp {
 	private BigDecimal creatorFees;
 
 	@ApiModelProperty("NFT属性列表")
-	private List<NftProperties> propertiesList;
+	private List<NftPropertiesResp> propertiesList;
 
 }

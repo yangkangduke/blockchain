@@ -31,8 +31,8 @@ public class SysNftModifyReq {
 	/**
 	 * nft名称
 	 */
-	@ApiModelProperty("nft名称")
-	@NotNull(message = "nft name cannot be empty")
+	@ApiModelProperty("NFT名称")
+	@NotBlank(message = "NFT name cannot be empty")
 	private String name;
 
 	/**
@@ -62,13 +62,6 @@ public class SysNftModifyReq {
 	@ApiModelProperty("图片文件id")
 	@NotNull(message = "NFT picture file id cannot be empty")
 	private Long fileId;
-
-	/**
-	 * NFT归属人
-	 */
-	@ApiModelProperty("NFT归属人")
-	@NotBlank(message = "NFT owner cannot be empty")
-	private String owner;
 
 	/**
 	 * NFT价格
@@ -131,6 +124,6 @@ public class SysNftModifyReq {
 	 */
 	@Valid
 	@ApiModelProperty("NFT属性列表")
-	private List<NftProperties> propertiesList;
+	private List<NftPropertiesReq> propertiesList;
 
 }

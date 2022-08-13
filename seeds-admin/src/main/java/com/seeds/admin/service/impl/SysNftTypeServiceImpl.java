@@ -137,6 +137,19 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
         return list.stream().map(SysNftTypeEntity::getCode).collect(Collectors.toSet());
     }
 
+    @Override
+    public List<SysNftTypeResp> queryRespByParentCode(String parentCode) {
+        LambdaQueryWrapper<SysNftTypeEntity> query = new QueryWrapper<SysNftTypeEntity>().lambda();
+        if (StringUtils.isEmpty(parentCode)) {
+            query.isNull(SysNftTypeEntity::getParentCode);
+        } else {
+            query.eq(SysNftTypeEntity::getParentCode, parentCode);
+        }
+        query.eq(SysNftTypeEntity::getDeleteFlag, WhetherEnum.NO.value())
+                .orderByAsc(SysNftTypeEntity::getSort);
+        return convertToResp(list(query));
+    }
+
     private List<SysNftTypeResp> convertToResp(List<SysNftTypeEntity> list) {
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();

@@ -69,4 +69,16 @@ public interface SysNftService extends IService<SysNftEntity> {
      */
     SysNftEntity queryByContractAddress(String contractAddress);
 
+    /**
+     * 修改NFT属性值
+     * @param req NFT属性
+     */
+    void propertiesValueModify(List<NftPropertiesValueModifyReq> req);
+
+    /**
+     * 修改NFT归属人
+     * @param req NFT归属人
+     */
+    void ownerChange(List<NftOwnerChangeReq> req);
+
 }

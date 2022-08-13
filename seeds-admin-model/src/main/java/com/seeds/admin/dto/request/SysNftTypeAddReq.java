@@ -28,21 +28,21 @@ public class SysNftTypeAddReq {
 	 * 类别编码
 	 */
 	@ApiModelProperty("类别编码")
-	@NotBlank(message = "Nft type code cannot be empty")
+	@NotBlank(message = "NFT type code cannot be empty")
 	private String code;
 
 	/**
 	 * 类别名称
 	 */
 	@ApiModelProperty("类别名称")
-	@NotBlank(message = "Nft type name cannot be empty")
+	@NotBlank(message = "NFT type name cannot be empty")
 	private String name;
 
 	/**
 	 * 是否有效  0：否   1：是
 	 */
 	@ApiModelProperty("是否有效  0：否   1：是")
-	@NotNull(message = "Nft type status cannot be empty")
+	@NotNull(message = "NFT type status cannot be empty")
 	private Integer status;
 
 	/**

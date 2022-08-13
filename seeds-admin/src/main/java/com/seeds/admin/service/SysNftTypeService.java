@@ -95,4 +95,11 @@ public interface SysNftTypeService extends IService<SysNftTypeEntity> {
      */
     Set<String> queryCodesByIds(Set<Long> ids);
 
+    /**
+     * 根据父类code获取系统NFT类别列表
+     * @param parentCode 父类code
+     * @return 系统NFT类别列表
+     */
+    List<SysNftTypeResp> queryRespByParentCode(String parentCode);
+
 }

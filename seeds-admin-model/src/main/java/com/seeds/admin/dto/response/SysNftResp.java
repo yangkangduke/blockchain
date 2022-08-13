@@ -42,7 +42,7 @@ public class SysNftResp {
 	@ApiModelProperty(value = "创建时间")
 	private Long createdAt;
 
-	@ApiModelProperty(value = "归属人")
-	private String owner;
+	@ApiModelProperty(value = "归属人名称")
+	private String ownerName;
 
 }

@@ -92,4 +92,18 @@ public class SysNftController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("owner-change")
+    @ApiOperation("归属人变更")
+    public GenericDto<Object> ownerChange(@Valid @RequestBody List<NftOwnerChangeReq> req) {
+        sysNftService.ownerChange(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("properties-modify")
+    @ApiOperation("属性值修改")
+    public GenericDto<Object> propertiesModify(@Valid @RequestBody List<NftPropertiesValueModifyReq> req) {
+        sysNftService.propertiesValueModify(req);
+        return GenericDto.success(null);
+    }
+
 }

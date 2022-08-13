@@ -75,10 +75,16 @@ public class SysNftEntity extends BaseEntity {
 	private Integer status;
 
 	/**
-	 * 归属人
+	 * 归属人id
 	 */
-	@TableField("owner")
-	private String owner;
+	@TableField("owner_id")
+	private String ownerId;
+
+	/**
+	 * 归属人名称
+	 */
+	@TableField("owner_name")
+	private String ownerName;
 
 	/**
 	 * 合约地址

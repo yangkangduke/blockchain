@@ -111,4 +111,11 @@ public class SysNftTypeController {
         return GenericDto.success(null);
     }
 
+    @GetMapping("select")
+    @ApiOperation("选取")
+    @RequiredPermission("sys:nftType:select")
+    public GenericDto<List<SysNftTypeResp>> select(@RequestParam(required = false) String parentCode) {
+        return GenericDto.success(sysNftTypeService.queryRespByParentCode(parentCode));
+    }
+
 }

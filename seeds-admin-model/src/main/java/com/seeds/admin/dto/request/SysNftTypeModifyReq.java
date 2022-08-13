@@ -35,14 +35,14 @@ public class SysNftTypeModifyReq {
 	 * 类别编码
 	 */
 	@ApiModelProperty("类别编码")
-	@NotBlank(message = "Nft type code cannot be empty")
+	@NotBlank(message = "NFT type code cannot be empty")
 	private String code;
 
 	/**
 	 * 类别名称
 	 */
 	@ApiModelProperty("类别名称")
-	@NotBlank(message = "Nft type name cannot be empty")
+	@NotBlank(message = "NFT type name cannot be empty")
 	private String name;
 
 	/**

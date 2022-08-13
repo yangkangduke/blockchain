@@ -6,12 +6,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.response.NftPropertiesResp;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
-import com.seeds.admin.entity.SysGameEntity;
-import com.seeds.admin.entity.SysNftEntity;
-import com.seeds.admin.entity.SysNftPropertiesEntity;
-import com.seeds.admin.entity.SysNftTypeEntity;
+import com.seeds.admin.entity.*;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysNftMapper;
@@ -50,6 +48,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Autowired
     private SysNftPropertiesService sysNftPropertiesService;
+
+    @Autowired
+    private SysNftPropertiesTypeService sysNftPropertiesTypeService;
 
     @Override
     public IPage<SysNftResp> queryPage(SysNftPageReq query) {
@@ -121,11 +122,18 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             }
             // NFT属性信息
             List<SysNftPropertiesEntity> propertiesList = sysNftPropertiesService.queryByNftId(id);
-            List<NftProperties> list = new ArrayList<>();
+            List<NftPropertiesResp> list = new ArrayList<>();
             if (!CollectionUtils.isEmpty(propertiesList)) {
+                Set<Long> typeIds = propertiesList.stream().map(SysNftPropertiesEntity::getTypeId).collect(Collectors.toSet());
+                Map<Long, SysNftPropertiesTypeEntity> propertiesTypeMap = sysNftPropertiesTypeService.queryMapByIds(typeIds);
                 propertiesList.forEach(p -> {
-                    NftProperties res = new NftProperties();
+                    NftPropertiesResp res = new NftPropertiesResp();
                     BeanUtils.copyProperties(p, res);
+                    SysNftPropertiesTypeEntity type = propertiesTypeMap.get(p.getTypeId());
+                    if (type != null) {
+                        res.setCode(type.getCode());
+                        res.setName(type.getName());
+                    }
                     list.add(res);
                 });
             }
@@ -178,11 +186,30 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         return getOne(queryWrap);
     }
 
-    private void addNftProperties(Long nftId, List<NftProperties> propertiesList) {
+    @Override
+    public void propertiesValueModify(List<NftPropertiesValueModifyReq> req) {
+        req.forEach(p -> {
+            SysNftPropertiesEntity entity = new SysNftPropertiesEntity();
+            BeanUtils.copyProperties(p, entity);
+            sysNftPropertiesService.updateById(entity);
+        });
+    }
+
+    @Override
+    public void ownerChange(List<NftOwnerChangeReq> req) {
+        req.forEach(p -> {
+            SysNftEntity entity = new SysNftEntity();
+            BeanUtils.copyProperties(p, entity);
+            updateById(entity);
+        });
+    }
+
+    private void addNftProperties(Long nftId, List<NftPropertiesReq> propertiesList) {
         if (!CollectionUtils.isEmpty(propertiesList)) {
             List<SysNftPropertiesEntity> nftPropertiesList = new ArrayList<>();
             propertiesList.forEach(p -> {
                 SysNftPropertiesEntity nftProperties = new SysNftPropertiesEntity();
+                nftProperties.setNftId(nftId);
                 BeanUtils.copyProperties(p, nftProperties);
                 nftPropertiesList.add(nftProperties);
             });

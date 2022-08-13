@@ -23,10 +23,10 @@ public class SysNftPropertiesEntity extends BaseEntity {
 	private Long nftId;
 
 	/**
-	 * NFT属性名称
+	 * NFT属性类别id
 	 */
-	@TableField("name")
-	private String name;
+	@TableField("type_id")
+	private Long typeId;
 
 	/**
 	 * NFT属性值

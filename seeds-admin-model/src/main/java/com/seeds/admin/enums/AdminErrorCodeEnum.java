@@ -45,6 +45,7 @@ public enum AdminErrorCodeEnum {
     ERR_40002_NFT_TYPE_PARENT_ITSELF(40002, "上级NFT类别不能为自身", "Parent nft type cannot be for itself"),
     ERR_40003_SUB_NFT_TYPE_EXIST(40003, "存在下级NFT类别", "Subordinate nft type exist"),
     ERR_40004_NFT_ALREADY_EXIST(40004, "NFT已存在", "NFT already exist"),
+    ERR_40004_NFT_PROPERTIES_TYPE_ALREADY_EXIST(40005, "NFT属性类别已存在", "NFT properties type already exist"),
 
     // merchant
     ERR_50001_MERCHANT_ALREADY_EXIST(50001, "商家已存在", "Merchant already exist"),
