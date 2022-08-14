@@ -30,6 +30,11 @@ public class ChainNftServiceImpl implements ChainNftService {
     }
 
     @Override
+    public String testAuth() {
+        return ipfsService.testAuth().toString();
+    }
+
+    @Override
     public String uploadMetadata(String imageFileHash, ChainMintNftReq request) {
 
         // generate metadata file
@@ -53,7 +58,6 @@ public class ChainNftServiceImpl implements ChainNftService {
                 .build();
         return uploadMetadata(imageFileHash, request);
     }
-
 
     @Override
     public boolean mintNft(String metadataFileHash) {

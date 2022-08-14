@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -29,24 +31,31 @@ public class PinataServiceImpl implements IpfsService {
 
     @Override
     public Object testAuth() {
-        GenericDto<Object> result = pinataApiService.authenticate(pinataConfig.getApiKey(), pinataConfig.getApiSecret());
-        return result.getMessage();
+        Object result = pinataApiService.authenticate(securityHeaders());
+        return result;
     }
 
     @Override
     public String pinFile(MultipartFile file) {
-        PinataPinResponse result = pinataApiService.pinFile(pinataConfig.getApiKey(), pinataConfig.getApiSecret(), file);
-        return result.getIpfsHash();
-    }
-    @Override
-    public String pinJson(PinataPinJsonRequest request) {
-        PinataPinResponse result = pinataApiService.pinJson(pinataConfig.getApiKey(), pinataConfig.getApiSecret(), request);
+        PinataPinResponse result = pinataApiService.pinFile(securityHeaders(), file);
         return result.getIpfsHash();
     }
 
     @Override
+    public String pinJson(PinataPinJsonRequest request) {
+        PinataPinResponse result = pinataApiService.pinJson(securityHeaders(), request);
+        return result.getIpfsHash();
+    }
+    @Override
     public String getImageString(String ipfsHash) {
         LinkedHashMap result = (LinkedHashMap) pinataCloudService.getFile(ipfsHash);
         return (String) result.get("image");
+    }
+
+    private Map<String, String> securityHeaders() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("pinata_api_key", pinataConfig.getApiKey());
+        headers.put("pinata_secret_api_key", pinataConfig.getApiSecret());
+        return headers;
     }
 }

@@ -31,8 +31,6 @@ public class ChainNftController {
         log.info("metaData: {}", request);
         String imageFileHash = chainNftService.uploadImage(image);
         String metadataFileHash = chainNftService.uploadMetadata(imageFileHash, request);
-//        String imageFileHash = "QmQG18b7QfJ8xRBN3mnDNEkXSotdw9GVE8Pb4w4oA2KbAa";
-//        String metadataFileHash = "QmXuw8iSyDsRyjF5Q3cVAzw5YedFgV5RZPiRU4jdx7REqt";
         boolean status = chainNftService.mintNft(metadataFileHash);
 
         if (status) {
@@ -45,9 +43,7 @@ public class ChainNftController {
     @PostMapping("/update-nft")
     public GenericDto<Object> updateNftAttribute(@RequestBody ChainUpdateNftReq request) {
         String imageFileHash = chainNftService.getMetadataFileImageHash(request.getTokenId());
-
         String metadataFileHash = chainNftService.updateMetadata(imageFileHash, request);
-
         boolean status = chainNftService.updateNftAttribute(request.getTokenId(), metadataFileHash);
 
         if (status) {
@@ -68,4 +64,12 @@ public class ChainNftController {
         }
     }
 
+    @GetMapping("/test-auth")
+    public GenericDto<Object> testAuth() {
+        try {
+            return GenericDto.success(chainNftService.testAuth());
+        } catch (Exception e) {
+            return GenericDto.failure(ERR_90001_FAIL_TO_EXECUTE_ON_CHAIN.getDescEn(), ERR_90001_FAIL_TO_EXECUTE_ON_CHAIN.getCode(), null);
+        }
+    }
 }

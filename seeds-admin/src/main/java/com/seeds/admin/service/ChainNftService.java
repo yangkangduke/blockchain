@@ -7,6 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 public interface ChainNftService {
     String uploadImage(MultipartFile image);
 
+    String testAuth();
+
     String uploadMetadata(String imageFileHash, ChainMintNftReq request);
 
     String updateMetadata(String imageFileHash, ChainUpdateNftReq request);
