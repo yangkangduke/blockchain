@@ -1,8 +1,10 @@
 package com.seeds.uc.dto.response;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -18,6 +20,8 @@ import java.math.BigDecimal;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AccountActionResp implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,10 +61,10 @@ public class AccountActionResp implements Serializable {
     private Integer status;
 
     @ApiModelProperty("金额")
-    private BigDecimal amount;
+    private String amount;
 
     @ApiModelProperty("手续费")
-    private BigDecimal fee;
+    private String fee;
 
     @ApiModelProperty("频道")
     private Integer channel;

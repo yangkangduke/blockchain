@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seeds.uc.mapper.UcUserAccountMapper">
 
-    <select id="actionHistory" resultType="com.seeds.uc.dto.response.AccountActionResp">
-        SELECT * FROM uc_user_account_action_history
+    <select id="actionHistory" resultType="com.seeds.uc.dto.response.AccountActionResp" parameterType="com.seeds.uc.dto.request.AccountActionHistoryReq">
+        SELECT t.* FROM uc_user_account_action_history t where t.user_id = #{historyReq.userId}
     </select>
 
 </mapper>

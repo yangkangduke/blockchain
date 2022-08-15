@@ -41,7 +41,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("/account")
-@Api(tags = "账号")
+@Api(tags = "账户")
 public class OpenUserAccountController {
 
     @Autowired
@@ -64,6 +64,8 @@ public class OpenUserAccountController {
     @PostMapping("/action/history")
     @ApiOperation(value = "充/提币历史分页", notes = "充/提币历史分页")
     public GenericDto<IPage<AccountActionResp>> actionHistory(@RequestBody AccountActionHistoryReq historyReq) {
+        Long currentUserId = UserContext.getCurrentUserId();
+        historyReq.setUserId(currentUserId);
         Page page = new Page();
         page.setCurrent(historyReq.getCurrent());
         page.setSize(historyReq.getSize());

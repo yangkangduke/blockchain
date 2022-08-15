@@ -39,4 +39,7 @@ public class AccountActionHistoryReq extends PageReq {
     @NotNull
     private Integer status;
 
+    @ApiModelProperty(hidden = true)
+    private Long userId;
+
 }
