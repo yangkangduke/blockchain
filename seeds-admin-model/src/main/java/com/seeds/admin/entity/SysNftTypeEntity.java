@@ -49,9 +49,9 @@ public class SysNftTypeEntity extends BaseEntity {
 	private Integer status;
 
 	/**
-	 * 删除标记  1：已删除   0：未删除
+	 * 删除标记  0：未删除
 	 */
-	@TableLogic
+	@TableLogic(value = "0", delval = "NULL")
 	@TableField("delete_flag")
 	private Integer deleteFlag;
 

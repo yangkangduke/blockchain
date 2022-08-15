@@ -139,7 +139,7 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             return Collections.emptyMap();
         }
         // 被删除的游戏也需要展示
-        List<SysGameEntity> sysGames = sysGameMapper.selectBatchIds(ids);
+        List<SysGameEntity> sysGames = sysGameMapper.queryListByIds(ids);
         if (CollectionUtils.isEmpty(sysGames)) {
             return Collections.emptyMap();
         }

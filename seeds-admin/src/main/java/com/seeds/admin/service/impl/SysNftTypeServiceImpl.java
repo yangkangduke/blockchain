@@ -42,7 +42,7 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
             return Collections.emptyMap();
         }
         // 包含已删除的数据
-        List<SysNftTypeEntity> list = sysNftTypeMapper.selectBatchIds(ids);
+        List<SysNftTypeEntity> list = sysNftTypeMapper.queryListByIds(ids);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyMap();
         }
@@ -51,7 +51,7 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
 
     @Override
     public SysNftTypeEntity queryById(Long id) {
-        return sysNftTypeMapper.selectById(id);
+        return sysNftTypeMapper.queryById(id);
     }
 
     @Override
