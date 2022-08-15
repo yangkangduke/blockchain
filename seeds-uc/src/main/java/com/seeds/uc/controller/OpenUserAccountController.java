@@ -2,16 +2,21 @@ package com.seeds.uc.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.request.UcUserAddressReq;
 import com.seeds.uc.dto.response.AccountActionResp;
+import com.seeds.uc.dto.response.UcUserAccountInfoResp;
+import com.seeds.uc.dto.response.UcUserAddressInfoResp;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
+import com.seeds.uc.model.UcUserAccount;
 import com.seeds.uc.model.UcUserAddress;
 import com.seeds.uc.service.IUcUserAccountService;
 import com.seeds.uc.service.IUcUserAddressService;
@@ -21,10 +26,7 @@ import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -52,15 +54,10 @@ public class OpenUserAccountController {
     private IUcUserAddressService ucUserAddressService;
 
     @PostMapping("/action")
-    @ApiOperation(value = "冲/提币", notes = "冲/提币")
-    public GenericDto<Object> action(@Valid @RequestBody AccountActionReq accountActionReq, HttpServletRequest request) {
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        if (loginUser == null ) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
-        }
-        ucUserAccountService.action(accountActionReq, loginUser);
+    @ApiOperation(value = "冲/提币", notes = "1.调用/account/generate-account 生成账户地址" +
+            "2.进行OTC操作，调用/account/action接口进行冲提币")
+    public GenericDto<Object> action(@Valid @RequestBody AccountActionReq accountActionReq) {
+        ucUserAccountService.action(accountActionReq);
         return GenericDto.success(null);
     }
 
@@ -73,20 +70,24 @@ public class OpenUserAccountController {
         return GenericDto.success(ucUserAccountService.actionHistory(page, historyReq));
     }
 
-    @PostMapping("/address/init")
-    @ApiOperation(value = "创建地址", notes = "创建地址")
-    public GenericDto<Object> createAddress(@RequestBody UcUserAddressReq addressReq, HttpServletRequest request) {
-        long currentTime = System.currentTimeMillis();
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        UcUserAddress build = UcUserAddress.builder()
-                .build();
-        BeanUtil.copyProperties(addressReq, build);
-        build.setUserId(loginUser.getUserId());
-        build.setCreateTime(currentTime);
-        build.setUpdateTime(currentTime);
-        ucUserAddressService.save(build);
-        return GenericDto.success(null);
+    @PostMapping("/generate-account")
+    @ApiOperation(value = "生成账户", notes = "生成账户")
+    public GenericDto<UcUserAccountInfoResp> deposit() {
+        Long userId = UserContext.getCurrentUserId();
+        UcUserAccount ucUserAccount = ucUserAccountService.getOne(new LambdaQueryWrapper<UcUserAccount>()
+                .eq(UcUserAccount::getUserId, userId));
+        if (ucUserAccount == null) {
+            // todo 远程调用创建账户
+            ucUserAccountService.creatAccountByUserId(userId);
+        }
+
+        return GenericDto.success(ucUserAccountService.getInfo());
+    }
+
+
+    @GetMapping("/info")
+    @ApiOperation(value = "账户详情", notes = "账户详情")
+    public GenericDto<UcUserAccountInfoResp> info() {
+        return GenericDto.success(ucUserAccountService.getInfo());
     }
 }
