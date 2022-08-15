@@ -6,6 +6,7 @@ import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.response.AccountActionResp;
+import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.model.UcUserAccount;
 
 /**
@@ -25,7 +26,7 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * @param loginUser
      * @return
      */
-    void action(AccountActionReq accountActionReq, LoginUserDTO loginUser);
+    void action(AccountActionReq accountActionReq);
 
     /**
      * 充/提币历史分页
@@ -34,4 +35,8 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * @return
      */
     Page<AccountActionResp> actionHistory(Page page, AccountActionHistoryReq historyReq);
+
+    UcUserAccountInfoResp getInfo();
+
+    void creatAccountByUserId(Long userId);
 }
