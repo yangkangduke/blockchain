@@ -5,6 +5,9 @@ import com.seeds.admin.entity.SysGameEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * 系统游戏
  *
@@ -15,5 +18,7 @@ import org.apache.ibatis.annotations.Param;
 public interface SysGameMapper extends BaseMapper<SysGameEntity> {
 
     SysGameEntity queryById(@Param("id") Long id);
+
+    List<SysGameEntity> queryListByIds(@Param("ids") Collection<Long> ids);
 
 }
