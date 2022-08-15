@@ -33,13 +33,6 @@ public interface SysGameService extends IService<SysGameEntity> {
     List<SysGameResp> select(Long merchantId);
 
     /**
-     * 通过游戏id列表获取系统游戏列表
-     * @param ids 游戏id列表
-     * @return 系统游戏列表
-     */
-    List<SysGameEntity> queryByIds(Collection<Long> ids);
-
-    /**
      * 通过游戏id获取系统游戏
      * @param id 游戏id
      * @return 系统游戏

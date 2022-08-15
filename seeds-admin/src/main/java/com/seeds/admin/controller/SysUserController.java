@@ -95,7 +95,7 @@ public class SysUserController {
     @ApiOperation("编辑")
     @RequiredPermission("sys:user:modify")
     public GenericDto<Object> modify(@Valid @RequestBody SysUserModifyReq req) {
-        SysUserEntity adminUser = sysUserService.queryById(req.getId());
+        SysUserEntity adminUser = sysUserService.getById(req.getId());
         if (adminUser == null) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
         }
@@ -114,7 +114,7 @@ public class SysUserController {
     @ApiOperation(value = "修改密码")
     @RequiredPermission("sys:user:changePassword")
     public GenericDto<Object> changePassword(@Valid @RequestBody SysUserPasswordReq req) {
-        SysUserEntity adminUser = sysUserService.queryById(req.getUserId());
+        SysUserEntity adminUser = sysUserService.getById(req.getUserId());
         if (adminUser == null) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
         }
@@ -132,7 +132,7 @@ public class SysUserController {
     @ApiOperation(value = "重置密码")
     @RequiredPermission("sys:user:resetPassword")
     public GenericDto<Object> resetPassword(@RequestParam(name = "userId") Long userId) {
-        SysUserEntity adminUser = sysUserService.queryById(userId);
+        SysUserEntity adminUser = sysUserService.getById(userId);
         if (adminUser == null) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
         }

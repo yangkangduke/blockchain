@@ -47,13 +47,6 @@ public interface SysNftPropertiesTypeService extends IService<SysNftPropertiesTy
     void batchDelete(ListReq req);
 
     /**
-     * 通过id查询NFT属性类别
-     * @param  id NFT属性类别id
-     * @return  NFT属性类别
-     */
-    SysNftPropertiesTypeEntity queryById(Long id);
-
-    /**
      * 通过id列表查询NFT属性类别
      * @param  ids NFT属性类别id列表
      * @return  NFT属性类别

@@ -72,7 +72,7 @@ public class DataFilterInterceptor implements InnerInterceptor {
         try {
             // 获取登录用户
             Long userId = UserContext.getCurrentAdminUserId();
-            SysUserEntity sysUser = sysUserService.queryById(userId);
+            SysUserEntity sysUser = sysUserService.getById(userId);
             // 如果是超级管理员，则不进行数据过滤
             if(sysUser.getSuperAdmin() == WhetherEnum.YES.value()) {
                 return;

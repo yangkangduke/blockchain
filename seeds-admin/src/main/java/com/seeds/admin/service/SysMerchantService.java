@@ -29,20 +29,6 @@ public interface SysMerchantService extends IService<SysMerchantEntity> {
     List<SysMerchantResp> queryList();
 
     /**
-     * 通过id获取系统商家信息
-     * @param id 商家id
-     * @return 系统商家信息
-     */
-    SysMerchantEntity queryById(Long id);
-
-    /**
-     * 通过id列表获取系统商家信息列表
-     * @param ids 商家id列表
-     * @return 系统商家信息列表
-     */
-    List<SysMerchantEntity> queryByIds(Collection<Long> ids);
-
-    /**
      * 分页获取系统商家信息
      * @param query 分页查询条件
      * @return 系统商家信息

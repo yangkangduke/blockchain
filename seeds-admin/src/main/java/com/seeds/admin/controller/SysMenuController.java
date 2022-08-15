@@ -104,7 +104,7 @@ public class SysMenuController {
         // 获取登录用户
         Long userId = UserContext.getCurrentAdminUserId();
         // 获取用户
-        SysUserEntity user = sysUserService.queryById(userId);
+        SysUserEntity user = sysUserService.getById(userId);
         return GenericDto.success(sysMenuService.getUserMenuList(user));
     }
 

@@ -11,7 +11,6 @@ import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.*;
 import com.seeds.admin.enums.SysStatusEnum;
-import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysNftMapper;
 import com.seeds.admin.service.*;
 import org.apache.commons.lang3.StringUtils;
@@ -55,8 +54,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .likeRight(StringUtils.isNotBlank(query.getName()), SysNftEntity::getName, query.getName())
                 .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId())
                 .eq(query.getStatus() != null, SysNftEntity::getStatus, query.getStatus())
-                .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
-                .eq(SysNftEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId());
         Page<SysNftEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysNftEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -84,14 +82,6 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
-    public SysNftEntity queryById(Long id) {
-        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
-                .eq(SysNftEntity::getId, id)
-                .eq(SysNftEntity::getDeleteFlag, WhetherEnum.NO.value());
-        return getOne(queryWrap);
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(SysNftAddReq req) {
         // 添加NFT
@@ -106,18 +96,18 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     public SysNftDetailResp detail(Long id) {
-        SysNftEntity sysNft = queryById(id);
+        SysNftEntity sysNft = getById(id);
         SysNftDetailResp resp = new SysNftDetailResp();
         if (sysNft != null) {
             // NFT信息
             BeanUtils.copyProperties(sysNft, resp);
             // 游戏信息
-            SysGameEntity sysGame = sysGameService.getById(sysNft.getId());
+            SysGameEntity sysGame = sysGameService.queryById(sysNft.getId());
             if (sysGame != null) {
                 resp.setGameName(sysGame.getName());
             }
             // NFT类别信息
-            SysNftTypeEntity sysNftType = sysNftTypeService.getById(sysNft.getNftTypeId());
+            SysNftTypeEntity sysNftType = sysNftTypeService.queryById(sysNft.getNftTypeId());
             if (sysNftType != null) {
                 resp.setTypeName(sysNftType.getName());
             }
@@ -182,8 +172,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Override
     public SysNftEntity queryByContractAddress(String contractAddress) {
         LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
-                .eq(SysNftEntity::getContractAddress, contractAddress)
-                .eq(SysNftEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(SysNftEntity::getContractAddress, contractAddress);
         return getOne(queryWrap);
     }
 
@@ -209,8 +198,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     public List<SysNftResp> userOwned(Long userId, Long gameId) {
         LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
                 .eq(SysNftEntity::getOwnerId, userId)
-                .eq(gameId != null, SysNftEntity::getGameId, gameId)
-                .eq(SysNftEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(gameId != null, SysNftEntity::getGameId, gameId);
         List<SysNftEntity> list = list(queryWrap);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();

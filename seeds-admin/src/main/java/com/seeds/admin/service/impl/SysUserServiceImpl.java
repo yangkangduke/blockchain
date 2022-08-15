@@ -48,32 +48,19 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     private SysRoleService sysRoleService;
 
     @Autowired
-    private SysFileService sysFileService;
-
-    @Autowired
     private SysRoleUserService sysRoleUserService;
 
     @Override
     public SysUserEntity queryByMobile(String mobile) {
         LambdaQueryWrapper<SysUserEntity> query = new QueryWrapper<SysUserEntity>().lambda()
-                .eq(SysUserEntity::getMobile, mobile)
-                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(SysUserEntity::getMobile, mobile);
         return getOne(query);
     }
 
     @Override
     public SysUserEntity queryByAccount(String account) {
         LambdaQueryWrapper<SysUserEntity> query = new QueryWrapper<SysUserEntity>().lambda()
-                .eq(SysUserEntity::getAccount, account)
-                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
-        return getOne(query);
-    }
-
-    @Override
-    public SysUserEntity queryById(Long userId) {
-        LambdaQueryWrapper<SysUserEntity> query = new QueryWrapper<SysUserEntity>().lambda()
-                .eq(SysUserEntity::getId, userId)
-                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(SysUserEntity::getAccount, account);
         return getOne(query);
     }
 
@@ -82,8 +69,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
                 .likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysUserEntity::getRealName, query.getNameOrMobile())
                 .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysUserEntity::getMobile, query.getNameOrMobile())
-                .eq(query.getDeptId() != null, SysUserEntity::getDeptId, query.getDeptId())
-                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(query.getDeptId() != null, SysUserEntity::getDeptId, query.getDeptId());
         Page<SysUserEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysUserEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -141,19 +127,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     }
 
     @Override
-    public List<SysUserEntity> queryByIds(Collection<Long> ids) {
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
-                .in(SysUserEntity::getId, ids)
-                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
-        return list(queryWrap);
-    }
-
-    @Override
     public Map<Long, String> queryNameMapByIds(Collection<Long> ids) {
-        List<SysUserEntity> sysUser = queryByIds(ids);
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        List<SysUserEntity> sysUser = listByIds(ids);
         if (CollectionUtils.isEmpty(sysUser)) {
             return Collections.emptyMap();
         }
@@ -195,7 +173,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 
     @Override
     public AdminUserResp queryLoginUserInfo(Long userId) {
-        SysUserEntity user = queryById(userId);
+        SysUserEntity user = getById(userId);
         AdminUserResp resp = new AdminUserResp();
         if (user != null) {
             // 用户信息
@@ -215,7 +193,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 
     @Override
     public SysUserResp detail(Long id) {
-        SysUserEntity user = queryById(id);
+        SysUserEntity user = getById(id);
         SysUserResp resp = new SysUserResp();
         if (user != null) {
             BeanUtils.copyProperties(user, resp);
@@ -224,7 +202,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
                 StringBuilder str = new StringBuilder();
                 Set<Long> roleIds = sysRoleUser.stream().map(SysRoleUserEntity::getRoleId).collect(Collectors.toSet());
                 resp.setRoleIds(new ArrayList<>(roleIds));
-                List<SysRoleEntity> sysRole = sysRoleService.queryByIds(roleIds);
+                List<SysRoleEntity> sysRole = sysRoleService.listByIds(roleIds);
                 sysRole.forEach(p -> str.append(p.getRoleName()).append(","));
                 if (str.length() > 0) {
                     resp.setRoleNameStr(str.substring(0, str.lastIndexOf(",")));
@@ -239,8 +217,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     @Override
     public SysUserBriefResp brief(String mobile) {
         LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
-                .eq(SysUserEntity::getMobile, mobile)
-                .eq(SysUserEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(SysUserEntity::getMobile, mobile);
         SysUserEntity sysUser = getOne(queryWrap);
         SysUserBriefResp res = new SysUserBriefResp();
         if (sysUser != null) {

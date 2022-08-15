@@ -36,7 +36,7 @@ public class AdminShiroServiceImpl implements AdminShiroService {
     public Set<String> getUserPermissions(Long userId) {
 
         // 获取用户
-        SysUserEntity user = sysUserService.queryById(userId);
+        SysUserEntity user = sysUserService.getById(userId);
         // 系统管理员，拥有最高权限
         List<String> permissionsList;
         if(user.getSuperAdmin() == WhetherEnum.YES.value()) {

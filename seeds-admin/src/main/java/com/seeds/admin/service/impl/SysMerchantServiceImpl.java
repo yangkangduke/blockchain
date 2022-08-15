@@ -21,7 +21,6 @@ import com.seeds.admin.entity.SysMerchantUserEntity;
 import com.seeds.admin.entity.SysRoleEntity;
 import com.seeds.admin.entity.SysUserEntity;
 import com.seeds.admin.enums.SysStatusEnum;
-import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.service.SysGameService;
 import com.seeds.admin.mapper.SysMerchantMapper;
 import com.seeds.admin.service.SysMerchantGameService;
@@ -74,37 +73,14 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
 
     @Override
     public List<SysMerchantResp> queryList() {
-        LambdaQueryWrapper<SysMerchantEntity> query = new QueryWrapper<SysMerchantEntity>().lambda()
-                .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
-        List<SysMerchantEntity> list = list(query);
-        return convertToResp(list);
-    }
-
-    @Override
-    public SysMerchantEntity queryById(Long id) {
-        LambdaQueryWrapper<SysMerchantEntity> query = new QueryWrapper<SysMerchantEntity>().lambda()
-                .eq(SysMerchantEntity::getId, id)
-                .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
-        return getOne(query);
-    }
-
-    @Override
-    public List<SysMerchantEntity> queryByIds(Collection<Long> ids) {
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        LambdaQueryWrapper<SysMerchantEntity> query = new QueryWrapper<SysMerchantEntity>().lambda()
-                .in(SysMerchantEntity::getId, ids)
-                .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
-        return list(query);
+        return convertToResp(list());
     }
 
     @Override
     public IPage<SysMerchantResp> queryPage(SysMerchantPageReq query) {
         LambdaQueryWrapper<SysMerchantEntity> queryWrap = new QueryWrapper<SysMerchantEntity>().lambda()
                 .likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysMerchantEntity::getName, query.getNameOrMobile())
-                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysMerchantEntity::getMobile, query.getNameOrMobile())
-                .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysMerchantEntity::getMobile, query.getNameOrMobile());
         Page<SysMerchantEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysMerchantEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -156,7 +132,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     @Override
     public SysMerchantResp detail(Long id) {
         // 商家详情
-        SysMerchantEntity sysMerchant = queryById(id);
+        SysMerchantEntity sysMerchant = getById(id);
         SysMerchantResp resp = new SysMerchantResp();
         if (sysMerchant == null) {
             return resp;
@@ -168,7 +144,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
         List<SysMerchantUserEntity> merchantUser = sysMerchantUserService.queryByMerchantId(id);
         if (!CollectionUtils.isEmpty(merchantUser)) {
             Set<Long> userIds = merchantUser.stream().map(SysMerchantUserEntity::getUserId).collect(Collectors.toSet());
-            List<SysUserEntity> sysUser = sysUserService.queryByIds(userIds);
+            List<SysUserEntity> sysUser = sysUserService.listByIds(userIds);
             List<SysMerchantUserResp> userRespList = new ArrayList<>();
             sysUser.forEach(p -> {
                         SysMerchantUserResp userResp = new SysMerchantUserResp();
@@ -187,7 +163,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     @Transactional(rollbackFor = Exception.class)
     public void modify(SysMerchantModifyReq req) {
         // 商家信息
-        SysMerchantEntity sysMerchant = queryById(req.getId());
+        SysMerchantEntity sysMerchant = getById(req.getId());
         if (sysMerchant == null) {
             return;
         }
@@ -223,7 +199,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     public void batchDelete(ListReq req) {
         Set<Long> merchantIds = req.getIds();
         // 删除商家
-        List<SysMerchantEntity> sysMerchants = queryByIds(merchantIds);
+        List<SysMerchantEntity> sysMerchants = listByIds(merchantIds);
         if (CollectionUtils.isEmpty(sysMerchants)) {
             return;
         }
@@ -292,7 +268,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(ListReq req, Long merchantId) {
-        SysMerchantEntity sysMerchant = queryById(merchantId);
+        SysMerchantEntity sysMerchant = getById(merchantId);
         if (sysMerchant == null) {
             return;
         }
@@ -358,8 +334,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     @Override
     public SysMerchantEntity queryByUrl(String url) {
         LambdaQueryWrapper<SysMerchantEntity> query = new QueryWrapper<SysMerchantEntity>().lambda()
-                .eq(SysMerchantEntity::getUrl, url)
-                .eq(SysMerchantEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(SysMerchantEntity::getUrl, url);
         return getOne(query);
     }
 
