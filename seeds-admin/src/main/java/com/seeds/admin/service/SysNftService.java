@@ -25,13 +25,6 @@ public interface SysNftService extends IService<SysNftEntity> {
     IPage<SysNftResp> queryPage(SysNftPageReq query);
 
     /**
-     * 通过id获取系统NFT信息
-     * @param id NFT的id
-     * @return 系统NFT信息
-     */
-    SysNftEntity queryById(Long id);
-
-    /**
      * 添加系统NFT信息
      * @param req NFT信息
      */

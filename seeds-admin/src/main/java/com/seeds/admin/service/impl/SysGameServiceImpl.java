@@ -9,9 +9,7 @@ import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.entity.SysGameEntity;
 import com.seeds.admin.enums.SysStatusEnum;
-import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysGameMapper;
-import com.seeds.admin.service.SysFileService;
 import com.seeds.admin.service.SysGameService;
 import com.seeds.admin.service.SysMerchantGameService;
 import org.apache.commons.lang3.StringUtils;
@@ -37,13 +35,12 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     private SysMerchantGameService sysMerchantGameService;
 
     @Autowired
-    private SysFileService sysFileService;
+    private SysGameMapper sysGameMapper;
 
     @Override
     public IPage<SysGameResp> queryPage(SysGamePageReq query) {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
-                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName())
-                .eq(SysGameEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName());
         Page<SysGameEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysGameEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -61,15 +58,15 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
 
     @Override
     public List<SysGameResp> select(Long merchantId) {
-        List<SysGameEntity> games;
+        List<SysGameEntity> games = new ArrayList<>();
         if (merchantId != null) {
             // 查询商家下的游戏
             Set<Long> gameIds = sysMerchantGameService.queryGameIdByMerchantId(merchantId);
-            games = queryByIds(gameIds);
+            if (!CollectionUtils.isEmpty(gameIds)) {
+                games = listByIds(gameIds);
+            }
         } else {
-            LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
-                    .eq(SysGameEntity::getDeleteFlag, WhetherEnum.NO.value());
-            games = list(queryWrap);
+            games = list();
         }
         List<SysGameResp> respList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(games)) {
@@ -83,22 +80,8 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     }
 
     @Override
-    public List<SysGameEntity> queryByIds(Collection<Long> ids) {
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
-                .eq(SysGameEntity::getDeleteFlag, WhetherEnum.NO.value())
-                .in(SysGameEntity::getId, ids);
-        return list(queryWrap);
-    }
-
-    @Override
     public SysGameEntity queryById(Long id) {
-        LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
-                .eq(SysGameEntity::getId, id)
-                .eq(SysGameEntity::getDeleteFlag, WhetherEnum.NO.value());
-        return getOne(queryWrap);
+        return sysGameMapper.queryById(id);
     }
 
     @Override
@@ -110,7 +93,7 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
 
     @Override
     public SysGameResp detail(Long id) {
-        SysGameEntity sysGame = queryById(id);
+        SysGameEntity sysGame = getById(id);
         SysGameResp resp = new SysGameResp();
         if (sysGame != null) {
             BeanUtils.copyProperties(sysGame, resp);
@@ -156,7 +139,7 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             return Collections.emptyMap();
         }
         // 被删除的游戏也需要展示
-        List<SysGameEntity> sysGames = listByIds(ids);
+        List<SysGameEntity> sysGames = sysGameMapper.selectBatchIds(ids);
         if (CollectionUtils.isEmpty(sysGames)) {
             return Collections.emptyMap();
         }
@@ -166,8 +149,7 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     @Override
     public SysGameEntity queryByOfficialUrl(String officialUrl) {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
-                .eq(SysGameEntity::getOfficialUrl, officialUrl)
-                .eq(SysGameEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(SysGameEntity::getOfficialUrl, officialUrl);
         return getOne(queryWrap);
     }
 }

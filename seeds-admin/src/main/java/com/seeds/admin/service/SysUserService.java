@@ -38,13 +38,6 @@ public interface SysUserService extends IService<SysUserEntity> {
     SysUserEntity queryByAccount(String account);
 
     /**
-     * 通过id查询系统用户
-     * @param userId 用户id
-     * @return 系统用户信息
-     */
-    SysUserEntity queryById(Long userId);
-
-    /**
      * 分页查询系统用户
      * @param query 查询条件
      * @return 系统用户信息
@@ -64,13 +57,6 @@ public interface SysUserService extends IService<SysUserEntity> {
      * @return 系统用户信息
      */
     SysUserEntity modify(SysUserModifyReq user);
-
-    /**
-     * 通过id批量查询系统用户
-     * @param ids 用户id
-     * @return 系统用户信息
-     */
-    List<SysUserEntity> queryByIds(Collection<Long> ids);
 
     /**
      * 通过id批量查询系统用户名称

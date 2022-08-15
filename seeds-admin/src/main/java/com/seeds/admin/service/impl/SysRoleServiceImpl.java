@@ -12,7 +12,6 @@ import com.seeds.admin.dto.request.SysRolePageReq;
 import com.seeds.admin.dto.response.SysRoleResp;
 import com.seeds.admin.entity.SysRoleEntity;
 import com.seeds.admin.entity.SysRoleUserEntity;
-import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysRoleMapper;
 import com.seeds.admin.service.SysRoleMenuService;
 import com.seeds.admin.service.SysRoleService;
@@ -45,8 +44,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
     @Override
     public IPage<SysRoleResp> queryPage(SysRolePageReq query) {
         LambdaQueryWrapper<SysRoleEntity> queryWrap = new QueryWrapper<SysRoleEntity>().lambda()
-                .eq(StringUtils.isNotBlank(query.getRoleName()), SysRoleEntity::getRoleName, query.getRoleName())
-                .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(StringUtils.isNotBlank(query.getRoleName()), SysRoleEntity::getRoleName, query.getRoleName());
         Page<SysRoleEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysRoleEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -66,28 +64,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
     @Override
     public SysRoleEntity queryByRoleCode(String roleCode) {
         LambdaQueryWrapper<SysRoleEntity> query = new QueryWrapper<SysRoleEntity>().lambda()
-                .eq(SysRoleEntity::getRoleCode, roleCode)
-                .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(SysRoleEntity::getRoleCode, roleCode);
         return getOne(query);
-    }
-
-    @Override
-    public SysRoleEntity queryById(Long id) {
-        LambdaQueryWrapper<SysRoleEntity> query = new QueryWrapper<SysRoleEntity>().lambda()
-                .eq(SysRoleEntity::getId, id)
-                .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());
-        return getOne(query);
-    }
-
-    @Override
-    public List<SysRoleEntity> queryByIds(Collection<Long> ids) {
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        LambdaQueryWrapper<SysRoleEntity> query = new QueryWrapper<SysRoleEntity>().lambda()
-                .in(SysRoleEntity::getId, ids)
-                .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());
-        return list(query);
     }
 
     @Override
@@ -95,7 +73,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyMap();
         }
-        List<SysRoleEntity> list = queryByIds(ids);
+        List<SysRoleEntity> list = listByIds(ids);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyMap();
         }
@@ -137,7 +115,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
 
     @Override
     public SysRoleResp detail(Long id) {
-        SysRoleEntity role = queryById(id);
+        SysRoleEntity role = getById(id);
         SysRoleResp resp = new SysRoleResp();
         if (role != null) {
             BeanUtils.copyProperties(role, resp);
@@ -149,10 +127,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
 
     @Override
     public List<SysRoleResp> queryList() {
-        LambdaQueryWrapper<SysRoleEntity> query = new QueryWrapper<SysRoleEntity>().lambda()
-                .eq(SysRoleEntity::getDeleteFlag, WhetherEnum.NO.value());
-        List<SysRoleEntity> list = list(query);
-        return convertToResp(list);
+        return convertToResp(list());
     }
 
     @Override

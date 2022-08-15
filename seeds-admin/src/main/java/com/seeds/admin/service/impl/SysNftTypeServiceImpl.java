@@ -10,12 +10,12 @@ import com.seeds.admin.dto.request.SysNftTypeModifyReq;
 import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.entity.SysNftTypeEntity;
 import com.seeds.admin.enums.SysStatusEnum;
-import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.utils.TreeUtils;
 import com.seeds.admin.mapper.SysNftTypeMapper;
 import com.seeds.admin.service.SysNftTypeService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -33,13 +33,16 @@ import java.util.stream.Collectors;
 @Service
 public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftTypeEntity> implements SysNftTypeService {
 
+    @Autowired
+    private SysNftTypeMapper sysNftTypeMapper;
+
     @Override
     public Map<Long, SysNftTypeEntity> queryMapByIds(Collection<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyMap();
         }
         // 包含已删除的数据
-        List<SysNftTypeEntity> list = listByIds(ids);
+        List<SysNftTypeEntity> list = sysNftTypeMapper.selectBatchIds(ids);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyMap();
         }
@@ -48,17 +51,13 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
 
     @Override
     public SysNftTypeEntity queryById(Long id) {
-        LambdaQueryWrapper<SysNftTypeEntity> query = new QueryWrapper<SysNftTypeEntity>().lambda()
-                .eq(SysNftTypeEntity::getId, id)
-                .eq(SysNftTypeEntity::getDeleteFlag, WhetherEnum.NO.value());
-        return getOne(query);
+        return sysNftTypeMapper.selectById(id);
     }
 
     @Override
     public List<SysNftTypeResp> queryRespList(String name) {
         LambdaQueryWrapper<SysNftTypeEntity> query = new QueryWrapper<SysNftTypeEntity>().lambda()
                 .likeRight(StringUtils.isNotBlank(name), SysNftTypeEntity::getName, name)
-                .eq(SysNftTypeEntity::getDeleteFlag, WhetherEnum.NO.value())
                 .orderByAsc(SysNftTypeEntity::getSort);
         return convertToResp(list(query));
     }
@@ -73,7 +72,7 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
     @Override
     public SysNftTypeResp detail(Long id) {
         SysNftTypeResp resp = new SysNftTypeResp();
-        SysNftTypeEntity nftType = queryById(id);
+        SysNftTypeEntity nftType = getById(id);
         if (nftType != null) {
             BeanUtils.copyProperties(nftType, resp);
         }
@@ -90,8 +89,7 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
     @Override
     public SysNftTypeEntity queryByTypeCode(String code) {
         LambdaQueryWrapper<SysNftTypeEntity> query = new QueryWrapper<SysNftTypeEntity>().lambda()
-                .eq(SysNftTypeEntity::getCode, code)
-                .eq(SysNftTypeEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .eq(SysNftTypeEntity::getCode, code);
         return getOne(query);
     }
 
@@ -145,8 +143,7 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
         } else {
             query.eq(SysNftTypeEntity::getParentCode, parentCode);
         }
-        query.eq(SysNftTypeEntity::getDeleteFlag, WhetherEnum.NO.value())
-                .orderByAsc(SysNftTypeEntity::getSort);
+        query.orderByAsc(SysNftTypeEntity::getSort);
         return convertToResp(list(query));
     }
 

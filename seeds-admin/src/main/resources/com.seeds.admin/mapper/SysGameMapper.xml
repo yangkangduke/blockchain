@@ -3,4 +3,42 @@
 
 <mapper namespace="com.seeds.admin.mapper.SysGameMapper">
 
+    <resultMap id="BaseResultMap" type="com.seeds.admin.entity.SysGameEntity">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="brief" jdbcType="VARCHAR" property="brief"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="unit" jdbcType="VARCHAR" property="unit"/>
+        <result column="official_url" jdbcType="VARCHAR" property="officialUrl"/>
+        <result column="download_url" jdbcType="VARCHAR" property="downloadUrl"/>
+        <result column="community_url" jdbcType="VARCHAR" property="communityUrl"/>
+        <result column="developer" jdbcType="VARCHAR" property="developer"/>
+        <result column="picture_url" jdbcType="VARCHAR" property="pictureUrl"/>
+        <result column="picture_file_id" jdbcType="BIGINT" property="pictureFileId"/>
+        <result column="video_url" jdbcType="VARCHAR" property="videoUrl"/>
+        <result column="video_file_id" jdbcType="BIGINT" property="videoFileId"/>
+        <result column="comments_allowed" jdbcType="TINYINT" property="commentsAllowed"/>
+        <result column="introduction" jdbcType="VARCHAR" property="introduction"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="delete_flag" jdbcType="TINYINT" property="deleteFlag"/>
+        <result column="created_by" jdbcType="BIGINT" property="createdBy"/>
+        <result column="updated_by" jdbcType="BIGINT" property="updatedBy"/>
+        <result column="created_at" jdbcType="BIGINT" property="createdAt"/>
+        <result column="updated_at" jdbcType="BIGINT" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="mainColumns">
+        id, name, brief, price, unit, official_url, download_url, community_url, developer, picture_url, picture_file_id, video_url,
+            video_file_id, comments_allowed, introduction, status, delete_flag, created_by, updated_by, created_at, updated_at
+    </sql>
+
+    <select id="queryById" resultMap="BaseResultMap">
+        select
+        <include refid="mainColumns"/>
+        from sys_game
+        where 1 = 1
+        <if test="id != null and id != ''">
+            and id != #{id}
+        </if>
+    </select>
 </mapper>

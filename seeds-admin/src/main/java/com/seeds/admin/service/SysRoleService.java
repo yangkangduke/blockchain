@@ -36,20 +36,6 @@ public interface SysRoleService extends IService<SysRoleEntity> {
     SysRoleEntity queryByRoleCode(String roleCode);
 
     /**
-     * 通过id查询系统角色
-     * @param id 角色编号
-     * @return 系统角色信息
-     */
-    SysRoleEntity queryById(Long id);
-
-    /**
-     * 通过id列表查询系统角色
-     * @param ids 角色id列表
-     * @return 系统角色信息
-     */
-    List<SysRoleEntity> queryByIds(Collection<Long> ids);
-
-    /**
      * 通过id列表查询系统角色
      * @param ids 角色id列表
      * @return 系统角色信息

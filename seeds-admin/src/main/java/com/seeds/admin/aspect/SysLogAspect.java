@@ -83,7 +83,7 @@ public class SysLogAspect {
         sysLog.setIp(IPUtil.getIpAddress(request));
         Long userId = UserContext.getCurrentAdminUserId();
         sysLog.setOperator(userId);
-        SysUserEntity sysUser = sysUserService.queryById(userId);
+        SysUserEntity sysUser = sysUserService.getById(userId);
         if (!ObjectUtils.isEmpty(sysUser)) {
             sysLog.setOperatorName(sysUser.getRealName());
         }

@@ -11,7 +11,6 @@ import com.seeds.admin.dto.request.SysNftPropertiesTypePageReq;
 import com.seeds.admin.dto.request.SysNftTypeModifyReq;
 import com.seeds.admin.dto.response.SysNftPropertiesTypeResp;
 import com.seeds.admin.entity.SysNftPropertiesTypeEntity;
-import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysNftPropertiesTypeMapper;
 import com.seeds.admin.service.SysNftPropertiesTypeService;
 import org.apache.commons.lang3.StringUtils;
@@ -60,14 +59,6 @@ public class SysNftPropertiesTypeServiceImpl extends ServiceImpl<SysNftPropertie
     }
 
     @Override
-    public SysNftPropertiesTypeEntity queryById(Long id) {
-        LambdaQueryWrapper<SysNftPropertiesTypeEntity> queryWrap = new QueryWrapper<SysNftPropertiesTypeEntity>().lambda()
-                .eq(SysNftPropertiesTypeEntity::getId, id)
-                .eq(SysNftPropertiesTypeEntity::getDeleteFlag, WhetherEnum.NO.value());
-        return getOne(queryWrap);
-    }
-
-    @Override
     public Map<Long, SysNftPropertiesTypeEntity> queryMapByIds(Collection<Long> ids) {
         List<SysNftPropertiesTypeEntity> list = listByIds(ids);
         if (CollectionUtils.isEmpty(list)) {
@@ -79,7 +70,7 @@ public class SysNftPropertiesTypeServiceImpl extends ServiceImpl<SysNftPropertie
 
     @Override
     public SysNftPropertiesTypeResp detail(Long id) {
-        SysNftPropertiesTypeEntity propertiesType = queryById(id);
+        SysNftPropertiesTypeEntity propertiesType = getById(id);
         SysNftPropertiesTypeResp resp = new SysNftPropertiesTypeResp();
         if (propertiesType != null) {
             BeanUtils.copyProperties(propertiesType, resp);
@@ -90,8 +81,7 @@ public class SysNftPropertiesTypeServiceImpl extends ServiceImpl<SysNftPropertie
     @Override
     public IPage<SysNftPropertiesTypeResp> queryPage(SysNftPropertiesTypePageReq query) {
         LambdaQueryWrapper<SysNftPropertiesTypeEntity> queryWrap = new QueryWrapper<SysNftPropertiesTypeEntity>().lambda()
-                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftPropertiesTypeEntity::getName, query.getName())
-                .eq(SysNftPropertiesTypeEntity::getDeleteFlag, WhetherEnum.NO.value());
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftPropertiesTypeEntity::getName, query.getName());
         Page<SysNftPropertiesTypeEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysNftPropertiesTypeEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
