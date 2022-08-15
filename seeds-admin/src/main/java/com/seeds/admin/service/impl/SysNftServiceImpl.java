@@ -38,9 +38,6 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     private SysGameService sysGameService;
 
     @Autowired
-    private SysFileService sysFileService;
-
-    @Autowired
     private SysNftTypeService sysNftTypeService;
 
     @Autowired
@@ -68,12 +65,16 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         Set<Long> gameIds = records.stream().map(SysNftEntity::getGameId).collect(Collectors.toSet());
         Map<Long, String> gameMap = sysGameService.queryMapByIds(gameIds);
         Set<Long> nftTypeIds = records.stream().map(SysNftEntity::getNftTypeId).collect(Collectors.toSet());
-        Map<Long, String> nftTypeMap = sysNftTypeService.queryNameMapByIds(nftTypeIds);
+        Map<Long, SysNftTypeEntity> nftTypeMap = sysNftTypeService.queryMapByIds(nftTypeIds);
         return page.convert(p -> {
             SysNftResp resp = new SysNftResp();
             BeanUtils.copyProperties(p, resp);
             resp.setGameName(gameMap.get(p.getGameId()));
-            resp.setTypeName(nftTypeMap.get(p.getNftTypeId()));
+            SysNftTypeEntity nftType = nftTypeMap.get(p.getNftTypeId());
+            if (nftType != null) {
+                resp.setTypeCode(nftType.getCode());
+                resp.setTypeName(nftType.getName());
+            }
             // 图片
             resp.setPicture(p.getUrl());
             // 价格
@@ -202,6 +203,32 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             BeanUtils.copyProperties(p, entity);
             updateById(entity);
         });
+    }
+
+    @Override
+    public List<SysNftResp> userOwned(Long userId, Long gameId) {
+        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                .eq(SysNftEntity::getOwnerId, userId)
+                .eq(gameId != null, SysNftEntity::getGameId, gameId)
+                .eq(SysNftEntity::getDeleteFlag, WhetherEnum.NO.value());
+        List<SysNftEntity> list = list(queryWrap);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+        Set<Long> nftTypeIds = list.stream().map(SysNftEntity::getNftTypeId).collect(Collectors.toSet());
+        Map<Long, SysNftTypeEntity> nftTypeMap = sysNftTypeService.queryMapByIds(nftTypeIds);
+        List<SysNftResp> respList = new ArrayList<>();
+        list.forEach(p -> {
+            SysNftResp resp = new SysNftResp();
+            BeanUtils.copyProperties(p, resp);
+            SysNftTypeEntity nftType = nftTypeMap.get(p.getNftTypeId());
+            if (nftType != null) {
+                resp.setTypeCode(nftType.getCode());
+                resp.setTypeName(nftType.getName());
+            }
+            respList.add(resp);
+        });
+        return respList;
     }
 
     private void addNftProperties(Long nftId, List<NftPropertiesReq> propertiesList) {

@@ -81,4 +81,12 @@ public interface SysNftService extends IService<SysNftEntity> {
      */
     void ownerChange(List<NftOwnerChangeReq> req);
 
+    /**
+     * 查询uc用户拥有的NFT
+     * @param userId uc用户id
+     * @param gameId 游戏id
+     * @return 系统NFT信息
+     */
+    List<SysNftResp> userOwned(Long userId, Long gameId);
+
 }

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -58,6 +59,7 @@ public class SysUserAddReq {
 	 * 邮箱
 	 */
 	@ApiModelProperty("邮箱")
+	@Email(message = "Email incorrect")
 	private String email;
 
 	/**

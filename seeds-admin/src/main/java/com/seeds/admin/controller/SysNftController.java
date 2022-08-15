@@ -106,4 +106,9 @@ public class SysNftController {
         return GenericDto.success(null);
     }
 
+    @GetMapping("user-owned/{userId}")
+    @ApiOperation("uc用户拥有的NFT")
+    public GenericDto<List<SysNftResp>> userOwned(@PathVariable("userId") Long userId, @RequestParam(required = false) Long gameId) {
+        return GenericDto.success(sysNftService.userOwned(userId, gameId));
+    }
 }

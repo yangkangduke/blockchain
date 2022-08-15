@@ -31,6 +31,9 @@ public class SysNftResp {
 	private String gameName;
 
 	@ApiModelProperty(value = "类型")
+	private String typeCode;
+
+	@ApiModelProperty(value = "类型名称")
 	private String typeName;
 
 	@ApiModelProperty(value = "价格")

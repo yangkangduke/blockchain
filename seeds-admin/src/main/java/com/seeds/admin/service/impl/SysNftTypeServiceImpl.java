@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftTypeEntity> implements SysNftTypeService {
 
     @Override
-    public Map<Long, String> queryNameMapByIds(Collection<Long> ids) {
+    public Map<Long, SysNftTypeEntity> queryMapByIds(Collection<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyMap();
         }
@@ -43,7 +43,7 @@ public class SysNftTypeServiceImpl extends ServiceImpl<SysNftTypeMapper, SysNftT
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyMap();
         }
-        return list.stream().collect(Collectors.toMap(SysNftTypeEntity::getId, SysNftTypeEntity::getName));
+        return list.stream().collect(Collectors.toMap(SysNftTypeEntity::getId, p -> p));
     }
 
     @Override

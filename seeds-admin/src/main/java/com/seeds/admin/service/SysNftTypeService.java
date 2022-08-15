@@ -26,7 +26,7 @@ public interface SysNftTypeService extends IService<SysNftTypeEntity> {
      * @param ids NFT类别id列表
      * @return NFT类别名称
      */
-    Map<Long, String> queryNameMapByIds(Collection<Long> ids);
+    Map<Long, SysNftTypeEntity> queryMapByIds(Collection<Long> ids);
 
     /**
      * 根据id获取系统NFT类别
