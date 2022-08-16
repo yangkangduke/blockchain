@@ -163,7 +163,7 @@ public class OpenSecurityItemController {
         }
         // 校验是否已经绑定过了
         if (null != ucUserService.getOne(new LambdaQueryWrapper<UcUser>()
-                .eq(UcUser::getPublicAddress, authTokenDTO.getSecret()))) {
+                .eq(UcUser::getPublicAddress, authTokenDTO.getAccountName()))) {
 
             throw new SecurityItemException(UcErrorCodeEnum.ERR_10029_METAMASK_EXIST);
         }
