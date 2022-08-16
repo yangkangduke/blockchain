@@ -1,6 +1,5 @@
 package com.seeds.uc.handler;
 
-import cn.hutool.extra.mail.MailException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.exceptions.GenericException;

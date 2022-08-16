@@ -1,6 +1,5 @@
 package com.seeds.uc.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import lombok.Data;
 

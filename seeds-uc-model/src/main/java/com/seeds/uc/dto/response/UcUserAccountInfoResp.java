@@ -1,10 +1,5 @@
 package com.seeds.uc.dto.response;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.Version;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.seeds.uc.enums.AccountTypeEnum;
 import com.seeds.uc.enums.CurrencyEnum;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.math.BigDecimal;
 

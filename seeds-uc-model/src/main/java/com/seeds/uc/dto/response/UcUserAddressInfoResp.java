@@ -1,8 +1,6 @@
 package com.seeds.uc.dto.response;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.seeds.uc.enums.CurrencyEnum;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

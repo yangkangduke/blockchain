@@ -1,6 +1,5 @@
 package com.seeds.uc.dto.request.security.item;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**

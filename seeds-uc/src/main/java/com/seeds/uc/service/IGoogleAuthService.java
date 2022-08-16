@@ -1,7 +1,5 @@
 package com.seeds.uc.service;
 
-import com.seeds.uc.dto.redis.LoginUserDTO;
-
 /**
  * @author yk
  * @email 819628513@qq.com

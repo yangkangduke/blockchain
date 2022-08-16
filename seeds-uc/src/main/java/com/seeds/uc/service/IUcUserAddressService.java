@@ -1,7 +1,6 @@
 package com.seeds.uc.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.model.UcUserAddress;
 
 /**

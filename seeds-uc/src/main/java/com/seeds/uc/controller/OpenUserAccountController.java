@@ -1,34 +1,22 @@
 package com.seeds.uc.controller;
 
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
-import com.seeds.uc.dto.request.UcUserAddressReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
-import com.seeds.uc.dto.response.UcUserAddressInfoResp;
-import com.seeds.uc.enums.UcErrorCodeEnum;
-import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.model.UcUserAccount;
-import com.seeds.uc.model.UcUserAddress;
 import com.seeds.uc.service.IUcUserAccountService;
-import com.seeds.uc.service.IUcUserAddressService;
-import com.seeds.uc.service.IUcUserService;
-import com.seeds.uc.service.impl.CacheService;
-import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**

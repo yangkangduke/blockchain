@@ -9,25 +9,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.oss.FileProperties;
 import com.seeds.common.web.oss.FileTemplate;
-import com.seeds.common.web.oss.service.OssTemplate;
 import com.seeds.uc.dto.request.UcFileResp;
-import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.mapper.UcFileMapper;
 import com.seeds.uc.model.UcFile;
 import com.seeds.uc.service.IUcFileService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>

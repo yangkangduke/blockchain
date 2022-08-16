@@ -1,6 +1,5 @@
 package com.seeds.uc.service.impl;
 
-import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.extra.mail.MailAccount;
@@ -20,7 +19,6 @@ import com.seeds.uc.exceptions.SendAuthCodeException;
 import com.seeds.uc.mapper.UcUserMapper;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.SendCodeService;
-import com.seeds.uc.util.DigestUtil;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

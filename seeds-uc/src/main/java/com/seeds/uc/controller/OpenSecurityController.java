@@ -10,7 +10,6 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.SecurityDetailDto;
 import com.seeds.uc.dto.SecurityStrategyDto;
-import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
 import com.seeds.uc.dto.request.SecuritySettingReq;
 import com.seeds.uc.dto.response.TokenResp;

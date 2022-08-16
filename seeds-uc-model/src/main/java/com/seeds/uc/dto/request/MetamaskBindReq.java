@@ -1,6 +1,5 @@
 package com.seeds.uc.dto.request;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
