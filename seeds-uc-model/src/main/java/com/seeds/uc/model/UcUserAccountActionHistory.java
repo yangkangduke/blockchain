@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.seeds.uc.enums.AccountActionEnum;
+import com.seeds.uc.enums.AccountTypeEnum;
+import com.seeds.uc.enums.CurrencyEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -42,17 +45,17 @@ public class UcUserAccountActionHistory implements Serializable {
     @Version
     private Long version;
 
-    @ApiModelProperty("操作 1冲币 2提币")
-    private Integer action;
+    @ApiModelProperty("操作: 1-冲币 2-提币")
+    private AccountActionEnum action;
 
-    @ApiModelProperty("账号类型 1 现货")
-    private Integer accountType;
+    @ApiModelProperty("账号类型 1-现货")
+    private AccountTypeEnum accountType;
 
     @ApiModelProperty("用户id")
     private Long userId;
 
     @ApiModelProperty("币种")
-    private String currency;
+    private CurrencyEnum currency;
 
     @ApiModelProperty("链")
     private String chain;

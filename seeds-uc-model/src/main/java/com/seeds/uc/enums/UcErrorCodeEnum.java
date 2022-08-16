@@ -29,6 +29,10 @@ public enum UcErrorCodeEnum {
     ERR_16003_METAMASK_NONCE_EXPIRED(16003, "nonce已经过期", "nonce has expired"),
     ERR_16004_METAMASK_VERIFY_EXPIRED(16004, "metamask签名验证过期", "metamask signature verification expired"),
 
+    // 账户
+    ERR_18001_ACCOUNT_BALANCE_INSUFFICIENT(18001, "账户余额不足", "Insufficient account balance"),
+    ERR_18002_ACCOUNT_NOT(18002, "账户不存在，请先生成账户", "The account does not exist, please create an account first"),
+    ERR_18003_ACCOUNT_ADDRESS_ERROR(18003, "账户地址填写错误", "wrong account address"),
 
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),

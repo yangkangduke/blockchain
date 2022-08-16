@@ -46,16 +46,11 @@ public class OpenUserAccountController {
 
     @Autowired
     private IUcUserAccountService ucUserAccountService;
-    @Autowired
-    private CacheService cacheService;
-    @Autowired
-    private IUcUserService ucUserService;
-    @Autowired
-    private IUcUserAddressService ucUserAddressService;
+
 
     @PostMapping("/action")
     @ApiOperation(value = "冲/提币", notes = "1.调用/account/generate-account 生成账户地址" +
-            "2.进行OTC操作，调用/account/action接口进行冲提币")
+            "2.进行OTC操作，调用/account/action接口进行冲/提币")
     public GenericDto<Object> action(@Valid @RequestBody AccountActionReq accountActionReq) {
         ucUserAccountService.action(accountActionReq);
         return GenericDto.success(null);
@@ -74,7 +69,7 @@ public class OpenUserAccountController {
 
     @PostMapping("/generate-account")
     @ApiOperation(value = "生成账户", notes = "生成账户")
-    public GenericDto<UcUserAccountInfoResp> deposit() {
+    public GenericDto<UcUserAccountInfoResp> generateAccount() {
         Long userId = UserContext.getCurrentUserId();
         UcUserAccount ucUserAccount = ucUserAccountService.getOne(new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, userId));

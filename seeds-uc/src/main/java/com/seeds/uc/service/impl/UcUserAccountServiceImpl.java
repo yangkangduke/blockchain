@@ -11,7 +11,11 @@ import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.dto.response.UcUserAddressInfoResp;
+import com.seeds.uc.enums.AccountActionEnum;
+import com.seeds.uc.enums.AccountTypeEnum;
+import com.seeds.uc.enums.CurrencyEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
+import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.mapper.UcUserAccountMapper;
 import com.seeds.uc.model.UcUserAccount;
@@ -55,36 +59,49 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     @Override
     public void action(AccountActionReq accountActionReq) {
         Long currentUserId = UserContext.getCurrentUserId();
-        // 往用户账户表、用户账户行动历史表中添加数据
-        Integer action = accountActionReq.getAction();
+        long currentTimeMillis = System.currentTimeMillis();
+        AccountActionEnum action = accountActionReq.getAction();
+        String fromAddress = accountActionReq.getFromAddress();
+        String toAddress = accountActionReq.getToAddress();
         BigDecimal amount = accountActionReq.getAmount();
         UcUserAccountInfoResp info = this.getInfo();
-        BigDecimal  balance;
         if (info == null) {
-            balance = new BigDecimal(0);
-        } else {
-            balance = info.getBalance();
+            throw new GenericException(UcErrorCodeEnum.ERR_18002_ACCOUNT_NOT);
         }
-        if (action == 1) {
-            // 账户中加钱
+
+        String address = info.getUserAddressResp().getAddress();
+        BigDecimal  balance = info.getBalance();
+        if (action.equals(AccountActionEnum.DEPOSIT)) {
+            // 账户中加钱，判断账户地址是否正确
+            if (!address.equals(toAddress)) {
+                throw new GenericException(UcErrorCodeEnum.ERR_18003_ACCOUNT_ADDRESS_ERROR);
+            }
             this.updateById(UcUserAccount.builder()
                             .id(currentUserId)
                             .balance(balance.add(amount))
                     .build());
-        } else if (action == 2) {
-            // 账户中减钱
+        } else if (action.equals(AccountActionEnum.WITHDRAW)) {
+            if (!address.equals(fromAddress)) {
+                throw new GenericException(UcErrorCodeEnum.ERR_18003_ACCOUNT_ADDRESS_ERROR);
+            }
+            // 账户中减钱, 先判断账户中剩余的钱够不够减
+            if (balance.compareTo(amount) == -1) {
+                throw new GenericException(UcErrorCodeEnum.ERR_18001_ACCOUNT_BALANCE_INSUFFICIENT);
+            }
             this.updateById(UcUserAccount.builder()
                     .id(currentUserId)
                     .balance(balance.subtract(amount))
                     .build());
         } else {
-            // 报错
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
         }
         // 添加历史信息
         UcUserAccountActionHistory history = UcUserAccountActionHistory.builder().build();
         BeanUtil.copyProperties(accountActionReq, history);
         history.setUserId(currentUserId);
+        history.setCreateTime(currentTimeMillis);
+        history.setAccountType(AccountTypeEnum.ACTUALS);
+        history.setCurrency(CurrencyEnum.USDC);
         ucUserAccountActionHistoryService.save(history);
     }
 
@@ -125,9 +142,9 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         // 创建账户
         UcUserAccount ucUserAccount = UcUserAccount.builder()
                 .userId(userId)
-                .accountType(1)
+                .accountType(AccountTypeEnum.ACTUALS)
                 .createTime(currentTimeMillis)
-                .currency("USDC")
+                .currency(CurrencyEnum.USDC)
                 .freeze(new BigDecimal(0))
                 .balance(new BigDecimal(0))
                 .build();
@@ -136,9 +153,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         // 创建地址
         UcUserAddress ucUserAddress = UcUserAddress.builder()
                 .address("0x40141cf4756a72df8d8f81c1e0c2" + randomSalt)
-                .currency("USDC")
-                .chain("")
-                .comments("备注")
+                .currency(CurrencyEnum.USDC)
                 .createTime(currentTimeMillis)
                 .userId(userId)
                 .build();

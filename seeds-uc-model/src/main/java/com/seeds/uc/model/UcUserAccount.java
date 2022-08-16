@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.seeds.uc.enums.AccountTypeEnum;
+import com.seeds.uc.enums.CurrencyEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -42,14 +44,14 @@ public class UcUserAccount implements Serializable {
     @Version
     private Long version;
 
-    @ApiModelProperty("账号类型 1 现货 ")
-    private Integer accountType;
+    @ApiModelProperty("账号类型")
+    private AccountTypeEnum accountType;
 
     @ApiModelProperty("用户id")
     private Long userId;
 
     @ApiModelProperty("币种")
-    private String currency;
+    private CurrencyEnum currency;
 
     @ApiModelProperty("账户余额")
     private BigDecimal balance;

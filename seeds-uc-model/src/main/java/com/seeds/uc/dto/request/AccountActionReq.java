@@ -1,9 +1,11 @@
 package com.seeds.uc.dto.request;
 
+import com.seeds.uc.enums.AccountActionEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -22,17 +24,19 @@ public class AccountActionReq implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("操作 1冲币 2提币")
-    @NotNull
-    private Integer action;
+    @ApiModelProperty("操作: 1-冲币 2-提币")
+    private AccountActionEnum action;
 
     @ApiModelProperty("发送端地址")
+    @NotBlank
     private String fromAddress;
 
     @ApiModelProperty("接收端地址")
+    @NotBlank
     private String toAddress;
 
     @ApiModelProperty("金额")
+    @NotNull
     private BigDecimal amount;
 
     @ApiModelProperty("手续费")

@@ -23,7 +23,6 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * 冲/提币
      *
      * @param accountActionReq
-     * @param loginUser
      * @return
      */
     void action(AccountActionReq accountActionReq);

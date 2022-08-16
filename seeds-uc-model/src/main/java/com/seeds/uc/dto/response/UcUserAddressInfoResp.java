@@ -1,10 +1,13 @@
 package com.seeds.uc.dto.response;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.seeds.uc.enums.CurrencyEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -16,10 +19,10 @@ import java.io.Serializable;
  * @author yk
  * @since 2022-07-29
  */
-@TableName("uc_user_address")
-@ApiModel(value = "UcUserAddress对象", description = "用户地址")
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UcUserAddressInfoResp implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -27,7 +30,7 @@ public class UcUserAddressInfoResp implements Serializable {
     @ApiModelProperty("primary key")
     private Long id;
 
-    private String currency;
+    private CurrencyEnum currency;
 
     private String chain;
 
