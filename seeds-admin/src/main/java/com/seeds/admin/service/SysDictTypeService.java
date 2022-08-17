@@ -6,6 +6,7 @@ import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysDictTypeResp;
 import com.seeds.admin.entity.SysDictTypeEntity;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -69,6 +70,13 @@ public interface SysDictTypeService extends IService<SysDictTypeEntity> {
      * @return 字典类别code列表
      */
     Set<String> queryCodesByIds(Set<Long> ids);
+
+    /**
+     * 获取系统字典类别列表
+     * @param name 字典类别名称
+     * @return 系统字典类别列表
+     */
+    List<SysDictTypeResp> queryRespList(String name);
 }
 
 

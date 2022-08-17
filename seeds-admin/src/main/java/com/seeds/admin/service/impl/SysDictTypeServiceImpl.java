@@ -7,17 +7,14 @@ import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SysDictTypeAddReq;
 import com.seeds.admin.dto.request.SysDictTypeModifyReq;
 import com.seeds.admin.dto.response.SysDictTypeResp;
-import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.entity.SysDictTypeEntity;
-import com.seeds.admin.entity.SysNftTypeEntity;
 import com.seeds.admin.mapper.SysDictTypeMapper;
 import com.seeds.admin.service.SysDictTypeService;
 import com.seeds.admin.utils.TreeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +30,14 @@ import java.util.stream.Collectors;
 @Service
 public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDictTypeEntity> implements SysDictTypeService {
 
+
+    @Override
+    public List queryRespList(String name) {
+        LambdaQueryWrapper<SysDictTypeEntity> query = new QueryWrapper<SysDictTypeEntity>().lambda()
+                .likeRight(StringUtils.isNotBlank(name), SysDictTypeEntity::getDictName, name)
+                .orderByAsc(SysDictTypeEntity::getSort);
+        return convertToResp(list(query));
+    }
 
     //查询
     @Override
