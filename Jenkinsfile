@@ -19,8 +19,8 @@ def harbor_url = "registry.cn-chengdu.aliyuncs.com/seeds-images"
            def imageName = "${project_name}:${tag}"
            //编译，构建本地镜像
            sh "mvn -f ${project_name} clean package dockerfile:build"
-          /*  // 给镜像打标签
-           sh "docker tag ${imageName} ${harbor_url}/${imageName}" */
+            // 给镜像打标签
+           sh "docker tag ${imageName} ${harbor_url}/${imageName}"
 
         }
         stage('deploy'){
