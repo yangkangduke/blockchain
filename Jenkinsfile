@@ -7,12 +7,12 @@ def harbor_url = "registry.cn-chengdu.aliyuncs.com/seeds-images"
 
     node{
         stage('Git Checkout') {
-               checkout([$class: 'GitSCM', branches: [[name: '*/${branch}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '2057a2c1-f936-4ebc-9467-cb23e5a96baa', url: 'git@github.com:AllenAi007/seeds-java.git']]])
+               checkout([$class: 'GitSCM', branches: [[name: '*/${branch}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: ${git_auth}, url: 'git@github.com:AllenAi007/seeds-java.git']]])
             }
 
         stage('Compile'){
             // 编译并安装
-            sh "clean install -pl ${project_name} -am -amd -Pdev -Dmaven.test.skip=true "
+            sh "mvn clean install -pl ${project_name} -am -amd -Pdev -Dmaven.test.skip=true "
         }
         stage('build image'){
             //定义镜像名称
