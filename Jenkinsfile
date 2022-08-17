@@ -7,7 +7,7 @@ def harbor_url = "registry.cn-chengdu.aliyuncs.com/seeds-images"
 
     node{
         stage('Git Checkout') {
-               checkout([$class: 'GitSCM', branches: [[name: '*/${branch}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: ${git_auth}, url: 'git@github.com:AllenAi007/seeds-java.git']]])
+               checkout([$class: 'GitSCM', branches: [[name: '*/${branch}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${git_auth}", url: 'git@github.com:AllenAi007/seeds-java.git']]])
             }
 
         stage('Compile'){
