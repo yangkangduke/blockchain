@@ -58,4 +58,4 @@ smart-contract:
 ipfs:
   pinata:
     apiKey: 4b23467f4c734a15ea18
-    secret: 140b427defed0d43b60c223301b45a783b47f9197429649f8fcf3dddc6092c0c
+    apiSecret: 140b427defed0d43b60c223301b45a783b47f9197429649f8fcf3dddc6092c0c
