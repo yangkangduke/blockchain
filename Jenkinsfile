@@ -4,7 +4,7 @@ def git_auth = "2057a2c1-f936-4ebc-9467-cb23e5a96baa"
 def tag = "latest"
 // 镜像仓库地址
 def harbor_url = "registry.cn-chengdu.aliyuncs.com/seeds-images"
-
+def harbor_auth = "cb0581c9-9096-4c3e-9068-ea98e1b90917"
     node{
         stage('Git Checkout') {
                checkout([$class: 'GitSCM', branches: [[name: '*/${branch}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${git_auth}", url: 'git@github.com:AllenAi007/seeds-java.git']]])
@@ -22,6 +22,7 @@ def harbor_url = "registry.cn-chengdu.aliyuncs.com/seeds-images"
             // 给镜像打标签
            sh "docker tag ${imageName} ${harbor_url}/${imageName}"
            //登录Harbor，并上传镜像
+
            withCredentials([usernamePassword(credentialsId: "${harbor_auth}", passwordVariable: 'password', usernameVariable: 'username')]) {
                //登录
                sh "docker login -u ${username} -p ${password} ${harbor_url}"
