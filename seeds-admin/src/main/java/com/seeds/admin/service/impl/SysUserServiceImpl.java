@@ -274,4 +274,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         );
     }
 
+    @Override
+    public IPage<SysUserBriefResp> dropdownPage(SysUserPageReq query) {
+        LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
+                .likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysUserEntity::getRealName, query.getNameOrMobile())
+                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysUserEntity::getMobile, query.getNameOrMobile());
+        Page<SysUserEntity> page = new Page<>(query.getCurrent(), query.getSize());
+        List<SysUserEntity> records = page(page, queryWrap).getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        return page.convert(p -> {
+            SysUserBriefResp resp = new SysUserBriefResp();
+            BeanUtils.copyProperties(p, resp);
+            return resp;
+        });
+    }
+
 }

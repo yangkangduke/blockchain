@@ -3,6 +3,7 @@ package com.seeds.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.entity.SysGameEntity;
 
@@ -83,5 +84,12 @@ public interface SysGameService extends IService<SysGameEntity> {
      * @return 系统游戏
      */
     SysGameEntity queryByOfficialUrl(String officialUrl);
+
+    /**
+     * 获取系统游戏下拉分页列表
+     * @param query 分页查询条件
+     * @return 系统游戏信息
+     */
+    IPage<SysGameBriefResp> dropdownPage(SysGamePageReq query);
 
 }

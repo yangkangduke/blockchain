@@ -3,6 +3,7 @@ package com.seeds.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.entity.SysGameEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
@@ -37,6 +38,12 @@ public class SysGameController {
     @RequiredPermission("sys:game:page")
     public GenericDto<IPage<SysGameResp>> queryPage(@Valid @RequestBody SysGamePageReq query) {
         return GenericDto.success(sysGameService.queryPage(query));
+    }
+
+    @PostMapping("dropdown-page")
+    @ApiOperation("下拉列表")
+    public GenericDto<IPage<SysGameBriefResp>> dropdownPage(@Valid @RequestBody SysGamePageReq query) {
+        return GenericDto.success(sysGameService.dropdownPage(query));
     }
 
     @GetMapping("select")

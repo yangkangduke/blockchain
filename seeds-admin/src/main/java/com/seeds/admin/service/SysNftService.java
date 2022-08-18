@@ -6,6 +6,7 @@ import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.SysNftEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,9 +27,10 @@ public interface SysNftService extends IService<SysNftEntity> {
 
     /**
      * 添加系统NFT信息
+     * @param image NFT图片
      * @param req NFT信息
      */
-    void add(SysNftAddReq req);
+    void add(MultipartFile image, SysNftAddReq req);
 
     /**
      * 通过id获取系统NFT信息
@@ -54,13 +56,6 @@ public interface SysNftService extends IService<SysNftEntity> {
      * @param req NFT的id列表
      */
     void batchDelete(ListReq req);
-
-    /**
-     * 通过合约地址获取系统NFT信息
-     * @param contractAddress 合约地址
-     * @return 系统NFT信息
-     */
-    SysNftEntity queryByContractAddress(String contractAddress);
 
     /**
      * 修改NFT属性值

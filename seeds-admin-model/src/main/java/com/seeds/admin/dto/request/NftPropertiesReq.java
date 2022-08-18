@@ -19,6 +19,13 @@ public class NftPropertiesReq {
     private Long typeId;
 
     /**
+     * NFT属性类别名称
+     */
+    @ApiModelProperty("NFT属性类别名称")
+    @NotNull(message = "NFT properties type name cannot be empty")
+    private String name;
+
+    /**
      * NFT属性值
      */
     @ApiModelProperty("NFT属性值")

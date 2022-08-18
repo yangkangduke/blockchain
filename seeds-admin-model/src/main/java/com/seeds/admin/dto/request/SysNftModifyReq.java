@@ -50,20 +50,6 @@ public class SysNftModifyReq {
 	private Long nftTypeId;
 
 	/**
-	 * NFT图片链接
-	 */
-	@ApiModelProperty("NFT图片链接")
-	@NotBlank(message = "NFT picture url cannot be empty")
-	private String url;
-
-	/**
-	 * 图片文件id
-	 */
-	@ApiModelProperty("图片文件id")
-	@NotNull(message = "NFT picture file id cannot be empty")
-	private Long fileId;
-
-	/**
 	 * NFT价格
 	 */
 	@ApiModelProperty("NFT价格")
@@ -78,46 +64,11 @@ public class SysNftModifyReq {
 	private String unit;
 
 	/**
-	 * 合约地址
+	 * NFT描述
 	 */
-	@ApiModelProperty("合约地址")
-	@NotBlank(message = "Contract address cannot be empty")
-	private String contractAddress;
-
-	/**
-	 * 令牌id
-	 */
-	@ApiModelProperty("令牌id")
-	@NotBlank(message = "Token id cannot be empty")
-	private String tokenId;
-
-	/**
-	 * 令牌类型
-	 */
-	@ApiModelProperty("令牌类型")
-	@NotBlank(message = "Token standard cannot be empty")
-	private String tokenStandard;
-
-	/**
-	 * 区块链
-	 */
-	@ApiModelProperty("区块链")
-	@NotBlank(message = "BlockChain cannot be empty")
-	private String blockChain;
-
-	/**
-	 * 元数据
-	 */
-	@ApiModelProperty("元数据")
-	@NotBlank(message = "Metadata cannot be empty")
-	private String metadata;
-
-	/**
-	 * 创建人报酬比例
-	 */
-	@ApiModelProperty("创建人报酬比例")
-	@NotNull(message = "Creator fees cannot be empty")
-	private BigDecimal creatorFees;
+	@ApiModelProperty("NFT描述")
+	@NotBlank(message = "NFT description cannot be empty")
+	private String description;
 
 	/**
 	 * NFT属性列表
