@@ -29,14 +29,14 @@ def harbor_auth = "cb0581c9-9096-4c3e-9068-ea98e1b90917"
                //上传镜像
                sh "docker push ${harbor_url}/${imageName}"
            }
-            //删除本地镜像
-            sh "docker rmi -f ${imageName}"
-            sh "docker rmi -f ${harbor_url}//${imageName}"
+//             //删除本地镜像
+//             sh "docker rmi -f ${imageName}"
+//             sh "docker rmi -f ${harbor_url}/${imageName}"
 
         }
-        stage('deploy'){
-            sshPublisher(publishers: [sshPublisherDesc(configName: '192.168.1.100', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: "/seeds/script/deploy.sh $harbor_url $project_name $tag $port", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
-        }
+//         stage('deploy'){
+//             sshPublisher(publishers: [sshPublisherDesc(configName: '192.168.1.100', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: "/seeds/script/deploy.sh $harbor_url $project_name $tag $port", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+//         }
     }
 
 
