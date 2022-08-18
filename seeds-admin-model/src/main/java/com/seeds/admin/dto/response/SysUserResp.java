@@ -1,6 +1,8 @@
 package com.seeds.admin.dto.response;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -75,6 +77,7 @@ public class SysUserResp {
 	 * 部门ID
 	 */
 	@ApiModelProperty("部门ID")
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long deptId;
 
 	/**
