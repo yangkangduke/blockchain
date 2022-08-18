@@ -21,6 +21,16 @@ def harbor_url = "registry.cn-chengdu.aliyuncs.com/seeds-images"
            sh "mvn -f ${project_name} clean package dockerfile:build"
             // 给镜像打标签
            sh "docker tag ${imageName} ${harbor_url}/${imageName}"
+           //登录Harbor，并上传镜像
+           withCredentials([usernamePassword(credentialsId: "${harbor_auth}", passwordVariable: 'password', usernameVariable: 'username')]) {
+               //登录
+               sh "docker login -u ${username} -p ${password} ${harbor_url}"
+               //上传镜像
+               sh "docker push ${harbor_url}/${imageName}"
+           }
+//            //删除本地镜像
+//            sh "docker rmi -f ${imageName}"
+//            sh "docker rmi -f ${harbor_url}/${harbor_project_name}/${imageName}"
 
         }
         stage('deploy'){
