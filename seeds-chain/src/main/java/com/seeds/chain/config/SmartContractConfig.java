@@ -12,11 +12,11 @@ import javax.annotation.PostConstruct;
 @Component
 @ConfigurationProperties(prefix = "smart-contract")
 public class SmartContractConfig {
-    long chainId;
-    String ownerAddress;
-    String ownerPrivateKey;
-    String rpcProviderUrl;
-    String gameAddress;
+    private long chainId;
+    private String ownerAddress;
+    private String ownerPrivateKey;
+    private String rpcProviderUrl;
+    private String gameAddress;
 
     @PostConstruct
     public void init() {
