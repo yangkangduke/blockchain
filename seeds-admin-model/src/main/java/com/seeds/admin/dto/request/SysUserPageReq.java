@@ -1,5 +1,7 @@
 package com.seeds.admin.dto.request;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,6 +18,7 @@ public class SysUserPageReq extends PageReq {
     private String nameOrMobile;
 
     @ApiModelProperty(value = "部门id")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long deptId;
 
 }
