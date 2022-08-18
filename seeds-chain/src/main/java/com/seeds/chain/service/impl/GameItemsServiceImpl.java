@@ -28,7 +28,7 @@ public class GameItemsServiceImpl implements GameItemsService {
 
     @Override
     public String getUri(BigInteger tokenId) {
-        gameItems = GameItems.load(smartContractConfig.getGameItemsContractAddress(), web3, txManager, new DefaultGasProvider());
+        gameItems = GameItems.load(smartContractConfig.getGameAddress(), web3, txManager, new DefaultGasProvider());
         try {
             return gameItems.uri(tokenId).send();
         } catch (Exception e) {
@@ -39,7 +39,7 @@ public class GameItemsServiceImpl implements GameItemsService {
 
     @Override
     public boolean mintNft(String uri) {
-        gameItems = GameItems.load(smartContractConfig.getGameItemsContractAddress(), web3, txManager, new DefaultGasProvider());
+        gameItems = GameItems.load(smartContractConfig.getGameAddress(), web3, txManager, new DefaultGasProvider());
         try {
             TransactionReceipt receipt = gameItems.mintNewNft(smartContractConfig.getOwnerAddress(), BigInteger.ONE, uri).send();
             log.info("receipt: {}", receipt);
@@ -64,7 +64,7 @@ public class GameItemsServiceImpl implements GameItemsService {
 
     @Override
     public boolean burnNft(String tokenId) {
-        gameItems = GameItems.load(smartContractConfig.getGameItemsContractAddress(), web3, txManager, new DefaultGasProvider());
+        gameItems = GameItems.load(smartContractConfig.getGameAddress(), web3, txManager, new DefaultGasProvider());
         try {
             TransactionReceipt receipt = gameItems.burn(smartContractConfig.getOwnerAddress(), new BigInteger(tokenId), BigInteger.ONE).send();
             log.info("receipt: {}", receipt);

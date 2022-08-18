@@ -4,19 +4,19 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
 @Slf4j
 @Data
-@ToString
-@Configuration
+@Component
+@ConfigurationProperties(prefix = "ipfs.pinata")
 public class PinataConfig {
 
-    @Value("${ipfs.pinata.apiKey:}")
     private String apiKey;
-    @Value("${ipfs.pinata.secret:}")
     private String apiSecret;
 
     @PostConstruct
