@@ -14,7 +14,7 @@ def harbor_auth = "cb0581c9-9096-4c3e-9068-ea98e1b90917"
             // 编译并安装
             sh "mvn clean install -pl ${project_name} -am -amd -Pdev -Dmaven.test.skip=true "
         }
-        stage('build image'){
+        stage('Build Image'){
             //定义镜像名称
            def imageName = "${project_name}:${tag}"
            //编译，构建本地镜像
@@ -34,7 +34,7 @@ def harbor_auth = "cb0581c9-9096-4c3e-9068-ea98e1b90917"
             sh "docker rmi -f ${harbor_url}/${imageName}"
 
         }
-        stage('deploy'){
+        stage('Deploy'){
             sshPublisher(publishers: [sshPublisherDesc(configName: '192.168.1.100', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: "/seeds/script/deploy.sh $harbor_url $project_name $tag $port", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
         }
     }
