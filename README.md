@@ -6,6 +6,7 @@
 3.将本地hosts文件中添加
 54.168.239.215 Seeds-redis
 54.168.239.215 Seeds-mysql
+54.168.239.215 Seeds-config
 注意改成自己的ip
 
 3.首先依次启动seeds-config项目、seeds-gateway
