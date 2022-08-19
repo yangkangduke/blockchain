@@ -3,7 +3,9 @@ package com.seeds.uc.feign;
 
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.LoginReq;
+import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.feign.interceptor.FeignInnerRequestInterceptor;
@@ -20,17 +22,12 @@ import javax.validation.Valid;
  * @author yk
  * @date 2022/8/8
  */
-@FeignClient(name = "remoteUserService", url = "127.0.0.1:10101", configuration = {FeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteNFTService", url = "127.0.0.1:10101", configuration = {FeignInnerRequestInterceptor.class})
 public interface RemoteNFTService {
 
-
-	/**
-	 * 获取用户信息
-	 * @return
-	 */
-	@GetMapping("/info")
-	@ApiOperation(value = "获取用户信息", notes = "获取用户信息")
-	GenericDto<UserInfoResp> getInfo(HttpServletRequest request);
+	@GetMapping("/nft/buy/callback")
+	@ApiOperation(value = "购买回调接口", notes = "购买回调接口")
+	GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyReq buyReq);
 
 
 
