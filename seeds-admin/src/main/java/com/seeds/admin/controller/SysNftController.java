@@ -1,6 +1,7 @@
 package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.annotation.DataFilter;
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.*;
@@ -95,10 +96,10 @@ public class SysNftController {
         return GenericDto.success(null);
     }
 
-    @GetMapping("uc-page")
+    @PostMapping("uc-page")
     @ApiOperation("uc分页查询NFT")
     @Inner
-    public GenericDto<IPage<SysNftResp>> ucPage(@Valid @RequestBody UcNftPageReq query) {
+    public GenericDto<Page<SysNftResp>> ucPage(@Valid @RequestBody UcNftPageReq query) {
         return GenericDto.success(sysNftService.ucPage(query));
     }
 }

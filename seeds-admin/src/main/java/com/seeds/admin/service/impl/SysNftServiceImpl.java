@@ -244,7 +244,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
-    public IPage<SysNftResp> ucPage(UcNftPageReq query) {
+    public Page<SysNftResp> ucPage(UcNftPageReq query) {
         LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
                 .likeRight(StringUtils.isNotBlank(query.getName()), SysNftEntity::getName, query.getName())
                 .eq(query.getStatus() != null, SysNftEntity::getStatus, query.getStatus())
@@ -252,13 +252,15 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .eq(query.getUserId() != null, SysNftEntity::getOwnerId, query.getUserId())
                 .eq(query.getAccountId() != null, SysNftEntity::getOwnerAccountId, query.getAccountId())
                 .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId());
-        IPage<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
+        Page<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
+        Page<SysNftResp> resPage = new Page<>(query.getCurrent(), query.getSize());
         if (CollectionUtils.isEmpty(page.getRecords())) {
-            return page.convert(p -> null);
+            return resPage;
         }
         Set<Long> nftTypeIds = page.getRecords().stream().map(SysNftEntity::getNftTypeId).collect(Collectors.toSet());
         Map<Long, SysNftTypeEntity> nftTypeMap = sysNftTypeService.queryMapByIds(nftTypeIds);
-        return page.convert(p -> {
+        List<SysNftResp> respList = new ArrayList<>();
+        page.getRecords().forEach(p -> {
             SysNftResp resp = new SysNftResp();
             BeanUtils.copyProperties(p, resp);
             SysNftTypeEntity nftType = nftTypeMap.get(p.getNftTypeId());
@@ -266,8 +268,10 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 resp.setTypeCode(nftType.getCode());
                 resp.setTypeName(nftType.getName());
             }
-            return resp;
+            respList.add(resp);
         });
+        resPage.setRecords(respList);
+        return resPage;
     }
 
     private void addNftProperties(Long nftId, List<NftPropertiesReq> propertiesList) {
