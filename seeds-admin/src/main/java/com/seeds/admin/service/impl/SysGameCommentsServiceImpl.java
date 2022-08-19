@@ -40,7 +40,7 @@ public class SysGameCommentsServiceImpl extends ServiceImpl<SysGameCommentsMappe
         LambdaQueryWrapper<SysGameCommentsEntity> wrapper = new LambdaQueryWrapper<>();
 
         wrapper.like(StringUtils.isNotBlank(req.getKeyWords()), SysGameCommentsEntity::getComments, req.getKeyWords())
-                .eq(StringUtils.isNotBlank(req.getGameName()), SysGameCommentsEntity::getGameName, req.getGameName())
+                .eq(!ObjectUtils.isEmpty(req.getGameId()), SysGameCommentsEntity::getGameId, req.getGameId())
                 .eq(!ObjectUtils.isEmpty(req.getStatus()), SysGameCommentsEntity::getStatus, req.getStatus());
 
         Page<SysGameCommentsEntity> page = new Page<>(req.getCurrent(), req.getSize());
