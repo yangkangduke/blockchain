@@ -94,9 +94,9 @@ public class SysNftController {
         return GenericDto.success(null);
     }
 
-    @GetMapping("user-owned/{userId}")
+    @GetMapping("user-owned")
     @ApiOperation("uc用户拥有的NFT")
-    public GenericDto<List<SysNftResp>> userOwned(@PathVariable("userId") Long userId, @RequestParam(required = false) Long gameId) {
-        return GenericDto.success(sysNftService.userOwned(userId, gameId));
+    public GenericDto<IPage<SysNftResp>> userOwned(@Valid @RequestBody UcNftPageReq query) {
+        return GenericDto.success(sysNftService.userOwned(query));
     }
 }

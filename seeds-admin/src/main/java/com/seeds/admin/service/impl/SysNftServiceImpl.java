@@ -240,21 +240,22 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             BeanUtils.copyProperties(p, entity);
             updateById(entity);
         });
+        // todo NFT transfer
     }
 
     @Override
-    public List<SysNftResp> userOwned(Long userId, Long gameId) {
+    public IPage<SysNftResp> userOwned(UcNftPageReq query) {
         LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
-                .eq(SysNftEntity::getOwnerId, userId)
-                .eq(gameId != null, SysNftEntity::getGameId, gameId);
-        List<SysNftEntity> list = list(queryWrap);
-        if (CollectionUtils.isEmpty(list)) {
-            return Collections.emptyList();
+                .eq(SysNftEntity::getOwnerId, query.getUserId())
+                .eq(query.getAccountId() != null, SysNftEntity::getOwnerAccountId, query.getAccountId())
+                .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId());
+        IPage<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
+        if (CollectionUtils.isEmpty(page.getRecords())) {
+            return page.convert(p -> null);
         }
-        Set<Long> nftTypeIds = list.stream().map(SysNftEntity::getNftTypeId).collect(Collectors.toSet());
+        Set<Long> nftTypeIds = page.getRecords().stream().map(SysNftEntity::getNftTypeId).collect(Collectors.toSet());
         Map<Long, SysNftTypeEntity> nftTypeMap = sysNftTypeService.queryMapByIds(nftTypeIds);
-        List<SysNftResp> respList = new ArrayList<>();
-        list.forEach(p -> {
+        return page.convert(p -> {
             SysNftResp resp = new SysNftResp();
             BeanUtils.copyProperties(p, resp);
             SysNftTypeEntity nftType = nftTypeMap.get(p.getNftTypeId());
@@ -262,9 +263,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 resp.setTypeCode(nftType.getCode());
                 resp.setTypeName(nftType.getName());
             }
-            respList.add(resp);
+            return resp;
         });
-        return respList;
     }
 
     private void addNftProperties(Long nftId, List<NftPropertiesReq> propertiesList) {

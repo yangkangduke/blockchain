@@ -71,10 +71,9 @@ public interface SysNftService extends IService<SysNftEntity> {
 
     /**
      * 查询uc用户拥有的NFT
-     * @param userId uc用户id
-     * @param gameId 游戏id
+     * @param query uc用户分页条件
      * @return 系统NFT信息
      */
-    List<SysNftResp> userOwned(Long userId, Long gameId);
+    IPage<SysNftResp> userOwned(UcNftPageReq query);
 
 }
