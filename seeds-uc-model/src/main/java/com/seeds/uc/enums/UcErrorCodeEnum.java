@@ -33,6 +33,7 @@ public enum UcErrorCodeEnum {
     ERR_18001_ACCOUNT_BALANCE_INSUFFICIENT(18001, "账户余额不足", "Insufficient account balance"),
     ERR_18002_ACCOUNT_NOT(18002, "账户不存在，请先生成账户", "The account does not exist, please create an account first"),
     ERR_18003_ACCOUNT_ADDRESS_ERROR(18003, "账户地址填写错误", "wrong account address"),
+    ERR_18004_ACCOUNT_AMOUNT_ERROR(18004, "金额必须大于0", "Amount must be greater than zero"),
 
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),
