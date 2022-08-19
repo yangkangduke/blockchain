@@ -244,9 +244,12 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
-    public IPage<SysNftResp> userOwned(UcNftPageReq query) {
+    public IPage<SysNftResp> ucPage(UcNftPageReq query) {
         LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
-                .eq(SysNftEntity::getOwnerId, query.getUserId())
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftEntity::getName, query.getName())
+                .eq(query.getStatus() != null, SysNftEntity::getStatus, query.getStatus())
+                .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
+                .eq(query.getUserId() != null, SysNftEntity::getOwnerId, query.getUserId())
                 .eq(query.getAccountId() != null, SysNftEntity::getOwnerAccountId, query.getAccountId())
                 .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId());
         IPage<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);

@@ -145,6 +145,12 @@
             <groupId>org.web3j</groupId>
             <artifactId>web3j-spring-boot-starter</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.seeds</groupId>
+            <artifactId>seeds-admin-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -21,6 +21,15 @@ import java.util.List;
 public interface RemoteNftService {
 
 	/**
+	 * 分页获取系统NFT信息
+	 * @param query 分页查询条件
+	 * @return 系统NFT信息
+	 */
+	@PostMapping("/page")
+	@ApiOperation("NFT分页查询")
+	GenericDto<IPage<SysNftResp>> ucPage(@RequestBody UcNftPageReq query);
+
+	/**
 	 * 归属人变更
 	 * @param req 归属人账户信息
 	 * @return Object

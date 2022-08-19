@@ -8,6 +8,7 @@ import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.service.SysNftService;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -94,9 +95,10 @@ public class SysNftController {
         return GenericDto.success(null);
     }
 
-    @GetMapping("user-owned")
-    @ApiOperation("uc用户拥有的NFT")
-    public GenericDto<IPage<SysNftResp>> userOwned(@Valid @RequestBody UcNftPageReq query) {
-        return GenericDto.success(sysNftService.userOwned(query));
+    @GetMapping("uc-page")
+    @ApiOperation("uc分页查询NFT")
+    @Inner
+    public GenericDto<IPage<SysNftResp>> ucPage(@Valid @RequestBody UcNftPageReq query) {
+        return GenericDto.success(sysNftService.ucPage(query));
     }
 }
