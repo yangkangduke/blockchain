@@ -63,8 +63,9 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         String fromAddress = accountActionReq.getFromAddress();
         String toAddress = accountActionReq.getToAddress();
         BigDecimal amount = accountActionReq.getAmount();
+        Long fromUserId = accountActionReq.getFromUserId();
         if (amount.compareTo(BigDecimal.ZERO) != 1) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_AMOUNT_ERROR);
+            throw new GenericException(UcErrorCodeEnum.ERR_18004_AMOUNT_ERROR);
         }
         UcUserAccountInfoResp info = this.getInfo();
         if (info == null) {
@@ -93,6 +94,15 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
             this.updateById(UcUserAccount.builder()
                     .id(currentUserId)
                     .balance(balance.subtract(amount))
+                    .build());
+        } else if (action.equals(AccountActionEnum.BUY_NFT)) {
+            this.updateById(UcUserAccount.builder()
+                    .id(currentUserId)
+                    .balance(balance.subtract(amount))
+                    .build());
+            this.updateById(UcUserAccount.builder()
+                    .id(fromUserId)
+                    .balance(balance.add(amount))
                     .build());
         } else {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
@@ -160,5 +170,21 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 .userId(userId)
                 .build();
         ucUserAddressService.save(ucUserAddress);
+    }
+
+    /**
+     * 检查账户里面的金额是否足够支付
+     * @param currentUserId
+     * @param amount
+     * @return
+     */
+    @Override
+    public Boolean checkBalance(Long currentUserId, BigDecimal amount) {
+        UcUserAccount one = this.getOne(new LambdaQueryWrapper<UcUserAccount>()
+                .eq(UcUserAccount::getUserId, currentUserId));
+        if (one == null || one.getBalance().compareTo(new BigDecimal(0))  != 1 || one.getBalance().compareTo(amount)  != 1) {
+            return false;
+        }
+        return true;
     }
 }
