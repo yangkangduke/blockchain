@@ -63,6 +63,9 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         String fromAddress = accountActionReq.getFromAddress();
         String toAddress = accountActionReq.getToAddress();
         BigDecimal amount = accountActionReq.getAmount();
+        if (amount.compareTo(BigDecimal.ZERO) != 1) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_AMOUNT_ERROR);
+        }
         UcUserAccountInfoResp info = this.getInfo();
         if (info == null) {
             throw new GenericException(UcErrorCodeEnum.ERR_18002_ACCOUNT_NOT);

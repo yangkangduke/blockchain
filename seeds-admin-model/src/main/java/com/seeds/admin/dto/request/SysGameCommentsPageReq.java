@@ -13,7 +13,7 @@ public class SysGameCommentsPageReq extends PageReq {
 
     private String keyWords;
 
-    private String gameName;
+    private Integer gameId;
 
     private Integer status;
 }
