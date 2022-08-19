@@ -64,13 +64,6 @@ public class SysNftAddReq {
 	private String unit;
 
 	/**
-	 * NFT是否在售  0：否   1：是
-	 */
-	@ApiModelProperty("NFT是否在售  0：否   1：是")
-	@NotNull(message = "NFT status cannot be empty")
-	private Integer status;
-
-	/**
 	 * NFT属性列表
 	 */
 	@Valid

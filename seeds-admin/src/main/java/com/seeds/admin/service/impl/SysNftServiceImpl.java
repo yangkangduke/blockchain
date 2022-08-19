@@ -12,8 +12,10 @@ import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.*;
 import com.seeds.admin.enums.NftInitStatusEnum;
 import com.seeds.admin.enums.SysStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysNftMapper;
 import com.seeds.admin.service.*;
+import com.seeds.common.exception.SeedsException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -157,6 +159,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Transactional(rollbackFor = Exception.class)
     public void modify(SysNftModifyReq req) {
         SysNftEntity sysNft = getById(req.getId());
+        if (WhetherEnum.YES.value() == sysNft.getStatus()) {
+            throw new SeedsException("NFT is on sale and cannot be modified");
+        }
         // 修改NFT状态
         sysNft.setInitStatus(NftInitStatusEnum.UPDATING.getCode());
         updateById(sysNft);
@@ -170,6 +175,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     public void enableOrDisable(List<SwitchReq> req) {
+        Set<Long> set = new HashSet<>();
         // 上架/下架NFT
         req.forEach(p -> {
             // 校验状态
@@ -177,6 +183,26 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             SysNftEntity nft = new SysNftEntity();
             nft.setId(p.getId());
             nft.setStatus(p.getStatus());
+            // 上架
+            if (WhetherEnum.YES.value() == p.getStatus()) {
+                set.add(nft.getId());
+            } else {
+                updateById(nft);
+            }
+        });
+        List<SysNftEntity> sysNftEntities = listByIds(set);
+        if (CollectionUtils.isEmpty(sysNftEntities)) {
+            return;
+        }
+        Set<Long> modifyIds = sysNftEntities.stream().filter(p -> NftInitStatusEnum.NORMAL.getCode() == p.getInitStatus()).map(SysNftEntity::getGameId).collect(Collectors.toSet());
+        Set<Long> modifySet = set.stream().filter(modifyIds::contains).collect(Collectors.toSet());
+        if (CollectionUtils.isEmpty(modifySet)) {
+            return;
+        }
+        modifySet.forEach(p -> {
+            SysNftEntity nft = new SysNftEntity();
+            nft.setId(p);
+            nft.setStatus(WhetherEnum.YES.value());
             updateById(nft);
         });
     }
@@ -268,7 +294,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     private void mintNft(MultipartFile image, SysNftAddReq req, Long id) {
-        int initStatus = NftInitStatusEnum.CREATE_SUCCESS.getCode();
+        int initStatus = NftInitStatusEnum.NORMAL.getCode();
         String imageFileHash = null;
         try {
             // 上传NFT图片
@@ -294,7 +320,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     private void modifyNft(SysNftEntity sysNft, SysNftModifyReq req) {
-        int initStatus = NftInitStatusEnum.UPDATE_SUCCESS.getCode();
+        int initStatus = NftInitStatusEnum.NORMAL.getCode();
         try {
             // 修改链上数据
             String imageFileHash = chainNftService.getMetadataFileImageHash(sysNft.getTokenId());

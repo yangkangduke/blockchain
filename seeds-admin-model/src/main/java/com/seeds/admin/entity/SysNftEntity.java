@@ -75,7 +75,7 @@ public class SysNftEntity extends BaseEntity {
 	private Integer status;
 
 	/**
-	 * 状态  0：创建中  1：创建成功  2：创建失败  3：修改中 4：修改成功  5：修改失败
+	 * 状态  0：正常  1：创建中  2：创建失败  3：修改中  4：修改失败
 	 */
 	@TableField("init_status")
 	private Integer initStatus;
@@ -85,6 +85,12 @@ public class SysNftEntity extends BaseEntity {
 	 */
 	@TableField("owner_id")
 	private String ownerId;
+
+	/**
+	 * 归属人账户id
+	 */
+	@TableField("owner_account_id")
+	private String ownerAccountId;
 
 	/**
 	 * 归属人名称
