@@ -18,10 +18,6 @@ import java.util.List;
 @Component
 public class RemoteNftServiceImpl implements RemoteNftService {
 
-	@Override
-	public GenericDto<IPage<SysNftResp>> ucPage(UcNftPageReq query) {
-		return GenericDto.failure("Internal Error:queryPage failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
-	}
 
 	@Override
 	public GenericDto<Object> ownerChange(List<NftOwnerChangeReq> req) {
@@ -29,8 +25,8 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	}
 
 	@Override
-	public GenericDto<IPage<SysNftResp>> userOwned(UcNftPageReq query) {
-		return GenericDto.failure("Internal Error:userOwned failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	public GenericDto<IPage<SysNftResp>> ucPage(UcNftPageReq query) {
+		return GenericDto.failure("Internal Error:ucPage failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 
 	}
 }

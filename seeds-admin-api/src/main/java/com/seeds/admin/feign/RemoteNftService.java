@@ -21,30 +21,21 @@ import java.util.List;
 public interface RemoteNftService {
 
 	/**
-	 * 分页获取系统NFT信息
-	 * @param query 分页查询条件
-	 * @return 系统NFT信息
-	 */
-	@PostMapping("/page")
-	@ApiOperation("NFT分页查询")
-	GenericDto<IPage<SysNftResp>> ucPage(@RequestBody UcNftPageReq query);
-
-	/**
 	 * 归属人变更
 	 * @param req 归属人账户信息
 	 * @return Object
 	 */
-	@PostMapping("/owner-change")
+	@PostMapping("/nft/owner-change")
 	@ApiOperation(value = "归属人变更", notes = "归属人变更")
 	GenericDto<Object> ownerChange(@RequestBody List<NftOwnerChangeReq> req);
 
 	/**
-	 * uc用户拥有的NFT
-	 * @param query 用户分页查询条件
+	 * uc分页查询NFT
+	 * @param query 分页查询条件
 	 * @return NFT信息
 	 */
-	@GetMapping("/user-owned")
-	@ApiOperation("uc用户拥有的NFT")
-	GenericDto<IPage<SysNftResp>> userOwned(UcNftPageReq query);
+	@GetMapping("/nft/uc-page")
+	@ApiOperation("uc分页查询NFT")
+	GenericDto<IPage<SysNftResp>> ucPage(UcNftPageReq query);
 
 }
