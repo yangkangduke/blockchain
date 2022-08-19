@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.annotation.DataFilter;
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.response.SysNftPropertiesTypeBriefResp;
 import com.seeds.admin.dto.response.SysNftPropertiesTypeResp;
 import com.seeds.admin.entity.SysNftPropertiesTypeEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
@@ -39,6 +40,12 @@ public class SysNftPropertiesTypeController {
     @RequiredPermission("sys:nftPT:page")
     public GenericDto<IPage<SysNftPropertiesTypeResp>> queryPage(@Valid @RequestBody SysNftPropertiesTypePageReq query) {
         return GenericDto.success(sysNftPropertiesTypeService.queryPage(query));
+    }
+
+    @PostMapping("dropdown-page")
+    @ApiOperation("下拉列表")
+    public GenericDto<IPage<SysNftPropertiesTypeBriefResp>> dropdownPage(@Valid @RequestBody SysNftPropertiesTypePageReq query) {
+        return GenericDto.success(sysNftPropertiesTypeService.dropdownPage(query));
     }
 
     @PostMapping("add")
