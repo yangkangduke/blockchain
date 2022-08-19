@@ -36,5 +36,4 @@ public class PublicNFTController {
         return remoteNftService.ucPage(query);
     }
 
-
 }
