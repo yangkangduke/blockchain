@@ -21,7 +21,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userContextInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/auth/**", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs");
+                .excludePathPatterns("/auth/**", "/public/**", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs");
     }
 
     @Bean

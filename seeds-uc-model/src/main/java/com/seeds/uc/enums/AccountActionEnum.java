@@ -15,6 +15,8 @@ public enum AccountActionEnum {
     DEPOSIT((short) 1, "deposit","充币"),
     @JsonProperty("2")
     WITHDRAW((short) 2,"withdraw","提币"),
+    @JsonProperty("3")
+    BUY_NFT((short) 3,"buy","购买NFT"),
     ;
     @JsonValue
     @EnumValue
