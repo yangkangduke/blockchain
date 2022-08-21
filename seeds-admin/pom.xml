@@ -50,7 +50,7 @@
         </dependency>
         <dependency>
             <groupId>com.seeds</groupId>
-            <artifactId>seeds-chain</artifactId>
+            <artifactId>seeds-chain-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
