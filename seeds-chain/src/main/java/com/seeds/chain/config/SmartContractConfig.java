@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 
 @Slf4j
 @Data
@@ -17,6 +18,12 @@ public class SmartContractConfig {
     private String ownerPrivateKey;
     private String rpcProviderUrl;
     private String gameAddress;
+
+    private String tokenStandard;
+    private String blockchain;
+    private String metadataMode;
+    private BigDecimal creatorFees;
+
 
     @PostConstruct
     public void init() {

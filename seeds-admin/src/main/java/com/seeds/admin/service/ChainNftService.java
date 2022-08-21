@@ -2,7 +2,10 @@ package com.seeds.admin.service;
 
 import com.seeds.admin.dto.request.ChainMintNftReq;
 import com.seeds.admin.dto.request.ChainUpdateNftReq;
+import com.seeds.admin.dto.response.ChainMintNftResp;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.math.BigInteger;
 
 public interface ChainNftService {
     String uploadImage(MultipartFile image);
@@ -13,7 +16,7 @@ public interface ChainNftService {
 
     String updateMetadata(String imageFileHash, ChainUpdateNftReq request);
 
-    boolean mintNft(String metadataFileHash);
+    ChainMintNftResp mintNft(String metadataFileHash);
 
     String getMetadataFileImageHash(String tokenId);
 

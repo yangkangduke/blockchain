@@ -2,7 +2,9 @@ package com.seeds.admin.service.impl;
 
 import com.seeds.admin.dto.request.ChainMintNftReq;
 import com.seeds.admin.dto.request.ChainUpdateNftReq;
+import com.seeds.admin.dto.response.ChainMintNftResp;
 import com.seeds.admin.service.ChainNftService;
+import com.seeds.chain.config.SmartContractConfig;
 import com.seeds.chain.feign.request.PinataPinJsonRequest;
 import com.seeds.chain.service.GameItemsService;
 import com.seeds.chain.service.IpfsService;
@@ -22,6 +24,9 @@ public class ChainNftServiceImpl implements ChainNftService {
 
     @Autowired
     private IpfsService ipfsService;
+
+    @Autowired
+    private SmartContractConfig smartContractConfig;
 
     @Override
     public String uploadImage(MultipartFile image) {
@@ -60,9 +65,14 @@ public class ChainNftServiceImpl implements ChainNftService {
     }
 
     @Override
-    public boolean mintNft(String metadataFileHash) {
+    public ChainMintNftResp mintNft(String metadataFileHash) {
         // mint nft with ipfs hash
-        return gameItemsService.mintNft("ipfs://" + metadataFileHash);
+        BigInteger tokenId = gameItemsService.mintNft("ipfs://" + metadataFileHash);
+        if (tokenId.compareTo(BigInteger.ZERO) > 0) {
+            return generateResponse(tokenId);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -82,5 +92,16 @@ public class ChainNftServiceImpl implements ChainNftService {
     @Override
     public boolean burnNft(String tokenId) {
         return gameItemsService.burnNft(tokenId);
+    }
+
+    private ChainMintNftResp generateResponse(BigInteger tokenId) {
+        ChainMintNftResp response = new ChainMintNftResp();
+        response.setTokenId(tokenId.toString());
+        response.setContractAddress(smartContractConfig.getGameAddress());
+        response.setTokenStandard(smartContractConfig.getTokenStandard());
+        response.setBlockchain(smartContractConfig.getBlockchain());
+        response.setMetadata(smartContractConfig.getMetadataMode());
+        response.setCreatorFees(smartContractConfig.getCreatorFees());
+        return response;
     }
 }
