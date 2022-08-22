@@ -1,24 +1,24 @@
 package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.annotation.DataFilter;
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
-import com.seeds.admin.entity.SysNftEntity;
-import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.service.SysNftService;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -46,13 +46,8 @@ public class SysNftController {
     @PostMapping("add")
     @ApiOperation("添加")
     @RequiredPermission("sys:nft:add")
-    public GenericDto<Object> add(@Valid @RequestBody SysNftAddReq req) {
-        // 查重
-        SysNftEntity nft = sysNftService.queryByContractAddress(req.getContractAddress());
-        if (nft != null) {
-            return GenericDto.failure(AdminErrorCodeEnum.ERR_40004_NFT_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_40004_NFT_ALREADY_EXIST.getCode(), null);
-        }
-        sysNftService.add(req);
+    public GenericDto<Object> add(@RequestPart("image") MultipartFile image, @Valid SysNftAddReq req) {
+        sysNftService.add(image, req);
         return GenericDto.success(null);
     }
 
@@ -67,11 +62,6 @@ public class SysNftController {
     @ApiOperation("编辑")
     @RequiredPermission("sys:nft:modify")
     public GenericDto<Object> modify(@Valid @RequestBody SysNftModifyReq req) {
-        // 查重
-        SysNftEntity nft = sysNftService.queryByContractAddress(req.getContractAddress());
-        if (nft != null && !Objects.equals(nft.getId(), req.getId())) {
-            return GenericDto.failure(AdminErrorCodeEnum.ERR_40004_NFT_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_40004_NFT_ALREADY_EXIST.getCode(), null);
-        }
         sysNftService.modify(req);
         return GenericDto.success(null);
     }
@@ -106,9 +96,10 @@ public class SysNftController {
         return GenericDto.success(null);
     }
 
-    @GetMapping("user-owned/{userId}")
-    @ApiOperation("uc用户拥有的NFT")
-    public GenericDto<List<SysNftResp>> userOwned(@PathVariable("userId") Long userId, @RequestParam(required = false) Long gameId) {
-        return GenericDto.success(sysNftService.userOwned(userId, gameId));
+    @PostMapping("uc-page")
+    @ApiOperation("uc分页查询NFT")
+    @Inner
+    public GenericDto<Page<SysNftResp>> ucPage(@Valid @RequestBody UcNftPageReq query) {
+        return GenericDto.success(sysNftService.ucPage(query));
     }
 }

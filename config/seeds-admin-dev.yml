@@ -49,12 +49,27 @@ redisson:
 
 smart-contract:
   chain-id: 97
+  blockchain: "Binance Test Chain"
+  token-standard: "ERC-1155"
   owner-address: "0x492b6f0E6C720c2516e0aE62929241c7c1eaCAa1"
   owner-private-key: "132ed90697a22ce740831f9895c025857680bfb44a36c5ab282c8a36edb44e2f"
   rpc-provider-url: "https://small-misty-firefly.bsc-testnet.discover.quiknode.pro/c1c740ca57d182a18b26e30f524199a641ce5f61/"
-  game-address: "0x31cD478DC5433A729B5096cd945BC3D542b9E40a"
+  game-address: "0x32f1DA1bdF22c8445Db224C38c6ec5Ed92F24e25"
+  metadata-mode: "Decentralized"
+  creator-fees: 5
 
 ipfs:
   pinata:
     apiKey: "4b23467f4c734a15ea18"
     apiSecret: "140b427defed0d43b60c223301b45a783b47f9197429649f8fcf3dddc6092c0c"
+
+feign:
+  hystrix:
+    enabled: true
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000

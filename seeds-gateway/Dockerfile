@@ -1,0 +1,6 @@
+FROM openjdk:8-jdk-alpine
+MAINTAINER hewei 952517823@qq.com
+ARG JAR_FILE
+COPY ${JAR_FILE} gateway.jar
+EXPOSE 9999
+ENTRYPOINT ["java","-jar","/gateway.jar"]

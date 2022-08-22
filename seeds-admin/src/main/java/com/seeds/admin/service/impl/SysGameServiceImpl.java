@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.entity.SysGameEntity;
 import com.seeds.admin.enums.SysStatusEnum;
@@ -151,6 +152,22 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
                 .eq(SysGameEntity::getOfficialUrl, officialUrl);
         return getOne(queryWrap);
+    }
+
+    @Override
+    public IPage<SysGameBriefResp> dropdownPage(SysGamePageReq query) {
+        LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName());
+        Page<SysGameEntity>  page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
+        List<SysGameEntity> records = page.getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        return page.convert(p -> {
+            SysGameBriefResp resp = new SysGameBriefResp();
+            BeanUtils.copyProperties(p, resp);
+            return resp;
+        });
     }
 }
 

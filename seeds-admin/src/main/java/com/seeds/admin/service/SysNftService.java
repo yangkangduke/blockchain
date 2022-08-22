@@ -1,11 +1,13 @@
 package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.SysNftEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,9 +28,10 @@ public interface SysNftService extends IService<SysNftEntity> {
 
     /**
      * 添加系统NFT信息
+     * @param image NFT图片
      * @param req NFT信息
      */
-    void add(SysNftAddReq req);
+    void add(MultipartFile image, SysNftAddReq req);
 
     /**
      * 通过id获取系统NFT信息
@@ -56,13 +59,6 @@ public interface SysNftService extends IService<SysNftEntity> {
     void batchDelete(ListReq req);
 
     /**
-     * 通过合约地址获取系统NFT信息
-     * @param contractAddress 合约地址
-     * @return 系统NFT信息
-     */
-    SysNftEntity queryByContractAddress(String contractAddress);
-
-    /**
      * 修改NFT属性值
      * @param req NFT属性
      */
@@ -75,11 +71,10 @@ public interface SysNftService extends IService<SysNftEntity> {
     void ownerChange(List<NftOwnerChangeReq> req);
 
     /**
-     * 查询uc用户拥有的NFT
-     * @param userId uc用户id
-     * @param gameId 游戏id
+     * 分页查询uc的NFT
+     * @param query uc分页条件
      * @return 系统NFT信息
      */
-    List<SysNftResp> userOwned(Long userId, Long gameId);
+    Page<SysNftResp> ucPage(UcNftPageReq query);
 
 }

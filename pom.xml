@@ -21,7 +21,8 @@
         <module>seeds-admin</module>
         <module>seeds-admin-model</module>
         <module>seeds-config</module>
-        <module>seeds-chain</module>
+        <module>seeds-chain-api</module>
+        <module>seeds-admin-api</module>
     </modules>
 
     <properties>

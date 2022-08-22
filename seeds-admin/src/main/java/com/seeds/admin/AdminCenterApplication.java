@@ -3,14 +3,15 @@ package com.seeds.admin;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author hang.yu
  * @date 2022/7/12
  */
 @MapperScan({"com.seeds.admin.mapper"})
+@EnableHystrix
 @EnableFeignClients(basePackages = "com.seeds")
 @SpringBootApplication(scanBasePackages = {"com.seeds"})
 public class AdminCenterApplication {

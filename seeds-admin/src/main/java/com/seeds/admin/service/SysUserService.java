@@ -108,7 +108,7 @@ public interface SysUserService extends IService<SysUserEntity> {
     /**
      * metamask获取随机数
      * @param publicAddress
-     * @param adminUser
+     * @param userId
      * @return
      */
     String metamaskNonce(String publicAddress, Long userId);
@@ -124,4 +124,12 @@ public interface SysUserService extends IService<SysUserEntity> {
      * @return
      */
     Boolean deleteMetaMask(Long userId);
+
+    /**
+     * 系统用户下拉分页列表
+     * @param query 查询条件
+     * @return 系统用户信息
+     */
+    IPage<SysUserBriefResp> dropdownPage(SysUserPageReq query);
+
 }

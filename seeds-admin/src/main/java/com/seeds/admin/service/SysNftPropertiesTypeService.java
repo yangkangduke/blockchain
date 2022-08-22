@@ -6,6 +6,7 @@ import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SysNftPropertiesTypeAddReq;
 import com.seeds.admin.dto.request.SysNftPropertiesTypePageReq;
 import com.seeds.admin.dto.request.SysNftTypeModifyReq;
+import com.seeds.admin.dto.response.SysNftPropertiesTypeBriefResp;
 import com.seeds.admin.dto.response.SysNftPropertiesTypeResp;
 import com.seeds.admin.entity.SysNftPropertiesTypeEntity;
 
@@ -66,5 +67,12 @@ public interface SysNftPropertiesTypeService extends IService<SysNftPropertiesTy
      * @return 系统NFT属性类别信息
      */
     IPage<SysNftPropertiesTypeResp> queryPage(SysNftPropertiesTypePageReq query);
+
+    /**
+     * 分页获取系统NFT属性类别信息
+     * @param query 分页查询条件
+     * @return 系统NFT属性类别信息
+     */
+    IPage<SysNftPropertiesTypeBriefResp> dropdownPage(SysNftPropertiesTypePageReq query);
 
 }

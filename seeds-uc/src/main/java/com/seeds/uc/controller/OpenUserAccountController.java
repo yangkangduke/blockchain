@@ -62,7 +62,7 @@ public class OpenUserAccountController {
         UcUserAccount ucUserAccount = ucUserAccountService.getOne(new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, userId));
         if (ucUserAccount == null) {
-            // todo 远程调用创建账户
+            // todo 远程调用钱包创建账户接口，根据协议来生成不同的地址
             ucUserAccountService.creatAccountByUserId(userId);
         }
 

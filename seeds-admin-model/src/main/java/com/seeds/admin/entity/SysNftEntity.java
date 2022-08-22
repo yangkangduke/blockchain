@@ -33,10 +33,10 @@ public class SysNftEntity extends BaseEntity {
 	private String url;
 
 	/**
-	 * 图片文件id
+	 * 描述
 	 */
-	@TableField("file_id")
-	private Long fileId;
+	@TableField("description")
+	private String description;
 
 	/**
 	 * 名称
@@ -75,10 +75,22 @@ public class SysNftEntity extends BaseEntity {
 	private Integer status;
 
 	/**
+	 * 状态  0：正常  1：创建中  2：创建失败  3：修改中  4：修改失败
+	 */
+	@TableField("init_status")
+	private Integer initStatus;
+
+	/**
 	 * 归属人id
 	 */
 	@TableField("owner_id")
 	private String ownerId;
+
+	/**
+	 * 归属人账户id
+	 */
+	@TableField("owner_account_id")
+	private String ownerAccountId;
 
 	/**
 	 * 归属人名称

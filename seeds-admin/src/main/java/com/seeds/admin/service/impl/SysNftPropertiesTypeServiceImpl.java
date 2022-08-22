@@ -9,6 +9,7 @@ import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SysNftPropertiesTypeAddReq;
 import com.seeds.admin.dto.request.SysNftPropertiesTypePageReq;
 import com.seeds.admin.dto.request.SysNftTypeModifyReq;
+import com.seeds.admin.dto.response.SysNftPropertiesTypeBriefResp;
 import com.seeds.admin.dto.response.SysNftPropertiesTypeResp;
 import com.seeds.admin.entity.SysNftPropertiesTypeEntity;
 import com.seeds.admin.mapper.SysNftPropertiesTypeMapper;
@@ -89,6 +90,21 @@ public class SysNftPropertiesTypeServiceImpl extends ServiceImpl<SysNftPropertie
         }
         return page.convert(p -> {
             SysNftPropertiesTypeResp resp = new SysNftPropertiesTypeResp();
+            BeanUtils.copyProperties(p, resp);
+            return resp;
+        });
+    }
+
+    @Override
+    public IPage<SysNftPropertiesTypeBriefResp> dropdownPage(SysNftPropertiesTypePageReq query) {
+        LambdaQueryWrapper<SysNftPropertiesTypeEntity> queryWrap = new QueryWrapper<SysNftPropertiesTypeEntity>().lambda()
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftPropertiesTypeEntity::getName, query.getName());
+        Page<SysNftPropertiesTypeEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
+        if (CollectionUtils.isEmpty(page.getRecords())) {
+            return page.convert(p -> null);
+        }
+        return page.convert(p -> {
+            SysNftPropertiesTypeBriefResp resp = new SysNftPropertiesTypeBriefResp();
             BeanUtils.copyProperties(p, resp);
             return resp;
         });

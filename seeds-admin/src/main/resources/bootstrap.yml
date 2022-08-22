@@ -18,7 +18,7 @@ spring:
   cloud:
     config:
       label: main-dev #分支名称
-      uri: http://127.0.0.1:8888
+      uri: http://Seeds-config:8888
       profile: dev
       name: application,seeds-admin #配置文件名称
       fail-fast: true

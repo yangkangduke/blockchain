@@ -32,6 +32,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
 
     public static String SWAGGER_URI = "/v2/api-docs";
     public static String AUTH = "/auth/";
+    public static String PUBLIC = "/public/";
     @Autowired
     private AuthService authService;
 
@@ -53,7 +54,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
             URI uri = exchange.getRequest().getURI();
             log.info("URL信息: {}", uri);
             // 不需要鉴权的
-            if (uri.toString().contains(SWAGGER_URI) || uri.toString().contains(AUTH) ){
+            if (uri.toString().contains(SWAGGER_URI) || uri.toString().contains(AUTH) || uri.toString().contains(PUBLIC)){
                 return success(chain, exchange, null);
             }
             String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_TOKEN);

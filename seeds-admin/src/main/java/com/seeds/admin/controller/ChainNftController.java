@@ -4,11 +4,11 @@ import cn.hutool.json.JSONUtil;
 import com.seeds.admin.dto.request.ChainBurnNftReq;
 import com.seeds.admin.dto.request.ChainMintNftReq;
 import com.seeds.admin.dto.request.ChainUpdateNftReq;
+import com.seeds.admin.dto.response.ChainMintNftResp;
 import com.seeds.admin.service.ChainNftService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +28,7 @@ public class ChainNftController {
 
     @PostMapping("mint-nft")
     @ApiOperation(value = "mint-nft", notes = "metaData参数格式：{\"name\":\"bow\", \"description\":\"shortbow\", \"attributes\": [{\"trait_type\":\"element\",\"value\":\"fire\"}]}")
-    public GenericDto<Object> mintNewNft(
+    public GenericDto<ChainMintNftResp> mintNewNft(
         @RequestPart("image") MultipartFile image,
         @RequestParam String metaData
     ) {
@@ -36,10 +36,10 @@ public class ChainNftController {
         ChainMintNftReq chainMintNftReq = JSONUtil.toBean(metaData, ChainMintNftReq.class);
         String imageFileHash = chainNftService.uploadImage(image);
         String metadataFileHash = chainNftService.uploadMetadata(imageFileHash, chainMintNftReq);
-        boolean status = chainNftService.mintNft(metadataFileHash);
+        ChainMintNftResp result = chainNftService.mintNft(metadataFileHash);
 
-        if (status) {
-            return GenericDto.success(null);
+        if (result != null) {
+            return GenericDto.success(result);
         } else {
             return GenericDto.failure(ERR_90001_FAIL_TO_EXECUTE_ON_CHAIN.getDescEn(), ERR_90001_FAIL_TO_EXECUTE_ON_CHAIN.getCode(), null);
         }

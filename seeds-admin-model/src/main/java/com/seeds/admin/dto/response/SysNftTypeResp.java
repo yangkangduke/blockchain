@@ -28,6 +28,9 @@ public class SysNftTypeResp extends TreeNode<SysNftTypeResp> {
 	@ApiModelProperty(value = "类别名称")
 	private String name;
 
+	@ApiModelProperty("状态  0：停用   1：正常")
+	private Integer status;
+
 	@ApiModelProperty(value = "排序")
 	private Integer sort;
 

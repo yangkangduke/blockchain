@@ -28,11 +28,9 @@ public class AccountActionReq implements Serializable {
     private AccountActionEnum action;
 
     @ApiModelProperty("发送端地址")
-    @NotBlank
     private String fromAddress;
 
     @ApiModelProperty("接收端地址")
-    @NotBlank
     private String toAddress;
 
     @ApiModelProperty("金额")
@@ -44,6 +42,7 @@ public class AccountActionReq implements Serializable {
 
     @ApiModelProperty("备注")
     private String comments;
+    private Long fromUserId;
 
 
 }

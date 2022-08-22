@@ -10,17 +10,23 @@ import com.seeds.admin.dto.response.NftPropertiesResp;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.*;
+import com.seeds.admin.enums.NftInitStatusEnum;
 import com.seeds.admin.enums.SysStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysNftMapper;
 import com.seeds.admin.service.*;
+import com.seeds.common.exception.SeedsException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 
@@ -30,11 +36,18 @@ import java.util.stream.Collectors;
  * @author hang.yu
  * @date 2022/7/22
  */
+@Slf4j
 @Service
 public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> implements SysNftService {
 
     @Autowired
     private SysGameService sysGameService;
+
+    @Autowired
+    private ExecutorService executorService;
+
+    @Autowired
+    private ChainNftService chainNftService;
 
     @Autowired
     private SysNftTypeService sysNftTypeService;
@@ -83,15 +96,20 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(SysNftAddReq req) {
+    public void add(MultipartFile image, SysNftAddReq req) {
         // 添加NFT
         SysNftEntity sysNft = new SysNftEntity();
         BeanUtils.copyProperties(req, sysNft);
         // 生成NFT编号
         sysNft.setNumber(sysSequenceNoService.generateNftNo());
+        sysNft.setInitStatus(NftInitStatusEnum.CREATING.getCode());
         save(sysNft);
         // 添加NFT属性
         addNftProperties(sysNft.getId(), req.getPropertiesList());
+        // NFT上链
+        executorService.submit(() -> {
+            mintNft(image, req, sysNft.getId());
+        });
     }
 
     @Override
@@ -138,17 +156,26 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void modify(SysNftModifyReq req) {
-        // 添加NFT
-        SysNftEntity sysNft = new SysNftEntity();
-        BeanUtils.copyProperties(req, sysNft);
+        SysNftEntity sysNft = getById(req.getId());
+        if (WhetherEnum.YES.value() == sysNft.getStatus()) {
+            throw new SeedsException("NFT is on sale and cannot be modified");
+        }
+        // 修改NFT状态
+        sysNft.setInitStatus(NftInitStatusEnum.UPDATING.getCode());
         updateById(sysNft);
         // 修改NFT属性
         addNftProperties(sysNft.getId(), req.getPropertiesList());
+        // 修改链上NFT
+        executorService.submit(() -> {
+            modifyNft(sysNft, req);
+        });
     }
 
     @Override
     public void enableOrDisable(List<SwitchReq> req) {
+        Set<Long> set = new HashSet<>();
         // 上架/下架NFT
         req.forEach(p -> {
             // 校验状态
@@ -156,24 +183,45 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             SysNftEntity nft = new SysNftEntity();
             nft.setId(p.getId());
             nft.setStatus(p.getStatus());
+            // 上架
+            if (WhetherEnum.YES.value() == p.getStatus()) {
+                set.add(nft.getId());
+            } else {
+                updateById(nft);
+            }
+        });
+        List<SysNftEntity> sysNftEntities = listByIds(set);
+        if (CollectionUtils.isEmpty(sysNftEntities)) {
+            return;
+        }
+        Set<Long> modifyIds = sysNftEntities.stream().filter(p -> NftInitStatusEnum.NORMAL.getCode() == p.getInitStatus()).map(SysNftEntity::getGameId).collect(Collectors.toSet());
+        Set<Long> modifySet = set.stream().filter(modifyIds::contains).collect(Collectors.toSet());
+        if (CollectionUtils.isEmpty(modifySet)) {
+            return;
+        }
+        modifySet.forEach(p -> {
+            SysNftEntity nft = new SysNftEntity();
+            nft.setId(p);
+            nft.setStatus(WhetherEnum.YES.value());
             updateById(nft);
         });
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void batchDelete(ListReq req) {
         Set<Long> ids = req.getIds();
+        // 删除链上的NFT
+        List<SysNftEntity> sysNftEntities = listByIds(ids);
+        if (!CollectionUtils.isEmpty(sysNftEntities)) {
+            sysNftEntities.forEach(p -> {
+                chainNftService.burnNft(p.getTokenId());
+            });
+        }
         // 删除NFT
         removeBatchByIds(ids);
         // 删除和NFT属性的关联
         sysNftPropertiesService.deleteByNftIs(ids);
-    }
-
-    @Override
-    public SysNftEntity queryByContractAddress(String contractAddress) {
-        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
-                .eq(SysNftEntity::getContractAddress, contractAddress);
-        return getOne(queryWrap);
     }
 
     @Override
@@ -192,21 +240,27 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             BeanUtils.copyProperties(p, entity);
             updateById(entity);
         });
+        // todo NFT transfer
     }
 
     @Override
-    public List<SysNftResp> userOwned(Long userId, Long gameId) {
+    public Page<SysNftResp> ucPage(UcNftPageReq query) {
         LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
-                .eq(SysNftEntity::getOwnerId, userId)
-                .eq(gameId != null, SysNftEntity::getGameId, gameId);
-        List<SysNftEntity> list = list(queryWrap);
-        if (CollectionUtils.isEmpty(list)) {
-            return Collections.emptyList();
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftEntity::getName, query.getName())
+                .eq(query.getStatus() != null, SysNftEntity::getStatus, query.getStatus())
+                .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
+                .eq(query.getUserId() != null, SysNftEntity::getOwnerId, query.getUserId())
+                .eq(query.getAccountId() != null, SysNftEntity::getOwnerAccountId, query.getAccountId())
+                .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId());
+        Page<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
+        Page<SysNftResp> resPage = new Page<>(query.getCurrent(), query.getSize());
+        if (CollectionUtils.isEmpty(page.getRecords())) {
+            return resPage;
         }
-        Set<Long> nftTypeIds = list.stream().map(SysNftEntity::getNftTypeId).collect(Collectors.toSet());
+        Set<Long> nftTypeIds = page.getRecords().stream().map(SysNftEntity::getNftTypeId).collect(Collectors.toSet());
         Map<Long, SysNftTypeEntity> nftTypeMap = sysNftTypeService.queryMapByIds(nftTypeIds);
         List<SysNftResp> respList = new ArrayList<>();
-        list.forEach(p -> {
+        page.getRecords().forEach(p -> {
             SysNftResp resp = new SysNftResp();
             BeanUtils.copyProperties(p, resp);
             SysNftTypeEntity nftType = nftTypeMap.get(p.getNftTypeId());
@@ -216,7 +270,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             }
             respList.add(resp);
         });
-        return respList;
+        resPage.setRecords(respList);
+        return resPage;
     }
 
     private void addNftProperties(Long nftId, List<NftPropertiesReq> propertiesList) {
@@ -230,6 +285,67 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             });
             sysNftPropertiesService.saveOrUpdate(nftId, nftPropertiesList);
         }
+    }
+
+    private List<ChainNftAttributes> buildNftProperties(List<NftPropertiesReq> propertiesList) {
+        List<ChainNftAttributes> attributes = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(propertiesList)) {
+            propertiesList.forEach(p -> {
+                ChainNftAttributes attribute = new ChainNftAttributes();
+                attribute.setTraitType(p.getName());
+                attribute.setValue(p.getValue());
+                attributes.add(attribute);
+            });
+        }
+        return attributes;
+    }
+
+    private void mintNft(MultipartFile image, SysNftAddReq req, Long id) {
+        int initStatus = NftInitStatusEnum.NORMAL.getCode();
+        String imageFileHash = null;
+        try {
+            // 上传NFT图片
+            imageFileHash = chainNftService.uploadImage(image);
+            // 上传Metadata
+            String metadataFileHash = chainNftService.uploadMetadata(imageFileHash,
+                    ChainMintNftReq.builder()
+                            .name(req.getName())
+                            .description(req.getDescription())
+                            .attributes(buildNftProperties(req.getPropertiesList()))
+                            .build());
+            // 在链上创建NFT
+            chainNftService.mintNft(metadataFileHash);
+        } catch (Exception e) {
+            log.error("NFT创建失败， id={}, msg={}", id, e.getMessage());
+            initStatus = NftInitStatusEnum.CREATE_FAILED.getCode();
+        }
+        // 更新NFT
+        SysNftEntity nft = getById(id);
+        nft.setInitStatus(initStatus);
+        nft.setUrl(imageFileHash);
+        updateById(nft);
+    }
+
+    private void modifyNft(SysNftEntity sysNft, SysNftModifyReq req) {
+        int initStatus = NftInitStatusEnum.NORMAL.getCode();
+        try {
+            // 修改链上数据
+            String imageFileHash = chainNftService.getMetadataFileImageHash(sysNft.getTokenId());
+            String metadataFileHash = chainNftService.updateMetadata(imageFileHash,
+                    ChainUpdateNftReq.builder()
+                            .name(req.getName())
+                            .description(req.getDescription())
+                            .attributes(buildNftProperties(req.getPropertiesList()))
+                            .build());
+            chainNftService.updateNftAttribute(sysNft.getTokenId(), metadataFileHash);
+            // 更新NFT
+            BeanUtils.copyProperties(req, sysNft);
+        } catch (Exception e) {
+            log.error("NFT修改失败， id={}, msg={}", sysNft.getId(), e.getMessage());
+            initStatus = NftInitStatusEnum.UPDATE_FAILED.getCode();
+        }
+        sysNft.setInitStatus(initStatus);
+        updateById(sysNft);
     }
 }
 

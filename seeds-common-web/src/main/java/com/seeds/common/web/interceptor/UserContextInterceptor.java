@@ -76,12 +76,15 @@ public class UserContextInterceptor implements HandlerInterceptor {
     }
 
     private Inner getInnerAnnotation(Object handler) {
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        Inner inner = handlerMethod.getMethodAnnotation(Inner.class);
-        if (inner == null) {
-            inner = handlerMethod.getMethod().getDeclaringClass().getAnnotation(Inner.class);
+        if (handler instanceof HandlerMethod) {
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            Inner inner = handlerMethod.getMethodAnnotation(Inner.class);
+            if (inner == null) {
+                inner = handlerMethod.getMethod().getDeclaringClass().getAnnotation(Inner.class);
+            }
+            return inner;
         }
-        return inner;
+        return null;
     }
 
 }

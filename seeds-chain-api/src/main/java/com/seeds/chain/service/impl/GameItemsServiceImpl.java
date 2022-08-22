@@ -15,6 +15,7 @@ import org.web3j.tx.gas.DefaultGasProvider;
 
 import javax.annotation.PostConstruct;
 import java.math.BigInteger;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -38,16 +39,18 @@ public class GameItemsServiceImpl implements GameItemsService {
     }
 
     @Override
-    public boolean mintNft(String uri) {
+    public BigInteger mintNft(String uri) {
         gameItems = GameItems.load(smartContractConfig.getGameAddress(), web3, txManager, new DefaultGasProvider());
         try {
             TransactionReceipt receipt = gameItems.mintNewNft(smartContractConfig.getOwnerAddress(), BigInteger.ONE, uri).send();
-            log.info("receipt: {}", receipt);
-            return true;
+            List<GameItems.MintEventEventResponse> event = gameItems.getMintEventEvents(receipt);
+            if (event.size() == 1) {
+                return event.get(0).newItemId;
+            }
         } catch (Exception e) {
             log.error("fail to mint", e);
         }
-        return false;
+        return BigInteger.ONE.negate();
     }
 
     @Override
