@@ -45,7 +45,7 @@ public class NFTBuyCallbackReq implements Serializable {
     private String tokenId;
 
     @ApiModelProperty("admin中的NFT的id")
-    private Long NftId;
+    private Long nftId;
 
     @ApiModelProperty("记录状态 1-进行中 2-成功 3-失败")
     @NotNull
