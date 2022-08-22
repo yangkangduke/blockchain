@@ -75,4 +75,4 @@ hystrix:
           thread:
             timeoutInMilliseconds: 5000
 
-Seeds-uc: http://Seeds-uc:10101
+Seeds-uc: http://192.168.1.100:10101

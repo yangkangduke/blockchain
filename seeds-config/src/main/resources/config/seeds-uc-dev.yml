@@ -40,4 +40,4 @@ redisson:
 resetpassword:
   url: http://localhost:9999/uc/auth/forgotPassword/verifyLink?encode={}&account={}
 
-Seeds-admin: http://Seeds-admin:10102
+Seeds-admin: http://192.168.1.100:10102
