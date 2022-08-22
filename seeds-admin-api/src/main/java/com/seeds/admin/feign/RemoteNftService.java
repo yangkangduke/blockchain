@@ -18,7 +18,7 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/8/19
  */
-@FeignClient(name = "remoteNftService", url = "Seeds-admin", fallback = RemoteNftServiceImpl.class, configuration = {FeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteNftService", url = "${Seeds-admin}", fallback = RemoteNftServiceImpl.class, configuration = {FeignInnerRequestInterceptor.class})
 public interface RemoteNftService {
 
 	/**

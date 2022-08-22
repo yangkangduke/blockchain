@@ -10,13 +10,13 @@ spring:
       routes:
 
         - id: seeds-uc-service
-          uri: http://127.0.0.1:10101
+          uri: http://Seeds-uc:10101
           predicates:
             - Path=/uc/**
           filters:
             - Auth
         - id: seeds-admin-service
-          uri: http://127.0.0.1:10102
+          uri: http://Seeds-admin:10102
           predicates:
             - Path=/admin/**
           filters:
