@@ -5,6 +5,7 @@ package com.seeds.uc.feign;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.LoginReq;
+import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.UserInfoResp;
@@ -26,8 +27,8 @@ import javax.validation.Valid;
 public interface RemoteNFTService {
 
 	@GetMapping("/nft/buy/callback")
-	@ApiOperation(value = "购买回调接口", notes = "购买回调接口")
-	GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyReq buyReq);
+	@ApiOperation(value = "购买回调", notes = "购买回调")
+	GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyCallbackReq buyReq);
 
 
 

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.seeds.uc.enums.AccountActionEnum;
+import com.seeds.uc.enums.AccountActionStatusEnum;
 import com.seeds.uc.enums.AccountTypeEnum;
 import com.seeds.uc.enums.CurrencyEnum;
 import io.swagger.annotations.ApiModel;
@@ -46,7 +47,7 @@ public class UcUserAccountActionHistory implements Serializable {
     private Long version;
 
     @ApiModelProperty("操作: 1-冲币 2-提币")
-    private AccountActionEnum action;
+    private AccountActionEnum actionEnum;
 
     @ApiModelProperty("账号类型 1-现货")
     private AccountTypeEnum accountType;
@@ -75,8 +76,8 @@ public class UcUserAccountActionHistory implements Serializable {
     @ApiModelProperty("区块的hash值")
     private String blockHash;
 
-    @ApiModelProperty("状态")
-    private Integer status;
+    @ApiModelProperty("状态 1-进行中 2-成功 3-失败")
+    private AccountActionStatusEnum status;
 
     @ApiModelProperty("金额")
     private BigDecimal amount;

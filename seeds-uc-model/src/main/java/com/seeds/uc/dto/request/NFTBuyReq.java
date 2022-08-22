@@ -1,5 +1,6 @@
 package com.seeds.uc.dto.request;
 
+import com.seeds.uc.enums.AccountActionStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -35,6 +36,9 @@ public class NFTBuyReq implements Serializable {
 
     @ApiModelProperty("NFT的tokenId")
     private String tokenId;
+
+    @ApiModelProperty("admin中的NFT的id")
+    private Long NftId;
 
 
 }

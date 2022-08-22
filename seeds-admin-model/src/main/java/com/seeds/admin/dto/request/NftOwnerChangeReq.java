@@ -32,4 +32,6 @@ public class NftOwnerChangeReq {
     @NotBlank(message = "NFT owner name cannot be empty")
     private Long ownerName;
 
+    @ApiModelProperty("记录id")
+    private Long actionHistoryId;
 }
