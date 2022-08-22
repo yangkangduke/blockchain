@@ -68,3 +68,5 @@ hystrix:
         isolation:
           thread:
             timeoutInMilliseconds: 5000
+
+Seeds-uc: http://54.168.239.215:10101
