@@ -23,6 +23,7 @@ public class SmartContractConfig {
     private String blockchain;
     private String metadataMode;
     private BigDecimal creatorFees;
+    private String ipfsUrl;
 
 
     @PostConstruct

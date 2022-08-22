@@ -81,6 +81,9 @@ public class AdminUserContextInterceptor implements HandlerInterceptor {
     }
 
     private Inner getInnerAnnotation(Object handler) {
+        if (!(handler instanceof HandlerMethod)) {
+            return null;
+        }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         Inner inner = handlerMethod.getMethodAnnotation(Inner.class);
         if (inner == null) {

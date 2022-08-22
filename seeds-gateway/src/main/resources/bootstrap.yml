@@ -19,7 +19,7 @@ spring:
     config:
       label: main-dev #分支名称
       uri: http://Seeds-config:8888
-      profile: dev
+      profile: uat
       name: application,seeds-gateway #配置文件名称
       fail-fast: true
       retry:

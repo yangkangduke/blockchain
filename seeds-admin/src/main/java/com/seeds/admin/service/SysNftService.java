@@ -75,6 +75,13 @@ public interface SysNftService extends IService<SysNftEntity> {
      * @param query uc分页条件
      * @return 系统NFT信息
      */
-    Page<SysNftResp> ucPage(UcNftPageReq query);
+    Page<SysNftResp> ucPage(SysNftPageReq query);
+
+    /**
+     * 通过id获取系统NFT信息
+     * @param id NFT的id
+     * @return 系统NFT信息
+     */
+    SysNftDetailResp ucDetail(Long id);
 
 }
