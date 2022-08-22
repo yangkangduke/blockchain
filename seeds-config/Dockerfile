@@ -4,4 +4,3 @@ ARG JAR_FILE
 COPY ${JAR_FILE} config.jar
 EXPOSE 8888
 ENTRYPOINT ["java","-jar","/config.jar"]
-RUN git config --global url."https://ghproxy.com/https://github.com".insteadOf "https://github.com"
