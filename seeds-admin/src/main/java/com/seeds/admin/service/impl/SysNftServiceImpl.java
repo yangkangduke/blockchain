@@ -73,7 +73,6 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .eq(query.getStatus() != null, SysNftEntity::getStatus, query.getStatus())
                 .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
                 .eq(query.getUserId() != null, SysNftEntity::getOwnerId, query.getUserId())
-                .eq(query.getAccountId() != null, SysNftEntity::getOwnerAccountId, query.getAccountId())
                 .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId());
         Page<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
         List<SysNftEntity> records = page.getRecords();
