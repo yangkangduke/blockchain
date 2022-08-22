@@ -32,13 +32,5 @@ public interface RemoteUserService {
 	@ApiOperation(value = "获取用户信息", notes = "获取用户信息")
 	GenericDto<UserInfoResp> getInfo(HttpServletRequest request);
 
-	/**
-	 * 账号登陆
-	 * 1.调用/login 返回token
-	 * 2.调用/2fa/login 返回ucToken
-	 * @return
-	 */
-	@PostMapping("auth/login")
-	GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq);
 
 }
