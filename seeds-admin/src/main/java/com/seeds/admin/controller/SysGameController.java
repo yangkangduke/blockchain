@@ -9,6 +9,7 @@ import com.seeds.admin.entity.SysGameEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.service.SysGameService;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,7 @@ public class SysGameController {
 
     @PostMapping("dropdown-page")
     @ApiOperation("下拉列表")
+    @Inner
     public GenericDto<IPage<SysGameBriefResp>> dropdownPage(@Valid @RequestBody SysGamePageReq query) {
         return GenericDto.success(sysGameService.dropdownPage(query));
     }

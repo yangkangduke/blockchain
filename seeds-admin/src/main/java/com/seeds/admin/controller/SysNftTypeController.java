@@ -11,6 +11,7 @@ import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.service.SysNftTypeService;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -116,6 +117,13 @@ public class SysNftTypeController {
     @RequiredPermission("sys:nftType:select")
     public GenericDto<List<SysNftTypeResp>> select(@RequestParam(required = false) String parentCode) {
         return GenericDto.success(sysNftTypeService.queryRespByParentCode(parentCode));
+    }
+
+    @GetMapping("uc-dropdown")
+    @ApiOperation("uc下拉列表")
+    @Inner
+    public GenericDto<List<SysNftTypeResp>> ucDropdown() {
+        return GenericDto.success(sysNftTypeService.queryRespList(null));
     }
 
 }

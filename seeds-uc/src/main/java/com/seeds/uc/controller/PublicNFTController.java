@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "公共NFT")
 public class PublicNFTController {
 
-
     @Autowired
     private RemoteNftService remoteNftService;
 
@@ -39,6 +38,12 @@ public class PublicNFTController {
     @ApiOperation("信息")
     public GenericDto<SysNftDetailResp> detail(@PathVariable("id") Long id) {
         return remoteNftService.ucDetail(id);
+    }
+
+    @GetMapping("/type/uc-dropdown")
+    @ApiOperation("NFT类别列表")
+    public GenericDto<SysNftDetailResp> typeDropdown() {
+        return remoteNftService.ucTypeDropdown();
     }
 
 }

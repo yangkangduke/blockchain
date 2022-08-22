@@ -35,4 +35,9 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 		return GenericDto.failure("Internal Error:ucDetail failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
+	@Override
+	public GenericDto<SysNftDetailResp> ucTypeDropdown() {
+		return GenericDto.failure("Internal Error:ucNftType dropdown failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
 }

@@ -48,4 +48,12 @@ public interface RemoteNftService {
 	@ApiOperation("uc查询NFT信息")
 	GenericDto<SysNftDetailResp> ucDetail(@RequestParam Long id);
 
+	/**
+	 * 获取系统NFT类别列表
+	 * @return 系统NFT类别列表
+	 */
+	@GetMapping("/nft-type/uc-dropdown")
+	@ApiOperation("uc查询NFT类别列表")
+	GenericDto<SysNftDetailResp> ucTypeDropdown();
+
 }

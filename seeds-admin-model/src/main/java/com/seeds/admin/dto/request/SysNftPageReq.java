@@ -19,9 +19,6 @@ public class SysNftPageReq extends PageReq {
     @ApiModelProperty(value = "游戏id")
     private Long gameId;
 
-    @ApiModelProperty(value = "用户账户id")
-    private Long accountId;
-
     @ApiModelProperty(value = "NFT名称")
     private String name;
 
