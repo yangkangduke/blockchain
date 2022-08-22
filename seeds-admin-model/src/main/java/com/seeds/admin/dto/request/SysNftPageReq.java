@@ -1,5 +1,6 @@
 package com.seeds.admin.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -29,5 +30,8 @@ public class SysNftPageReq extends PageReq {
 
     @ApiModelProperty(value = "是否在售  0：否   1：是")
     private Integer status;
+
+    @JsonIgnore
+    private Integer initStatus;
 
 }

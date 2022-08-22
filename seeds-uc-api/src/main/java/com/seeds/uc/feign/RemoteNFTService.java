@@ -23,6 +23,4 @@ public interface RemoteNFTService {
 	@ApiOperation(value = "购买回调", notes = "购买回调")
 	GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyCallbackReq buyReq);
 
-
-
 }

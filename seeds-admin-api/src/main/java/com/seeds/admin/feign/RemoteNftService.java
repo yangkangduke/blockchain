@@ -2,7 +2,7 @@ package com.seeds.admin.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
-import com.seeds.admin.dto.request.UcNftPageReq;
+import com.seeds.admin.dto.request.SysNftPageReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.feign.impl.RemoteNftServiceImpl;
@@ -37,7 +37,7 @@ public interface RemoteNftService {
 	 */
 	@PostMapping("/nft/uc-page")
 	@ApiOperation("uc分页查询NFT")
-	GenericDto<Page<SysNftResp>> ucPage(UcNftPageReq query);
+	GenericDto<Page<SysNftResp>> ucPage(SysNftPageReq query);
 
 	/**
 	 * 通过id获取系统NFT信息

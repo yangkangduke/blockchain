@@ -51,7 +51,7 @@ smart-contract:
   game-address: "0x31cD478DC5433A729B5096cd945BC3D542b9E40a"
   metadata-mode: "Decentralized"
   creator-fees: 5
-  ipfs-url: "https://gateway.pinata.cloud/ipfs/"
+  ipfs-url: "https://cloudflare-ipfs.com/ipfs/"
 
 ipfs:
   pinata:

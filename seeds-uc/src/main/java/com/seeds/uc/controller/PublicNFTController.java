@@ -2,7 +2,7 @@ package com.seeds.uc.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.admin.dto.request.UcNftPageReq;
+import com.seeds.admin.dto.request.SysNftPageReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.feign.RemoteNftService;
@@ -31,7 +31,7 @@ public class PublicNFTController {
 
     @PostMapping("/uc-page")
     @ApiOperation(value = "分页查询", notes = "分页查询")
-    public GenericDto<Page<SysNftResp>> page(UcNftPageReq query) {
+    public GenericDto<Page<SysNftResp>> page(SysNftPageReq query) {
         return remoteNftService.ucPage(query);
     }
 
