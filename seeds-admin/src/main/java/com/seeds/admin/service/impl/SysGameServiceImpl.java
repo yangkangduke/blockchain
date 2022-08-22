@@ -50,7 +50,6 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         return page.convert(p -> {
             SysGameResp resp = new SysGameResp();
             BeanUtils.copyProperties(p, resp);
-            resp.setPrice(p.getPrice() + p.getUnit());
             // 图片
             resp.setPicture(p.getPictureUrl());
             return resp;
@@ -98,7 +97,6 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         SysGameResp resp = new SysGameResp();
         if (sysGame != null) {
             BeanUtils.copyProperties(sysGame, resp);
-            resp.setPrice(sysGame.getPrice() + sysGame.getUnit());
             // 图片
             resp.setPicture(sysGame.getPictureUrl());
             // 视频

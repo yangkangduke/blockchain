@@ -20,7 +20,7 @@ import javax.validation.Valid;
  * @author yk
  * @date 2022/8/8
  */
-@FeignClient(name = "remoteUserService", url = "127.0.0.1:10101", configuration = {FeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteUserService", url = "Seeds-uc", configuration = {FeignInnerRequestInterceptor.class})
 public interface RemoteUserService {
 
 
