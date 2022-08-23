@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public interface RemoteNftService {
 	 */
 	@PostMapping("/nft/uc-page")
 	@ApiOperation("uc分页查询NFT")
-	GenericDto<Page<SysNftResp>> ucPage(SysNftPageReq query);
+	GenericDto<Page<SysNftResp>> ucPage(@Valid @RequestBody SysNftPageReq query);
 
 	/**
 	 * 通过id获取系统NFT信息
