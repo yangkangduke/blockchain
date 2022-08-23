@@ -6,7 +6,6 @@ import com.seeds.chain.feign.PinataCloudService;
 import com.seeds.chain.feign.request.PinataPinJsonRequest;
 import com.seeds.chain.feign.response.PinataPinResponse;
 import com.seeds.chain.service.IpfsService;
-import com.seeds.common.dto.GenericDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

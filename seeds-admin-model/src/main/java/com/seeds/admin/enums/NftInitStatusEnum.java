@@ -14,6 +14,8 @@ public enum NftInitStatusEnum {
     CREATE_FAILED(2, "创建失败"),
     UPDATING(3, "修改中"),
     UPDATE_FAILED(4, "修改失败"),
+    DELETING(5, "删除中"),
+    DELETE_FAILED(6, "删除失败"),
     ;
 
     private final int code;
