@@ -85,7 +85,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 throw new GenericException(UcErrorCodeEnum.ERR_18003_ACCOUNT_ADDRESS_ERROR);
             }
             this.updateById(UcUserAccount.builder()
-                            .id(currentUserId)
+                            .userId(currentUserId)
+                            .currency(CurrencyEnum.USDC)
                             .balance(balance.add(amount))
                     .build());
         } else if (action.equals(AccountActionEnum.WITHDRAW)) {
@@ -97,7 +98,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 throw new GenericException(UcErrorCodeEnum.ERR_18001_ACCOUNT_BALANCE_INSUFFICIENT);
             }
             this.updateById(UcUserAccount.builder()
-                    .id(currentUserId)
+                    .userId(currentUserId)
+                    .currency(CurrencyEnum.USDC)
                     .balance(balance.subtract(amount))
                     .build());
         } else {
