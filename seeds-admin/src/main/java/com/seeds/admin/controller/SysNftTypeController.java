@@ -122,7 +122,7 @@ public class SysNftTypeController {
     @GetMapping("uc-dropdown")
     @ApiOperation("uc下拉列表")
     @Inner
-    public GenericDto<List<SysNftTypeResp>> ucTypeDropdown() {
+    public GenericDto<List<SysNftTypeResp>> ucDropdown() {
         return GenericDto.success(sysNftTypeService.queryRespList(null));
     }
 
