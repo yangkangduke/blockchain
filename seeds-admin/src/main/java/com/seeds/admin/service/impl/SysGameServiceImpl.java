@@ -10,6 +10,7 @@ import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.entity.SysGameEntity;
 import com.seeds.admin.enums.SysStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysGameMapper;
 import com.seeds.admin.service.SysGameService;
 import com.seeds.admin.service.SysMerchantGameService;
@@ -50,7 +51,6 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         return page.convert(p -> {
             SysGameResp resp = new SysGameResp();
             BeanUtils.copyProperties(p, resp);
-            resp.setPrice(p.getPrice() + p.getUnit());
             // 图片
             resp.setPicture(p.getPictureUrl());
             return resp;
@@ -98,7 +98,6 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         SysGameResp resp = new SysGameResp();
         if (sysGame != null) {
             BeanUtils.copyProperties(sysGame, resp);
-            resp.setPrice(sysGame.getPrice() + sysGame.getUnit());
             // 图片
             resp.setPicture(sysGame.getPictureUrl());
             // 视频
@@ -157,7 +156,8 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     @Override
     public IPage<SysGameBriefResp> dropdownPage(SysGamePageReq query) {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
-                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName());
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName())
+                .eq(SysGameEntity::getStatus, WhetherEnum.YES.value());
         Page<SysGameEntity>  page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
         List<SysGameEntity> records = page.getRecords();
         if (CollectionUtils.isEmpty(records)) {

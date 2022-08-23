@@ -39,6 +39,12 @@ public class SysNftDetailResp {
 	@ApiModelProperty(value = "价格")
 	private String price;
 
+	@ApiModelProperty(value = "单位")
+	private String unit;
+
+	@ApiModelProperty(value = "描述")
+	private String description;
+
 	@ApiModelProperty(value = "是否在售  0：否   1：是")
 	private Integer status;
 

@@ -33,6 +33,9 @@ public class SysGameResp {
 	@ApiModelProperty(value = "价格")
 	private String price;
 
+	@ApiModelProperty(value = "单位")
+	private String unit;
+
 	@ApiModelProperty(value = "官方网址")
 	private String officialUrl;
 

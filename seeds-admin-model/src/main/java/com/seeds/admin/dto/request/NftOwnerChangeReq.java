@@ -26,17 +26,18 @@ public class NftOwnerChangeReq {
     private Long ownerId;
 
     /**
-     * NFT的归属人账户id
-     */
-    @ApiModelProperty("NFT的归属人账户id")
-    @NotNull(message = "NFT owner account id cannot be empty")
-    private Long ownerAccountId;
-
-    /**
      * NFT的归属人名称
      */
     @ApiModelProperty("NFT的归属人名称")
     @NotBlank(message = "NFT owner name cannot be empty")
-    private Long ownerName;
+    private String ownerName;
+
+    @ApiModelProperty("记录id")
+    @NotNull(message = "NFT actionHistory id cannot be empty")
+    private Long actionHistoryId;
+
+    @ApiModelProperty("买家地址")
+    @NotBlank(message = "NFT buyers address cannot be empty")
+    private String toAddress;
 
 }

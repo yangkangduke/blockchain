@@ -99,7 +99,14 @@ public class SysNftController {
     @PostMapping("uc-page")
     @ApiOperation("uc分页查询NFT")
     @Inner
-    public GenericDto<Page<SysNftResp>> ucPage(@Valid @RequestBody UcNftPageReq query) {
+    public GenericDto<Page<SysNftResp>> ucPage(@Valid @RequestBody SysNftPageReq query) {
         return GenericDto.success(sysNftService.ucPage(query));
+    }
+
+    @GetMapping("uc-detail")
+    @ApiOperation("uc查询NFT信息")
+    @Inner
+    public GenericDto<SysNftDetailResp> ucDetail(@RequestParam Long id) {
+        return GenericDto.success(sysNftService.ucDetail(id));
     }
 }

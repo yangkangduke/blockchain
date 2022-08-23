@@ -117,11 +117,4 @@ public class SysMetaMaskController {
         return GenericDto.success(sysUserService.deleteMetaMask(sysUserEntity.getId()));
     }
 
-    @PostMapping("/test")
-    @ApiOperation(value = "test", notes = "test")
-    public GenericDto<Object> test(@Valid @RequestBody LoginReq loginReq) {
-        GenericDto<LoginResp> login = remoteUserService.login(loginReq);
-        return GenericDto.success(login);
-    }
-
 }

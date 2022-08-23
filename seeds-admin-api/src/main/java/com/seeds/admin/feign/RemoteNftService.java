@@ -2,7 +2,8 @@ package com.seeds.admin.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
-import com.seeds.admin.dto.request.UcNftPageReq;
+import com.seeds.admin.dto.request.SysNftPageReq;
+import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.feign.impl.RemoteNftServiceImpl;
 import com.seeds.common.dto.GenericDto;
@@ -17,7 +18,7 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/8/19
  */
-@FeignClient(name = "remoteNftService", url = "127.0.0.1:10102", fallback = RemoteNftServiceImpl.class, configuration = {FeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteNftService", url = "${Seeds-admin}", fallback = RemoteNftServiceImpl.class, configuration = {FeignInnerRequestInterceptor.class})
 public interface RemoteNftService {
 
 	/**
@@ -36,6 +37,23 @@ public interface RemoteNftService {
 	 */
 	@PostMapping("/nft/uc-page")
 	@ApiOperation("uc分页查询NFT")
-	GenericDto<Page<SysNftResp>> ucPage(UcNftPageReq query);
+	GenericDto<Page<SysNftResp>> ucPage(SysNftPageReq query);
+
+	/**
+	 * 通过id获取系统NFT信息
+	 * @param id NFT的id
+	 * @return 系统NFT信息
+	 */
+	@GetMapping("/nft/uc-detail")
+	@ApiOperation("uc查询NFT信息")
+	GenericDto<SysNftDetailResp> ucDetail(@RequestParam Long id);
+
+	/**
+	 * 获取系统NFT类别列表
+	 * @return 系统NFT类别列表
+	 */
+	@GetMapping("/nft-type/uc-dropdown")
+	@ApiOperation("uc查询NFT类别列表")
+	GenericDto<SysNftDetailResp> ucTypeDropdown();
 
 }

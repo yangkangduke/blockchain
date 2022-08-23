@@ -4,16 +4,17 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.dto.request.NftOwnerChangeReq;
+import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
+import com.seeds.uc.dto.request.NFTBuyCallbackReq;
+import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.dto.response.UcUserAddressInfoResp;
-import com.seeds.uc.enums.AccountActionEnum;
-import com.seeds.uc.enums.AccountTypeEnum;
-import com.seeds.uc.enums.CurrencyEnum;
-import com.seeds.uc.enums.UcErrorCodeEnum;
+import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.mapper.UcUserAccountMapper;
@@ -30,6 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -48,6 +51,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     private IUcUserAccountActionHistoryService ucUserAccountActionHistoryService;
     @Autowired
     private IUcUserAddressService ucUserAddressService;
+    @Autowired
+    private RemoteNftService remoteNftService;
 
     /**
      * 冲/提币
@@ -57,13 +62,13 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      */
     @Override
     public void action(AccountActionReq accountActionReq) {
+        // todo 后面改成需要冻结金额
         Long currentUserId = UserContext.getCurrentUserId();
         long currentTimeMillis = System.currentTimeMillis();
         AccountActionEnum action = accountActionReq.getAction();
         String fromAddress = accountActionReq.getFromAddress();
         String toAddress = accountActionReq.getToAddress();
         BigDecimal amount = accountActionReq.getAmount();
-        Long fromUserId = accountActionReq.getFromUserId();
         if (amount.compareTo(BigDecimal.ZERO) != 1) {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_AMOUNT_ERROR);
         }
@@ -95,19 +100,10 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                     .id(currentUserId)
                     .balance(balance.subtract(amount))
                     .build());
-        } else if (action.equals(AccountActionEnum.BUY_NFT)) {
-            this.updateById(UcUserAccount.builder()
-                    .id(currentUserId)
-                    .balance(balance.subtract(amount))
-                    .build());
-            this.updateById(UcUserAccount.builder()
-                    .id(fromUserId)
-                    .balance(balance.add(amount))
-                    .build());
         } else {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
         }
-        // 添加历史信息
+        // 添加记录信息
         UcUserAccountActionHistory history = UcUserAccountActionHistory.builder().build();
         BeanUtil.copyProperties(accountActionReq, history);
         history.setUserId(currentUserId);
@@ -186,5 +182,81 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
             return false;
         }
         return true;
+    }
+
+    /**
+     * 购买nft
+     * @param buyReq
+     */
+    @Override
+    public void buyNFTFreeze(NFTBuyReq buyReq) {
+        Long nftId = buyReq.getNftId();
+        long currentTimeMillis = System.currentTimeMillis();
+        BigDecimal amount = buyReq.getAmount();
+        Long currentUserId = UserContext.getCurrentUserId();
+        // todo 远程调用钱包接口
+
+        // 冻结金额
+        UcUserAccountInfoResp info = this.getInfo();
+        this.update(UcUserAccount.builder()
+                    .balance(info.getBalance().subtract(amount))
+                    .freeze(info.getFreeze().add(amount))
+                .build(), new LambdaQueryWrapper<UcUserAccount>()
+                .eq(UcUserAccount::getUserId, currentUserId)
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+
+        // 添加记录信息
+        UcUserAccountActionHistory ucUserAccountActionHistory = UcUserAccountActionHistory.builder()
+                .userId(currentUserId)
+                .createTime(currentTimeMillis)
+                .actionEnum(AccountActionEnum.BUY_NFT)
+                .accountType(AccountTypeEnum.ACTUALS)
+                .currency(CurrencyEnum.USDC)
+                .status(AccountActionStatusEnum.PROCESSING)
+                .build();
+        ucUserAccountActionHistoryService.save(ucUserAccountActionHistory);
+        Long actionHistoryId = ucUserAccountActionHistory.getId();
+
+        // 远程调用admin端归属人变更接口
+        List list = new ArrayList<NftOwnerChangeReq>();
+        NftOwnerChangeReq nftOwnerChangeReq = new NftOwnerChangeReq();
+        nftOwnerChangeReq.setOwnerId(currentUserId);
+        nftOwnerChangeReq.setId(nftId);
+        nftOwnerChangeReq.setActionHistoryId(actionHistoryId);
+        remoteNftService.ownerChange(list);
+    }
+
+    /**
+     * 购买回调
+     * @param buyReq
+     */
+    @Override
+    public void buyNFTCallback(NFTBuyCallbackReq buyReq) {
+        BigDecimal amount = buyReq.getAmount();
+        // 买家减少 卖家增加
+        UcUserAccountInfoResp info = this.getInfo();
+        this.update(UcUserAccount.builder()
+                .freeze(info.getFreeze().subtract(amount))
+                .build(), new LambdaQueryWrapper<UcUserAccount>()
+                .eq(UcUserAccount::getUserId, buyReq.getToUserId())
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+
+        this.update(UcUserAccount.builder()
+                .balance(info.getBalance().add(amount))
+                .build(), new LambdaQueryWrapper<UcUserAccount>()
+                .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+
+        // 改变交易记录的状态及其他信息
+        ucUserAccountActionHistoryService.updateById(UcUserAccountActionHistory.builder()
+                        .status(buyReq.getActionStatusEnum())
+                        .fromAddress(buyReq.getFromAddress())
+                        .toAddress(buyReq.getToAddress())
+                        .chain(buyReq.getChain())
+                        .txHash(buyReq.getTxHash())
+                        .blockNumber(buyReq.getBlockNumber())
+                        .blockHash(buyReq.getBlockHash())
+                        .id(buyReq.getActionHistoryId())
+                .build());
     }
 }

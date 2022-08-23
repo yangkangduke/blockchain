@@ -57,6 +57,7 @@ smart-contract:
   game-address: "0x32f1DA1bdF22c8445Db224C38c6ec5Ed92F24e25"
   metadata-mode: "Decentralized"
   creator-fees: 5
+  ipfs-url: "https://cloudflare-ipfs.com/ipfs/"
 
 ipfs:
   pinata:
@@ -73,3 +74,5 @@ hystrix:
         isolation:
           thread:
             timeoutInMilliseconds: 5000
+
+Seeds-uc: http://192.168.1.100:10101

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
+import com.seeds.uc.dto.request.NFTBuyCallbackReq;
+import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.model.UcUserAccount;
@@ -55,4 +57,17 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * @return
      */
     Boolean checkBalance(Long currentUserId, BigDecimal amount);
+
+    /**
+     * 购买nft
+     * @param buyReq
+     */
+    void buyNFTFreeze(NFTBuyReq buyReq);
+
+    /**
+     * 购买回调
+     * @param buyReq
+     */
+    void buyNFTCallback(NFTBuyCallbackReq buyReq);
+
 }

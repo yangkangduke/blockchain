@@ -19,7 +19,7 @@ public class ThreadPoolConfig {
     @Bean
     public ExecutorService executorService() {
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("thread-call-runner-%d").build();
-        return new ThreadPoolExecutor(3, 5, 200L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(1), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+        return new ThreadPoolExecutor(3, 5, 200L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(10), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
     }
 
 }
