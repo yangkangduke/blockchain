@@ -81,6 +81,12 @@ public class SysNftEntity extends BaseEntity {
 	private Integer initStatus;
 
 	/**
+	 * 错误信息
+	 */
+	@TableField("error_msg")
+	private String errorMsg;
+
+	/**
 	 * 归属人id
 	 */
 	@TableField("owner_id")

@@ -115,15 +115,19 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         BeanUtils.copyProperties(req, sysNft);
         // 默认停售
         sysNft.setStatus(WhetherEnum.NO.value());
+        sysNft.setInitStatus(NftInitStatusEnum.CREATING.getCode());
+        // 上传NFT图片
+        String imageFileHash = chainNftService.uploadImage(image);
+        sysNft.setUrl(smartContractConfig.getIpfsUrl() + imageFileHash);
         // 生成NFT编号
         sysNft.setNumber(sysSequenceNoService.generateNftNo());
-        sysNft.setInitStatus(NftInitStatusEnum.CREATING.getCode());
+        // 保存NFT
         save(sysNft);
         // 添加NFT属性
         addNftProperties(sysNft.getId(), req.getPropertiesList());
         // NFT上链
         executorService.submit(() -> {
-            mintNft(image, req, sysNft.getId());
+            mintNft(req, sysNft.getId(), imageFileHash);
         });
     }
 
@@ -304,13 +308,11 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         return attributes;
     }
 
-    private void mintNft(MultipartFile image, SysNftAddReq req, Long id) {
+    private void mintNft(SysNftAddReq req, Long id, String imageFileHash) {
         int initStatus = NftInitStatusEnum.NORMAL.getCode();
-        String imageFileHash = null;
+        String errorMsg;
         SysNftEntity nft = getById(id);
         try {
-            // 上传NFT图片
-            imageFileHash = chainNftService.uploadImage(image);
             // 上传Metadata
             String metadataFileHash = chainNftService.uploadMetadata(imageFileHash,
                     ChainMintNftReq.builder()
@@ -322,11 +324,15 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             ChainMintNftResp chainMintNftResp = chainNftService.mintNft(metadataFileHash);
             nft.setBlockChain(chainMintNftResp.getBlockchain());
             BeanUtils.copyProperties(chainMintNftResp, nft);
-            nft.setUrl(smartContractConfig.getIpfsUrl() + imageFileHash);
             nft.setStatus(req.getStatus());
         } catch (Exception e) {
             log.error("NFT创建失败， id={}, msg={}", id, e.getMessage());
             initStatus = NftInitStatusEnum.CREATE_FAILED.getCode();
+            errorMsg = e.getMessage();
+            if (StringUtils.isNotBlank(errorMsg) && errorMsg.length() > 255) {
+                errorMsg = errorMsg.substring(0, 255);
+            }
+            nft.setErrorMsg(errorMsg);
         }
         // 更新NFT
         nft.setInitStatus(initStatus);
