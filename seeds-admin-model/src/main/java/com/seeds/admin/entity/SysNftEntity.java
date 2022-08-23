@@ -140,5 +140,4 @@ public class SysNftEntity extends BaseEntity {
 	@TableLogic(value = "0", delval = "NULL")
 	@TableField("delete_flag")
 	private Integer deleteFlag;
-
 }

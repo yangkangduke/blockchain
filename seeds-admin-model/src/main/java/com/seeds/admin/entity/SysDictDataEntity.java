@@ -23,7 +23,7 @@ public class SysDictDataEntity extends BaseEntity {
 	private Long dictTypeId;
 
 	/**
-	 * 字典标签
+	 * 字典名称
 	 */
 	@TableField("dict_label")
 	private String dictLabel;
@@ -45,5 +45,4 @@ public class SysDictDataEntity extends BaseEntity {
 	 */
 	@TableField("sort")
 	private Integer sort;
-
 }

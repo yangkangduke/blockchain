@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -30,6 +31,13 @@ public class SysDictTypeController {
 
     @Autowired
     private SysDictTypeService sysDictTypeService;
+
+    @GetMapping("list")
+    @ApiOperation("列表")
+    @RequiredPermission("sys:dictType:list")
+    public GenericDto<List<SysDictTypeResp>> list(@RequestParam(required = false) String name) {
+        return GenericDto.success(sysDictTypeService.queryRespList(name));
+    }
 
     //增加用户
     @PostMapping("add")

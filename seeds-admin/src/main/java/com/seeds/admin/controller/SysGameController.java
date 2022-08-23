@@ -67,6 +67,7 @@ public class SysGameController {
         return GenericDto.success(null);
     }
 
+    //查询
     @GetMapping("detail/{id}")
     @ApiOperation("信息")
     @RequiredPermission("sys:game:detail")
@@ -101,5 +102,4 @@ public class SysGameController {
         sysGameService.enableOrDisable(req);
         return GenericDto.success(null);
     }
-
 }

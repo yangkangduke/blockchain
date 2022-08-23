@@ -118,7 +118,6 @@ public class DesensitizedUtils {
 		}
 		String preEmail = desValue(email.substring(0, index), 1, 0, "*");
 		return preEmail + email.substring(index);
-
 	}
 
 	/**

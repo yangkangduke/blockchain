@@ -51,7 +51,6 @@ public class SysGameCommentsController {
 
     @GetMapping("detail/{id}")
     @ApiOperation("详情")
-
     @RequiredPermission("sys:game-comments:detail")
     public GenericDto<SysGameCommentsResp> detail(@PathVariable("id") Long id) {
         return GenericDto.success(gameCommentsService.detail(id));
@@ -64,7 +63,6 @@ public class SysGameCommentsController {
         gameCommentsService.modify(req);
         return GenericDto.success(null);
     }
-
 
     @PostMapping("switch")
     @ApiOperation("启用/停用")

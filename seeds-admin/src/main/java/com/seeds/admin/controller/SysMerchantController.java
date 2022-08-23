@@ -129,6 +129,4 @@ public class SysMerchantController {
         sysMerchantService.deleteUser(req, merchantId);
         return GenericDto.success(null);
     }
-
-
 }
