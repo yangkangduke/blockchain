@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,7 +42,8 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     @Override
     public IPage<SysGameResp> queryPage(SysGamePageReq query) {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
-                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName());
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName())
+                .orderByDesc(SysGameEntity::getCreatedAt);
         Page<SysGameEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysGameEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {

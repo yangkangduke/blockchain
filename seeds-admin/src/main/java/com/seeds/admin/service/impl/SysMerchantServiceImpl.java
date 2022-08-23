@@ -79,7 +79,8 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
     public IPage<SysMerchantResp> queryPage(SysMerchantPageReq query) {
         LambdaQueryWrapper<SysMerchantEntity> queryWrap = new QueryWrapper<SysMerchantEntity>().lambda()
                 .likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysMerchantEntity::getName, query.getNameOrMobile())
-                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysMerchantEntity::getMobile, query.getNameOrMobile());
+                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysMerchantEntity::getMobile, query.getNameOrMobile())
+                .orderByDesc(SysMerchantEntity::getCreatedAt);
         Page<SysMerchantEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysMerchantEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {

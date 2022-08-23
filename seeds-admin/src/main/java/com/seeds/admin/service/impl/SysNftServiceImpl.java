@@ -80,7 +80,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
                 .eq(query.getUserId() != null, SysNftEntity::getOwnerId, query.getUserId())
                 .eq(query.getInitStatus() != null, SysNftEntity::getInitStatus, query.getInitStatus())
-                .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId());
+                .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId())
+                .orderByDesc(SysNftEntity::getCreatedAt);
         Page<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
         List<SysNftEntity> records = page.getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -215,7 +216,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         if (CollectionUtils.isEmpty(sysNftEntities)) {
             return;
         }
-        Set<Long> modifyIds = sysNftEntities.stream().filter(p -> NftInitStatusEnum.NORMAL.getCode() == p.getInitStatus()).map(SysNftEntity::getGameId).collect(Collectors.toSet());
+        Set<Long> modifyIds = sysNftEntities.stream().filter(p -> NftInitStatusEnum.NORMAL.getCode() == p.getInitStatus()).map(SysNftEntity::getId).collect(Collectors.toSet());
         Set<Long> modifySet = set.stream().filter(modifyIds::contains).collect(Collectors.toSet());
         if (CollectionUtils.isEmpty(modifySet)) {
             return;

@@ -82,7 +82,8 @@ public class SysNftPropertiesTypeServiceImpl extends ServiceImpl<SysNftPropertie
     @Override
     public IPage<SysNftPropertiesTypeResp> queryPage(SysNftPropertiesTypePageReq query) {
         LambdaQueryWrapper<SysNftPropertiesTypeEntity> queryWrap = new QueryWrapper<SysNftPropertiesTypeEntity>().lambda()
-                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftPropertiesTypeEntity::getName, query.getName());
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftPropertiesTypeEntity::getName, query.getName())
+                .orderByDesc(SysNftPropertiesTypeEntity::getCreatedAt);
         Page<SysNftPropertiesTypeEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysNftPropertiesTypeEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {

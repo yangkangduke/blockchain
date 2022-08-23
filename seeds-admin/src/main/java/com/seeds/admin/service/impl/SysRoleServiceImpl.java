@@ -44,7 +44,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
     @Override
     public IPage<SysRoleResp> queryPage(SysRolePageReq query) {
         LambdaQueryWrapper<SysRoleEntity> queryWrap = new QueryWrapper<SysRoleEntity>().lambda()
-                .eq(StringUtils.isNotBlank(query.getRoleName()), SysRoleEntity::getRoleName, query.getRoleName());
+                .eq(StringUtils.isNotBlank(query.getRoleName()), SysRoleEntity::getRoleName, query.getRoleName())
+                .orderByDesc(SysRoleEntity::getCreatedAt);
         Page<SysRoleEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysRoleEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {

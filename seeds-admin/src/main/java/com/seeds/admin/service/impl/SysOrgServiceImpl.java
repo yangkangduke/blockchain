@@ -73,6 +73,7 @@ public class SysOrgServiceImpl extends ServiceImpl<SysOrgMapper, SysOrgEntity> i
         if (!StrUtil.isEmpty(orgName)) {
             queryWrapper.like(SysOrgEntity::getOrgName, orgName);
         }
+        queryWrapper.orderByDesc(SysOrgEntity::getCreatedAt);
         List<SysOrgEntity> orgList = list(queryWrapper);
 
         if (!CollectionUtils.isEmpty(orgList)) {
