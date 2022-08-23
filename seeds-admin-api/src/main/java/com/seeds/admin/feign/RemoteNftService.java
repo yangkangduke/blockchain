@@ -5,6 +5,7 @@ import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.request.SysNftPageReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
+import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.impl.RemoteNftServiceImpl;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.admin.feign.interceptor.FeignInnerRequestInterceptor;
@@ -54,6 +55,6 @@ public interface RemoteNftService {
 	 */
 	@GetMapping("/nft-type/uc-dropdown")
 	@ApiOperation("uc查询NFT类别列表")
-	GenericDto<SysNftDetailResp> ucTypeDropdown();
+	GenericDto<List<SysNftTypeResp>> ucTypeDropdown();
 
 }

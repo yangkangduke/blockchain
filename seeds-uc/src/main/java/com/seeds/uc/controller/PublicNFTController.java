@@ -5,12 +5,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.SysNftPageReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
+import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>
@@ -42,7 +45,7 @@ public class PublicNFTController {
 
     @GetMapping("/type/uc-dropdown")
     @ApiOperation("NFT类别列表")
-    public GenericDto<SysNftDetailResp> typeDropdown() {
+    public GenericDto<List<SysNftTypeResp>> typeDropdown() {
         return remoteNftService.ucTypeDropdown();
     }
 

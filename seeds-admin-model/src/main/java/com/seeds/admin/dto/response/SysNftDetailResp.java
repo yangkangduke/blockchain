@@ -1,6 +1,5 @@
 package com.seeds.admin.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -48,6 +47,9 @@ public class SysNftDetailResp {
 
 	@ApiModelProperty(value = "是否在售  0：否   1：是")
 	private Integer status;
+
+	@ApiModelProperty(value = "状态  0：正常  1：创建中  2：创建失败  3：修改中  4：修改失败")
+	private Integer initStatus;
 
 	@ApiModelProperty(value = "创建时间")
 	private Long createdAt;
