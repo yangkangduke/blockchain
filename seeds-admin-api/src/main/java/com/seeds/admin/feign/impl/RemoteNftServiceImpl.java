@@ -5,6 +5,7 @@ import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.request.SysNftPageReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
+import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	}
 
 	@Override
-	public GenericDto<SysNftDetailResp> ucTypeDropdown() {
+	public GenericDto<List<SysNftTypeResp>> ucTypeDropdown() {
 		return GenericDto.failure("Internal Error:ucNftType dropdown failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
