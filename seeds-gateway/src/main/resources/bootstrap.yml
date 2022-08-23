@@ -3,7 +3,7 @@ spring:
     name: seeds-gateway
 
   profiles:
-    active: dev
+    active: uat
 
   # 读取本地文件
   cloud:
