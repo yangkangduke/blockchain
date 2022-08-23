@@ -4,19 +4,21 @@ import com.seeds.admin.dto.TreeNode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
- *字典
+ *字典类别
  * @author yang.deng
  * @data 2022/8/1
  */
+
+
 @Data
 @ApiModel(value = "SysDictTypeResp", description = "系统字典类别系统")
 public class SysDictTypeResp extends TreeNode<SysDictTypeResp> {
 
     @ApiModelProperty(value = "id")
     private Long id;
-
 
     @ApiModelProperty(value = "字典编码")
     private Long dictCode;

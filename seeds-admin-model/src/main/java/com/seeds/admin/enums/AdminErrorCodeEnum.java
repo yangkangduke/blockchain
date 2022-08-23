@@ -67,8 +67,12 @@ public enum AdminErrorCodeEnum {
 
     // block chain
 
-    ERR_90001_FAIL_TO_EXECUTE_ON_CHAIN(90001,"区块链操作失败", "chain operation failed")
+    ERR_90001_FAIL_TO_EXECUTE_ON_CHAIN(90001,"区块链操作失败", "chain operation failed"),
+
+    //dict data
+    ERR_100001_DICT_DATA_ALREADY_EXIST(100001,"字典已经存在","Dict data code already exist")
     ;
+
     @JsonValue
     @EnumValue
     private Integer code;

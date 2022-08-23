@@ -10,7 +10,6 @@ import reactor.core.publisher.Mono;
 
 @Configuration
 public class GatewayConfig {
-
     @Bean(name = "defaultResolver")
     public KeyResolver defaultResolver() {
         return exchange -> {

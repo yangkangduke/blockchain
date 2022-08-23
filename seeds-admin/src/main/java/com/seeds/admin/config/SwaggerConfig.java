@@ -53,7 +53,6 @@ public class SwaggerConfig {
                 .version("0.0.1")
                 .build();
     }
-
     /**
      * 配置文档生成最佳实践
      * @param apiInfo
