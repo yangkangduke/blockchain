@@ -42,7 +42,7 @@ public class SysNftResp {
 	@ApiModelProperty(value = "是否在售  0：否   1：是")
 	private Integer status;
 
-	@ApiModelProperty(value = "状态  0：正常  1：创建中  2：创建失败  3：修改中  4：修改失败")
+	@ApiModelProperty(value = "状态  0：正常  1：创建中  2：创建失败  3：修改中  4：修改失败  3：删除中  4：删除失败 ")
 	private Integer initStatus;
 
 	@ApiModelProperty(value = "创建时间")
