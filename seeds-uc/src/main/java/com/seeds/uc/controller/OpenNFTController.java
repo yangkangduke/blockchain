@@ -63,15 +63,5 @@ public class OpenNFTController {
         return GenericDto.success(null);
     }
 
-    /**
-     *  购买回调接口
-     */
-    @PostMapping("/buy/callback")
-    @ApiOperation(value = "购买回调", notes = "购买回调")
-    @Inner
-    public GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyCallbackReq buyReq) {
-        ucUserAccountService.buyNFTCallback(buyReq);
-        return GenericDto.success(null);
-    }
 
 }
