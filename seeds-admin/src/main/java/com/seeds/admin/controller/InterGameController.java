@@ -39,10 +39,10 @@ public class InterGameController {
         return GenericDto.success(sysGameService.queryPage(query));
     }
 
-    @GetMapping("uc-detail/{id}")
+    @GetMapping("uc-detail")
     @ApiOperation("信息")
     @Inner
-    public GenericDto<SysGameResp> ucDetail(@PathVariable("id") Long id) {
+    public GenericDto<SysGameResp> ucDetail(@RequestParam Long id) {
         return GenericDto.success(sysGameService.detail(id));
     }
 

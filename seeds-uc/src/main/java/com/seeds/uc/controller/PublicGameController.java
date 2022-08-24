@@ -37,7 +37,7 @@ public class PublicGameController {
         return remoteGameService.ucPage(query);
     }
 
-    @GetMapping("detail/{id}")
+    @GetMapping("/detail/{id}")
     @ApiOperation(value = "信息", notes = "信息")
     public GenericDto<SysGameResp> detail(@PathVariable("id") Long id) {
         return remoteGameService.ucDetail(id);

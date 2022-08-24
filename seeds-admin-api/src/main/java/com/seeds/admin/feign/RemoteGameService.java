@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -29,16 +31,16 @@ public interface RemoteGameService {
 	 */
 	@PostMapping("/internal-game/uc-page")
 	@ApiOperation("uc查询游戏分页")
-	GenericDto<Page<SysGameResp>> ucPage(SysGamePageReq query);
+	GenericDto<Page<SysGameResp>> ucPage(@RequestBody SysGamePageReq query);
 
 	/**
 	 * 通过游戏id获取系统游戏信息
 	 * @param id 游戏id
 	 * @return 系统游戏信息
 	 */
-	@GetMapping("/internal-game/uc-detail/{id}")
+	@GetMapping("/internal-game/uc-detail")
 	@ApiOperation("uc查询游戏信息")
-	GenericDto<SysGameResp> ucDetail(Long id);
+	GenericDto<SysGameResp> ucDetail(@RequestParam Long id);
 
 	/**
 	 * 获取系统游戏下拉列表

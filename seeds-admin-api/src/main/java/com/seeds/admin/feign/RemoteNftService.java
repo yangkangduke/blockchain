@@ -38,7 +38,7 @@ public interface RemoteNftService {
 	 */
 	@PostMapping("/internal-nft/uc-page")
 	@ApiOperation("uc分页查询NFT")
-	GenericDto<Page<SysNftResp>> ucPage(SysNftPageReq query);
+	GenericDto<Page<SysNftResp>> ucPage(@RequestBody SysNftPageReq query);
 
 	/**
 	 * 通过id获取系统NFT信息
