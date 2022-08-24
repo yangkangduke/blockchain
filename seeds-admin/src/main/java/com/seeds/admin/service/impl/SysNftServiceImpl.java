@@ -268,6 +268,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     public void ownerChange(List<NftOwnerChangeReq> req) {
         req.forEach(p -> {
             SysNftEntity entity = new SysNftEntity();
+            entity.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
             BeanUtils.copyProperties(p, entity);
             updateById(entity);
         });
