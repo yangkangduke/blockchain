@@ -96,7 +96,7 @@ public class SysNftEntity extends BaseEntity {
 	 * 归属人id
 	 */
 	@TableField("owner_id")
-	private String ownerId;
+	private Long ownerId;
 
 	/**
 	 * 归属人名称

@@ -416,8 +416,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         req.forEach(p -> {
             SysNftEntity nft = map.get(p.getId()) == null ? new SysNftEntity() : map.get(p.getId());
             NFTBuyCallbackReq callback = NFTBuyCallbackReq.builder()
-                    .fromUserId(1L)
-                    .fromAddress("0x492b6f0E6C720c2516e0aE62929241c7c1eaCAa1")
+                    .fromUserId(nft.getOwnerId())
+                    .fromAddress(p.getFromAddress())
                     .toUserId(p.getOwnerId())
                     .amount(nft.getPrice())
                     .tokenId(nft.getTokenId())
