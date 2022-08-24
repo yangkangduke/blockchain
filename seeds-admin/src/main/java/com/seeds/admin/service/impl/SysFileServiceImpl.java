@@ -34,7 +34,7 @@ import java.net.URLEncoder;
 @Service
 public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity> implements SysFileService {
 
-    @Value("Seeds-gateway")
+    @Value("${Seeds-gateway:127.0.0.1:9999}")
     private String baseUrl;
 
     @Autowired
