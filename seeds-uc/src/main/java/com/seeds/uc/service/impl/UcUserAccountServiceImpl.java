@@ -195,7 +195,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     public void buyNFTFreeze(SysNftDetailResp buyReq) {
         Long nftId = buyReq.getId();
         long currentTimeMillis = System.currentTimeMillis();
-        BigDecimal amount = new BigDecimal(buyReq.getPrice());
+        BigDecimal amount = buyReq.getPrice();
         Long currentUserId = UserContext.getCurrentUserId();
         // todo 远程调用钱包接口
         // 冻结金额

@@ -100,8 +100,6 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             }
             // 图片
             resp.setPicture(p.getUrl());
-            // 价格
-            resp.setPrice(p.getPrice() + p.getUnit());
             return resp;
         });
     }

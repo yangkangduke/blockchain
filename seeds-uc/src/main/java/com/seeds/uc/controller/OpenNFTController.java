@@ -58,7 +58,7 @@ public class OpenNFTController {
     @ApiOperation(value = "购买", notes = "购买")
     public GenericDto<Object> buyNFT(@Valid @RequestBody NFTBuyReq buyReq) {
         Long currentUserId = UserContext.getCurrentUserId();
-        String price;
+        BigDecimal price;
         SysNftDetailResp sysNftDetailResp;
         try {
             GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = remoteNftService.ucDetail(buyReq.getNftId());
@@ -69,7 +69,7 @@ public class OpenNFTController {
         }
         // todo 判断nft是否是上架状态、nft是否已经购买过了
         // 检查账户里面的金额是否足够支付
-        if (!ucUserAccountService.checkBalance(currentUserId, new BigDecimal(price))) {
+        if (!ucUserAccountService.checkBalance(currentUserId, price)) {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
         }
         ucUserAccountService.buyNFTFreeze(sysNftDetailResp);
