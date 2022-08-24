@@ -37,7 +37,7 @@ public class SysNftDetailResp {
 	private String typeName;
 
 	@ApiModelProperty(value = "价格")
-	private String price;
+	private BigDecimal price;
 
 	@ApiModelProperty(value = "单位")
 	private String unit;
