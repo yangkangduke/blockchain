@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
+import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
@@ -191,13 +192,12 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      * @param buyReq
      */
     @Override
-    public void buyNFTFreeze(NFTBuyReq buyReq) {
-        Long nftId = buyReq.getNftId();
+    public void buyNFTFreeze(SysNftDetailResp buyReq) {
+        Long nftId = buyReq.getId();
         long currentTimeMillis = System.currentTimeMillis();
-        BigDecimal amount = buyReq.getAmount();
+        BigDecimal amount = new BigDecimal(buyReq.getPrice());
         Long currentUserId = UserContext.getCurrentUserId();
         // todo 远程调用钱包接口
-
         // 冻结金额
         UcUserAccountInfoResp info = this.getInfo();
         this.update(UcUserAccount.builder()
@@ -235,6 +235,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     @Override
     public void buyNFTCallback(NFTBuyCallbackReq buyReq) {
         BigDecimal amount = buyReq.getAmount();
+        // todo 如果是admin端mint的nft，在uc端不用记账该账户到uc_user_account，都是uc端的用户则需要记账
         // 买家减少 卖家增加
         UcUserAccountInfoResp info = this.getInfo();
         this.update(UcUserAccount.builder()
