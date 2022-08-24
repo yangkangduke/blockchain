@@ -11,6 +11,7 @@ import com.seeds.admin.dto.response.SysNftPropertiesTypeResp;
 import com.seeds.admin.entity.SysNftPropertiesTypeEntity;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 
@@ -69,10 +70,9 @@ public interface SysNftPropertiesTypeService extends IService<SysNftPropertiesTy
     IPage<SysNftPropertiesTypeResp> queryPage(SysNftPropertiesTypePageReq query);
 
     /**
-     * 分页获取系统NFT属性类别信息
-     * @param query 分页查询条件
+     * 获取系统NFT属性类别信息
      * @return 系统NFT属性类别信息
      */
-    IPage<SysNftPropertiesTypeBriefResp> dropdownPage(SysNftPropertiesTypePageReq query);
+    List<SysNftPropertiesTypeBriefResp> dropdownList();
 
 }

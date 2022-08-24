@@ -27,7 +27,7 @@ public interface RemoteNftService {
 	 * @param req 归属人账户信息
 	 * @return Object
 	 */
-	@PostMapping("/nft/owner-change")
+	@PostMapping("/internal-nft/owner-change")
 	@ApiOperation(value = "归属人变更", notes = "归属人变更")
 	GenericDto<Object> ownerChange(@RequestBody List<NftOwnerChangeReq> req);
 
@@ -36,7 +36,7 @@ public interface RemoteNftService {
 	 * @param query 分页查询条件
 	 * @return NFT信息
 	 */
-	@PostMapping("/nft/uc-page")
+	@PostMapping("/internal-nft/uc-page")
 	@ApiOperation("uc分页查询NFT")
 	GenericDto<Page<SysNftResp>> ucPage(SysNftPageReq query);
 
@@ -45,7 +45,7 @@ public interface RemoteNftService {
 	 * @param id NFT的id
 	 * @return 系统NFT信息
 	 */
-	@GetMapping("/nft/uc-detail")
+	@GetMapping("/internal-nft/uc-detail")
 	@ApiOperation("uc查询NFT信息")
 	GenericDto<SysNftDetailResp> ucDetail(@RequestParam Long id);
 
@@ -53,7 +53,7 @@ public interface RemoteNftService {
 	 * 获取系统NFT类别列表
 	 * @return 系统NFT类别列表
 	 */
-	@GetMapping("/nft-type/uc-dropdown")
+	@GetMapping("/internal-nft-type/uc-dropdown")
 	@ApiOperation("uc查询NFT类别列表")
 	GenericDto<List<SysNftTypeResp>> ucTypeDropdown();
 

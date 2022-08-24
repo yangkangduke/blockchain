@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -42,10 +43,10 @@ public class SysNftPropertiesTypeController {
         return GenericDto.success(sysNftPropertiesTypeService.queryPage(query));
     }
 
-    @PostMapping("dropdown-page")
+    @PostMapping("dropdown-list")
     @ApiOperation("下拉列表")
-    public GenericDto<IPage<SysNftPropertiesTypeBriefResp>> dropdownPage(@Valid @RequestBody SysNftPropertiesTypePageReq query) {
-        return GenericDto.success(sysNftPropertiesTypeService.dropdownPage(query));
+    public GenericDto<List<SysNftPropertiesTypeBriefResp>> dropdownList() {
+        return GenericDto.success(sysNftPropertiesTypeService.dropdownList());
     }
 
     @PostMapping("add")

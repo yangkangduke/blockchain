@@ -11,10 +11,7 @@ import com.seeds.admin.dto.response.NftPropertiesResp;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.*;
-import com.seeds.admin.enums.AdminErrorCodeEnum;
-import com.seeds.admin.enums.NftInitStatusEnum;
-import com.seeds.admin.enums.SysStatusEnum;
-import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.admin.enums.*;
 import com.seeds.admin.mapper.SysNftMapper;
 import com.seeds.admin.service.*;
 import com.seeds.chain.config.SmartContractConfig;
@@ -161,6 +158,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                     BeanUtils.copyProperties(p, res);
                     SysNftPropertiesTypeEntity type = propertiesTypeMap.get(p.getTypeId());
                     if (type != null) {
+                        res.setTypeId(type.getId());
                         res.setCode(type.getCode());
                         res.setName(type.getName());
                     }
@@ -201,7 +199,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             return;
         }
         // uc端客户拥有的nft不能在admin端上架或者下架
-        Set<Long> finalIds = nftList.stream().filter(p -> p.getOwnerId() == null).map(SysNftEntity::getId).collect(Collectors.toSet());
+        Set<Long> finalIds = nftList.stream().filter(p -> SysOwnerTypeEnum.UC_USER.getCode() != p.getOwnerType()).map(SysNftEntity::getId).collect(Collectors.toSet());
         Set<Long> set = new HashSet<>();
         // 上架/下架NFT
         req.forEach(p -> {
@@ -279,16 +277,6 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         executorService.submit(() -> {
             transferNft(req);
         });
-    }
-
-    @Override
-    public Page<SysNftResp> ucPage(SysNftPageReq query) {
-        query.setInitStatus(NftInitStatusEnum.NORMAL.getCode());
-        Page<SysNftResp> respPage = new Page<>(query.getCurrent(), query.getSize());
-        IPage<SysNftResp> page = queryPage(query);
-        BeanUtils.copyProperties(page, respPage);
-        respPage.setRecords(page.getRecords());
-        return respPage;
     }
 
     @Override

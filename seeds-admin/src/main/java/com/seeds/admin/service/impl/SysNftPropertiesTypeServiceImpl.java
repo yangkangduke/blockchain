@@ -97,18 +97,18 @@ public class SysNftPropertiesTypeServiceImpl extends ServiceImpl<SysNftPropertie
     }
 
     @Override
-    public IPage<SysNftPropertiesTypeBriefResp> dropdownPage(SysNftPropertiesTypePageReq query) {
-        LambdaQueryWrapper<SysNftPropertiesTypeEntity> queryWrap = new QueryWrapper<SysNftPropertiesTypeEntity>().lambda()
-                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftPropertiesTypeEntity::getName, query.getName());
-        Page<SysNftPropertiesTypeEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
-        if (CollectionUtils.isEmpty(page.getRecords())) {
-            return page.convert(p -> null);
+    public List<SysNftPropertiesTypeBriefResp> dropdownList() {
+        List<SysNftPropertiesTypeEntity> list = list();
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyList();
         }
-        return page.convert(p -> {
+        List<SysNftPropertiesTypeBriefResp> respList = new ArrayList<>();
+        list.forEach(p -> {
             SysNftPropertiesTypeBriefResp resp = new SysNftPropertiesTypeBriefResp();
             BeanUtils.copyProperties(p, resp);
-            return resp;
+            respList.add(resp);
         });
+        return respList;
     }
 }
 

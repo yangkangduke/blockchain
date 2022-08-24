@@ -85,10 +85,9 @@ public interface SysGameService extends IService<SysGameEntity> {
     SysGameEntity queryByOfficialUrl(String officialUrl);
 
     /**
-     * 获取系统游戏下拉分页列表
-     * @param query 分页查询条件
+     * 获取系统游戏下拉列表
      * @return 系统游戏信息
      */
-    IPage<SysGameBriefResp> dropdownPage(SysGamePageReq query);
+    List<SysGameBriefResp> dropdownList();
 
 }

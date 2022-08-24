@@ -51,6 +51,9 @@ public class SysNftDetailResp {
 	@ApiModelProperty(value = "状态  0：正常  1：创建中  2：创建失败  3：修改中  4：修改失败  3：删除中  4：删除失败 ")
 	private Integer initStatus;
 
+	@ApiModelProperty(value = "归属方类型  0：平台  1：uc用户")
+	private Integer ownerType;
+
 	@ApiModelProperty(value = "创建时间")
 	private Long createdAt;
 

@@ -1,8 +1,6 @@
 package com.seeds.uc.controller;
 
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.admin.dto.request.SysGamePageReq;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
@@ -10,6 +8,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>
@@ -27,10 +27,10 @@ public class PublicGameController {
     @Autowired
     private RemoteGameService remoteGameService;
 
-    @PostMapping("/dropdown-page")
+    @PostMapping("/dropdown-list")
     @ApiOperation(value = "下拉列表", notes = "下拉列表")
-    public GenericDto<Page<SysGameBriefResp>> dropdownPage(SysGamePageReq query) {
-        return remoteGameService.dropdownPage(query);
+    public GenericDto<List<SysGameBriefResp>> dropdownList() {
+        return remoteGameService.ucDropdownList();
     }
 
 }

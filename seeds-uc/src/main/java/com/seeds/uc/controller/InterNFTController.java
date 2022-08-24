@@ -2,12 +2,8 @@ package com.seeds.uc.controller;
 
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.web.context.UserContext;
 import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
-import com.seeds.uc.dto.request.NFTBuyReq;
-import com.seeds.uc.enums.UcErrorCodeEnum;
-import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.service.IUcUserAccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 
 /**
  * <p>

@@ -41,11 +41,11 @@ public class SysGameController {
         return GenericDto.success(sysGameService.queryPage(query));
     }
 
-    @PostMapping("dropdown-page")
+    @PostMapping("dropdown-list")
     @ApiOperation("下拉列表")
     @Inner
-    public GenericDto<IPage<SysGameBriefResp>> dropdownPage(@Valid @RequestBody SysGamePageReq query) {
-        return GenericDto.success(sysGameService.dropdownPage(query));
+    public GenericDto<List<SysGameBriefResp>> dropdownList() {
+        return GenericDto.success(sysGameService.dropdownList());
     }
 
     @GetMapping("select")
