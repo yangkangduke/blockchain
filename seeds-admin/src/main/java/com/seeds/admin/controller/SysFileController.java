@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-
 
 /**
  * 系统文件
@@ -33,13 +31,6 @@ public class SysFileController {
     @RequiredPermission("sys:file:upload")
     public GenericDto<SysFileResp> upload(@RequestBody MultipartFile file, @PathVariable String type) {
         return GenericDto.success(sysFileService.upload(file, type));
-    }
-
-    @GetMapping("download/{bucketName}/{objectName}")
-    @ApiOperation("下载")
-    @RequiredPermission("sys:file:download")
-    public void download(HttpServletResponse response, @PathVariable String bucketName, @PathVariable String objectName) {
-        sysFileService.download(response, bucketName, objectName);
     }
 
     @PostMapping("delete/{fileId}")

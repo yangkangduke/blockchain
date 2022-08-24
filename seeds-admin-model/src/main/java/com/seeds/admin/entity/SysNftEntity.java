@@ -81,7 +81,7 @@ public class SysNftEntity extends BaseEntity {
 	private Integer ownerType;
 
 	/**
-	 * 状态  0：正常  1：创建中  2：创建失败  3：修改中  4：修改失败  3：删除中  4：删除失败
+	 * 状态  0：正常  1：创建中  2：创建失败  3：修改中  4：修改失败  5：删除中  6：删除失败
 	 */
 	@TableField("init_status")
 	private Integer initStatus;

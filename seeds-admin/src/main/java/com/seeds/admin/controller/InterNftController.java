@@ -34,6 +34,7 @@ public class InterNftController {
 
     @PostMapping("owner-change")
     @ApiOperation("归属人变更")
+    @Inner
     public GenericDto<Object> ownerChange(@Valid @RequestBody List<NftOwnerChangeReq> req) {
         sysNftService.ownerChange(req);
         return GenericDto.success(null);

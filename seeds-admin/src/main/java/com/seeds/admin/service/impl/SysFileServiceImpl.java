@@ -15,6 +15,7 @@ import com.seeds.common.web.oss.FileProperties;
 import com.seeds.common.web.oss.FileTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,9 @@ import java.net.URLEncoder;
 @Slf4j
 @Service
 public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity> implements SysFileService {
+
+    @Value("Seeds-gateway")
+    private String baseUrl;
 
     @Autowired
     private FileProperties properties;
@@ -65,7 +69,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
         res.setFileId(sysFile.getId());
         res.setObjectName(objectName);
         res.setBucketName(properties.getBucketName());
-        res.setUrl(String.format("/admin/file/download/%s/%s", properties.getBucketName(), objectName));
+        res.setUrl(baseUrl + String.format("/admin/file/download/%s?objectName=%s", properties.getBucketName(), objectName));
         return res;
     }
 

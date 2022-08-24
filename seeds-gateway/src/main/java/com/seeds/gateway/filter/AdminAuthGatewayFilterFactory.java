@@ -63,7 +63,8 @@ public class AdminAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 }
             }
             LoginAdminUser loginAdminUser = authService.verifyAdmin(token);
-            if (uri.toString().contains(WhiteListPath.DOC_API) || uri.getPath().startsWith(WhiteListPath.AUTH_RELATED)) {
+            if (uri.toString().contains(WhiteListPath.DOC_API) || uri.getPath().startsWith(WhiteListPath.AUTH_RELATED)
+                    || uri.getPath().startsWith(WhiteListPath.PUBLIC_RELATED)) {
                 if (loginAdminUser != null && loginAdminUser.getUserId() != null) {
                     return adminSuccess(chain, exchange, loginAdminUser.getUserId());
                 }
