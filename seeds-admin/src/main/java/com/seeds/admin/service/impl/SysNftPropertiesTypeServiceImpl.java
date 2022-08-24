@@ -33,9 +33,9 @@ import java.util.stream.Collectors;
 public class SysNftPropertiesTypeServiceImpl extends ServiceImpl<SysNftPropertiesTypeMapper, SysNftPropertiesTypeEntity> implements SysNftPropertiesTypeService {
 
     @Override
-    public SysNftPropertiesTypeEntity queryByCode(String code) {
+    public SysNftPropertiesTypeEntity queryByCodeOrName(String code, String name) {
         LambdaQueryWrapper<SysNftPropertiesTypeEntity> query = new QueryWrapper<SysNftPropertiesTypeEntity>().lambda()
-                .eq(SysNftPropertiesTypeEntity::getCode, code);
+                .eq(SysNftPropertiesTypeEntity::getCode, code).or().eq(SysNftPropertiesTypeEntity::getName, name);
         return getOne(query);
     }
 

@@ -54,7 +54,7 @@ public class SysNftPropertiesTypeController {
     @RequiredPermission("sys:nftPT:add")
     public GenericDto<Object> add(@Valid @RequestBody SysNftPropertiesTypeAddReq req) {
         // 查重
-        SysNftPropertiesTypeEntity nft = sysNftPropertiesTypeService.queryByCode(req.getCode());
+        SysNftPropertiesTypeEntity nft = sysNftPropertiesTypeService.queryByCodeOrName(req.getCode(), req.getName());
         if (nft != null) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_40005_NFT_PROPERTIES_TYPE_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_40005_NFT_PROPERTIES_TYPE_ALREADY_EXIST.getCode(), null);
         }
@@ -74,7 +74,7 @@ public class SysNftPropertiesTypeController {
     @RequiredPermission("sys:nftPT:modify")
     public GenericDto<Object> modify(@Valid @RequestBody SysNftTypeModifyReq req) {
         // 查重
-        SysNftPropertiesTypeEntity nft = sysNftPropertiesTypeService.queryByCode(req.getCode());
+        SysNftPropertiesTypeEntity nft = sysNftPropertiesTypeService.queryByCodeOrName(req.getCode(), req.getName());
         if (nft != null && !Objects.equals(nft.getId(), req.getId())) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_40005_NFT_PROPERTIES_TYPE_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_40005_NFT_PROPERTIES_TYPE_ALREADY_EXIST.getCode(), null);
         }

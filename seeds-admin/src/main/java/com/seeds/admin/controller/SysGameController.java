@@ -59,7 +59,7 @@ public class SysGameController {
     @ApiOperation("添加")
     @RequiredPermission("sys:game:add")
     public GenericDto<Object> add(@Valid @RequestBody SysGameAddReq req) {
-        SysGameEntity game = sysGameService.queryByOfficialUrl(req.getOfficialUrl());
+        SysGameEntity game = sysGameService.queryByOfficialUrlOrName(req.getOfficialUrl(), req.getName());
         if (game != null) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_80002_GAME_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_80002_GAME_ALREADY_EXIST.getCode(), null);
         }
@@ -79,7 +79,7 @@ public class SysGameController {
     @ApiOperation("编辑")
     @RequiredPermission("sys:game:modify")
     public GenericDto<Object> modify(@Valid @RequestBody SysGameModifyReq req) {
-        SysGameEntity game = sysGameService.queryByOfficialUrl(req.getOfficialUrl());
+        SysGameEntity game = sysGameService.queryByOfficialUrlOrName(req.getOfficialUrl(), req.getName());
         if (game != null && !Objects.equals(req.getId(), game.getId())) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_80002_GAME_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_80002_GAME_ALREADY_EXIST.getCode(), null);
         }

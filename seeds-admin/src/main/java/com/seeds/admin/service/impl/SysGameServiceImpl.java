@@ -149,9 +149,9 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     }
 
     @Override
-    public SysGameEntity queryByOfficialUrl(String officialUrl) {
+    public SysGameEntity queryByOfficialUrlOrName(String officialUrl, String name) {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
-                .eq(SysGameEntity::getOfficialUrl, officialUrl);
+                .eq(SysGameEntity::getOfficialUrl, officialUrl).or().eq(SysGameEntity::getName, name);
         return getOne(queryWrap);
     }
 

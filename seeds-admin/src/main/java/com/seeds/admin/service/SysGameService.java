@@ -80,9 +80,10 @@ public interface SysGameService extends IService<SysGameEntity> {
     /**
      * 通过游戏官方网址列表获取系统游戏名称列表
      * @param officialUrl 官方网址
+     * @param name 游戏名称
      * @return 系统游戏
      */
-    SysGameEntity queryByOfficialUrl(String officialUrl);
+    SysGameEntity queryByOfficialUrlOrName(String officialUrl, String name);
 
     /**
      * 获取系统游戏下拉列表

@@ -26,9 +26,10 @@ public interface SysNftPropertiesTypeService extends IService<SysNftPropertiesTy
     /**
      * 通过code查询NFT属性类别
      * @param  code NFT属性类别code
+     * @param  name NFT属性类别名称
      * @return  NFT属性类别
      */
-    SysNftPropertiesTypeEntity queryByCode(String code);
+    SysNftPropertiesTypeEntity queryByCodeOrName(String code, String name);
 
     /**
      * 添加NFT属性类别

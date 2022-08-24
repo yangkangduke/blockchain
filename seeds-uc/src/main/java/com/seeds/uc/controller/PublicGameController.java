@@ -1,7 +1,10 @@
 package com.seeds.uc.controller;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.admin.dto.request.SysGamePageReq;
 import com.seeds.admin.dto.response.SysGameBriefResp;
+import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -9,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -26,6 +30,18 @@ public class PublicGameController {
 
     @Autowired
     private RemoteGameService remoteGameService;
+
+    @PostMapping("/page")
+    @ApiOperation(value = "分页", notes = "分页")
+    public GenericDto<Page<SysGameResp>> queryPage(@Valid @RequestBody SysGamePageReq query) {
+        return remoteGameService.ucPage(query);
+    }
+
+    @GetMapping("detail/{id}")
+    @ApiOperation(value = "信息", notes = "信息")
+    public GenericDto<SysGameResp> detail(@PathVariable("id") Long id) {
+        return remoteGameService.ucDetail(id);
+    }
 
     @PostMapping("/dropdown-list")
     @ApiOperation(value = "下拉列表", notes = "下拉列表")
