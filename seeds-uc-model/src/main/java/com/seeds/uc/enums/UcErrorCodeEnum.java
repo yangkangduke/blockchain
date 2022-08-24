@@ -35,6 +35,7 @@ public enum UcErrorCodeEnum {
     ERR_18003_ACCOUNT_ADDRESS_ERROR(18003, "账户地址填写错误", "wrong account address"),
     ERR_18004_AMOUNT_ERROR(18004, "金额必须大于0", "Amount must be greater than zero"),
     ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT(18004, "账户余额不足", "Insufficient account balance"),
+    ERR_18005_ACCOUNT_BUY_FAIL(18005, "购买NFT失败", "Failed to buy NFT"),
 
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),

@@ -2,6 +2,7 @@ package com.seeds.uc.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
@@ -62,7 +63,7 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * 购买nft
      * @param buyReq
      */
-    void buyNFTFreeze(NFTBuyReq buyReq);
+    void buyNFTFreeze(SysNftDetailResp buyReq);
 
     /**
      * 购买回调
