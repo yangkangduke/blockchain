@@ -9,6 +9,7 @@
              uc_user_account_action_history t
         WHERE
               t.user_id = #{historyReq.userId}
+        ORDER BY t.id DESC
     </select>
 
 </mapper>

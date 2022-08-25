@@ -11,6 +11,7 @@ import com.seeds.admin.dto.response.SysNftPropertiesTypeResp;
 import com.seeds.admin.entity.SysNftPropertiesTypeEntity;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 
@@ -25,9 +26,10 @@ public interface SysNftPropertiesTypeService extends IService<SysNftPropertiesTy
     /**
      * 通过code查询NFT属性类别
      * @param  code NFT属性类别code
+     * @param  name NFT属性类别名称
      * @return  NFT属性类别
      */
-    SysNftPropertiesTypeEntity queryByCode(String code);
+    SysNftPropertiesTypeEntity queryByCodeOrName(String code, String name);
 
     /**
      * 添加NFT属性类别
@@ -69,10 +71,9 @@ public interface SysNftPropertiesTypeService extends IService<SysNftPropertiesTy
     IPage<SysNftPropertiesTypeResp> queryPage(SysNftPropertiesTypePageReq query);
 
     /**
-     * 分页获取系统NFT属性类别信息
-     * @param query 分页查询条件
+     * 获取系统NFT属性类别信息
      * @return 系统NFT属性类别信息
      */
-    IPage<SysNftPropertiesTypeBriefResp> dropdownPage(SysNftPropertiesTypePageReq query);
+    List<SysNftPropertiesTypeBriefResp> dropdownList();
 
 }

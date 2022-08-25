@@ -33,9 +33,9 @@ import java.util.stream.Collectors;
 public class SysNftPropertiesTypeServiceImpl extends ServiceImpl<SysNftPropertiesTypeMapper, SysNftPropertiesTypeEntity> implements SysNftPropertiesTypeService {
 
     @Override
-    public SysNftPropertiesTypeEntity queryByCode(String code) {
+    public SysNftPropertiesTypeEntity queryByCodeOrName(String code, String name) {
         LambdaQueryWrapper<SysNftPropertiesTypeEntity> query = new QueryWrapper<SysNftPropertiesTypeEntity>().lambda()
-                .eq(SysNftPropertiesTypeEntity::getCode, code);
+                .eq(SysNftPropertiesTypeEntity::getCode, code).or().eq(SysNftPropertiesTypeEntity::getName, name);
         return getOne(query);
     }
 
@@ -97,18 +97,18 @@ public class SysNftPropertiesTypeServiceImpl extends ServiceImpl<SysNftPropertie
     }
 
     @Override
-    public IPage<SysNftPropertiesTypeBriefResp> dropdownPage(SysNftPropertiesTypePageReq query) {
-        LambdaQueryWrapper<SysNftPropertiesTypeEntity> queryWrap = new QueryWrapper<SysNftPropertiesTypeEntity>().lambda()
-                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftPropertiesTypeEntity::getName, query.getName());
-        Page<SysNftPropertiesTypeEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
-        if (CollectionUtils.isEmpty(page.getRecords())) {
-            return page.convert(p -> null);
+    public List<SysNftPropertiesTypeBriefResp> dropdownList() {
+        List<SysNftPropertiesTypeEntity> list = list();
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyList();
         }
-        return page.convert(p -> {
+        List<SysNftPropertiesTypeBriefResp> respList = new ArrayList<>();
+        list.forEach(p -> {
             SysNftPropertiesTypeBriefResp resp = new SysNftPropertiesTypeBriefResp();
             BeanUtils.copyProperties(p, resp);
-            return resp;
+            respList.add(resp);
         });
+        return respList;
     }
 }
 

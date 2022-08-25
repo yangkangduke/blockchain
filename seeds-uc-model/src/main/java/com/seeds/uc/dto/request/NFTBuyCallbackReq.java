@@ -31,6 +31,11 @@ public class NFTBuyCallbackReq implements Serializable {
     @ApiModelProperty("买方用户id")
     private Long toUserId;
 
+
+    @NotNull
+    @ApiModelProperty("NFT 归属方类型  0：平台  1：uc用户")
+    private Integer ownerType;
+
     @ApiModelProperty("售卖金额")
     @NotNull
     private BigDecimal amount;

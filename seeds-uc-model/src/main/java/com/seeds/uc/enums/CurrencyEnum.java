@@ -10,7 +10,7 @@ import lombok.Getter;
  * @date 2022/8/16
  */
 @Getter
-public enum CurrencyEnum {
+public enum  CurrencyEnum {
     @JsonProperty("USDC")
     USDC("usdc", "usdc"),
 

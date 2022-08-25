@@ -37,7 +37,7 @@ public class SysGameAddReq {
 	 * 价格
 	 */
 	@ApiModelProperty("价格")
-	@NotBlank(message = "price cannot be empty")
+	@NotNull(message = "price cannot be empty")
 	private BigDecimal price;
 
 	/**

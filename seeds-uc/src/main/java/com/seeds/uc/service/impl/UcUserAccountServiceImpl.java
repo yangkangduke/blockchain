@@ -2,15 +2,16 @@ package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
+import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
-import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.dto.response.UcUserAddressInfoResp;
@@ -85,7 +86,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 throw new GenericException(UcErrorCodeEnum.ERR_18003_ACCOUNT_ADDRESS_ERROR);
             }
             this.updateById(UcUserAccount.builder()
-                            .id(currentUserId)
+                            .userId(currentUserId)
+                            .currency(CurrencyEnum.USDC)
                             .balance(balance.add(amount))
                     .build());
         } else if (action.equals(AccountActionEnum.WITHDRAW)) {
@@ -97,7 +99,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 throw new GenericException(UcErrorCodeEnum.ERR_18001_ACCOUNT_BALANCE_INSUFFICIENT);
             }
             this.updateById(UcUserAccount.builder()
-                    .id(currentUserId)
+                    .userId(currentUserId)
+                    .currency(CurrencyEnum.USDC)
                     .balance(balance.subtract(amount))
                     .build());
         } else {
@@ -189,13 +192,13 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      * @param buyReq
      */
     @Override
-    public void buyNFTFreeze(NFTBuyReq buyReq) {
-        Long nftId = buyReq.getNftId();
+    @Transactional(rollbackFor = Exception.class)
+    public void buyNFTFreeze(SysNftDetailResp buyReq) {
+        Long nftId = buyReq.getId();
         long currentTimeMillis = System.currentTimeMillis();
-        BigDecimal amount = buyReq.getAmount();
+        BigDecimal amount = buyReq.getPrice();
         Long currentUserId = UserContext.getCurrentUserId();
         // todo 远程调用钱包接口
-
         // 冻结金额
         UcUserAccountInfoResp info = this.getInfo();
         this.update(UcUserAccount.builder()
@@ -223,6 +226,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         nftOwnerChangeReq.setOwnerId(currentUserId);
         nftOwnerChangeReq.setId(nftId);
         nftOwnerChangeReq.setActionHistoryId(actionHistoryId);
+        nftOwnerChangeReq.setOwnerType(buyReq.getOwnerType());
+        list.add(nftOwnerChangeReq);
         remoteNftService.ownerChange(list);
     }
 
@@ -231,25 +236,39 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      * @param buyReq
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void buyNFTCallback(NFTBuyCallbackReq buyReq) {
         BigDecimal amount = buyReq.getAmount();
-        // 买家减少 卖家增加
-        UcUserAccountInfoResp info = this.getInfo();
+        // 如果是admin端mint的nft，在uc端不用记账该账户到uc_user_account，都是uc端的用户则需要记账
+        if (null != buyReq.getOwnerType() && buyReq.getOwnerType() == 1) { // 卖家为UC端用户
+            //  卖家balance增加
+            LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
+                    .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+            UcUserAccount account = this.getOne(wrapper);
+
+            this.update(UcUserAccount.builder()
+                    .balance(account.getBalance().add(amount))
+                    .build(), new LambdaQueryWrapper<UcUserAccount>()
+                    .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+
+        }
+        // 买家freeze减少
+        LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
+                .eq(UcUserAccount::getUserId, buyReq.getToUserId())
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+        UcUserAccount account = this.getOne(wrapper);
+
         this.update(UcUserAccount.builder()
-                .freeze(info.getFreeze().subtract(amount))
+                .freeze(account.getFreeze().subtract(amount))
                 .build(), new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, buyReq.getToUserId())
                 .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
 
-        this.update(UcUserAccount.builder()
-                .balance(info.getBalance().add(amount))
-                .build(), new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
-
         // 改变交易记录的状态及其他信息
         ucUserAccountActionHistoryService.updateById(UcUserAccountActionHistory.builder()
-                        .status(buyReq.getActionStatusEnum())
+                .status(buyReq.getActionStatusEnum())
                         .fromAddress(buyReq.getFromAddress())
                         .toAddress(buyReq.getToAddress())
                         .chain(buyReq.getChain())

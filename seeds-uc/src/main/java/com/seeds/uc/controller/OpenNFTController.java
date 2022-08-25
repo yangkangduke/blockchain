@@ -1,36 +1,27 @@
 package com.seeds.uc.controller;
 
 
-import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.seeds.admin.dto.request.NftOwnerChangeReq;
+import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.enums.NftStatusEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.common.web.inner.Inner;
-import com.seeds.uc.dto.request.AccountActionReq;
-import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.request.NFTBuyReq;
-import com.seeds.uc.dto.response.UcUserAccountInfoResp;
-import com.seeds.uc.enums.*;
+import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.GenericException;
-import com.seeds.uc.model.UcUserAccount;
-import com.seeds.uc.model.UcUserAccountActionHistory;
-import com.seeds.uc.service.IUcUserAccountActionHistoryService;
 import com.seeds.uc.service.IUcUserAccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -43,35 +34,44 @@ import java.util.List;
 @RestController
 @RequestMapping("/nft")
 @Api(tags = "NFT交易")
+@Slf4j
 public class OpenNFTController {
 
     @Autowired
     private IUcUserAccountService ucUserAccountService;
+    @Autowired
+    private RemoteNftService remoteNftService;
 
 
     @PostMapping("/buy")
     @ApiOperation(value = "购买", notes = "购买")
     public GenericDto<Object> buyNFT(@Valid @RequestBody NFTBuyReq buyReq) {
-        BigDecimal amount = buyReq.getAmount();
         Long currentUserId = UserContext.getCurrentUserId();
-        // 检查账户里面的金额是否足够支付
-        if (!ucUserAccountService.checkBalance(currentUserId, amount)) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
+        BigDecimal price;
+        SysNftDetailResp sysNftDetailResp;
+        try {
+            GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = remoteNftService.ucDetail(buyReq.getNftId());
+            sysNftDetailResp = sysNftDetailRespGenericDto.getData();
+            price = sysNftDetailResp.getPrice();
+        } catch (Exception e) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
+        }
+        //  判断nft是否是上架状态、nft是否已经购买过了
+        if (!Objects.isNull(sysNftDetailResp)) {
+            if (sysNftDetailResp.getStatus() != NftStatusEnum.ON_SALE.getCode()) {
+                throw new GenericException(UcErrorCodeEnum.ERR_18006_ACCOUNT_BUY_FAIL_INVALID_NFT_STATUS);
+            }
         }
 
-        ucUserAccountService.buyNFTFreeze(buyReq);
+
+        // 检查账户里面的金额是否足够支付
+        if (!ucUserAccountService.checkBalance(currentUserId, price)) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
+        }
+        ucUserAccountService.buyNFTFreeze(sysNftDetailResp);
+
         return GenericDto.success(null);
     }
 
-    /**
-     *  购买回调接口
-     */
-    @PostMapping("/buy/callback")
-    @ApiOperation(value = "购买回调", notes = "购买回调")
-    @Inner
-    public GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyCallbackReq buyReq) {
-        ucUserAccountService.buyNFTCallback(buyReq);
-        return GenericDto.success(null);
-    }
 
 }

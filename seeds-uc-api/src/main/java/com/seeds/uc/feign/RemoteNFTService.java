@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @FeignClient(name = "remoteNFTService", url = "${Seeds-uc}", configuration = {FeignInnerRequestInterceptor.class})
 public interface RemoteNFTService {
 
-	@GetMapping("/nft/buy/callback")
+	@GetMapping("/internal-nft/buy/callback")
 	@ApiOperation(value = "购买回调", notes = "购买回调")
 	GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyCallbackReq buyReq);
 

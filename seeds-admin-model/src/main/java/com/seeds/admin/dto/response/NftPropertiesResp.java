@@ -18,6 +18,9 @@ public class NftPropertiesResp {
 	@ApiModelProperty(value = "id")
 	private Long id;
 
+	@ApiModelProperty(value = "类别id")
+	private Long typeId;
+
 	@ApiModelProperty(value = "编码")
 	private String code;
 

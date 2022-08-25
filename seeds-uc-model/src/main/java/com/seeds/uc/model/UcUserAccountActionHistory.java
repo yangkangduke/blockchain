@@ -1,9 +1,6 @@
 package com.seeds.uc.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.*;
 import com.seeds.uc.enums.AccountActionEnum;
 import com.seeds.uc.enums.AccountActionStatusEnum;
 import com.seeds.uc.enums.AccountTypeEnum;
@@ -46,7 +43,8 @@ public class UcUserAccountActionHistory implements Serializable {
     @Version
     private Long version;
 
-    @ApiModelProperty("操作: 1-冲币 2-提币")
+    @ApiModelProperty("操作: 1-冲币 2-提币 3-购买NFT")
+    @TableField(value = "action")
     private AccountActionEnum actionEnum;
 
     @ApiModelProperty("账号类型 1-现货")

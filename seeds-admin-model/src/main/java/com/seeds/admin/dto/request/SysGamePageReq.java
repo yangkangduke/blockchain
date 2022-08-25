@@ -1,5 +1,6 @@
 package com.seeds.admin.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,5 +15,8 @@ public class SysGamePageReq extends PageReq {
 
     @ApiModelProperty(value = "名称")
     private String name;
+
+    @JsonIgnore
+    private Integer status;
 
 }

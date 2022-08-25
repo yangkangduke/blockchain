@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 
 /**
  * 系统游戏
@@ -31,7 +33,7 @@ public class SysGameResp {
 	private String brief;
 
 	@ApiModelProperty(value = "价格")
-	private String price;
+	private BigDecimal price;
 
 	@ApiModelProperty(value = "单位")
 	private String unit;

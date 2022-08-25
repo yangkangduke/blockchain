@@ -71,13 +71,6 @@ public interface SysNftService extends IService<SysNftEntity> {
     void ownerChange(List<NftOwnerChangeReq> req);
 
     /**
-     * 分页查询uc的NFT
-     * @param query uc分页条件
-     * @return 系统NFT信息
-     */
-    Page<SysNftResp> ucPage(SysNftPageReq query);
-
-    /**
      * 通过id获取系统NFT信息
      * @param id NFT的id
      * @return 系统NFT信息

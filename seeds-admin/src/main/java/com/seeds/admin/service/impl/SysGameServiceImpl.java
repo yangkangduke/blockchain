@@ -42,6 +42,7 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     @Override
     public IPage<SysGameResp> queryPage(SysGamePageReq query) {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
+                .eq(query.getStatus() != null, SysGameEntity::getStatus, query.getStatus())
                 .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName())
                 .orderByDesc(SysGameEntity::getCreatedAt);
         Page<SysGameEntity> page = new Page<>(query.getCurrent(), query.getSize());
@@ -148,27 +149,27 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     }
 
     @Override
-    public SysGameEntity queryByOfficialUrl(String officialUrl) {
+    public SysGameEntity queryByOfficialUrlOrName(String officialUrl, String name) {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
-                .eq(SysGameEntity::getOfficialUrl, officialUrl);
+                .eq(SysGameEntity::getOfficialUrl, officialUrl).or().eq(SysGameEntity::getName, name);
         return getOne(queryWrap);
     }
 
     @Override
-    public IPage<SysGameBriefResp> dropdownPage(SysGamePageReq query) {
+    public List<SysGameBriefResp> dropdownList() {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
-                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName())
                 .eq(SysGameEntity::getStatus, WhetherEnum.YES.value());
-        Page<SysGameEntity>  page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
-        List<SysGameEntity> records = page.getRecords();
+        List<SysGameEntity> records = list(queryWrap);
         if (CollectionUtils.isEmpty(records)) {
-            return page.convert(p -> null);
+            return Collections.emptyList();
         }
-        return page.convert(p -> {
+        List<SysGameBriefResp> respList = new ArrayList<>();
+        records.forEach(p -> {
             SysGameBriefResp resp = new SysGameBriefResp();
             BeanUtils.copyProperties(p, resp);
-            return resp;
+            respList.add(resp);
         });
+        return respList;
     }
 }
 
