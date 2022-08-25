@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class PublicNFTController {
 
     @PostMapping("/uc-page")
     @ApiOperation(value = "分页查询", notes = "分页查询")
-    public GenericDto<Page<SysNftResp>> page(SysNftPageReq query) {
+    public GenericDto<Page<SysNftResp>> page(@Valid @RequestBody SysNftPageReq query) {
         return remoteNftService.ucPage(query);
     }
 

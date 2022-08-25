@@ -21,10 +21,16 @@ public class SysGameResp {
 	private Long id;
 
 	@ApiModelProperty(value = "图片地址")
-	private String picture;
+	private String pictureUrl;
+
+	@ApiModelProperty(value = "图片文件id")
+	private Long pictureFileId;
 
 	@ApiModelProperty(value = "视频地址")
-	private String video;
+	private String videoUrl;
+
+	@ApiModelProperty(value = "视频文件id")
+	private Long videoFileId;
 
 	@ApiModelProperty(value = "游戏名称")
 	private String name;

@@ -78,9 +78,9 @@ public class SysGameAddReq {
 	/**
 	 * 图片对象名称
 	 */
-	@ApiModelProperty("图片对象名称")
-	@NotBlank(message = "Picture object name cannot be empty")
-	private String pictureObjectName;
+	@ApiModelProperty("图片链接")
+	@NotBlank(message = "Picture url cannot be empty")
+	private String pictureUrl;
 
 	/**
 	 * 图片文件id
@@ -92,9 +92,9 @@ public class SysGameAddReq {
 	/**
 	 * 视频对象名称
 	 */
-	@ApiModelProperty("视频对象名称")
-	@NotBlank(message = "Video object name cannot be empty")
-	private String videoObjectName;
+	@ApiModelProperty("视频链接")
+	@NotBlank(message = "Video url cannot be empty")
+	private String videoUrl;
 
 	/**
 	 * 视频文件id
