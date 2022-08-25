@@ -1,5 +1,6 @@
 package com.seeds.uc.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.response.SysNftDetailResp;
@@ -37,7 +38,7 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * @param historyReq
      * @return
      */
-    Page<AccountActionResp> actionHistory(Page page, AccountActionHistoryReq historyReq);
+    IPage<AccountActionResp> actionHistory(Page page, AccountActionHistoryReq historyReq);
 
     /**
      * 账户详情
