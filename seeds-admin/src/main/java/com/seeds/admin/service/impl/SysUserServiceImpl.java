@@ -183,10 +183,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
             if (WhetherEnum.YES.value() == user.getSuperAdmin()) {
                 // 超级管理员
                 resp.setRoleList(sysRoleService.queryList());
-                resp.setMenuList(sysMenuService.queryRespList(null));
+                resp.setMenuList(sysMenuService.queryShowMenu());
             } else {
                 resp.setRoleList(sysRoleService.queryByUserId(userId));
-                resp.setMenuList(sysMenuService.queryByUserId(null, userId));
+                resp.setMenuList(sysMenuService.queryByUserId(userId));
             }
         }
         return resp;
