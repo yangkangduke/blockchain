@@ -2,13 +2,17 @@ package com.seeds.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.entity.SysGameEntity;
+import com.seeds.admin.enums.SortTypeEnum;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysGameMapper;
@@ -43,8 +47,8 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     public IPage<SysGameResp> queryPage(SysGamePageReq query) {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
                 .eq(query.getStatus() != null, SysGameEntity::getStatus, query.getStatus())
-                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName())
-                .orderByDesc(SysGameEntity::getCreatedAt);
+                .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName());
+        buildOrderBy(query, queryWrap);
         Page<SysGameEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysGameEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -164,6 +168,39 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             respList.add(resp);
         });
         return respList;
+    }
+
+    @Override
+    public void ucCollection(Long id) {
+        LambdaUpdateWrapper<SysGameEntity> queryWrap = new UpdateWrapper<SysGameEntity>().lambda()
+                .setSql("`collections`=`collections`+1")
+                .eq(SysGameEntity::getId, id);
+        update(queryWrap);
+    }
+
+    private void buildOrderBy(SysGamePageReq query, LambdaQueryWrapper<SysGameEntity> queryWrap) {
+        if (query.getSortType() != null) {
+            int descFlag = query.getDescFlag() == null ? 0 : query.getDescFlag();
+            if (WhetherEnum.YES.value() == descFlag) {
+                queryWrap.orderByDesc(getOrderType(query.getSortType()));
+            } else {
+                queryWrap.orderByAsc(getOrderType(query.getSortType()));
+            }
+        } else {
+            queryWrap.orderByDesc(SysGameEntity::getCreatedAt);
+        }
+    }
+
+    private SFunction<SysGameEntity, ?> getOrderType(Integer sortType) {
+        SortTypeEnum type = SortTypeEnum.from(sortType);
+        switch (type) {
+            case RANK:
+                return SysGameEntity::getRank;
+            case PRICE:
+                return SysGameEntity::getPrice;
+            default:
+                return SysGameEntity::getCreatedAt;
+        }
     }
 }
 

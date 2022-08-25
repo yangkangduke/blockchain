@@ -57,4 +57,22 @@ public interface RemoteNftService {
 	@ApiOperation("uc查询NFT类别列表")
 	GenericDto<List<SysNftTypeResp>> ucTypeDropdown();
 
+	/**
+	 * uc收藏
+	 * @param id NFT的id
+	 * @return 系统NFT信息
+	 */
+	@PostMapping("/internal-nft/uc-collection")
+	@ApiOperation("uc收藏")
+	GenericDto<Object> ucCollection(@RequestParam Long id);
+
+	/**
+	 * uc浏览
+	 * @param id NFT的id
+	 * @return 系统NFT信息
+	 */
+	@PostMapping("/internal-nft/uc-view")
+	@ApiOperation("uc浏览")
+	GenericDto<Object> ucView(@RequestParam Long id);
+
 }

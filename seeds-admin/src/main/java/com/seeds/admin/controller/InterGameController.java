@@ -53,4 +53,12 @@ public class InterGameController {
         return GenericDto.success(sysGameService.dropdownList());
     }
 
+    @PostMapping("uc-collection")
+    @ApiOperation("uc收藏")
+    @Inner
+    public GenericDto<Object> ucCollection(@RequestParam Long id) {
+        sysGameService.ucCollection(id);
+        return GenericDto.success(null);
+    }
+
 }

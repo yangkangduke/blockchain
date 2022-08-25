@@ -91,4 +91,10 @@ public interface SysGameService extends IService<SysGameEntity> {
      */
     List<SysGameBriefResp> dropdownList();
 
+    /**
+     * uc收藏
+     * @param id 游戏的id
+     */
+    void ucCollection(Long id);
+
 }

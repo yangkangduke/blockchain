@@ -1,7 +1,6 @@
 package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
@@ -76,5 +75,17 @@ public interface SysNftService extends IService<SysNftEntity> {
      * @return 系统NFT信息
      */
     SysNftDetailResp ucDetail(Long id);
+
+    /**
+     * 收藏
+     * @param id NFT的id
+     */
+    void ucCollection(Long id);
+
+    /**
+     * 浏览
+     * @param id NFT的id
+     */
+    void ucView(Long id);
 
 }

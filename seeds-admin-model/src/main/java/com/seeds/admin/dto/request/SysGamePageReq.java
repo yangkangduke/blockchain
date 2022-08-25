@@ -16,6 +16,12 @@ public class SysGamePageReq extends PageReq {
     @ApiModelProperty(value = "名称")
     private String name;
 
+    @ApiModelProperty(value = "排序类型 1.Newest 2.Rank 3.Price")
+    private Integer sortType;
+
+    @ApiModelProperty(value = "倒叙排序 0.正序 1.倒序")
+    private Integer descFlag;
+
     @JsonIgnore
     private Integer status;
 

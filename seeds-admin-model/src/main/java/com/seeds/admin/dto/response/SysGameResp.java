@@ -41,6 +41,12 @@ public class SysGameResp {
 	@ApiModelProperty(value = "价格")
 	private BigDecimal price;
 
+	@ApiModelProperty(value = "评分")
+	private BigDecimal rank;
+
+	@ApiModelProperty("收藏量")
+	private Long collections;
+
 	@ApiModelProperty(value = "单位")
 	private String unit;
 

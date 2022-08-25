@@ -78,6 +78,12 @@ public class SysNftDetailResp {
 	@ApiModelProperty("创建人报酬比例")
 	private BigDecimal creatorFees;
 
+	@ApiModelProperty("收藏量")
+	private Long collections;
+
+	@ApiModelProperty("浏览量")
+	private Long views;
+
 	@ApiModelProperty("NFT属性列表")
 	private List<NftPropertiesResp> propertiesList;
 

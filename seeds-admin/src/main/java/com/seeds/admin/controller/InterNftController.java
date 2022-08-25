@@ -62,4 +62,20 @@ public class InterNftController {
         return GenericDto.success(sysNftService.ucDetail(id));
     }
 
+    @PostMapping("uc-collection")
+    @ApiOperation("uc收藏")
+    @Inner
+    public GenericDto<Object> ucCollection(@RequestParam Long id) {
+        sysNftService.ucCollection(id);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("uc-view")
+    @ApiOperation("uc浏览")
+    @Inner
+    public GenericDto<Object> ucView(@RequestParam Long id) {
+        sysNftService.ucView(id);
+        return GenericDto.success(null);
+    }
+
 }

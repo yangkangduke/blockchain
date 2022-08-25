@@ -50,4 +50,13 @@ public interface RemoteGameService {
 	@ApiOperation("uc查询游戏下拉列表")
 	GenericDto<List<SysGameBriefResp>> ucDropdownList();
 
+	/**
+	 * uc收藏
+	 * @param id 游戏的id
+	 * @return 系统游戏
+	 */
+	@PostMapping("/internal-game/uc-collection")
+	@ApiOperation("uc收藏")
+	GenericDto<Object> ucCollection(@RequestParam Long id);
+
 }

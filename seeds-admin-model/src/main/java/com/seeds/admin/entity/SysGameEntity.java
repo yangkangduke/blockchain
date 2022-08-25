@@ -99,10 +99,22 @@ public class SysGameEntity extends BaseEntity {
 	private Integer commentsAllowed;
 
 	/**
+	 * 收藏量
+	 */
+	@TableField("collections")
+	private Long collections;
+
+	/**
 	 * 介绍
 	 */
 	@TableField("introduction")
 	private String introduction;
+
+	/**
+	 * 评分
+	 */
+	@TableField("rank")
+	private BigDecimal rank;
 
 	/**
 	 * 游戏状态  0：下架   1：正常
