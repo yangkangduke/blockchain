@@ -2,7 +2,6 @@ package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
@@ -25,6 +24,7 @@ import com.seeds.uc.model.UcUserAddress;
 import com.seeds.uc.service.IUcUserAccountActionHistoryService;
 import com.seeds.uc.service.IUcUserAccountService;
 import com.seeds.uc.service.IUcUserAddressService;
+import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +54,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     private IUcUserAddressService ucUserAddressService;
     @Autowired
     private RemoteNftService remoteNftService;
+    @Autowired
+    private IUcUserService ucUserService;
 
     /**
      * 冲/提币
@@ -224,6 +226,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         List list = new ArrayList<NftOwnerChangeReq>();
         NftOwnerChangeReq nftOwnerChangeReq = new NftOwnerChangeReq();
         nftOwnerChangeReq.setOwnerId(currentUserId);
+        nftOwnerChangeReq.setOwnerName(ucUserService.getById(currentUserId).getNickname());
         nftOwnerChangeReq.setId(nftId);
         nftOwnerChangeReq.setActionHistoryId(actionHistoryId);
         nftOwnerChangeReq.setOwnerType(buyReq.getOwnerType());
