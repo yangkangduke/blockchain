@@ -10,6 +10,7 @@ import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ import java.util.List;
 public class RemoteNftServiceImpl implements RemoteNftService {
 
 
+	@PostMapping("/internal-nft/owner-change")
 	@Override
 	public GenericDto<Object> ownerChange(List<NftOwnerChangeReq> req) {
 		return GenericDto.failure("Internal Error:ownerChange failed", HttpStatus.INTERNAL_SERVER_ERROR.value());

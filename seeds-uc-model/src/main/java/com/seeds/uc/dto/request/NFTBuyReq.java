@@ -1,12 +1,13 @@
 package com.seeds.uc.dto.request;
 
-import com.seeds.uc.enums.AccountActionStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * <p>
@@ -18,11 +19,13 @@ import java.math.BigDecimal;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class NFTBuyReq implements Serializable {
 
-    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("admin中的NFT的id")
+    @NotNull
     private Long nftId;
 
 

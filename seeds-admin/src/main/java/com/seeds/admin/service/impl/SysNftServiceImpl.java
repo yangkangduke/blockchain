@@ -268,8 +268,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     public void ownerChange(List<NftOwnerChangeReq> req) {
         req.forEach(p -> {
             SysNftEntity entity = new SysNftEntity();
-            entity.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
             BeanUtils.copyProperties(p, entity);
+            entity.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
             updateById(entity);
         });
         // todo NFT transfer
@@ -424,6 +424,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                     .actionHistoryId(p.getActionHistoryId())
                     .actionStatusEnum(status)
                     .toAddress(p.getToAddress())
+                    .ownerType(p.getOwnerType())
                     .build();
             remoteNftService.buyNFTCallback(callback);
         });

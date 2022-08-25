@@ -1,23 +1,14 @@
 package com.seeds.uc.controller;
 
 
-import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.enums.NftStatusEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.common.web.inner.Inner;
-import com.seeds.uc.dto.request.AccountActionReq;
-import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.request.NFTBuyReq;
-import com.seeds.uc.dto.response.UcUserAccountInfoResp;
-import com.seeds.uc.enums.*;
+import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.GenericException;
-import com.seeds.uc.model.UcUserAccount;
-import com.seeds.uc.model.UcUserAccountActionHistory;
-import com.seeds.uc.service.IUcUserAccountActionHistoryService;
 import com.seeds.uc.service.IUcUserAccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,12 +18,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -67,7 +56,14 @@ public class OpenNFTController {
         } catch (Exception e) {
             throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
         }
-        // todo 判断nft是否是上架状态、nft是否已经购买过了
+        //  判断nft是否是上架状态、nft是否已经购买过了
+        if (!Objects.isNull(sysNftDetailResp)) {
+            if (sysNftDetailResp.getStatus() != NftStatusEnum.ON_SALE.getCode()) {
+                throw new GenericException(UcErrorCodeEnum.ERR_18006_ACCOUNT_BUY_FAIL_INVALID_NFT_STATUS);
+            }
+        }
+
+
         // 检查账户里面的金额是否足够支付
         if (!ucUserAccountService.checkBalance(currentUserId, price)) {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
