@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @author hang.yu
  * @date 2022/7/22
@@ -33,6 +35,12 @@ public class SysNftPageReq extends PageReq {
 
     @ApiModelProperty(value = "倒叙排序 0.正序 1.倒序")
     private Integer descFlag;
+
+    @ApiModelProperty(value = "最小价格")
+    private BigDecimal minPrice;
+
+    @ApiModelProperty(value = "最大价格")
+    private BigDecimal maxPrice;
 
     @JsonIgnore
     private Integer initStatus;

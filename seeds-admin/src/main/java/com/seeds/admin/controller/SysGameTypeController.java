@@ -22,12 +22,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * NFT类别管理
+ * 游戏类别管理
  * @author hang.yu
- * @date 2022/7/21
+ * @date 2022/8/25
  */
 @Slf4j
-@Api(tags = "NFT类别管理")
+@Api(tags = "游戏类别管理")
 @RestController
 @RequestMapping("/game-type")
 public class SysGameTypeController {
