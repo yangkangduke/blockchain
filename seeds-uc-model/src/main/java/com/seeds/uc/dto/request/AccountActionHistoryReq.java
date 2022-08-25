@@ -2,8 +2,10 @@ package com.seeds.uc.dto.request;
 
 import com.seeds.common.dto.PageReq;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -15,6 +17,8 @@ import lombok.Data;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AccountActionHistoryReq extends PageReq {
 
     private static final long serialVersionUID = 1L;
