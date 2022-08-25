@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.seeds.admin.mapper.SysGameTypeMapper">
+
+    <resultMap id="BaseResultMap" type="com.seeds.admin.entity.SysGameTypeEntity">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="parent_code" jdbcType="VARCHAR" property="parentCode"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="sort" jdbcType="TINYINT" property="sort"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="delete_flag" jdbcType="TINYINT" property="deleteFlag"/>
+        <result column="created_by" jdbcType="BIGINT" property="createdBy"/>
+        <result column="updated_by" jdbcType="BIGINT" property="updatedBy"/>
+        <result column="created_at" jdbcType="BIGINT" property="createdAt"/>
+        <result column="updated_at" jdbcType="BIGINT" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="mainColumns">
+        id, parent_code, code, name, sort, delete_flag, created_by, updated_by, created_at, updated_at
+    </sql>
+
+    <select id="queryById" resultMap="BaseResultMap">
+        select
+        <include refid="mainColumns"/>
+        from sys_game_type
+        where 1 = 1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+    </select>
+
+    <select id="queryListByIds" resultMap="BaseResultMap">
+        select
+        <include refid="mainColumns"/>
+        from sys_game_type
+        where 1 = 1 and id in
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

@@ -81,7 +81,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
                 .eq(query.getUserId() != null, SysNftEntity::getOwnerId, query.getUserId())
                 .eq(query.getInitStatus() != null, SysNftEntity::getInitStatus, query.getInitStatus())
-                .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId());
+                .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId())
+                .ge(query.getMinPrice() != null, SysNftEntity::getPrice, query.getMinPrice())
+                .le(query.getMaxPrice() != null, SysNftEntity::getPrice, query.getMaxPrice());
                 buildOrderBy(query, queryWrap);
         Page<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
         List<SysNftEntity> records = page.getRecords();
