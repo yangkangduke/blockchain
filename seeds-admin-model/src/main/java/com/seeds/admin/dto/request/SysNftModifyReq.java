@@ -7,7 +7,6 @@ import lombok.Data;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -34,34 +33,6 @@ public class SysNftModifyReq {
 	@ApiModelProperty("NFT名称")
 	@NotBlank(message = "NFT name cannot be empty")
 	private String name;
-
-	/**
-	 * 游戏id
-	 */
-	@ApiModelProperty("游戏id")
-	@NotNull(message = "Game id cannot be empty")
-	private Long gameId;
-
-	/**
-	 * NFT类别id
-	 */
-	@ApiModelProperty("NFT类别id")
-	@NotNull(message = "NFT type id cannot be empty")
-	private Long nftTypeId;
-
-	/**
-	 * NFT价格
-	 */
-	@ApiModelProperty("NFT价格")
-	@NotNull(message = "NFT price cannot be empty")
-	private BigDecimal price;
-
-	/**
-	 * NFT价格单位 USDC
-	 */
-	@ApiModelProperty("NFT价格单位")
-	@NotBlank(message = "NFT price unit cannot be empty")
-	private String unit;
 
 	/**
 	 * NFT描述

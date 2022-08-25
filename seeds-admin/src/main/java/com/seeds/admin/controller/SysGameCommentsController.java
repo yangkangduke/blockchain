@@ -37,7 +37,7 @@ public class SysGameCommentsController {
     @PostMapping("page")
     @ApiOperation("分页")
     @RequiredPermission("sys:game-comments:page")
-    public GenericDto<IPage<SysGameCommentsResp>> queryPage(SysGameCommentsPageReq req) {
+    public GenericDto<IPage<SysGameCommentsResp>> queryPage(@RequestBody SysGameCommentsPageReq req) {
         return GenericDto.success(gameCommentsService.queryPage(req));
     }
 

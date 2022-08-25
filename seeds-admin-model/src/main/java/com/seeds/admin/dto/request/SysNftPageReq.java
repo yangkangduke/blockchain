@@ -28,6 +28,12 @@ public class SysNftPageReq extends PageReq {
     @ApiModelProperty(value = "是否在售  0：否   1：是")
     private Integer status;
 
+    @ApiModelProperty(value = "排序类型 1.Newest 2.Rank 3.Price")
+    private Integer sortType;
+
+    @ApiModelProperty(value = "倒叙排序 0.正序 1.倒序")
+    private Integer descFlag;
+
     @JsonIgnore
     private Integer initStatus;
 

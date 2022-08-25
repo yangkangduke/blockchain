@@ -49,4 +49,10 @@ public class PublicGameController {
         return remoteGameService.ucDropdownList();
     }
 
+    @PostMapping("/uc-collection/{id}")
+    @ApiOperation("uc收藏")
+    public GenericDto<Object> ucCollection(@PathVariable("id") Long id) {
+        return remoteGameService.ucCollection(id);
+    }
+
 }

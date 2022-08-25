@@ -25,7 +25,7 @@ public class AccountActionResp implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("操作 1冲币 2提币")
+    @ApiModelProperty("操作 1冲币 2提币 3购买NFT")
     @NotNull
     private Integer action;
 

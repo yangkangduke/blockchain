@@ -57,6 +57,18 @@ public class SysNftEntity extends BaseEntity {
 	private Long nftTypeId;
 
 	/**
+	 * 收藏量
+	 */
+	@TableField("collections")
+	private Long collections;
+
+	/**
+	 * 浏览量
+	 */
+	@TableField("views")
+	private Long views;
+
+	/**
 	 * 价格
 	 */
 	@TableField("price")

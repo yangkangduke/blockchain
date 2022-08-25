@@ -2,7 +2,10 @@ package com.seeds.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.*;
@@ -78,8 +81,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
                 .eq(query.getUserId() != null, SysNftEntity::getOwnerId, query.getUserId())
                 .eq(query.getInitStatus() != null, SysNftEntity::getInitStatus, query.getInitStatus())
-                .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId())
-                .orderByDesc(SysNftEntity::getCreatedAt);
+                .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId());
+                buildOrderBy(query, queryWrap);
         Page<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
         List<SysNftEntity> records = page.getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -136,7 +139,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             // NFT信息
             BeanUtils.copyProperties(sysNft, resp);
             // 游戏信息
-            SysGameEntity sysGame = sysGameService.queryById(sysNft.getId());
+            SysGameEntity sysGame = sysGameService.queryById(sysNft.getGameId());
             if (sysGame != null) {
                 resp.setGameName(sysGame.getName());
             }
@@ -275,6 +278,22 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Override
     public SysNftDetailResp ucDetail(Long id) {
         return detail(id);
+    }
+
+    @Override
+    public void ucCollection(Long id) {
+        LambdaUpdateWrapper<SysNftEntity> queryWrap = new UpdateWrapper<SysNftEntity>().lambda()
+                .setSql("`collections`=`collections`+1")
+                .eq(SysNftEntity::getId, id);
+        update(queryWrap);
+    }
+
+    @Override
+    public void ucView(Long id) {
+        LambdaUpdateWrapper<SysNftEntity> queryWrap = new UpdateWrapper<SysNftEntity>().lambda()
+                .setSql("`views`=`views`+1")
+                .eq(SysNftEntity::getId, id);
+        update(queryWrap);
     }
 
     private void addNftProperties(Long nftId, List<NftPropertiesReq> propertiesList) {
@@ -430,6 +449,31 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             });
         } catch (Exception e) {
             log.error("归属人变更失败，message={}", e.getMessage());
+        }
+    }
+
+    private void buildOrderBy(SysNftPageReq query, LambdaQueryWrapper<SysNftEntity> queryWrap) {
+        if (query.getSortType() == null) {
+            queryWrap.orderByDesc(SysNftEntity::getCreatedAt);
+        } else {
+            int descFlag = query.getDescFlag() == null ? 0 : query.getDescFlag();
+            SortTypeEnum sortType = SortTypeEnum.from(query.getSortType());
+            if (WhetherEnum.YES.value() == descFlag) {
+                queryWrap.orderByDesc(getOrderType(sortType));
+            } else {
+                queryWrap.orderByAsc(getOrderType(sortType));
+            }
+        }
+    }
+
+    private SFunction<SysNftEntity, ?> getOrderType(SortTypeEnum sortType) {
+        switch (sortType) {
+            case PRICE:
+                return SysNftEntity::getPrice;
+            case RANK:
+                return SysNftEntity::getCollections;
+            default:
+                return SysNftEntity::getCreatedAt;
         }
     }
 }

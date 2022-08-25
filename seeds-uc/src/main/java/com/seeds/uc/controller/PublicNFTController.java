@@ -50,4 +50,16 @@ public class PublicNFTController {
         return remoteNftService.ucTypeDropdown();
     }
 
+    @PostMapping("/uc-collection/{id}")
+    @ApiOperation("uc收藏")
+    public GenericDto<Object> ucCollection(@PathVariable("id") Long id) {
+        return remoteNftService.ucCollection(id);
+    }
+
+    @PostMapping("/uc-view/{id}")
+    @ApiOperation("uc浏览")
+    public GenericDto<Object> ucView(@PathVariable("id") Long id) {
+        return remoteNftService.ucView(id);
+    }
+
 }

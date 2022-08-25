@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class AccountActionHistoryReq extends PageReq {
 
     private static final long serialVersionUID = 1L;

@@ -25,22 +25,32 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	@PostMapping("/internal-nft/owner-change")
 	@Override
 	public GenericDto<Object> ownerChange(List<NftOwnerChangeReq> req) {
-		return GenericDto.failure("Internal Error:ownerChange failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return GenericDto.failure("Internal Error:nft ownerChange failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 	@Override
 	public GenericDto<Page<SysNftResp>> ucPage(SysNftPageReq query) {
-		return GenericDto.failure("Internal Error:ucPage failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return GenericDto.failure("Internal Error:nft ucPage failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 	@Override
 	public GenericDto<SysNftDetailResp> ucDetail(Long id) {
-		return GenericDto.failure("Internal Error:ucDetail failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return GenericDto.failure("Internal Error:nft ucDetail failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 	@Override
 	public GenericDto<List<SysNftTypeResp>> ucTypeDropdown() {
-		return GenericDto.failure("Internal Error:ucNftType dropdown failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return GenericDto.failure("Internal Error:nft ucNftType dropdown failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<Object> ucCollection(Long id) {
+		return GenericDto.failure("Internal Error:nft ucCollection dropdown failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<Object> ucView(Long id) {
+		return GenericDto.failure("Internal Error:nft ucView dropdown failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 }

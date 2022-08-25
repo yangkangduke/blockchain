@@ -1,6 +1,7 @@
 package com.seeds.admin.dto.request;
 
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -15,5 +16,8 @@ public class SysGameCommentsPageReq extends PageReq {
 
     private Integer gameId;
 
+    @ApiModelProperty(value = "评价状态  0：无效   1：有效")
     private Integer status;
+
+
 }

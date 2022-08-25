@@ -21,16 +21,21 @@ public class RemoteGameServiceImpl implements RemoteGameService {
 
 	@Override
 	public GenericDto<Page<SysGameResp>> ucPage(SysGamePageReq query) {
-		return GenericDto.failure("Internal Error:ucPage failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return GenericDto.failure("Internal Error:game ucPage failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 	@Override
 	public GenericDto<SysGameResp> ucDetail(Long id) {
-		return GenericDto.failure("Internal Error:ucDetail failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return GenericDto.failure("Internal Error:game ucDetail failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 	@Override
 	public GenericDto<List<SysGameBriefResp>> ucDropdownList() {
-		return GenericDto.failure("Internal Error:uc dropdownPage failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return GenericDto.failure("Internal Error:game uc dropdownPage failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<Object> ucCollection(Long id) {
+		return GenericDto.failure("Internal Error:game ucCollection failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 }

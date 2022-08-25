@@ -2,6 +2,7 @@ package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
@@ -27,6 +28,7 @@ import com.seeds.uc.service.IUcUserAddressService;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,8 +127,16 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      * @return
      */
     @Override
-    public Page<AccountActionResp> actionHistory(Page page, AccountActionHistoryReq historyReq) {
-        return baseMapper.actionHistory(page, historyReq);
+    public IPage<AccountActionResp> actionHistory(Page page, AccountActionHistoryReq historyReq) {
+        Page<AccountActionResp> respPage = baseMapper.actionHistory(page, historyReq);
+       return respPage.convert(p -> {
+            AccountActionResp resp = new AccountActionResp();
+            BeanUtils.copyProperties(p, resp);
+            resp.setAmount(new BigDecimal(p.getAmount()).toPlainString());
+            resp.setFee(new BigDecimal(p.getFee()).toPlainString());
+            return resp;
+        });
+
     }
 
     @Override
