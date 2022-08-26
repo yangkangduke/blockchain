@@ -60,6 +60,9 @@ public class SysNftDetailResp {
 	@ApiModelProperty(value = "创建时间")
 	private Long createdAt;
 
+	@ApiModelProperty(value = "归属人ID")
+	private Long ownerId;
+
 	@ApiModelProperty(value = "归属人名称")
 	private String ownerName;
 
