@@ -248,12 +248,20 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         // 排除已上架的NFT
         List<SysNftEntity> deleteList = new ArrayList<>();
         sysNftEntities.forEach(p ->{
-            if (WhetherEnum.NO.value() == p.getStatus()) {
-                p.setInitStatus(NftInitStatusEnum.DELETING.getCode());
-                updateById(p);
-                deleteList.add(p);
+            // 创建失败的直接删除
+            if (NftInitStatusEnum.CREATE_FAILED.getCode() == p.getInitStatus()) {
+                removeById(p);
+            } else {
+                if (WhetherEnum.NO.value() == p.getStatus()) {
+                    p.setInitStatus(NftInitStatusEnum.DELETING.getCode());
+                    updateById(p);
+                    deleteList.add(p);
+                }
             }
         });
+        if (CollectionUtils.isEmpty(deleteList)) {
+            return;
+        }
         // 删除链上数据
         executorService.submit(() -> {
             burnNft(deleteList);
