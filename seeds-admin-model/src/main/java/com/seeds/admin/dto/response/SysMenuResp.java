@@ -43,6 +43,9 @@ public class SysMenuResp extends TreeNode<SysMenuResp> {
 	@ApiModelProperty(value = "排序")
 	private Integer sort;
 
+	@ApiModelProperty(value = "是否展示   0：否   1：是")
+	private Integer showFlag;
+
 	@ApiModelProperty(value = "创建时间")
 	private Long createdAt;
 

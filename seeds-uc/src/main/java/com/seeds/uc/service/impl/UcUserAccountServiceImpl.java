@@ -19,6 +19,7 @@ import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.mapper.UcUserAccountMapper;
+import com.seeds.uc.model.UcUser;
 import com.seeds.uc.model.UcUserAccount;
 import com.seeds.uc.model.UcUserAccountActionHistory;
 import com.seeds.uc.model.UcUserAddress;
@@ -201,21 +202,22 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
 
     /**
      * 购买nft
-     * @param buyReq
+     *
+     * @param nftDetail
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void buyNFTFreeze(SysNftDetailResp buyReq) {
-        Long nftId = buyReq.getId();
+    public void buyNFTFreeze(SysNftDetailResp nftDetail) {
+        Long nftId = nftDetail.getId();
         long currentTimeMillis = System.currentTimeMillis();
-        BigDecimal amount = buyReq.getPrice();
+        BigDecimal amount = nftDetail.getPrice();
         Long currentUserId = UserContext.getCurrentUserId();
         // todo 远程调用钱包接口
         // 冻结金额
         UcUserAccountInfoResp info = this.getInfo();
         this.update(UcUserAccount.builder()
-                    .balance(info.getBalance().subtract(amount))
-                    .freeze(info.getFreeze().add(amount))
+                .balance(info.getBalance().subtract(amount))
+                .freeze(info.getFreeze().add(amount))
                 .build(), new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, currentUserId)
                 .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
@@ -235,11 +237,21 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         // 远程调用admin端归属人变更接口
         List list = new ArrayList<NftOwnerChangeReq>();
         NftOwnerChangeReq nftOwnerChangeReq = new NftOwnerChangeReq();
+        UcUser buyer = ucUserService.getById(currentUserId);
+        if (null != buyer) {
+            // 买家名字、地址
+            nftOwnerChangeReq.setOwnerName(buyer.getNickname());
+            nftOwnerChangeReq.setToAddress(buyer.getPublicAddress());
+        }
         nftOwnerChangeReq.setOwnerId(currentUserId);
-        nftOwnerChangeReq.setOwnerName(ucUserService.getById(currentUserId).getNickname());
         nftOwnerChangeReq.setId(nftId);
         nftOwnerChangeReq.setActionHistoryId(actionHistoryId);
-        nftOwnerChangeReq.setOwnerType(buyReq.getOwnerType());
+        nftOwnerChangeReq.setOwnerType(nftDetail.getOwnerType());
+        if (nftDetail.getOwnerType() == 1) {
+            // 卖家地址
+            UcUser saler = ucUserService.getById(nftDetail.getOwnerId());
+            nftOwnerChangeReq.setFromAddress(saler.getPublicAddress());
+        }
         list.add(nftOwnerChangeReq);
         remoteNftService.ownerChange(list);
     }
@@ -284,6 +296,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 .status(buyReq.getActionStatusEnum())
                         .fromAddress(buyReq.getFromAddress())
                         .toAddress(buyReq.getToAddress())
+                        .amount(buyReq.getAmount())
                         .chain(buyReq.getChain())
                         .txHash(buyReq.getTxHash())
                         .blockNumber(buyReq.getBlockNumber())

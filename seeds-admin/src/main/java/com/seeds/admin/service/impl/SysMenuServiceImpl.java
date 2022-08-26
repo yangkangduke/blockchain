@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.ListReq;
+import com.seeds.admin.dto.request.SwitchReq;
 import com.seeds.admin.dto.request.SysMenuAddReq;
 import com.seeds.admin.dto.request.SysMenuModifyReq;
 import com.seeds.admin.dto.response.SysMenuBriefResp;
@@ -11,6 +12,7 @@ import com.seeds.admin.dto.response.SysMenuResp;
 import com.seeds.admin.entity.SysMenuEntity;
 import com.seeds.admin.entity.SysRoleUserEntity;
 import com.seeds.admin.entity.SysUserEntity;
+import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.utils.TreeUtils;
 import com.seeds.admin.mapper.SysMenuMapper;
@@ -122,7 +124,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
     }
 
     @Override
-    public List<SysMenuResp> queryByUserId(Integer type, Long userId) {
+    public List<SysMenuResp> queryByUserId(Long userId) {
         List<SysRoleUserEntity> roleUsers = sysRoleUserService.queryByUserId(userId);
         if (CollectionUtils.isEmpty(roleUsers)) {
             return Collections.emptyList();
@@ -132,8 +134,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
         if (CollectionUtils.isEmpty(menuIds)) {
             return Collections.emptyList();
         }
-        List<SysMenuEntity> list = listByIds(menuIds);
-        return convertToResp(list);
+        LambdaQueryWrapper<SysMenuEntity> query = new QueryWrapper<SysMenuEntity>().lambda()
+                .eq(SysMenuEntity::getShowFlag, WhetherEnum.YES.value())
+                .in(SysMenuEntity::getId, menuIds)
+                .orderByAsc(SysMenuEntity::getSort);
+        return convertToResp(list(query));
+    }
+
+    @Override
+    public List<SysMenuResp> queryShowMenu() {
+        LambdaQueryWrapper<SysMenuEntity> query = new QueryWrapper<SysMenuEntity>().lambda()
+                .eq(SysMenuEntity::getShowFlag, WhetherEnum.YES.value())
+                .orderByAsc(SysMenuEntity::getSort);
+        return convertToResp(list(query));
     }
 
     @Override
@@ -191,6 +204,22 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
             respList.add(resp);
         });
         return respList;
+    }
+
+    @Override
+    public void enableOrDisable(List<SwitchReq> req) {
+        if (CollectionUtils.isEmpty(req)) {
+            return;
+        }
+        req.forEach(p -> {
+            // 校验状态
+            SysStatusEnum.from(p.getStatus());
+            SysMenuEntity menu = new SysMenuEntity();
+            menu.setId(p.getId());
+            menu.setShowFlag(p.getStatus());
+            // 停用/启用用户
+            updateById(menu);
+        });
     }
 
     private List<SysMenuResp> convertToResp(List<SysMenuEntity> list) {
