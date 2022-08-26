@@ -1,6 +1,7 @@
 package com.seeds.uc.controller;
 
 
+import com.seeds.admin.dto.request.UcSwitchReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.enums.NftStatusEnum;
 import com.seeds.admin.feign.RemoteNftService;
@@ -73,5 +74,12 @@ public class OpenNFTController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("/uc-switch")
+    @ApiOperation("uc上架/下架")
+    public GenericDto<Object> ucUpOrDown(@Valid @RequestBody UcSwitchReq req) {
+        Long currentUserId = UserContext.getCurrentUserId();
+        req.setUcUserId(currentUserId);
+        return remoteNftService.ucUpOrDown(req);
+    }
 
 }

@@ -21,6 +21,12 @@ import java.math.BigDecimal;
 public class SysGameEntity extends BaseEntity {
 
 	/**
+	 * 游戏类别id
+	 */
+	@TableField("type_id")
+	private Long typeId;
+
+	/**
 	 * 游戏名称
 	 */
 	@TableField("name")

@@ -195,7 +195,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void enableOrDisable(List<SwitchReq> req) {
+    public void upOrDown(List<SwitchReq> req) {
         Set<Long> ids = req.stream().map(SwitchReq::getId).collect(Collectors.toSet());
         List<SysNftEntity> nftList = listByIds(ids);
         if (CollectionUtils.isEmpty(nftList)) {
@@ -296,6 +296,37 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .setSql("`views`=`views`+1")
                 .eq(SysNftEntity::getId, id);
         update(queryWrap);
+    }
+
+    @Override
+    public void ucUpOrDown(UcSwitchReq req) {
+        List<SwitchReq> reqs = req.getReqs();
+        List<SysNftEntity> sysNftEntities = queryNormalByOwnerId(req.getUcUserId());
+        if (CollectionUtils.isEmpty(sysNftEntities)) {
+            return;
+        }
+        Set<Long> ids = sysNftEntities.stream().map(SysNftEntity::getId).collect(Collectors.toSet());
+        reqs = reqs.stream().filter(p -> ids.contains(p.getId())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(reqs)) {
+            return;
+        }
+        // 上架/下架NFT
+        reqs.forEach(p -> {
+            // 校验状态
+            SysStatusEnum.from(p.getStatus());
+            SysNftEntity nft = new SysNftEntity();
+            nft.setId(p.getId());
+            nft.setStatus(p.getStatus());
+            updateById(nft);
+        });
+    }
+
+    @Override
+    public List<SysNftEntity> queryNormalByOwnerId(Long ownerId) {
+        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                .eq(SysNftEntity::getOwnerId, ownerId)
+                .eq(SysNftEntity::getInitStatus, NftInitStatusEnum.NORMAL.getCode());
+        return list(queryWrap);
     }
 
     private void addNftProperties(Long nftId, List<NftPropertiesReq> propertiesList) {

@@ -49,7 +49,7 @@ public interface SysNftService extends IService<SysNftEntity> {
      * 上架/下架系统NFT信息
      * @param req NFT的id列表和状态
      */
-    void enableOrDisable(List<SwitchReq> req);
+    void upOrDown(List<SwitchReq> req);
 
     /**
      * 批量删除系统NFT信息
@@ -87,5 +87,18 @@ public interface SysNftService extends IService<SysNftEntity> {
      * @param id NFT的id
      */
     void ucView(Long id);
+
+    /**
+     * uc上架/下架系统NFT信息
+     * @param req NFT的id列表和状态
+     */
+    void ucUpOrDown(UcSwitchReq req);
+
+    /**
+     * 查询用户拥有的NFT
+     * @param ownerId 归属人id
+     * @return 拥有的NFT信息
+     */
+    List<SysNftEntity> queryNormalByOwnerId(Long ownerId);
 
 }

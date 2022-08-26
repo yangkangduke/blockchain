@@ -27,6 +27,13 @@ public class SysGameModifyReq {
 	private Long id;
 
 	/**
+	 * 游戏类别id
+	 */
+	@ApiModelProperty("游戏类别id")
+	@NotNull(message = "Game type id cannot be empty")
+	private Long typeId;
+
+	/**
 	 * 游戏名称
 	 */
 	@ApiModelProperty("游戏名称")

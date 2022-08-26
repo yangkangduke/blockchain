@@ -73,10 +73,10 @@ public class SysNftController {
     }
 
     @PostMapping("switch")
-    @ApiOperation("启用/停用")
+    @ApiOperation("上架/下架")
     @RequiredPermission("sys:nft:switch")
-    public GenericDto<Object> enableOrDisable(@Valid @RequestBody List<SwitchReq> req) {
-        sysNftService.enableOrDisable(req);
+    public GenericDto<Object> upOrDown(@Valid @RequestBody List<SwitchReq> req) {
+        sysNftService.upOrDown(req);
         return GenericDto.success(null);
     }
 

@@ -12,11 +12,13 @@ import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.entity.SysGameEntity;
+import com.seeds.admin.entity.SysGameTypeEntity;
 import com.seeds.admin.enums.SortTypeEnum;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysGameMapper;
 import com.seeds.admin.service.SysGameService;
+import com.seeds.admin.service.SysGameTypeService;
 import com.seeds.admin.service.SysMerchantGameService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -41,12 +43,16 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     private SysMerchantGameService sysMerchantGameService;
 
     @Autowired
+    private SysGameTypeService sysGameTypeService;
+
+    @Autowired
     private SysGameMapper sysGameMapper;
 
     @Override
     public IPage<SysGameResp> queryPage(SysGamePageReq query) {
         LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
                 .eq(query.getStatus() != null, SysGameEntity::getStatus, query.getStatus())
+                .eq(query.getTypeId() != null, SysGameEntity::getTypeId, query.getTypeId())
                 .likeRight(StringUtils.isNotBlank(query.getName()), SysGameEntity::getName, query.getName());
         buildOrderBy(query, queryWrap);
         Page<SysGameEntity> page = new Page<>(query.getCurrent(), query.getSize());
@@ -54,9 +60,16 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
+        Set<Long> typeIds = records.stream().map(SysGameEntity::getTypeId).collect(Collectors.toSet());
+        Map<Long, SysGameTypeEntity> nftGameMap = sysGameTypeService.queryMapByIds(typeIds);
         return page.convert(p -> {
             SysGameResp resp = new SysGameResp();
             BeanUtils.copyProperties(p, resp);
+            SysGameTypeEntity gameType = nftGameMap.get(p.getTypeId());
+            if (gameType != null) {
+                resp.setTypeId(gameType.getId());
+                resp.setTypeName(gameType.getName());
+            }
             return resp;
         });
     }
@@ -102,6 +115,12 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         SysGameResp resp = new SysGameResp();
         if (sysGame != null) {
             BeanUtils.copyProperties(sysGame, resp);
+            // 游戏类别信息
+            SysGameTypeEntity sysGameType = sysGameTypeService.queryById(sysGame.getTypeId());
+            if (sysGameType != null) {
+                resp.setTypeId(sysGameType.getId());
+                resp.setTypeName(sysGameType.getName());
+            }
         }
         return resp;
     }

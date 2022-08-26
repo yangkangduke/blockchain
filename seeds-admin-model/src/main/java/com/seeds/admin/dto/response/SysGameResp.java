@@ -20,6 +20,12 @@ public class SysGameResp {
 	@ApiModelProperty(value = "id")
 	private Long id;
 
+	@ApiModelProperty(value = "游戏类别id")
+	private Long typeId;
+
+	@ApiModelProperty(value = "游戏类别名称")
+	private String typeName;
+
 	@ApiModelProperty(value = "图片地址")
 	private String pictureUrl;
 
