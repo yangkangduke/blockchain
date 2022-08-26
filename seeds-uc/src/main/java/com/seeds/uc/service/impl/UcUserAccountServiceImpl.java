@@ -90,11 +90,11 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
             if (!address.equals(toAddress)) {
                 throw new GenericException(UcErrorCodeEnum.ERR_18003_ACCOUNT_ADDRESS_ERROR);
             }
-            this.updateById(UcUserAccount.builder()
-                            .userId(currentUserId)
-                            .currency(CurrencyEnum.USDC)
-                            .balance(balance.add(amount))
-                    .build());
+            this.update(UcUserAccount.builder()
+                        .balance(balance.add(amount))
+                    .build(), new LambdaQueryWrapper<UcUserAccount>()
+                    .eq(UcUserAccount::getUserId, currentUserId)
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
         } else if (action.equals(AccountActionEnum.WITHDRAW)) {
             if (!address.equals(fromAddress)) {
                 throw new GenericException(UcErrorCodeEnum.ERR_18003_ACCOUNT_ADDRESS_ERROR);
@@ -103,11 +103,11 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
             if (balance.compareTo(amount) == -1) {
                 throw new GenericException(UcErrorCodeEnum.ERR_18001_ACCOUNT_BALANCE_INSUFFICIENT);
             }
-            this.updateById(UcUserAccount.builder()
-                    .userId(currentUserId)
-                    .currency(CurrencyEnum.USDC)
+            this.update(UcUserAccount.builder()
                     .balance(balance.subtract(amount))
-                    .build());
+                    .build(), new LambdaQueryWrapper<UcUserAccount>()
+                    .eq(UcUserAccount::getUserId, currentUserId)
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
         } else {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
         }
