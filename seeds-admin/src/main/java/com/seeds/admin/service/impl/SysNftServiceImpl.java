@@ -182,15 +182,11 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         if (WhetherEnum.YES.value() == sysNft.getStatus()) {
             throw new SeedsException(AdminErrorCodeEnum.ERR_40006_NFT_ON_SALE_CAN_NOT_BE_MODIFIED.getDescEn());
         }
-        // 修改NFT状态
-        sysNft.setInitStatus(NftInitStatusEnum.UPDATING.getCode());
-        updateById(sysNft);
         // 修改NFT属性
         addNftProperties(sysNft.getId(), req.getPropertiesList());
-        // 修改链上NFT
-        executorService.submit(() -> {
-            modifyNft(sysNft, req);
-        });
+        // 更新NFT
+        BeanUtils.copyProperties(req, sysNft);
+        updateById(sysNft);
     }
 
     @Override
@@ -279,10 +275,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     public void ownerChange(List<NftOwnerChangeReq> req) {
-        // todo NFT transfer
-        executorService.submit(() -> {
-            transferNft(req);
-        });
+        transferNft(req);
     }
 
     @Override
@@ -308,7 +301,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     public void ucUpOrDown(UcSwitchReq req) {
-        List<SwitchReq> reqs = req.getReqs();
+        List<UpOrDownReq> reqs = req.getReqs();
         List<SysNftEntity> sysNftEntities = queryNormalByOwnerId(req.getUcUserId());
         if (CollectionUtils.isEmpty(sysNftEntities)) {
             return;
@@ -323,6 +316,11 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             // 校验状态
             SysStatusEnum.from(p.getStatus());
             SysNftEntity nft = new SysNftEntity();
+            // 上架
+            if (SysStatusEnum.ENABLED.value() == p.getStatus()) {
+                nft.setUnit(p.getUnit());
+                nft.setPrice(p.getPrice());
+            }
             nft.setId(p.getId());
             nft.setStatus(p.getStatus());
             updateById(nft);
@@ -397,6 +395,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         updateById(nft);
     }
 
+    @Deprecated
     private void modifyNft(SysNftEntity sysNft, SysNftModifyReq req) {
         int initStatus = NftInitStatusEnum.NORMAL.getCode();
         String errorMsg;

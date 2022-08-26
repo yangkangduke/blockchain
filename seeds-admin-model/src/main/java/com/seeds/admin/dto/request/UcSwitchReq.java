@@ -16,6 +16,6 @@ public class UcSwitchReq {
 
     @ApiModelProperty(value = "停用/启用请求入参")
     @NotEmpty(message = "The request param cannot be empty")
-    private List<SwitchReq> reqs;
+    private List<UpOrDownReq> reqs;
 
 }
