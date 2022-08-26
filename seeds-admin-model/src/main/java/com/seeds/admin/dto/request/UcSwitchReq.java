@@ -1,6 +1,5 @@
 package com.seeds.admin.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,7 +11,7 @@ import java.util.List;
 @ApiModel(value = "UcSwitchReq", description = "uc停用/启用请求入参")
 public class UcSwitchReq {
 
-    @JsonIgnore
+    @ApiModelProperty(value = "uc用户编号")
     private Long ucUserId;
 
     @ApiModelProperty(value = "停用/启用请求入参")
