@@ -21,3 +21,20 @@ email:
   from: seeds<yangkang.duke@gmail.com>
   user: yangkang.duke@gmail.com
   pass: nfijtkbvgaflsprw
+
+Spring:
+  kafka:
+    bootstrap-servers: 54.168.239.215:9092
+    producer:
+      retries: 3  # 生产者发送失败时，重试次数
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: tomge-consumer-group  # 默认消费者group id
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      auto-commit-interval: 100
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer

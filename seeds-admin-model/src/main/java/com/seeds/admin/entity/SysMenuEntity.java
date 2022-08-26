@@ -66,6 +66,12 @@ public class SysMenuEntity extends BaseEntity {
 	private Integer sort;
 
 	/**
+	 * 是否展示   0：否   1：是
+	 */
+	@TableField("show_flag")
+	private Integer showFlag;
+
+	/**
 	 * 上级菜单名称
 	 */
 	@TableField(exist = false)

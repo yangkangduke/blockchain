@@ -2,6 +2,7 @@ package com.seeds.admin.controller;
 
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.ListReq;
+import com.seeds.admin.dto.request.SwitchReq;
 import com.seeds.admin.dto.request.SysMenuAddReq;
 import com.seeds.admin.dto.request.SysMenuModifyReq;
 import com.seeds.admin.dto.response.SysMenuBriefResp;
@@ -94,6 +95,14 @@ public class SysMenuController {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_30003_SUB_MENU_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_30003_SUB_MENU_EXIST.getCode(), null);
         }
         sysMenuService.batchDelete(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("switch")
+    @ApiOperation("启用/停用")
+    @RequiredPermission("sys:menu:switch")
+    public GenericDto<Object> enableOrDisable(@Valid @RequestBody List<SwitchReq> req) {
+        sysMenuService.enableOrDisable(req);
         return GenericDto.success(null);
     }
 

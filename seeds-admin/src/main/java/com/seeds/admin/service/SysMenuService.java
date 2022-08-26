@@ -2,6 +2,7 @@ package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.ListReq;
+import com.seeds.admin.dto.request.SwitchReq;
 import com.seeds.admin.dto.request.SysMenuAddReq;
 import com.seeds.admin.dto.request.SysMenuModifyReq;
 import com.seeds.admin.dto.response.SysMenuBriefResp;
@@ -84,11 +85,16 @@ public interface SysMenuService extends IService<SysMenuEntity> {
 
     /**
      * 根据用户id查询菜单列表
-     * @param type 菜单类型
      * @param userId 用户id
      * @return 菜单列表
      */
-    List<SysMenuResp> queryByUserId(Integer type, Long userId);
+    List<SysMenuResp> queryByUserId(Long userId);
+
+    /**
+     * 查询显示的菜单列表
+     * @return 菜单列表
+     */
+    List<SysMenuResp> queryShowMenu();
 
     /**
      * 查询权限列表
@@ -116,5 +122,11 @@ public interface SysMenuService extends IService<SysMenuEntity> {
      * @return 菜单列表
      */
     List<SysMenuBriefResp> getUserMenuList(SysUserEntity user);
+
+    /**
+     * 批量启用/停用菜单
+     * @param req 菜单编号和状态集合
+     */
+    void enableOrDisable(List<SwitchReq> req);
 
 }
