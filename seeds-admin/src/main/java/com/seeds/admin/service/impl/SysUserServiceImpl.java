@@ -276,18 +276,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
     }
 
     @Override
-    public List<SysUserBriefResp> dropdownList() {
-        List<SysUserEntity> records = list();
+    public IPage<SysUserBriefResp> dropdownPage(SysUserPageReq query) {
+        LambdaQueryWrapper<SysUserEntity> queryWrap = new QueryWrapper<SysUserEntity>().lambda()
+                .likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysUserEntity::getRealName, query.getNameOrMobile())
+                .or().likeRight(StringUtils.isNotBlank(query.getNameOrMobile()), SysUserEntity::getMobile, query.getNameOrMobile());
+        Page<SysUserEntity> page = new Page<>(query.getCurrent(), query.getSize());
+        List<SysUserEntity> records = page(page, queryWrap).getRecords();
         if (CollectionUtils.isEmpty(records)) {
-            return Collections.emptyList();
+            return page.convert(p -> null);
         }
-        List<SysUserBriefResp> respList = new ArrayList<>();
-        records.forEach(p -> {
+        return page.convert(p -> {
             SysUserBriefResp resp = new SysUserBriefResp();
             BeanUtils.copyProperties(p, resp);
-            respList.add(resp);
+            return resp;
         });
-        return respList;
     }
 
 }

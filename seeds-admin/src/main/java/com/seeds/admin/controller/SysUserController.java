@@ -57,10 +57,10 @@ public class SysUserController {
         return GenericDto.success(sysUserService.queryPage(query));
     }
 
-    @PostMapping("dropdown-list")
+    @PostMapping("dropdown-page")
     @ApiOperation("下拉列表")
-    public GenericDto<List<SysUserBriefResp>> dropdownList() {
-        return GenericDto.success(sysUserService.dropdownList());
+    public GenericDto<IPage<SysUserBriefResp>> dropdownPage(@Valid @RequestBody SysUserPageReq query) {
+        return GenericDto.success(sysUserService.dropdownPage(query));
     }
 
     @GetMapping("detail/{id}")

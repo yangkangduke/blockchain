@@ -80,16 +80,14 @@ public class OpenNFTController {
     @PostMapping("/owner-page")
     @ApiOperation(value = "用户拥有分页查询", notes = "用户拥有分页查询")
     public GenericDto<Page<SysNftResp>> ownerPage(@Valid @RequestBody SysNftPageReq query) {
-        Long currentUserId = UserContext.getCurrentUserId();
-        query.setUserId(currentUserId);
+        query.setUserId(UserContext.getCurrentUserId());
         return remoteNftService.ucPage(query);
     }
 
     @PostMapping("/uc-switch")
     @ApiOperation("uc上架/下架")
     public GenericDto<Object> ucUpOrDown(@Valid @RequestBody UcSwitchReq req) {
-        Long currentUserId = UserContext.getCurrentUserId();
-        req.setUcUserId(currentUserId);
+        req.setUcUserId(UserContext.getCurrentUserId());
         return remoteNftService.ucUpOrDown(req);
     }
 
