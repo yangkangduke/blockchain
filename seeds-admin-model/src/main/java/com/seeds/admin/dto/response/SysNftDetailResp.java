@@ -31,7 +31,7 @@ public class SysNftDetailResp {
 	private String name;
 
 	@ApiModelProperty(value = "游戏id")
-	private String gameId;
+	private Long gameId;
 
 	@ApiModelProperty(value = "游戏名称")
 	private String gameName;

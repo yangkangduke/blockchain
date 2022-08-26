@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.SysGamePageReq;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
+import com.seeds.admin.dto.response.SysGameTypeResp;
 import com.seeds.admin.feign.impl.RemoteGameServiceImpl;
 import com.seeds.admin.feign.interceptor.FeignInnerRequestInterceptor;
 import com.seeds.common.dto.GenericDto;
@@ -58,5 +59,13 @@ public interface RemoteGameService {
 	@PostMapping("/internal-game/uc-collection")
 	@ApiOperation("uc收藏")
 	GenericDto<Object> ucCollection(@RequestParam Long id);
+
+	/**
+	 * 获取系统游戏类别列表
+	 * @return 系统游戏类别列表
+	 */
+	@GetMapping("/internal-game-type/uc-dropdown")
+	@ApiOperation("uc查询游戏类别列表")
+	GenericDto<List<SysGameTypeResp>> ucTypeDropdown();
 
 }
