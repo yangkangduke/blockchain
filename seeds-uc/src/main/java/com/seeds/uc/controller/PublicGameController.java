@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.SysGamePageReq;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
+import com.seeds.admin.dto.response.SysGameTypeResp;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -53,6 +54,12 @@ public class PublicGameController {
     @ApiOperation("uc收藏")
     public GenericDto<Object> ucCollection(@PathVariable("id") Long id) {
         return remoteGameService.ucCollection(id);
+    }
+
+    @GetMapping("/type/uc-dropdown")
+    @ApiOperation("游戏类别列表")
+    public GenericDto<List<SysGameTypeResp>> typeDropdown() {
+        return remoteGameService.ucTypeDropdown();
     }
 
 }

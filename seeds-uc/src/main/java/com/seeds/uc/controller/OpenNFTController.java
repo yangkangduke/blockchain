@@ -1,7 +1,11 @@
 package com.seeds.uc.controller;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.admin.dto.request.SysNftPageReq;
+import com.seeds.admin.dto.request.UcSwitchReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.enums.NftStatusEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
@@ -73,5 +77,18 @@ public class OpenNFTController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("/owner-page")
+    @ApiOperation(value = "用户拥有分页查询", notes = "用户拥有分页查询")
+    public GenericDto<Page<SysNftResp>> ownerPage(@Valid @RequestBody SysNftPageReq query) {
+        query.setUserId(UserContext.getCurrentUserId());
+        return remoteNftService.ucPage(query);
+    }
+
+    @PostMapping("/uc-switch")
+    @ApiOperation("uc上架/下架")
+    public GenericDto<Object> ucUpOrDown(@Valid @RequestBody UcSwitchReq req) {
+        req.setUcUserId(UserContext.getCurrentUserId());
+        return remoteNftService.ucUpOrDown(req);
+    }
 
 }

@@ -78,4 +78,12 @@ public class InterNftController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("uc-switch")
+    @ApiOperation("上架/下架")
+    @Inner
+    public GenericDto<Object> ucUpOrDown(@Valid @RequestBody UcSwitchReq req) {
+        sysNftService.ucUpOrDown(req);
+        return GenericDto.success(null);
+    }
+
 }

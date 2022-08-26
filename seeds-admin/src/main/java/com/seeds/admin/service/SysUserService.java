@@ -126,9 +126,10 @@ public interface SysUserService extends IService<SysUserEntity> {
     Boolean deleteMetaMask(Long userId);
 
     /**
-     * 系统用户下拉列表
+     * 系统用户下拉分页列表
+     * @param query 查询条件
      * @return 系统用户信息
      */
-    List<SysUserBriefResp> dropdownList();
+    IPage<SysUserBriefResp> dropdownPage(SysUserPageReq query);
 
 }
