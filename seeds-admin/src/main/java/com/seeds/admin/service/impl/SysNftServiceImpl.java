@@ -125,8 +125,6 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         sysNft.setNumber(sysSequenceNoService.generateNftNo());
         // 保存NFT
         save(sysNft);
-        // 添加NFT属性
-        addNftProperties(sysNft.getId(), req.getPropertiesList());
         // NFT上链
         executorService.submit(() -> {
             mintNft(req, sysNft.getId(), imageFileHash);
@@ -381,6 +379,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             nft.setBlockChain(chainMintNftResp.getBlockchain());
             BeanUtils.copyProperties(chainMintNftResp, nft);
             nft.setStatus(req.getStatus());
+            // 添加NFT属性
+            addNftProperties(id, req.getPropertiesList());
         } catch (Exception e) {
             log.error("NFT创建失败， id={}, msg={}", id, e.getMessage());
             initStatus = NftInitStatusEnum.CREATE_FAILED.getCode();
