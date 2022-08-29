@@ -6,7 +6,9 @@ import com.seeds.admin.dto.request.SysOrgAddOrModifyReq;
 import com.seeds.admin.dto.response.SysOrgResp;
 import com.seeds.admin.entity.SysOrgEntity;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author hewei
@@ -44,10 +46,27 @@ public interface SysOrgService extends IService<SysOrgEntity> {
     SysOrgResp detail(Long id);
 
     /**
+     * 组织详情
+     *
+     * @param orgId 组织id
+     * @return 组织信息
+     */
+    SysOrgEntity queryByOrgId(Long orgId);
+
+    /**
      * 获取组织树结构
      *
      * @param orgName 组织名称
      * @return 组织树形结构
      */
     List<SysOrgResp> queryRespList(String orgName);
+
+    /**
+     * 获取组织名称
+     *
+     * @param orgIds 组织id列表
+     * @return 组织名称
+     */
+    Map<Long, String> queryNameByOrgIds(Collection<Long> orgIds);
+
 }

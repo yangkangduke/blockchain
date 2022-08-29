@@ -3,6 +3,7 @@ package com.seeds.admin.service.impl;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SysOrgAddOrModifyReq;
@@ -15,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -67,6 +65,13 @@ public class SysOrgServiceImpl extends ServiceImpl<SysOrgMapper, SysOrgEntity> i
     }
 
     @Override
+    public SysOrgEntity queryByOrgId(Long orgId) {
+        LambdaQueryWrapper<SysOrgEntity> queryWrap = new QueryWrapper<SysOrgEntity>().lambda()
+                .eq(SysOrgEntity::getOrgId, orgId);
+        return getOne(queryWrap);
+    }
+
+    @Override
     public List<SysOrgResp> queryRespList(String orgName) {
         List<SysOrgResp> orgResp = new ArrayList<>();
         LambdaQueryWrapper<SysOrgEntity> queryWrapper = new LambdaQueryWrapper<>();
@@ -88,6 +93,17 @@ public class SysOrgServiceImpl extends ServiceImpl<SysOrgMapper, SysOrgEntity> i
         }
 
         return orgResp;
+    }
+
+    @Override
+    public Map<Long, String> queryNameByOrgIds(Collection<Long> orgIds) {
+        LambdaQueryWrapper<SysOrgEntity> queryWrap = new QueryWrapper<SysOrgEntity>().lambda()
+                .in(SysOrgEntity::getOrgId, orgIds);
+        List<SysOrgEntity> list = list(queryWrap);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(SysOrgEntity::getOrgId, SysOrgEntity::getOrgName));
     }
 
 

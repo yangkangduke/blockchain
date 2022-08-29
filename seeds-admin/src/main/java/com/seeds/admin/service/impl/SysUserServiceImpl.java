@@ -13,6 +13,7 @@ import com.seeds.admin.dto.request.SysUserPageReq;
 import com.seeds.admin.dto.response.AdminUserResp;
 import com.seeds.admin.dto.response.SysUserBriefResp;
 import com.seeds.admin.dto.response.SysUserResp;
+import com.seeds.admin.entity.SysOrgEntity;
 import com.seeds.admin.entity.SysRoleEntity;
 import com.seeds.admin.entity.SysRoleUserEntity;
 import com.seeds.admin.entity.SysUserEntity;
@@ -40,6 +41,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity> implements SysUserService {
+
+    @Autowired
+    private SysOrgService sysOrgService;
 
     @Autowired
     private SysMenuService sysMenuService;
@@ -83,6 +87,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
             roleUserMap.values().forEach(roleIds::addAll);
         }
         Map<Long, String> roleMap = sysRoleService.queryMapByIds(roleIds);
+        Set<Long> deptIds = records.stream().map(SysUserEntity::getDeptId).collect(Collectors.toSet());
+        Map<Long, String> orgMap = sysOrgService.queryNameByOrgIds(deptIds);
         return page.convert(p -> {
             SysUserResp resp = new SysUserResp();
             BeanUtils.copyProperties(p, resp);
@@ -100,6 +106,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
             }
             if (str.length() > 0) {
                 resp.setRoleNameStr(str.substring(0, str.lastIndexOf(",")));
+            }
+            // 头像
+            resp.setHeadUrl(p.getUrl());
+            if (p.getDeptId() != null) {
+                // 部门
+                resp.setDeptName(orgMap.get(p.getDeptId()));
             }
             return resp;
         });
@@ -179,6 +191,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         if (user != null) {
             // 用户信息
             BeanUtils.copyProperties(user, resp);
+            resp.setHeadUrl(user.getUrl());
             // 角色信息 菜单信息
             if (WhetherEnum.YES.value() == user.getSuperAdmin()) {
                 // 超级管理员
@@ -211,6 +224,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
             }
             // 头像
             resp.setHeadUrl(user.getUrl());
+            // 部门
+            if (user.getDeptId() != null) {
+                SysOrgEntity org = sysOrgService.queryByOrgId(user.getDeptId());
+                resp.setDeptName(org.getOrgName());
+            }
         }
         return resp;
     }
