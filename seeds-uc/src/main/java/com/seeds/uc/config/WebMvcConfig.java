@@ -9,8 +9,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 @Configuration
@@ -21,9 +19,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        List<String> patterns = new ArrayList<>();
-        patterns.add("/uc-internal/**");
-        registry.addInterceptor(userContextInterceptor).addPathPatterns(patterns);
+        registry.addInterceptor(userContextInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/auth/**", "/public/**", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs");
     }
 
     @Bean

@@ -47,6 +47,8 @@ public class AdminAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
+            // 通过网关的为外部调用
+            exchange.getRequest().mutate().header(HttpHeaders.INNER_REQUEST, Boolean.FALSE.toString());
             URI uri = exchange.getRequest().getURI();
             log.debug("get into auth gateway filter");
             String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ADMIN_USER_TOKEN);
@@ -61,7 +63,8 @@ public class AdminAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 }
             }
             LoginAdminUser loginAdminUser = authService.verifyAdmin(token);
-            if (uri.toString().contains(WhiteListPath.DOC_API) || uri.getPath().startsWith(WhiteListPath.AUTH_RELATED)) {
+            if (uri.toString().contains(WhiteListPath.DOC_API) || uri.getPath().startsWith(WhiteListPath.AUTH_RELATED)
+                    || uri.getPath().startsWith(WhiteListPath.PUBLIC_RELATED)) {
                 if (loginAdminUser != null && loginAdminUser.getUserId() != null) {
                     return adminSuccess(chain, exchange, loginAdminUser.getUserId());
                 }
@@ -84,7 +87,7 @@ public class AdminAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<
 
     private Mono<Void> adminFailure(ServerWebExchange exchange) {
         //unauthorized request to be blocked
-        log.debug("token verify failed");
+        log.info("token verify failed");
         ServerHttpResponse serverHttpResponse = exchange.getResponse();
         serverHttpResponse.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         DataBuffer buffer = serverHttpResponse.bufferFactory().wrap(getErrorBytes("Invalid token"));

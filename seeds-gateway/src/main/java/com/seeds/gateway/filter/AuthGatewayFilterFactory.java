@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
-import com.seeds.uc.model.cache.dto.LoginUser;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.gateway.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +30,9 @@ import java.net.URI;
 @Component
 public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthGatewayFilterFactory.Config> {
 
+    public static String SWAGGER_URI = "/v2/api-docs";
+    public static String AUTH = "/auth/";
+    public static String PUBLIC = "/public/";
     @Autowired
     private AuthService authService;
 
@@ -45,10 +48,13 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
+            // 通过网关的为外部调用
+            exchange.getRequest().mutate().header(HttpHeaders.INNER_REQUEST, Boolean.FALSE.toString());
             log.debug("get into auth gateway filter");
             URI uri = exchange.getRequest().getURI();
             log.info("URL信息: {}", uri);
-            if (uri.toString().contains("/v2/api-docs") || uri.toString().contains("/uc-open") ){
+            // 不需要鉴权的
+            if (uri.toString().contains(SWAGGER_URI) || uri.toString().contains(AUTH) || uri.toString().contains(PUBLIC)){
                 return success(chain, exchange, null);
             }
             String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_TOKEN);
@@ -66,7 +72,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                 log.debug("no token found from either cookie or header");
                 return failure(exchange);
             }
-            LoginUser loginUser = authService.verify(token);
+            LoginUserDTO loginUser = authService.verify(token);
             if (loginUser == null) {
                 return failure(exchange);
             } else {

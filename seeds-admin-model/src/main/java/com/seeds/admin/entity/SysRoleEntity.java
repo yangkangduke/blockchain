@@ -1,0 +1,46 @@
+package com.seeds.admin.entity;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+
+/**
+ * 系统角色
+ * 
+ * @author hang.yu
+ * @date 2022/7/14
+ */
+@Data
+@EqualsAndHashCode(callSuper=false)
+@TableName("sys_role")
+public class SysRoleEntity extends BaseEntity {
+
+	/**
+	 * 角色编码
+	 */
+	@TableField("role_code")
+	private String roleCode;
+
+	/**
+	 * 角色名称
+	 */
+	@TableField("role_name")
+	private String roleName;
+
+	/**
+	 * 备注
+	 */
+	@TableField("remark")
+	private String remark;
+
+	/**
+	 * 删除标记  0：未删除
+	 */
+	@TableLogic(value = "0", delval = "NULL")
+	@TableField("delete_flag")
+	private Integer deleteFlag;
+
+}

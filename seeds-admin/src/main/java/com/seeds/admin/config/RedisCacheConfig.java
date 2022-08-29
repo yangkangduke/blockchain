@@ -8,7 +8,6 @@ import org.redisson.config.SingleServerConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 /**
  * @author allen
  * @email allen.hua.ai@gmail.com
@@ -32,19 +31,15 @@ public class RedisCacheConfig {
     @Value("${redisson.password:}")
     String password;
 
-    @Value("${redisson.pingConnectionInterval:1000}")
-    int pingConnectionInterval;
-
     @Value("${redisson.database:0}")
     int database;
 
-    @Bean("defaultRedisClient")
+    @Bean("adminRedisClient")
     public RedissonClient defaultClient() {
         Config config = new Config();
         SingleServerConfig serverConfig = config.useSingleServer();
         serverConfig.setAddress(address);
         serverConfig.setTimeout(timeout);
-        serverConfig.setPingConnectionInterval(pingConnectionInterval);
         serverConfig.setConnectTimeout(timeout);
         serverConfig.setConnectionPoolSize(maxPoolSize);
         serverConfig.setConnectionMinimumIdleSize(minIdleSize);

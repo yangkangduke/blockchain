@@ -25,6 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SwaggerResourceConfig implements SwaggerResourcesProvider {
 
+    private static final String API_URI = "v2/api-docs";
     private final RouteLocator routeLocator;
     private final GatewayProperties gatewayProperties;
 
@@ -39,7 +40,7 @@ public class SwaggerResourceConfig implements SwaggerResourcesProvider {
                     .filter(predicateDefinition -> ("Path").equalsIgnoreCase(predicateDefinition.getName()))
                     .forEach(predicateDefinition -> resources.add(swaggerResource(route.getId(),
                             predicateDefinition.getArgs().get(NameUtils.GENERATED_NAME_PREFIX + "0")
-                                    .replace("**", "v2/api-docs?group=SwaggerGroupOneAPI"))));
+                                    .replace("**", API_URI))));
         });
 
         return resources;

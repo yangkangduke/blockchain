@@ -25,4 +25,9 @@ public class HttpHeaders {
      */
     public static final String ADMIN_USER_TOKEN = "seeds-admin-user-token";
 
+    /**
+     * 是否内部调用
+     */
+    public static final String INNER_REQUEST = "x-inner-request";
+
 }

@@ -101,7 +101,7 @@ public class SymbolConstants {
      * @return
      */
     public static List<String> getCompoundAndRealSymbols() {
-        List<String> result = new ArrayList<>();
+        List<String> result = new ArrayList();
         result.addAll(getCompoundSymbols());
         result.addAll(getRealSymbols());
         return result;

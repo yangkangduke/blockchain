@@ -1,0 +1,43 @@
+server:
+  port: 10101
+
+spring:
+  datasource:
+    url: jdbc:mysql://Seeds-mysql:3306/seeds_uc?useUnicode=true&characterEncoding=utf-8
+    username: root
+    password: Seeds123!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+management:
+  endpoints:
+    web:
+      base-path: /
+
+mybatis:
+  type-aliases-package*: com.seeds.uc.model
+
+uc:
+  sso:
+    redis:
+      keyExpireAfter: 259200
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+redisson:
+  address: redis://Seeds-redis:6379
+  timeout: 5000
+  poolsize: 50
+  idlesize: 50
+  password: Seeds123!
+
+resetpassword:
+  url: http://localhost:9999/uc/auth/forgotPassword/verifyLink?encode={}&account={}
+
+Seeds-admin: http://192.168.1.100:10102

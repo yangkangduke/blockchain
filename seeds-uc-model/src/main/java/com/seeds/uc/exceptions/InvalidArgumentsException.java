@@ -1,6 +1,6 @@
 package com.seeds.uc.exceptions;
 
-import com.seeds.uc.model.user.enums.UcErrorCode;
+import com.seeds.uc.enums.UcErrorCodeEnum;
 import lombok.Getter;
 
 /**
@@ -14,7 +14,7 @@ public class InvalidArgumentsException extends GenericException {
         super(message);
     }
 
-    public InvalidArgumentsException(UcErrorCode errorCode) {
+    public InvalidArgumentsException(UcErrorCodeEnum errorCode) {
         super(errorCode);
     }
 }

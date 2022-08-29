@@ -1,6 +1,7 @@
 package com.seeds.admin.utils;
 
-import com.seeds.admin.dto.common.TreeNode;
+import com.seeds.admin.dto.TreeNode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -16,12 +17,12 @@ import java.util.Map;
 public class TreeUtils {
 
     /**
-     * 根据pid，构建树节点
+     * 根据父级code，构建树节点
      */
-    public static <T extends TreeNode> List<T> build(List<T> treeNodes, Long pid) {
+    public static <T extends TreeNode> List<T> buildTree(List<T> treeNodes) {
         List<T> treeList = new ArrayList<>();
         for(T treeNode : treeNodes) {
-            if (pid.equals(treeNode.getPid())) {
+            if (StringUtils.isEmpty(treeNode.getParentCode())) {
                 treeList.add(findChildren(treeNodes, treeNode));
             }
         }
@@ -34,7 +35,7 @@ public class TreeUtils {
      */
     private static <T extends TreeNode> T findChildren(List<T> treeNodes, T rootNode) {
         for(T treeNode : treeNodes) {
-            if(rootNode.getId().equals(treeNode.getPid())) {
+            if(rootNode.getCode().equals(treeNode.getParentCode())) {
                 rootNode.getChildren().add(findChildren(treeNodes, treeNode));
             }
         }
@@ -43,19 +44,20 @@ public class TreeUtils {
 
     /**
      * 构建树节点
+     * @param treeNodes
      */
     public static <T extends TreeNode> List<T> build(List<T> treeNodes) {
         List<T> result = new ArrayList<>();
 
         //list转map
-        Map<Long, T> nodeMap = new LinkedHashMap<>(treeNodes.size());
+        Map<String, T> nodeMap = new LinkedHashMap<>(treeNodes.size());
         for(T treeNode : treeNodes){
-            nodeMap.put(treeNode.getId(), treeNode);
+            nodeMap.put(treeNode.getCode(), treeNode);
         }
 
         for(T node : nodeMap.values()) {
-            T parent = nodeMap.get(node.getPid());
-            if(parent != null && !(node.getId().equals(parent.getId()))){
+            T parent = nodeMap.get(node.getParentCode());
+            if(parent != null && !(node.getCode().equals(parent.getCode()))){
                 parent.getChildren().add(node);
                 continue;
             }

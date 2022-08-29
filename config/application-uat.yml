@@ -1,0 +1,40 @@
+spring:
+  redis:
+    host: Seeds-redis
+    port: 6379
+    password: Seeds123!
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 1024MB
+
+file:
+  bucketName: seeds # 上文创建的桶名称
+  oss:
+    enable: true
+    endpoint: http://127.0.0.1:9000
+    access-key: Seeds123!
+    secret-key: Seeds123!
+
+email:
+  host: smtp.gmail.com
+  from: seeds<yangkang.duke@gmail.com>
+  user: yangkang.duke@gmail.com
+  pass: nfijtkbvgaflsprw
+
+Spring:
+  kafka:
+    bootstrap-servers: 54.168.239.215:9092
+    producer:
+      retries: 3  # 生产者发送失败时，重试次数
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: tomge-consumer-group  # 默认消费者group id
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      auto-commit-interval: 100
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer

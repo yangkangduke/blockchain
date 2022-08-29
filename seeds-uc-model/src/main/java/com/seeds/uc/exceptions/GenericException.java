@@ -1,6 +1,6 @@
 package com.seeds.uc.exceptions;
 
-import com.seeds.uc.model.user.enums.UcErrorCode;
+import com.seeds.uc.enums.UcErrorCodeEnum;
 import lombok.Getter;
 
 /**
@@ -10,13 +10,13 @@ import lombok.Getter;
  */
 @Getter
 public class GenericException extends RuntimeException {
-    protected UcErrorCode errorCode;
+    protected UcErrorCodeEnum errorCode;
 
     public GenericException(String message) {
         super(message);
     }
 
-    public GenericException(UcErrorCode errorCode) {
+    public GenericException(UcErrorCodeEnum errorCode) {
         super(errorCode.getDescEn());
         this.errorCode = errorCode;
     }

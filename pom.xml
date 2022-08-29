@@ -4,17 +4,6 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <modules>
-        <module>seeds-common-model</module>
-        <module>seeds-common-web</module>
-        <module>seeds-uc-model</module>
-        <module>seeds-uc</module>
-        <module>seeds-gateway</module>
-        <module>seeds-admin</module>
-        <module>seeds-admin-model</module>
-        <module>seeds-config</module>
-    </modules>
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -22,8 +11,24 @@
         <relativePath/>
     </parent>
 
+    <modules>
+        <module>seeds-common-model</module>
+        <module>seeds-common-web</module>
+        <module>seeds-uc-model</module>
+        <module>seeds-uc-api</module>
+        <module>seeds-uc</module>
+        <module>seeds-gateway</module>
+        <module>seeds-admin</module>
+        <module>seeds-admin-model</module>
+        <module>seeds-config</module>
+        <module>seeds-chain-api</module>
+        <module>seeds-admin-api</module>
+    </modules>
+
     <properties>
-        <java.version>1.8</java.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <aws.version>1.11.543</aws.version>
         <mysql.version>8.0.21</mysql.version>
         <guava.version>29.0-jre</guava.version>
         <spring-cloud.version>2021.0.3</spring-cloud.version>
@@ -31,8 +36,7 @@
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <swagger.version>3.0.0</swagger.version>
         <knife4j.version>3.0.2</knife4j.version>
-        <email.version>1.5</email.version>
-        <p6spy.version>3.9.1</p6spy.version>
+        <email.version>1.6.2</email.version>
         <web3j.spring-boot.version>1.6.0</web3j.spring-boot.version>
         <okhttp.version>4.8.1</okhttp.version>
         <web3j.version>5.0.0</web3j.version>
@@ -40,6 +44,9 @@
         <redission.version>3.13.2</redission.version>
         <commons-io.version>2.11.0</commons-io.version>
         <hutool.version>5.8.4</hutool.version>
+        <jasypt.version>3.0.4</jasypt.version>
+        <spring-boot.version>2.7.1</spring-boot.version>
+        <spring-boot-admin.version>2.6.7</spring-boot-admin.version>
     </properties>
 
     <groupId>com.seeds</groupId>
@@ -55,6 +62,11 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>javax.mail</artifactId>
+                <version>${email.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
@@ -77,11 +89,6 @@
                 <version>${hibernate-validator.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-email</artifactId>
-                <version>${email.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.version}</version>
@@ -91,12 +98,6 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/p6spy/p6spy -->
-            <dependency>
-                <groupId>p6spy</groupId>
-                <artifactId>p6spy</artifactId>
-                <version>${p6spy.version}</version>
             </dependency>
             <!--代码生成-->
             <dependency>
