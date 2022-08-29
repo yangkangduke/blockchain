@@ -2,11 +2,8 @@ package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.AdminUserResp;
-import com.seeds.admin.dto.request.SwitchReq;
-import com.seeds.admin.dto.request.SysUserAddReq;
-import com.seeds.admin.dto.request.SysUserModifyReq;
-import com.seeds.admin.dto.request.SysUserPageReq;
 import com.seeds.admin.dto.response.SysUserBriefResp;
 import com.seeds.admin.dto.response.SysUserResp;
 import com.seeds.admin.entity.SysUserEntity;
@@ -116,7 +113,7 @@ public interface SysUserService extends IService<SysUserEntity> {
     /**
      * 更新metamask信息
      */
-    Boolean updateMetaMask(Long userId);
+    Boolean updateMetaMask(MetaMaskReq metaMaskReq, Long userId);
 
     /**
      * 删除metaemask相关信息

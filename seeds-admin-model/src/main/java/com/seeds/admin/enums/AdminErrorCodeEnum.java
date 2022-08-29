@@ -60,6 +60,7 @@ public enum AdminErrorCodeEnum {
     ERR_70001_METAMASK_ADDRESS(70001, "非法地址格式", "Illegal address format"),
     ERR_70002_METAMASK_SIGNATURE(70002, "签名验证失败", "Signature verification failed"),
     ERR_70003_METAMASK_UNBIND_REPEATEDLY(70003, "重复解除绑定", "Unbind repeatedly"),
+    ERR_17004_METAMASK_NONCE_INCORRECT(17004, "nonce不正确", "nonce is incorrect"),
 
     // game
     ERR_80001_GAME_COMMENTS_ALREADY_EXIST(80001, "您已经评价过该游戏", "you has commented on the game"),

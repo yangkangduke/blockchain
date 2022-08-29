@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.admin.dto.request.SwitchReq;
-import com.seeds.admin.dto.request.SysUserAddReq;
-import com.seeds.admin.dto.request.SysUserModifyReq;
-import com.seeds.admin.dto.request.SysUserPageReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.AdminUserResp;
 import com.seeds.admin.dto.response.SysUserBriefResp;
 import com.seeds.admin.dto.response.SysUserResp;
@@ -252,10 +249,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
      *
      */
     @Override
-    public Boolean updateMetaMask(Long userId) {
+    public Boolean updateMetaMask(MetaMaskReq metaMaskReq, Long userId) {
         SysUserEntity sysUser = new SysUserEntity();
         sysUser.setNonce(RandomUtil.getRandomSalt());
         sysUser.setMetamaskFlag(MetaMaskFlagEnum.ENABLED.value());
+        sysUser.setPublicAddress(metaMaskReq.getPublicAddress());
         return this.update(sysUser, new QueryWrapper<SysUserEntity>().lambda()
                 .eq(SysUserEntity::getId, userId));
     }
@@ -272,6 +270,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
                         .set(SysUserEntity::getPublicAddress, null)
                         .set(SysUserEntity::getNonce, null)
                         .set(SysUserEntity::getMetamaskFlag, MetaMaskFlagEnum.DISABLE.value())
+                        .eq(SysUserEntity::getId,userId)
         );
     }
 

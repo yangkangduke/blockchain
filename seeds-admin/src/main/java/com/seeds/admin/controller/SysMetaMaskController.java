@@ -11,9 +11,13 @@ import com.seeds.admin.service.SysUserService;
 import com.seeds.admin.utils.CryptoUtils;
 import com.seeds.admin.utils.WebUtil;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.context.UserContext;
+import com.seeds.uc.dto.redis.GenMetamaskAuth;
+import com.seeds.uc.enums.UcErrorCodeEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,44 +45,27 @@ public class SysMetaMaskController {
     @Autowired
     private AdminCacheService adminCacheService;
 
-
-    /**
-     * metamask获取随机数
-     *
-     * @param
-     * @return
-     */
     @PostMapping("/nonce")
     @ApiOperation(value = "metamask获取随机数", notes = "metamask获取随机数")
-    public GenericDto<String> metamaskNonce(@Valid @RequestBody MetaMaskReq metaMaskReq, HttpServletRequest request) {
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginAdminUser loginAdminUser = adminCacheService.getAdminUserByToken(loginToken);
-
-        return GenericDto.success(sysUserService.metamaskNonce(metaMaskReq.getPublicAddress(), loginAdminUser.getUserId()));
+    public GenericDto<String> metamaskNonce(@Valid @RequestBody MetaMaskReq metaMaskReq) {
+        return GenericDto.success(sysUserService.metamaskNonce(metaMaskReq.getPublicAddress(), UserContext.getCurrentAdminUserId()));
     }
 
-    /**
-     * 绑定metamask
-     * 1.调用/metamask/nonce生成nonce
-     * 2.前端根据nonce生成签名信息
-     * 3.调用/metamask/bind验证签名信息
-     *
-     * @param
-     * @return
-     */
     @PostMapping("/bind")
     @ApiOperation(value = "绑定metamask",
             notes = "1.调用/metamask/nonce生成nonce\n" +
                     "2.前端根据nonce生成签名信息\n" +
                     "3.调用/metamask/bind验证签名信息")
-    public GenericDto<Boolean> bind(@Valid @RequestBody MetaMaskReq metaMaskReq, HttpServletRequest request) {
+    public GenericDto<Boolean> bind(@Valid @RequestBody MetaMaskReq metaMaskReq) {
         String signature = metaMaskReq.getSignature();
         String publicAddress = metaMaskReq.getPublicAddress();
         String message = metaMaskReq.getMessage();
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginAdminUser loginAdminUser = adminCacheService.getAdminUserByToken(loginToken);
+        String[] split = message.split(":");
+        Long currentAdminUserId = UserContext.getCurrentAdminUserId();
+        SysUserEntity userEntity = sysUserService.getById(currentAdminUserId);
+        if (!userEntity.getNonce().equals(split[1]) ) {
+            throw new InvalidArgumentsException(AdminErrorCodeEnum.ERR_17004_METAMASK_NONCE_INCORRECT);
+        }
         // 地址合法性校验
         if (!WalletUtils.isValidAddress(metaMaskReq.getPublicAddress())) {
             // 不合法直接返回错误
@@ -93,7 +80,7 @@ public class SysMetaMaskController {
             throw new InvalidArgumentsException(AdminErrorCodeEnum.ERR_70002_METAMASK_SIGNATURE);
         }
         // 更新
-        return GenericDto.success(sysUserService.updateMetaMask(loginAdminUser.getUserId()));
+        return GenericDto.success(sysUserService.updateMetaMask(metaMaskReq, currentAdminUserId));
     }
 
     /**
@@ -104,11 +91,8 @@ public class SysMetaMaskController {
      */
     @PostMapping("/unbind")
     @ApiOperation(value = "解除绑定metamask", notes = "解除绑定metamask")
-    public GenericDto<Boolean> unbind(HttpServletRequest request) {
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginAdminUser loginAdminUser = adminCacheService.getAdminUserByToken(loginToken);
-        SysUserEntity sysUserEntity = sysUserService.getById(loginAdminUser.getUserId());
+    public GenericDto<Boolean> unbind() {
+        SysUserEntity sysUserEntity = sysUserService.getById(UserContext.getCurrentAdminUserId());
         if (MetaMaskFlagEnum.DISABLE.value() == sysUserEntity.getMetamaskFlag()) {
             throw new InvalidArgumentsException(AdminErrorCodeEnum.ERR_70003_METAMASK_UNBIND_REPEATEDLY);
         }
