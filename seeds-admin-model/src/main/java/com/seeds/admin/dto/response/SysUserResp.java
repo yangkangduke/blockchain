@@ -81,6 +81,12 @@ public class SysUserResp {
 	private Long deptId;
 
 	/**
+	 * 部门名称
+	 */
+	@ApiModelProperty("部门名称")
+	private String deptName;
+
+	/**
 	 * 状态  0：停用   1：正常
 	 */
 	@ApiModelProperty("状态  0：停用   1：正常")
