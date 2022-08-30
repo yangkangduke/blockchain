@@ -1,4 +1,4 @@
-package com.seeds.admin.dto.request;
+package com.seeds.uc.dto.request;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,11 +14,9 @@ import java.math.BigDecimal;
  */
 
 @Data
-@ApiModel(value = "SysGameCommentsAddOrModifyReq", description = "系统游戏评论信息")
-public class SysGameCommentsAddOrModifyReq {
+@ApiModel(value = "GameCommentsReq", description = "游戏评论")
+public class GameCommentsReq {
 
-    @ApiModelProperty("主键id")
-    private Long id;
 
     @ApiModelProperty(value = "游戏id", required = true)
     @NotNull(message = "gameId can not be empty")
@@ -27,14 +25,6 @@ public class SysGameCommentsAddOrModifyReq {
     @ApiModelProperty(value = "游戏名称", required = true)
     @NotBlank(message = "gameName can not be empty")
     private String gameName;
-
-    @ApiModelProperty(value = "uc端用户id", required = true)
-    @NotNull(message = "ucUserId can not be empty")
-    private Long ucUserId;
-
-    @ApiModelProperty(value = "uc端用户名字", required = true)
-    @NotBlank(message = "ucUserName can not be empty")
-    private String ucUserName;
 
     @ApiModelProperty(value = "用户评价，10-1024个字符", required = true)
     @NotBlank(message = " the number of words must be between 10 and 1024")
@@ -45,7 +35,4 @@ public class SysGameCommentsAddOrModifyReq {
     @Max(value = 5, message = "score cannot be greater than 5 points")
     @Min(value = 0, message = "score cannot be less than 0 points")
     private BigDecimal star;
-
-    @ApiModelProperty("评价状态  0：无效   1：有效")
-    private Integer status;
 }

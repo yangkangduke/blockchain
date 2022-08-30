@@ -3,7 +3,7 @@ spring:
     name: seeds-admin
 
   profiles:
-    active: prod
+    active: dev
 
   # 读取本地文件
   cloud:

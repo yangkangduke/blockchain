@@ -60,4 +60,12 @@ public interface SysGameCommentsService extends IService<SysGameCommentsEntity> 
      * @param req id和状态集合
      */
     void enableOrDisable(List<SwitchReq> req);
+
+    /**
+     * uc端评论分页列表
+     *
+     * @param req
+     * @return
+     */
+    IPage<SysGameCommentsResp> queryPageForUc(SysGameCommentsPageReq req);
 }
