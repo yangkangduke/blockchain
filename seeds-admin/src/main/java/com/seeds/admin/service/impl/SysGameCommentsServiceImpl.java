@@ -128,8 +128,8 @@ public class SysGameCommentsServiceImpl extends ServiceImpl<SysGameCommentsMappe
     @Override
     public IPage<SysGameCommentsResp> queryPageForUc(SysGameCommentsPageReq req) {
         LambdaQueryWrapper<SysGameCommentsEntity> wrapper = new LambdaQueryWrapper<>();
-
-        wrapper.orderByDesc((req.getSortType() != null && req.getSortType() == SortTypeEnum.RANK.getCode()) ? SysGameCommentsEntity::getLikes : SysGameCommentsEntity::getCommentsTime);
+        wrapper.eq(!ObjectUtils.isEmpty(req.getGameId()),SysGameCommentsEntity::getGameId,req.getGameId())
+                .orderByDesc((req.getSortType() != null && req.getSortType() == SortTypeEnum.RANK.getCode()) ? SysGameCommentsEntity::getLikes : SysGameCommentsEntity::getCommentsTime);
 
         Page<SysGameCommentsEntity> page = new Page<>(req.getCurrent(), req.getSize());
         List<SysGameCommentsEntity> records = page(page, wrapper).getRecords();
