@@ -40,14 +40,14 @@ public class SysGameCommentsController {
     public GenericDto<IPage<SysGameCommentsResp>> queryPage(@RequestBody SysGameCommentsPageReq req) {
         return GenericDto.success(gameCommentsService.queryPage(req));
     }
-
-    @PostMapping("add")
-    @ApiOperation("添加")
-    @RequiredPermission("sys:game-comments:add")
-    public GenericDto<Object> add(@Validated @RequestBody SysGameCommentsAddOrModifyReq req) {
-        gameCommentsService.add(req);
-        return GenericDto.success(null);
-    }
+//
+//    @PostMapping("add")
+//    @ApiOperation("添加")
+//    @RequiredPermission("sys:game-comments:add")
+//    public GenericDto<Object> add(@Validated @RequestBody SysGameCommentsAddOrModifyReq req) {
+//        gameCommentsService.add(req);
+//        return GenericDto.success(null);
+//    }
 
     @GetMapping("detail/{id}")
     @ApiOperation("详情")
