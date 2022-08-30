@@ -8,7 +8,7 @@
     2. 注意修改 <property name="${log-path}/log.path" value=""/> 的value模块
 -->
 <configuration scanPeriod="60 seconds" scan="ture" debug="false">
-    <contextName>seeds-uc</contextName>
+    <contextName>seeds-admin</contextName>
     <property name="log.path" value="logs/seeds-admin"/>
     <!-- 彩色日志格式 -->
     <property name="CONSOLE_LOG_PATTERN"
