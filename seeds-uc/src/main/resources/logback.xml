@@ -7,7 +7,8 @@
     1. 其他模块加日志输出，直接copy本文件放在resources 目录即可
     2. 注意修改 <property name="${log-path}/log.path" value=""/> 的value模块
 -->
-<configuration debug="false" scan="false">
+<configuration scanPeriod="60 seconds" scan="ture" debug="false">
+    <contextName>seeds-uc</contextName>
     <property name="log.path" value="logs/seeds-uc"/>
     <!-- 彩色日志格式 -->
     <property name="CONSOLE_LOG_PATTERN"
@@ -18,6 +19,33 @@
                     converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
     <conversionRule conversionWord="wEx"
                     converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+    <!-- This is the kafkaAppender -->
+    <appender name="kafkaAppender" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <topic>${appender.bootstrap.topic}</topic>
+        <!-- we don't care how the log messages will be partitioned  -->
+        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" />
+
+        <!-- use async delivery. the application threads are not blocked by logging -->
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
+
+        <!-- each <producerConfig> translates to regular kafka-client config (format: key=value) -->
+        <!-- producer configs are documented here: https://kafka.apache.org/documentation.html#newproducerconfigs -->
+        <!-- bootstrap.servers is the only mandatory producerConfig -->
+        <producerConfig>bootstrap.servers=${appender.bootstrap.servers}</producerConfig>
+        <!-- don't wait for a broker to ack the reception of a batch.  -->
+        <producerConfig>acks=0</producerConfig>
+        <!-- wait up to 1000ms and collect log messages before sending them as a batch -->
+        <producerConfig>linger.ms=1000</producerConfig>
+        <!-- even if the producer buffer runs full, do not block the application but start to drop messages -->
+        <producerConfig>max.block.ms=0</producerConfig>
+        <!-- define a client-id that you use to identify yourself against the kafka broker -->
+        <producerConfig>client.id=${HOSTNAME}-${CONTEXT_NAME}-logback-relaxed</producerConfig>
+
+    </appender>
+
     <!-- Console log output -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -59,5 +87,6 @@
         <appender-ref ref="console"/>
         <appender-ref ref="debug"/>
         <appender-ref ref="error"/>
+        <appender-ref ref="kafkaAppender" />
     </root>
 </configuration>
