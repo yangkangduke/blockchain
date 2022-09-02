@@ -31,7 +31,7 @@ public class SysGameCommentsResp implements Serializable {
      * uc端用户id
      */
     @ApiModelProperty("uc端用户id")
-    private String ucUserId;
+    private Long ucUserId;
 
     /**
      * uc端用户id
