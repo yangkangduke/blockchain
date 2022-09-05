@@ -19,14 +19,8 @@ import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.mapper.UcUserAccountMapper;
-import com.seeds.uc.model.UcUser;
-import com.seeds.uc.model.UcUserAccount;
-import com.seeds.uc.model.UcUserAccountActionHistory;
-import com.seeds.uc.model.UcUserAddress;
-import com.seeds.uc.service.IUcUserAccountActionHistoryService;
-import com.seeds.uc.service.IUcUserAccountService;
-import com.seeds.uc.service.IUcUserAddressService;
-import com.seeds.uc.service.IUcUserService;
+import com.seeds.uc.model.*;
+import com.seeds.uc.service.*;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -55,6 +49,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     private IUcUserAccountActionHistoryService ucUserAccountActionHistoryService;
     @Autowired
     private IUcUserAddressService ucUserAddressService;
+    @Autowired
+    private IUcNftOfferService ucNftOfferService;
     @Autowired
     private RemoteNftService remoteNftService;
     @Autowired
@@ -142,8 +138,12 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
 
     @Override
     public UcUserAccountInfoResp getInfo() {
+        return getInfoByUserId(UserContext.getCurrentUserId());
+    }
+
+    @Override
+    public UcUserAccountInfoResp getInfoByUserId(Long userId) {
         UcUserAccountInfoResp info = null;
-        Long userId = UserContext.getCurrentUserId();
         UcUserAccount ucUserAccount = this.getOne(new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, userId));
         UcUserAddress ucUserAddress = ucUserAddressService.getOne(new LambdaQueryWrapper<UcUserAddress>()
@@ -303,5 +303,13 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                         .blockHash(buyReq.getBlockHash())
                         .id(buyReq.getActionHistoryId())
                 .build());
+
+        // 改变offer状态
+        if (buyReq.getOfferId() != null) {
+            ucNftOfferService.updateById(UcNftOffer.builder()
+                    .status(buyReq.getOfferStatusEnum())
+                    .id(buyReq.getOfferId())
+                    .build());
+        }
     }
 }

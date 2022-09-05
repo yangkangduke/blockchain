@@ -18,6 +18,7 @@ import com.seeds.admin.enums.*;
 import com.seeds.admin.mapper.SysNftMapper;
 import com.seeds.admin.service.*;
 import com.seeds.chain.config.SmartContractConfig;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.common.exception.SeedsException;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.enums.AccountActionStatusEnum;
@@ -273,7 +274,15 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     public void ownerChange(List<NftOwnerChangeReq> req) {
-        transferNft(req);
+        Set<Long> nftIds = req.stream().map(NftOwnerChangeReq::getId).collect(Collectors.toSet());
+        List<SysNftEntity> list = listByIds(nftIds);
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        // 回调通知uc
+        req.forEach(p -> {
+            transferNft(p, list);
+        });
     }
 
     @Override
@@ -455,40 +464,29 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         });
     }
 
-    private void transferNft(List<NftOwnerChangeReq> req) {
-        Set<Long> nftIds = req.stream().map(NftOwnerChangeReq::getId).collect(Collectors.toSet());
-        List<SysNftEntity> list = listByIds(nftIds);
-        if (CollectionUtils.isEmpty(list)) {
-            return;
-        }
+    @Transactional(rollbackFor = Exception.class)
+    public void transferNft(NftOwnerChangeReq req, List<SysNftEntity> list) {
         Map<Long, SysNftEntity> map = list.stream().collect(Collectors.toMap(SysNftEntity::getId, p -> p));
-        AccountActionStatusEnum status = AccountActionStatusEnum.SUCCESS;
-        try {
-            // todo 链上归属人变更
-            // 回调通知uc
-            req.forEach(p -> {
-                SysNftEntity nft = map.get(p.getId()) == null ? new SysNftEntity() : map.get(p.getId());
-                NFTBuyCallbackReq callback = NFTBuyCallbackReq.builder()
-                        .fromUserId(nft.getOwnerId())
-                        .fromAddress(p.getFromAddress())
-                        .toUserId(p.getOwnerId())
-                        .amount(nft.getPrice())
-                        .tokenId(nft.getTokenId())
-                        .nftId(p.getId())
-                        .actionHistoryId(p.getActionHistoryId())
-                        .actionStatusEnum(status)
-                        .toAddress(p.getToAddress())
-                        .ownerType(p.getOwnerType())
-                        .build();
-                remoteNftService.buyNFTCallback(callback);
-                SysNftEntity entity = new SysNftEntity();
-                BeanUtils.copyProperties(p, entity);
-                entity.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
-                entity.setStatus(WhetherEnum.NO.value());
-                updateById(entity);
-            });
-        } catch (Exception e) {
-            log.error("归属人变更失败，message={}", e.getMessage());
+        SysNftEntity entity = new SysNftEntity();
+        BeanUtils.copyProperties(req, entity);
+        entity.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
+        entity.setStatus(WhetherEnum.NO.value());
+        updateById(entity);
+        SysNftEntity nft = map.get(req.getId()) == null ? new SysNftEntity() : map.get(req.getId());
+        NFTBuyCallbackReq callback = NFTBuyCallbackReq.builder()
+                .fromUserId(nft.getOwnerId())
+                .fromAddress(req.getFromAddress())
+                .toUserId(req.getOwnerId())
+                .amount(nft.getPrice())
+                .tokenId(nft.getTokenId())
+                .nftId(req.getId())
+                .actionHistoryId(req.getActionHistoryId())
+                .actionStatusEnum(AccountActionStatusEnum.SUCCESS)
+                .toAddress(req.getToAddress())
+                .ownerType(req.getOwnerType())
+                .build();
+        if (!remoteNftService.buyNFTCallback(callback).isSuccess()) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
         }
     }
 

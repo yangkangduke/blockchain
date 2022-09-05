@@ -7,7 +7,6 @@ import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
-import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.model.UcUserAccount;
@@ -45,6 +44,13 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * @return
      */
     UcUserAccountInfoResp getInfo();
+
+    /**
+     * 账户详情
+     * @param userId 用户id
+     * @return
+     */
+    UcUserAccountInfoResp getInfoByUserId(Long userId);
 
     /**
      * 根据用户id创建账户
