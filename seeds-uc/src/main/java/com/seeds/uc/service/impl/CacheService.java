@@ -263,6 +263,26 @@ public class CacheService {
         genMetamaskAuthRBucket.set(genMetamaskAuth, metamaskAuthExpireAfter, TimeUnit.SECONDS);
         log.info("CacheService - putGenerateMetamaskAuth - put key: {}, value: {}", key, genMetamaskAuth);
     }
+
+    public void putOneDayMarking(String key) {
+        key = UcRedisKeysConstant.getOneDayMarkingTemplate(key);
+        RBucket<String> bucket = redisson.getBucket(key);
+        bucket.set(key, 1, TimeUnit.DAYS);
+        log.info("CacheService - putOneDayMarking - put key: {}, value: {}", key, key);
+    }
+
+    public String getOneDayMarking(String key) {
+        key = UcRedisKeysConstant.getOneDayMarkingTemplate(key);
+        RBucket<String> genMetamaskAuthRBucket = redisson.getBucket(key);
+        return genMetamaskAuthRBucket.get();
+    }
+
+    public void removeOneDayMarking(String key) {
+        key = UcRedisKeysConstant.getOneDayMarkingTemplate(key);
+        RBucket<String> value = redisson.getBucket(key);
+        value.delete();
+    }
+
     public GenMetamaskAuth getGenerateMetamaskAuth(String token) {
         String key = UcRedisKeysConstant.getUcGenerateMetamaskAuthKeyTemplate(token);
         RBucket<GenMetamaskAuth> genMetamaskAuthRBucket = redisson.getBucket(key);

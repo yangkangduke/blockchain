@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
-import com.seeds.uc.dto.request.NFTBuyCallbackReq;
-import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.model.UcUserAccount;
@@ -47,6 +45,13 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
     UcUserAccountInfoResp getInfo();
 
     /**
+     * 账户详情
+     * @param userId 用户id
+     * @return
+     */
+    UcUserAccountInfoResp getInfoByUserId(Long userId);
+
+    /**
      * 根据用户id创建账户
      * @param userId
      */
@@ -65,11 +70,5 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * @param buyReq
      */
     void buyNFTFreeze(SysNftDetailResp buyReq);
-
-    /**
-     * 购买回调
-     * @param buyReq
-     */
-    void buyNFTCallback(NFTBuyCallbackReq buyReq);
 
 }

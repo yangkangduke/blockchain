@@ -39,6 +39,9 @@ public class NftOwnerChangeReq {
     @NotNull(message = "NFT actionHistory id cannot be empty")
     private Long actionHistoryId;
 
+    @ApiModelProperty("offer的id")
+    private Long offerId;
+
     @ApiModelProperty("卖家地址")
     @NotBlank(message = "NFT sellers address cannot be empty")
     private String fromAddress;

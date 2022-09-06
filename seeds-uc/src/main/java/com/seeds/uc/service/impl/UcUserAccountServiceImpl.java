@@ -11,7 +11,6 @@ import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
-import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.dto.response.UcUserAddressInfoResp;
@@ -19,14 +18,8 @@ import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.mapper.UcUserAccountMapper;
-import com.seeds.uc.model.UcUser;
-import com.seeds.uc.model.UcUserAccount;
-import com.seeds.uc.model.UcUserAccountActionHistory;
-import com.seeds.uc.model.UcUserAddress;
-import com.seeds.uc.service.IUcUserAccountActionHistoryService;
-import com.seeds.uc.service.IUcUserAccountService;
-import com.seeds.uc.service.IUcUserAddressService;
-import com.seeds.uc.service.IUcUserService;
+import com.seeds.uc.model.*;
+import com.seeds.uc.service.*;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -142,8 +135,12 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
 
     @Override
     public UcUserAccountInfoResp getInfo() {
+        return getInfoByUserId(UserContext.getCurrentUserId());
+    }
+
+    @Override
+    public UcUserAccountInfoResp getInfoByUserId(Long userId) {
         UcUserAccountInfoResp info = null;
-        Long userId = UserContext.getCurrentUserId();
         UcUserAccount ucUserAccount = this.getOne(new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, userId));
         UcUserAddress ucUserAddress = ucUserAddressService.getOne(new LambdaQueryWrapper<UcUserAddress>()
@@ -256,52 +253,4 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         remoteNftService.ownerChange(list);
     }
 
-    /**
-     * 购买回调
-     * @param buyReq
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void buyNFTCallback(NFTBuyCallbackReq buyReq) {
-        BigDecimal amount = buyReq.getAmount();
-        // 如果是admin端mint的nft，在uc端不用记账该账户到uc_user_account，都是uc端的用户则需要记账
-        if (null != buyReq.getOwnerType() && buyReq.getOwnerType() == 1) { // 卖家为UC端用户
-            //  卖家balance增加
-            LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
-                    .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
-            UcUserAccount account = this.getOne(wrapper);
-
-            this.update(UcUserAccount.builder()
-                    .balance(account.getBalance().add(amount))
-                    .build(), new LambdaQueryWrapper<UcUserAccount>()
-                    .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
-
-        }
-        // 买家freeze减少
-        LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, buyReq.getToUserId())
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
-        UcUserAccount account = this.getOne(wrapper);
-
-        this.update(UcUserAccount.builder()
-                .freeze(account.getFreeze().subtract(amount))
-                .build(), new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, buyReq.getToUserId())
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
-
-        // 改变交易记录的状态及其他信息
-        ucUserAccountActionHistoryService.updateById(UcUserAccountActionHistory.builder()
-                .status(buyReq.getActionStatusEnum())
-                        .fromAddress(buyReq.getFromAddress())
-                        .toAddress(buyReq.getToAddress())
-                        .amount(buyReq.getAmount())
-                        .chain(buyReq.getChain())
-                        .txHash(buyReq.getTxHash())
-                        .blockNumber(buyReq.getBlockNumber())
-                        .blockHash(buyReq.getBlockHash())
-                        .id(buyReq.getActionHistoryId())
-                .build());
-    }
 }

@@ -28,7 +28,14 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.web3j.crypto.WalletUtils;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -471,6 +478,15 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
         }
         return true;
+    }
+
+    @Override
+    public Map<Long, String> queryNameByIds(Collection<Long> ids) {
+        List<UcUser> list = listByIds(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(UcUser::getId, UcUser::getNickname));
     }
 
     private LoginResp buildLoginResponse(Long userId, String email) {

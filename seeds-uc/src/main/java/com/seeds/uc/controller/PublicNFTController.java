@@ -8,6 +8,8 @@ import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.dto.response.NFTOfferResp;
+import com.seeds.uc.service.IUcNftOfferService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,9 @@ public class PublicNFTController {
 
     @Autowired
     private RemoteNftService remoteNftService;
+
+    @Autowired
+    private IUcNftOfferService ucNftOfferService;
 
     @PostMapping("/uc-page")
     @ApiOperation(value = "分页查询", notes = "分页查询")
@@ -60,6 +65,12 @@ public class PublicNFTController {
     @ApiOperation("uc浏览")
     public GenericDto<Object> ucView(@PathVariable("id") Long id) {
         return remoteNftService.ucView(id);
+    }
+
+    @GetMapping("/offer-list/{id}")
+    @ApiOperation("出价列表")
+    public GenericDto<List<NFTOfferResp>> offerList(@PathVariable("id") Long id) {
+        return GenericDto.success(ucNftOfferService.offerList(id));
     }
 
 }
