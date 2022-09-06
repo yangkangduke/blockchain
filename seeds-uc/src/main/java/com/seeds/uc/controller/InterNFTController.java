@@ -4,7 +4,7 @@ package com.seeds.uc.controller;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
-import com.seeds.uc.service.IUcUserAccountService;
+import com.seeds.uc.service.UcInterNFTService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +29,7 @@ import javax.validation.Valid;
 public class InterNFTController {
 
     @Autowired
-    private IUcUserAccountService ucUserAccountService;
-
+    private UcInterNFTService ucInterNFTService;
 
     /**
      *  购买回调接口
@@ -39,7 +38,7 @@ public class InterNFTController {
     @ApiOperation(value = "购买回调", notes = "购买回调")
     @Inner
     public GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyCallbackReq buyReq) {
-        ucUserAccountService.buyNFTCallback(buyReq);
+        ucInterNFTService.buyNFTCallback(buyReq);
         return GenericDto.success(null);
     }
 
