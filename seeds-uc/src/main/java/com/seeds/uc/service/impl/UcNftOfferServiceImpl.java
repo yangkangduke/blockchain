@@ -117,6 +117,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
     @Override
     public List<NFTOfferResp> offerList(Long id) {
         LambdaQueryWrapper<UcNftOffer> query = new QueryWrapper<UcNftOffer>().lambda()
+                .eq(UcNftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
                 .eq(UcNftOffer::getNftId, id);
         List<UcNftOffer> list = list(query);
         if (CollectionUtils.isEmpty(list)) {
@@ -186,6 +187,14 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
         }
         List<NftOwnerChangeReq> list = Collections.singletonList(nftOwnerChangeReq);
         remoteNftService.ownerChange(list);
+    }
+
+    @Override
+    public List<UcNftOffer> queryExpiredOffers() {
+        LambdaQueryWrapper<UcNftOffer> query = new QueryWrapper<UcNftOffer>().lambda()
+                .eq(UcNftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
+                .lt(UcNftOffer::getExpireTime, System.currentTimeMillis());
+        return list(query);
     }
 
     private SysNftDetailResp validateOffer(UcNftOffer offer) {

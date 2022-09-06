@@ -68,6 +68,8 @@ public class UcRedisKeysConstant {
 
     public final String UC_GENERATE_METAMASK_AUTH_KEY_TEMPLATE = UC_KEY_PREFIX + "metamask:user.token:%s";
 
+    public final String UC_ONE_DAY_MARKING_TEMPLATE = UC_KEY_PREFIX + "one:day:marking:%s";
+
 
     /**
      * return uc:token:{uid} as redis key in login
@@ -158,6 +160,10 @@ public class UcRedisKeysConstant {
 
     public static String getUcKeyForgotPassword(String account) {
         return String.format(UC_FORGOT_PASSWORD_ACCOUNT_KEY_TEMPLATE, account);
+    }
+
+    public String getOneDayMarkingTemplate(String key) {
+        return String.format(UC_ONE_DAY_MARKING_TEMPLATE, key);
     }
 
 }
