@@ -39,5 +39,5 @@ email:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     appender:
       bootstrap:
-        servers: 54.168.239.215:9092
-        topic: applog
+        servers: 10.18.14.65:9092
+        topic: applog-seeds
