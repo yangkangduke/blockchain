@@ -62,7 +62,7 @@ public class NFTBuyCallbackReq implements Serializable {
     @ApiModelProperty("offer的id")
     private Long offerId;
 
-    @ApiModelProperty("记录状态 1-进行中 2-成功 3-失败")
+    @ApiModelProperty("状态 0：竞价中 1：已接受 2：已拒绝 3：已过期")
     private NFTOfferStatusEnum offerStatusEnum;
 
     @ApiModelProperty("发送地址")
