@@ -24,3 +24,9 @@ spring:
 #          search-paths: config
 #          default-label: main-dev
 #          force-pull: true
+
+  kafka:
+    appender:
+      bootstrap:
+        servers: 10.18.14.65:9092
+        topic: applog-seeds
