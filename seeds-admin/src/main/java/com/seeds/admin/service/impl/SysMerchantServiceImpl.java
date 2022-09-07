@@ -149,6 +149,7 @@ public class SysMerchantServiceImpl extends ServiceImpl<SysMerchantMapper, SysMe
             sysUser.forEach(p -> {
                         SysMerchantUserResp userResp = new SysMerchantUserResp();
                         BeanUtils.copyProperties(p, userResp);
+                        userResp.setUserId(p.getId());
                         userRespList.add(userResp);
                         if (Objects.equals(p.getId(), sysMerchant.getLeaderId())) {
                             resp.setLeaderName(p.getRealName());

@@ -15,6 +15,9 @@ import lombok.Data;
 public class SysMerchantUserResp {
 
     @ApiModelProperty(value = "用户名称")
+    private Long userId;
+
+    @ApiModelProperty(value = "用户名称")
     private String realName;
 
     @ApiModelProperty(value = "联系方式")
