@@ -42,4 +42,10 @@ public interface IUcNftOfferService extends IService<UcNftOffer> {
      */
     void offerAccept(Long id);
 
+    /**
+     * 查询过期的offers
+     * @return 过期的offers
+     */
+    List<UcNftOffer> queryExpiredOffers();
+
 }
