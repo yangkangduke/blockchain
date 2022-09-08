@@ -18,10 +18,10 @@ import com.seeds.admin.enums.*;
 import com.seeds.admin.mapper.SysNftMapper;
 import com.seeds.admin.service.*;
 import com.seeds.chain.config.SmartContractConfig;
-import com.seeds.common.dto.GenericDto;
 import com.seeds.common.exception.SeedsException;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.enums.AccountActionStatusEnum;
+import com.seeds.uc.enums.NFTOfferStatusEnum;
 import com.seeds.uc.feign.RemoteNFTService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -482,6 +482,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .nftId(req.getId())
                 .actionHistoryId(req.getActionHistoryId())
                 .actionStatusEnum(AccountActionStatusEnum.SUCCESS)
+                .offerStatusEnum(NFTOfferStatusEnum.ACCEPTED)
                 .toAddress(req.getToAddress())
                 .ownerType(req.getOwnerType())
                 .build();
