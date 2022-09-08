@@ -482,6 +482,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .nftId(req.getId())
                 .actionHistoryId(req.getActionHistoryId())
                 .actionStatusEnum(AccountActionStatusEnum.SUCCESS)
+                .offerId(req.getOfferId())
                 .offerStatusEnum(NFTOfferStatusEnum.ACCEPTED)
                 .toAddress(req.getToAddress())
                 .ownerType(req.getOwnerType())
