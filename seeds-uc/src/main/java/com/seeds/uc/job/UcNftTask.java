@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
@@ -40,7 +41,8 @@ import java.util.List;
  */
 @Component
 @Slf4j
-@RestController("/nft-task")
+@RestController
+@RequestMapping("/public/nft-task")
 @Api(tags = "NFT任务")
 public class UcNftTask {
 
