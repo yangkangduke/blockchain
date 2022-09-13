@@ -115,10 +115,10 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
     }
 
     @Override
-    public List<NFTOfferResp> offerList(Long id) {
+    public List<NFTOfferResp> offerList(Long nftId) {
         LambdaQueryWrapper<UcNftOffer> query = new QueryWrapper<UcNftOffer>().lambda()
                 .eq(UcNftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
-                .eq(UcNftOffer::getNftId, id);
+                .eq(UcNftOffer::getNftId, nftId);
         List<UcNftOffer> list = list(query);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();
@@ -194,6 +194,14 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
         LambdaQueryWrapper<UcNftOffer> query = new QueryWrapper<UcNftOffer>().lambda()
                 .eq(UcNftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
                 .lt(UcNftOffer::getExpireTime, System.currentTimeMillis());
+        return list(query);
+    }
+
+    @Override
+    public List<UcNftOffer> queryBiddingByNftId(Long nftId) {
+        LambdaQueryWrapper<UcNftOffer> query = new QueryWrapper<UcNftOffer>().lambda()
+                .eq(UcNftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
+                .eq(UcNftOffer::getNftId, nftId);
         return list(query);
     }
 

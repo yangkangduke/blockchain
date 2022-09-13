@@ -26,9 +26,9 @@ public interface IUcNftOfferService extends IService<UcNftOffer> {
 
     /**
      * 出价列表
-     * @param id NFT的id
+     * @param nftId NFT的id
      */
-    List<NFTOfferResp> offerList(Long id);
+    List<NFTOfferResp> offerList(Long nftId);
 
     /**
      * NFT竞价拒绝
@@ -47,5 +47,12 @@ public interface IUcNftOfferService extends IService<UcNftOffer> {
      * @return 过期的offers
      */
     List<UcNftOffer> queryExpiredOffers();
+
+    /**
+     * 通过nft的id查询竞价中的offers
+     * @param nftId NFT 的id
+     * @return 竞价中的offers
+     */
+    List<UcNftOffer> queryBiddingByNftId(Long nftId);
 
 }

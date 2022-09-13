@@ -9,8 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 
 /**
@@ -87,6 +89,21 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
                     .status(buyReq.getOfferStatusEnum())
                     .id(buyReq.getOfferId())
                     .build());
+
+            // offer接受成功，拒绝其他相关的offer
+            if (NFTOfferStatusEnum.ACCEPTED == buyReq.getOfferStatusEnum()) {
+                List<UcNftOffer> nftOffers = ucNftOfferService.queryBiddingByNftId(buyReq.getNftId());
+                if (!CollectionUtils.isEmpty(nftOffers)) {
+                    nftOffers.forEach(p -> {
+                        // 排除即将接受的offer
+                        if (!p.getId().equals(buyReq.getOfferId())) {
+                            // 拒绝其他相关的offer
+                            ucNftOfferService.offerReject(p.getId());
+                        }
+                    });
+                }
+            }
         }
+
     }
 }
