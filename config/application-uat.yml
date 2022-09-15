@@ -37,12 +37,12 @@ spring:
         servers: 54.168.239.215:9092
         topic: applog
 file:
-  bucketName: seeds # 上文创建的桶名称
+  bucketName: theseeds-uat # 上文创建的桶名称
   oss:
     enable: true
-    endpoint: http://127.0.0.1:9000
-    access-key: Seeds123!
-    secret-key: Seeds123!
+    endpoint: https://theseeds-uat.s3.ap-east-1.amazonaws.com
+    access-key: AKIAQMKUPROLJREE5AGN
+    secret-key: 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
 
 email:
   host: smtp.gmail.com
