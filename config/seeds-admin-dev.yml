@@ -29,11 +29,6 @@ admin:
     redis:
       keyExpireAfter: 259200
 
-# admin 文件存储目录
-file:
-  bucketName: admin
-  store:
-    location: /seeds-admin/files/
 
 springfox:
   documentation:
