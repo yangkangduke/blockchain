@@ -49,4 +49,7 @@ public class UcConstant {
     public static final String BIND_METAMASK_EMAIL_SUBJECT = "bind metamask";
     public static final String BIND_METAMASK_EMAIL_CONTENT = "bind metamask verification code, note that it expires in {} minutes:{}";
 
+    // 默认邮箱验证码
+    public static final String DEFAULT_EMAIL_VERIFICATION_CODE = "123456";
+
 }
