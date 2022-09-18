@@ -130,8 +130,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .build();
         } else {
             // 发送邮件
-            // generate a random code
-            // todo 暂时不发邮件
             sendCodeService.sendUserCodeByUseType(userDto, AuthCodeUseTypeEnum.LOGIN);
 
             // 将2FA token存入redis，用户进入等待2FA验证态

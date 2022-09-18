@@ -47,14 +47,16 @@ public class SendCodeServiceImpl implements SendCodeService {
     @Override
     public void sendUserCodeByUseType(UserDto userDto, AuthCodeUseTypeEnum useTypeEnum) {
         // generate a random code
-//        String otp = RandomUtil.getRandom6DigitsOTP();
-        // todo 后面换一下
-        String otp = "123456";
+        String otp;
+        if (emailProperties.getEnable()) {
+            otp = RandomUtil.getRandom6DigitsOTP();
+        } else {
+            otp = UcConstant.DEFAULT_EMAIL_VERIFICATION_CODE;
+        }
 
         // 设置此时登陆的安全项
         userDto.setAuthType(userDto.getAuthType());
-        // todo 暂时不发邮件
-//        doSendUserCode(userDto, otp, useTypeEnum);
+        doSendUserCode(userDto, otp, useTypeEnum);
 
         String accountName =  ClientAuthTypeEnum.getAccountNameByAuthType(
                         userDto.getPhone(),
@@ -72,11 +74,13 @@ public class SendCodeServiceImpl implements SendCodeService {
     @Override
     public void sendEmailWithUseType(String address, AuthCodeUseTypeEnum useTypeEnum) {
         // generate a random code
-//        String otp = RandomUtil.getRandom6DigitsOTP();
-        // todo 后面换一下
-        String otp = "123456";
-        // todo 暂时关闭
-//        doSendEmailCode(address, otp, useTypeEnum);
+        String otp;
+        if (emailProperties.getEnable()) {
+            otp = RandomUtil.getRandom6DigitsOTP();
+        } else {
+            otp = UcConstant.DEFAULT_EMAIL_VERIFICATION_CODE;
+        }
+        doSendEmailCode(address, otp, useTypeEnum);
 
         // store the auth code in auth code bucket
         cacheService.putAuthCode(
@@ -94,12 +98,14 @@ public class SendCodeServiceImpl implements SendCodeService {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
         }
         UcUser userDto = ucUserMapper.selectById(twoFactorAuth.getUserId());
-
         // generate a random code
-//        String otp = RandomUtil.getRandom6DigitsOTP();
-        // todo 后面换一下
-        String otp = "123456";
-        // TODO发送
+        String otp;
+        if (emailProperties.getEnable()) {
+            otp = RandomUtil.getRandom6DigitsOTP();
+        } else {
+            otp = UcConstant.DEFAULT_EMAIL_VERIFICATION_CODE;
+        }
+
         sendEmailWithUseType(userDto.getEmail(), useTypeEnum);
 
         // store the auth code in auth code bucket
@@ -138,26 +144,28 @@ public class SendCodeServiceImpl implements SendCodeService {
     }
 
     private boolean doSendEmailCode(String email, String code, AuthCodeUseTypeEnum useType) {
-        if (useType.equals(AuthCodeUseTypeEnum.REGISTER)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.REGISTER_EMAIL_SUBJECT, StrFormatter.format(UcConstant.REGISTER_EMAIL_CONTENT, 5, code), false);
-        } else if (useType.equals(AuthCodeUseTypeEnum.RESET_PASSWORD)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT,5, code), false);
-        } else if (useType.equals(AuthCodeUseTypeEnum.RESET_GA)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.RESET_GA_EMAIL_SUBJECT, StrFormatter.format(UcConstant.RESET_GA_EMAIL_CONTENT,5, code), false);
-        } else if (useType.equals(AuthCodeUseTypeEnum.LOGIN)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.LOGIN_EMAIL_VERIFY_SUBJECT, StrFormatter.format(UcConstant.LOGIN_EMAIL_VERIFY_CONTENT, 5, code), false);
-        } else if (useType.equals(AuthCodeUseTypeEnum.CHANGE_PASSWORD)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.CHANGE_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.CHANGE_PASSWORD_EMAIL_CONTENT, 5, code), false);
-        } else if (useType.equals(AuthCodeUseTypeEnum.CHANGE_EMAIL)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.CHANGE_EMAIL_EMAIL_SUBJECT, StrFormatter.format(UcConstant.CHANGE_EMAIL_EMAIL_CONTENT, 5, code), false);
-        } else if (useType.equals(AuthCodeUseTypeEnum.BIND_EMAIL)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.BIND_EMAIL_EMAIL_SUBJECT, StrFormatter.format(UcConstant.BIND_EMAIL_EMAIL_CONTENT, 5, code), false);
-        } else if (useType.equals(AuthCodeUseTypeEnum.BIND_METAMASK)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.BIND_METAMASK_EMAIL_SUBJECT, StrFormatter.format(UcConstant.BIND_METAMASK_EMAIL_CONTENT, 5, code), false);
-        } else if (useType.equals(AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_BIND_GA)) {
-            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.BIND_EMAIL_EMAIL_SUBJECT, StrFormatter.format(UcConstant.BIND_EMAIL_EMAIL_CONTENT, 5, code), false);
-       } else {
-            throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
+        if (emailProperties.getEnable()) {
+            if (useType.equals(AuthCodeUseTypeEnum.REGISTER)) {
+                MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.REGISTER_EMAIL_SUBJECT, StrFormatter.format(UcConstant.REGISTER_EMAIL_CONTENT, 5, code), false);
+            } else if (useType.equals(AuthCodeUseTypeEnum.RESET_PASSWORD)) {
+                MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT,5, code), false);
+            } else if (useType.equals(AuthCodeUseTypeEnum.RESET_GA)) {
+                MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.RESET_GA_EMAIL_SUBJECT, StrFormatter.format(UcConstant.RESET_GA_EMAIL_CONTENT,5, code), false);
+            } else if (useType.equals(AuthCodeUseTypeEnum.LOGIN)) {
+                MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.LOGIN_EMAIL_VERIFY_SUBJECT, StrFormatter.format(UcConstant.LOGIN_EMAIL_VERIFY_CONTENT, 5, code), false);
+            } else if (useType.equals(AuthCodeUseTypeEnum.CHANGE_PASSWORD)) {
+                MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.CHANGE_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.CHANGE_PASSWORD_EMAIL_CONTENT, 5, code), false);
+            } else if (useType.equals(AuthCodeUseTypeEnum.CHANGE_EMAIL)) {
+                MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.CHANGE_EMAIL_EMAIL_SUBJECT, StrFormatter.format(UcConstant.CHANGE_EMAIL_EMAIL_CONTENT, 5, code), false);
+            } else if (useType.equals(AuthCodeUseTypeEnum.BIND_EMAIL)) {
+                MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.BIND_EMAIL_EMAIL_SUBJECT, StrFormatter.format(UcConstant.BIND_EMAIL_EMAIL_CONTENT, 5, code), false);
+            } else if (useType.equals(AuthCodeUseTypeEnum.BIND_METAMASK)) {
+                MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.BIND_METAMASK_EMAIL_SUBJECT, StrFormatter.format(UcConstant.BIND_METAMASK_EMAIL_CONTENT, 5, code), false);
+            } else if (useType.equals(AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_BIND_GA)) {
+                MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.BIND_EMAIL_EMAIL_SUBJECT, StrFormatter.format(UcConstant.BIND_EMAIL_EMAIL_CONTENT, 5, code), false);
+            } else {
+                throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
+            }
         }
 
         return true;
