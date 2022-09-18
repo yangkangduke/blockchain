@@ -348,6 +348,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             propertiesList.forEach(p -> {
                 SysNftPropertiesEntity nftProperties = new SysNftPropertiesEntity();
                 nftProperties.setNftId(nftId);
+                p.setTypeId(p.getTypeId() == null ? -1 : p.getTypeId());
                 BeanUtils.copyProperties(p, nftProperties);
                 nftPropertiesList.add(nftProperties);
             });
