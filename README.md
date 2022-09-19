@@ -12,22 +12,22 @@
 3.首先依次启动seeds-config项目、seeds-gateway
 其他不区分顺序seeds-uc、seeds-admin
 ## JAVA
-jdk 11
+jdk 1.8
 spring cloud version: 2021.0.3 
 spring boot version: 2.7.1
 mybatis plus version: 3.5.1
 
 ## cache: 
-redis version: 6.0
+redis 6.0.2
 
 ## message bus:
 kafka 3.2.1
 
 ## database
-mysql8.0
+mysql 8.0.2
 
 ## swagger
-swagger3.0
+swagger 3.0
 访问地址：http://ip:9999/swagger-ui/index.html
 增强版本：http://ip:9999/doc.html
 

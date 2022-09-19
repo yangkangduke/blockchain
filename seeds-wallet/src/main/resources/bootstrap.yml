@@ -1,0 +1,31 @@
+info:
+  app:
+    name: ${APP_NAME:kine-wallet-service}
+    check: ${APP_CHECK:NOT_SET}
+  env:
+    name: ${PROFILE:NOT_SET}
+    hostname: ${hostname:NOT_SET}
+  build:
+    version: ${BUILD_NUMBER:NOT_SET}
+
+spring:
+  application:
+    name: ${APP_NAME:kine-wallet-service}
+  profiles:
+    active: ${PROFILE:NOT_SET}
+    include:
+      - ${ENV_PROFILE:default}
+  cloud:
+    config:
+      uri: ${CONFIG_SERVERS:http://192.168.0.117:31004}
+      label: ${CONFIG_GIT_VERSION:master}
+      prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/master
+      enabled: true
+
+log:
+  kafka:
+    servers: ${LOG_KAFKA_SERVERS:192.168.0.115:9092,192.168.0.115:9192,192.168.0.115:9292}
+    topic: ${LOG_KAFKA_TOPIC:applog-kine}
+
+logging:
+  config: ${spring.cloud.config.prefix}/logback/logback.xml

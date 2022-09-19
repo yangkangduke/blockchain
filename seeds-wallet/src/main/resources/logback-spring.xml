@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="false" scanPeriod="30 seconds">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <springProperty name="APP_NAME" source="spring.application.name" defaultValue=""/>
+    <springProperty name="ENV_NAME" source="spring.profiles.active" defaultValue=""/>
+    <springProperty name="LOG_KAFKA_HOST" source="log.kafka.servers" defaultValue=""/>
+    <springProperty name="LOG_KAFKA_TOPIC" source="log.kafka.topic" defaultValue=""/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+<!--    <appender name="kafkaAppender" class="com.github.danielwegener.logback.kafka.KafkaAppender">-->
+<!--        <encoder class="com.github.danielwegener.logback.kafka.encoding.PatternLayoutKafkaMessageEncoder">-->
+<!--            <layout class="net.logstash.logback.layout.LogstashLayout">-->
+<!--                <includeMdc>true</includeMdc>-->
+<!--                <customFields>{"app_name":"${APP_NAME}","env_name":"${ENV_NAME}"}</customFields>-->
+<!--            </layout>-->
+<!--        </encoder>-->
+<!--        <topic>${LOG_KAFKA_TOPIC}</topic>-->
+<!--        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.RoundRobinKeyingStrategy"/>-->
+<!--        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>-->
+<!--        <producerConfig>bootstrap.servers=${LOG_KAFKA_HOST}</producerConfig>-->
+<!--        <appender-ref ref="CONSOLE"/>-->
+<!--    </appender>-->
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+<!--        <springProfile name="local">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--        </springProfile>-->
+<!--        <springProfile name="!local">-->
+<!--            <appender-ref ref="kafkaAppender"/>-->
+<!--        </springProfile>-->
+    </root>
+
+</configuration>

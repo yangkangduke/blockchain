@@ -23,6 +23,10 @@
         <module>seeds-config</module>
         <module>seeds-chain-api</module>
         <module>seeds-admin-api</module>
+        <module>seeds-wallet-model</module>
+        <module>seeds-wallet-api</module>
+        <module>seeds-wallet</module>
+        <module>seeds-common</module>
     </modules>
 
     <properties>
