@@ -46,3 +46,4 @@ resetpassword:
   url: http://localhost:9999/uc/auth/forgotPassword/verifyLink?encode={}&account={}
 
 Seeds-admin: http://192.168.1.100:10102
+Seeds-uc-logo-url: http://192.168.1.100:9999/admin/public/file/download/seeds?objectName=logo/cc27772887b9452492be1c3e97cd15ce.png
