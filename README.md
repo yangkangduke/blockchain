@@ -12,19 +12,19 @@
 3.首先依次启动seeds-config项目、seeds-gateway
 其他不区分顺序seeds-uc、seeds-admin
 ## JAVA
-jdk 1.8
+jdk 11
 spring cloud version: 2021.0.3 
 spring boot version: 2.7.1
 mybatis plus version: 3.5.1
 
 ## cache: 
-redis version: 4.0
+redis version: 6.0
 
 ## message bus:
-kafka
+kafka 3.2.1
 
 ## database
-mysql5.7
+mysql8.0
 
 ## swagger
 swagger3.0
