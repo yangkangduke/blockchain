@@ -2,6 +2,7 @@ package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
@@ -96,9 +97,23 @@ public interface SysNftService extends IService<SysNftEntity> {
 
     /**
      * 查询用户拥有的NFT
+     *
      * @param ownerId 归属人id
      * @return 拥有的NFT信息
      */
     List<SysNftEntity> queryNormalByOwnerId(Long ownerId);
 
+    /**
+     * mint NFT
+     *
+     * @param msgDTO mintNFT消息DTO
+     */
+    void mintNft(NftMintMsgDTO msgDTO);
+
+    /**
+     * burn NFT
+     *
+     * @param sysNftEntities NFT信息
+     */
+    void burnNft(List<SysNftEntity> sysNftEntities);
 }
