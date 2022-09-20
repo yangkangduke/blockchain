@@ -1,4 +1,4 @@
-package com.seeds.wallet.exception;
+package com.seeds.wallet.handler;
 
 import com.seeds.common.dto.GenericDto;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @Slf4j
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class WalletExceptionHandler {
 
     public static final int ERR_CODE = 500;
 
