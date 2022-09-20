@@ -38,8 +38,6 @@ redisson:
   idlesize: 50
   password: Seeds123!
 
-resetpassword:
-  url: http://localhost:9999/uc/auth/forgotPassword/verifyLink?encode={}&account={}
 
 Seeds-admin: http://127.0.0.1:10102
 Seeds-uc-logo-url: http://127.0.0.1:9999/admin/public/file/download/admin?objectName=logo/6edbf1918f824f2b85c03e1ff04f3305.png

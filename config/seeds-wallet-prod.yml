@@ -1,9 +1,9 @@
 server:
-  port: 10101
+  port: 10104
 
 spring:
   datasource:
-    url: jdbc:mysql://Seeds-mysql:3306/seeds_uc?useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://Seeds-mysql:3306/seeds_wallet?useUnicode=true&characterEncoding=utf-8
     username: root
     password: Seeds123!
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -20,11 +20,6 @@ management:
 mybatis:
   type-aliases-package*: com.seeds.uc.model
 
-uc:
-  sso:
-    redis:
-      keyExpireAfter: 259200
-
 
 springfox:
   documentation:
@@ -38,6 +33,11 @@ redisson:
   idlesize: 50
   password: Seeds123!
 
-
-Seeds-admin: http://127.0.0.1:10102
-Seeds-uc-logo-url: http://127.0.0.1:9999/admin/public/file/download/admin?objectName=logo/6edbf1918f824f2b85c03e1ff04f3305.png
+wallet:
+  passwordKey: "{ASM}"
+  chainId: 1
+  access:
+    allowed-timestamp-range: 10000
+    key-list:
+      - key: XXXXX
+        secret: "{ASM}wallet.access.key.secret"

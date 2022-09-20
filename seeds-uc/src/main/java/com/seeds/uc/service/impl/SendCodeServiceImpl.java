@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
 import com.seeds.common.web.config.EmailProperties;
-import com.seeds.uc.config.ResetPasswordProperties;
 import com.seeds.uc.constant.UcConstant;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
@@ -46,8 +45,6 @@ public class SendCodeServiceImpl implements SendCodeService {
     private EmailProperties emailProperties;
     @Autowired
     private UcUserMapper ucUserMapper;
-    @Autowired
-    private ResetPasswordProperties resetPasswordProperties;
     @Autowired
     private TemplateEngine templateEngine;
 
