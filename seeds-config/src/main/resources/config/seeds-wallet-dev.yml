@@ -34,10 +34,10 @@ redisson:
   password: Seeds123!
 
 wallet:
-  passwordKey: "{ASM}"
+  passwordKey: "5bb40a4623ead547e4b2f15a"
   chainId: 1
   access:
     allowed-timestamp-range: 10000
     key-list:
       - key: XXXXX
-        secret: "{ASM}wallet.access.key.secret"
+        secret: "5bb40a4623ead547e4b2f15awallet.access.key.secret"

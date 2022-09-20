@@ -15,8 +15,9 @@ public interface EnumWithCode {
 
         T[] enums = enumClass.getEnumConstants();
         for (T t : enums) {
-            if (t.getCode().equals(code))
+            if (t.getCode().equals(code)) {
                 return t;
+            }
         }
         throw new IllegalArgumentException("Cannot parse integer: " + code + " to " + enumClass.getName());
     }
