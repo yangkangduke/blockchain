@@ -27,6 +27,8 @@
         <module>seeds-wallet-api</module>
         <module>seeds-wallet</module>
         <module>seeds-common</module>
+        <module>seeds-account-model</module>
+        <module>seeds-account</module>
     </modules>
 
     <properties>
