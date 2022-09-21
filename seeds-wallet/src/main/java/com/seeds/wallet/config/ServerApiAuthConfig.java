@@ -38,6 +38,10 @@ public class ServerApiAuthConfig {
         return new ServerApiAuthInterceptor(keyMapping, new RequestConfiguration(), allowedTimestampRange);
     }
 
+    /**
+     * request中的inputStream，因为只能被读取一次，后面spring框架无法读取了，所以需要添加wrapper和filter解决流只能读取一次的问题
+     * @return
+     */
     @Bean
     public FilterRegistrationBean<Filter> replaceStreamFilterRegistration() {
         FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
