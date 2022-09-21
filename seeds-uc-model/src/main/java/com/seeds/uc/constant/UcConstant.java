@@ -52,4 +52,7 @@ public class UcConstant {
     // 默认邮箱验证码
     public static final String DEFAULT_EMAIL_VERIFICATION_CODE = "123456";
 
+    // 默认邮件主题
+    public static final String DEFAULT_EMAIL_SUBJECT = "Verification Code";
+
 }

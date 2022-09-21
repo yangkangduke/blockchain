@@ -5,6 +5,7 @@ import com.seeds.uc.constant.UcRedisKeysConstant;
 import com.seeds.uc.dto.redis.*;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @Slf4j
+@Getter
 @Service
 public class CacheService {
 

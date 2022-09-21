@@ -21,6 +21,10 @@ spring:
             - Path=/admin/**
           filters:
             - AdminAuth
+        - id: seeds-wallet-service
+          uri: http://Seeds-wallet:10104/
+          predicates:
+            - Path=/wallet/**
       globalcors:
         cors-configurations:
           '[/**]':

@@ -37,6 +37,11 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

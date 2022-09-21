@@ -157,6 +157,10 @@
             <artifactId>web3j-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.seeds</groupId>
             <artifactId>seeds-admin-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
