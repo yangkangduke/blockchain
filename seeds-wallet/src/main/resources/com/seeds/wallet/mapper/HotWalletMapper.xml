@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.wallet.mapper.HotWalletMapper">
+
+  <resultMap id="BaseResultMap" type="com.seeds.wallet.model.HotWallet">
+    <id column="f_id" jdbcType="BIGINT" property="id" />
+    <result column="f_chain" jdbcType="TINYINT" property="chain" />
+    <result column="f_address" jdbcType="VARCHAR" property="address" />
+    <result column="f_file_json" jdbcType="VARCHAR" property="fileJson" />
+    <result column="f_created_at" jdbcType="BIGINT" property="createdAt" />
+  </resultMap>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_hot_wallet
+    where f_id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.seeds.wallet.model.HotWallet" useGeneratedKeys="true" keyProperty="id">
+    insert into t_hot_wallet (f_id, f_chain, f_address, f_file_json,  f_created_at)
+    values (#{id,jdbcType=BIGINT}, #{chain,jdbcType=TINYINT}, #{address,jdbcType=VARCHAR}, #{fileJson,jdbcType=VARCHAR}, #{createdAt,jdbcType=BIGINT})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.seeds.wallet.model.HotWallet">
+    update t_hot_wallet
+    set f_chain = #{chain,jdbcType=TINYINT},
+        f_address = #{address,jdbcType=VARCHAR},
+        f_file_json = #{fileJson,jdbcType=VARCHAR},
+        f_created_at = #{createdAt,jdbcType=BIGINT}
+    where f_id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select *
+    from t_hot_wallet
+    where f_id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select *
+    from t_hot_wallet
+    order by f_id
+  </select>
+
+  <select id="selectByAddress" resultMap="BaseResultMap">
+    select *
+    from t_hot_wallet
+    where f_chain = #{chain,jdbcType=TINYINT} and f_address = #{address,jdbcType=VARCHAR}
+  </select>
+</mapper>

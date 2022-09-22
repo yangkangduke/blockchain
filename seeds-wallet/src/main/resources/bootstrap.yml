@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: seeds-wallet
+
+  profiles:
+    active: dev
+
+  # 读取本地文件
+  cloud:
+    config:
+      fail-fast: true #是否启动快速失败功能，功能开启则优先判断config server是否正常
+      name: application,seeds-wallet # 配置文件名 如果多个则逗号拼接 按优先级排序，如果key 相同 取 后者
+      profile: ${spring.profiles.active}
+      uri: http://Seeds-config:8888
+
+
+      #读取github上文件
+#  cloud:
+#    config:
+#      label: main-dev #分支名称
+#      uri: http://Seeds-config:8888
+#      profile: dev
+#      name: application,seeds-wallet #配置文件名称
+#      fail-fast: true
+#      retry:
+#        initial-interval: 2000
+#        max-interval: 10000
+#        multiplier: 2
+#        max-attempts: 10
+

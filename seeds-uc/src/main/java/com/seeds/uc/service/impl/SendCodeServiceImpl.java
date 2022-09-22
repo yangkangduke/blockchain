@@ -1,11 +1,9 @@
 package com.seeds.uc.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.StrFormatter;
 import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
 import com.seeds.common.web.config.EmailProperties;
-import com.seeds.uc.config.ResetPasswordProperties;
 import com.seeds.uc.constant.UcConstant;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
@@ -15,7 +13,6 @@ import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
-import com.seeds.uc.exceptions.SendAuthCodeException;
 import com.seeds.uc.mapper.UcUserMapper;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.SendCodeService;
@@ -23,8 +20,11 @@ import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 /**
  * @author allen
@@ -35,6 +35,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Service
 public class SendCodeServiceImpl implements SendCodeService {
+
+    @Value("${Seeds-uc-logo-url}")
+    private String logoUrl;
+
     @Autowired
     private CacheService cacheService;
     @Autowired
@@ -42,7 +46,7 @@ public class SendCodeServiceImpl implements SendCodeService {
     @Autowired
     private UcUserMapper ucUserMapper;
     @Autowired
-    private ResetPasswordProperties resetPasswordProperties;
+    private TemplateEngine templateEngine;
 
     @Override
     public void sendUserCodeByUseType(UserDto userDto, AuthCodeUseTypeEnum useTypeEnum) {
@@ -145,7 +149,7 @@ public class SendCodeServiceImpl implements SendCodeService {
 
     private boolean doSendEmailCode(String email, String code, AuthCodeUseTypeEnum useType) {
         if (emailProperties.getEnable()) {
-            if (useType.equals(AuthCodeUseTypeEnum.REGISTER)) {
+            /*if (useType.equals(AuthCodeUseTypeEnum.REGISTER)) {
                 MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.REGISTER_EMAIL_SUBJECT, StrFormatter.format(UcConstant.REGISTER_EMAIL_CONTENT, 5, code), false);
             } else if (useType.equals(AuthCodeUseTypeEnum.RESET_PASSWORD)) {
                 MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.FORGOT_PASSWORD_EMAIL_SUBJECT, StrFormatter.format(UcConstant.FORGOT_PASSWORD_EMAIL_CONTENT,5, code), false);
@@ -165,7 +169,15 @@ public class SendCodeServiceImpl implements SendCodeService {
                 MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.BIND_EMAIL_EMAIL_SUBJECT, StrFormatter.format(UcConstant.BIND_EMAIL_EMAIL_CONTENT, 5, code), false);
             } else {
                 throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
-            }
+            }*/
+            Context context = new Context();
+            context.setVariable("logoUrl", logoUrl);
+            context.setVariable("email", email);
+            context.setVariable("verificationCode", code);
+            context.setVariable("expiryTime", cacheService.getAuthTokenExpireAfter()/60);
+            //读取html文件，并动态赋值
+            String emailContent = templateEngine.process("validationCode", context);
+            MailUtil.send(this.createMailAccount(), CollUtil.newArrayList(email), UcConstant.DEFAULT_EMAIL_SUBJECT, emailContent, true);
         }
 
         return true;
