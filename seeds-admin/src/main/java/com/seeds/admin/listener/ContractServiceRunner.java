@@ -1,4 +1,4 @@
-package listener;
+package com.seeds.admin.listener;
 
 import com.seeds.admin.entity.SysTransferRecordEntity;
 import com.seeds.admin.service.SysTransferRecordService;
