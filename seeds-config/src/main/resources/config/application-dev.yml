@@ -23,7 +23,7 @@ spring:
     consumer:
       group-id: tomge-consumer-group  # 默认消费者group id
       auto-offset-reset: earliest
-      enable-auto-commit: true
+      enable-auto-commit: false  # 手动提交ack
       auto-commit-interval: 100
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -31,6 +31,9 @@ spring:
         sasl.mechanism: PLAIN
         security.protocol: SASL_PLAINTEXT
         sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
+
+    listener:
+      ack-mode: manual_immediate
 
     appender:
       bootstrap:
