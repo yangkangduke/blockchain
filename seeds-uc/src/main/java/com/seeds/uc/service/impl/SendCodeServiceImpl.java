@@ -101,23 +101,12 @@ public class SendCodeServiceImpl implements SendCodeService {
         if (twoFactorAuth == null) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
         }
-        UcUser userDto = ucUserMapper.selectById(twoFactorAuth.getUserId());
-        // generate a random code
-        String otp;
-        if (emailProperties.getEnable()) {
-            otp = RandomUtil.getRandom6DigitsOTP();
-        } else {
-            otp = UcConstant.DEFAULT_EMAIL_VERIFICATION_CODE;
-        }
+        UcUser user = ucUserMapper.selectById(twoFactorAuth.getUserId());
+        UserDto userDto = new UserDto();
+        userDto.setAuthType(twoFactorAuth.getAuthType());
+        userDto.setEmail(twoFactorAuth.getAuthAccountName());
 
-        sendEmailWithUseType(userDto.getEmail(), useTypeEnum);
-
-        // store the auth code in auth code bucket
-        cacheService.putAuthCode(
-                userDto.getEmail(),
-                ClientAuthTypeEnum.EMAIL,
-                otp,
-                useTypeEnum);
+        sendUserCodeByUseType(userDto, useTypeEnum);
     }
 
 
