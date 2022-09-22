@@ -1,4 +1,4 @@
-package com.seeds.admin.constant;
+package com.seeds.common.mq.constant;
 
 import lombok.experimental.UtilityClass;
 
@@ -10,6 +10,13 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class KafkaTopic {
+
+    // NFT
     public final String NFT_SAVE_SUCCESS = "nft-save-success";
     public final String NFT_DELETE_SUCCESS = "nft-delete-success";
+
+    // Notification
+    public final String SEND_NOTICE = "send-notice1";
+
+
 }

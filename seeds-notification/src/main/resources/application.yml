@@ -1,0 +1,74 @@
+server:
+  port: 10103
+
+spring:
+  application:
+    name: seeds-admin
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    url: jdbc:mysql://Seeds-mysql:3306/seeds_message?useUnicode=true&characterEncoding=utf-8
+    username: root
+    password: Seeds123!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  kafka:
+    bootstrap-servers: 192.168.1.101:9092
+    producer:
+      retries: 3  # 生产者发送失败时，重试次数
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        sasl.mechanism: PLAIN
+        security.protocol: SASL_PLAINTEXT
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
+
+    consumer:
+      group-id: tomge-consumer-group  # 默认消费者group id
+      auto-offset-reset: earliest
+      enable-auto-commit: false  # 手动提交ack
+      auto-commit-interval: 100
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        sasl.mechanism: PLAIN
+        security.protocol: SASL_PLAINTEXT
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
+    listener:
+      ack-mode: manual_immediate
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+redisson:
+  address: redis://Seeds-redis:6379
+  timeout: 10000
+  poolsize: 50
+  idlesize: 50
+  password: Seeds123!
+
+## todo  使用配置中心里的配置
+file:
+  bucketName: seeds # 上文创建的桶名称
+  oss:
+    enable: true
+    endpoint: http://192.168.1.101:9000
+    access-key: seeds123!
+    secret-key: seeds123!
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      base-path: /
+
+webSocket:
+  origin: http://127.0.0.1
+  port: 8899

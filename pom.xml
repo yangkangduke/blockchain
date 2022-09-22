@@ -23,6 +23,8 @@
         <module>seeds-config</module>
         <module>seeds-chain-api</module>
         <module>seeds-admin-api</module>
+        <module>seeds-notification</module>
+        <module>seeds-notification-model</module>
     </modules>
 
     <properties>

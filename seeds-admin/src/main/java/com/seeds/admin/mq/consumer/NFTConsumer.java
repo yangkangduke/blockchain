@@ -1,7 +1,7 @@
 package com.seeds.admin.mq.consumer;
 
 import cn.hutool.json.JSONUtil;
-import com.seeds.admin.constant.KafkaTopic;
+import com.seeds.common.mq.constant.KafkaTopic;
 import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.entity.SysNftEntity;
 import com.seeds.admin.service.SysNftService;
