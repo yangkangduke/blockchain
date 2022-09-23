@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
     public IPage<NotificationResp> getNoticeByUserId(NoticePageReq req) {
         LambdaQueryWrapper<NotificationEntity> wrapper = new LambdaQueryWrapper<>();
 
-        wrapper.eq(!ObjectUtils.isEmpty(req.getUserId()), NotificationEntity::getUcUserId, req.getUserId());
+        wrapper.eq(!ObjectUtils.isEmpty(req.getUcUserId()), NotificationEntity::getUcUserId, req.getUcUserId());
 
         Page<NotificationEntity> page = new Page<>(req.getCurrent(), req.getSize());
         List<NotificationEntity> records = page(page, wrapper).getRecords();
@@ -64,12 +65,20 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
 
     @Override
     public Boolean saveNotice(NoticeSaveReq req) {
-        NotificationEntity entity = new NotificationEntity();
-        BeanUtils.copyProperties(req, entity);
-        entity.setCreatedAt(new Date().getTime());
-        entity.setUpdatedAt(new Date().getTime());
 
-        return save(entity);
+        ArrayList<NotificationEntity> entities = new ArrayList<>();
+        if (null != req && null != req.getUcUserIds()) {
+            req.getUcUserIds().forEach(userId -> {
+                NotificationEntity entity = new NotificationEntity();
+                entity.setUcUserId(userId);
+                entity.setContent(req.getContent());
+                entity.setCreatedAt(new Date().getTime());
+                entity.setUpdatedAt(new Date().getTime());
+                entities.add(entity);
+            });
+
+        }
+        return saveBatch(entities);
     }
 
     @Override

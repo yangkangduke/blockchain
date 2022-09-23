@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 
 /**
+ * 启动websocket server
  * @author: hewei
  * @date 2022/9/19
  */

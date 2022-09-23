@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -15,12 +16,15 @@ public class NoticeDTO implements Serializable {
 	 * 用户id
 	 */
 	@ApiModelProperty("用户id")
-	private Long ucUserId;
+	private List<Long> ucUserIds;
 
 	/**
 	 * 消息内容
 	 */
 	@ApiModelProperty("消息内容")
 	private String content;
+
+	@ApiModelProperty("推送时间")
+	private Long pushTime;
 
 }

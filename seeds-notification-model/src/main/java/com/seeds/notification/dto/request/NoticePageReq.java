@@ -13,5 +13,5 @@ import lombok.Data;
 @ApiModel(value = "通知列表请求入参")
 public class NoticePageReq extends PageReq {
     @ApiModelProperty(value = "ucUserId")
-    private Long userId;
+    private Long ucUserId;
 }

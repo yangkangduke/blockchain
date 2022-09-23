@@ -25,4 +25,10 @@ public class NotificationResp implements Serializable {
 
     @ApiModelProperty("是否已读，0 未读 1 已读")
     private Integer hasRead;
+
+    @ApiModelProperty("创建时间")
+    private Long createdAt;
+
+    @ApiModelProperty("更新时间")
+    private Long updatedAt;
 }

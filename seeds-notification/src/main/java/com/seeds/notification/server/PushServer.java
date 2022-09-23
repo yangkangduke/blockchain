@@ -8,6 +8,7 @@ import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.seeds.notification.dto.NoticeDTO;
 import com.seeds.notification.enums.NoticeErrorCodeEnum;
+import com.seeds.notification.server.util.ServerConfigUtil;
 import com.seeds.uc.constant.UcRedisKeysConstant;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.exceptions.GenericException;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -26,15 +28,22 @@ public class PushServer {
     @Autowired
     private ClientCache clientCache = SpringUtil.getBean(ClientCache.class);
 
+    @Autowired
+    private ServerConfigUtil serverConfig = SpringUtil.getBean(ServerConfigUtil.class);
+
     public static final PushServer pushServer = new PushServer();
+
     private SocketIOServer server;
 
     private PushServer() {
 
         final Configuration configuration = new Configuration();
         configuration.setAuthorizationListener(new UserAuthorizationListener());
-        configuration.setPort(8899);
-        configuration.setOrigin("http://127.0.0.1");
+        configuration.setPort(serverConfig.getWebSocketPort());
+        configuration.setOrigin(serverConfig.getWebSocketOrigin());
+        configuration.setHostname(serverConfig.getHost());
+        configuration.setPingInterval(serverConfig.getPingInterval());
+        configuration.setPingTimeout(serverConfig.getPingTimeout());
 
         // 可重用地址，防止处于TIME_WAIT的socket影响服务启动
         final SocketConfig socketConfig = new SocketConfig();
@@ -63,7 +72,7 @@ public class PushServer {
         server.addDisconnectListener(client -> {
             clientCache.deleteSessionClient(client);
             client.disconnect();
-            log.info("Connection Disconnected", client);
+            log.info("disconnected....", client);
         });
 
     }
@@ -75,14 +84,19 @@ public class PushServer {
      */
     public void push(NoticeDTO notice) {
         String json = JSONUtil.toJsonStr(notice);
-        SocketIOClient userClient = clientCache.getUserClient(notice.getUcUserId());
-        try {
-            if (userClient != null) {
-                userClient.sendEvent("new-notice", json);
+        List<Long> ucUserIds = notice.getUcUserIds();
+        //loop to send messages to all connected users
+        ucUserIds.forEach(userId -> {
+            SocketIOClient userClient = clientCache.getUserClient(userId);
+            try {
+                if (userClient != null) {
+                    userClient.sendEvent("new-notice", json);
+                    log.info("push message to user:{} successfully", userId);
+                }
+            } catch (Exception e) {
+                log.error("push message failed", e);
             }
-        } catch (Exception e) {
-            log.error("push message failed", e);
-        }
+        });
     }
 
     /**
@@ -104,6 +118,5 @@ public class PushServer {
     public void stop() {
         server.stop();
     }
-
 
 }

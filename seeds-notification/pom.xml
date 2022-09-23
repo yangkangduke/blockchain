@@ -21,7 +21,15 @@
         <redisson.version>3.13.3</redisson.version>
     </properties>
     <dependencies>
-
+        <!-- spring cloud config 客户端包 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -56,6 +64,7 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
+        <!--openfeign-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -89,6 +98,10 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

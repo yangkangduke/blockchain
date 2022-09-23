@@ -31,7 +31,7 @@ public class NotificationController {
     }
 
     @GetMapping("/getUnReadNoticeFlag")
-    GenericDto<Boolean> getUnReadNoticeFlag(@RequestParam("userId") Long userId) {
-        return GenericDto.success(notificationService.getUnReadNoticeFlag(userId));
+    GenericDto<Boolean> getUnReadNoticeFlag(@RequestParam("ucUserId") Long ucUserId) {
+        return GenericDto.success(notificationService.getUnReadNoticeFlag(ucUserId));
     }
 }

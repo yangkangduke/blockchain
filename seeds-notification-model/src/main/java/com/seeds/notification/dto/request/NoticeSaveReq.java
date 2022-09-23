@@ -14,7 +14,7 @@ import java.util.List;
 @ApiModel(value = "保存通知请求入参")
 public class NoticeSaveReq {
     @ApiModelProperty("用户id")
-    private Long ucUserId;
+    private List<Long> ucUserIds;
 
     @ApiModelProperty("消息内容")
     private String content;

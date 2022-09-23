@@ -16,7 +16,7 @@ public class KafkaTopic {
     public final String NFT_DELETE_SUCCESS = "nft-delete-success";
 
     // Notification
-    public final String SEND_NOTICE = "send-notice1";
+    public final String SEND_NOTIFICATION = "send-notification";
 
 
 }
