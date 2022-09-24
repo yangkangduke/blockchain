@@ -135,4 +135,7 @@ public interface IUcUserService extends IService<UcUser> {
      */
     Map<Long, String> queryNameByIds(Collection<Long> ids);
 
+    LoginResp buildLoginResponse(Long userId, String email);
+
 }
+

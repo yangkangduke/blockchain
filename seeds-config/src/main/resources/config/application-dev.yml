@@ -31,15 +31,13 @@ spring:
         sasl.mechanism: PLAIN
         security.protocol: SASL_PLAINTEXT
         sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
-
     listener:
       ack-mode: manual_immediate
 
     appender:
       bootstrap:
-        servers: 127.0.0.1:9092
+        servers: 192.168.1.101:9092
         topic: applog
-
 file:
   bucketName: seeds # 上文创建的桶名称
   oss:
@@ -54,3 +52,6 @@ email:
   from: seeds<no-reply-dev@theseeds.io>
   user: AKIAQMKUPROLIXMNEIJK
   pass: BBTyucDgyIg8qIDU1ki5XT1x3JEZZSA3cK1FC96TO0r4
+
+login:
+  twofa: true

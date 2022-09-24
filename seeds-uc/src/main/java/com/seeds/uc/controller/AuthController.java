@@ -2,6 +2,8 @@ package com.seeds.uc.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.config.LoginProperties;
+import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
@@ -40,7 +42,7 @@ public class AuthController {
     @Autowired
     private SendCodeService sendCodeService;
     @Autowired
-    private IGoogleAuthService googleAuthService;
+    private LoginProperties loginProperties;
     @Autowired
     private CacheService cacheService;
 
@@ -58,6 +60,14 @@ public class AuthController {
     @ApiOperation(value = "账号登陆", notes = "1.调用/auth/login接口，返回token和authType " +
             "2.调用/auth/2fa/login，参数authCode填的值根据上一个接口返回的authType来决定，如果是2就填email的验证码，如果是3就填ga的验证码， 返回的ucToken就是登陆成功的凭证 ")
     public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
+        // 只有正式环境需要2fa认证，其他环境不需要，就直接返回ucToken
+        if (!loginProperties.getTwofa()) {
+            // 校验账号、密码
+            UserDto userDto = ucUserService.verifyLogin(loginReq);
+            LoginResp login = ucUserService.buildLoginResponse(userDto.getUid(), userDto.getEmail());
+            return GenericDto.success(login);
+        }
+
         LoginResp login = ucUserService.login(loginReq);
         if (login.getUcToken() == null) {
             return GenericDto.failure(UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getDescEn(), UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getCode(), login);
