@@ -11,7 +11,7 @@ spring:
       fail-fast: true #是否启动快速失败功能，功能开启则优先判断config server是否正常
       name: application,seeds-uc # 配置文件名 如果多个则逗号拼接 按优先级排序，如果key 相同 取 后者
       profile: ${spring.profiles.active}
-      uri: http://Seeds-config:8888
+      uri: http://seeds-config.app.prd.devseeds.link
 
 
       #读取github上文件
