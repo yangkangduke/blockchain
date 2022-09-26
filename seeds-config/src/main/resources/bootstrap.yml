@@ -1,5 +1,9 @@
-server:
-  port: 8080
+info:
+  app:
+    name: ${APP_NAME:seeds-config}
+  env:
+    name: ${PROFILE:NOT_SET}
+  hostname: ${HOSTNAME:NOT_SET}
 
 spring:
   application:
@@ -21,6 +25,6 @@ spring:
           uri: https://github.com/AllenAi007/seeds-java
           username: 819628513@qq.com
           password: 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
-          search-paths: config
+          search-paths: prod-config
           default-label: main
           force-pull: true
