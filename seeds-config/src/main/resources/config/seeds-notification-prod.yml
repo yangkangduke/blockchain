@@ -38,5 +38,10 @@ redisson:
   password: Seeds123!
 
 webSocket:
-  origin: *  #跨域设置
+  host: 0.0.0.0
+  origin: "*" #跨域设置
   port: 8899
+  # Ping消息超时时间（毫秒），默认60秒，这个时间间隔内没有接收到心跳消息就会发送超时事件
+  pingTimeout: 60000
+  # Ping消息间隔（毫秒），默认25秒。客户端向服务器发送一条心跳消息间隔
+  pingInterval: 25000

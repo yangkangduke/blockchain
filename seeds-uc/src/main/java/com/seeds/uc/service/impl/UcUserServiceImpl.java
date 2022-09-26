@@ -507,13 +507,13 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
     /**
      * 校验邮箱
-     * @param registerReq
+     * @param email
      * @return
      */
     @Override
-    public Boolean registerCheckEmail(RegisterReq registerReq) {
+    public Boolean registerCheckEmail(String email) {
         // 校验账号重复
-        UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, registerReq.getEmail()));
+        UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, email));
         if (one != null) {
             return false;
         }
