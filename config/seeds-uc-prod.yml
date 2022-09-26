@@ -11,7 +11,7 @@ spring:
   kafka:
     appender:
       bootstrap:
-        servers: 10.18.14.65:9093
+        servers: 10.18.14.65:9092
         topic: applog-seeds
 
   mvc:
