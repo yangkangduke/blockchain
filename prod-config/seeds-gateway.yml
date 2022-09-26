@@ -1,8 +1,6 @@
 spring:
   redis:
-    host: 54.168.239.215
-    port: 6379
-    password: Seeds123!
+    url: "rediss://${redis.encode-password}@${redis.host}:${redis.port}"
     timeout: 5000
     lettuce:
       pool:
