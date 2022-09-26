@@ -25,9 +25,16 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
+#redisson:
+#  address: rediss://master.seeds-redis.wpdbfj.ape1.cache.amazonaws.com:6379
+#  password: KtxCpkdSsIbm3uNx
+#  timeout: 5000
+#  max-pool-size: 50
+#  min-idle-size: 25
+
 redisson:
-  address: rediss://master.seeds-redis.wpdbfj.ape1.cache.amazonaws.com:6379
-  password: KtxCpkdSsIbm3uNx
+  address: rediss://${redis.host}:${redis.port}
+  password: ${redis.password}
   timeout: 5000
   max-pool-size: 50
   min-idle-size: 25
