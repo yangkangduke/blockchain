@@ -487,7 +487,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return list.stream().collect(Collectors.toMap(UcUser::getId, UcUser::getNickname));
     }
 
-    private LoginResp buildLoginResponse(Long userId, String email) {
+    @Override
+    public LoginResp buildLoginResponse(Long userId, String email) {
         // 生成uc token给用户
         String ucToken = RandomUtil.genRandomToken(userId.toString());
         // 将token存入redis，用户进入登陆态
