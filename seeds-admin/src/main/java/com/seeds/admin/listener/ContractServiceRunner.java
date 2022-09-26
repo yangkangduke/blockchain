@@ -87,7 +87,7 @@ public class ContractServiceRunner implements ApplicationRunner {
             record.setBlockNum(blockNumber.longValue());
             record.setTransHash(p.getTransactionHash());
             sysTransferRecordService.save(record);
-        });
+        }, Throwable::printStackTrace);
         // subscription.unsubscribe();
     }
 }
