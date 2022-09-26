@@ -17,9 +17,9 @@ spring:
   #读取github上文件
   cloud:
     config:
-      label: main-dev #分支名称
+      label: main #分支名称
       uri: http://seeds-config.app.prd.devseeds.link
-      profile: dev
+      profile: prod
       name: application,seeds-gateway #配置文件名称
       fail-fast: true
       retry:
