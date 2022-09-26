@@ -65,4 +65,5 @@ hystrix:
             timeoutInMilliseconds: 5000
 
 Seeds-uc: http://127.0.0.1:10101
+Seeds-notification: http://127.0.0.1:10103
 Seeds-gateway: http://54.168.239.215:9999
