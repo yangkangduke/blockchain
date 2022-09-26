@@ -38,5 +38,5 @@ log:
     servers: ${LOG_KAFKA_SERVERS:10.18.14.65:9092,10.18.14.65:9093,10.18.14.65:9094}
     topic: ${LOG_KAFKA_TOPIC:applog-seeds}
 
-logging:
-  config: ${spring.cloud.config.prefix}/logback/logback.xml
+#logging:
+#  config: ${spring.cloud.config.prefix}/logback/logback.xml
