@@ -14,27 +14,27 @@
         </encoder>
     </appender>
 
-    <appender name="kafkaAppender" class="com.github.danielwegener.logback.kafka.KafkaAppender">
-        <encoder class="com.github.danielwegener.logback.kafka.encoding.PatternLayoutKafkaMessageEncoder">
-            <layout class="net.logstash.logback.layout.LogstashLayout">
-                <includeMdc>true</includeMdc>
-                <customFields>{"app_name":"${APP_NAME}","env_name":"${ENV_NAME}","host_name":"${HOST_NAME}","build_number":"${BUILD_NUMBER}"}</customFields>
-            </layout>
-        </encoder>
-        <topic>${LOG_KAFKA_TOPIC}</topic>
-        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.RoundRobinKeyingStrategy"/>
-        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
-        <producerConfig>bootstrap.servers=${LOG_KAFKA_HOST}</producerConfig>
-        <appender-ref ref="CONSOLE"/>
-    </appender>
+<!--    <appender name="kafkaAppender" class="com.github.danielwegener.logback.kafka.KafkaAppender">-->
+<!--        <encoder class="com.github.danielwegener.logback.kafka.encoding.PatternLayoutKafkaMessageEncoder">-->
+<!--            <layout class="net.logstash.logback.layout.LogstashLayout">-->
+<!--                <includeMdc>true</includeMdc>-->
+<!--                <customFields>{"app_name":"${APP_NAME}","env_name":"${ENV_NAME}","host_name":"${HOST_NAME}","build_number":"${BUILD_NUMBER}"}</customFields>-->
+<!--            </layout>-->
+<!--        </encoder>-->
+<!--        <topic>${LOG_KAFKA_TOPIC}</topic>-->
+<!--        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.RoundRobinKeyingStrategy"/>-->
+<!--        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>-->
+<!--        <producerConfig>bootstrap.servers=${LOG_KAFKA_HOST}</producerConfig>-->
+<!--        <appender-ref ref="CONSOLE"/>-->
+<!--    </appender>-->
 
     <root level="INFO">
         <springProfile name="local">
             <appender-ref ref="CONSOLE"/>
         </springProfile>
-        <springProfile name="!local">
-            <appender-ref ref="kafkaAppender"/>
-        </springProfile>
+<!--        <springProfile name="!local">-->
+<!--            <appender-ref ref="kafkaAppender"/>-->
+<!--        </springProfile>-->
     </root>
 
     <logger name="com.seeds.gateway.filter.RequestTimingFilter" level="debug" />
