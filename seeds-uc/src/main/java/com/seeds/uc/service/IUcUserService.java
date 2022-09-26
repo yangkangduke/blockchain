@@ -137,5 +137,11 @@ public interface IUcUserService extends IService<UcUser> {
 
     LoginResp buildLoginResponse(Long userId, String email);
 
+    /**
+     * 校验邮箱
+     * @param registerReq
+     * @return
+     */
+    Boolean registerCheckEmail(RegisterReq registerReq);
 }
 

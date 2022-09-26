@@ -505,4 +505,19 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .build();
     }
 
+    /**
+     * 校验邮箱
+     * @param registerReq
+     * @return
+     */
+    @Override
+    public Boolean registerCheckEmail(RegisterReq registerReq) {
+        // 校验账号重复
+        UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, registerReq.getEmail()));
+        if (one != null) {
+            return false;
+        }
+        return true;
+    }
+
 }
