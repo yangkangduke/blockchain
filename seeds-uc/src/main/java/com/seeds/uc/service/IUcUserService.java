@@ -139,9 +139,9 @@ public interface IUcUserService extends IService<UcUser> {
 
     /**
      * 校验邮箱
-     * @param registerReq
+     * @param email
      * @return
      */
-    Boolean registerCheckEmail(RegisterReq registerReq);
+    Boolean registerCheckEmail(String email);
 }
 

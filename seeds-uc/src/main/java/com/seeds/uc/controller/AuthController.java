@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 @Slf4j
 @RestController
@@ -57,8 +58,8 @@ public class AuthController {
 
     @PostMapping("/register/check-email")
     @ApiOperation(value = "校验邮箱", notes = "校验邮箱")
-    public GenericDto<Boolean> registerCheckEmail(@Valid @RequestBody RegisterReq registerReq) {
-        return GenericDto.success(ucUserService.registerCheckEmail(registerReq));
+    public GenericDto<Boolean> registerCheckEmail(@Valid @NotNull @RequestBody String email) {
+        return GenericDto.success(ucUserService.registerCheckEmail(email));
     }
 
 
