@@ -24,7 +24,7 @@ redis 6.0.2
 kafka 3.2.1
 
 ## database
-mysql 8.0.2
+mysql 8.0.28
 
 ## swagger
 swagger 3.0
