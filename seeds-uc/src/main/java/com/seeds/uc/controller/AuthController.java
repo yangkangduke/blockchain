@@ -55,6 +55,12 @@ public class AuthController {
         return GenericDto.success(ucUserService.registerEmail(registerReq));
     }
 
+    @PostMapping("/register/check-email")
+    @ApiOperation(value = "校验邮箱", notes = "校验邮箱")
+    public GenericDto<Boolean> registerCheckEmail(@Valid @RequestBody RegisterReq registerReq) {
+        return GenericDto.success(ucUserService.registerCheckEmail(registerReq));
+    }
+
 
     @PostMapping("/login")
     @ApiOperation(value = "账号登陆", notes = "1.调用/auth/login接口，返回token和authType " +
