@@ -1,8 +1,8 @@
 spring:
-  redis:
-    host: master.seeds-redis.wpdbfj.ape1.cache.amazonaws.com
-    port: 6379
-    password: KtxCpkdSsIbm3uNx
+#  redis:
+#    host: master.seeds-redis.wpdbfj.ape1.cache.amazonaws.com
+#    port: 6379
+#    password: KtxCpkdSsIbm3uNx
   servlet:
     multipart:
       max-file-size: 100MB
