@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "email")
 public class EmailProperties {
 
+	private Boolean enable;
 	private String host;
 	private String from;
 	private String user;

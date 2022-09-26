@@ -23,6 +23,15 @@
         <module>seeds-config</module>
         <module>seeds-chain-api</module>
         <module>seeds-admin-api</module>
+        <module>seeds-wallet-model</module>
+        <module>seeds-wallet-api</module>
+        <module>seeds-wallet</module>
+        <module>seeds-common</module>
+        <module>seeds-account-model</module>
+        <module>seeds-account</module>
+        <module>seeds-notification</module>
+        <module>seeds-notification-api</module>
+        <module>seeds-notification-model</module>
     </modules>
 
     <properties>

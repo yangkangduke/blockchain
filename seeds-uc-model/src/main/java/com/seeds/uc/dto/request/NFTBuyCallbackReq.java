@@ -1,6 +1,7 @@
 package com.seeds.uc.dto.request;
 
 import com.seeds.uc.enums.AccountActionStatusEnum;
+import com.seeds.uc.enums.NFTOfferStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +31,6 @@ public class NFTBuyCallbackReq implements Serializable {
     @ApiModelProperty("买方用户id")
     private Long toUserId;
 
-
     @NotNull
     @ApiModelProperty("NFT 归属方类型  0：平台  1：uc用户")
     private Integer ownerType;
@@ -58,6 +58,12 @@ public class NFTBuyCallbackReq implements Serializable {
     @ApiModelProperty("记录id")
     @NotNull
     private Long actionHistoryId;
+
+    @ApiModelProperty("offer的id")
+    private Long offerId;
+
+    @ApiModelProperty("状态 0：竞价中 1：已接受 2：已拒绝 3：已过期")
+    private NFTOfferStatusEnum offerStatusEnum;
 
     @ApiModelProperty("发送地址")
     private String fromAddress;

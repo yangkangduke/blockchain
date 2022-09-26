@@ -18,16 +18,16 @@ spring boot version: 2.7.1
 mybatis plus version: 3.5.1
 
 ## cache: 
-redis version: 4.0
+redis 6.0.2
 
 ## message bus:
-kafka
+kafka 3.2.1
 
 ## database
-mysql5.7
+mysql 8.0.28
 
 ## swagger
-swagger3.0
+swagger 3.0
 访问地址：http://ip:9999/swagger-ui/index.html
 增强版本：http://ip:9999/doc.html
 

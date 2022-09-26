@@ -1,12 +1,12 @@
 
-package com.seeds.uc.config;
+package com.seeds.common.web.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * 重置密码
+ * 邮件 配置信息
  *
  * @author yk
  * <p>
@@ -14,9 +14,10 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @Component
-@ConfigurationProperties(prefix = "resetpassword")
-public class ResetPasswordProperties {
+@ConfigurationProperties(prefix = "login")
+public class LoginProperties {
 
-    private String url;
+	private Boolean twofa;
+
 
 }

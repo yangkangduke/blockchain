@@ -93,7 +93,7 @@ public class PublicGameCommentsController {
         return remoteGameCommentsService.reply(req);
     }
 
-    @GetMapping("game-comments/get-replies/{id}")
+    @GetMapping("/public/game-comments/get-replies/{id}")
     @ApiOperation("获取评论下的回复")
     public GenericDto<List<SysGameCommentsRepliesResp>> getReplies(@ApiParam(value = "评论id") @PathVariable("id") Long id) {
         return remoteGameCommentsService.getReplies(id);

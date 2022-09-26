@@ -28,7 +28,14 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.web3j.crypto.WalletUtils;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -123,8 +130,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .build();
         } else {
             // 发送邮件
-            // generate a random code
-            // todo 暂时不发邮件
             sendCodeService.sendUserCodeByUseType(userDto, AuthCodeUseTypeEnum.LOGIN);
 
             // 将2FA token存入redis，用户进入等待2FA验证态
@@ -473,7 +478,17 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return true;
     }
 
-    private LoginResp buildLoginResponse(Long userId, String email) {
+    @Override
+    public Map<Long, String> queryNameByIds(Collection<Long> ids) {
+        List<UcUser> list = listByIds(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(UcUser::getId, UcUser::getNickname));
+    }
+
+    @Override
+    public LoginResp buildLoginResponse(Long userId, String email) {
         // 生成uc token给用户
         String ucToken = RandomUtil.genRandomToken(userId.toString());
         // 将token存入redis，用户进入登陆态

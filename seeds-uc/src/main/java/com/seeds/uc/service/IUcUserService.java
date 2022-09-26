@@ -10,6 +10,9 @@ import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.model.UcUser;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
  * <p>
  * user table 服务类
@@ -124,4 +127,15 @@ public interface IUcUserService extends IService<UcUser> {
      * @return
      */
     Boolean verifyMetamask(MetamaskVerifyReq verifyReq);
+
+    /**
+     * 通过id查询用户昵称
+     * @param ids 用户id列表
+     * @return 用户昵称
+     */
+    Map<Long, String> queryNameByIds(Collection<Long> ids);
+
+    LoginResp buildLoginResponse(Long userId, String email);
+
 }
+

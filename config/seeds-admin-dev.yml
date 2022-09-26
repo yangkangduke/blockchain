@@ -29,11 +29,6 @@ admin:
     redis:
       keyExpireAfter: 259200
 
-# admin 文件存储目录
-file:
-  bucketName: admin
-  store:
-    location: /seeds-admin/files/
 
 springfox:
   documentation:
@@ -76,4 +71,5 @@ hystrix:
             timeoutInMilliseconds: 5000
 
 Seeds-uc: http://192.168.1.100:10101
+Seeds-notification: http://127.0.0.1:10103
 Seeds-gateway: http://192.168.1.100:9999

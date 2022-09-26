@@ -18,8 +18,20 @@ spring:
           uri: http://Seeds-admin:10102/
           predicates:
             - Path=/admin/**
-          filters:           #网关过滤器；
+          filters:
             - AdminAuth
+        - id: seeds-wallet-service
+          uri: http://Seeds-wallet:10104/
+          predicates:
+            - Path=/wallet/**
+
+        - id: seeds-notification-service
+          uri: http://Seeds-notification:10103/
+          predicates:
+            - Path=/notification/**
+          filters:
+            - Auth
+
       globalcors:
         cors-configurations:
           '[/**]':
@@ -30,14 +42,14 @@ spring:
               - HEAD
               - PUT
               - POST
-      default-filters:          #默认的网关过滤器
-        - StripPrefix=1         #分割掉一个路径；
+      default-filters:
+        - StripPrefix=1
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
         - AddResponseHeader=Access-Control-Allow-Credentials, true
         - AddResponseHeader=Access-Control-Allow-Origin, *
         - name: RequestRateLimiter
           args:
-            key-resolver: '#{@defaultResolver}'       #使用SpEl 表达式按名称引用bean对象
-            redis-rate-limiter.replenishRate: 5       #令牌桶每秒填充速率；
-            redis-rate-limiter.burstCapacity: 10      #令牌桶总容量；
+            key-resolver: '#{@defaultResolver}'
+            redis-rate-limiter.replenishRate: 5
+            redis-rate-limiter.burstCapacity: 10
 

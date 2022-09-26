@@ -11,17 +11,16 @@ import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.NFTBuyReq;
+import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.GenericException;
+import com.seeds.uc.service.IUcNftOfferService;
 import com.seeds.uc.service.IUcUserAccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -44,8 +43,9 @@ public class OpenNFTController {
     @Autowired
     private IUcUserAccountService ucUserAccountService;
     @Autowired
+    private IUcNftOfferService ucNftOffersService;
+    @Autowired
     private RemoteNftService remoteNftService;
-
 
     @PostMapping("/buy")
     @ApiOperation(value = "购买", notes = "购买")
@@ -89,6 +89,27 @@ public class OpenNFTController {
     public GenericDto<Object> ucUpOrDown(@Valid @RequestBody UcSwitchReq req) {
         req.setUcUserId(UserContext.getCurrentUserId());
         return remoteNftService.ucUpOrDown(req);
+    }
+
+    @PostMapping("/make-offer")
+    @ApiOperation("NFT出价")
+    public GenericDto<Object> makeOffer(@Valid @RequestBody NFTMakeOfferReq req) {
+        ucNftOffersService.makeOffer(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("/offer-reject/{id}")
+    @ApiOperation("NFT竞价拒绝")
+    public GenericDto<Object> offerReject(@PathVariable("id") Long id) {
+        ucNftOffersService.offerReject(id);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("/offer-accept/{id}")
+    @ApiOperation("NFT竞价接受")
+    public GenericDto<Object> offerAccept(@PathVariable("id") Long id) {
+        ucNftOffersService.offerAccept(id);
+        return GenericDto.success(null);
     }
 
 }

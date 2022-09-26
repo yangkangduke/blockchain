@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -8,6 +9,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.common.mq.constant.KafkaTopic;
+import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.ChainMintNftResp;
 import com.seeds.admin.dto.response.NftPropertiesResp;
@@ -16,11 +19,13 @@ import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.*;
 import com.seeds.admin.enums.*;
 import com.seeds.admin.mapper.SysNftMapper;
+import com.seeds.admin.mq.producer.KafkaProducer;
 import com.seeds.admin.service.*;
 import com.seeds.chain.config.SmartContractConfig;
 import com.seeds.common.exception.SeedsException;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.enums.AccountActionStatusEnum;
+import com.seeds.uc.enums.NFTOfferStatusEnum;
 import com.seeds.uc.feign.RemoteNFTService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -72,6 +78,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Autowired
     private SysNftPropertiesTypeService sysNftPropertiesTypeService;
+
+    @Resource
+    private KafkaProducer kafkaProducer;
 
     @Override
     public IPage<SysNftResp> queryPage(SysNftPageReq query) {
@@ -125,10 +134,19 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         sysNft.setNumber(sysSequenceNoService.generateNftNo());
         // 保存NFT
         save(sysNft);
+
         // NFT上链
-        executorService.submit(() -> {
-            mintNft(req, sysNft.getId(), imageFileHash);
-        });
+        //executorService.submit(() -> {
+        //    mintNft(req, sysNft.getId(), imageFileHash);
+        //});
+
+        // 发NFT保存成功消息
+        NftMintMsgDTO msgDTO = new NftMintMsgDTO();
+        BeanUtils.copyProperties(req, msgDTO);
+        msgDTO.setId(sysNft.getId());
+        msgDTO.setImageFileHash(imageFileHash);
+
+        kafkaProducer.send(KafkaTopic.NFT_SAVE_SUCCESS, JSONUtil.toJsonStr(msgDTO));
     }
 
     @Override
@@ -257,9 +275,12 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             return;
         }
         // 删除链上数据
-        executorService.submit(() -> {
-            burnNft(deleteList);
-        });
+        //executorService.submit(() -> {
+        //   burnNft(deleteList);
+        //});
+
+        // 发NFT删除成功消息
+        kafkaProducer.send(KafkaTopic.NFT_DELETE_SUCCESS, JSONUtil.toJsonStr(deleteList));
     }
 
     @Override
@@ -273,7 +294,15 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     public void ownerChange(List<NftOwnerChangeReq> req) {
-        transferNft(req);
+        Set<Long> nftIds = req.stream().map(NftOwnerChangeReq::getId).collect(Collectors.toSet());
+        List<SysNftEntity> list = listByIds(nftIds);
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        // 回调通知uc
+        req.forEach(p -> {
+            transferNft(p, list);
+        });
     }
 
     @Override
@@ -339,6 +368,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             propertiesList.forEach(p -> {
                 SysNftPropertiesEntity nftProperties = new SysNftPropertiesEntity();
                 nftProperties.setNftId(nftId);
+                p.setTypeId(p.getTypeId() == null ? -1 : p.getTypeId());
                 BeanUtils.copyProperties(p, nftProperties);
                 nftPropertiesList.add(nftProperties);
             });
@@ -359,17 +389,18 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         return attributes;
     }
 
-    private void mintNft(SysNftAddReq req, Long id, String imageFileHash) {
+    @Override
+    public void mintNft(NftMintMsgDTO msgDTO) {
         int initStatus = NftInitStatusEnum.NORMAL.getCode();
         String errorMsg;
-        SysNftEntity nft = getById(id);
+        SysNftEntity nft = getById(msgDTO.getId());
         try {
             // 上传Metadata
-            String metadataFileHash = chainNftService.uploadMetadata(imageFileHash,
+            String metadataFileHash = chainNftService.uploadMetadata(msgDTO.getImageFileHash(),
                     ChainMintNftReq.builder()
-                            .name(req.getName())
-                            .description(req.getDescription())
-                            .attributes(buildNftProperties(req.getPropertiesList()))
+                            .name(msgDTO.getName())
+                            .description(msgDTO.getDescription())
+                            .attributes(buildNftProperties(msgDTO.getPropertiesList()))
                             .build());
             // 在链上创建NFT
             ChainMintNftResp chainMintNftResp = chainNftService.mintNft(metadataFileHash);
@@ -378,11 +409,11 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             }
             nft.setBlockChain(chainMintNftResp.getBlockchain());
             BeanUtils.copyProperties(chainMintNftResp, nft);
-            nft.setStatus(req.getStatus());
+            nft.setStatus(msgDTO.getStatus());
             // 添加NFT属性
-            addNftProperties(id, req.getPropertiesList());
+            addNftProperties(msgDTO.getId(), msgDTO.getPropertiesList());
         } catch (Exception e) {
-            log.error("NFT创建失败， id={}, msg={}", id, e.getMessage());
+            log.error("NFT创建失败， id={}, msg={}", msgDTO.getId(), e.getMessage());
             initStatus = NftInitStatusEnum.CREATE_FAILED.getCode();
             errorMsg = e.getMessage();
             if (StringUtils.isNotBlank(errorMsg) && errorMsg.length() > 255) {
@@ -427,7 +458,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         updateById(sysNft);
     }
 
-    private void burnNft(List<SysNftEntity> sysNftEntities) {
+    @Override
+    public void burnNft(List<SysNftEntity> sysNftEntities) {
         if (CollectionUtils.isEmpty(sysNftEntities)) {
             return;
         }
@@ -455,40 +487,31 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         });
     }
 
-    private void transferNft(List<NftOwnerChangeReq> req) {
-        Set<Long> nftIds = req.stream().map(NftOwnerChangeReq::getId).collect(Collectors.toSet());
-        List<SysNftEntity> list = listByIds(nftIds);
-        if (CollectionUtils.isEmpty(list)) {
-            return;
-        }
+    @Transactional(rollbackFor = Exception.class)
+    public void transferNft(NftOwnerChangeReq req, List<SysNftEntity> list) {
         Map<Long, SysNftEntity> map = list.stream().collect(Collectors.toMap(SysNftEntity::getId, p -> p));
-        AccountActionStatusEnum status = AccountActionStatusEnum.SUCCESS;
-        try {
-            // todo 链上归属人变更
-            // 回调通知uc
-            req.forEach(p -> {
-                SysNftEntity nft = map.get(p.getId()) == null ? new SysNftEntity() : map.get(p.getId());
-                NFTBuyCallbackReq callback = NFTBuyCallbackReq.builder()
-                        .fromUserId(nft.getOwnerId())
-                        .fromAddress(p.getFromAddress())
-                        .toUserId(p.getOwnerId())
-                        .amount(nft.getPrice())
-                        .tokenId(nft.getTokenId())
-                        .nftId(p.getId())
-                        .actionHistoryId(p.getActionHistoryId())
-                        .actionStatusEnum(status)
-                        .toAddress(p.getToAddress())
-                        .ownerType(p.getOwnerType())
-                        .build();
-                remoteNftService.buyNFTCallback(callback);
-                SysNftEntity entity = new SysNftEntity();
-                BeanUtils.copyProperties(p, entity);
-                entity.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
-                entity.setStatus(WhetherEnum.NO.value());
-                updateById(entity);
-            });
-        } catch (Exception e) {
-            log.error("归属人变更失败，message={}", e.getMessage());
+        SysNftEntity entity = new SysNftEntity();
+        BeanUtils.copyProperties(req, entity);
+        entity.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
+        entity.setStatus(WhetherEnum.NO.value());
+        updateById(entity);
+        SysNftEntity nft = map.get(req.getId()) == null ? new SysNftEntity() : map.get(req.getId());
+        NFTBuyCallbackReq callback = NFTBuyCallbackReq.builder()
+                .fromUserId(nft.getOwnerId())
+                .fromAddress(req.getFromAddress())
+                .toUserId(req.getOwnerId())
+                .amount(nft.getPrice())
+                .tokenId(nft.getTokenId())
+                .nftId(req.getId())
+                .actionHistoryId(req.getActionHistoryId())
+                .actionStatusEnum(AccountActionStatusEnum.SUCCESS)
+                .offerId(req.getOfferId())
+                .offerStatusEnum(NFTOfferStatusEnum.ACCEPTED)
+                .toAddress(req.getToAddress())
+                .ownerType(req.getOwnerType())
+                .build();
+        if (!remoteNftService.buyNFTCallback(callback).isSuccess()) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
         }
     }
 

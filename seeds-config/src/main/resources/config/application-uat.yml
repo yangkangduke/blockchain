@@ -7,21 +7,6 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 1024MB
-
-file:
-  bucketName: seeds # 上文创建的桶名称
-  oss:
-    enable: true
-    endpoint: http://127.0.0.1:9000
-    access-key: Seeds123!
-    secret-key: Seeds123!
-
-email:
-  host: smtp.gmail.com
-  from: seeds<yangkang.duke@gmail.com>
-  user: yangkang.duke@gmail.com
-  pass: nfijtkbvgaflsprw
-
   kafka:
     bootstrap-servers: 54.168.239.215:9092
     producer:
@@ -30,6 +15,11 @@ email:
       buffer-memory: 33554432
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        sasl.mechanism: PLAIN
+        security.protocol: SASL_PLAINTEXT
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
+
     consumer:
       group-id: tomge-consumer-group  # 默认消费者group id
       auto-offset-reset: earliest
@@ -37,7 +27,30 @@ email:
       auto-commit-interval: 100
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        sasl.mechanism: PLAIN
+        security.protocol: SASL_PLAINTEXT
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
+
     appender:
       bootstrap:
         servers: 54.168.239.215:9092
         topic: applog
+file:
+  bucketName: theseeds-uat # 上文创建的桶名称
+  oss:
+    enable: true
+    endpoint: https://theseeds-uat.s3.ap-east-1.amazonaws.com
+    access-key: AKIAQMKUPROLJREE5AGN
+    secret-key: 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
+
+email:
+  enable: true
+  host: email-smtp.ap-northeast-1.amazonaws.com
+  from: seeds<no-reply-uat@theseeds.io>
+  user: AKIAQMKUPROLIXMNEIJK
+  pass: BBTyucDgyIg8qIDU1ki5XT1x3JEZZSA3cK1FC96TO0r4
+
+login:
+  twofa: true
+

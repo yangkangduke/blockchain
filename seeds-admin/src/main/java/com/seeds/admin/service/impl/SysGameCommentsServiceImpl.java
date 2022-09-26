@@ -16,6 +16,7 @@ import com.seeds.admin.entity.SysGameCommentsLikeBuryEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.enums.SortTypeEnum;
 import com.seeds.admin.enums.SysStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.mapper.SysGameCommentsMapper;
 import com.seeds.admin.service.SysGameCommentsLikeBuryService;
@@ -128,8 +129,9 @@ public class SysGameCommentsServiceImpl extends ServiceImpl<SysGameCommentsMappe
     @Override
     public IPage<SysGameCommentsResp> queryPageForUc(SysGameCommentsPageReq req) {
         LambdaQueryWrapper<SysGameCommentsEntity> wrapper = new LambdaQueryWrapper<>();
-
-        wrapper.orderByDesc((req.getSortType() != null && req.getSortType() == SortTypeEnum.RANK.getCode()) ? SysGameCommentsEntity::getLikes : SysGameCommentsEntity::getCommentsTime);
+        wrapper.eq(!ObjectUtils.isEmpty(req.getGameId()),SysGameCommentsEntity::getGameId,req.getGameId())
+                .eq(SysGameCommentsEntity::getStatus, WhetherEnum.YES.value())
+                .orderByDesc((req.getSortType() != null && req.getSortType() == SortTypeEnum.RANK.getCode()) ? SysGameCommentsEntity::getLikes : SysGameCommentsEntity::getCommentsTime);
 
         Page<SysGameCommentsEntity> page = new Page<>(req.getCurrent(), req.getSize());
         List<SysGameCommentsEntity> records = page(page, wrapper).getRecords();

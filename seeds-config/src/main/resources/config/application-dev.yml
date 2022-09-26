@@ -7,7 +7,37 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 1024MB
+  kafka:
+    bootstrap-servers: 192.168.1.101:9092
+    producer:
+      retries: 3  # 生产者发送失败时，重试次数
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        sasl.mechanism: PLAIN
+        security.protocol: SASL_PLAINTEXT
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
 
+    consumer:
+      group-id: tomge-consumer-group  # 默认消费者group id
+      auto-offset-reset: earliest
+      enable-auto-commit: false  # 手动提交ack
+      auto-commit-interval: 100
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        sasl.mechanism: PLAIN
+        security.protocol: SASL_PLAINTEXT
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
+    listener:
+      ack-mode: manual_immediate
+
+    appender:
+      bootstrap:
+        servers: 192.168.1.101:9092
+        topic: applog
 file:
   bucketName: seeds # 上文创建的桶名称
   oss:
@@ -17,27 +47,11 @@ file:
     secret-key: seeds123!
 
 email:
-  host: smtp.gmail.com
-  from: seeds<yangkang.duke@gmail.com>
-  user: yangkang.duke@gmail.com
-  pass: nfijtkbvgaflsprw
+  enable: false
+  host: email-smtp.ap-northeast-1.amazonaws.com
+  from: seeds<no-reply-dev@theseeds.io>
+  user: AKIAQMKUPROLIXMNEIJK
+  pass: BBTyucDgyIg8qIDU1ki5XT1x3JEZZSA3cK1FC96TO0r4
 
-  kafka:
-    bootstrap-servers: 192.168.1.101:9092
-    producer:
-      retries: 3  # 生产者发送失败时，重试次数
-      batch-size: 16384
-      buffer-memory: 33554432
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    consumer:
-      group-id: tomge-consumer-group  # 默认消费者group id
-      auto-offset-reset: earliest
-      enable-auto-commit: true
-      auto-commit-interval: 100
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    appender:
-      bootstrap:
-        servers: 127.0.0.1:9092
-        topic: applog
+login:
+  twofa: true
