@@ -15,10 +15,7 @@ spring:
       buffer-memory: 33554432
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      properties:
-        sasl.mechanism: PLAIN
-        security.protocol: SASL_PLAINTEXT
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
+
 
     consumer:
       group-id: tomge-consumer-group  # 默认消费者group id
@@ -27,15 +24,9 @@ spring:
       auto-commit-interval: 100
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      properties:
-        sasl.mechanism: PLAIN
-        security.protocol: SASL_PLAINTEXT
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
 
-    appender:
-      bootstrap:
-        servers: 54.168.239.215:9092
-        topic: applog
+
+
 file:
   bucketName: seeds # 上文创建的桶名称
   oss:

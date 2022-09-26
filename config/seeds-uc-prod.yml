@@ -8,6 +8,12 @@ spring:
     password: jT*kx9nqeqv6UQZR
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  kafka:
+    appender:
+      bootstrap:
+        servers: 10.18.14.65:9093
+        topic: applog-seeds
+
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
