@@ -18,7 +18,7 @@ spring:
   cloud:
     config:
       label: main #分支名称
-      uri: http://http://seeds-config.app.prd.devseeds.link
+      uri: http://seeds-config.app.prd.devseeds.link
       profile: prod
       name: application,seeds-uc #配置文件名称
       fail-fast: true
