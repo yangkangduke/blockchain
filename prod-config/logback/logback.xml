@@ -37,5 +37,5 @@
         </springProfile>
     </root>
 
-    <logger name="com.kine.gateway.filter.RequestTimingFilter" level="debug" />
+    <logger name="com.seeds.gateway.filter.RequestTimingFilter" level="debug" />
 </configuration>

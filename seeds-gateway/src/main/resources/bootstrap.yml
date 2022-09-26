@@ -1,9 +1,20 @@
+info:
+  app:
+    name: ${APP_NAME:kine-gateway}
+    check: ${APP_CHECK:NOT_SET}
+  env:
+    name: ${PROFILE:NOT_SET}
+    hostname: ${hostname:NOT_SET}
+  build:
+    version: ${BUILD_NUMBER:NOT_SET}
+
 spring:
   application:
-    name: seeds-gateway
-
+    name: ${APP_NAME:seeds-gateway}
   profiles:
-    active: prod
+    active: ${PROFILE:NOT_SET}
+    include:
+      - ${ENV_PROFILE:default}
 
   # 读取本地文件
 #  cloud:
@@ -15,19 +26,6 @@ spring:
 
 
   #读取github上文件
-#  cloud:
-#    config:
-#      label: main #分支名称
-#      uri: http://seeds-config.app.prd.devseeds.link
-#      profile: prod
-#      name: application,seeds-gateway #配置文件名称
-#      fail-fast: true
-#      retry:
-#        initial-interval: 2000
-#        max-interval: 10000
-#        multiplier: 2
-#        max-attempts: 10
-
   cloud:
     config:
       uri: ${CONFIG_SERVERS:http://seeds-config.app.prd.devseeds.link}
@@ -35,3 +33,10 @@ spring:
       prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/main
       enabled: true
 
+log:
+  kafka:
+    servers: ${LOG_KAFKA_SERVERS:10.18.14.65:9092,10.18.14.65:9093,10.18.14.65:9094}
+    topic: ${LOG_KAFKA_TOPIC:applog-seeds}
+
+logging:
+  config: ${spring.cloud.config.prefix}/logback/logback.xml

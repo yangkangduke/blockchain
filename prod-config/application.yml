@@ -49,3 +49,7 @@ email:
 
 login:
   twofa: true
+
+service:
+  url:
+    uc: http://seeds-uc.app.prd.devseeds.link
