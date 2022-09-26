@@ -26,11 +26,12 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 redisson:
-  address: redis://redis.wpdbfj.ape1.cache.amazonaws.com:6379
-  timeout: 5000
-  poolsize: 50
-  idlesize: 50
+  address: rediss://redis.wpdbfj.ape1.cache.amazonaws.com:6379
   password: KtxCpkdSsIbm3uNx
+  timeout: 5000
+  max-pool-size: 50
+  min-idle-size: 25
+
 
 file:
   bucketName: seeds # 上文创建的桶名称
