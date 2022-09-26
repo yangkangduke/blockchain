@@ -56,9 +56,9 @@ public class AuthController {
         return GenericDto.success(ucUserService.registerEmail(registerReq));
     }
 
-    @PostMapping("/register/check-email")
+    @GetMapping("/register/check-email")
     @ApiOperation(value = "校验邮箱", notes = "校验邮箱")
-    public GenericDto<Boolean> registerCheckEmail(@Valid @NotNull @RequestBody String email) {
+    public GenericDto<Boolean> registerCheckEmail(@Valid @NotNull String email) {
         return GenericDto.success(ucUserService.registerCheckEmail(email));
     }
 
