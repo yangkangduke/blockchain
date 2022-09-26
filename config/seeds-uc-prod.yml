@@ -38,7 +38,7 @@ springfox:
       enabled: true
 
 redisson:
-  address: rediss://redis.wpdbfj.ape1.cache.amazonaws.com:6379
+  address: rediss://master.seeds-redis.wpdbfj.ape1.cache.amazonaws.com:6379
   password: KtxCpkdSsIbm3uNx
   timeout: 5000
   max-pool-size: 50
