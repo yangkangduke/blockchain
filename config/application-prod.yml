@@ -1,8 +1,4 @@
 spring:
-#  redis:
-#    host: master.seeds-redis.wpdbfj.ape1.cache.amazonaws.com
-#    port: 6379
-#    password: KtxCpkdSsIbm3uNx
   servlet:
     multipart:
       max-file-size: 100MB
@@ -16,7 +12,6 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-
     consumer:
       group-id: tomge-consumer-group  # 默认消费者group id
       auto-offset-reset: earliest
@@ -25,12 +20,10 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
-#redisson:
-#  address: rediss://master.seeds-redis.wpdbfj.ape1.cache.amazonaws.com:6379
-#  password: KtxCpkdSsIbm3uNx
-#  timeout: 5000
-#  max-pool-size: 50
-#  min-idle-size: 25
+redis:
+  host: master.seeds-redis.wpdbfj.ape1.cache.amazonaws.com
+  port: 6379
+  password: KtxCpkdSsIbm3uNx
 
 redisson:
   address: rediss://${redis.host}:${redis.port}
