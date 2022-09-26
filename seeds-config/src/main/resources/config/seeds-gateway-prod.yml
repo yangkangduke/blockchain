@@ -5,6 +5,12 @@ spring:
   application:
     name: seeds-gateway
 
+  kafka:
+    appender:
+      bootstrap:
+        servers: 10.18.14.65:9092
+        topic: applog-seeds
+
   cloud:
     gateway:
       routes:
