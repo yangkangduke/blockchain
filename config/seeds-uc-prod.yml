@@ -38,11 +38,11 @@ springfox:
       enabled: true
 
 redisson:
-  address: redis://Seeds-redis:6379
+  address: redis://redis.wpdbfj.ape1.cache.amazonaws.com:6379
   timeout: 5000
   poolsize: 50
   idlesize: 50
-  password: Seeds123!
+  password: KtxCpkdSsIbm3uNx
 
 
 Seeds-admin: http://127.0.0.1:10102
