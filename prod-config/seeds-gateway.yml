@@ -1,6 +1,9 @@
 spring:
   redis:
-    url: "rediss://${redis.password}@${redis.host}:${redis.port}"
+    host: ${redis.host}
+    port: ${redis.port}
+    password: ${redis.password}
+    ssl: true
     timeout: 5000
     lettuce:
       pool:
