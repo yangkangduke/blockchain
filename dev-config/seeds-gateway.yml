@@ -3,7 +3,7 @@ spring:
     host: ${redis.host}
     port: ${redis.port}
     password: ${redis.password}
-    ssl: true
+#    ssl: true
     timeout: 5000
     lettuce:
       pool:

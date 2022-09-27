@@ -12,20 +12,20 @@ spring:
   application:
     name: ${APP_NAME:seeds-gateway}
   profiles:
-    active: ${PROFILE:NOT_SET}
+    active: ${PROFILE:local}
     include:
       - ${ENV_PROFILE:default}
   cloud:
     config:
       uri: ${CONFIG_SERVERS:http://127.0.0.1:8888}
-      label: ${CONFIG_GIT_VERSION:main}
-      prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/main
+      label: ${CONFIG_GIT_VERSION:dev}
+      prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/dev
       enabled: true
 
 log:
   kafka:
-    servers: ${LOG_KAFKA_SERVERS:10.18.14.65:9092,10.18.14.65:9093,10.18.14.65:9094}
-    topic: ${LOG_KAFKA_TOPIC:applog-seeds}
+    servers: ${LOG_KAFKA_SERVERS:192.168.1.101:9092}
+    topic: ${LOG_KAFKA_TOPIC:applog}
 
 logging:
   config: ${spring.cloud.config.prefix}/logback/logback.xml
