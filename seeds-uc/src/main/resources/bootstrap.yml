@@ -17,7 +17,7 @@ spring:
       - ${ENV_PROFILE:default}
   cloud:
     config:
-      uri: ${CONFIG_SERVERS:http://seeds-config.app.prd.devseeds.link}
+      uri: ${CONFIG_SERVERS:http://127.0.0.1:8888}
       label: ${CONFIG_GIT_VERSION:dev}
       prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/dev
       enabled: true
