@@ -31,6 +31,12 @@ spring:
             - Path=/notification/**
           filters:
             - Auth
+        - id: seeds-game-service
+            uri: http://Seeds-game:10105/
+            predicates:
+              - Path=/game/**
+            filters:
+              - OpenAuth
 
       globalcors:
         cors-configurations:

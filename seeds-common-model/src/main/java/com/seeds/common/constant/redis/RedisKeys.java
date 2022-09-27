@@ -1,4 +1,4 @@
-package com.seeds.common.redis.constant;
+package com.seeds.common.constant.redis;
 
 import lombok.experimental.UtilityClass;
 
@@ -16,7 +16,16 @@ public class RedisKeys {
     // uid -> login token
     public final String UC_LOGIN_UID_KEY_TEMPLATE = UC_KEY_PREFIX + "login:uid:%s";
 
+    public final String UC_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "token:%s";
+
     public final String ADMIN_LOGIN_UID_KEY_TEMPLATE = ADMIN_KEY_PREFIX + "login:uid:%s";
+
+    /**
+     * return uc:token:{uid} as redis key in login
+     */
+    public String getUcTokenKey(String token) {
+        return String.format(UC_TOKEN_KEY_TEMPLATE, token);
+    }
 
     /**
      * 保存的内容为 uid -> login token

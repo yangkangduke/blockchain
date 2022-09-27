@@ -1,10 +1,10 @@
 package com.seeds.common.web.interceptor;
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.dto.LoginDTO;
 import com.seeds.common.constant.redis.RedisKeys;
 import com.seeds.common.web.HttpHeaders;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.common.web.inner.Inner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RedissonClient;
@@ -14,7 +14,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +22,7 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-public class UserContextInterceptor implements HandlerInterceptor {
+public class OpenContextInterceptor implements HandlerInterceptor {
 
     @Autowired
     private MappingJackson2HttpMessageConverter converter;
@@ -32,39 +31,45 @@ public class UserContextInterceptor implements HandlerInterceptor {
     private RedissonClient redissonClient;
 
     private static final GenericDto<String> INVALID_TOKEN_RESPONSE = GenericDto.failure("Invalid token", 401);
+    private static final GenericDto<String> INVALID_SIGNATURE_RESPONSE = GenericDto.failure("Invalid signature", 401);
+    private static final String NO_LOGIN_REQUIRED_PATH = "/open-api/";
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (getInnerAnnotation(handler) != null && Boolean.parseBoolean(request.getHeader(HttpHeaders.INNER_REQUEST))) {
+        // 外部调用签名校验
+        String accessKey = request.getHeader(HttpHeaders.ACCESS_KEY);
+        String signature = request.getHeader(HttpHeaders.SIGNATURE);
+        if (!accessKey.equals(signature)) {
+            writeFailureResponse(response, INVALID_SIGNATURE_RESPONSE);
+            return false;
+        }
+        // 不需要进行登录校验
+        if (request.getRequestURI().contains(NO_LOGIN_REQUIRED_PATH)) {
             return true;
         }
+        // 需要进行登录校验
         String token = request.getHeader(HttpHeaders.USER_TOKEN);
         if (StringUtils.isEmpty(token)) {
-            writeFailureResponse(response);
+            writeFailureResponse(response, INVALID_TOKEN_RESPONSE);
             return false;
         }
-        String userIdStr = request.getHeader(HttpHeaders.INTERNAL_USER_ID);
-        if (StringUtils.isEmpty(userIdStr)) {
-            writeFailureResponse(response);
-            return false;
-        }
-        String redisToken = redissonClient.<String>getBucket(RedisKeys.getUcLoginUidKey(Long.valueOf(userIdStr))).get();
-        if (!token.equals(redisToken)) {
-            writeFailureResponse(response);
+        LoginDTO user = redissonClient.<LoginDTO>getBucket(RedisKeys.getUcTokenKey(token)).get();
+        if (user == null || user.getUserId() == null) {
+            writeFailureResponse(response, INVALID_TOKEN_RESPONSE);
             return false;
         }
         try {
-            UserContext.setCurrentUserId(Long.valueOf(userIdStr));
+            UserContext.setCurrentUserId(user.getUserId());
             return true;
         } catch (Exception e) {
-            log.error("Got invalid user id from header: {}", userIdStr);
-            writeFailureResponse(response);
+            log.error("Got invalid user id from header: {}", user.getUserId());
+            writeFailureResponse(response, INVALID_TOKEN_RESPONSE);
             return false;
         }
     }
 
-    private void writeFailureResponse(HttpServletResponse response) {
+    private void writeFailureResponse(HttpServletResponse response, GenericDto<String> message) {
         try {
-            converter.write(INVALID_TOKEN_RESPONSE, MediaType.APPLICATION_JSON, new ServletServerHttpResponse(response));
+            converter.write(message, MediaType.APPLICATION_JSON, new ServletServerHttpResponse(response));
         } catch (IOException e) {
             log.error("response io exception: ", e);
         }
@@ -75,16 +80,7 @@ public class UserContextInterceptor implements HandlerInterceptor {
         UserContext.removeCurrentUserId();
     }
 
-    private Inner getInnerAnnotation(Object handler) {
-        if (handler instanceof HandlerMethod) {
-            HandlerMethod handlerMethod = (HandlerMethod) handler;
-            Inner inner = handlerMethod.getMethodAnnotation(Inner.class);
-            if (inner == null) {
-                inner = handlerMethod.getMethod().getDeclaringClass().getAnnotation(Inner.class);
-            }
-            return inner;
-        }
-        return null;
+    private boolean signatureCheck() {
+        return true;
     }
-
 }

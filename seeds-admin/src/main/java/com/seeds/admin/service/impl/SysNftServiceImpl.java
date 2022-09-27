@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.common.mq.constant.KafkaTopic;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.ChainMintNftResp;
