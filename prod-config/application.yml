@@ -24,7 +24,6 @@ redis:
   host: master.seeds-redis.wpdbfj.ape1.cache.amazonaws.com
   port: 6379
   password: KtxCpkdSsIbm3uNx
-  encode-password: S3R4Q3BrZFNzSWJtM3VOeA==
 
 redisson:
   address: rediss://${redis.host}:${redis.port}
