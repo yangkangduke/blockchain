@@ -1,21 +1,19 @@
-server:
-  port: 8080
-
 spring:
-  application:
-    name: seeds-gateway
-
-  kafka:
-    appender:
-      bootstrap:
-        servers: 10.18.14.65:9092
-        topic: applog-seeds
-
+  redis:
+    host: ${redis.host}
+    port: ${redis.port}
+    password: ${redis.password}
+    ssl: true
+    timeout: 5000
+    lettuce:
+      pool:
+        max-active: 32
+        min-idle: 8
   cloud:
     gateway:
       routes:
         - id: seeds-uc-service
-          uri: http://Seeds-uc:10101
+          uri: ${service.url.uc}
           predicates:
             - Path=/uc/**
           filters:
@@ -45,6 +43,10 @@ spring:
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
         - AddResponseHeader=Access-Control-Allow-Credentials, true
         - AddResponseHeader=Access-Control-Allow-Origin, *
+        - RemoveResponseHeader=X-RateLimit-Remaining
+        - RemoveResponseHeader=X-RateLimit-Replenish-Rate
+        - RemoveResponseHeader=X-RateLimit-Requested-Tokens
+        - RemoveResponseHeader=X-RateLimit-Burst-Capacity
         - name: RequestRateLimiter
           args:
             key-resolver: '#{@defaultResolver}'

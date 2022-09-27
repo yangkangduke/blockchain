@@ -7,7 +7,7 @@ info:
 
 spring:
   application:
-    name: seeds-config
+    name: ${APP_NAME:seeds-config}
 
 #  profiles:
 #    active: native # 取本地配置文件
@@ -25,6 +25,6 @@ spring:
           uri: https://github.com/AllenAi007/seeds-java
           username: 819628513@qq.com
           password: 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
-          search-paths: prod-config
-          default-label: main
+          search-paths: dev-config
+          default-label: dev
           force-pull: true
