@@ -25,7 +25,7 @@ spring:
           filters:
             - AdminAuth
         - id: seeds-wallet-service
-          uri: http://Seeds-wallet:10104/
+          uri: ${service.url.wallet}
           predicates:
             - Path=/wallet/**
       globalcors:

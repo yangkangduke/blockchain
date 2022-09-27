@@ -60,3 +60,4 @@ login:
 service:
   url:
     uc: http://192.168.1.100:10101
+    wallet: http://192.168.1.100:10104
