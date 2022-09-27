@@ -3,7 +3,7 @@ spring:
     host: ${redis.host}
     port: ${redis.port}
     password: ${redis.password}
-    ssl: true
+#    ssl: true
     timeout: 5000
     lettuce:
       pool:
@@ -24,8 +24,12 @@ spring:
             - Path=/admin/**
           filters:
             - AdminAuth
+        - id: seeds-account-service
+          uri: ${service.url.account}
+          predicates:
+            - Path=/account/**
         - id: seeds-wallet-service
-          uri: http://Seeds-wallet:10104/
+          uri: ${service.url.wallet}
           predicates:
             - Path=/wallet/**
       globalcors:
