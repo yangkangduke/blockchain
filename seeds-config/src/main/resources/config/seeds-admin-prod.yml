@@ -1,5 +1,5 @@
 server:
-  port: 10102
+  port: 8080
 
 spring:
   mvc:
@@ -11,6 +11,12 @@ spring:
     username: root
     password: Seeds123!
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  kafka:
+    appender:
+      bootstrap:
+        servers: 10.18.14.65:9093
+        topic: applog-seeds
 
 management:
   endpoints:

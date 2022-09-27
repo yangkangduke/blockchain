@@ -1,9 +1,15 @@
 server:
-  port: 9999
+  port: 8080
 
 spring:
   application:
     name: seeds-gateway
+
+  kafka:
+    appender:
+      bootstrap:
+        servers: 10.18.14.65:9092
+        topic: applog-seeds
 
   cloud:
     gateway:
