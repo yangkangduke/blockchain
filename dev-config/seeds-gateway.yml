@@ -24,6 +24,10 @@ spring:
             - Path=/admin/**
           filters:
             - AdminAuth
+        - id: seeds-account-service
+          uri: ${service.url.account}
+          predicates:
+            - Path=/account/**
         - id: seeds-wallet-service
           uri: ${service.url.wallet}
           predicates:
