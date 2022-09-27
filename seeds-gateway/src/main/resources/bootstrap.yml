@@ -1,6 +1,6 @@
 info:
   app:
-    name: ${APP_NAME:kine-gateway}
+    name: ${APP_NAME:seeds-gateway}
     check: ${APP_CHECK:NOT_SET}
   env:
     name: ${PROFILE:NOT_SET}
