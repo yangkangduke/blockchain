@@ -23,11 +23,5 @@ public interface IChainDepositService {
      */
     String getDepositAddress(Chain chain, long userId, boolean createIfNull) throws Exception;
 
-    /**
-     * 直接从数据库读取所有的合约配置
-     *
-     * @return
-     */
-    List<SystemWalletAddressDto> loadAll();
 
 }

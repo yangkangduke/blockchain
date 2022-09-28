@@ -30,4 +30,9 @@ public class HttpHeaders {
      */
     public static final String INNER_REQUEST = "x-inner-request";
 
+    /**
+     * 外部调用身份标识
+     */
+    public static final String OPEN_AUTH = "openAuth";
+
 }

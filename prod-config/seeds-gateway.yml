@@ -28,6 +28,20 @@ spring:
           uri: http://Seeds-wallet:10104/
           predicates:
             - Path=/wallet/**
+
+        - id: seeds-notification-service
+          uri: http://Seeds-notification:10103/
+          predicates:
+            - Path=/notification/**
+          filters:
+            - Auth
+        - id: seeds-game-service
+            uri: http://Seeds-game:10105/
+            predicates:
+              - Path=/game/**
+            filters:
+              - OpenAuth
+
       globalcors:
         cors-configurations:
           '[/**]':

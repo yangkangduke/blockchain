@@ -1,7 +1,7 @@
 package com.seeds.notification.mq.listener;
 
 import cn.hutool.json.JSONUtil;
-import com.seeds.common.mq.constant.KafkaTopic;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.notification.dto.NoticeDTO;
 import com.seeds.notification.dto.request.NoticeSaveReq;
 import com.seeds.notification.service.NotificationService;

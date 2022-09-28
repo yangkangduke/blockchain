@@ -3,7 +3,7 @@ package com.seeds.notification.controller.rpc;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.mq.constant.KafkaTopic;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.notification.dto.NoticeDTO;
 import com.seeds.notification.dto.request.NoticePageReq;
 import com.seeds.notification.dto.request.NoticeSaveReq;

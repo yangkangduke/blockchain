@@ -1,4 +1,4 @@
-package com.seeds.common.mq.constant;
+package com.seeds.common.constant.mq;
 
 import lombok.experimental.UtilityClass;
 

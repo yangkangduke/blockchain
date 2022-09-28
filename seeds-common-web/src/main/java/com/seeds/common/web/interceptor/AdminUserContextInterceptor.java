@@ -1,7 +1,7 @@
 package com.seeds.common.web.interceptor;
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.redis.constant.RedisKeys;
+import com.seeds.common.constant.redis.RedisKeys;
 import com.seeds.common.web.HttpHeaders;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.common.web.inner.Inner;
