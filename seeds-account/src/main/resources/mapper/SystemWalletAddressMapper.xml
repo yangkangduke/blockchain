@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.account.mapper.SystemWalletAddressMapper">
+    <resultMap id="BaseResultMap" type="com.seeds.account.model.SystemWalletAddress">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
+        <result column="version" jdbcType="BIGINT" property="version"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="tag" jdbcType="VARCHAR" property="tag"/>
+        <result column="comments" jdbcType="VARCHAR" property="comments"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+<!--        <result column="chain" jdbcType="TINYINT" property="chain"/>-->
+    </resultMap>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select *
+        from system_wallet_address
+        order by id desc
+    </select>
+</mapper>

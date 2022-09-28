@@ -1,4 +1,4 @@
-package com.seeds.account.tool;
+package com.seeds.account.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -7,25 +7,28 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+
 /**
+ * 系统使用的钱包
  *
- * @author yk
+ * @author milo
  *
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ListMap<T> implements Serializable {
+@NoArgsConstructor
+public class SystemWalletAddressDto implements Serializable {
     private static final long serialVersionUID = -1L;
 
-    List<T> list;
-    Map<String, T> map;
+    private long createTime;
+    private int type;
+    private String address;
+    private String tag;
+    private String comments;
 
-    public static <T> ListMap<T> init(List<T> list, Map<String, T> map) {
-        return ListMap.<T>builder().list(list).map(map).build();
-    }
+    private int status;
+
+    private int chain;
 }

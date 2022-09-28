@@ -11,7 +11,6 @@ spring:
       buffer-memory: 33554432
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-
     consumer:
       group-id: tomge-consumer-group  # 默认消费者group id
       auto-offset-reset: earliest
@@ -19,6 +18,7 @@ spring:
       auto-commit-interval: 100
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
 redis:
   host: 192.168.1.101
   port: 6379
@@ -51,7 +51,7 @@ login:
 
 service:
   url:
-    uc: http://192.168.1.100:10101
-    account: http://192.168.1.100:10103
-    wallet: http://192.168.1.100:10104
-    notification: http://192.168.1.100:10105
+    uc: http://127.0.0.1:10101
+    account: http://127.0.0.1:10103
+    wallet: http://127.0.0.1:10104
+    notification: http://127.0.0.1:10105
