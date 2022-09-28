@@ -1,13 +1,10 @@
-server:
-  port: 10102
-
 spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
 
   datasource:
-    url: jdbc:mysql://Seeds-mysql:3306/seeds_admin?useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.1.101:3306/seeds_admin?useUnicode=true&characterEncoding=utf-8
     username: root
     password: Seeds123!
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -20,6 +17,10 @@ management:
 mybatis:
   type-aliases-package*: com.seeds.admin.entity
 
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 admin:
   sso:
     redis:
@@ -31,19 +32,14 @@ springfox:
     swagger-ui:
       enabled: true
 
-redisson:
-  address: redis://Seeds-redis:6379
-  timeout: 10000
-  poolsize: 50
-  idlesize: 50
-  password: Seeds123!
-
 smart-contract:
   chain-id: 97
+  blockchain: "Binance Test Chain"
+  token-standard: "ERC-1155"
   owner-address: "0x492b6f0E6C720c2516e0aE62929241c7c1eaCAa1"
   owner-private-key: "132ed90697a22ce740831f9895c025857680bfb44a36c5ab282c8a36edb44e2f"
   rpc-provider-url: "https://small-misty-firefly.bsc-testnet.discover.quiknode.pro/c1c740ca57d182a18b26e30f524199a641ce5f61/"
-  game-address: "0x31cD478DC5433A729B5096cd945BC3D542b9E40a"
+  game-address: "0x32f1DA1bdF22c8445Db224C38c6ec5Ed92F24e25"
   metadata-mode: "Decentralized"
   creator-fees: 5
   ipfs-url: "https://cloudflare-ipfs.com/ipfs/"
@@ -64,6 +60,6 @@ hystrix:
           thread:
             timeoutInMilliseconds: 5000
 
-Seeds-uc: http://127.0.0.1:10101
-Seeds-notification: http://127.0.0.1:10103
-Seeds-gateway: http://54.168.239.215:9999
+Seeds-uc: http://192.168.1.100:10101
+Seeds-notification: http://192.168.1.100:10103
+Seeds-gateway: http://192.168.1.100:9999

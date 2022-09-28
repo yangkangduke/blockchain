@@ -52,6 +52,8 @@ login:
 service:
   url:
     uc: http://192.168.1.100:10101
+    admin: http://192.168.1.100:10102
     account: http://192.168.1.100:10103
     wallet: http://192.168.1.100:10104
     notification: http://192.168.1.100:10105
+    game: http://192.168.1.100:10106
