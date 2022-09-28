@@ -62,3 +62,4 @@ service:
     uc: http://127.0.0.1:10101
     account: http://127.0.0.1:10103
     wallet: http://127.0.0.1:10104
+    notification: http://127.0.0.1:10105
