@@ -34,6 +34,12 @@ spring:
           uri: ${service.url.wallet}
           predicates:
             - Path=/wallet/**
+        - id: seeds-uc-notification
+          uri: ${service.url.notification}
+          predicates:
+            - Path=/notification/**
+          filters:
+            - Auth
       globalcors:
         cors-configurations:
           '[/**]':
