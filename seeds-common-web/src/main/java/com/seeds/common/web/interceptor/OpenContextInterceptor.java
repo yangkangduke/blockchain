@@ -1,10 +1,14 @@
 package com.seeds.common.web.interceptor;
 
+import com.alibaba.fastjson.JSONObject;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.dto.LoginDTO;
 import com.seeds.common.constant.redis.RedisKeys;
 import com.seeds.common.web.HttpHeaders;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.common.web.util.HttpHelper;
+import com.seeds.common.web.util.SignatureUtils;
+import com.seeds.common.web.wrapper.BodyReaderHttpServletRequestWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RedissonClient;
@@ -16,9 +20,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -33,12 +41,18 @@ public class OpenContextInterceptor implements HandlerInterceptor {
     private static final GenericDto<String> INVALID_TOKEN_RESPONSE = GenericDto.failure("Invalid token", 401);
     private static final GenericDto<String> INVALID_SIGNATURE_RESPONSE = GenericDto.failure("Invalid signature", 401);
     private static final String NO_LOGIN_REQUIRED_PATH = "/open-api/";
+    private static final String GET_METHOD = "GET";
+    private static final String POST_METHOD = "POST";
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // 外部调用签名校验
-        String accessKey = request.getHeader(HttpHeaders.ACCESS_KEY);
-        String signature = request.getHeader(HttpHeaders.SIGNATURE);
-        if (!accessKey.equals(signature)) {
+        // 网关调用校验
+        String openAuth = request.getHeader(HttpHeaders.OPEN_AUTH);
+        if (!HttpHeaders.OPEN_AUTH.equals(openAuth)) {
+            writeFailureResponse(response, INVALID_SIGNATURE_RESPONSE);
+            return false;
+        }
+        // 验签
+        if (!signatureCheck(request)) {
             writeFailureResponse(response, INVALID_SIGNATURE_RESPONSE);
             return false;
         }
@@ -80,7 +94,39 @@ public class OpenContextInterceptor implements HandlerInterceptor {
         UserContext.removeCurrentUserId();
     }
 
-    private boolean signatureCheck() {
-        return true;
+    private boolean signatureCheck(HttpServletRequest request) throws IOException {
+        // 判断请求方式
+        String method = request.getMethod();
+        if (POST_METHOD.equals(method)) {
+            log.info("POST请求进入...");
+            // 获取请求Body参数，需要使用 BodyReaderHttpServletRequestWrapper进行处理
+            // 否则会出现异常：I/O error while reading input message； nested exception is java.io.IOException: Stream closed
+            // 原因就是在拦截器已经读取了请求体中的内容，这时候Request请求的流中已经没有了数据
+            // 解决流只能读取一次的问题：先读取流，然后在将流重新写进去就行了
+            ServletRequest requestWrapper = new BodyReaderHttpServletRequestWrapper(request);
+            String body = HttpHelper.getBodyString(requestWrapper);
+            String bodyString = URLDecoder.decode(body, "utf-8");
+            if (StringUtils.isEmpty(bodyString)) {
+                return false;
+            }
+            // 解析参数转JSON格式
+            JSONObject jsonObject = JSONObject.parseObject(bodyString);
+            // 验签
+            return SignatureUtils.validation(jsonObject);
+        }
+        if (GET_METHOD.equals(method)) {
+            log.info("GET请求进入...");
+            // 获取请求参数
+            Map<String, String> allRequestParam = HttpHelper.getAllRequestParam(request);
+            Set<Map.Entry<String, String>> entries = allRequestParam.entrySet();
+            // 参数转JSON格式
+            JSONObject jsonObject = new JSONObject();
+            entries.forEach(key -> {
+                jsonObject.put(key.getKey(), key.getValue());
+            });
+            // 验签
+            return SignatureUtils.validation(jsonObject);
+        }
+        return false;
     }
 }

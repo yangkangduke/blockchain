@@ -25,17 +25,26 @@
     </properties>
 
     <dependencies>
-        <!--kafka依赖-->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
         </dependency>
         <!--logback-kafka-appender依赖-->
         <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.danielwegener</groupId>
             <artifactId>logback-kafka-appender</artifactId>
+            <scope>runtime</scope>
         </dependency>
-
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         <!-- spring cloud config 客户端包 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

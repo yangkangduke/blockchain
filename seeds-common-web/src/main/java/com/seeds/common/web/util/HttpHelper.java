@@ -25,7 +25,7 @@ public class HttpHelper {
      * @param request request
      * @return 请求入参
      */
-    private Map<String, String> getAllRequestParam(HttpServletRequest request) {
+    public static Map<String, String> getAllRequestParam(HttpServletRequest request) {
         Map<String, String> res = new HashMap<>();
         Enumeration<?> temp = request.getParameterNames();
         if (null != temp) {
