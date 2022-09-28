@@ -33,6 +33,7 @@ public class UserContextInterceptor implements HandlerInterceptor {
 
     private static final GenericDto<String> INVALID_TOKEN_RESPONSE = GenericDto.failure("Invalid token", 401);
 
+    @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (getInnerAnnotation(handler) != null && Boolean.parseBoolean(request.getHeader(HttpHeaders.INNER_REQUEST))) {
             return true;
@@ -70,6 +71,7 @@ public class UserContextInterceptor implements HandlerInterceptor {
         }
     }
 
+    @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
         log.debug("remove user context");
         UserContext.removeCurrentUserId();

@@ -47,14 +47,6 @@ public class ChainDepositServiceImpl implements IChainDepositService {
 
 
     @Override
-    public List<SystemWalletAddressDto> loadAll() {
-        return systemWalletAddressMapper.selectAll()
-                .stream()
-                .map(e -> ObjectUtils.copy(e, new SystemWalletAddressDto()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public String getDepositAddress(Chain chain, long userId, boolean createIfNull) throws Exception {
         log.info("getDepositAddress chain={} user={} createIfNull={}", chain, userId, createIfNull);
 

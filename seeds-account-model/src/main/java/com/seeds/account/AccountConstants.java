@@ -136,7 +136,8 @@ public class AccountConstants {
     /**
      * 用户ID起始地址
      */
-    public final static long CLIENT_USER_ID = 1000_0000;
+//    public final static long CLIENT_USER_ID = 1000_0000;
+    public final static long CLIENT_USER_ID = 1;
 
     /**
      * 系统热点用户分片

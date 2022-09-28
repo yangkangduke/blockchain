@@ -16,6 +16,6 @@ spring:
           uri: https://github.com/AllenAi007/seeds-java
           username: 819628513@qq.com
           password: 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
-          search-paths: dev-config
+          search-paths: local-config
           default-label: dev
           force-pull: true

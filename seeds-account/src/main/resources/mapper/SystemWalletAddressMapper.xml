@@ -15,7 +15,7 @@
     </resultMap>
     <select id="selectAll" resultMap="BaseResultMap">
         select *
-        from t_system_wallet_address
-        order by f_id desc
+        from system_wallet_address
+        order by id desc
     </select>
 </mapper>

@@ -6,6 +6,7 @@ import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
