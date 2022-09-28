@@ -31,12 +31,10 @@ public class NFTConsumer {
      * @param msg
      */
     @KafkaListener(groupId = "nft-consumer-group", topics = {KafkaTopic.NFT_SAVE_SUCCESS})
-    public void mintNft(String msg, Acknowledgment ack) {
+    public void mintNft(String msg) {
         log.info("收到消息：{}", msg);
         NftMintMsgDTO msgDTO = JSONUtil.toBean(msg, NftMintMsgDTO.class);
         nftService.mintNft(msgDTO);
-        //手动提交offset
-        ack.acknowledge();
     }
 
     /**
@@ -45,12 +43,10 @@ public class NFTConsumer {
      * @param msg
      */
     @KafkaListener(groupId = "nft-consumer-group", topics = {KafkaTopic.NFT_DELETE_SUCCESS})
-    public void burnNft(String msg, Acknowledgment ack) {
+    public void burnNft(String msg) {
         log.info("收到消息：{}", msg);
         List<SysNftEntity> sysNftEntities = JSONUtil.toList(JSONUtil.parseArray(msg), SysNftEntity.class);
         nftService.burnNft(sysNftEntities);
-        //手动提交offset
-        ack.acknowledge();
     }
 
 }

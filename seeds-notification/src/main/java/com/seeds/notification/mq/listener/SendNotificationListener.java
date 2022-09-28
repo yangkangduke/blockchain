@@ -25,7 +25,7 @@ public class SendNotificationListener {
     private NotificationService notificationService;
 
     @KafkaListener(groupId = "notice-consumer-group", topics = {KafkaTopic.SEND_NOTIFICATION})
-    public void sendNotice(String msg, Acknowledgment ack) {
+    public void sendNotice(String msg) {
         log.info("收到消息：{}", msg);
         NoticeDTO msgDTO = JSONUtil.toBean(msg, NoticeDTO.class);
         // sava message to db
@@ -38,7 +38,5 @@ public class SendNotificationListener {
             msgDTO.setPushTime(new Date().getTime());
             notificationService.sendNotice(msgDTO);
         }
-        //手动提交offset
-        ack.acknowledge();
     }
 }
