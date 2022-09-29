@@ -42,4 +42,11 @@ public interface ChainDepositAddressMapper extends BaseMapper<ChainDepositAddres
      * @return
      */
     int assignAddress(@Param("chain") int chain, String address, @Param("userId") long userId);
+
+    /**
+     * 统计未分配空闲地址的数量
+     *
+     * @return
+     */
+    int countIdleAddresses(@Param("chain") int chain);
 }
