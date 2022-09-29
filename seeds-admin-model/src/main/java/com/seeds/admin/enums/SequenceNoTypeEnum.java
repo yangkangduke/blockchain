@@ -9,5 +9,6 @@ package com.seeds.admin.enums;
 public enum SequenceNoTypeEnum {
 
     NFT,
+    GAME,
 
 }
