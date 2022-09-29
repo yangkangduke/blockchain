@@ -11,10 +11,7 @@ spring:
       buffer-memory: 33554432
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      properties:
-        sasl.mechanism: PLAIN
-        security.protocol: SASL_PLAINTEXT
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
+
     consumer:
       group-id: tomge-consumer-group  # 默认消费者group id
       auto-offset-reset: earliest
@@ -22,10 +19,7 @@ spring:
       auto-commit-interval: 100
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      properties:
-        sasl.mechanism: PLAIN
-        security.protocol: SASL_PLAINTEXT
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
+
 
 redis:
   host: 54.168.239.215
@@ -60,5 +54,8 @@ login:
 service:
   url:
     uc: http://54.168.239.215:10101
+    admin: http://54.168.239.215:10102
     account: http://54.168.239.215:10103
     wallet: http://54.168.239.215:10104
+    notification: http://54.168.239.215:10105
+    game: http://54.168.239.215:10106
