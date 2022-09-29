@@ -24,4 +24,10 @@ public interface SysSequenceNoService extends IService<SysSequenceNoEntity> {
      */
     String generateNftNo();
 
+    /**
+     * 生成游戏认证编号
+     * @return 游戏认证编号
+     */
+    Long generateGameAccessNo();
+
 }

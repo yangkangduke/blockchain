@@ -17,16 +17,22 @@ public class SignatureUtils {
     /**
      * 验签
      *
-     * @param body     请求参数
+     * @param body  请求参数
+     * @param time  过期时间
      * @return result
      */
-    public static boolean validation(JSONObject body) {
+    public static boolean validation(JSONObject body, long time, String secretKey) {
         // 拿出请求签名
         String sign = body.getString("signature");
         body.remove("signature");
         // 根据APPID查询的密钥进行重签
-        String newSign = getSign(body);
+        String newSign = getSign(body, secretKey);
 
+        // 校验签名是否失效
+        long thisTime = System.currentTimeMillis() - body.getLong("timestamp");
+        if (thisTime > time) {
+            return false;
+        }
         // 校验签名
         return StringUtils.equals(newSign, sign);
     }
@@ -37,9 +43,7 @@ public class SignatureUtils {
      * @param params 入参
      * @return 签名
      */
-    public static String getSign(JSONObject params) {
-        // todo 获取密钥
-        String secretKey = "";
+    public static String getSign(JSONObject params, String secretKey) {
         // 参数进行字典排序
         String sortStr = getFormatParams(params);
         // 将密钥key拼接在字典排序后的参数字符串中,得到待签名字符串。
