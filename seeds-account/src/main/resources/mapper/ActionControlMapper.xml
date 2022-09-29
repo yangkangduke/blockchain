@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.account.mapper.ActionControlMapper">
+    <resultMap id="BaseResultMap" type="com.seeds.account.model.ActionControl">
+        <id column="f_id" jdbcType="BIGINT" property="id"/>
+        <result column="f_create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="f_update_time" jdbcType="BIGINT" property="updateTime"/>
+        <result column="f_version" jdbcType="BIGINT" property="version"/>
+        <result column="f_type" jdbcType="VARCHAR" property="type"/>
+        <result column="f_key" jdbcType="VARCHAR" property="key"/>
+        <result column="f_name" jdbcType="VARCHAR" property="name"/>
+        <result column="f_value" jdbcType="VARCHAR" property="value"/>
+        <result column="f_comments" jdbcType="VARCHAR" property="comments"/>
+        <result column="f_status" jdbcType="TINYINT" property="status"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.seeds.account.model.ActionControl" useGeneratedKeys="true" keyProperty="id">
+        insert into t_action_control (f_id, f_create_time, f_update_time, f_version,
+                                      f_type, f_key, f_name, f_value, f_comments,
+                                      f_status)
+        values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, #{version,jdbcType=BIGINT},
+                #{type,jdbcType=VARCHAR}, #{key,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, #{comments,jdbcType=TINYINT},
+                #{status,jdbcType=TINYINT})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.ActionControl">
+        update t_action_control
+        set f_create_time  = #{createTime,jdbcType=BIGINT},
+            f_update_time  = #{updateTime,jdbcType=BIGINT},
+            f_version      = #{version,jdbcType=BIGINT},
+            f_type         = #{type,jdbcType=VARCHAR},
+            f_key          = #{key,jdbcType=VARCHAR},
+            f_name         = #{name,jdbcType=TINYINT},
+            f_value        = #{value,jdbcType=TINYINT},
+            f_comments     = #{comments,jdbcType=VARCHAR},
+            f_status       = #{status,jdbcType=TINYINT}
+        where f_id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from t_action_control
+        order by f_id
+    </select>
+
+    <select id="getByTypeAndKey" resultMap="BaseResultMap">
+        select * from t_action_control
+        where f_type  = #{type,jdbcType=TINYINT}
+          and f_key   = #{key,jdbcType=VARCHAR}
+    </select>
+</mapper>

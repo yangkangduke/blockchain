@@ -1,13 +1,23 @@
 package com.seeds.account.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.account.dto.SystemConfigDto;
 import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.enums.CommonStatus;
+import com.seeds.account.model.SystemConfig;
 
 import java.util.List;
 import java.util.Map;
 
-public interface SystemConfigService {
+/**
+ * <p>
+ * 全局配置 服务类
+ * </p>
+ *
+ * @author yk
+ * @since 2022-09-29
+ */
+public interface ISystemConfigService extends IService<SystemConfig> {
 
     /**
      * 获取价格

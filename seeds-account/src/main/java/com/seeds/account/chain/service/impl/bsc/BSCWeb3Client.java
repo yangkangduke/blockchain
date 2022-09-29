@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.seeds.account.chain.dto.ChainRpcConfigDto;
 import com.seeds.account.config.ProxyConfig;
-import com.seeds.account.service.SystemConfigService;
+import com.seeds.account.service.ISystemConfigService;
 import com.seeds.account.util.JsonUtils;
 import io.micrometer.core.instrument.Metrics;
 import lombok.Data;
@@ -46,7 +46,7 @@ public class BSCWeb3Client {
     private ProxyConfig proxyConfig;
 
     @Autowired
-    SystemConfigService systemConfigService;
+    ISystemConfigService systemConfigService;
 
     AtomicLong counter = new AtomicLong(0);
     String lastConfig = null;

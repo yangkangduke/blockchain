@@ -1,12 +1,11 @@
 package com.seeds.account.chain.service.impl;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.seeds.account.chain.service.ChainService;
 import com.seeds.account.dto.*;
 import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.ex.AccountException;
-import com.seeds.account.service.SystemConfigService;
+import com.seeds.account.service.ISystemConfigService;
 import com.seeds.account.util.AddressUtils;
 import com.seeds.account.util.JsonUtils;
 import com.seeds.common.dto.GenericDto;
@@ -42,7 +41,7 @@ import java.util.stream.Collectors;
 public abstract class ChainBasicService implements ChainService {
 
     @Autowired
-    protected SystemConfigService systemConfigService;
+    protected ISystemConfigService systemConfigService;
     @Autowired
     RedissonClient client;
 //    @Autowired

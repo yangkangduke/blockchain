@@ -1,22 +1,24 @@
 package com.seeds.account.service;
 
-
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.account.dto.ActionControlDto;
 import com.seeds.account.enums.AccountActionControl;
 import com.seeds.account.enums.CommonStatus;
+import com.seeds.account.model.ActionControl;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * 都操作施加全局控制。例如充币，提币等
+ * <p>
+ * 操作控制 服务类
+ * </p>
  *
- * @author shilz
- *
+ * @author yk
+ * @since 2022-09-29
  */
-public interface ActionControlService {
-
+public interface IActionControlService extends IService<ActionControl> {
     /**
      * 获取一个操作是否可以执行
      * @param ac
@@ -26,7 +28,7 @@ public interface ActionControlService {
         ActionControlDto actionControlDto = get(ac.getType(), ac.getKey());
         return actionControlDto == null ||
                 (Objects.equals(actionControlDto.getValue(), "true")
-                && actionControlDto.getStatus() == CommonStatus.ENABLED.getCode());
+                        && actionControlDto.getStatus() == CommonStatus.ENABLED.getCode());
     }
 
     default boolean isEnabled(String type, String key) {

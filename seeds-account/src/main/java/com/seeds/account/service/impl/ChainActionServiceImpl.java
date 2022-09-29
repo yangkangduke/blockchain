@@ -8,9 +8,9 @@ import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.mapper.ChainDepositAddressMapper;
 import com.seeds.account.model.ChainDepositAddress;
-import com.seeds.account.service.ActionControlService;
+import com.seeds.account.service.IActionControlService;
 import com.seeds.account.service.IChainActionService;
-import com.seeds.account.service.SystemConfigService;
+import com.seeds.account.service.ISystemConfigService;
 import com.seeds.common.enums.Chain;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +30,11 @@ import java.util.stream.Collectors;
 public class ChainActionServiceImpl implements IChainActionService {
 
     @Autowired
-    private ActionControlService actionControlService;
+    private IActionControlService actionControlService;
     @Autowired
     private ChainDepositAddressMapper chainDepositAddressMapper;
     @Autowired
-    SystemConfigService systemConfigService;
+    ISystemConfigService systemConfigService;
     @Autowired
     private ChainService chainService;
 
