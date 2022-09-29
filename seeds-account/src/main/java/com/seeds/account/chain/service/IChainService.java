@@ -22,7 +22,7 @@ import java.util.Set;
  *
  * @author milo
  */
-public interface ChainService {
+public interface IChainService {
 
     Chain getCurrentChain(Chain chain);
 

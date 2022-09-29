@@ -6,6 +6,6 @@ import org.web3j.protocol.core.Response;
 import java.util.Map;
 
 @FunctionalInterface
-public interface BatchBalanceResponseProcessor {
+public interface IBatchBalanceResponseProcessor {
     void process(Map<String, AddressBalanceDto> balanceMap, Response response);
 }

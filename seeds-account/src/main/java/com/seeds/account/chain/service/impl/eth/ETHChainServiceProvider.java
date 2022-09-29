@@ -8,6 +8,7 @@
 //import com.seeds.account.chain.dto.ChainTransactionReceipt;
 //import com.seeds.account.chain.dto.NativeChainBlockDto;
 //import com.seeds.account.chain.dto.NativeChainTransactionDto;
+//import com.seeds.account.chain.service.BatchBalanceResponseProcessor;
 //import com.seeds.account.chain.service.ChainProviderService;
 //import com.seeds.account.chain.service.ChainService;
 //import com.seeds.account.chain.service.impl.ChainBasicService;
@@ -15,6 +16,8 @@
 //import com.seeds.account.enums.AccountSystemConfig;
 //import com.seeds.account.enums.WalletAddressType;
 //import com.seeds.account.service.ActionControlService;
+//import com.seeds.account.service.IChainDepositService;
+//import com.seeds.account.service.ISystemWalletAddressService;
 //import com.seeds.account.util.AddressUtils;
 //import com.seeds.account.util.JsonUtils;
 //import com.seeds.account.util.ObjectUtils;
@@ -101,10 +104,10 @@
 //    ChainContractService chainContractService;
 //
 //    @Autowired
-//    SystemWalletAddressService systemWalletAddressService;
+//    ISystemWalletAddressService systemWalletAddressService;
 //
 //    @Autowired
-//    ChainDepositService chainDepositService;
+//    IChainDepositService chainDepositService;
 //
 //    @Autowired
 //    RedissonClient client;

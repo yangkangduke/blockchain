@@ -1,7 +1,7 @@
 package com.seeds.account.chain.service.impl;
 
 import com.google.common.collect.Lists;
-import com.seeds.account.chain.service.ChainService;
+import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.dto.*;
 import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.ex.AccountException;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @Data
-public abstract class ChainBasicService implements ChainService {
+public abstract class ChainBasicService implements IChainService {
 
     @Autowired
     protected ISystemConfigService systemConfigService;
