@@ -7,6 +7,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.common.web.inner.Inner;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  **/
 @RestController
 @Slf4j
+@Api(tags = "账户")
 @RequestMapping("/account")
 public class AccountController {
 

@@ -14,6 +14,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.utils.BasicUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @Slf4j
+@Api(tags = "账户-内部调用")
 @RequestMapping("/account-internal")
 public class AccountInternalController {
 
