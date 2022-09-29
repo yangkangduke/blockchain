@@ -13,33 +13,33 @@ spring:
     gateway:
       routes:
         - id: seeds-uc-service
-            uri: ${service.url.uc}
-            predicates:
-              - Path=/uc/**
-            filters:
-              - Auth
-              - id: seeds-admin-service
-                uri: ${service.url.admin}
-                predicates:
-                  - Path=/admin/**
-                filters:
-                  - AdminAuth
-              - id: seeds-account-service
-                uri: ${service.url.account}
-                predicates:
-                  - Path=/account/**
-                filters:
-                  - Auth
-              - id: seeds-wallet-service
-                uri: ${service.url.wallet}
-                predicates:
-                  - Path=/wallet/**
-              - id: seeds-uc-notification
-                uri: ${service.url.notification}
-                predicates:
-                  - Path=/notification/**
-                filters:
-                  - Auth
+          uri: ${service.url.uc}
+          predicates:
+            - Path=/uc/**
+          filters:
+            - Auth
+        - id: seeds-admin-service
+          uri: ${service.url.admin}
+          predicates:
+            - Path=/admin/**
+          filters:
+            - AdminAuth
+        - id: seeds-account-service
+          uri: ${service.url.account}
+          predicates:
+            - Path=/account/**
+          filters:
+            - Auth
+        - id: seeds-wallet-service
+          uri: ${service.url.wallet}
+          predicates:
+            - Path=/wallet/**
+        - id: seeds-uc-notification
+          uri: ${service.url.notification}
+          predicates:
+            - Path=/notification/**
+          filters:
+            - Auth
       globalcors:
         cors-configurations:
           '[/**]':
