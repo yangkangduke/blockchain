@@ -1,26 +1,21 @@
-server:
-  port: 8888
+info:
+  app:
+    name: ${APP_NAME:seeds-config}
+  env:
+    name: ${PROFILE:NOT_SET}
+  hostname: ${HOSTNAME:NOT_SET}
 
 spring:
   application:
-    name: seeds-config
+    name: ${APP_NAME:seeds-config}
 
-  profiles:
-    active: native # 取本地配置文件
   cloud:
     config:
       server:
-        native:
-          search-locations: classpath:/config # 配置文件的存储位置路径
-
-# 取github上的地址配置
-#  cloud:
-#    config:
-#      server:
-#        git:
-#          uri: https://github.com/AllenAi007/seeds-java
-#          username: 819628513@qq.com
-#          password: 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
-#          search-paths: config
-#          default-label: main-dev
-#          force-pull: true
+        git:
+          uri: https://github.com/AllenAi007/seeds-java
+          username: 819628513@qq.com
+          password: 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
+          search-paths: local-config
+          default-label: dev
+          force-pull: true

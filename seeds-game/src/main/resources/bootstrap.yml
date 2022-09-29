@@ -1,0 +1,32 @@
+info:
+  app:
+    name: ${APP_NAME:seeds-game}
+    check: ${APP_CHECK:NOT_SET}
+  env:
+    name: ${PROFILE:NOT_SET}
+    hostname: ${hostname:NOT_SET}
+  build:
+    version: ${BUILD_NUMBER:NOT_SET}
+
+spring:
+  application:
+    name: ${APP_NAME:seeds-game}
+  profiles:
+    active: ${PROFILE:local}
+    include:
+      - ${ENV_PROFILE:default}
+  cloud:
+    config:
+      uri: ${CONFIG_SERVERS:http://127.0.0.1:8888}
+      label: ${CONFIG_GIT_VERSION:dev}
+      prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/dev
+      enabled: true
+
+log:
+  kafka:
+    servers: ${LOG_KAFKA_SERVERS:192.168.1.101:9092}
+    topic: ${LOG_KAFKA_TOPIC:applog}
+
+logging:
+  config: ${spring.cloud.config.prefix}/logback/logback.xml
+

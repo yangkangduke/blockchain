@@ -1,6 +1,6 @@
 info:
   app:
-    name: ${APP_NAME:kine-account-service}
+    name: ${APP_NAME:seeds-account}
     check: ${APP_CHECK:NOT_SET}
   env:
     name: ${PROFILE:NOT_SET}
@@ -10,21 +10,22 @@ info:
 
 spring:
   application:
-    name: ${APP_NAME:kine-account-service}
+    name: ${APP_NAME:seeds-account}
   profiles:
-    active: ${PROFILE:NOT_SET}
+    active: ${PROFILE:local}
     include:
       - ${ENV_PROFILE:default}
   cloud:
     config:
-      uri: ${CONFIG_SERVERS:http://192.168.0.123:31004}
-      label: ${CONFIG_GIT_VERSION:master}
-      prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/master
+      uri: ${CONFIG_SERVERS:http://127.0.0.1:8888}
+      label: ${CONFIG_GIT_VERSION:dev}
+      prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/dev
       enabled: true
+
 log:
   kafka:
-    servers: ${LOG_KAFKA_SERVERS:192.168.0.115:9092,192.168.0.115:9192,192.168.0.115:9292}
-    topic: ${LOG_KAFKA_TOPIC:applog-kine}
+    servers: ${LOG_KAFKA_SERVERS:192.168.1.101:9092}
+    topic: ${LOG_KAFKA_TOPIC:applog}
 
 logging:
   config: ${spring.cloud.config.prefix}/logback/logback.xml

@@ -36,9 +36,6 @@ import org.thymeleaf.context.Context;
 @Service
 public class SendCodeServiceImpl implements SendCodeService {
 
-    @Value("${Seeds-uc-logo-url}")
-    private String logoUrl;
-
     @Autowired
     private CacheService cacheService;
     @Autowired
@@ -160,7 +157,6 @@ public class SendCodeServiceImpl implements SendCodeService {
                 throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
             }*/
             Context context = new Context();
-            context.setVariable("logoUrl", logoUrl);
             context.setVariable("email", email);
             context.setVariable("verificationCode", code);
             context.setVariable("expiryTime", cacheService.getAuthTokenExpireAfter()/60);

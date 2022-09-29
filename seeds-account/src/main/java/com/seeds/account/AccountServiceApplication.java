@@ -14,13 +14,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @author milo
  */
 @MapperScan("com.seeds.account.mapper")
-@EnableTransactionManagement
-@Slf4j
-@EnableSwagger2
-@EnableScheduling
 @EnableFeignClients(basePackages = "com.seeds")
 @SpringBootApplication(scanBasePackages = "com.seeds")
-@EnableKafka
 public class AccountServiceApplication {
 
     public static void main(String[] args) {
