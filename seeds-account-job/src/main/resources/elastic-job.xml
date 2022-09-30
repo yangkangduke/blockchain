@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:reg="http://www.dangdang.com/schema/ddframe/reg"
+       xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.dangdang.com/schema/ddframe/reg
+                        http://www.dangdang.com/schema/ddframe/reg/reg.xsd
+                        http://www.dangdang.com/schema/ddframe/job
+                        http://www.dangdang.com/schema/ddframe/job/job.xsd
+                        ">
+
+    <!-- account tasks -->
+    <bean id="autoCreateAddressTask" class="com.seeds.account.task.AutoCreateAddressTask"/>
+
+
+    <reg:zookeeper id="regCenter" server-lists="${kine.elastic-job.zk.servers}"
+                   namespace="${kine.elastic-job.namespace}"/>
+    <!--                 base-sleep-time-milliseconds="${elastic-job.zk.baseSleep}"-->
+    <!--                 max-sleep-time-milliseconds="${elastic-job.zk.maxSleep}"-->
+    <!--                 max-retries="${elastic-job.zk.maxRetries}"/>-->
+
+    <!-- tasks -->
+    <job:simple id="systemWalletBalancesCacheRefreshTaskJob" job-ref="systemWalletBalancesCacheRefreshTask"
+                registry-center-ref="regCenter"
+                cron="${account.systemWalletBalancesCacheRefreshTask.cron}"
+                overwrite="true"
+                disabled="${account.systemWalletBalancesCacheRefreshTask.disabled}"
+                sharding-total-count="${account.systemWalletBalancesCacheRefreshTask.shardingCount}"/>
+
+    <job:simple id="autoCreateAddressTaskJob" job-ref="autoCreateAddressTask"
+                registry-center-ref="regCenter"
+                cron="${account.autoCreateAddressTask.cron}"
+                overwrite="true"
+                disabled="${account.autoCreateAddressTask.disabled}"
+                sharding-total-count="${account.autoCreateAddressTask.shardingCount}"/>
+
+    <job:simple id="fundingRateTaskJob" job-ref="fundingRateCalcTask"
+                registry-center-ref="regCenter"
+                cron="${account.fundingRateTask.cron}"
+                overwrite="true"
+                disabled="${account.fundingRateTask.disabled}"
+                sharding-total-count="${account.fundingRateTask.shardingCount}"/>
+
+    <job:simple id="markFundingRateSettleTaskJob" job-ref="markFundingRateSettleTask"
+                registry-center-ref="regCenter"
+                cron="${account.markFundingRateSettleTask.cron}"
+                overwrite="true"
+                disabled="${account.markFundingRateSettleTask.disabled}"
+                sharding-total-count="${account.markFundingRateSettleTask.shardingCount}"/>
+
+    <job:simple id="fundingRateSettleTaskJob" job-ref="fundingRateSettleTask"
+                registry-center-ref="regCenter"
+                cron="${account.fundingRateSettleTask.cron}"
+                overwrite="true"
+                disabled="${account.fundingRateSettleTask.disabled}"
+                sharding-total-count="${account.fundingRateSettleTask.shardingCount}"/>
+
+    <job:simple id="tradingAccountSnapshotTaskJob" job-ref="tradingAccountSnapshotTask"
+                registry-center-ref="regCenter"
+                cron="${account.tradingAccountSnapshotTask.cron}"
+                overwrite="true"
+                disabled="${account.tradingAccountSnapshotTask.disabled}"
+                sharding-total-count="${account.tradingAccountSnapshotTask.shardingCount}"/>
+
+    <job:simple id="systemPositionsTaskJob" job-ref="systemPositionsTask"
+                registry-center-ref="regCenter"
+                cron="${account.systemPositionsTask.cron}"
+                overwrite="true"
+                disabled="${account.systemPositionsTask.disabled}"
+                sharding-total-count="${account.systemPositionsTask.shardingCount}"/>
+
+    <job:simple id="riskRateTaskJob" job-ref="riskRateTask"
+                registry-center-ref="regCenter"
+                cron="${account.riskRateTask.cron}"
+                overwrite="true"
+                disabled="${account.riskRateTask.disabled}"
+                sharding-total-count="${account.riskRateTask.shardingCount}"/>
+
+    <job:simple id="liquidationTaskJob" job-ref="liquidationTask"
+                registry-center-ref="regCenter"
+                cron="${account.liquidationTask.cron}"
+                overwrite="true"
+                disabled="${account.liquidationTask.disabled}"
+                sharding-total-count="${account.liquidationTask.shardingCount}"/>
+
+    <job:simple id="dividendTaskJob" job-ref="dividendTask"
+                registry-center-ref="regCenter"
+                cron="${account.dividendTask.cron}"
+                overwrite="true"
+                disabled="${account.dividendTask.disabled}"
+                sharding-total-count="${account.dividendTask.shardingCount}"/>
+
+    <job:simple id="mcdTaskJob" job-ref="mcdTask"
+                registry-center-ref="regCenter"
+                cron="${account.mcdTask.cron}"
+                overwrite="true"
+                disabled="${account.mcdTask.disabled}"
+                sharding-total-count="${account.mcdTask.shardingCount}"/>
+
+    <job:simple id="scanDividendExchangeTaskJob" job-ref="scanDividendExchangeTask"
+                registry-center-ref="regCenter"
+                cron="${account.scanDividendExchangeTask.cron}"
+                overwrite="true"
+                disabled="${account.scanDividendExchangeTask.disabled}"
+                sharding-total-count="${account.scanDividendExchangeTask.shardingCount}"/>
+
+    <job:simple id="scanDividendTransferTaskJob" job-ref="scanDividendTransferTask"
+                registry-center-ref="regCenter"
+                cron="${account.scanDividendTransferTask.cron}"
+                overwrite="true"
+                disabled="${account.scanDividendTransferTask.disabled}"
+                sharding-total-count="${account.scanDividendTransferTask.shardingCount}"/>
+
+    <job:simple id="scanSystemExchangeTaskJob" job-ref="scanSystemExchangeTask"
+                registry-center-ref="regCenter"
+                cron="${account.scanSystemExchangeTask.cron}"
+                overwrite="true"
+                disabled="${account.scanSystemExchangeTask.disabled}"
+                sharding-total-count="${account.scanSystemExchangeTask.shardingCount}"/>
+
+    <job:simple id="scanChainBlockTaskJob" job-ref="scanChainBlockTask"
+                registry-center-ref="regCenter"
+                cron="${account.scanChainBlockTask.cron}"
+                overwrite="true"
+                disabled="${account.scanChainBlockTask.disabled}"
+                sharding-total-count="${account.scanChainBlockTask.shardingCount}"/>
+
+    <job:simple id="gasPriceTaskJob" job-ref="gasPriceTask"
+                registry-center-ref="regCenter"
+                cron="${account.gasPriceTask.cron}"
+                overwrite="true"
+                disabled="${account.gasPriceTask.disabled}"
+                sharding-total-count="${account.gasPriceTask.shardingCount}"/>
+
+    <job:simple id="scanWithdrawTaskJob" job-ref="scanWithdrawTask"
+                registry-center-ref="regCenter"
+                cron="${account.scanWithdrawTask.cron}"
+                overwrite="true"
+                disabled="${account.scanWithdrawTask.disabled}"
+                sharding-total-count="${account.scanWithdrawTask.shardingCount}"/>
+
+    <job:simple id="scanPendingCollectBalancesTaskJob" job-ref="scanPendingCollectBalancesTask"
+                registry-center-ref="regCenter"
+                cron="${account.scanPendingCollectBalancesTask.cron}"
+                overwrite="true"
+                disabled="${account.scanPendingCollectBalancesTask.disabled}"
+                sharding-total-count="${account.scanPendingCollectBalancesTask.shardingCount}"/>
+
+    <job:simple id="executeWithdrawTaskJob" job-ref="executeWithdrawTask"
+                registry-center-ref="regCenter"
+                cron="${account.executeWithdrawTask.cron}"
+                overwrite="true"
+                disabled="${account.executeWithdrawTask.disabled}"
+                sharding-total-count="${account.executeWithdrawTask.shardingCount}"/>
+
+    <job:simple id="scanMcdTaskJob" job-ref="scanMcdTask"
+                registry-center-ref="regCenter"
+                cron="${account.scanMcdTask.cron}"
+                overwrite="true"
+                disabled="${account.scanMcdTask.disabled}"
+                sharding-total-count="${account.scanMcdTask.shardingCount}"/>
+
+    <job:simple id="monitorChainTxnStatusTaskJob" job-ref="monitorChainTxnStatusTask"
+                registry-center-ref="regCenter"
+                cron="${account.monitorChainTxnStatusTask.cron}"
+                overwrite="true"
+                disabled="${account.monitorChainTxnStatusTask.disabled}"
+                sharding-total-count="${account.monitorChainTxnStatusTask.shardingCount}"/>
+
+    <job:simple id="updateDashboardMinsDataTaskJob" job-ref="updateDashboardMinsDataTask"
+                registry-center-ref="regCenter"
+                cron="${account.updateDashboardMinsDataTask.cron}"
+                overwrite="true"
+                disabled="${account.updateDashboardMinsDataTask.disabled}"
+                sharding-total-count="${account.updateDashboardMinsDataTask.shardingCount}"/>
+
+    <job:simple id="collectRebateFeeTaskJob" job-ref="collectRebateFeeTask"
+                registry-center-ref="regCenter"
+                cron="${account.collectRebateFeeTask.cron}"
+                overwrite="true"
+                disabled="${account.collectRebateFeeTask.disabled}"
+                sharding-total-count="${account.collectRebateFeeTask.shardingCount}"/>
+
+    <job:simple id="adlTaskJob" job-ref="adlTask"
+                registry-center-ref="regCenter"
+                cron="${account.adlTask.cron}"
+                overwrite="true"
+                disabled="${account.adlTask.disabled}"
+                sharding-total-count="${account.adlTask.shardingCount}"/>
+
+    <job:simple id="opsDashboardOpenInterestTaskJob" job-ref="opsDashboardOpenInterestTask"
+                registry-center-ref="regCenter"
+                cron="${account.opsDashboardOpenInterestTask.cron}"
+                overwrite="true"
+                disabled="${account.opsDashboardOpenInterestTask.disabled}"
+                sharding-total-count="${account.opsDashboardOpenInterestTask.shardingCount}"/>
+
+    <job:simple id="accountDashboardTaskJob" job-ref="accountDashboardTask"
+                registry-center-ref="regCenter"
+                cron="${account.accountDashboardTask.cron}"
+                overwrite="true"
+                disabled="${account.accountDashboardTask.disabled}"
+                sharding-total-count="${account.accountDashboardTask.shardingCount}"/>
+
+    <job:simple id="refreshKusdTotalTaskJob" job-ref="refreshKusdTotalTask"
+                registry-center-ref="regCenter"
+                cron="${account.refreshKusdTotalTask.cron}"
+                overwrite="true"
+                disabled="${account.refreshKusdTotalTask.disabled}"
+                sharding-total-count="${account.refreshKusdTotalTask.shardingCount}"/>
+
+    <job:simple id="refreshMcdTaskJob" job-ref="refreshMcdTask"
+                registry-center-ref="regCenter"
+                cron="${account.refreshMcdTask.cron}"
+                overwrite="true"
+                disabled="${account.refreshMcdTask.disabled}"
+                sharding-total-count="${account.refreshMcdTask.shardingCount}"/>
+
+    <job:simple id="calcMiningRewardTaskJob" job-ref="calcMiningRewardTask"
+                registry-center-ref="regCenter"
+                cron="${account.calcMiningRewardTask.cron}"
+                overwrite="true"
+                disabled="${account.calcMiningRewardTask.disabled}"
+                sharding-total-count="${account.calcMiningRewardTask.shardingCount}"/>
+
+    <job:simple id="clearMiningRewardTaskJob" job-ref="clearMiningRewardTask"
+                registry-center-ref="regCenter"
+                cron="${account.clearMiningRewardTask.cron}"
+                overwrite="true"
+                disabled="${account.clearMiningRewardTask.disabled}"
+                sharding-total-count="${account.clearMiningRewardTask.shardingCount}"/>
+
+    <job:simple id="opsDashboardChainCacheTaskJob" job-ref="opsDashboardChainCacheTask"
+                registry-center-ref="regCenter"
+                cron="${account.opsDashboardChainCacheTask.cron}"
+                overwrite="true"
+                disabled="${account.opsDashboardChainCacheTask.disabled}"
+                sharding-total-count="${account.opsDashboardChainCacheTask.shardingCount}"/>
+
+    <job:simple id="opsDashboardChainRealtimeTaskJob" job-ref="opsDashboardChainRealtimeTask"
+                registry-center-ref="regCenter"
+                cron="${account.opsDashboardChainRealtimeTask.cron}"
+                overwrite="true"
+                disabled="${account.opsDashboardChainRealtimeTask.disabled}"
+                sharding-total-count="${account.opsDashboardChainRealtimeTask.shardingCount}"/>
+
+    <job:simple id="opsDashboardProfitFeeTaskJob" job-ref="opsDashboardProfitFeeTask"
+                registry-center-ref="regCenter"
+                cron="${account.opsDashboardProfitFeeTask.cron}"
+                overwrite="true"
+                disabled="${account.opsDashboardProfitFeeTask.disabled}"
+                sharding-total-count="${account.opsDashboardProfitFeeTask.shardingCount}"/>
+
+    <job:simple id="opsDashboardSnapshotProfitFeeTaskJob" job-ref="opsDashboardSnapshotProfitFeeTask"
+                registry-center-ref="regCenter"
+                cron="${account.opsDashboardSnapshotProfitFeeTask.cron}"
+                overwrite="true"
+                disabled="${account.opsDashboardSnapshotProfitFeeTask.disabled}"
+                sharding-total-count="${account.opsDashboardSnapshotProfitFeeTask.shardingCount}"/>
+
+    <!--    <job:simple id="opsDashboardSysAccountTaskJob" job-ref="opsDashboardSysAccountTask"-->
+    <!--                registry-center-ref="regCenter"-->
+    <!--                cron="${account.opsDashboardSysAccountTask.cron}"-->
+    <!--                overwrite="true"-->
+    <!--                disabled="${account.opsDashboardSysAccountTask.disabled}"-->
+    <!--                sharding-total-count="${account.opsDashboardSysAccountTask.shardingCount}"/>-->
+
+    <!--    <job:simple id="opsDashboardWalletBalanceTaskJob" job-ref="opsDashboardWalletBalanceTask"-->
+    <!--                registry-center-ref="regCenter"-->
+    <!--                cron="${account.opsDashboardWalletBalanceTask.cron}"-->
+    <!--                overwrite="true"-->
+    <!--                disabled="${account.opsDashboardWalletBalanceTask.disabled}"-->
+    <!--                sharding-total-count="${account.opsDashboardWalletBalanceTask.shardingCount}"/>-->
+
+    <job:simple id="fetchKinePriceMiningRewardTaskJob" job-ref="fetchKinePriceMiningRewardTask"
+                registry-center-ref="regCenter"
+                cron="${account.fetchKinePriceMiningRewardTask.cron}"
+                overwrite="true"
+                disabled="${account.fetchKinePriceMiningRewardTask.disabled}"
+                sharding-total-count="${account.fetchKinePriceMiningRewardTask.shardingCount}"/>
+    <job:simple id="mcdRetryTaskJob" job-ref="mcdRetryTask"
+                registry-center-ref="regCenter"
+                cron="${account.mcdRetryTask.cron}"
+                overwrite="true"
+                disabled="${account.mcdRetryTask.disabled}"
+                sharding-total-count="${account.mcdRetryTask.shardingCount}"/>
+    <job:simple id="mcdCalcAttributeTaskJob" job-ref="mcdCalcAttributeTask"
+                registry-center-ref="regCenter"
+                cron="${account.mcdCalcAttributeTask.cron}"
+                overwrite="true"
+                disabled="${account.mcdCalcAttributeTask.disabled}"
+                sharding-total-count="${account.mcdCalcAttributeTask.shardingCount}"/>
+
+    <!--  Affiliate tasks  Start -->
+
+    <job:simple id="orderCommissionSplitCompensateTaskJob" job-ref="orderCommissionSplitCompensateTask"
+                registry-center-ref="regCenter"
+                cron="${affiliate.orderCommissionSplitCompensateTask.cron}"
+                overwrite="true"
+                disabled="${affiliate.orderCommissionSplitCompensateTask.disabled}"
+                sharding-total-count="${affiliate.orderCommissionSplitCompensateTask.shardingCount}"/>
+
+    <job:simple id="affiliateGenerateCommissionSummaryTaskJob" job-ref="affiliateGenerateCommissionSummaryTask"
+                registry-center-ref="regCenter"
+                cron="${affiliate.affiliateGenerateCommissionSummaryTask.cron}"
+                overwrite="true"
+                disabled="${affiliate.affiliateGenerateCommissionSummaryTask.disabled}"
+                sharding-total-count="${affiliate.affiliateGenerateCommissionSummaryTask.shardingCount}"/>
+
+    <job:simple id="affiliateGenerateSettlementTaskJob" job-ref="affiliateGenerateSettlementTask"
+                registry-center-ref="regCenter"
+                cron="${affiliate.affiliateGenerateSettlementTask.cron}"
+                overwrite="true"
+                disabled="${affiliate.affiliateGenerateSettlementTask.disabled}"
+                sharding-total-count="${affiliate.affiliateGenerateSettlementTask.shardingCount}"/>
+
+    <job:simple id="affiliateSettlementTransferTaskJob" job-ref="affiliateSettlementTransferTask"
+                registry-center-ref="regCenter"
+                cron="${affiliate.affiliateSettlementTransferTask.cron}"
+                overwrite="true"
+                disabled="${affiliate.affiliateSettlementTransferTask.disabled}"
+                sharding-total-count="${affiliate.affiliateSettlementTransferTask.shardingCount}"/>
+
+    <job:simple id="affiliateSettlementAutoApproveTaskJob" job-ref="affiliateSettlementAutoApproveTask"
+                registry-center-ref="regCenter"
+                cron="${affiliate.affiliateSettlementAutoApproveTask.cron}"
+                overwrite="true"
+                disabled="${affiliate.affiliateSettlementAutoApproveTask.disabled}"
+                sharding-total-count="${affiliate.affiliateSettlementAutoApproveTask.shardingCount}"/>
+
+    <!--  Affiliate tasks  End -->
+    <job:simple id="tradeDashboardTaskJob" job-ref="tradeDashboardTask"
+                registry-center-ref="regCenter"
+                cron="${trade.tradeDashboardTask.cron}"
+                overwrite="true"
+                disabled="${trade.tradeDashboardTask.disabled}"
+                sharding-total-count="${trade.tradeDashboardTask.shardingCount}"/>
+
+    <job:simple id="tradeUserVolTaskJob" job-ref="tradeUserVolTask"
+                registry-center-ref="regCenter"
+                cron="${trade.tradeUserVolTask.cron}"
+                overwrite="true"
+                disabled="${trade.tradeUserVolTask.disabled}"
+                sharding-total-count="${trade.tradeUserVolTask.shardingCount}"/>
+
+    <job:simple id="tradeUserDailyVolTaskJob" job-ref="tradeUserDailyVolTask"
+                registry-center-ref="regCenter"
+                cron="${trade.tradeUserDailyVolTask.cron}"
+                overwrite="true"
+                disabled="${trade.tradeUserDailyVolTask.disabled}"
+                sharding-total-count="${trade.tradeUserDailyVolTask.shardingCount}"/>
+
+    <job:simple id="tradeUserDailyVolRetryTaskJob" job-ref="tradeUserDailyVolRetryTask"
+                registry-center-ref="regCenter"
+                cron="${trade.tradeUserDailyVolRetryTask.cron}"
+                overwrite="true"
+                disabled="${trade.tradeUserDailyVolRetryTask.disabled}"
+                sharding-total-count="${trade.tradeUserDailyVolRetryTask.shardingCount}"/>
+
+    <job:simple id="tradeCondOrderExpireTaskJob" job-ref="tradeCondOrderExpireTask"
+                registry-center-ref="regCenter"
+                cron="${trade.tradeCondOrderExpireTask.cron}"
+                overwrite="true"
+                disabled="${trade.tradeCondOrderExpireTask.disabled}"
+                sharding-total-count="${trade.tradeCondOrderExpireTask.shardingCount}"/>
+
+</beans>
