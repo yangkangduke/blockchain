@@ -2,8 +2,8 @@ package com.seeds.account.chain.service.impl;
 
 import com.google.common.collect.Maps;
 import com.seeds.account.chain.dto.*;
-import com.seeds.account.chain.service.ChainProviderService;
-import com.seeds.account.chain.service.ChainService;
+import com.seeds.account.chain.service.IChainProviderService;
+import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.chain.dto.ChainTransaction;
 import com.seeds.account.chain.dto.NativeChainBlockDto;
 import com.seeds.account.chain.dto.NativeChainTransactionDto;
@@ -35,24 +35,24 @@ import java.util.Set;
 @Service
 @Slf4j
 @Primary
-public class ChainServiceProxyImpl implements ChainService, ChainProviderService {
+public class ChainServiceProxyImpl implements IChainService, IChainProviderService {
 
 
     /**
      * 支持的链处理类
      */
-    Map<Chain, ChainService> providers = Maps.newConcurrentMap();
+    Map<Chain, IChainService> providers = Maps.newConcurrentMap();
 
     @Override
-    public void registerProvider(Chain chain, ChainService provider) {
+    public void registerProvider(Chain chain, IChainService provider) {
         log.info("registerProvider chain={} provider={}", chain, provider);
         Utils.check(chain != null, ErrorCode.ACCOUNT_INVALID_CHAIN);
         providers.put(chain, provider);
     }
 
     @Override
-    public ChainService getServiceProvider(Chain chain) {
-        ChainService provider = providers.get(chain);
+    public IChainService getServiceProvider(Chain chain) {
+        IChainService provider = providers.get(chain);
         Utils.check(provider != null, ErrorCode.ACCOUNT_INVALID_CHAIN);
         return provider;
     }
@@ -129,7 +129,7 @@ public class ChainServiceProxyImpl implements ChainService, ChainProviderService
 
     @Override
     public List<NativeChainTransactionDto> getTransactions(Chain chain, Chain defiChain, Long blockNumber, List<String> addresses) throws Exception {
-        ChainService provider = getServiceProvider(chain);
+        IChainService provider = getServiceProvider(chain);
 
         long l1 = System.currentTimeMillis();
         List<NativeChainTransactionDto> list = provider.getTransactions(chain, defiChain, blockNumber, addresses);
@@ -283,7 +283,7 @@ public class ChainServiceProxyImpl implements ChainService, ChainProviderService
 
     @Override
     public BigInteger getPendingNonce(Chain chain, String address) {
-        ChainService provider = getServiceProvider(chain);
+        IChainService provider = getServiceProvider(chain);
         BigInteger nonce = provider.getPendingNonce(chain, address);
         log.info("getPendingNonce chain={} address={} nonce={}", chain, address, nonce);
         return nonce;
@@ -332,7 +332,7 @@ public class ChainServiceProxyImpl implements ChainService, ChainProviderService
     @Override
     public SignedMessageDto encodeAndSignDefiWithdraw(Chain chain, long id, String address, String currency, BigDecimal amount, long deadline) {
         log.info("encodeAndSignDefiWithdraw chain={} id={} address={} currency={} amount={} deadline={}", chain, id, address, currency, amount, deadline);
-        ChainService provider = getServiceProvider(chain);
+        IChainService provider = getServiceProvider(chain);
         return provider.encodeAndSignDefiWithdraw(chain, id, address, currency, amount, deadline);
     }
 }

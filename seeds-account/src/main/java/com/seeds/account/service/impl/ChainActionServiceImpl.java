@@ -2,15 +2,16 @@ package com.seeds.account.service.impl;
 
 import com.seeds.account.AccountConstants;
 import com.seeds.account.anno.SingletonLock;
-import com.seeds.account.chain.service.ChainService;
+import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.enums.AccountActionControl;
 import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.mapper.ChainDepositAddressMapper;
 import com.seeds.account.model.ChainDepositAddress;
-import com.seeds.account.service.ActionControlService;
+import com.seeds.account.service.IChainActionPersistentService;
+import com.seeds.account.service.IActionControlService;
 import com.seeds.account.service.IChainActionService;
-import com.seeds.account.service.SystemConfigService;
+import com.seeds.account.service.ISystemConfigService;
 import com.seeds.common.enums.Chain;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +31,15 @@ import java.util.stream.Collectors;
 public class ChainActionServiceImpl implements IChainActionService {
 
     @Autowired
-    private ActionControlService actionControlService;
+    private IActionControlService actionControlService;
     @Autowired
     private ChainDepositAddressMapper chainDepositAddressMapper;
     @Autowired
-    SystemConfigService systemConfigService;
+    ISystemConfigService systemConfigService;
     @Autowired
-    private ChainService chainService;
+    private IChainService chainService;
+    @Autowired
+    private IChainActionPersistentService chainActionPersistentService;
 
     @Override
     @SingletonLock(key = "/seeds/account/chain/scan-idle-addresses")
@@ -75,7 +78,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                                     .build()
                             ).collect(Collectors.toList());
                     // 交给一个事务service
-//                    chainActionPersistentService.insert(list);
+                    chainActionPersistentService.insert(list);
                 }
             } catch (Exception e) {
                 log.error("checkAndCreateAddresses chain={} minIdles={} idles={} slot={}", chain, minIdles, idles, slot, e);

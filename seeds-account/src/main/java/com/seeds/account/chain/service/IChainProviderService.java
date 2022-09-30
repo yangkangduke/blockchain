@@ -6,7 +6,7 @@ import com.seeds.common.enums.Chain;
 /**
  * @author milo
  */
-public interface ChainProviderService {
+public interface IChainProviderService {
 
 
     /**
@@ -14,8 +14,8 @@ public interface ChainProviderService {
      * @param chain
      * @param provider
      */
-    void registerProvider(Chain chain, ChainService provider);
+    void registerProvider(Chain chain, IChainService provider);
 
-    ChainService getServiceProvider(Chain chain);
+    IChainService getServiceProvider(Chain chain);
 
 }

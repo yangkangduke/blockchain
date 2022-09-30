@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -20,6 +21,8 @@ import com.seeds.admin.mapper.SysGameMapper;
 import com.seeds.admin.service.SysGameService;
 import com.seeds.admin.service.SysGameTypeService;
 import com.seeds.admin.service.SysMerchantGameService;
+import com.seeds.admin.service.SysSequenceNoService;
+import com.seeds.admin.utils.HashUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +44,9 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
 
     @Autowired
     private SysMerchantGameService sysMerchantGameService;
+
+    @Autowired
+    private SysSequenceNoService sysSequenceNoService;
 
     @Autowired
     private SysGameTypeService sysGameTypeService;
@@ -104,7 +110,10 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
 
     @Override
     public void add(SysGameAddReq req) {
+        Long gameAccessNo = sysSequenceNoService.generateGameAccessNo();
         SysGameEntity game = new SysGameEntity();
+        game.setAccessKey(RandomUtil.randomString(gameAccessNo.toString(), 8));
+        game.setSecretKey(HashUtil.MD5(RandomUtil.randomString(gameAccessNo.toString(), 8).toUpperCase()));
         BeanUtils.copyProperties(req, game);
         save(game);
     }
@@ -195,6 +204,17 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
                 .setSql("`collections`=`collections`+1")
                 .eq(SysGameEntity::getId, id);
         update(queryWrap);
+    }
+
+    @Override
+    public String querySecretKey(String accessKey) {
+        LambdaQueryWrapper<SysGameEntity> queryWrap = new QueryWrapper<SysGameEntity>().lambda()
+                .eq(SysGameEntity::getAccessKey, accessKey);
+        SysGameEntity game = getOne(queryWrap);
+        if (game == null) {
+            return null;
+        }
+        return game.getSecretKey();
     }
 
     private void buildOrderBy(SysGamePageReq query, LambdaQueryWrapper<SysGameEntity> queryWrap) {

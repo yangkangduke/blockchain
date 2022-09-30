@@ -3,7 +3,7 @@ package com.seeds.account.chain.service.impl.tron;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.seeds.account.chain.dto.TronRpcConfigDto;
-import com.seeds.account.service.SystemConfigService;
+import com.seeds.account.service.ISystemConfigService;
 import com.seeds.account.util.JsonUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class TRONGridClient {
     final static String KEY = "tron_rpc";
 
     @Autowired
-    SystemConfigService systemConfigService;
+    ISystemConfigService systemConfigService;
 
     AtomicLong counter = new AtomicLong(0);
     String lastConfig = null;

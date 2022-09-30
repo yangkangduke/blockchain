@@ -1,4 +1,4 @@
-package com.seeds.common.web.interceptor;
+package com.seeds.game.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.seeds.common.dto.GenericDto;
@@ -11,8 +11,11 @@ import com.seeds.common.web.util.SignatureUtils;
 import com.seeds.common.web.wrapper.BodyReaderHttpServletRequestWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.groovy.util.concurrent.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import org.apache.groovy.util.concurrent.concurrentlinkedhashmap.Weighers;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
@@ -32,11 +35,27 @@ import java.util.Set;
 @Component
 public class OpenContextInterceptor implements HandlerInterceptor {
 
+    /**
+     * 热点缓存
+     */
+    public static ConcurrentLinkedHashMap<String, String> cache = new ConcurrentLinkedHashMap.Builder<String, String>()
+            .maximumWeightedCapacity(30).weigher(Weighers.singleton()).build();
+
+    /**
+     * 签名验证时间（TIMES =分钟 * 秒 * 毫秒）
+     * 当前设置为：5分钟有效期
+     */
+    @Value("${open.sign.expired.time:300000}")
+    private Integer times;
+
     @Autowired
     private MappingJackson2HttpMessageConverter converter;
 
     @Autowired
     private RedissonClient redissonClient;
+
+    //@Autowired
+    //private SysGameService sysGameService;
 
     private static final GenericDto<String> INVALID_TOKEN_RESPONSE = GenericDto.failure("Invalid token", 401);
     private static final GenericDto<String> INVALID_SIGNATURE_RESPONSE = GenericDto.failure("Invalid signature", 401);
@@ -112,7 +131,7 @@ public class OpenContextInterceptor implements HandlerInterceptor {
             // 解析参数转JSON格式
             JSONObject jsonObject = JSONObject.parseObject(bodyString);
             // 验签
-            return SignatureUtils.validation(jsonObject);
+            return SignatureUtils.validation(jsonObject, times, getSecretKey(jsonObject));
         }
         if (GET_METHOD.equals(method)) {
             log.info("GET请求进入...");
@@ -125,8 +144,21 @@ public class OpenContextInterceptor implements HandlerInterceptor {
                 jsonObject.put(key.getKey(), key.getValue());
             });
             // 验签
-            return SignatureUtils.validation(jsonObject);
+            return SignatureUtils.validation(jsonObject, times, getSecretKey(jsonObject));
         }
         return false;
+    }
+
+    private String getSecretKey(JSONObject params) {
+        // 从缓存中获取密钥
+        String accessKey = params.getString("accessKey");
+        String secretKey = cache.get(accessKey);
+        if (StringUtils.isBlank(secretKey)) {
+            // 从DB中查询
+            //secretKey = sysGameService.querySecretKey(accessKey);
+            // 放入缓存
+            cache.put(accessKey, secretKey);
+        }
+        return secretKey;
     }
 }
