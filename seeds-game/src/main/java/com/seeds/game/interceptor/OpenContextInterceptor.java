@@ -1,7 +1,6 @@
 package com.seeds.game.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
-import com.seeds.admin.service.SysGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.dto.LoginDTO;
 import com.seeds.common.constant.redis.RedisKeys;
@@ -55,8 +54,8 @@ public class OpenContextInterceptor implements HandlerInterceptor {
     @Autowired
     private RedissonClient redissonClient;
 
-    @Autowired
-    private SysGameService sysGameService;
+    //@Autowired
+    //private SysGameService sysGameService;
 
     private static final GenericDto<String> INVALID_TOKEN_RESPONSE = GenericDto.failure("Invalid token", 401);
     private static final GenericDto<String> INVALID_SIGNATURE_RESPONSE = GenericDto.failure("Invalid signature", 401);
@@ -156,7 +155,7 @@ public class OpenContextInterceptor implements HandlerInterceptor {
         String secretKey = cache.get(accessKey);
         if (StringUtils.isBlank(secretKey)) {
             // 从DB中查询
-            secretKey = sysGameService.querySecretKey(accessKey);
+            //secretKey = sysGameService.querySecretKey(accessKey);
             // 放入缓存
             cache.put(accessKey, secretKey);
         }
