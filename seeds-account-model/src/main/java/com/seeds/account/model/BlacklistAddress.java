@@ -11,17 +11,17 @@ import lombok.Data;
 
 /**
  * <p>
- * 全局配置
+ * Ethereum黑地址
  * </p>
  *
  * @author yk
- * @since 2022-09-29
+ * @since 2022-10-08
  */
-@TableName("system_config")
-@ApiModel(value = "SystemConfig对象", description = "全局配置")
+@TableName("blacklist_address")
+@ApiModel(value = "BlacklistAddress对象", description = "Ethereum黑地址")
 @Data
 @Builder
-public class SystemConfig implements Serializable {
+public class BlacklistAddress implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,21 +38,18 @@ public class SystemConfig implements Serializable {
     @ApiModelProperty("version")
     private Long version;
 
-    @ApiModelProperty("type")
-    private String type;
+    @ApiModelProperty("chain")
+    private String chain;
 
-    @ApiModelProperty("name")
-    private String name;
+    private Integer type;
 
-    @ApiModelProperty("key")
-    private String key;
+    @ApiModelProperty("address")
+    private String address;
 
-    @ApiModelProperty("value")
-    private String value;
-
-    @ApiModelProperty("comments")
-    private String comments;
+    @ApiModelProperty("reason")
+    private String reason;
 
     private Integer status;
+
 
 }

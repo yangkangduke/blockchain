@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -11,17 +12,17 @@ import lombok.Data;
 
 /**
  * <p>
- * 全局配置
+ * 提币白名单
  * </p>
  *
  * @author yk
- * @since 2022-09-29
+ * @since 2022-10-08
  */
-@TableName("system_config")
-@ApiModel(value = "SystemConfig对象", description = "全局配置")
+@TableName("withdraw_whitelist")
+@ApiModel(value = "WithdrawWhitelist对象", description = "提币白名单")
 @Data
 @Builder
-public class SystemConfig implements Serializable {
+public class WithdrawWhitelist implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,21 +39,28 @@ public class SystemConfig implements Serializable {
     @ApiModelProperty("version")
     private Long version;
 
-    @ApiModelProperty("type")
-    private String type;
+    @ApiModelProperty("user id")
+    private Long userId;
 
-    @ApiModelProperty("name")
-    private String name;
+    @ApiModelProperty("chain")
+    private String chain;
 
-    @ApiModelProperty("key")
-    private String key;
+    @ApiModelProperty("currency")
+    private String currency;
 
-    @ApiModelProperty("value")
-    private String value;
+    @ApiModelProperty("max amount")
+    private BigDecimal maxAmount;
+
+    @ApiModelProperty("intrady amount")
+    private BigDecimal intradayAmount;
+
+    @ApiModelProperty("auto withdraw amount")
+    private BigDecimal autoAmount;
 
     @ApiModelProperty("comments")
     private String comments;
 
     private Integer status;
+
 
 }

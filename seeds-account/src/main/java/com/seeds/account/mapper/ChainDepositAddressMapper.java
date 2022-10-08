@@ -49,4 +49,12 @@ public interface ChainDepositAddressMapper extends BaseMapper<ChainDepositAddres
      * @return
      */
     int countIdleAddresses(@Param("chain") int chain);
+
+    /**
+     * 根据地址获取
+     * @param chain
+     * @param address
+     * @return
+     */
+    ChainDepositAddress getByAddress(@Param("chain") int chain, @Param("address") String address);
 }

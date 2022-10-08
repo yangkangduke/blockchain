@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.account.mapper.ChainDepositWithdrawSigHisMapper">
+    <resultMap id="BaseResultMap" type="com.seeds.account.model.ChainDepositWithdrawSigHis">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
+        <result column="version" jdbcType="BIGINT" property="version"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="chain" jdbcType="TINYINT" property="chain"
+                typeHandler="com.seeds.common.enums.handler.EnumWithCodeTypeHandler"
+                javaType="com.seeds.common.enums.Chain"/>
+        <result column="currency" jdbcType="VARCHAR" property="currency"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="deadline" jdbcType="BIGINT" property="deadline"/>
+        <result column="singed_signature" jdbcType="VARCHAR" property="signedSignature"/>
+        <result column="singed_message" jdbcType="VARCHAR" property="signedMessage"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.seeds.account.model.ChainDepositWithdrawHis" keyProperty="id">
+        insert into chain_deposit_withdraw_sig_his (id, create_time, update_time, version,
+                user_id, chain, currency, amount, deadline, singed_signature, singed_message)
+        values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, #{version,jdbcType=BIGINT},
+                #{userId,jdbcType=BIGINT}, #{chain.code,jdbcType=TINYINT}, #{currency,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{deadline,jdbcType=BIGINT},
+                #{signedSignature,jdbcType=VARCHAR}, #{signedMessage,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select *
+        from chain_deposit_withdraw_sig_his
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="getByUserId" resultMap="BaseResultMap">
+        select *
+        from chain_deposit_withdraw_sig_his
+        where id = #{id,jdbcType=BIGINT}
+          and user_id = #{userId,jdbcType=BIGINT}
+    </select>
+
+</mapper>
