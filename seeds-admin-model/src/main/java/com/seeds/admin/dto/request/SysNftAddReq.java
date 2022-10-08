@@ -46,7 +46,6 @@ public class SysNftAddReq {
 	 * NFT描述
 	 */
 	@ApiModelProperty("NFT描述")
-	@NotBlank(message = "NFT description cannot be empty")
 	private String description;
 
 	/**
@@ -67,7 +66,6 @@ public class SysNftAddReq {
 	 * 状态  0：停售   1：在售
 	 */
 	@ApiModelProperty("状态  0：停售   1：在售")
-	@NotNull(message = "NFT status cannot be empty")
 	private Integer status;
 
 	/**

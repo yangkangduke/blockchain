@@ -1,9 +1,7 @@
 package com.seeds.admin.feign.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.admin.dto.request.NftOwnerChangeReq;
-import com.seeds.admin.dto.request.SysNftPageReq;
-import com.seeds.admin.dto.request.UcSwitchReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.dto.response.SysNftTypeResp;
@@ -12,6 +10,7 @@ import com.seeds.common.dto.GenericDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,7 +20,6 @@ import java.util.List;
  */
 @Component
 public class RemoteNftServiceImpl implements RemoteNftService {
-
 
 	@PostMapping("/internal-nft/owner-change")
 	@Override
@@ -57,6 +55,21 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	@Override
 	public GenericDto<Object> ucUpOrDown(UcSwitchReq req) {
 		return GenericDto.failure("Internal Error:nft ucUpOrDown failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<Long> create(MultipartFile image, SysNftAddReq req) {
+		return GenericDto.failure("Internal Error:nft create failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<Object> modify(SysNftModifyReq req) {
+		return GenericDto.failure("Internal Error:nft modify failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<Object> honorModify(List<SysNftHonorModifyReq> req) {
+		return GenericDto.failure("Internal Error:nft honor modify failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 }

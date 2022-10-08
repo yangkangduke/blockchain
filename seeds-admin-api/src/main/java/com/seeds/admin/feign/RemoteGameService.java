@@ -68,4 +68,13 @@ public interface RemoteGameService {
 	@ApiOperation("uc查询游戏类别列表")
 	GenericDto<List<SysGameTypeResp>> ucTypeDropdown();
 
+	/**
+	 * 查询游戏秘钥
+	 * @param accessKey 游戏的访问键
+	 * @return 系统游戏秘钥
+	 */
+	@GetMapping("/internal-game/secret-key")
+	@ApiOperation("查询游戏秘钥")
+	GenericDto<String> querySecretKey(@RequestParam String accessKey);
+
 }
