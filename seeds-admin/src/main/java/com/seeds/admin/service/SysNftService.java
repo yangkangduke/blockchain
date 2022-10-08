@@ -30,8 +30,10 @@ public interface SysNftService extends IService<SysNftEntity> {
      * 添加系统NFT信息
      * @param image NFT图片
      * @param req NFT信息
+     * @param topic 消息方式
+     * @return NFT的唯一标识
      */
-    void add(MultipartFile image, SysNftAddReq req);
+    Long add(MultipartFile image, SysNftAddReq req, String topic);
 
     /**
      * 通过id获取系统NFT信息
@@ -116,4 +118,12 @@ public interface SysNftService extends IService<SysNftEntity> {
      * @param sysNftEntities NFT信息
      */
     void burnNft(List<SysNftEntity> sysNftEntities);
+
+    /**
+     * NFT战绩更新
+     *
+     * @param req NFT战绩记录
+     */
+    void honorModify(List<SysNftHonorModifyReq> req);
+
 }

@@ -44,4 +44,9 @@ public class RemoteGameServiceImpl implements RemoteGameService {
 	public GenericDto<List<SysGameTypeResp>> ucTypeDropdown() {
 		return GenericDto.failure("Internal Error:game ucTypeDropdown failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
+
+	@Override
+	public GenericDto<String> querySecretKey(String accessKey) {
+		return GenericDto.failure("Internal Error:game querySecretKey failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
 }

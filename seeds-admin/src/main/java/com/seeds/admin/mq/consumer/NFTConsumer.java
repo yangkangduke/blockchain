@@ -7,7 +7,6 @@ import com.seeds.admin.entity.SysNftEntity;
 import com.seeds.admin.service.SysNftService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -35,6 +34,19 @@ public class NFTConsumer {
         log.info("收到消息：{}", msg);
         NftMintMsgDTO msgDTO = JSONUtil.toBean(msg, NftMintMsgDTO.class);
         nftService.mintNft(msgDTO);
+    }
+
+    /**
+     * 消费NFT保存成功消息，完成NFT上链操作
+     *
+     * @param msg
+     */
+    @KafkaListener(groupId = "nft-consumer-group", topics = {KafkaTopic.GAME_NFT_SAVE_SUCCESS})
+    public void gameMintNft(String msg) {
+        log.info("收到消息：{}", msg);
+        NftMintMsgDTO msgDTO = JSONUtil.toBean(msg, NftMintMsgDTO.class);
+        nftService.mintNft(msgDTO);
+        // todo 通知游戏方NFT创建结果
     }
 
     /**

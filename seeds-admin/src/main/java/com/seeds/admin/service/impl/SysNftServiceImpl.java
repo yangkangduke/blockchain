@@ -68,6 +68,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     private SysNftTypeService sysNftTypeService;
 
     @Autowired
+    private SysNftHonorService sysNftHonorService;
+
+    @Autowired
     private SmartContractConfig smartContractConfig;
 
     @Autowired
@@ -75,6 +78,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Autowired
     private SysNftPropertiesService sysNftPropertiesService;
+
+    @Autowired
+    private SysNftEventRecordService sysNftEventRecordService;
 
     @Autowired
     private SysNftPropertiesTypeService sysNftPropertiesTypeService;
@@ -120,7 +126,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(MultipartFile image, SysNftAddReq req) {
+    public Long add(MultipartFile image, SysNftAddReq req, String topic) {
         // 添加NFT
         SysNftEntity sysNft = new SysNftEntity();
         BeanUtils.copyProperties(req, sysNft);
@@ -146,7 +152,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         msgDTO.setId(sysNft.getId());
         msgDTO.setImageFileHash(imageFileHash);
 
-        kafkaProducer.send(KafkaTopic.NFT_SAVE_SUCCESS, JSONUtil.toJsonStr(msgDTO));
+        kafkaProducer.send(topic, JSONUtil.toJsonStr(msgDTO));
+        return sysNft.getId();
     }
 
     @Override
@@ -483,6 +490,28 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 p.setErrorMsg(errorMsg);
                 p.setInitStatus(NftInitStatusEnum.DELETE_FAILED.getCode());
                 updateById(p);
+            }
+        });
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void honorModify(List<SysNftHonorModifyReq> req) {
+        Set<Long> nftIds = req.stream().map(SysNftHonorModifyReq::getNftId).collect(Collectors.toSet());
+        sysNftHonorService.removeByNftIds(nftIds);
+        req.forEach(p -> {
+            // 战绩记录更新
+            SysNftHonorEntity nftHonor = new SysNftHonorEntity();
+            BeanUtils.copyProperties(p, nftHonor);
+            sysNftHonorService.save(nftHonor);
+            // 记录触发事件
+            if (!CollectionUtils.isEmpty(p.getEventList())) {
+                p.getEventList().forEach(e -> {
+                    SysNftEventRecordEntity eventRecord  = new SysNftEventRecordEntity();
+                    eventRecord.setNftId(p.getNftId());
+                    BeanUtils.copyProperties(e, eventRecord);
+                    sysNftEventRecordService.save(eventRecord);
+                });
             }
         });
     }

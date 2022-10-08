@@ -34,10 +34,11 @@ public class ContractConfig {
     @Autowired
     public EthFilter filter(Web3j  web3j) throws IOException {
         //获取启动时监听的区块
-        Request<?, EthBlockNumber> request = web3j.ethBlockNumber();
+        /*Request<?, EthBlockNumber> request = web3j.ethBlockNumber();
         BigInteger block = request.send().getBlockNumber();
         return new EthFilter(DefaultBlockParameter.valueOf(block),
-                DefaultBlockParameterName.LATEST, smartContractConfig.getGameAddress());
+                DefaultBlockParameterName.LATEST, smartContractConfig.getGameAddress());*/
+        return new EthFilter();
     }
 
     @Bean

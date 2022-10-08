@@ -1,9 +1,7 @@
 package com.seeds.admin.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.admin.dto.request.NftOwnerChangeReq;
-import com.seeds.admin.dto.request.SysNftPageReq;
-import com.seeds.admin.dto.request.UcSwitchReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.dto.response.SysNftTypeResp;
@@ -13,6 +11,7 @@ import com.seeds.admin.feign.interceptor.FeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -85,5 +84,33 @@ public interface RemoteNftService {
 	@PostMapping("/internal-nft/uc-switch")
 	@ApiOperation("uc上架/下架")
 	GenericDto<Object> ucUpOrDown(@Valid @RequestBody UcSwitchReq req);
+
+	/**
+	 * NFT创建
+	 * @param image NFT图片
+	 * @param req NFT属性
+	 * @return NFT的唯一标识
+	 */
+	@PostMapping("/internal-nft/create")
+	@ApiOperation("NFT创建")
+	GenericDto<Long> create(@RequestPart("image") MultipartFile image, @Valid SysNftAddReq req);
+
+	/**
+	 * NFT修改
+	 * @param req NFT属性
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/modify")
+	@ApiOperation("NFT修改")
+	GenericDto<Object> modify(@Valid @RequestBody SysNftModifyReq req);
+
+	/**
+	 * NFT战绩更新
+	 * @param req NFT战绩记录
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/honor-modify")
+	@ApiOperation("NFT战绩更新")
+	GenericDto<Object> honorModify(List<SysNftHonorModifyReq> req);
 
 }

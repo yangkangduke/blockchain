@@ -25,16 +25,17 @@ public class FieldMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
+        Long adminUserId;
         try {
-            Long adminUserId = UserContext.getCurrentAdminUserId();
-            //创建者
-            strictInsertFill(metaObject, CREATOR, Long.class, adminUserId);
-            //更新者
-            strictInsertFill(metaObject, UPDATER, Long.class, adminUserId);
+            adminUserId = UserContext.getCurrentAdminUserId();
         } catch (Exception e) {
             log.info("getCurrentAdminUserId error" + e);
+            adminUserId = 0L;
         }
-
+        //创建者
+        strictInsertFill(metaObject, CREATOR, Long.class, adminUserId);
+        //更新者
+        strictInsertFill(metaObject, UPDATER, Long.class, adminUserId);
         Date date = new Date();
         long time = date.getTime();
 

@@ -6,6 +6,7 @@ import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.enums.NftInitStatusEnum;
 import com.seeds.admin.service.SysNftService;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -86,4 +88,26 @@ public class InterNftController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("create")
+    @ApiOperation("NFT创建")
+    @Inner
+    public GenericDto<Long> create(@RequestPart("image") MultipartFile image, @Valid SysNftAddReq req) {
+        return GenericDto.success(sysNftService.add(image, req, KafkaTopic.GAME_NFT_SAVE_SUCCESS));
+    }
+
+    @PostMapping("modify")
+    @ApiOperation("NFT修改")
+    @Inner
+    public GenericDto<Long> modify(@Valid @RequestBody SysNftModifyReq req) {
+        sysNftService.modify(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("honor-modify")
+    @ApiOperation("NFT战绩更新")
+    @Inner
+    public GenericDto<Long> honorModify(@Valid @RequestBody List<SysNftHonorModifyReq> req) {
+        sysNftService.honorModify(req);
+        return GenericDto.success(null);
+    }
 }
