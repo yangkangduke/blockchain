@@ -4,11 +4,11 @@ info:
   env:
     name: ${PROFILE:NOT_SET}
   hostname: ${HOSTNAME:NOT_SET}
+
 spring:
   application:
     name: ${APP_NAME:seeds-config}
-  profiles:
-    active: dev
+
   cloud:
     config:
       server:
@@ -19,5 +19,3 @@ spring:
           search-paths: dev-config
           default-label: dev
           force-pull: true
-server:
-  port: 8888
