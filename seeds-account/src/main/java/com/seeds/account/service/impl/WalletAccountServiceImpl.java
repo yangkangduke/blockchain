@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.anno.SingletonLock;
+import com.seeds.account.mapper.UserAccountMapper;
 import com.seeds.account.service.IWalletAccountService;
 import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
@@ -32,7 +33,7 @@ public class WalletAccountServiceImpl implements IWalletAccountService {
     @Autowired
     RedissonClient client;
     @Autowired
-//    UserAccountMapper userAccountMapper;
+    UserAccountMapper userAccountMapper;
 
     @Override
     public boolean freeze(Long userId, String currency, BigDecimal amount) {
@@ -41,7 +42,6 @@ public class WalletAccountServiceImpl implements IWalletAccountService {
         Assert.isTrue(userId != null && userId >= 0, "user Id must > 0");
         Assert.isTrue(currency != null && currency.length() > 0, "invalid currency");
         Assert.isTrue(amount != null && amount.signum() > 0, "invalid amount");
-//        return userAccountMapper.freeze(userId, currency, amount) == 1;
-        return false;
+        return userAccountMapper.freeze(userId, currency, amount) == 1;
     }
 }

@@ -19,11 +19,11 @@ import java.util.concurrent.Callable;
 @Service
 public class TransactionServiceImpl implements ITransactionService {
 
-/*    @Override
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void execute(Runnable runnable) throws Exception {
         runnable.run();
-    }*/
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

@@ -95,7 +95,7 @@ public class ActionControlServiceImpl extends ServiceImpl<ActionControlMapper, A
         if (actionControl == null) {
             throw new MissingElementException();
         }
-        // actionControl.setValue(actionControlDto.getValue());
+        actionControl.setValue(actionControlDto.getValue());
         actionControl.setUpdateTime(System.currentTimeMillis());
         actionControl.setVersion(actionControl.getVersion() + 1);
         actionControl.setStatus(actionControlDto.getStatus());

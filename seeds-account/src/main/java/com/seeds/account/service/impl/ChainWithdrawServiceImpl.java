@@ -103,11 +103,10 @@ public class ChainWithdrawServiceImpl implements IChainWithdrawService {
 
     @Override
     public List<WithdrawRuleDto> loadAll() {
-//        return withdrawRuleMapper.selectAll()
-//                .stream()
-//                .map(e -> ObjectUtils.copy(e, new WithdrawRuleDto()))
-//                .collect(Collectors.toList());
-        return null;
+        return withdrawRuleMapper.selectList(new QueryWrapper<>())
+                .stream()
+                .map(e -> ObjectUtils.copy(e, new WithdrawRuleDto()))
+                .collect(Collectors.toList());
     }
 
 }

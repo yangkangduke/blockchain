@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.account.mapper.UserAccountMapper">
+
+    <update id="freeze">
+        <![CDATA[
+        update user_account
+        set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
+            version     = version + 1,
+            available   = available - #{amount,jdbcType=DECIMAL},
+            freeze      = freeze + #{amount,jdbcType=DECIMAL}
+        where user_id = #{userId,jdbcType=BIGINT}
+          and currency = #{currency,jdbcType=VARCHAR}
+          and available >= #{amount,jdbcType=DECIMAL}
+        ]]>
+    </update>
+</mapper>

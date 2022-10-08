@@ -78,6 +78,8 @@ public class AccountServiceImpl implements IAccountService {
     IFundingRateActionService fundingRateActionService;
     @Autowired
     ITransactionService transactionService;
+    @Autowired
+    IUserAccountActionService userAccountActionService;
 
 
     @Override
@@ -246,15 +248,15 @@ public class AccountServiceImpl implements IAccountService {
             });
         }
 
-//        transactionService.afterCommit(() -> {
-//            // 记录历史执行中
-//            userAccountActionService.createHistory(userId, currency, AccountAction.WITHDRAW, String.valueOf(transaction.getId()), amount, CommonActionStatus.PROCESSING);
-//
-//            // 通知账户变更
+        transactionService.afterCommit(() -> {
+            // 记录历史执行中
+            userAccountActionService.createHistory(userId, currency, AccountAction.WITHDRAW, String.valueOf(transaction.getId()), amount, CommonActionStatus.PROCESSING);
+
+            // 通知账户变更
 //            accountPublishService.publishAsync(AccountTopics.TOPIC_ACCOUNT_UPDATE,
 //                    AccountUpdateEvent.builder().ts(System.currentTimeMillis()).userId(userId).action(AccountAction.WITHDRAW.getCode()).build());
-//
-//            // 发送通知给运营人员
+
+            // 发送通知给运营人员
 //            if (requireReview) {
 //                notificationService.sendNotificationAsync(NotificationDto.builder()
 //                        .notificationType(OpsAction.OPS_SUPPORT.getNotificationType())
@@ -264,7 +266,7 @@ public class AccountServiceImpl implements IAccountService {
 //                                "content", transaction.getId() + " pending approval"))
 //                        .build());
 //            }
-//        });
+        });
 
         return withdrawResponseDto;
     }

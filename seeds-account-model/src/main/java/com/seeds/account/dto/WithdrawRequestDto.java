@@ -24,7 +24,7 @@ public class WithdrawRequestDto implements Serializable {
 
     /**
      *
-     * @see com.kine.common.enums.Chain
+     * @see com.seeds.common.enums.Chain
      */
     int chain;
 
