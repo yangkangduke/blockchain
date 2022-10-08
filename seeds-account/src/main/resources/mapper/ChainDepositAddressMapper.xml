@@ -37,4 +37,12 @@
           and user_id = 0
     </update>
 
+    <select id="countIdleAddresses" resultType="java.lang.Integer">
+        select count(*)
+        from chain_deposit_address
+        where status = 1
+          and chain = #{chain,jdbcType=TINYINT}
+          and user_id = 0
+    </select>
+
 </mapper>

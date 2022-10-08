@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:reg="http://www.dangdang.com/schema/ddframe/reg"
+       xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.dangdang.com/schema/ddframe/reg
+                        http://www.dangdang.com/schema/ddframe/reg/reg.xsd
+                        http://www.dangdang.com/schema/ddframe/job
+                        http://www.dangdang.com/schema/ddframe/job/job.xsd
+                        ">
+
+    <!-- account tasks -->
+    <bean id="autoCreateAddressTask" class="com.seeds.account.task.AutoCreateAddressTask"/>
+
+
+    <reg:zookeeper id="regCenter" server-lists="${seeds.elastic-job.zk.servers}"
+                   namespace="${seeds.elastic-job.namespace}"/>
+    <!--                 base-sleep-time-milliseconds="${elastic-job.zk.baseSleep}"-->
+    <!--                 max-sleep-time-milliseconds="${elastic-job.zk.maxSleep}"-->
+    <!--                 max-retries="${elastic-job.zk.maxRetries}"/>-->
+
+    <!-- tasks -->
+    <job:simple id="autoCreateAddressTaskJob" job-ref="autoCreateAddressTask"
+                registry-center-ref="regCenter"
+                cron="${account.autoCreateAddressTask.cron}"
+                overwrite="true"
+                disabled="${account.autoCreateAddressTask.disabled}"
+                sharding-total-count="${account.autoCreateAddressTask.shardingCount}"/>
+
+
+
+</beans>

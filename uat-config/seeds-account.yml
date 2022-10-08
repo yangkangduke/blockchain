@@ -17,6 +17,16 @@ management:
 mybatis:
   type-aliases-package*: com.seeds.account.model
 
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 45000
+        read-timeout: 45000
+  wallet:
+    access:
+      access-key: XXXXX
+      secret-key: "5bb40a4623ead547e4b2f15awallet.access.key.secret"
 
 
 

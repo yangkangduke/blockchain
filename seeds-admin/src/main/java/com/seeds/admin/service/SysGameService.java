@@ -97,4 +97,11 @@ public interface SysGameService extends IService<SysGameEntity> {
      */
     void ucCollection(Long id);
 
+    /**
+     * 获取密钥
+     * @param accessKey 访问键
+     * @return 密钥
+     */
+    String querySecretKey(String accessKey);
+
 }
