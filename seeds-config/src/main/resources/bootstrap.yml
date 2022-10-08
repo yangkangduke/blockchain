@@ -7,8 +7,6 @@ info:
 spring:
   application:
     name: ${APP_NAME:seeds-config}
-  profiles:
-    active: dev
   cloud:
     config:
       server:
@@ -19,5 +17,3 @@ spring:
           search-paths: uat-config
           default-label: uat
           force-pull: true
-server:
-  port: 8888
