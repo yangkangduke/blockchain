@@ -1,17 +1,12 @@
 package com.seeds.account.service.impl;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.seeds.account.dto.SystemWalletAddressDto;
 import com.seeds.account.enums.WalletAddressType;
 import com.seeds.account.mapper.ChainDepositAddressMapper;
 import com.seeds.account.mapper.SystemWalletAddressMapper;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.account.service.IChainDepositService;
 import com.seeds.account.service.ISystemWalletAddressService;
-import com.seeds.account.service.LockService;
-import com.seeds.account.tool.ListMap;
-import com.seeds.account.util.ObjectUtils;
+import com.seeds.account.service.ILockService;
 import com.seeds.account.util.Utils;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
@@ -21,10 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * @program: seeds-java
@@ -43,7 +34,7 @@ public class ChainDepositServiceImpl implements IChainDepositService {
     @Autowired
     ChainDepositAddressMapper chainDepositAddressMapper;
     @Autowired
-    LockService lockService;
+    ILockService lockService;
 
 
     @Override
@@ -86,5 +77,13 @@ public class ChainDepositServiceImpl implements IChainDepositService {
         return null;
     }
 
+    @Override
+    public ChainDepositAddress getByAddress(Chain chain, String address) {
+        // 2021-04-27 milo 增加链校验，以防止用户用户的暴力访问
+        Utils.check(chain != null, ErrorCode.ACCOUNT_INVALID_CHAIN);
 
+        // 2021-04-27 milo 链做个映射，主要的目的是BSC的地址跟ETH的地址共享
+        chain = Chain.mapChain(chain);
+        return chainDepositAddressMapper.getByAddress(chain.getCode(), address);
+    }
 }

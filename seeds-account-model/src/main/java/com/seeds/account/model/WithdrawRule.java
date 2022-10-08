@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -11,17 +12,17 @@ import lombok.Data;
 
 /**
  * <p>
- * Ethereum块跟踪
+ * 提币规则
  * </p>
  *
  * @author yk
- * @since 2022-09-29
+ * @since 2022-10-08
  */
-@TableName("chain_block")
-@ApiModel(value = "ChainBlock对象", description = "Ethereum块跟踪")
+@TableName("withdraw_rule")
+@ApiModel(value = "WithdrawRule对象", description = "提币规则")
 @Data
 @Builder
-public class ChainBlock implements Serializable {
+public class WithdrawRule implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,18 +42,33 @@ public class ChainBlock implements Serializable {
     @ApiModelProperty("chain")
     private String chain;
 
-    @ApiModelProperty("block number")
-    private Long blockNumber;
+    @ApiModelProperty("currency")
+    private String currency;
 
-    @ApiModelProperty("block hash")
-    private String blockHash;
+    @ApiModelProperty("min amount")
+    private BigDecimal minAmount;
 
-    @ApiModelProperty("block timestamp")
-    private Long blockTime;
+    @ApiModelProperty("max amount")
+    private BigDecimal maxAmount;
 
-    @ApiModelProperty("parent block hash")
-    private String parentHash;
+    @ApiModelProperty("intrady amount")
+    private BigDecimal intradayAmount;
+
+    @ApiModelProperty("fee type")
+    private Integer feeType;
+
+    @ApiModelProperty("fee amount")
+    private BigDecimal feeAmount;
+
+    private Integer decimals;
+
+    @ApiModelProperty("auto withdraw amount")
+    private BigDecimal autoAmount;
+
+    @ApiModelProperty("是否内部提币面手续费")
+    private String zeroFeeOnInternal;
 
     private Integer status;
+
 
 }

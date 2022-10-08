@@ -45,4 +45,10 @@
           and user_id = 0
     </select>
 
+    <select id="getByAddress" resultMap="BaseResultMap">
+        select *
+        from chain_deposit_address
+        where chain = #{chain,jdbcType=TINYINT}
+          and address = #{address,jdbcType=VARCHAR}
+    </select>
 </mapper>

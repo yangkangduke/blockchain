@@ -17,5 +17,6 @@ public class MetamaskVerifyReq {
     private String signature;
     @ApiModelProperty(value = "签名原文")
     private String message;
+    private Long userId;
 
 }
