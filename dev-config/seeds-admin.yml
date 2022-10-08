@@ -1,11 +1,7 @@
-server:
-  port: 10102
 spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-  profile:
-    active: dev
 
   datasource:
     url: jdbc:mysql://192.168.1.101:3306/seeds_admin?useUnicode=true&characterEncoding=utf-8
