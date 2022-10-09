@@ -1,7 +1,9 @@
 package com.seeds.account.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.google.common.collect.Maps;
 import com.seeds.common.enums.EnumWithCode;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -13,7 +15,8 @@ import java.util.Map;
  * @author milo
  *
  */
-public enum CommonStatus implements EnumWithCode {
+@Getter
+public enum CommonStatus {
     /**
      * 启用
      */
@@ -27,21 +30,16 @@ public enum CommonStatus implements EnumWithCode {
 
     public static final int maxCode = 2;
 
+    @EnumValue
     private Integer code;
 
     CommonStatus(int code) {
         this.code = code;
     }
 
-    @Override
-    public Integer getCode() {
-        return code;
-    }
 
     public static final Map<Integer, CommonStatus> codeMap = Maps.newHashMap();
-    static {
-        Arrays.stream(values()).forEach(e -> codeMap.put(e.getCode(), e));
-    }
+
     public static CommonStatus fromCode(int code) {
         return codeMap.get(code);
     }

@@ -2,6 +2,7 @@ package com.seeds.account.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.seeds.account.enums.CommonStatus;
+import com.seeds.common.enums.Chain;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,9 +26,9 @@ public class WithdrawRuleDto implements Serializable {
 
     /**
      *
-     * @see com.kine.common.enums.Chain
+     * @see com.seeds.common.enums.Chain
      */
-    int chain;
+    Chain chain;
     /**
      * 币种
      */

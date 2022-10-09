@@ -10,6 +10,7 @@ import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.ex.MissingElementException;
 import com.seeds.account.mapper.WithdrawLimitRuleMapper;
 import com.seeds.account.mapper.WithdrawRuleMapper;
+import com.seeds.account.model.WithdrawRule;
 import com.seeds.account.service.IChainWithdrawService;
 import com.seeds.account.tool.ListMap;
 import com.seeds.account.util.ObjectUtils;
@@ -51,7 +52,7 @@ public class ChainWithdrawServiceImpl implements IChainWithdrawService {
                 List<WithdrawRuleDto> list = loadAll();
                 Map<String, WithdrawRuleDto> map = list.stream()
                         .filter(e -> e.getStatus() == CommonStatus.ENABLED)
-                        .collect(Collectors.toMap(e -> toKey(e.getChain(), e.getCurrency()), e -> e));
+                        .collect(Collectors.toMap(e -> toKey(e.getChain().getCode(), e.getCurrency()), e -> e));
                 return ListMap.init(list, map);
             });
 

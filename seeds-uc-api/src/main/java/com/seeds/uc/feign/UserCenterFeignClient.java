@@ -20,7 +20,7 @@ import java.util.List;
  * @email antilaw@yahoo.com
  * @date 2020/8/26
  */
-@FeignClient(name = "seeds-uc-service", url = "${service.url.uc}")
+@FeignClient(name = "userCenterFeignClient", url = "${service.url.uc}")
 public interface UserCenterFeignClient {
 
     @PostMapping("/uc-internal/token/verify")

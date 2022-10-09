@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
+
+import com.seeds.account.enums.CommonStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -60,7 +62,7 @@ public class WithdrawWhitelist implements Serializable {
     @ApiModelProperty("comments")
     private String comments;
 
-    private Integer status;
+    private CommonStatus status;
 
 
 }

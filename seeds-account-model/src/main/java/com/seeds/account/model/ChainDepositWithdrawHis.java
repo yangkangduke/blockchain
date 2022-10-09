@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
+
+import com.seeds.account.enums.ChainAction;
+import com.seeds.common.enums.Chain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -43,7 +46,7 @@ public class ChainDepositWithdrawHis implements Serializable {
     private Long userId;
 
     @ApiModelProperty("chain")
-    private Enum chain;
+    private Chain chain;
 
     @ApiModelProperty("from address")
     private String fromAddress;
@@ -60,7 +63,7 @@ public class ChainDepositWithdrawHis implements Serializable {
     private Integer internal;
 
     @ApiModelProperty("1 deposit, 2 withdraw")
-    private Enum action;
+    private ChainAction action;
 
     @ApiModelProperty("amount")
     private BigDecimal amount;
