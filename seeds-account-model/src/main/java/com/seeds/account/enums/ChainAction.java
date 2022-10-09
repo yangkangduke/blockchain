@@ -1,7 +1,9 @@
 package com.seeds.account.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.google.common.collect.Maps;
 import com.seeds.common.enums.EnumWithCode;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -13,7 +15,8 @@ import java.util.Map;
  * @author milo
  *
  */
-public enum ChainAction implements EnumWithCode {
+@Getter
+public enum ChainAction {
     /**
      * 充币
      */
@@ -23,15 +26,11 @@ public enum ChainAction implements EnumWithCode {
      */
     WITHDRAW(2);
 
+    @EnumValue
     private Integer code;
 
     ChainAction(int code) {
         this.code = code;
-    }
-
-    @Override
-    public Integer getCode() {
-        return this.code;
     }
 
     public static final Map<Integer, ChainAction> codeMap = Maps.newHashMap();

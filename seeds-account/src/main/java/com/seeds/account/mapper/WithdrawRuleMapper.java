@@ -3,6 +3,8 @@ package com.seeds.account.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.seeds.account.model.WithdrawRule;
 
+import java.util.List;
+
 /**
  * <p>
  * 提币规则 Mapper 接口

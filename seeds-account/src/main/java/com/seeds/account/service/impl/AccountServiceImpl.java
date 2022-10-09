@@ -166,10 +166,14 @@ public class AccountServiceImpl implements IAccountService {
         if (!isDefiWithdraw) {
             if (withdrawToken != null) {
                 // 验证用户的提币Token是否有效
-                VerifyAuthTokenReq verifyRequest = VerifyAuthTokenReq.builder().uid(userId).authToken(withdrawToken).useType(AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_WITHDRAW).build();
+                VerifyAuthTokenReq verifyRequest = VerifyAuthTokenReq.builder()
+                        .uid(userId)
+                        .authToken(withdrawToken)
+                        .useType(AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_WITHDRAW)
+                        .build();
                 GenericDto<Boolean> verifyResponse = userCenterFeignClient.verifyToken(verifyRequest);
                 log.info("withdraw userId={} currency={} verifyRequest={} verifyResponse={}", userId, currency, verifyRequest, verifyResponse);
-                Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
+//                Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
             } else if (publicAddress != null && signature != null) {
                 MetamaskVerifyReq verifyRequest = new MetamaskVerifyReq();
                 verifyRequest.setPublicAddress(publicAddress);
