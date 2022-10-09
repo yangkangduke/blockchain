@@ -12,5 +12,11 @@ import com.seeds.admin.entity.SysNftEventRecordEntity;
  */
 public interface SysNftEventRecordService extends IService<SysNftEventRecordEntity> {
 
+    /**
+     * NFT的事件记录继承
+     * @param oldNftId 旧的NFT的id
+     * @param newNftId 新的NFT的id
+     */
+    void successionByNftId(Long oldNftId, Long newNftId);
 
 }

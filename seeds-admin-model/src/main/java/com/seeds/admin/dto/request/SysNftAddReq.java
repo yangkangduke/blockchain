@@ -75,4 +75,6 @@ public class SysNftAddReq {
 	@ApiModelProperty("NFT属性列表")
 	private List<NftPropertiesReq> propertiesList;
 
+	private String imageFileHash;
+
 }

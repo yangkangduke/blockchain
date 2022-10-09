@@ -46,7 +46,7 @@ public class SysNftController {
     @ApiOperation("添加")
     @RequiredPermission("sys:nft:add")
     public GenericDto<Object> add(@RequestPart("image") MultipartFile image, @Valid SysNftAddReq req) {
-        sysNftService.add(image, req, KafkaTopic.NFT_SAVE_SUCCESS);
+        sysNftService.addSend(image, req, KafkaTopic.NFT_SAVE_SUCCESS);
         return GenericDto.success(null);
     }
 
