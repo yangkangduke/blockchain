@@ -126,4 +126,13 @@ public interface SysNftService extends IService<SysNftEntity> {
      */
     void honorModify(List<SysNftHonorModifyReq> req);
 
+
+    /**
+     * NFT升级
+     *
+     * @param req NFT信息
+     * @return 新NFT的唯一标识
+     */
+    Long upgradeSend(SysNftUpgradeReq req);
+
 }

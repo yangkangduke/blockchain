@@ -60,7 +60,7 @@ public class OpenContextInterceptor implements HandlerInterceptor {
 
     private static final GenericDto<String> INVALID_TOKEN_RESPONSE = GenericDto.failure("Invalid token", 401);
     private static final GenericDto<String> INVALID_SIGNATURE_RESPONSE = GenericDto.failure("Invalid signature", 401);
-    private static final String NO_LOGIN_REQUIRED_PATH = "/open-api/";
+    private static final String NO_LOGIN_REQUIRED_PATH = "/public/";
     private static final String GET_METHOD = "GET";
     private static final String POST_METHOD = "POST";
 

@@ -1,9 +1,8 @@
 package com.seeds.game.controller;
 
-import cn.hutool.json.JSONUtil;
-import com.seeds.admin.dto.request.SysNftAddReq;
 import com.seeds.admin.dto.request.SysNftHonorModifyReq;
 import com.seeds.admin.dto.request.SysNftModifyReq;
+import com.seeds.admin.dto.request.SysNftUpgradeReq;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -22,10 +21,10 @@ import java.util.List;
  * @date 2022/10/08
  */
 @Slf4j
-@Api(tags = "NFT外部调用")
+@Api(tags = "NFT外部调用开放")
 @RestController
-@RequestMapping("/nft")
-public class NftController {
+@RequestMapping("/public/nft")
+public class PublicNftController {
 
     @Autowired
     private RemoteNftService remoteNftService;
@@ -33,7 +32,7 @@ public class NftController {
     @PostMapping("create")
     @ApiOperation("NFT创建")
     public GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData) {
-        return remoteNftService.create(image, JSONUtil.toBean(metaData, SysNftAddReq.class));
+        return remoteNftService.create(image, metaData);
     }
 
     @PostMapping("modify")
@@ -46,6 +45,12 @@ public class NftController {
     @ApiOperation("NFT战绩更新")
     public GenericDto<Object> honorModify(@Valid @RequestBody List<SysNftHonorModifyReq> req) {
         return remoteNftService.honorModify(req);
+    }
+
+    @PostMapping("upgrade")
+    @ApiOperation("NFT升级")
+    public GenericDto<Long> upgrade(@Valid @RequestBody SysNftUpgradeReq req) {
+        return remoteNftService.upgrade(req);
     }
 
 }

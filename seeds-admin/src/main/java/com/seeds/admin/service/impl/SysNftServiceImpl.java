@@ -516,6 +516,54 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         });
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long upgradeSend(SysNftUpgradeReq req) {
+        // 校验NFT是否正常存在
+        List<Long> list = req.getNftIdList();
+        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                .eq(SysNftEntity::getInitStatus, NftInitStatusEnum.NORMAL.getCode())
+                .in(SysNftEntity::getId, list);
+        List<SysNftEntity> nftList = list(queryWrap);
+        if (CollectionUtils.isEmpty(nftList) || list.size() != nftList.size() || !list.contains(req.getNftId())) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+        }
+        SysNftEntity newNft = new SysNftEntity();
+        for (SysNftEntity nft : nftList) {
+            // 校验归属人
+            if (!Objects.equals(req.getUserId(), nft.getOwnerId())) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+            }
+            // 校验nft是否上架中
+            if (WhetherEnum.YES.value() == nft.getStatus()) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_40006_NFT_ON_SALE_CAN_NOT_BE_MODIFIED.getDescEn());
+            }
+            // 保留记录的NFT
+            //if (Objects.equals(req.getNftId(), nft.getId())) {
+                //BeanUtils.copyProperties(nft, newNft);
+            //}
+            // 删除消耗的NFT
+            //removeById(nft.getId());
+        }
+        // 添加NFT
+        SysNftEntity sysNft = new SysNftEntity();
+        // 默认停售
+        sysNft.setStatus(WhetherEnum.NO.value());
+        sysNft.setInitStatus(NftInitStatusEnum.CREATING.getCode());
+        // 生成NFT编号
+        sysNft.setNumber(sysSequenceNoService.generateNftNo());
+        // 保存NFT
+        save(sysNft);
+
+        // 发NFT保存成功消息
+
+        // 更新战绩记录
+
+        // 更新事件记录
+
+        return null;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void transferNft(NftOwnerChangeReq req, List<SysNftEntity> list) {
         Map<Long, SysNftEntity> map = list.stream().collect(Collectors.toMap(SysNftEntity::getId, p -> p));

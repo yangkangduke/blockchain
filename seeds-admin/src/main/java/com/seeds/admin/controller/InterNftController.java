@@ -1,10 +1,12 @@
 package com.seeds.admin.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.enums.NftInitStatusEnum;
+import com.seeds.admin.mq.producer.KafkaProducer;
 import com.seeds.admin.service.SysNftService;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -33,6 +36,9 @@ public class InterNftController {
 
     @Autowired
     private SysNftService sysNftService;
+
+    @Resource
+    private KafkaProducer kafkaProducer;
 
     @PostMapping("owner-change")
     @ApiOperation("归属人变更")
@@ -91,14 +97,14 @@ public class InterNftController {
     @PostMapping("create")
     @ApiOperation("NFT创建")
     @Inner
-    public GenericDto<Long> create(@RequestPart("image") MultipartFile image, @Valid SysNftAddReq req) {
-        return GenericDto.success(sysNftService.add(image, req, KafkaTopic.GAME_NFT_SAVE_SUCCESS));
+    public GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData) {
+        return GenericDto.success(sysNftService.add(image, JSONUtil.toBean(metaData, SysNftAddReq.class), KafkaTopic.GAME_NFT_SAVE_SUCCESS));
     }
 
     @PostMapping("modify")
     @ApiOperation("NFT修改")
     @Inner
-    public GenericDto<Long> modify(@Valid @RequestBody SysNftModifyReq req) {
+    public GenericDto<Object> modify(@Valid @RequestBody SysNftModifyReq req) {
         sysNftService.modify(req);
         return GenericDto.success(null);
     }
@@ -106,8 +112,15 @@ public class InterNftController {
     @PostMapping("honor-modify")
     @ApiOperation("NFT战绩更新")
     @Inner
-    public GenericDto<Long> honorModify(@Valid @RequestBody List<SysNftHonorModifyReq> req) {
-        sysNftService.honorModify(req);
+    public GenericDto<Object> honorModify(@Valid @RequestBody List<SysNftHonorModifyReq> req) {
+        kafkaProducer.send(KafkaTopic.GAME_NFT_HONOR_MODIFY, JSONUtil.toJsonStr(req));
         return GenericDto.success(null);
+    }
+
+    @PostMapping("upgrade")
+    @ApiOperation("NFT升级")
+    @Inner
+    public GenericDto<Long> upgrade(@Valid @RequestBody SysNftUpgradeReq req) {
+        return GenericDto.success(sysNftService.upgradeSend(req));
     }
 }

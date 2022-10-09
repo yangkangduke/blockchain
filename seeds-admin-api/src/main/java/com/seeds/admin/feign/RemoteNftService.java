@@ -88,12 +88,12 @@ public interface RemoteNftService {
 	/**
 	 * NFT创建
 	 * @param image NFT图片
-	 * @param req NFT属性
+	 * @param metaData NFT属性
 	 * @return NFT的唯一标识
 	 */
 	@PostMapping("/internal-nft/create")
 	@ApiOperation("NFT创建")
-	GenericDto<Long> create(@RequestPart("image") MultipartFile image, @Valid SysNftAddReq req);
+	GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData);
 
 	/**
 	 * NFT修改
@@ -111,6 +111,15 @@ public interface RemoteNftService {
 	 */
 	@PostMapping("/internal-nft/honor-modify")
 	@ApiOperation("NFT战绩更新")
-	GenericDto<Object> honorModify(List<SysNftHonorModifyReq> req);
+	GenericDto<Object> honorModify(@Valid @RequestBody List<SysNftHonorModifyReq> req);
+
+	/**
+	 * NFT升级
+	 * @param req NFT升级
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/upgrade")
+	@ApiOperation("NFT升级")
+	GenericDto<Long> upgrade(@Valid @RequestBody SysNftUpgradeReq req);
 
 }

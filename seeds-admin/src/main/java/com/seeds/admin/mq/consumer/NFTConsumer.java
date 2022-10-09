@@ -1,6 +1,7 @@
 package com.seeds.admin.mq.consumer;
 
 import cn.hutool.json.JSONUtil;
+import com.seeds.admin.dto.request.SysNftHonorModifyReq;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.entity.SysNftEntity;
@@ -59,6 +60,17 @@ public class NFTConsumer {
         log.info("收到消息：{}", msg);
         List<SysNftEntity> sysNftEntities = JSONUtil.toList(JSONUtil.parseArray(msg), SysNftEntity.class);
         nftService.burnNft(sysNftEntities);
+    }
+
+    /**
+     * 消费NFT战绩记录更新消息
+     *
+     * @param msg
+     */
+    @KafkaListener(groupId = "nft-consumer-group", topics = {KafkaTopic.GAME_NFT_HONOR_MODIFY})
+    public void honorModify(String msg) {
+        log.info("收到消息：{}", msg);
+        nftService.honorModify(JSONUtil.toList(msg, SysNftHonorModifyReq.class));
     }
 
 }
