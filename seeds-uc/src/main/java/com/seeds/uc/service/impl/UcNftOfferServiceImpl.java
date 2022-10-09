@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.enums.NftStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
@@ -74,6 +75,10 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
         // 判断NFT是否可以购买
         if (sysNftDetailResp.getStatus() != NftStatusEnum.ON_SALE.getCode()) {
             throw new GenericException(UcErrorCodeEnum.ERR_18006_ACCOUNT_BUY_FAIL_INVALID_NFT_STATUS);
+        }
+        // 判断NFT是否已锁定
+        if (WhetherEnum.YES.value() == sysNftDetailResp.getLockFlag()) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18007_ACCOUNT_BUY_FAIL_NFT_LOCKED);
         }
         Long currentUserId = UserContext.getCurrentUserId();
         // 检查余额

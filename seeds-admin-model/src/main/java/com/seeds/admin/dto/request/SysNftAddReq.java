@@ -1,5 +1,6 @@
 package com.seeds.admin.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -75,6 +76,7 @@ public class SysNftAddReq {
 	@ApiModelProperty("NFT属性列表")
 	private List<NftPropertiesReq> propertiesList;
 
+	@JsonIgnore
 	private String imageFileHash;
 
 }

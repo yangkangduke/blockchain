@@ -97,6 +97,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
                 .eq(query.getUserId() != null, SysNftEntity::getOwnerId, query.getUserId())
                 .eq(query.getInitStatus() != null, SysNftEntity::getInitStatus, query.getInitStatus())
+                .eq(query.getLockFlag() != null, SysNftEntity::getLockFlag, query.getLockFlag())
                 .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId())
                 .ge(query.getMinPrice() != null, SysNftEntity::getPrice, query.getMinPrice())
                 .le(query.getMaxPrice() != null, SysNftEntity::getPrice, query.getMaxPrice());
@@ -152,6 +153,17 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     public Long addSend(MultipartFile image, SysNftAddReq req, String topic) {
+        // 校验基础属性缺失或重复
+        List<NftPropertiesReq> propertiesList = req.getPropertiesList();
+        List<NftPropertiesReq> enduranceList = propertiesList.stream().filter(p -> p.getTypeId() == 1L).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(enduranceList) || enduranceList.size() > 1) {
+            throw new SeedsException(String.format(AdminErrorCodeEnum.ERR_40010_DUPLICATE_OR_MISSING_BASE_ATTRIBUTES_OF_NFT.getDescEn(), 1));
+        }
+        NftPropertiesReq properties = enduranceList.get(0);
+        if (!properties.getValue().matches("^[0-9]*$")) {
+            throw new SeedsException(String.format(AdminErrorCodeEnum.ERR_40011_NFT_PROPERTY_VALUE_IS_NOT_IN_THE_CORRECT_FORMAT.getDescEn(), 1));
+        }
+
         Long nftId = add(image, req);
         // 发NFT保存成功消息
         NftMintMsgDTO msgDTO = new NftMintMsgDTO();
@@ -208,8 +220,13 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Transactional(rollbackFor = Exception.class)
     public void modify(SysNftModifyReq req) {
         SysNftEntity sysNft = getById(req.getId());
+        // 已上架的NFT不能修改
         if (WhetherEnum.YES.value() == sysNft.getStatus()) {
             throw new SeedsException(AdminErrorCodeEnum.ERR_40006_NFT_ON_SALE_CAN_NOT_BE_MODIFIED.getDescEn());
+        }
+        // 已锁定的NFT不能修改
+        if (WhetherEnum.YES.value() == sysNft.getLockFlag()) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40007_NFT_LOCKED_CAN_NOT_BE_MODIFIED.getDescEn());
         }
         // 修改NFT属性
         addNftProperties(sysNft.getId(), req.getPropertiesList());
@@ -221,8 +238,12 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void upOrDown(List<SwitchReq> req) {
+        // 排除已锁定的NFT
         Set<Long> ids = req.stream().map(SwitchReq::getId).collect(Collectors.toSet());
-        List<SysNftEntity> nftList = listByIds(ids);
+        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                .eq(SysNftEntity::getLockFlag, WhetherEnum.NO.value())
+                .in(SysNftEntity::getId, ids);
+        List<SysNftEntity> nftList = list(queryWrap);
         if (CollectionUtils.isEmpty(nftList)) {
             return;
         }
@@ -270,14 +291,14 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Transactional(rollbackFor = Exception.class)
     public void batchDelete(ListReq req) {
         List<SysNftEntity> sysNftEntities = listByIds(req.getIds());
-        // 排除已上架的NFT
         List<SysNftEntity> deleteList = new ArrayList<>();
         sysNftEntities.forEach(p ->{
             // 创建失败的直接删除
             if (NftInitStatusEnum.CREATE_FAILED.getCode() == p.getInitStatus()) {
                 removeById(p);
             } else {
-                if (WhetherEnum.NO.value() == p.getStatus()) {
+                // 排除已上架和已锁定的NFT
+                if (WhetherEnum.NO.value() == p.getStatus() && WhetherEnum.NO.value() == p.getLockFlag()) {
                     p.setInitStatus(NftInitStatusEnum.DELETING.getCode());
                     updateById(p);
                     deleteList.add(p);
@@ -342,6 +363,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Override
     public void ucUpOrDown(UcSwitchReq req) {
         List<UpOrDownReq> reqs = req.getReqs();
+        // 过滤出正常且未锁定的NFT
         List<SysNftEntity> sysNftEntities = queryNormalByOwnerId(req.getUcUserId());
         if (CollectionUtils.isEmpty(sysNftEntities)) {
             return;
@@ -371,6 +393,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     public List<SysNftEntity> queryNormalByOwnerId(Long ownerId) {
         LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
                 .eq(SysNftEntity::getOwnerId, ownerId)
+                .eq(SysNftEntity::getLockFlag, WhetherEnum.NO.value())
                 .eq(SysNftEntity::getInitStatus, NftInitStatusEnum.NORMAL.getCode());
         return list(queryWrap);
     }
@@ -557,6 +580,39 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             sysNftEventRecordService.successionByNftId(req.getNftId(), req.getId());
         }
         // todo 通知游戏方NFT升级结果
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void lock(SysNftLockReq req) {
+        Long nftId = req.getNftId();
+        SysNftEntity nft = getById(nftId);
+        // 判断NFT是否正常
+        if (NftInitStatusEnum.NORMAL.getCode() != nft.getInitStatus()) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+        }
+        // 判断NFT是否上架
+        if (WhetherEnum.YES.value() == nft.getStatus()) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40008_NFT_ON_SALE_CAN_NOT_LOCKED.getDescEn());
+        }
+        Integer endurance = req.getEndurance();
+        if (endurance > 0) {
+            // 判断NFT耐久值是否够用, 耐久是内置id为1的属性类别
+            SysNftPropertiesEntity properties = sysNftPropertiesService.queryByTypeAndNftId(1L, nftId);
+            if (properties == null) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+            }
+            int newEndurance = (StringUtils.isEmpty(properties.getValue()) ? 0 : Integer.parseInt(properties.getValue())) - endurance;
+            if (newEndurance < 0) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_40009_INSUFFICIENT_DURABILITY_VALUE_OF_NFT.getDescEn());
+            }
+            // 更新耐久值
+            properties.setValue(Integer.toString(newEndurance));
+            sysNftPropertiesService.save(properties);
+        }
+        // 锁定NFT
+        nft.setLockFlag(WhetherEnum.YES.value());
+        save(nft);
     }
 
     @Transactional(rollbackFor = Exception.class)

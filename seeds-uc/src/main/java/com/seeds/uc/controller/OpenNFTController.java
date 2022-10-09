@@ -7,6 +7,7 @@ import com.seeds.admin.dto.request.UcSwitchReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.enums.NftStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
@@ -64,6 +65,10 @@ public class OpenNFTController {
         if (!Objects.isNull(sysNftDetailResp)) {
             if (sysNftDetailResp.getStatus() != NftStatusEnum.ON_SALE.getCode()) {
                 throw new GenericException(UcErrorCodeEnum.ERR_18006_ACCOUNT_BUY_FAIL_INVALID_NFT_STATUS);
+            }
+            // 判断NFT是否已锁定
+            if (WhetherEnum.YES.value() == sysNftDetailResp.getLockFlag()) {
+                throw new GenericException(UcErrorCodeEnum.ERR_18007_ACCOUNT_BUY_FAIL_NFT_LOCKED);
             }
         }
 

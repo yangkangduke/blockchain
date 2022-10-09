@@ -31,5 +31,4 @@ public class NftPropertiesReq {
     @NotBlank(message = "NFT properties value cannot be empty")
     private String value;
 
-
 }

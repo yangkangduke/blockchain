@@ -151,4 +151,10 @@ public interface SysNftService extends IService<SysNftEntity> {
      */
     void upgrade(NftUpgradeMsgDTO req);
 
+    /**
+     * NFT锁定
+     * @param req NFT信息
+     */
+    void lock(SysNftLockReq req);
+
 }

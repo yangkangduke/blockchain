@@ -29,6 +29,14 @@ public interface SysNftPropertiesService extends IService<SysNftPropertiesEntity
     List<SysNftPropertiesEntity> queryByNftId(Long nftId);
 
     /**
+     * 通过NFT的id查询nft属性列表
+     * @param typeId nft属性类别的id
+     * @param nftId nft的id
+     * @return  nft属性列表
+     */
+    SysNftPropertiesEntity queryByTypeAndNftId(Long typeId, Long nftId);
+
+    /**
      * 通过nft的id删除nft属性
      * @param nftId   nft的id
      */

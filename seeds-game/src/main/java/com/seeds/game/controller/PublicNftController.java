@@ -2,7 +2,6 @@ package com.seeds.game.controller;
 
 import com.seeds.admin.dto.request.SysNftHonorModifyReq;
 import com.seeds.admin.dto.request.SysNftModifyReq;
-import com.seeds.admin.dto.request.SysNftUpgradeReq;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;

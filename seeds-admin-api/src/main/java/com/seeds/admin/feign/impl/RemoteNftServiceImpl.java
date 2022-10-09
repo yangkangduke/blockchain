@@ -10,8 +10,6 @@ import com.seeds.common.dto.GenericDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -77,6 +75,11 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	@Override
 	public GenericDto<Long> upgrade(MultipartFile image, String data) {
 		return GenericDto.failure("Internal Error:nft upgrade failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<Object> lock(SysNftLockReq req) {
+		return GenericDto.failure("Internal Error:nft lock failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 }

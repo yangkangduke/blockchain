@@ -6,6 +6,7 @@ import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.enums.NftInitStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mq.producer.KafkaProducer;
 import com.seeds.admin.service.SysNftService;
 import com.seeds.common.constant.mq.KafkaTopic;
@@ -60,6 +61,7 @@ public class InterNftController {
     @Inner
     public GenericDto<IPage<SysNftResp>> ucPage(@Valid @RequestBody SysNftPageReq query) {
         query.setInitStatus(NftInitStatusEnum.NORMAL.getCode());
+        query.setLockFlag(WhetherEnum.NO.value());
         return GenericDto.success(sysNftService.queryPage(query));
     }
 
@@ -123,4 +125,14 @@ public class InterNftController {
     public GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data) {
         return GenericDto.success(sysNftService.upgradeSend(image, JSONUtil.toBean(data, SysNftUpgradeReq.class)));
     }
+
+    @PostMapping("lock")
+    @ApiOperation("NFT锁定")
+    @Inner
+    public GenericDto<Long> lock(@Valid @RequestBody SysNftLockReq req) {
+        sysNftService.lock(req);
+        return GenericDto.success(null);
+    }
+
+
 }

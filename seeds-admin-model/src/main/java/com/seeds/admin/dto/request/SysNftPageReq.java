@@ -45,4 +45,7 @@ public class SysNftPageReq extends PageReq {
     @JsonIgnore
     private Integer initStatus;
 
+    @JsonIgnore
+    private Integer lockFlag;
+
 }

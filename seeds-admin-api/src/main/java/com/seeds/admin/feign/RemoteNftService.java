@@ -123,4 +123,13 @@ public interface RemoteNftService {
 	@ApiOperation("NFT升级")
 	GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data);
 
+	/**
+	 * NFT锁定
+	 * @param req NFT信息
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/lock")
+	@ApiOperation("NFT锁定")
+	GenericDto<Object> lock(SysNftLockReq req);
+
 }
