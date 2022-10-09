@@ -115,11 +115,12 @@ public interface RemoteNftService {
 
 	/**
 	 * NFT升级
-	 * @param req NFT升级
+	 * @param image NFT图片
+	 * @param data NFT升级属性
 	 * @return 响应结果
 	 */
 	@PostMapping("/internal-nft/upgrade")
 	@ApiOperation("NFT升级")
-	GenericDto<Long> upgrade(@Valid @RequestBody SysNftUpgradeReq req);
+	GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data);
 
 }

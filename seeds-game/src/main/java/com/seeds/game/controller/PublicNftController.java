@@ -47,10 +47,4 @@ public class PublicNftController {
         return remoteNftService.honorModify(req);
     }
 
-    @PostMapping("upgrade")
-    @ApiOperation("NFT升级")
-    public GenericDto<Long> upgrade(@Valid @RequestBody SysNftUpgradeReq req) {
-        return remoteNftService.upgrade(req);
-    }
-
 }

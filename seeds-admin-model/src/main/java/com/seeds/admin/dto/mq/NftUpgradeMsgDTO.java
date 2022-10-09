@@ -1,50 +1,38 @@
 package com.seeds.admin.dto.mq;
 
-import com.seeds.admin.dto.request.NftPropertiesReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.math.BigDecimal;
 import java.util.List;
+
 
 /**
  * @author hang.yu
  * @date 2022/10/09
  */
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel(value = "NftUpgradeMsgDTO", description = "NFT升级消息")
-public class NftUpgradeMsgDTO {
+public class NftUpgradeMsgDTO extends NftMintMsgDTO {
 
-    @ApiModelProperty("NFTId")
-    private Long id;
+    /**
+     * 操作用户id
+     */
+    private Long userId;
 
-    @ApiModelProperty("NFT名称")
-    private String name;
+    /**
+     * 保留战绩NFT的id
+     */
+    @ApiModelProperty("保留战绩NFT的id")
+    private Long nftId;
 
-    @ApiModelProperty("游戏id")
-    private Long gameId;
-
-    @ApiModelProperty("NFT类别id")
-    private Long nftTypeId;
-
-    @ApiModelProperty("NFT描述")
-    private String description;
-
-    @ApiModelProperty("NFT价格")
-    private BigDecimal price;
-
-    @ApiModelProperty("NFT价格单位")
-    private String unit;
-
-    @ApiModelProperty("状态  0：停售   1：在售")
-    private Integer status;
-
-    @ApiModelProperty("NFT属性列表")
-    private List<NftPropertiesReq> propertiesList;
-
-    @ApiModelProperty("NFT图片")
-    private String imageFileHash;
+    /**
+     * 消耗的NFT唯一标识集合
+     */
+    @ApiModelProperty("消耗NFT的id列表")
+    private List<Long> nftIdList;
 
 }

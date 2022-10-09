@@ -75,7 +75,7 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	}
 
 	@Override
-	public GenericDto<Long> upgrade(SysNftUpgradeReq req) {
+	public GenericDto<Long> upgrade(MultipartFile image, String data) {
 		return GenericDto.failure("Internal Error:nft upgrade failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 

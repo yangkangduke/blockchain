@@ -20,4 +20,11 @@ public interface SysNftHonorService extends IService<SysNftHonorEntity> {
      */
     void removeByNftIds(Collection<Long> nftIds);
 
+    /**
+     * NFT的战绩记录继承
+     * @param oldNftId 旧的NFT的id
+     * @param newNftId 新的NFT的id
+     */
+    void successionByNftId(Long oldNftId, Long newNftId);
+
 }

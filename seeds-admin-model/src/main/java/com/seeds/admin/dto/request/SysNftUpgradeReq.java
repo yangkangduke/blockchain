@@ -3,6 +3,7 @@ package com.seeds.admin.dto.request;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -15,8 +16,14 @@ import java.util.List;
  * @date 2022/10/09
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @ApiModel(value = "SysNftUpgradeReq", description = "系统NFT升级")
-public class SysNftUpgradeReq {
+public class SysNftUpgradeReq extends SysNftAddReq {
+
+	/**
+	 * 操作用户id
+	 */
+	private Long userId;
 
 	/**
 	 * 保留战绩NFT的id
@@ -24,11 +31,6 @@ public class SysNftUpgradeReq {
 	@ApiModelProperty("保留战绩NFT的id")
 	@NotNull(message = "NFT id cannot be empty")
 	private Long nftId;
-
-	/**
-	 * 操作用户id
-	 */
-	private Long userId;
 
 	/**
 	 * 消耗的NFT唯一标识集合

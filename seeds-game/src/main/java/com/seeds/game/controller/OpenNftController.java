@@ -1,5 +1,6 @@
 package com.seeds.game.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.seeds.admin.dto.request.SysNftUpgradeReq;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
@@ -9,8 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 提供外部调用的NFT相关接口
@@ -28,9 +28,10 @@ public class OpenNftController {
 
     @PostMapping("upgrade")
     @ApiOperation("NFT升级")
-    public GenericDto<Long> upgrade(@Valid @RequestBody SysNftUpgradeReq req) {
+    public GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data) {
+        SysNftUpgradeReq req = JSONUtil.toBean(data, SysNftUpgradeReq.class);
         req.setUserId(UserContext.getCurrentUserId());
-        return remoteNftService.upgrade(req);
+        return remoteNftService.upgrade(image, JSONUtil.toJsonStr(req));
     }
 
 }

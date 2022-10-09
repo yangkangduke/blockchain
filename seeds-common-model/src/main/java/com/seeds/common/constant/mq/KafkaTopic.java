@@ -16,6 +16,7 @@ public class KafkaTopic {
     public final String GAME_NFT_SAVE_SUCCESS = "game-nft-save-success";
     public final String GAME_NFT_HONOR_MODIFY = "game-nft-honor-modify";
     public final String NFT_DELETE_SUCCESS = "nft-delete-success";
+    public final String NFT_UPGRADE_SUCCESS = "nft-upgrade-success";
 
     // Notification
     public final String SEND_NOTIFICATION = "send-notification";

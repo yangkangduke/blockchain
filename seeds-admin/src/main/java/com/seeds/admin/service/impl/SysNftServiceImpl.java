@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.dto.mq.NftUpgradeMsgDTO;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.request.*;
@@ -126,7 +127,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long add(MultipartFile image, SysNftAddReq req, String topic) {
+    public Long add(MultipartFile image, SysNftAddReq req) {
         // 添加NFT
         SysNftEntity sysNft = new SysNftEntity();
         BeanUtils.copyProperties(req, sysNft);
@@ -145,15 +146,20 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         //executorService.submit(() -> {
         //    mintNft(req, sysNft.getId(), imageFileHash);
         //});
+        req.setImageFileHash(imageFileHash);
+        return sysNft.getId();
+    }
 
+    @Override
+    public Long addSend(MultipartFile image, SysNftAddReq req, String topic) {
+        Long nftId = add(image, req);
         // 发NFT保存成功消息
         NftMintMsgDTO msgDTO = new NftMintMsgDTO();
         BeanUtils.copyProperties(req, msgDTO);
-        msgDTO.setId(sysNft.getId());
-        msgDTO.setImageFileHash(imageFileHash);
+        msgDTO.setId(nftId);
 
         kafkaProducer.send(topic, JSONUtil.toJsonStr(msgDTO));
-        return sysNft.getId();
+        return nftId;
     }
 
     @Override
@@ -397,7 +403,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
-    public void mintNft(NftMintMsgDTO msgDTO) {
+    public Boolean mintNft(NftMintMsgDTO msgDTO) {
         int initStatus = NftInitStatusEnum.NORMAL.getCode();
         String errorMsg;
         SysNftEntity nft = getById(msgDTO.getId());
@@ -431,6 +437,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         // 更新NFT
         nft.setInitStatus(initStatus);
         updateById(nft);
+        return NftInitStatusEnum.NORMAL.getCode() == initStatus;
     }
 
     @Deprecated
@@ -518,50 +525,38 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long upgradeSend(SysNftUpgradeReq req) {
-        // 校验NFT是否正常存在
-        List<Long> list = req.getNftIdList();
-        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
-                .eq(SysNftEntity::getInitStatus, NftInitStatusEnum.NORMAL.getCode())
-                .in(SysNftEntity::getId, list);
-        List<SysNftEntity> nftList = list(queryWrap);
-        if (CollectionUtils.isEmpty(nftList) || list.size() != nftList.size() || !list.contains(req.getNftId())) {
-            throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
-        }
-        SysNftEntity newNft = new SysNftEntity();
-        for (SysNftEntity nft : nftList) {
-            // 校验归属人
-            if (!Objects.equals(req.getUserId(), nft.getOwnerId())) {
-                throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
-            }
-            // 校验nft是否上架中
-            if (WhetherEnum.YES.value() == nft.getStatus()) {
-                throw new SeedsException(AdminErrorCodeEnum.ERR_40006_NFT_ON_SALE_CAN_NOT_BE_MODIFIED.getDescEn());
-            }
-            // 保留记录的NFT
-            //if (Objects.equals(req.getNftId(), nft.getId())) {
-                //BeanUtils.copyProperties(nft, newNft);
-            //}
-            // 删除消耗的NFT
-            //removeById(nft.getId());
-        }
+    public Long upgradeSend(MultipartFile image, SysNftUpgradeReq req) {
+        // 校验NFT
+        upgradeValidate(req.getNftIdList(), req.getUserId(), req.getNftId());
+
         // 添加NFT
-        SysNftEntity sysNft = new SysNftEntity();
-        // 默认停售
-        sysNft.setStatus(WhetherEnum.NO.value());
-        sysNft.setInitStatus(NftInitStatusEnum.CREATING.getCode());
-        // 生成NFT编号
-        sysNft.setNumber(sysSequenceNoService.generateNftNo());
-        // 保存NFT
-        save(sysNft);
+        Long nftId = add(image, req);
+        // 发NFT升级消息
+        NftUpgradeMsgDTO msgDTO = new NftUpgradeMsgDTO();
+        BeanUtils.copyProperties(req, msgDTO);
+        msgDTO.setId(nftId);
 
-        // 发NFT保存成功消息
+        kafkaProducer.send(KafkaTopic.NFT_UPGRADE_SUCCESS, JSONUtil.toJsonStr(msgDTO));
+        return nftId;
+    }
 
-        // 更新战绩记录
-
-        // 更新事件记录
-
-        return null;
+    @Override
+    public void upgrade(NftUpgradeMsgDTO req) {
+        // 校验NFT
+        List<Long> nftIdList = req.getNftIdList();
+        upgradeValidate(nftIdList, req.getUserId(), req.getNftId());
+        // NFT上链
+        Boolean result = mintNft(req);
+        // 成功
+        if (result) {
+            // 销毁消耗的NFT
+            removeBatchByIds(nftIdList);
+            // 更新战绩记录
+            sysNftHonorService.successionByNftId(req.getNftId(), req.getId());
+            // 更新事件记录
+            sysNftEventRecordService.successionByNftId(req.getNftId(), req.getId());
+        }
+        // todo 通知游戏方NFT升级结果
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -614,6 +609,27 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 return SysNftEntity::getCollections;
             default:
                 return SysNftEntity::getCreatedAt;
+        }
+    }
+
+    private void upgradeValidate(List<Long> nftIds, Long userId, Long nftId) {
+        // 校验NFT是否正常存在
+        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                .eq(SysNftEntity::getInitStatus, NftInitStatusEnum.NORMAL.getCode())
+                .in(SysNftEntity::getId, nftIds);
+        List<SysNftEntity> nftList = list(queryWrap);
+        if (CollectionUtils.isEmpty(nftList) || nftIds.size() != nftList.size() || !nftIds.contains(nftId)) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+        }
+        for (SysNftEntity nft : nftList) {
+            // 校验归属人
+            if (!Objects.equals(userId, nft.getOwnerId())) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+            }
+            // 校验nft是否上架中
+            if (WhetherEnum.YES.value() == nft.getStatus()) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_40006_NFT_ON_SALE_CAN_NOT_BE_MODIFIED.getDescEn());
+            }
         }
     }
 }

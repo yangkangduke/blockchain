@@ -98,7 +98,7 @@ public class InterNftController {
     @ApiOperation("NFT创建")
     @Inner
     public GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData) {
-        return GenericDto.success(sysNftService.add(image, JSONUtil.toBean(metaData, SysNftAddReq.class), KafkaTopic.GAME_NFT_SAVE_SUCCESS));
+        return GenericDto.success(sysNftService.addSend(image, JSONUtil.toBean(metaData, SysNftAddReq.class), KafkaTopic.GAME_NFT_SAVE_SUCCESS));
     }
 
     @PostMapping("modify")
@@ -120,7 +120,7 @@ public class InterNftController {
     @PostMapping("upgrade")
     @ApiOperation("NFT升级")
     @Inner
-    public GenericDto<Long> upgrade(@Valid @RequestBody SysNftUpgradeReq req) {
-        return GenericDto.success(sysNftService.upgradeSend(req));
+    public GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data) {
+        return GenericDto.success(sysNftService.upgradeSend(image, JSONUtil.toBean(data, SysNftUpgradeReq.class)));
     }
 }
