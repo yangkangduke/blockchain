@@ -22,9 +22,11 @@ public class SysSequenceNoServiceImpl extends ServiceImpl<SysSequenceNoMapper, S
     @Value("${admin.generateNo.nft.prefix:#}")
     private String nftPrefix;
 
+    @Value("${admin.generateNo.game.prefix:game}")
+    private String gamePrefix;
+
     @Value("${admin.generateNo.nft.format:%07d}")
     private String nftFormat;
-
 
     @Override
     public SysSequenceNoEntity queryByType(String type) {
@@ -47,5 +49,21 @@ public class SysSequenceNoServiceImpl extends ServiceImpl<SysSequenceNoMapper, S
             save(sysSequenceNo);
         }
         return sysSequenceNo.getPrefix() + String.format(nftFormat, sysSequenceNo.getNumber());
+    }
+
+    @Override
+    public Long generateGameAccessNo() {
+        SysSequenceNoEntity sysSequenceNo = queryByType(SequenceNoTypeEnum.GAME.name());
+        if (sysSequenceNo != null) {
+            sysSequenceNo.setNumber(sysSequenceNo.getNumber() + 1);
+            updateById(sysSequenceNo);
+        } else {
+            sysSequenceNo = new SysSequenceNoEntity();
+            sysSequenceNo.setType(SequenceNoTypeEnum.GAME.name());
+            sysSequenceNo.setNumber(1L);
+            sysSequenceNo.setPrefix(gamePrefix);
+            save(sysSequenceNo);
+        }
+        return sysSequenceNo.getNumber();
     }
 }

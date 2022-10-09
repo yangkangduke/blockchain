@@ -1,6 +1,6 @@
 package com.seeds.game.config;
 
-import com.seeds.common.web.interceptor.OpenContextInterceptor;
+import com.seeds.game.interceptor.OpenContextInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Configuration;

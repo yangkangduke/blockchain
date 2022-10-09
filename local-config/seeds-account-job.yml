@@ -1,0 +1,30 @@
+spring:
+  kafka:
+    bootstrap-servers: ${kafka.bootstrapAddress}
+    consumer:
+      group-id: ${spring.application.name}
+
+feign:
+  account:
+    access:
+      access-key: seeds-account-job
+      secret-key: "xxx"
+  client:
+    config:
+      default:
+        connect-timeout: 45000
+        read-timeout: 45000
+
+## elastic-job zookeeper settings
+seeds:
+  elastic-job:
+    zk:
+      servers: ${zookeeper.address}
+    namespace: seeds-elastic-job
+
+## job settings
+account:
+  autoCreateAddressTask:
+    cron: "0/10 * * * * ?" ## every 10 sec
+    shardingCount: 1
+    disabled: false

@@ -123,6 +123,18 @@ public class SysGameEntity extends BaseEntity {
 	private BigDecimal rank;
 
 	/**
+	 * 访问键
+	 */
+	@TableField("access_key")
+	private String accessKey;
+
+	/**
+	 * 密钥
+	 */
+	@TableField("secret_key")
+	private String secretKey;
+
+	/**
 	 * 游戏状态  0：下架   1：正常
 	 */
 	@TableField("status")
