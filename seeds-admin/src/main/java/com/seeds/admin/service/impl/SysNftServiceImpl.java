@@ -23,6 +23,8 @@ import com.seeds.admin.mapper.SysNftMapper;
 import com.seeds.admin.mq.producer.KafkaProducer;
 import com.seeds.admin.service.*;
 import com.seeds.chain.config.SmartContractConfig;
+import com.seeds.common.enums.ApiType;
+import com.seeds.common.enums.RequestSource;
 import com.seeds.common.exception.SeedsException;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.enums.AccountActionStatusEnum;
@@ -66,6 +68,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Autowired
     private RemoteNFTService remoteNftService;
+
+    @Autowired
+    private SysGameApiService sysGameApiService;
 
     @Autowired
     private SysNftTypeService sysNftTypeService;
@@ -581,6 +586,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             // 更新事件记录
             sysNftEventRecordService.successionByNftId(req.getNftId(), req.getId());
         }
+        String url = sysGameApiService.queryUrlByGameAndType(req.getGameId(), ApiType.NFT_NOTIFICATION.getCode());
         // todo 通知游戏方NFT升级结果
     }
 
@@ -678,6 +684,11 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .build();
         if (!remoteNftService.buyNFTCallback(callback).isSuccess()) {
             throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+        }
+        // 请求来源是游戏方，交易完成通知游戏方
+        if (RequestSource.GAME == req.getSource()) {
+            String url = sysGameApiService.queryUrlByGameAndType(nft.getGameId(), ApiType.TRADE_NOTIFICATION.getCode());
+            // todo 通知游戏方交易完成
         }
     }
 

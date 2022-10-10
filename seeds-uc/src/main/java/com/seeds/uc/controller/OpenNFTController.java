@@ -77,7 +77,7 @@ public class OpenNFTController {
         if (!ucUserAccountService.checkBalance(currentUserId, price)) {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
         }
-        ucUserAccountService.buyNFTFreeze(sysNftDetailResp);
+        ucUserAccountService.buyNFTFreeze(sysNftDetailResp, buyReq.getSource());
 
         return GenericDto.success(null);
     }

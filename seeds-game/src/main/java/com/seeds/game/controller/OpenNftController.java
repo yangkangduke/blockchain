@@ -7,7 +7,10 @@ import com.seeds.admin.dto.request.SysNftUpgradeReq;
 import com.seeds.admin.enums.SysOwnerTypeEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.uc.dto.request.NFTBuyReq;
+import com.seeds.uc.feign.RemoteNFTService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +34,9 @@ public class OpenNftController {
     @Autowired
     private RemoteNftService remoteNftService;
 
+    @Autowired
+    private RemoteNFTService remoteNFTService;
+
     @PostMapping("create")
     @ApiOperation("NFT创建")
     public GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData) {
@@ -53,6 +59,13 @@ public class OpenNftController {
     @ApiOperation("NFT锁定")
     public GenericDto<Object> lock(@Valid @RequestBody SysNftLockReq req) {
         return remoteNftService.lock(req);
+    }
+
+    @PostMapping("buy")
+    @ApiOperation("NFT购买")
+    public GenericDto<Object> buy(@Valid @RequestBody NFTBuyReq req) {
+        req.setSource(RequestSource.GAME);
+        return remoteNFTService.buyNFT(req);
     }
 
 }

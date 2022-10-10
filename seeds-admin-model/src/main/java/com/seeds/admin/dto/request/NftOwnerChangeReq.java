@@ -1,5 +1,6 @@
 package com.seeds.admin.dto.request;
 
+import com.seeds.common.enums.RequestSource;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -49,5 +50,8 @@ public class NftOwnerChangeReq {
     @ApiModelProperty("买家地址")
     @NotBlank(message = "NFT buyers address cannot be empty")
     private String toAddress;
+
+    @ApiModelProperty("请求来源")
+    private RequestSource source;
 
 }

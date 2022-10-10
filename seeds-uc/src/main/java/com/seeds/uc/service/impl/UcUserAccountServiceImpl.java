@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.feign.RemoteNftService;
+import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
@@ -204,7 +205,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void buyNFTFreeze(SysNftDetailResp nftDetail) {
+    public void buyNFTFreeze(SysNftDetailResp nftDetail, RequestSource source) {
         Long nftId = nftDetail.getId();
         long currentTimeMillis = System.currentTimeMillis();
         BigDecimal amount = nftDetail.getPrice();
@@ -240,6 +241,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
             nftOwnerChangeReq.setOwnerName(buyer.getNickname());
             nftOwnerChangeReq.setToAddress(buyer.getPublicAddress());
         }
+        nftOwnerChangeReq.setSource(source);
         nftOwnerChangeReq.setOwnerId(currentUserId);
         nftOwnerChangeReq.setId(nftId);
         nftOwnerChangeReq.setActionHistoryId(actionHistoryId);
