@@ -8,7 +8,6 @@ import com.seeds.admin.dto.response.SysGameTypeResp;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -17,7 +16,6 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/8/19
  */
-@Component
 public class RemoteGameServiceImpl implements RemoteGameService {
 
 	@Override

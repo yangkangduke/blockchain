@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.ServletRequest;
@@ -33,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 
 @Slf4j
-@Component
 public class OpenContextInterceptor implements HandlerInterceptor {
 
     /**

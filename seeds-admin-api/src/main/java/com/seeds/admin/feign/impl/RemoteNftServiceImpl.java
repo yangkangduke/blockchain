@@ -8,7 +8,6 @@ import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +17,6 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/8/19
  */
-@Component
 public class RemoteNftServiceImpl implements RemoteNftService {
 
 	@PostMapping("/internal-nft/owner-change")
