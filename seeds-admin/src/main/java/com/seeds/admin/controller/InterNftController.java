@@ -129,10 +129,17 @@ public class InterNftController {
     @PostMapping("lock")
     @ApiOperation("NFT锁定")
     @Inner
-    public GenericDto<Long> lock(@Valid @RequestBody SysNftLockReq req) {
+    public GenericDto<Object> lock(@Valid @RequestBody SysNftLockReq req) {
         sysNftService.lock(req);
         return GenericDto.success(null);
     }
 
+    @PostMapping("settlement")
+    @ApiOperation("NFT结算")
+    @Inner
+    public GenericDto<Object> settlement(@Valid @RequestBody SysNftSettlementReq req) {
+        sysNftService.settlement(req);
+        return GenericDto.success(null);
+    }
 
 }

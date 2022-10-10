@@ -53,6 +53,8 @@ import java.util.stream.Collectors;
 @Service
 public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> implements SysNftService {
 
+    private static final String NUMBER_PATTER = "^[0-9]*$";
+
     @Autowired
     private SysGameService sysGameService;
 
@@ -160,7 +162,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             throw new SeedsException(String.format(AdminErrorCodeEnum.ERR_40010_DUPLICATE_OR_MISSING_BASE_ATTRIBUTES_OF_NFT.getDescEn(), 1));
         }
         NftPropertiesReq properties = enduranceList.get(0);
-        if (!properties.getValue().matches("^[0-9]*$")) {
+        if (!properties.getValue().matches(NUMBER_PATTER)) {
             throw new SeedsException(String.format(AdminErrorCodeEnum.ERR_40011_NFT_PROPERTY_VALUE_IS_NOT_IN_THE_CORRECT_FORMAT.getDescEn(), 1));
         }
 
@@ -613,6 +615,37 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         // 锁定NFT
         nft.setLockFlag(WhetherEnum.YES.value());
         save(nft);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void settlement(SysNftSettlementReq req) {
+        // 归属人变更结算
+        List<SysNftSettlementReq.NftSettlement> settlementList = req.getSettlementList();
+        if (!CollectionUtils.isEmpty(settlementList)) {
+            Map<Long, SysNftSettlementReq.NftSettlement> settlementMap = settlementList.stream().collect(Collectors.toMap(SysNftSettlementReq.NftSettlement::getNftId, p -> p));
+            Set<Long> set = settlementMap.keySet();
+            List<SysNftEntity> nftList = listByIds(set);
+            if (CollectionUtils.isEmpty(nftList) || nftList.size() != set.size()) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+            }
+            // 校验归属人
+            nftList.forEach(p -> {
+                SysNftSettlementReq.NftSettlement nftSettlement = settlementMap.get(p.getId());
+                if (!Objects.equals(nftSettlement.getOldOwnerId(), p.getOwnerId())) {
+                    throw new SeedsException(AdminErrorCodeEnum.ERR_40012_NFT_ATTRIBUTED_PERSON_MISMATCH.getDescEn());
+                }
+                p.setOwnerId(nftSettlement.getNewOwnerId());
+                p.setOwnerName(nftSettlement.getNewOwnerName());
+                p.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
+            });
+            updateBatchById(nftList);
+        }
+        // 解除锁定NFT
+        LambdaUpdateWrapper<SysNftEntity> queryWrap = new UpdateWrapper<SysNftEntity>().lambda()
+                .set(SysNftEntity::getLockFlag, WhetherEnum.NO.value())
+                .in(SysNftEntity::getId, req.getNftIds());
+        update(queryWrap);
     }
 
     @Transactional(rollbackFor = Exception.class)

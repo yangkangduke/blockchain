@@ -132,4 +132,13 @@ public interface RemoteNftService {
 	@ApiOperation("NFT锁定")
 	GenericDto<Object> lock(SysNftLockReq req);
 
+	/**
+	 * NFT结算
+	 * @param req NFT对局记录
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/settlement")
+	@ApiOperation("NFT结算")
+	GenericDto<Object> settlement(SysNftSettlementReq req);
+
 }

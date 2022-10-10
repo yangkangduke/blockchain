@@ -157,4 +157,10 @@ public interface SysNftService extends IService<SysNftEntity> {
      */
     void lock(SysNftLockReq req);
 
+    /**
+     * NFT结算
+     * @param req NFT对局记录
+     */
+    void settlement(SysNftSettlementReq req);
+
 }

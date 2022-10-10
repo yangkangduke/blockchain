@@ -82,4 +82,9 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 		return GenericDto.failure("Internal Error:nft lock failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
+	@Override
+	public GenericDto<Object> settlement(SysNftSettlementReq req) {
+		return GenericDto.failure("Internal Error:nft settlement failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
 }
