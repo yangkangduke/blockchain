@@ -1,6 +1,7 @@
 package com.seeds.account.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Maps;
 import com.seeds.common.enums.EnumWithCode;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public enum ChainAction {
     WITHDRAW(2);
 
     @EnumValue
+    @JsonValue
     private Integer code;
 
     ChainAction(int code) {

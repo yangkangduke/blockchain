@@ -1,5 +1,7 @@
 package com.seeds.account.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Maps;
 import com.seeds.common.enums.EnumWithCode;
 import lombok.Getter;
@@ -15,7 +17,7 @@ import java.util.Set;
  * @author milo
  */
 @Getter
-public enum AccountAction implements EnumWithCode {
+public enum AccountAction {
     /**
      * 充币
      */
@@ -189,6 +191,8 @@ public enum AccountAction implements EnumWithCode {
             TRADE, TRANSFER_WALLET_TO_TRADE, TRANSFER_TRADE_TO_WALLET, MARGIN_TYPE_CHANGE, LEVERAGE_CHANGE, TRANSFER_MARGIN
     ));
 
+    @JsonValue
+    @EnumValue
     Integer code;
     String notificationType;
 
