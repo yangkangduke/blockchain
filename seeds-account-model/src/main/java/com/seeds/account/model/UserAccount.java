@@ -51,4 +51,5 @@ public class UserAccount implements Serializable {
     @ApiModelProperty("freeze amount")
     private BigDecimal freeze;
 
+    private BigDecimal locked;
 }

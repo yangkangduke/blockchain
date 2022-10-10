@@ -44,6 +44,12 @@ public class UserAccountActionServiceImpl implements IUserAccountActionService {
 
     @Override
     @Async("executorPool")
+    public void createHistory(long userId, String currency, AccountAction action, BigDecimal amount) {
+        createHistory(userId, currency, action, amount, CommonActionStatus.SUCCESS);
+    }
+
+    @Override
+    @Async("executorPool")
     public void createHistory(long userId, String currency, AccountAction action, String source, BigDecimal amount, CommonActionStatus status) {
         UserAccountActionHis o = UserAccountActionHis.builder()
                 .userId(userId)

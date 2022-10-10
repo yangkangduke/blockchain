@@ -46,4 +46,39 @@
         order by id
         ]]>
     </select>
+
+    <update id="updateStatusByPrimaryKey">
+        <![CDATA[
+        update chain_deposit_withdraw_his
+        set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
+            version     = version + 1,
+            status      = #{status,jdbcType=TINYINT}
+        where id = #{id,jdbcType=BIGINT}
+          and status <> #{status,jdbcType=TINYINT}
+        ]]>
+    </update>
+
+    <select id="getChainDepositWithdrawEarlierThanBlockNumber" resultType="com.seeds.account.model.ChainDepositWithdrawHis">
+        <![CDATA[
+        select *
+        from chain_deposit_withdraw_his
+        where chain = #{chain.code,jdbcType=VARCHAR}
+          and `action` = #{action,jdbcType=TINYINT}
+          and status = #{status,jdbcType=TINYINT}
+          and block_number <= #{blockNumber,jdbcType=BIGINT}
+        order by id
+        ]]>
+    </select>
+
+    <update id="rollbackByBlockNumberAndBlockHash">
+        <![CDATA[
+        update chain_deposit_withdraw_his
+        set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
+            version     = version + 1,
+            status      = #{status,jdbcType=TINYINT}
+        where block_number = #{blockNumber,jdbcType=BIGINT}
+          and block_hash = #{blockHash,jdbcType=VARCHAR}
+          and chain = #{chain.code,jdbcType=VARCHAR}
+        ]]>
+    </update>
 </mapper>

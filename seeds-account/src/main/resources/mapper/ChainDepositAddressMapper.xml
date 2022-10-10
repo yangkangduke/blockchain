@@ -51,4 +51,14 @@
         where chain = #{chain,jdbcType=TINYINT}
           and address = #{address,jdbcType=VARCHAR}
     </select>
+
+    <select id="getAssignedAddresses" resultMap="BaseResultMap" fetchSize="5000">
+        <![CDATA[
+        select * from chain_deposit_address
+        where status = 1
+          and chain = #{chain,jdbcType=TINYINT}
+          and user_id > 0
+        order by id
+        ]]>
+    </select>
 </mapper>

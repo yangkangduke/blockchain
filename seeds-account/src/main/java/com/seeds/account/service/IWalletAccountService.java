@@ -20,4 +20,16 @@ public interface IWalletAccountService {
      */
     @Transactional(rollbackFor = Exception.class)
     boolean freeze(Long userId, String currency, BigDecimal amount);
+
+    /**
+     * 更新余额
+     *
+     * @param userId
+     * @param currency
+     * @param amount   !=0
+     * @param geZero   结果是否满足>=0
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    boolean updateAvailable(Long userId, String currency, BigDecimal amount, boolean geZero);
 }

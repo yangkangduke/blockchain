@@ -14,4 +14,21 @@
           and available >= #{amount,jdbcType=DECIMAL}
         ]]>
     </update>
+
+    <update id="updateAvailable">
+        update user_account
+        set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
+        version = version + 1,
+        available = available + #{amount,jdbcType=DECIMAL}
+        where user_id = #{userId,jdbcType=BIGINT}
+        and currency = #{currency,jdbcType=VARCHAR}
+        <if test="geZero == true">and available + #{amount,jdbcType=DECIMAL} &gt;= 0</if>
+    </update>
+
+    <select id="countUserAccount" resultType="java.lang.Integer">
+        select count(*)
+        from user_account
+        where user_id = #{userId,jdbcType=BIGINT}
+          and currency = #{currency,jdbcType=VARCHAR}
+    </select>
 </mapper>
