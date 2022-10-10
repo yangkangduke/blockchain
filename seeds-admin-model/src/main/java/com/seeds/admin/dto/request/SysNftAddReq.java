@@ -79,4 +79,10 @@ public class SysNftAddReq {
 	@JsonIgnore
 	private String imageFileHash;
 
+	private Long ownerId;
+
+	private String ownerName;
+
+	private Integer ownerType;
+
 }

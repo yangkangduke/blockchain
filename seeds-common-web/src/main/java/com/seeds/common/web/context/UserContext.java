@@ -8,10 +8,20 @@ public class UserContext {
 
     private final ThreadLocal<Long> USER_ID_THREAD_LOCAL = new ThreadLocal<>();
 
+    private final ThreadLocal<String> USER_NAME_THREAD_LOCAL = new ThreadLocal<>();
+
     private final ThreadLocal<Long> ADMIN_USER_ID_THREAD_LOCAL = new ThreadLocal<>();
 
     public void setCurrentUserId(Long userId) {
         USER_ID_THREAD_LOCAL.set(userId);
+    }
+
+    public void setCurrentUserName(String userName) {
+        USER_NAME_THREAD_LOCAL.set(userName);
+    }
+
+    public String getCurrentUserName() {
+        return USER_NAME_THREAD_LOCAL.get();
     }
 
     public Long getCurrentUserId() {

@@ -1,8 +1,10 @@
 package com.seeds.game.controller;
 
 import cn.hutool.json.JSONUtil;
+import com.seeds.admin.dto.request.SysNftAddReq;
 import com.seeds.admin.dto.request.SysNftLockReq;
 import com.seeds.admin.dto.request.SysNftUpgradeReq;
+import com.seeds.admin.enums.SysOwnerTypeEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
@@ -28,6 +30,16 @@ public class OpenNftController {
 
     @Autowired
     private RemoteNftService remoteNftService;
+
+    @PostMapping("create")
+    @ApiOperation("NFT创建")
+    public GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData) {
+        SysNftAddReq req = JSONUtil.toBean(metaData, SysNftAddReq.class);
+        req.setOwnerId(UserContext.getCurrentUserId());
+        req.setOwnerName(UserContext.getCurrentUserName());
+        req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
+        return remoteNftService.create(image, JSONUtil.toJsonStr(req));
+    }
 
     @PostMapping("upgrade")
     @ApiOperation("NFT升级")

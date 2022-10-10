@@ -52,6 +52,7 @@ public enum AdminErrorCodeEnum {
     ERR_40009_INSUFFICIENT_DURABILITY_VALUE_OF_NFT(40009, "NFT耐久不足", "Insufficient durability value of NFT"),
     ERR_40010_DUPLICATE_OR_MISSING_BASE_ATTRIBUTES_OF_NFT(40010, "NFT基础属性重复或缺失", "Duplicate or missing base attributes of NFT, type id:{%s}"),
     ERR_40011_NFT_PROPERTY_VALUE_IS_NOT_IN_THE_CORRECT_FORMAT(40011, "NFT属性值格式不正确", "NFT property value is not in the correct format, type id:{%s}"),
+    ERR_40012_NFT_ATTRIBUTED_PERSON_MISMATCH(40012, "NFT归属人不匹配", "NFT attributed person mismatch"),
 
 
     // merchant

@@ -132,4 +132,31 @@ public interface RemoteNftService {
 	@ApiOperation("NFT锁定")
 	GenericDto<Object> lock(SysNftLockReq req);
 
+	/**
+	 * NFT结算
+	 * @param req NFT对局记录
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/settlement")
+	@ApiOperation("NFT结算")
+	GenericDto<Object> settlement(SysNftSettlementReq req);
+
+	/**
+	 * NFT交易列表
+	 * @param req 分页查询条件
+	 * @return NFT信息
+	 */
+	@PostMapping("/internal-nft/trade-page")
+	@ApiOperation("NFT交易列表")
+	GenericDto<Page<SysNftResp>> tradePage(SysNftPageReq req);
+
+	/**
+	 * NFT交易详情
+	 * @param id NFT的id
+	 * @return 系统NFT信息
+	 */
+	@GetMapping("/internal-nft/trade-detail")
+	@ApiOperation("NFT交易详情")
+	GenericDto<SysNftDetailResp> tradeDetail(@RequestParam Long id);
+
 }
