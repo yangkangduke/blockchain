@@ -2,6 +2,7 @@ package com.seeds.account.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.seeds.account.model.ChainDepositWithdrawHis;
+import com.seeds.common.enums.Chain;
 
 import java.util.List;
 
@@ -24,4 +25,26 @@ public interface ChainDepositWithdrawHisMapper extends BaseMapper<ChainDepositWi
      * @return
      */
     List<ChainDepositWithdrawHis> getIntradayWithdraw(long userId, String currency, long startTime);
+
+    List<ChainDepositWithdrawHis> getChainDepositWithdrawEarlierThanBlockNumber(Chain chain, int action, int status, long blockNumber);
+
+    /**
+     * 更新状态
+     *
+     * @param id
+     * @param status
+     * @return
+     */
+    int updateStatusByPrimaryKey(Long id, int status);
+
+    /**
+     * 回滚
+     *
+     * @param blockNumber
+     * @param blockHash
+     * @param status
+     * @return
+     */
+    int rollbackByBlockNumberAndBlockHash(Chain chain, long blockNumber, String blockHash, int status);
+
 }

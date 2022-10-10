@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import com.seeds.account.enums.CommonStatus;
-import com.seeds.common.enums.Chain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -14,17 +14,17 @@ import lombok.Data;
 
 /**
  * <p>
- * Ethereum块跟踪
+ * 充提规则
  * </p>
  *
  * @author yk
- * @since 2022-09-29
+ * @since 2022-10-10
  */
-@TableName("chain_block")
-@ApiModel(value = "ChainBlock对象", description = "Ethereum块跟踪")
+@TableName("deposit_rule")
+@ApiModel(value = "DepositRule对象", description = "充提规则")
 @Data
 @Builder
-public class ChainBlock implements Serializable {
+public class DepositRule implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -42,19 +42,18 @@ public class ChainBlock implements Serializable {
     private Long version;
 
     @ApiModelProperty("chain")
-    private Chain chain;
+    private String chain;
 
-    @ApiModelProperty("block number")
-    private Long blockNumber;
+    @ApiModelProperty("currency")
+    private String currency;
 
-    @ApiModelProperty("block hash")
-    private String blockHash;
+    @ApiModelProperty("min amount")
+    private BigDecimal minAmount;
 
-    @ApiModelProperty("block timestamp")
-    private Long blockTime;
+    private Integer decimals;
 
-    @ApiModelProperty("parent block hash")
-    private String parentHash;
+    @ApiModelProperty("auto deposit amount")
+    private BigDecimal autoAmount;
 
     private CommonStatus status;
 

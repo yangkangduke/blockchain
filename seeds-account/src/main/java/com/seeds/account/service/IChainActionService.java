@@ -8,4 +8,11 @@ public interface IChainActionService {
      * @throws Exception
      */
     void scanAndCreateAddresses() throws Exception;
+
+    /**
+     * 扫描新块
+     *
+     * @throws Exception
+     */
+    void scanBlock() throws Exception;
 }

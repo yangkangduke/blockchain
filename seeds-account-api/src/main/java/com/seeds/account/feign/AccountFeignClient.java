@@ -15,5 +15,12 @@ public interface AccountFeignClient {
     @PostMapping("/job/scan-and-create-addresses")
     GenericDto<Boolean> scanAndCreateAddresses();
 
+    /**
+     * 扫描新的块
+     *
+     * @return
+     */
+    @PostMapping("/job/scan-block")
+    GenericDto<Boolean> scanBlock();
 
 }

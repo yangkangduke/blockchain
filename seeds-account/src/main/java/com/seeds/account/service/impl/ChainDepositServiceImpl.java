@@ -1,12 +1,19 @@
 package com.seeds.account.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.seeds.account.dto.DepositRuleDto;
 import com.seeds.account.enums.WalletAddressType;
 import com.seeds.account.mapper.ChainDepositAddressMapper;
+import com.seeds.account.mapper.DepositRuleMapper;
 import com.seeds.account.mapper.SystemWalletAddressMapper;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.account.service.IChainDepositService;
 import com.seeds.account.service.ISystemWalletAddressService;
 import com.seeds.account.service.ILockService;
+import com.seeds.account.tool.ListMap;
+import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
@@ -16,6 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @program: seeds-java
@@ -27,6 +38,8 @@ import java.util.List;
 @Service
 public class ChainDepositServiceImpl implements IChainDepositService {
 
+    final static String ALL = "all";
+
     @Autowired
     ISystemWalletAddressService systemWalletAddressService;
     @Autowired
@@ -35,7 +48,21 @@ public class ChainDepositServiceImpl implements IChainDepositService {
     ChainDepositAddressMapper chainDepositAddressMapper;
     @Autowired
     ILockService lockService;
+    @Autowired
+    DepositRuleMapper depositRuleMapper;
 
+    LoadingCache<String, ListMap<DepositRuleDto>> rules = Caffeine.newBuilder()
+            .refreshAfterWrite(15, TimeUnit.SECONDS)
+            .recordStats()
+            .build(k -> {
+                List<DepositRuleDto> list = loadAll();
+                Map<String, DepositRuleDto> map = list.stream().collect(Collectors.toMap(e -> toKey(e.getChain(), e.getCurrency()), e -> e));
+                return ListMap.init(list, map);
+            });
+
+    private String toKey(int chain, String currency) {
+        return chain + ":" + currency;
+    }
 
     @Override
     public String getDepositAddress(Chain chain, long userId, boolean createIfNull) throws Exception {
@@ -78,6 +105,11 @@ public class ChainDepositServiceImpl implements IChainDepositService {
     }
 
     @Override
+    public List<DepositRuleDto> loadAll() {
+        return depositRuleMapper.selectList(new QueryWrapper<>()).stream().map(e -> ObjectUtils.copy(e, new DepositRuleDto())).collect(Collectors.toList());
+    }
+
+    @Override
     public ChainDepositAddress getByAddress(Chain chain, String address) {
         // 2021-04-27 milo 增加链校验，以防止用户用户的暴力访问
         Utils.check(chain != null, ErrorCode.ACCOUNT_INVALID_CHAIN);
@@ -85,5 +117,15 @@ public class ChainDepositServiceImpl implements IChainDepositService {
         // 2021-04-27 milo 链做个映射，主要的目的是BSC的地址跟ETH的地址共享
         chain = Chain.mapChain(chain);
         return chainDepositAddressMapper.getByAddress(chain.getCode(), address);
+    }
+
+    @Override
+    public DepositRuleDto getDepositRule(Chain chain, String currency) {
+        return getAllDepositRuleMap().get(toKey(chain.getCode(), currency));
+    }
+
+    @Override
+    public Map<String, DepositRuleDto> getAllDepositRuleMap() {
+        return Objects.requireNonNull(rules.get(ALL)).getMap();
     }
 }

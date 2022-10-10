@@ -31,6 +31,16 @@ public interface IUserAccountActionService {
      * @param userId
      * @param currency
      * @param action
+     * @param amount
+     */
+    void createHistory(long userId, String currency, AccountAction action, BigDecimal amount);
+
+    /**
+     * 创建历史
+     *
+     * @param userId
+     * @param currency
+     * @param action
      * @param source
      * @param amount
      * @param status
