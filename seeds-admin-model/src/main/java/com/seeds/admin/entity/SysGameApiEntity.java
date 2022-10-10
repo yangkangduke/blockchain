@@ -32,7 +32,7 @@ public class SysGameApiEntity extends BaseEntity {
 	/**
 	 * 游戏api描述
 	 */
-	@TableField("desc")
+	@TableField("`desc`")
 	private String desc;
 
 	/**

@@ -2,14 +2,14 @@ package com.seeds.game.controller;
 
 import cn.hutool.json.JSONUtil;
 import com.seeds.admin.dto.request.SysNftAddReq;
-import com.seeds.admin.dto.request.SysNftLockReq;
 import com.seeds.admin.dto.request.SysNftUpgradeReq;
 import com.seeds.admin.enums.SysOwnerTypeEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.uc.dto.request.NFTBuyReq;
+import com.seeds.game.dto.request.OpenNftBuyReq;
+import com.seeds.game.dto.request.OpenNftLockReq;
 import com.seeds.uc.feign.RemoteNFTService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -57,13 +57,13 @@ public class OpenNftController {
 
     @PostMapping("lock")
     @ApiOperation("NFT锁定")
-    public GenericDto<Object> lock(@Valid @RequestBody SysNftLockReq req) {
+    public GenericDto<Object> lock(@Valid @RequestBody OpenNftLockReq req) {
         return remoteNftService.lock(req);
     }
 
     @PostMapping("buy")
     @ApiOperation("NFT购买")
-    public GenericDto<Object> buy(@Valid @RequestBody NFTBuyReq req) {
+    public GenericDto<Object> buy(@Valid @RequestBody OpenNftBuyReq req) {
         req.setSource(RequestSource.GAME);
         return remoteNFTService.buyNFT(req);
     }
