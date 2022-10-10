@@ -5,6 +5,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
+
+import com.seeds.account.enums.AccountAction;
+import com.seeds.account.enums.ChainAction;
+import com.seeds.account.enums.CommonActionStatus;
+import com.seeds.account.enums.CommonStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -39,7 +44,7 @@ public class UserAccountActionHis implements Serializable {
     @ApiModelProperty("version")
     private Integer version;
 
-    private Enum action;
+    private AccountAction action;
 
     private String source;
 
@@ -51,6 +56,6 @@ public class UserAccountActionHis implements Serializable {
     @ApiModelProperty("amount")
     private BigDecimal amount;
 
-    private Enum status;
+    private CommonActionStatus status;
 
 }

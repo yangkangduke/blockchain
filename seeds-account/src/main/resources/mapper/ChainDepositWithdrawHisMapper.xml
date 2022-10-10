@@ -34,7 +34,7 @@
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="tx_to_address" jdbcType="VARCHAR" property="txToAddress"/>
     </resultMap>
-    <select id="getIntradayWithdraw" resultMap="BaseResultMap">
+    <select id="getIntradayWithdraw" resultType="com.seeds.account.model.ChainDepositWithdrawHis">
         <![CDATA[
         select *
         from chain_deposit_withdraw_his

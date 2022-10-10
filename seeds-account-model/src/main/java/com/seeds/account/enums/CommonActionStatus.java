@@ -1,7 +1,10 @@
 package com.seeds.account.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Maps;
 import com.seeds.common.enums.EnumWithCode;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -13,7 +16,8 @@ import java.util.Map;
  * @author milo
  *
  */
-public enum CommonActionStatus implements EnumWithCode {
+@Getter
+public enum CommonActionStatus {
     /**
      * 成功
      */
@@ -27,16 +31,14 @@ public enum CommonActionStatus implements EnumWithCode {
      */
     PROCESSING(3);
 
+    @JsonValue
+    @EnumValue
     private Integer code;
 
     CommonActionStatus(int code) {
         this.code = code;
     }
 
-    @Override
-    public Integer getCode() {
-        return code;
-    }
 
     public static final Map<Integer, CommonActionStatus> codeMap = Maps.newHashMap();
     static {
