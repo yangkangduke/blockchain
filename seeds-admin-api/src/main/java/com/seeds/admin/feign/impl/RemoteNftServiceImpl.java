@@ -87,4 +87,14 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 		return GenericDto.failure("Internal Error:nft settlement failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
+	@Override
+	public GenericDto<Page<SysNftResp>> tradePage(SysNftPageReq req) {
+		return GenericDto.failure("Internal Error:nft tradePage failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<SysNftDetailResp> tradeDetail(Long id) {
+		return GenericDto.failure("Internal Error:nft tradeDetail failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
 }

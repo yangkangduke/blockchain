@@ -142,4 +142,19 @@ public class InterNftController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("trade-page")
+    @ApiOperation("NFT交易列表")
+    @Inner
+    public GenericDto<IPage<SysNftResp>> tradePage(@Valid @RequestBody SysNftPageReq query) {
+        query.setInitStatus(NftInitStatusEnum.NORMAL.getCode());
+        query.setLockFlag(WhetherEnum.NO.value());
+        return GenericDto.success(sysNftService.queryPage(query));
+    }
+
+    @GetMapping("trade-detail")
+    @ApiOperation("NFT交易详情")
+    @Inner
+    public GenericDto<SysNftDetailResp> tradeDetail(@RequestParam Long id) {
+        return GenericDto.success(sysNftService.tradeDetail(id));
+    }
 }

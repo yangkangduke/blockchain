@@ -1,8 +1,12 @@
 package com.seeds.game.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.SysNftHonorModifyReq;
 import com.seeds.admin.dto.request.SysNftModifyReq;
+import com.seeds.admin.dto.request.SysNftPageReq;
 import com.seeds.admin.dto.request.SysNftSettlementReq;
+import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -46,4 +50,15 @@ public class PublicNftController {
         return remoteNftService.settlement(req);
     }
 
+    @PostMapping("trade-page")
+    @ApiOperation("NFT交易列表")
+    public GenericDto<Page<SysNftResp>> tradePage(@Valid @RequestBody SysNftPageReq req) {
+        return remoteNftService.tradePage(req);
+    }
+
+    @GetMapping("/detail/{id}")
+    @ApiOperation("NFT交易详情")
+    public GenericDto<SysNftDetailResp> detail(@PathVariable("id") Long id) {
+        return remoteNftService.tradeDetail(id);
+    }
 }

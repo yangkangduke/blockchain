@@ -648,6 +648,11 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         update(queryWrap);
     }
 
+    @Override
+    public SysNftDetailResp tradeDetail(Long id) {
+        return detail(id);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void transferNft(NftOwnerChangeReq req, List<SysNftEntity> list) {
         Map<Long, SysNftEntity> map = list.stream().collect(Collectors.toMap(SysNftEntity::getId, p -> p));
