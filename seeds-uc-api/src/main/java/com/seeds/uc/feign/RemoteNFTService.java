@@ -5,7 +5,7 @@ package com.seeds.uc.feign;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.request.NFTBuyReq;
-import com.seeds.uc.feign.interceptor.FeignInnerRequestInterceptor;
+import com.seeds.uc.feign.interceptor.UcFeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +18,7 @@ import javax.validation.Valid;
  * @author yk
  * @date 2022/8/8
  */
-@FeignClient(name = "remoteNFTService", url = "${Seeds-uc}", configuration = {FeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteNFTService", url = "${Seeds-uc}", configuration = {UcFeignInnerRequestInterceptor.class})
 public interface RemoteNFTService {
 
 	@GetMapping("/internal-nft/buy/callback")

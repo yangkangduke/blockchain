@@ -7,7 +7,7 @@ import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.impl.RemoteNftServiceImpl;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.admin.feign.interceptor.FeignInnerRequestInterceptor;
+import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/8/19
  */
-@FeignClient(name = "remoteNftService", url = "${Seeds-admin}", fallback = RemoteNftServiceImpl.class, configuration = {FeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteNftService", url = "${Seeds-admin}", fallback = RemoteNftServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
 public interface RemoteNftService {
 
 	/**
