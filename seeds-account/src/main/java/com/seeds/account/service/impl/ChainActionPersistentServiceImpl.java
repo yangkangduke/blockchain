@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -234,7 +235,7 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
 
         Assert.isTrue(transaction != null
                         && transaction.getAction() == ChainAction.DEPOSIT
-                        && transaction.getStatus() == DepositStatus.CREATED.getCode(),
+                        && Objects.equals(transaction.getStatus(), DepositStatus.CREATED.getCode()),
                 "invalid transaction" + transaction);
 
         // 更新充币状态为确认
