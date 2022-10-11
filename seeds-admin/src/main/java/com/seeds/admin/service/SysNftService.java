@@ -3,6 +3,7 @@ package com.seeds.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.mq.NftMintMsgDTO;
+import com.seeds.admin.dto.mq.NftUpgradeMsgDTO;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
@@ -30,8 +31,18 @@ public interface SysNftService extends IService<SysNftEntity> {
      * 添加系统NFT信息
      * @param image NFT图片
      * @param req NFT信息
+     * @return NFT的唯一标识
      */
-    void add(MultipartFile image, SysNftAddReq req);
+    Long add(MultipartFile image, SysNftAddReq req);
+
+    /**
+     * 添加系统NFT信息发送消息
+     * @param image NFT图片
+     * @param req NFT信息
+     * @param topic 消息方式
+     * @return NFT的唯一标识
+     */
+    Long addSend(MultipartFile image, SysNftAddReq req, String topic);
 
     /**
      * 通过id获取系统NFT信息
@@ -107,8 +118,9 @@ public interface SysNftService extends IService<SysNftEntity> {
      * mint NFT
      *
      * @param msgDTO mintNFT消息DTO
+     * @return 结果
      */
-    void mintNft(NftMintMsgDTO msgDTO);
+    Boolean mintNft(NftMintMsgDTO msgDTO);
 
     /**
      * burn NFT
@@ -116,4 +128,46 @@ public interface SysNftService extends IService<SysNftEntity> {
      * @param sysNftEntities NFT信息
      */
     void burnNft(List<SysNftEntity> sysNftEntities);
+
+    /**
+     * NFT战绩更新
+     *
+     * @param req NFT战绩记录
+     */
+    void honorModify(List<SysNftHonorModifyReq> req);
+
+
+    /**
+     * NFT升级发消息
+     * @param image NFT图片
+     * @param req NFT信息
+     * @return 新NFT的唯一标识
+     */
+    Long upgradeSend(MultipartFile image, SysNftUpgradeReq req);
+
+    /**
+     * NFT升级
+     * @param req NFT信息
+     */
+    void upgrade(NftUpgradeMsgDTO req);
+
+    /**
+     * NFT锁定
+     * @param req NFT信息
+     */
+    void lock(SysNftLockReq req);
+
+    /**
+     * NFT结算
+     * @param req NFT对局记录
+     */
+    void settlement(SysNftSettlementReq req);
+
+    /**
+     * NFT交易详情
+     * @param id NFT的id
+     * @return 系统NFT信息
+     */
+    SysNftDetailResp tradeDetail(Long id);
+
 }

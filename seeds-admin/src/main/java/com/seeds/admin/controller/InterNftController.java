@@ -1,11 +1,15 @@
 package com.seeds.admin.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.enums.NftInitStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.admin.mq.producer.KafkaProducer;
 import com.seeds.admin.service.SysNftService;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
@@ -13,7 +17,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -31,6 +37,9 @@ public class InterNftController {
 
     @Autowired
     private SysNftService sysNftService;
+
+    @Resource
+    private KafkaProducer kafkaProducer;
 
     @PostMapping("owner-change")
     @ApiOperation("归属人变更")
@@ -52,6 +61,7 @@ public class InterNftController {
     @Inner
     public GenericDto<IPage<SysNftResp>> ucPage(@Valid @RequestBody SysNftPageReq query) {
         query.setInitStatus(NftInitStatusEnum.NORMAL.getCode());
+        query.setLockFlag(WhetherEnum.NO.value());
         return GenericDto.success(sysNftService.queryPage(query));
     }
 
@@ -86,4 +96,65 @@ public class InterNftController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("create")
+    @ApiOperation("NFT创建")
+    @Inner
+    public GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData) {
+        return GenericDto.success(sysNftService.addSend(image, JSONUtil.toBean(metaData, SysNftAddReq.class), KafkaTopic.GAME_NFT_SAVE_SUCCESS));
+    }
+
+    @PostMapping("modify")
+    @ApiOperation("NFT修改")
+    @Inner
+    public GenericDto<Object> modify(@Valid @RequestBody SysNftModifyReq req) {
+        sysNftService.modify(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("honor-modify")
+    @ApiOperation("NFT战绩更新")
+    @Inner
+    public GenericDto<Object> honorModify(@Valid @RequestBody List<SysNftHonorModifyReq> req) {
+        kafkaProducer.send(KafkaTopic.GAME_NFT_HONOR_MODIFY, JSONUtil.toJsonStr(req));
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("upgrade")
+    @ApiOperation("NFT升级")
+    @Inner
+    public GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data) {
+        return GenericDto.success(sysNftService.upgradeSend(image, JSONUtil.toBean(data, SysNftUpgradeReq.class)));
+    }
+
+    @PostMapping("lock")
+    @ApiOperation("NFT锁定")
+    @Inner
+    public GenericDto<Object> lock(@Valid @RequestBody SysNftLockReq req) {
+        sysNftService.lock(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("settlement")
+    @ApiOperation("NFT结算")
+    @Inner
+    public GenericDto<Object> settlement(@Valid @RequestBody SysNftSettlementReq req) {
+        sysNftService.settlement(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("trade-page")
+    @ApiOperation("NFT交易列表")
+    @Inner
+    public GenericDto<IPage<SysNftResp>> tradePage(@Valid @RequestBody SysNftPageReq query) {
+        query.setInitStatus(NftInitStatusEnum.NORMAL.getCode());
+        query.setLockFlag(WhetherEnum.NO.value());
+        return GenericDto.success(sysNftService.queryPage(query));
+    }
+
+    @GetMapping("trade-detail")
+    @ApiOperation("NFT交易详情")
+    @Inner
+    public GenericDto<SysNftDetailResp> tradeDetail(@RequestParam Long id) {
+        return GenericDto.success(sysNftService.tradeDetail(id));
+    }
 }

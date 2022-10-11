@@ -4,16 +4,12 @@ package com.seeds.uc.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.SysNftPageReq;
 import com.seeds.admin.dto.request.UcSwitchReq;
-import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
-import com.seeds.admin.enums.NftStatusEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.request.NFTMakeOfferReq;
-import com.seeds.uc.enums.UcErrorCodeEnum;
-import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.service.IUcNftOfferService;
 import com.seeds.uc.service.IUcUserAccountService;
 import io.swagger.annotations.Api;
@@ -23,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
-import java.util.Objects;
 
 /**
  * <p>
@@ -50,30 +44,7 @@ public class OpenNFTController {
     @PostMapping("/buy")
     @ApiOperation(value = "购买", notes = "购买")
     public GenericDto<Object> buyNFT(@Valid @RequestBody NFTBuyReq buyReq) {
-        Long currentUserId = UserContext.getCurrentUserId();
-        BigDecimal price;
-        SysNftDetailResp sysNftDetailResp;
-        try {
-            GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = remoteNftService.ucDetail(buyReq.getNftId());
-            sysNftDetailResp = sysNftDetailRespGenericDto.getData();
-            price = sysNftDetailResp.getPrice();
-        } catch (Exception e) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
-        }
-        //  判断nft是否是上架状态、nft是否已经购买过了
-        if (!Objects.isNull(sysNftDetailResp)) {
-            if (sysNftDetailResp.getStatus() != NftStatusEnum.ON_SALE.getCode()) {
-                throw new GenericException(UcErrorCodeEnum.ERR_18006_ACCOUNT_BUY_FAIL_INVALID_NFT_STATUS);
-            }
-        }
-
-
-        // 检查账户里面的金额是否足够支付
-        if (!ucUserAccountService.checkBalance(currentUserId, price)) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
-        }
-        ucUserAccountService.buyNFTFreeze(sysNftDetailResp);
-
+        ucUserAccountService.buyNFT(buyReq);
         return GenericDto.success(null);
     }
 

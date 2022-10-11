@@ -1,5 +1,6 @@
 package com.seeds.admin.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -46,7 +47,6 @@ public class SysNftAddReq {
 	 * NFT描述
 	 */
 	@ApiModelProperty("NFT描述")
-	@NotBlank(message = "NFT description cannot be empty")
 	private String description;
 
 	/**
@@ -67,7 +67,6 @@ public class SysNftAddReq {
 	 * 状态  0：停售   1：在售
 	 */
 	@ApiModelProperty("状态  0：停售   1：在售")
-	@NotNull(message = "NFT status cannot be empty")
 	private Integer status;
 
 	/**
@@ -76,5 +75,14 @@ public class SysNftAddReq {
 	@Valid
 	@ApiModelProperty("NFT属性列表")
 	private List<NftPropertiesReq> propertiesList;
+
+	@JsonIgnore
+	private String imageFileHash;
+
+	private Long ownerId;
+
+	private String ownerName;
+
+	private Integer ownerType;
 
 }

@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
  * @author yk
  *
  */
-public interface LockService {
+public interface ILockService {
     /**
      * 在获取lock的情况下执行
      * @param key

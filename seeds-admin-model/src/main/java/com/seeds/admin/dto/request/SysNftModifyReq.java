@@ -38,7 +38,6 @@ public class SysNftModifyReq {
 	 * NFT描述
 	 */
 	@ApiModelProperty("NFT描述")
-	@NotBlank(message = "NFT description cannot be empty")
 	private String description;
 
 	/**

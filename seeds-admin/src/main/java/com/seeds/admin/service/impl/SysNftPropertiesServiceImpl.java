@@ -42,6 +42,14 @@ public class SysNftPropertiesServiceImpl extends ServiceImpl<SysNftPropertiesMap
     }
 
     @Override
+    public SysNftPropertiesEntity queryByTypeAndNftId(Long typeId, Long nftId) {
+        LambdaQueryWrapper<SysNftPropertiesEntity> query = new QueryWrapper<SysNftPropertiesEntity>().lambda()
+                .eq(SysNftPropertiesEntity::getTypeId, typeId)
+                .eq(SysNftPropertiesEntity::getNftId, nftId);
+        return getOne(query);
+    }
+
+    @Override
     public void deleteByNftId(Long nftId) {
         LambdaQueryWrapper<SysNftPropertiesEntity> query = new QueryWrapper<SysNftPropertiesEntity>().lambda()
                 .eq(SysNftPropertiesEntity::getNftId, nftId);

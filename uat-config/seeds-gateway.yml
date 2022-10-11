@@ -19,7 +19,7 @@ spring:
           filters:
             - Auth
         - id: seeds-admin-service
-          uri: http://Seeds-admin:10102
+          uri: ${service.url.admin}
           predicates:
             - Path=/admin/**
           filters:

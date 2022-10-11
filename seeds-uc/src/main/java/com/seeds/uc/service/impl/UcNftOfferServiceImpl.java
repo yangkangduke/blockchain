@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.enums.NftStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
@@ -62,6 +63,10 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void makeOffer(NFTMakeOfferReq req) {
+        Long currentUserId = req.getUserId();
+        if (currentUserId == null) {
+            currentUserId = UserContext.getCurrentUserId();
+        }
         SysNftDetailResp sysNftDetailResp;
         BigDecimal price;
         try {
@@ -75,7 +80,10 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
         if (sysNftDetailResp.getStatus() != NftStatusEnum.ON_SALE.getCode()) {
             throw new GenericException(UcErrorCodeEnum.ERR_18006_ACCOUNT_BUY_FAIL_INVALID_NFT_STATUS);
         }
-        Long currentUserId = UserContext.getCurrentUserId();
+        // 判断NFT是否已锁定
+        if (WhetherEnum.YES.value() == sysNftDetailResp.getLockFlag()) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18007_ACCOUNT_BUY_FAIL_NFT_LOCKED);
+        }
         // 检查余额
         BigDecimal reqPrice = req.getPrice();
         if (!ucUserAccountService.checkBalance(currentUserId, reqPrice)) {

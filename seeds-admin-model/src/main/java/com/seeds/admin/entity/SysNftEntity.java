@@ -153,6 +153,12 @@ public class SysNftEntity extends BaseEntity {
 	private BigDecimal creatorFees;
 
 	/**
+	 * 锁定标记，已锁定不可操作  0：未锁定 1：已锁定
+	 */
+	@TableField("lock_flag")
+	private Integer lockFlag;
+
+	/**
 	 * 删除标记  0：未删除
 	 */
 	@TableLogic(value = "0", delval = "NULL")

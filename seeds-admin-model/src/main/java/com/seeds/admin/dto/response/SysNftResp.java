@@ -59,4 +59,7 @@ public class SysNftResp {
 	@ApiModelProperty(value = "归属人名称")
 	private String ownerName;
 
+	@ApiModelProperty(value = "锁定标记，已锁定不可操作  0：未锁定 1：已锁定")
+	private Integer lockFlag;
+
 }
