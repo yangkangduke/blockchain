@@ -184,7 +184,12 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     }
 
     @Override
-    public void bids(NFTMakeOfferReq req) {
+    public void forwardBids(NFTMakeOfferReq req) {
         ucNftOffersService.makeOffer(req);
+    }
+
+    @Override
+    public void reverseBids(NFTBuyReq req) {
+        buyNFT(req);
     }
 }

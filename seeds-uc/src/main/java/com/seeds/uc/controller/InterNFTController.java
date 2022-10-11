@@ -76,13 +76,24 @@ public class InterNFTController {
     }
 
     /**
-     *  出价接口
+     *  正向出价
      */
-    @PostMapping("/bids")
-    @ApiOperation(value = "出价", notes = "出价")
+    @PostMapping("/forward-bids")
+    @ApiOperation(value = "正向出价", notes = "正向出价")
     @Inner
-    public GenericDto<Object> bids(@Valid @RequestBody NFTMakeOfferReq req) {
-        ucInterNFTService.bids(req);
+    public GenericDto<Object> forwardBids(@Valid @RequestBody NFTMakeOfferReq req) {
+        ucInterNFTService.forwardBids(req);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  反向出价
+     */
+    @PostMapping("/reverse-bids")
+    @ApiOperation(value = "反向出价", notes = "反向出价")
+    @Inner
+    public GenericDto<Object> reverseBids(@Valid @RequestBody NFTBuyReq req) {
+        ucInterNFTService.reverseBids(req);
         return GenericDto.success(null);
     }
 

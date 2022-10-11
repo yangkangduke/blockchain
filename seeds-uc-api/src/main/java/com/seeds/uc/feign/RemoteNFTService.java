@@ -36,8 +36,12 @@ public interface RemoteNFTService {
 	@ApiOperation(value = "反向拍卖", notes = "反向拍卖")
 	GenericDto<Object> reverseAuction(NFTReverseAuctionReq req);
 
-	@PostMapping("/internal-nft/bids")
-	@ApiOperation(value = "出价", notes = "出价")
-	GenericDto<Object> bids(NFTMakeOfferReq req);
+	@PostMapping("/internal-nft/forward-bids")
+	@ApiOperation(value = "正向出价", notes = "正向出价")
+	GenericDto<Object> forwardBids(NFTMakeOfferReq req);
+
+	@PostMapping("/internal-nft/reverse-bids")
+	@ApiOperation(value = "反向出价", notes = "反向出价")
+	GenericDto<Object> reverseBids(NFTBuyReq req);
 
 }

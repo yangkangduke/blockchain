@@ -82,13 +82,18 @@ public class OpenNftController {
         return remoteNFTService.reverseAuction(req);
     }
 
-    @PostMapping("bids")
-    @ApiOperation("NFT出价")
-    public GenericDto<Object> bids(@Valid @RequestBody OpenNftBidsReq req) {
+    @PostMapping("forward-bids")
+    @ApiOperation("NFT正向出价")
+    public GenericDto<Object> forwardBids(@Valid @RequestBody OpenNftForwardBidsReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return remoteNFTService.bids(req);
+        return remoteNFTService.forwardBids(req);
     }
 
-
+    @PostMapping("reverse-bids")
+    @ApiOperation("NFT反向出价")
+    public GenericDto<Object> reverseBids(@Valid @RequestBody OpenNftReverseBidsReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return remoteNFTService.reverseBids(req);
+    }
 
 }

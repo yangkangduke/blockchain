@@ -38,9 +38,15 @@ public interface UcInterNFTService {
     void reverseAuction(NFTReverseAuctionReq req);
 
     /**
-     * 出价
+     * 正向出价
      * @param req 入参
      */
-    void bids(NFTMakeOfferReq req);
+    void forwardBids(NFTMakeOfferReq req);
+
+    /**
+     * 反向出价
+     * @param req 入参
+     */
+    void reverseBids(NFTBuyReq req);
 
 }
