@@ -8,6 +8,7 @@ import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.OpenNftBidsReq;
 import com.seeds.game.dto.request.OpenNftBuyReq;
 import com.seeds.game.dto.request.OpenNftLockReq;
 import com.seeds.uc.feign.RemoteNFTService;
@@ -64,8 +65,16 @@ public class OpenNftController {
     @PostMapping("buy")
     @ApiOperation("NFT购买")
     public GenericDto<Object> buy(@Valid @RequestBody OpenNftBuyReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         req.setSource(RequestSource.GAME);
         return remoteNFTService.buyNFT(req);
+    }
+
+    @PostMapping("bids")
+    @ApiOperation("NFT出价")
+    public GenericDto<Object> bids(@Valid @RequestBody OpenNftBidsReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return remoteNFTService.bids(req);
     }
 
 }

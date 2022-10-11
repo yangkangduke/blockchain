@@ -2,6 +2,8 @@ package com.seeds.uc.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
+import com.seeds.uc.dto.request.NFTBuyReq;
+import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.model.*;
 import com.seeds.uc.service.*;
@@ -32,6 +34,8 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     private IUcUserAccountActionHistoryService ucUserAccountActionHistoryService;
     @Autowired
     private IUcUserAccountService ucUserAccountService;
+    @Autowired
+    private IUcNftOfferService ucNftOffersService;
     @Autowired
     private IUcNftOfferService ucNftOfferService;
 
@@ -105,5 +109,15 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
             }
         }
 
+    }
+
+    @Override
+    public void buyNFT(NFTBuyReq req) {
+        ucUserAccountService.buyNFT(req);
+    }
+
+    @Override
+    public void bids(NFTMakeOfferReq req) {
+        ucNftOffersService.makeOffer(req);
     }
 }
