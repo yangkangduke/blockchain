@@ -18,8 +18,8 @@ spring:
   cloud:
     config:
       uri: ${CONFIG_SERVERS:http://127.0.0.1:8888}
-      label: ${CONFIG_GIT_VERSION:dev}
-      prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/dev
+      label: ${CONFIG_GIT_VERSION:uat}
+      prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/uat
       enabled: true
 
 log:
