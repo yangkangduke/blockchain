@@ -40,6 +40,12 @@ spring:
             - Path=/notification/**
           filters:
             - Auth
+        - id: seeds-game-service
+          uri: ${service.url.game}
+          predicates:
+            - Path=/game/**
+          filters:
+            - OpenAuth
       globalcors:
         cors-configurations:
           '[/**]':
