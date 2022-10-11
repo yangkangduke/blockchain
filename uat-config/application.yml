@@ -4,7 +4,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 1024MB
   kafka:
-    bootstrap-servers: 54.168.239.215:9092
+    bootstrap-servers: 13.115.129.100:9092
     producer:
       retries: 3  # 生产者发送失败时，重试次数
       batch-size: 16384
@@ -22,7 +22,7 @@ spring:
 
 
 redis:
-  host: 54.168.239.215
+  host: 13.115.129.100
   port: 6379
   password: Seeds123!
 
