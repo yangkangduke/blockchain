@@ -1,6 +1,6 @@
 package com.seeds.game.dto.request;
 
-import com.seeds.uc.dto.request.NFTMakeOfferReq;
+import com.seeds.uc.dto.request.NFTForwardAuctionReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,15 +11,15 @@ import javax.validation.constraints.NotNull;
 
 
 /**
- * 系统NFT出价
+ * 系统NFT正向拍卖
  *
  * @author hang.yu
  * @date 2022/10/11
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ApiModel(value = "OpenNftBidsReq", description = "系统NFT出价")
-public class OpenNftBidsReq extends NFTMakeOfferReq {
+@ApiModel(value = "OpenNftForwardAuctionReq", description = "系统NFT正向拍卖")
+public class OpenNftForwardAuctionReq extends NFTForwardAuctionReq {
 
     @ApiModelProperty(value = "访问键")
     @NotBlank(message = "Access key cannot be empty")

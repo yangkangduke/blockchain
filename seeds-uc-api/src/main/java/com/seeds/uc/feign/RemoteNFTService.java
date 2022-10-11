@@ -5,6 +5,7 @@ package com.seeds.uc.feign;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.request.NFTBuyReq;
+import com.seeds.uc.dto.request.NFTForwardAuctionReq;
 import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.feign.interceptor.UcFeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +30,10 @@ public interface RemoteNFTService {
 	@PostMapping("/internal-nft/buy")
 	@ApiOperation(value = "购买", notes = "购买")
 	GenericDto<Object> buyNFT(@Valid @RequestBody NFTBuyReq buyReq) ;
+
+	@PostMapping("/internal-nft/forward-auction")
+	@ApiOperation(value = "正向拍卖", notes = "正向拍卖")
+	GenericDto<Object> forwardAuction(NFTForwardAuctionReq req);
 
 	@PostMapping("/internal-nft/bids")
 	@ApiOperation(value = "出价", notes = "出价")

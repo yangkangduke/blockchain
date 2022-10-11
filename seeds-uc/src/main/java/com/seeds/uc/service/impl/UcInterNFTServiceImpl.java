@@ -1,10 +1,18 @@
 package com.seeds.uc.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.seeds.admin.dto.request.UcSwitchReq;
+import com.seeds.admin.dto.request.UpOrDownReq;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
+import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.request.NFTBuyReq;
+import com.seeds.uc.dto.request.NFTForwardAuctionReq;
 import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.enums.*;
+import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.model.*;
 import com.seeds.uc.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -33,11 +42,15 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     @Autowired
     private IUcUserAccountActionHistoryService ucUserAccountActionHistoryService;
     @Autowired
+    private IUcNftForwardAuctionService ucNftForwardAuctionService;
+    @Autowired
     private IUcUserAccountService ucUserAccountService;
     @Autowired
     private IUcNftOfferService ucNftOffersService;
     @Autowired
     private IUcNftOfferService ucNftOfferService;
+    @Autowired
+    private RemoteNftService remoteNftService;
 
     /**
      * 购买回调
@@ -114,6 +127,34 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     @Override
     public void buyNFT(NFTBuyReq req) {
         ucUserAccountService.buyNFT(req);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void forwardAuction(NFTForwardAuctionReq req) {
+        // 判断是否已存在正向拍卖
+        UcNftForwardAuction forwardAuction = ucNftForwardAuctionService.queryByUserIdAndNftId(req.getUserId(), req.getNftId());
+        if (forwardAuction != null) {
+            throw new GenericException(AdminErrorCodeEnum.ERR_40013_THIS_NFT_AUCTION_IS_IN_PROGRESS.getDescEn());
+        }
+        // 上架NFT
+        UcSwitchReq switchReq = new UcSwitchReq();
+        switchReq.setUcUserId(req.getUserId());
+        List<UpOrDownReq> reqs = new ArrayList<>();
+        UpOrDownReq upOrDownReq = new UpOrDownReq();
+        upOrDownReq.setId(req.getNftId());
+        upOrDownReq.setStatus(WhetherEnum.YES.value());
+        upOrDownReq.setPrice(req.getMaxPrice());
+        upOrDownReq.setUnit(req.getCurrency().name());
+        reqs.add(upOrDownReq);
+        switchReq.setReqs(reqs);
+        if (!remoteNftService.ucUpOrDown(switchReq).isSuccess()) {
+            throw new GenericException(UcErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+        }
+        // 保存正向拍卖记录
+        forwardAuction = UcNftForwardAuction.builder().build();
+        BeanUtil.copyProperties(req, forwardAuction);
+        ucNftForwardAuctionService.save(forwardAuction);
     }
 
     @Override

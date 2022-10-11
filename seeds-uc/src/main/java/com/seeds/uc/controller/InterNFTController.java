@@ -5,6 +5,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.request.NFTBuyReq;
+import com.seeds.uc.dto.request.NFTForwardAuctionReq;
 import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.service.UcInterNFTService;
 import io.swagger.annotations.Api;
@@ -52,6 +53,17 @@ public class InterNFTController {
     @Inner
     public GenericDto<Object> buyNFT(@Valid @RequestBody NFTBuyReq buyReq) {
         ucInterNFTService.buyNFT(buyReq);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  正向拍卖
+     */
+    @PostMapping("/forward-auction")
+    @ApiOperation(value = "正向拍卖", notes = "正向拍卖")
+    @Inner
+    public GenericDto<Object> forwardAuction(@Valid @RequestBody NFTForwardAuctionReq req) {
+        ucInterNFTService.forwardAuction(req);
         return GenericDto.success(null);
     }
 

@@ -53,7 +53,7 @@ public enum AdminErrorCodeEnum {
     ERR_40010_DUPLICATE_OR_MISSING_BASE_ATTRIBUTES_OF_NFT(40010, "NFT基础属性重复或缺失", "Duplicate or missing base attributes of NFT, type id:{%s}"),
     ERR_40011_NFT_PROPERTY_VALUE_IS_NOT_IN_THE_CORRECT_FORMAT(40011, "NFT属性值格式不正确", "NFT property value is not in the correct format, type id:{%s}"),
     ERR_40012_NFT_ATTRIBUTED_PERSON_MISMATCH(40012, "NFT归属人不匹配", "NFT attributed person mismatch"),
-
+    ERR_40013_THIS_NFT_AUCTION_IS_IN_PROGRESS(40013, "该NFT拍卖正在进行中", "This NFT auction is in progress"),
 
     // merchant
     ERR_50001_MERCHANT_ALREADY_EXIST(50001, "商家已存在", "Merchant already exist"),

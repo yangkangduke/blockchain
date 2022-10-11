@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
-import com.seeds.admin.enums.NftStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
@@ -222,7 +221,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         }
         //  判断nft是否是上架状态、nft是否已经购买过了
         if (!Objects.isNull(sysNftDetailResp)) {
-            if (sysNftDetailResp.getStatus() != NftStatusEnum.ON_SALE.getCode()) {
+            if (sysNftDetailResp.getStatus() != WhetherEnum.YES.value()) {
                 throw new GenericException(UcErrorCodeEnum.ERR_18006_ACCOUNT_BUY_FAIL_INVALID_NFT_STATUS);
             }
             // 判断NFT是否已锁定
