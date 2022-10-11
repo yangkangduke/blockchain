@@ -8,6 +8,7 @@ import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.uc.dto.request.*;
+import com.seeds.uc.dto.response.NFTOfferResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.model.*;
@@ -191,5 +192,10 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     @Override
     public void reverseBids(NFTBuyReq req) {
         buyNFT(req);
+    }
+
+    @Override
+    public List<NFTOfferResp> offerList(Long id) {
+        return ucNftOfferService.offerList(id);
     }
 }
