@@ -8,9 +8,8 @@ import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.game.dto.request.OpenNftBidsReq;
-import com.seeds.game.dto.request.OpenNftBuyReq;
-import com.seeds.game.dto.request.OpenNftLockReq;
+import com.seeds.game.dto.request.*;
+import com.seeds.uc.dto.response.NFTOfferResp;
 import com.seeds.uc.feign.RemoteNFTService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 提供外部调用的NFT相关接口
@@ -70,11 +70,41 @@ public class OpenNftController {
         return remoteNFTService.buyNFT(req);
     }
 
-    @PostMapping("bids")
-    @ApiOperation("NFT出价")
-    public GenericDto<Object> bids(@Valid @RequestBody OpenNftBidsReq req) {
+    @PostMapping("forward-auction")
+    @ApiOperation("NFT正向拍卖")
+    public GenericDto<Object> forwardAuction(@Valid @RequestBody OpenNftForwardAuctionReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return remoteNFTService.bids(req);
+        return remoteNFTService.forwardAuction(req);
+    }
+
+    @PostMapping("reverse-auction")
+    @ApiOperation("NFT反向拍卖")
+    public GenericDto<Object> reverseAuction(@Valid @RequestBody OpenNftReverseAuctionReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return remoteNFTService.reverseAuction(req);
+    }
+
+    @PostMapping("forward-bids")
+    @ApiOperation("NFT正向出价")
+    public GenericDto<Object> forwardBids(@Valid @RequestBody OpenNftForwardBidsReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return remoteNFTService.forwardBids(req);
+    }
+
+    @PostMapping("reverse-bids")
+    @ApiOperation("NFT反向出价")
+    public GenericDto<Object> reverseBids(@Valid @RequestBody OpenNftReverseBidsReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return remoteNFTService.reverseBids(req);
+    }
+
+    @GetMapping("/offer-list")
+    @ApiOperation("NFT出价列表")
+    public GenericDto<List<NFTOfferResp>> offerList(@RequestParam Long id,
+                                                    @RequestParam String accessKey,
+                                                    @RequestParam String signature,
+                                                    @RequestParam Long timestamp) {
+        return GenericDto.success(remoteNFTService.offerList(id));
     }
 
 }

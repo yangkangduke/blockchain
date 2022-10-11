@@ -93,6 +93,9 @@ public class SysNftDetailResp {
 	@ApiModelProperty(value = "锁定标记，已锁定不可操作  0：未锁定 1：已锁定")
 	private Integer lockFlag;
 
+	@ApiModelProperty(value = "拍卖标记  0：未拍卖 1：正向拍卖 2：反向拍卖 3：正向和反向拍卖")
+	private Integer auctionFlag;
+
 	@ApiModelProperty("NFT属性列表")
 	private List<NftPropertiesResp> propertiesList;
 
