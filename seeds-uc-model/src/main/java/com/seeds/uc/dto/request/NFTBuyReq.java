@@ -32,4 +32,7 @@ public class NFTBuyReq implements Serializable {
     @ApiModelProperty("请求来源")
     private RequestSource source = RequestSource.UC;
 
+    @ApiModelProperty("购买用户id")
+    private Long userId;
+
 }

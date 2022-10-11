@@ -40,4 +40,7 @@ public class NFTMakeOfferReq implements Serializable {
     @ApiModelProperty("过期时间")
     private Long expireTime;
 
+    @ApiModelProperty("出价用户id")
+    private Long userId;
+
 }

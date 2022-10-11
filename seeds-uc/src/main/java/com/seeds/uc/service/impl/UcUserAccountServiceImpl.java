@@ -7,12 +7,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.enums.NftStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
+import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.AccountActionResp;
+import com.seeds.uc.dto.response.UcUserAccountAmountResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.dto.response.UcUserAddressInfoResp;
 import com.seeds.uc.enums.*;
@@ -27,10 +32,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -198,6 +205,40 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         return true;
     }
 
+    @Override
+    public void buyNFT(NFTBuyReq buyReq) {
+        Long currentUserId = buyReq.getUserId();
+        if (currentUserId == null) {
+            currentUserId = UserContext.getCurrentUserId();
+        }
+        BigDecimal price;
+        SysNftDetailResp sysNftDetailResp;
+        try {
+            GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = remoteNftService.ucDetail(buyReq.getNftId());
+            sysNftDetailResp = sysNftDetailRespGenericDto.getData();
+            price = sysNftDetailResp.getPrice();
+        } catch (Exception e) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
+        }
+        //  判断nft是否是上架状态、nft是否已经购买过了
+        if (!Objects.isNull(sysNftDetailResp)) {
+            if (sysNftDetailResp.getStatus() != NftStatusEnum.ON_SALE.getCode()) {
+                throw new GenericException(UcErrorCodeEnum.ERR_18006_ACCOUNT_BUY_FAIL_INVALID_NFT_STATUS);
+            }
+            // 判断NFT是否已锁定
+            if (WhetherEnum.YES.value() == sysNftDetailResp.getLockFlag()) {
+                throw new GenericException(UcErrorCodeEnum.ERR_18007_ACCOUNT_BUY_FAIL_NFT_LOCKED);
+            }
+        }
+
+
+        // 检查账户里面的金额是否足够支付
+        if (!checkBalance(currentUserId, price)) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
+        }
+        buyNFTFreeze(sysNftDetailResp, buyReq.getSource());
+    }
+
     /**
      * 购买nft
      *
@@ -253,6 +294,21 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         }
         list.add(nftOwnerChangeReq);
         remoteNftService.ownerChange(list);
+    }
+
+    @Override
+    public List<UcUserAccountAmountResp> amountInfo(Long userId) {
+        List<UcUserAccountAmountResp> resList = new ArrayList<>();
+        List<UcUserAccount> list = this.list(new LambdaQueryWrapper<UcUserAccount>()
+                .eq(UcUserAccount::getUserId, userId));
+        if (!CollectionUtils.isEmpty(list)) {
+            list.forEach(p -> {
+                UcUserAccountAmountResp info = UcUserAccountAmountResp.builder().build();
+                BeanUtil.copyProperties(p, info);
+                resList.add(info);
+            });
+        }
+        return resList;
     }
 
 }

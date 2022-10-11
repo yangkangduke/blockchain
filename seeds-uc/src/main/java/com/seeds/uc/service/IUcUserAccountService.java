@@ -7,11 +7,14 @@ import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
+import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.AccountActionResp;
+import com.seeds.uc.dto.response.UcUserAccountAmountResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.model.UcUserAccount;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -70,6 +73,19 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * 购买nft
      * @param buyReq
      */
+    void buyNFT(NFTBuyReq buyReq);
+
+    /**
+     * 购买nft
+     * @param buyReq
+     */
     void buyNFTFreeze(SysNftDetailResp buyReq, RequestSource source);
+
+    /**
+     * 账户金额详情
+     * @param userId 用户id
+     * @return 账户金额
+     */
+    List<UcUserAccountAmountResp> amountInfo(Long userId);
 
 }

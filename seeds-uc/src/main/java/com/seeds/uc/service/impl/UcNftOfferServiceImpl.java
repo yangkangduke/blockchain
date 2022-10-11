@@ -63,6 +63,10 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void makeOffer(NFTMakeOfferReq req) {
+        Long currentUserId = req.getUserId();
+        if (currentUserId == null) {
+            currentUserId = UserContext.getCurrentUserId();
+        }
         SysNftDetailResp sysNftDetailResp;
         BigDecimal price;
         try {
@@ -80,7 +84,6 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
         if (WhetherEnum.YES.value() == sysNftDetailResp.getLockFlag()) {
             throw new GenericException(UcErrorCodeEnum.ERR_18007_ACCOUNT_BUY_FAIL_NFT_LOCKED);
         }
-        Long currentUserId = UserContext.getCurrentUserId();
         // 检查余额
         BigDecimal reqPrice = req.getPrice();
         if (!ucUserAccountService.checkBalance(currentUserId, reqPrice)) {
