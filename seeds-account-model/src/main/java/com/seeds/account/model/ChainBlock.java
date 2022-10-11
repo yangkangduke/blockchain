@@ -4,8 +4,13 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+
+import com.seeds.account.enums.CommonStatus;
+import com.seeds.common.enums.Chain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
+import lombok.Data;
 
 /**
  * <p>
@@ -17,6 +22,8 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("chain_block")
 @ApiModel(value = "ChainBlock对象", description = "Ethereum块跟踪")
+@Data
+@Builder
 public class ChainBlock implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,7 +42,7 @@ public class ChainBlock implements Serializable {
     private Long version;
 
     @ApiModelProperty("chain")
-    private String chain;
+    private Chain chain;
 
     @ApiModelProperty("block number")
     private Long blockNumber;
@@ -49,92 +56,6 @@ public class ChainBlock implements Serializable {
     @ApiModelProperty("parent block hash")
     private String parentHash;
 
-    private Integer status;
+    private CommonStatus status;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public Long getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Long createTime) {
-        this.createTime = createTime;
-    }
-    public Long getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Long updateTime) {
-        this.updateTime = updateTime;
-    }
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-    public String getChain() {
-        return chain;
-    }
-
-    public void setChain(String chain) {
-        this.chain = chain;
-    }
-    public Long getBlockNumber() {
-        return blockNumber;
-    }
-
-    public void setBlockNumber(Long blockNumber) {
-        this.blockNumber = blockNumber;
-    }
-    public String getBlockHash() {
-        return blockHash;
-    }
-
-    public void setBlockHash(String blockHash) {
-        this.blockHash = blockHash;
-    }
-    public Long getBlockTime() {
-        return blockTime;
-    }
-
-    public void setBlockTime(Long blockTime) {
-        this.blockTime = blockTime;
-    }
-    public String getParentHash() {
-        return parentHash;
-    }
-
-    public void setParentHash(String parentHash) {
-        this.parentHash = parentHash;
-    }
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "ChainBlock{" +
-            "id=" + id +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            ", version=" + version +
-            ", chain=" + chain +
-            ", blockNumber=" + blockNumber +
-            ", blockHash=" + blockHash +
-            ", blockTime=" + blockTime +
-            ", parentHash=" + parentHash +
-            ", status=" + status +
-        "}";
-    }
 }

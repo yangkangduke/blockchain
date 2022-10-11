@@ -80,7 +80,7 @@ public class ActionControlServiceImpl extends ServiceImpl<ActionControlMapper, A
     @Override
     public void add(ActionControlDto actionControlDto) {
         log.info("insert actionControlDto={}", actionControlDto);
-        ActionControl actionControl = ObjectUtils.copy(actionControlDto, new ActionControl());
+        ActionControl actionControl = ObjectUtils.copy(actionControlDto, ActionControl.builder().build());
         actionControl.setCreateTime(System.currentTimeMillis());
         actionControl.setUpdateTime(System.currentTimeMillis());
         actionControl.setVersion(AccountConstants.DEFAULT_VERSION);
@@ -95,7 +95,7 @@ public class ActionControlServiceImpl extends ServiceImpl<ActionControlMapper, A
         if (actionControl == null) {
             throw new MissingElementException();
         }
-        // actionControl.setValue(actionControlDto.getValue());
+        actionControl.setValue(actionControlDto.getValue());
         actionControl.setUpdateTime(System.currentTimeMillis());
         actionControl.setVersion(actionControl.getVersion() + 1);
         actionControl.setStatus(actionControlDto.getStatus());

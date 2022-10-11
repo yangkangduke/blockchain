@@ -57,4 +57,16 @@ public class AccountInternalController {
             return Utils.returnFromException(e);
         }
     }
+
+    @PostMapping("/job/scan-block")
+    @ApiOperation("扫描新块")
+    public GenericDto<Boolean> scanBlock() {
+        try {
+            chainActionService.scanBlock();
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("scanBlock", e);
+            return Utils.returnFromException(e);
+        }
+    }
 }

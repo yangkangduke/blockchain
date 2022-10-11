@@ -1,6 +1,6 @@
 package com.seeds.account.service.impl;
 
-import com.seeds.account.service.LockService;
+import com.seeds.account.service.ILockService;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import java.util.concurrent.Callable;
  */
 @Slf4j
 @Service
-public class LockServiceImpl implements LockService {
+public class LockServiceImpl implements ILockService {
 
     @Autowired
     RedissonClient client;

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @date 2022/08/09
  **/
 @Component
-public class FeignInnerRequestInterceptor  implements RequestInterceptor {
+public class UcFeignInnerRequestInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {

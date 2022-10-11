@@ -8,7 +8,7 @@ import com.seeds.admin.dto.request.SysGameCommentsRepliesReq;
 import com.seeds.admin.dto.response.SysGameCommentsLikeOrBuryResp;
 import com.seeds.admin.dto.response.SysGameCommentsRepliesResp;
 import com.seeds.admin.dto.response.SysGameCommentsResp;
-import com.seeds.admin.feign.interceptor.FeignInnerRequestInterceptor;
+import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -25,7 +25,7 @@ import java.util.List;
  * @author hewei
  * @date 2022/8/26
  */
-@FeignClient(name = "remoteGamCommentsService", url = "${Seeds-admin}", path = "/internal-game-comments", configuration = {FeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteGamCommentsService", url = "${Seeds-admin}", path = "/internal-game-comments", configuration = {AdminFeignInnerRequestInterceptor.class})
 public interface RemoteGameCommentsService {
 
 	@PostMapping("page")

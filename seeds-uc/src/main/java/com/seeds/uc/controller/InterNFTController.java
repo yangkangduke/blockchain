@@ -4,6 +4,8 @@ package com.seeds.uc.controller;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
+import com.seeds.uc.dto.request.NFTBuyReq;
+import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.service.UcInterNFTService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,6 +41,28 @@ public class InterNFTController {
     @Inner
     public GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyCallbackReq buyReq) {
         ucInterNFTService.buyNFTCallback(buyReq);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  购买接口
+     */
+    @PostMapping("/buy")
+    @ApiOperation(value = "购买", notes = "购买")
+    @Inner
+    public GenericDto<Object> buyNFT(@Valid @RequestBody NFTBuyReq buyReq) {
+        ucInterNFTService.buyNFT(buyReq);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  出价接口
+     */
+    @PostMapping("/bids")
+    @ApiOperation(value = "出价", notes = "出价")
+    @Inner
+    public GenericDto<Object> bids(@Valid @RequestBody NFTMakeOfferReq req) {
+        ucInterNFTService.bids(req);
         return GenericDto.success(null);
     }
 

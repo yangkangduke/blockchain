@@ -1,5 +1,6 @@
 package com.seeds.uc.dto.request;
 
+import com.seeds.common.enums.RequestSource;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +29,10 @@ public class NFTBuyReq implements Serializable {
     @NotNull
     private Long nftId;
 
+    @ApiModelProperty("请求来源")
+    private RequestSource source = RequestSource.UC;
+
+    @ApiModelProperty("购买用户id")
+    private Long userId;
 
 }

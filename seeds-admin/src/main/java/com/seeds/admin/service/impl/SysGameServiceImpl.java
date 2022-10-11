@@ -112,8 +112,8 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     public void add(SysGameAddReq req) {
         Long gameAccessNo = sysSequenceNoService.generateGameAccessNo();
         SysGameEntity game = new SysGameEntity();
-        game.setAccessKey(RandomUtil.randomString(gameAccessNo.toString(), 8));
-        game.setSecretKey(HashUtil.MD5(RandomUtil.randomString(gameAccessNo.toString(), 8).toUpperCase()));
+        game.setAccessKey(RandomUtil.randomString(7) + gameAccessNo);
+        game.setSecretKey(gameAccessNo + HashUtil.MD5(RandomUtil.randomString(8).toUpperCase()));
         BeanUtils.copyProperties(req, game);
         save(game);
     }

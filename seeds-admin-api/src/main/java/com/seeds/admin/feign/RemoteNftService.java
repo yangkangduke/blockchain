@@ -1,18 +1,17 @@
 package com.seeds.admin.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.admin.dto.request.NftOwnerChangeReq;
-import com.seeds.admin.dto.request.SysNftPageReq;
-import com.seeds.admin.dto.request.UcSwitchReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.impl.RemoteNftServiceImpl;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.admin.feign.interceptor.FeignInnerRequestInterceptor;
+import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/8/19
  */
-@FeignClient(name = "remoteNftService", url = "${Seeds-admin}", fallback = RemoteNftServiceImpl.class, configuration = {FeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteNftService", url = "${Seeds-admin}", fallback = RemoteNftServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
 public interface RemoteNftService {
 
 	/**
@@ -85,5 +84,79 @@ public interface RemoteNftService {
 	@PostMapping("/internal-nft/uc-switch")
 	@ApiOperation("uc上架/下架")
 	GenericDto<Object> ucUpOrDown(@Valid @RequestBody UcSwitchReq req);
+
+	/**
+	 * NFT创建
+	 * @param image NFT图片
+	 * @param metaData NFT属性
+	 * @return NFT的唯一标识
+	 */
+	@PostMapping("/internal-nft/create")
+	@ApiOperation("NFT创建")
+	GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData);
+
+	/**
+	 * NFT修改
+	 * @param req NFT属性
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/modify")
+	@ApiOperation("NFT修改")
+	GenericDto<Object> modify(@Valid @RequestBody SysNftModifyReq req);
+
+	/**
+	 * NFT战绩更新
+	 * @param req NFT战绩记录
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/honor-modify")
+	@ApiOperation("NFT战绩更新")
+	GenericDto<Object> honorModify(@Valid @RequestBody List<SysNftHonorModifyReq> req);
+
+	/**
+	 * NFT升级
+	 * @param image NFT图片
+	 * @param data NFT升级属性
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/upgrade")
+	@ApiOperation("NFT升级")
+	GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data);
+
+	/**
+	 * NFT锁定
+	 * @param req NFT信息
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/lock")
+	@ApiOperation("NFT锁定")
+	GenericDto<Object> lock(SysNftLockReq req);
+
+	/**
+	 * NFT结算
+	 * @param req NFT对局记录
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/settlement")
+	@ApiOperation("NFT结算")
+	GenericDto<Object> settlement(SysNftSettlementReq req);
+
+	/**
+	 * NFT交易列表
+	 * @param req 分页查询条件
+	 * @return NFT信息
+	 */
+	@PostMapping("/internal-nft/trade-page")
+	@ApiOperation("NFT交易列表")
+	GenericDto<Page<SysNftResp>> tradePage(SysNftPageReq req);
+
+	/**
+	 * NFT交易详情
+	 * @param id NFT的id
+	 * @return 系统NFT信息
+	 */
+	@GetMapping("/internal-nft/trade-detail")
+	@ApiOperation("NFT交易详情")
+	GenericDto<SysNftDetailResp> tradeDetail(@RequestParam Long id);
 
 }

@@ -19,7 +19,7 @@ spring:
           filters:
             - Auth
         - id: seeds-admin-service
-          uri: http://Seeds-admin:10102
+          uri: ${service.url.admin}
           predicates:
             - Path=/admin/**
           filters:
@@ -40,6 +40,12 @@ spring:
             - Path=/notification/**
           filters:
             - Auth
+        - id: seeds-game-service
+          uri: ${service.url.game}
+          predicates:
+            - Path=/game/**
+          filters:
+            - OpenAuth
       globalcors:
         cors-configurations:
           '[/**]':

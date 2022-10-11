@@ -37,6 +37,7 @@ public enum UcErrorCodeEnum {
     ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT(18004, "账户余额不足", "Insufficient account balance"),
     ERR_18005_ACCOUNT_BUY_FAIL(18005, "购买NFT失败", "Failed to buy NFT"),
     ERR_18006_ACCOUNT_BUY_FAIL_INVALID_NFT_STATUS (18006, "购买NFT失败,无效的NFT状态", "Failed to buy NFT,Invalid NFT status"),
+    ERR_18007_ACCOUNT_BUY_FAIL_NFT_LOCKED (18007, "购买NFT失败,NFT已锁定", "Failed to buy NFT,NFT locked"),
 
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),

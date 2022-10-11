@@ -1,5 +1,6 @@
 package com.seeds.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import java.util.Objects;
  * @author milo
  */
 @Getter
-public enum Chain implements EnumWithCode {
+public enum Chain {
 
     /**
      * 以太坊 Ethereum
@@ -137,6 +138,7 @@ public enum Chain implements EnumWithCode {
     /**
      * chain name
      */
+    @EnumValue
     private String name;
 
     /**

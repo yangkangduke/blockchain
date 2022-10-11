@@ -55,7 +55,7 @@ zookeeper:
 service:
   url:
     uc: http://127.0.0.1:10101
-    admin: http://192.168.1.100:10102
+    admin: http://127.0.0.1:10102
     account: http://127.0.0.1:10103
     wallet: http://127.0.0.1:10104
     notification: http://127.0.0.1:10105

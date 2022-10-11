@@ -1,6 +1,9 @@
 package com.seeds.account.controller;
 
 import com.seeds.account.AccountConstants;
+import com.seeds.account.dto.WithdrawRequestDto;
+import com.seeds.account.dto.WithdrawResponseDto;
+import com.seeds.account.service.IAccountService;
 import com.seeds.account.service.IChainDepositService;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
@@ -12,10 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @program: seeds-java
@@ -31,6 +31,8 @@ public class AccountController {
 
     @Autowired
     IChainDepositService chainDepositService;
+    @Autowired
+    IAccountService accountService;
 
     /**
      * 获取充币地址
@@ -60,5 +62,25 @@ public class AccountController {
         log.debug("currentUserId={}", currentUserId);
         Assert.isTrue(currentUserId >= AccountConstants.getClientUserId(), "invalid user");
         return currentUserId;
+    }
+
+
+    /**
+     * 提币
+     *
+     * @param withdrawRequestDto
+     * @return
+     */
+    @PostMapping("/withdraw")
+    @ApiOperation("提交提币请求")
+    public GenericDto<WithdrawResponseDto> withdraw(@RequestBody WithdrawRequestDto withdrawRequestDto) {
+        try {
+            long userId = getUserId();
+            WithdrawResponseDto withdrawResponseDto = accountService.withdraw(userId, withdrawRequestDto);
+            return GenericDto.success(withdrawResponseDto);
+        } catch (Exception e) {
+            log.error("withdraw", e);
+            return Utils.returnFromException(e);
+        }
     }
 }

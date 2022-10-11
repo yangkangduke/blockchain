@@ -42,6 +42,10 @@ public class Utils {
         return result;
     }
 
+    public static void throwError(ErrorCode errorCode) {
+        throw new AccountException(errorCode);
+    }
+
     private static <T> GenericDto<T> returnFromException0(Throwable t) {
         if (t instanceof IllegalArgumentException) {
             return GenericDto.<T>failure(ErrorCode.ACCOUNT_VALIDATION_ERROR.getCode(), t.getMessage() != null ? t.getMessage() : t.getClass().getSimpleName());
@@ -68,6 +72,12 @@ public class Utils {
     public static void check(boolean expression, ErrorCode errorCode) {
         if (!expression) {
             throw new AccountException(errorCode);
+        }
+    }
+
+    public static void check(boolean expression, String errorMessage) {
+        if (!expression) {
+            throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, errorMessage);
         }
     }
 

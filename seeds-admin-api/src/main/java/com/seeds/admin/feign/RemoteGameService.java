@@ -6,7 +6,7 @@ import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.dto.response.SysGameTypeResp;
 import com.seeds.admin.feign.impl.RemoteGameServiceImpl;
-import com.seeds.admin.feign.interceptor.FeignInnerRequestInterceptor;
+import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -22,7 +22,7 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/8/22
  */
-@FeignClient(name = "remoteGameService", url = "${Seeds-admin}", fallback = RemoteGameServiceImpl.class, configuration = {FeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteGameService", url = "${Seeds-admin}", fallback = RemoteGameServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
 public interface RemoteGameService {
 
 	/**
@@ -67,5 +67,14 @@ public interface RemoteGameService {
 	@GetMapping("/internal-game-type/uc-dropdown")
 	@ApiOperation("uc查询游戏类别列表")
 	GenericDto<List<SysGameTypeResp>> ucTypeDropdown();
+
+	/**
+	 * 查询游戏秘钥
+	 * @param accessKey 游戏的访问键
+	 * @return 系统游戏秘钥
+	 */
+	@GetMapping("/internal-game/secret-key")
+	@ApiOperation("查询游戏秘钥")
+	GenericDto<String> querySecretKey(@RequestParam String accessKey);
 
 }

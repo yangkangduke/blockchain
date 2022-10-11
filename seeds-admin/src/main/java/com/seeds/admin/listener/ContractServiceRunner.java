@@ -47,7 +47,7 @@ public class ContractServiceRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        uploadProAuth();
+        //uploadProAuth();
         log.info("This will be execute when the project was started!");
     }
 

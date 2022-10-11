@@ -1,6 +1,7 @@
 package com.seeds.game.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
+import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.dto.LoginDTO;
 import com.seeds.common.constant.redis.RedisKeys;
@@ -20,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.ServletRequest;
@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 
 @Slf4j
-@Component
 public class OpenContextInterceptor implements HandlerInterceptor {
 
     /**
@@ -54,12 +53,12 @@ public class OpenContextInterceptor implements HandlerInterceptor {
     @Autowired
     private RedissonClient redissonClient;
 
-    //@Autowired
-    //private SysGameService sysGameService;
+    @Autowired
+    private RemoteGameService remoteGameService;
 
     private static final GenericDto<String> INVALID_TOKEN_RESPONSE = GenericDto.failure("Invalid token", 401);
     private static final GenericDto<String> INVALID_SIGNATURE_RESPONSE = GenericDto.failure("Invalid signature", 401);
-    private static final String NO_LOGIN_REQUIRED_PATH = "/open-api/";
+    private static final String NO_LOGIN_REQUIRED_PATH = "/public/";
     private static final String GET_METHOD = "GET";
     private static final String POST_METHOD = "POST";
 
@@ -92,6 +91,7 @@ public class OpenContextInterceptor implements HandlerInterceptor {
         }
         try {
             UserContext.setCurrentUserId(user.getUserId());
+            UserContext.setCurrentUserName(user.getLoginName());
             return true;
         } catch (Exception e) {
             log.error("Got invalid user id from header: {}", user.getUserId());
@@ -155,7 +155,7 @@ public class OpenContextInterceptor implements HandlerInterceptor {
         String secretKey = cache.get(accessKey);
         if (StringUtils.isBlank(secretKey)) {
             // 从DB中查询
-            //secretKey = sysGameService.querySecretKey(accessKey);
+            secretKey = remoteGameService.querySecretKey(accessKey).getData();
             // 放入缓存
             cache.put(accessKey, secretKey);
         }

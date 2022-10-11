@@ -47,6 +47,13 @@ public enum AdminErrorCodeEnum {
     ERR_40004_NFT_ALREADY_EXIST(40004, "NFT已存在", "NFT already exist"),
     ERR_40005_NFT_PROPERTIES_TYPE_ALREADY_EXIST(40005, "NFT属性类别已存在", "NFT properties type already exist"),
     ERR_40006_NFT_ON_SALE_CAN_NOT_BE_MODIFIED(40006, "NFT在售不能修改", "NFT is on sale and cannot be modified"),
+    ERR_40007_NFT_LOCKED_CAN_NOT_BE_MODIFIED(40007, "NFT已锁定不能修改", "NFT is locked and cannot be modified"),
+    ERR_40008_NFT_ON_SALE_CAN_NOT_LOCKED(40008, "NFT在售不能锁定", "NFT is on sale and cannot be locked"),
+    ERR_40009_INSUFFICIENT_DURABILITY_VALUE_OF_NFT(40009, "NFT耐久不足", "Insufficient durability value of NFT"),
+    ERR_40010_DUPLICATE_OR_MISSING_BASE_ATTRIBUTES_OF_NFT(40010, "NFT基础属性重复或缺失", "Duplicate or missing base attributes of NFT, type id:{%s}"),
+    ERR_40011_NFT_PROPERTY_VALUE_IS_NOT_IN_THE_CORRECT_FORMAT(40011, "NFT属性值格式不正确", "NFT property value is not in the correct format, type id:{%s}"),
+    ERR_40012_NFT_ATTRIBUTED_PERSON_MISMATCH(40012, "NFT归属人不匹配", "NFT attributed person mismatch"),
+
 
     // merchant
     ERR_50001_MERCHANT_ALREADY_EXIST(50001, "商家已存在", "Merchant already exist"),

@@ -2,4 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seeds.account.mapper.ChainBlockMapper">
 
+    <select id="getLatestBlock" resultType="com.seeds.account.model.ChainBlock">
+        select *
+        from chain_block
+        where status = 1 and chain = #{chain.code,jdbcType=TINYINT}
+        order by id desc
+            limit 1
+    </select>
+
+    <update id="rollbackBlock">
+        update chain_block
+        set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
+            version     = version + 1,
+            status      = #{status,jdbcType=TINYINT}
+        where block_number = #{blockNumber,jdbcType=BIGINT}
+          and block_hash = #{blockHash,jdbcType=VARCHAR}
+          and chain = #{chain.code,jdbcType=TINYINT}
+    </update>
 </mapper>

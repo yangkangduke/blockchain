@@ -61,4 +61,11 @@ public class InterGameController {
         return GenericDto.success(null);
     }
 
+    @GetMapping("secret-key")
+    @ApiOperation("查询游戏秘钥")
+    @Inner
+    public GenericDto<String> querySecretKey(@RequestParam String accessKey) {
+        return GenericDto.success(sysGameService.querySecretKey(accessKey));
+    }
+
 }

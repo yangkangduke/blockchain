@@ -119,7 +119,7 @@ public class SysGameEntity extends BaseEntity {
 	/**
 	 * 评分
 	 */
-	@TableField("rank")
+	@TableField("`rank`")
 	private BigDecimal rank;
 
 	/**
