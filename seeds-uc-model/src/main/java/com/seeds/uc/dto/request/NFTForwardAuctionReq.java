@@ -13,34 +13,38 @@ import java.math.BigDecimal;
 
 /**
  * <p>
- * NFT出价入参
+ * NFT正向拍卖入参
  * </p>
  *
  * @author hang.yu
- * @since 2022-09-05
+ * @since 2022-10-11
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NFTMakeOfferReq implements Serializable {
+public class NFTForwardAuctionReq implements Serializable {
 
     @ApiModelProperty("admin中的NFT的id")
     @NotNull
     private Long nftId;
 
-    @ApiModelProperty("价格")
+    @ApiModelProperty("拍卖的初始最低价格")
     @NotNull
     private BigDecimal price;
 
-    @ApiModelProperty("单位")
+    @ApiModelProperty("一口价")
+    @NotNull
+    private BigDecimal maxPrice;
+
+    @ApiModelProperty("价格单位")
     @NotNull
     private CurrencyEnum currency;
 
-    @ApiModelProperty("过期时间")
-    private Long expireTime;
+    @ApiModelProperty("结算时间")
+    private Long settlementTime;
 
-    @ApiModelProperty("出价用户id")
+    @ApiModelProperty("拥有NFT的用户id")
     private Long userId;
 
 }

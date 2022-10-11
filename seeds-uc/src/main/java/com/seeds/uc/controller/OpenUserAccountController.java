@@ -9,6 +9,7 @@ import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.response.AccountActionResp;
+import com.seeds.uc.dto.response.UcUserAccountAmountResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.model.UcUserAccount;
 import com.seeds.uc.service.IUcUserAccountService;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -69,10 +71,15 @@ public class OpenUserAccountController {
         return GenericDto.success(ucUserAccountService.getInfo());
     }
 
-
     @GetMapping("/info")
     @ApiOperation(value = "账户详情", notes = "账户详情")
     public GenericDto<UcUserAccountInfoResp> info() {
         return GenericDto.success(ucUserAccountService.getInfo());
+    }
+
+    @GetMapping("/amount-info")
+    @ApiOperation(value = "账户金额详情", notes = "账户金额详情")
+    public GenericDto<List<UcUserAccountAmountResp>> amountInfo() {
+        return GenericDto.success(ucUserAccountService.amountInfo(UserContext.getCurrentUserId()));
     }
 }

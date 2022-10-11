@@ -19,18 +19,23 @@ import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
+import com.seeds.uc.service.IUsUserLoginLogService;
 import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.util.CryptoUtils;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
+import com.seeds.uc.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.web3j.crypto.WalletUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +63,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     private IGoogleAuthService googleAuthService;
     @Autowired
     private SendCodeService sendCodeService;
-
+    @Autowired
+    private IUsUserLoginLogService userLoginLogService;
 
     /**
      * 注册邮箱账号
@@ -498,6 +504,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String refreshToken = RandomUtil.genRandomToken(ucToken);
         // 将refresh token存入redis
         cacheService.putUserRefreshToken(refreshToken, userId, email);
+
+        // 登录成功，记录日志
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String realClientIp = WebUtil.getIpAddr(request);
+        userLoginLogService.recordLog(userId, email, realClientIp);
 
         return LoginResp.builder()
                 .ucToken(ucToken)
