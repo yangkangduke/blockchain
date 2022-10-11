@@ -192,7 +192,17 @@ public class ETHChainServiceProvider extends ChainBasicService implements IChain
 
     @Override
     public NativeChainBlockDto getChainNativeBlock(Chain chain, Long blockNumber) throws Exception {
-        return null;
+        EthBlock ethBlock = web3.readCli().ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), true).send();
+        if (ethBlock == null || ethBlock.getBlock() == null) {
+            return null;
+        }
+        EthBlock.Block block = ethBlock.getBlock();
+        NativeChainBlockDto blockDto = new NativeChainBlockDto();
+        blockDto.setBlockTime(block.getTimestamp().longValue());
+        blockDto.setBlockNumber(block.getNumber().longValue());
+        blockDto.setBlockHash(block.getHash());
+        blockDto.setParentHash(block.getParentHash());
+        return blockDto;
     }
 
     @Override
