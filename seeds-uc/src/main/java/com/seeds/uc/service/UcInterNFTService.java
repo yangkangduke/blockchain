@@ -1,9 +1,6 @@
 package com.seeds.uc.service;
 
-import com.seeds.uc.dto.request.NFTBuyCallbackReq;
-import com.seeds.uc.dto.request.NFTBuyReq;
-import com.seeds.uc.dto.request.NFTForwardAuctionReq;
-import com.seeds.uc.dto.request.NFTMakeOfferReq;
+import com.seeds.uc.dto.request.*;
 
 
 /**
@@ -33,6 +30,12 @@ public interface UcInterNFTService {
      * @param req 入参
      */
     void forwardAuction(NFTForwardAuctionReq req);
+
+    /**
+     * 反向拍卖
+     * @param req 入参
+     */
+    void reverseAuction(NFTReverseAuctionReq req);
 
     /**
      * 出价

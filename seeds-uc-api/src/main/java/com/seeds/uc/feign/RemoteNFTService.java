@@ -3,10 +3,7 @@ package com.seeds.uc.feign;
 
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.uc.dto.request.NFTBuyCallbackReq;
-import com.seeds.uc.dto.request.NFTBuyReq;
-import com.seeds.uc.dto.request.NFTForwardAuctionReq;
-import com.seeds.uc.dto.request.NFTMakeOfferReq;
+import com.seeds.uc.dto.request.*;
 import com.seeds.uc.feign.interceptor.UcFeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -34,6 +31,10 @@ public interface RemoteNFTService {
 	@PostMapping("/internal-nft/forward-auction")
 	@ApiOperation(value = "正向拍卖", notes = "正向拍卖")
 	GenericDto<Object> forwardAuction(NFTForwardAuctionReq req);
+
+	@PostMapping("/internal-nft/reverse-auction")
+	@ApiOperation(value = "反向拍卖", notes = "反向拍卖")
+	GenericDto<Object> reverseAuction(NFTReverseAuctionReq req);
 
 	@PostMapping("/internal-nft/bids")
 	@ApiOperation(value = "出价", notes = "出价")

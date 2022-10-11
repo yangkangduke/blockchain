@@ -8,10 +8,7 @@ import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.game.dto.request.OpenNftBidsReq;
-import com.seeds.game.dto.request.OpenNftBuyReq;
-import com.seeds.game.dto.request.OpenNftForwardAuctionReq;
-import com.seeds.game.dto.request.OpenNftLockReq;
+import com.seeds.game.dto.request.*;
 import com.seeds.uc.feign.RemoteNFTService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -76,6 +73,13 @@ public class OpenNftController {
     public GenericDto<Object> forwardAuction(@Valid @RequestBody OpenNftForwardAuctionReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return remoteNFTService.forwardAuction(req);
+    }
+
+    @PostMapping("reverse-auction")
+    @ApiOperation("NFT反向拍卖")
+    public GenericDto<Object> reverseAuction(@Valid @RequestBody OpenNftReverseAuctionReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return remoteNFTService.reverseAuction(req);
     }
 
     @PostMapping("bids")
