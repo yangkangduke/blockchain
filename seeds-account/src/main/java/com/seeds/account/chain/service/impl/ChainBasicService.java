@@ -6,6 +6,7 @@ import com.seeds.account.dto.*;
 import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.ex.AccountException;
 import com.seeds.account.service.ISystemConfigService;
+import com.seeds.account.service.ISystemWalletAddressService;
 import com.seeds.account.util.AddressUtils;
 import com.seeds.account.util.JsonUtils;
 import com.seeds.common.dto.GenericDto;
@@ -50,8 +51,8 @@ public abstract class ChainBasicService implements IChainService {
     WalletFeignClient walletFeignClient;
 //    @Autowired
 //    ChainContractService chainContractService;
-//    @Autowired
-//    SystemWalletAddressService systemWalletAddressService;
+    @Autowired
+    private ISystemWalletAddressService systemWalletAddressService;
 
     private GenericDto<String> createAccount(Chain chain) {
         // 2021-04-28 milo 统一添加 chain

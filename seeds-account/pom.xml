@@ -50,6 +50,11 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/jar/core-0.2.1.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-all</artifactId>
+            <version>1.31.0</version>
+        </dependency>
 
         <dependency>
             <groupId>com.seeds</groupId>

@@ -14,8 +14,10 @@ import com.seeds.account.dto.*;
 import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.enums.WalletAddressType;
 import com.seeds.account.ex.AccountException;
+import com.seeds.account.service.IChainContractService;
 import com.seeds.account.service.IChainDepositService;
 import com.seeds.account.service.ISystemConfigService;
+import com.seeds.account.service.ISystemWalletAddressService;
 import com.seeds.account.util.AddressUtils;
 import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
@@ -76,21 +78,19 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
 
     @Autowired
     IChainProviderService chainProviderService;
-
     @Autowired
     TRONGridClient tronClient;
-
     @Autowired
     IChainDepositService chainDepositService;
-
     @Autowired
     ISystemConfigService systemConfigService;
-
     @Autowired
     WalletFeignClient walletFeignClient;
-
     @Autowired
     TRONChainConverter converter;
+    @Autowired
+    IChainContractService chainContractService;
+
 
     private final TransferFunctionDecoder DEFAULT_DECODER = new TransferFunctionDecoder();
     private static final DefaultFunctionEncoder DEFAULT_ENCODER = new DefaultFunctionEncoder();
@@ -213,10 +213,200 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
 
     @Override
     public List<NativeChainTransactionDto> getTransactions(Chain chain, Chain defiChain, Long blockNumber, List<String> addresses) throws Exception {
-        return null;
+        try {
+            return getTransactions0(tronClient.cli(), chain, defiChain, blockNumber, addresses);
+        } catch (IllegalException e) {
+            if (DEFAULT_ILLEGAL_EXCEPTION_MSG.equals(e.getMessage())) {
+                log.warn("getTransactions exception: {}", e.getMessage(), e);
+                return null;
+            } else {
+                throw e;
+            }
+        }
     }
 
+    private List<NativeChainTransactionDto> getTransactions0(ApiWrapper cli, Chain chain, Chain defiChain, Long blockNumber, List<String> addresses) throws Exception {
+        List<NativeChainTransactionDto> ethereumTransactions = Lists.newArrayList();
 
+        String defiContractAddress = getSystemWalletAddressService().getOne(chain, WalletAddressType.DEFI_DEPOSIT_WITHDRAW_CONTRACT);
+
+        Response.BlockExtention block = tronClient.cli().getBlockByLimitNext(blockNumber, blockNumber + 1).getBlock(0);
+        List<Response.TransactionExtention> transactionResults = block.getTransactionsList();
+        transactionResults.forEach(transactionObject -> {
+            org.tron.trident.proto.Chain.Transaction.Contract contract = transactionObject.getTransaction().getRawData().getContract(0);
+            if (contract.getType().equals(org.tron.trident.proto.Chain.Transaction.Contract.ContractType.TransferContract)
+                    && transactionObject.getTransaction().getRet(0).getRet() == org.tron.trident.proto.Chain.Transaction.Result.code.SUCESS
+                    && transactionObject.getTransaction().getRet(0).getContractRet().equals(org.tron.trident.proto.Chain.Transaction.Result.contractResult.SUCCESS)) {
+                // TRX 转账 且 成功的
+                String toAddress = null;
+                String fromAddress = null;
+                org.tron.trident.proto.Contract.TransferContract transferContract = null;
+                try {
+                    transferContract = contract.getParameter().unpack(org.tron.trident.proto.Contract.TransferContract.class);
+                    toAddress = Base58Check.bytesToBase58(transferContract.getToAddress().toByteArray());
+                    fromAddress = Base58Check.bytesToBase58(transferContract.getOwnerAddress().toByteArray());
+                } catch (InvalidProtocolBufferException e) {
+                    log.error("decode toAddress error: {}", e.getMessage(), e);
+                    // 如果报错就不处理
+                    return;
+                }
+
+                if (containsAddress(addresses, toAddress)) {
+                    // 是用户的地址充币
+                    String currency = currentChain.getNativeToken();
+                    int decimals = currentChain.getDecimals();
+
+                    long blockTime = block.getBlockHeader().getRawData().getTimestamp() / 1000;
+                    String blockHash = ApiWrapper.toHex(block.getBlockid());
+
+                    // sun
+                    BigInteger value = BigInteger.valueOf(transferContract.getAmount());
+                    // amount
+                    BigDecimal amount = unscaleAmountByDecimal(value, decimals);
+                    // 不解析手续费
+                    BigDecimal txFee = BigDecimal.ZERO;
+
+                    NativeChainTransactionDto nativeChainTransactionDto = NativeChainTransactionDto.builder()
+                            .chain(chain)
+                            .blockNumber(blockNumber)
+                            .blockHash(blockHash)
+                            .txHash(ApiWrapper.toHex(transactionObject.getTxid()))
+                            .txTime(blockTime)
+                            .fromAddress(fromAddress)
+                            .toAddress(toAddress)
+                            .currency(currency)
+                            .amount(amount)
+                            .txFee(txFee)
+                            .build();
+                    ethereumTransactions.add(nativeChainTransactionDto);
+                }
+
+            } else if (contract.getType().equals(org.tron.trident.proto.Chain.Transaction.Contract.ContractType.TriggerSmartContract)
+                    && transactionObject.getTransaction().getRet(0).getRet() == org.tron.trident.proto.Chain.Transaction.Result.code.SUCESS
+                    && transactionObject.getTransaction().getRet(0).getContractRet().equals(org.tron.trident.proto.Chain.Transaction.Result.contractResult.SUCCESS)) {
+
+                // 触发智能合约， TRC-20转账？
+                String contractAddress;
+                String fromAddress;
+                org.tron.trident.proto.Contract.TriggerSmartContract triggerSmartContract;
+                try {
+                    triggerSmartContract = contract.getParameter().unpack(org.tron.trident.proto.Contract.TriggerSmartContract.class);
+                    contractAddress = Base58Check.bytesToBase58(triggerSmartContract.getContractAddress().toByteArray());
+                    fromAddress = Base58Check.bytesToBase58(triggerSmartContract.getOwnerAddress().toByteArray());
+                } catch (InvalidProtocolBufferException e) {
+                    log.error("decode toAddress error: {}", e.getMessage(), e);
+                    // 如果报错就不处理
+                    return;
+                }
+
+                chainContractService.getAll().forEach(contractConfigDto -> {
+                    if (contractConfigDto.getChain() == chain.getCode() && ObjectUtils.isAddressEquals(contractConfigDto.getAddress(), contractAddress)) {
+                        decodeContractTransaction(chain, defiChain, defiContractAddress,
+                                contractConfigDto, addresses, ethereumTransactions, block, transactionObject, triggerSmartContract);
+                    }
+                });
+            }
+        });
+
+        return ethereumTransactions;
+    }
+
+    private void decodeContractTransaction(Chain chain, Chain defiChain, String defiContractAddress, ChainContractDto contractConfigDto, List<String> addresses, List<NativeChainTransactionDto> ethereumTransactions, Response.BlockExtention block, Response.TransactionExtention transactionObject, org.tron.trident.proto.Contract.TriggerSmartContract triggerSmartContract) {
+        ContractTransferParamsDto params = decodeInputAsTransfer(ApiWrapper.toHex(triggerSmartContract.getData()));
+        if (params == null) {
+            return;
+        }
+        // 判断充币地址是否为交易所分配给用户的充币地址
+        if (containsAddress(addresses, params.getToAddress())) {
+            NativeChainTransactionDto nativeChainTransactionDto
+                    = decodeContractTransaction0(chain, defiChain, defiContractAddress, contractConfigDto, addresses, ethereumTransactions, block, transactionObject, params, triggerSmartContract);
+            if (nativeChainTransactionDto != null) {
+                nativeChainTransactionDto.setChain(chain);
+                ethereumTransactions.add(nativeChainTransactionDto);
+            }
+        }
+        // 如果是defi充币（此处并不判断fromAddress是否是交易所中已经绑定用户Id的用户，留给后面的业务处理）
+        else if (defiChain != null && ObjectUtils.isAddressEquals(defiContractAddress, params.getToAddress())) {
+            NativeChainTransactionDto nativeChainTransactionDto =
+                    decodeContractTransaction0(chain, defiChain, defiContractAddress, contractConfigDto, addresses, ethereumTransactions, block, transactionObject, params, triggerSmartContract);
+            if (nativeChainTransactionDto != null) {
+                nativeChainTransactionDto.setChain(defiChain);
+                ethereumTransactions.add(nativeChainTransactionDto);
+            }
+        }
+    }
+
+    private NativeChainTransactionDto decodeContractTransaction0(Chain chain, Chain defiChain, String defiContractAddress,
+                                                                 ChainContractDto contractConfigDto, List<String> addresses,
+                                                                 List<NativeChainTransactionDto> ethereumTransactions,
+                                                                 Response.BlockExtention block, Response.TransactionExtention transactionObject, ContractTransferParamsDto params,
+                                                                 org.tron.trident.proto.Contract.TriggerSmartContract triggerSmartContract) {
+        // block number
+        long blockNumber = block.getBlockHeader().getRawData().getNumber();
+        // block hash
+        String blockHash = ApiWrapper.toHex(block.getBlockid());
+        // transaction hash
+        String txHash = ApiWrapper.toHex(transactionObject.getTxid());
+
+        log.info("decodeContractTransaction contractConfigDto={} params={} input={} value={} blockNumber={} blockHash={} txHash={} from={}",
+                contractConfigDto, params, transactionObject.getTransaction().getRawData().getData().toStringUtf8(), "dummy", blockNumber, blockHash, txHash, "dummy");
+
+        String currency = contractConfigDto.getCurrency();
+        int decimals = contractConfigDto.getDecimals();
+        long blockTime = block.getBlockHeader().getRawData().getTimestamp() / 1000;
+
+        // from address
+        String fromAddress = Base58Check.bytesToBase58(triggerSmartContract.getOwnerAddress().toByteArray());
+        // to address
+        String toAddress = params.getToAddress();
+        // the token amount to transfer
+        BigDecimal amount = unscaleAmountByDecimal(params.getValue(), decimals);
+        // 不解析手续费
+        BigDecimal txFee = BigDecimal.ZERO;
+        NativeChainTransactionDto nativeChainTransactionDto = NativeChainTransactionDto.builder()
+                .blockNumber(blockNumber).blockHash(blockHash).txHash(txHash).txTime(blockTime).fromAddress(fromAddress).toAddress(toAddress).currency(currency).amount(amount).txFee(txFee).build();
+        return nativeChainTransactionDto;
+    }
+
+    private ContractTransferParamsDto decodeInputAsTransfer(String input) {
+        if (input != null && (input.length() == 136 || input.length() == 200)) {
+            try {
+                String methodId = input.substring(0, 8);
+                // transfer(address to, uint256 value)
+                if (Objects.equals("a9059cbb", methodId)) {
+                    String to = input.substring(8, 72);
+                    String value = input.substring(72, 136);
+                    Address toAddress = (Address) DEFAULT_DECODER.getDecoderMethod().invoke(null, to, 0, Address.class);
+                    Uint256 amount = (Uint256) DEFAULT_DECODER.getDecoderMethod().invoke(null, value, 0, Uint256.class);
+
+                    ContractTransferParamsDto paramsDto = new ContractTransferParamsDto();
+                    paramsDto.setMethodId(methodId);
+                    paramsDto.setToAddress(toAddress.getValue());
+                    paramsDto.setValue(amount.getValue());
+                    return paramsDto;
+                }
+                // transferFrom(address from, address to, uint256 value)
+                else if (Objects.equals("23b872dd", methodId)) {
+                    String from = input.substring(8, 72);
+                    String to = input.substring(72, 136);
+                    String value = input.substring(136, 200);
+                    Address fromAddress = (Address) DEFAULT_DECODER.getDecoderMethod().invoke(null, from, 0, Address.class);
+                    Address toAddress = (Address) DEFAULT_DECODER.getDecoderMethod().invoke(null, to, 0, Address.class);
+                    Uint256 amount = (Uint256) DEFAULT_DECODER.getDecoderMethod().invoke(null, value, 0, Uint256.class);
+
+                    ContractTransferParamsDto paramsDto = new ContractTransferParamsDto();
+                    paramsDto.setMethodId(methodId);
+                    paramsDto.setFromAddress(fromAddress.getValue());
+                    paramsDto.setToAddress(toAddress.getValue());
+                    paramsDto.setValue(amount.getValue());
+                    return paramsDto;
+                }
+            } catch (Exception e) {
+                log.error("failed to decodeInputAsTransfer input={}", input);
+            }
+        }
+        return null;
+    }
 
     private boolean containsAddress(List<String> addresses, String address) {
         return addresses.stream().anyMatch(e -> e.equalsIgnoreCase(address));

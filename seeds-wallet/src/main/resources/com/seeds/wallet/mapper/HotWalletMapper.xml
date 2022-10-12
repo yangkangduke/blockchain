@@ -3,47 +3,47 @@
 <mapper namespace="com.seeds.wallet.mapper.HotWalletMapper">
 
   <resultMap id="BaseResultMap" type="com.seeds.wallet.model.HotWallet">
-    <id column="f_id" jdbcType="BIGINT" property="id" />
-    <result column="f_chain" jdbcType="TINYINT" property="chain" />
-    <result column="f_address" jdbcType="VARCHAR" property="address" />
-    <result column="f_file_json" jdbcType="VARCHAR" property="fileJson" />
-    <result column="f_created_at" jdbcType="BIGINT" property="createdAt" />
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="chain" jdbcType="TINYINT" property="chain" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="file_json" jdbcType="VARCHAR" property="fileJson" />
+    <result column="created_at" jdbcType="BIGINT" property="createdAt" />
   </resultMap>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from t_hot_wallet
-    where f_id = #{id,jdbcType=BIGINT}
+    delete from hot_wallet
+    where id = #{id,jdbcType=BIGINT}
   </delete>
 
   <insert id="insert" parameterType="com.seeds.wallet.model.HotWallet" useGeneratedKeys="true" keyProperty="id">
-    insert into t_hot_wallet (f_id, f_chain, f_address, f_file_json,  f_created_at)
+    insert into hot_wallet (id, chain, address, file_json,  created_at)
     values (#{id,jdbcType=BIGINT}, #{chain,jdbcType=TINYINT}, #{address,jdbcType=VARCHAR}, #{fileJson,jdbcType=VARCHAR}, #{createdAt,jdbcType=BIGINT})
   </insert>
 
   <update id="updateByPrimaryKey" parameterType="com.seeds.wallet.model.HotWallet">
-    update t_hot_wallet
-    set f_chain = #{chain,jdbcType=TINYINT},
-        f_address = #{address,jdbcType=VARCHAR},
-        f_file_json = #{fileJson,jdbcType=VARCHAR},
-        f_created_at = #{createdAt,jdbcType=BIGINT}
-    where f_id = #{id,jdbcType=BIGINT}
+    update hot_wallet
+    set chain = #{chain,jdbcType=TINYINT},
+        address = #{address,jdbcType=VARCHAR},
+        file_json = #{fileJson,jdbcType=VARCHAR},
+        created_at = #{createdAt,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select *
-    from t_hot_wallet
-    where f_id = #{id,jdbcType=BIGINT}
+    from hot_wallet
+    where id = #{id,jdbcType=BIGINT}
   </select>
 
   <select id="selectAll" resultMap="BaseResultMap">
     select *
-    from t_hot_wallet
-    order by f_id
+    from hot_wallet
+    order by id
   </select>
 
   <select id="selectByAddress" resultMap="BaseResultMap">
     select *
-    from t_hot_wallet
-    where f_chain = #{chain,jdbcType=TINYINT} and f_address = #{address,jdbcType=VARCHAR}
+    from hot_wallet
+    where chain = #{chain,jdbcType=TINYINT} and address = #{address,jdbcType=VARCHAR}
   </select>
 </mapper>
