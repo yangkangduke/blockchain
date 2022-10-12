@@ -40,7 +40,11 @@ public class OpenNftController {
 
     @PostMapping("create")
     @ApiOperation("NFT创建")
-    public GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData) {
+    public GenericDto<Long> create(@RequestPart("image") MultipartFile image,
+                                   @RequestParam String metaData,
+                                   @RequestParam String accessKey,
+                                   @RequestParam String signature,
+                                   @RequestParam Long timestamp) {
         SysNftAddReq req = JSONUtil.toBean(metaData, SysNftAddReq.class);
         req.setOwnerId(UserContext.getCurrentUserId());
         req.setOwnerName(UserContext.getCurrentUserName());
@@ -50,7 +54,11 @@ public class OpenNftController {
 
     @PostMapping("upgrade")
     @ApiOperation("NFT升级")
-    public GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data) {
+    public GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image,
+                                    @RequestParam String data,
+                                    @RequestParam String accessKey,
+                                    @RequestParam String signature,
+                                    @RequestParam Long timestamp) {
         SysNftUpgradeReq req = JSONUtil.toBean(data, SysNftUpgradeReq.class);
         req.setUserId(UserContext.getCurrentUserId());
         return remoteNftService.upgrade(image, JSONUtil.toJsonStr(req));

@@ -10,6 +10,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -91,7 +92,7 @@ public interface RemoteNftService {
 	 * @param metaData NFT属性
 	 * @return NFT的唯一标识
 	 */
-	@PostMapping("/internal-nft/create")
+	@PostMapping(value = "/internal-nft/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ApiOperation("NFT创建")
 	GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData);
 
@@ -119,7 +120,7 @@ public interface RemoteNftService {
 	 * @param data NFT升级属性
 	 * @return 响应结果
 	 */
-	@PostMapping("/internal-nft/upgrade")
+	@PostMapping(value = "/internal-nft/upgrade", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ApiOperation("NFT升级")
 	GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data);
 

@@ -3,13 +3,13 @@ package com.seeds.game.interceptor;
 import com.alibaba.fastjson.JSONObject;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.dto.LoginDTO;
 import com.seeds.common.constant.redis.RedisKeys;
 import com.seeds.common.web.HttpHeaders;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.common.web.util.HttpHelper;
 import com.seeds.common.web.util.SignatureUtils;
 import com.seeds.common.web.wrapper.BodyReaderHttpServletRequestWrapper;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.groovy.util.concurrent.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
@@ -84,7 +84,7 @@ public class OpenContextInterceptor implements HandlerInterceptor {
             writeFailureResponse(response, INVALID_TOKEN_RESPONSE);
             return false;
         }
-        LoginDTO user = redissonClient.<LoginDTO>getBucket(RedisKeys.getUcTokenKey(token)).get();
+        LoginUserDTO user = redissonClient.<LoginUserDTO>getBucket(RedisKeys.getUcTokenKey(token)).get();
         if (user == null || user.getUserId() == null) {
             writeFailureResponse(response, INVALID_TOKEN_RESPONSE);
             return false;
@@ -126,7 +126,9 @@ public class OpenContextInterceptor implements HandlerInterceptor {
             String body = HttpHelper.getBodyString(requestWrapper);
             String bodyString = URLDecoder.decode(body, "utf-8");
             if (StringUtils.isEmpty(bodyString)) {
-                return false;
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.putAll(HttpHelper.getAllRequestParam(request));
+                return SignatureUtils.validation(jsonObject, times, getSecretKey(jsonObject));
             }
             // 解析参数转JSON格式
             JSONObject jsonObject = JSONObject.parseObject(bodyString);
