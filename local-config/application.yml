@@ -50,7 +50,7 @@ login:
   twofa: true
 
 zookeeper:
-  address: 192.168.10.101:2181
+  address: 127.0.0.1:2181
 
 service:
   url:
