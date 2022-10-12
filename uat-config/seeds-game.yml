@@ -27,3 +27,16 @@ springfox:
   documentation:
     swagger-ui:
       enabled: true
+feign:
+  hystrix:
+    enabled: true
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+
+Seeds-uc: http://127.0.0.1:10101
+Seeds-admin: http://127.0.0.1:10102
