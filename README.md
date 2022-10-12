@@ -4,9 +4,9 @@
 1.准备mysql数据库和数据
 2.准备redis数据库
 3.将本地hosts文件中添加
-13.115.129.100 Seeds-redis
-13.115.129.100 Seeds-mysql
-13.115.129.100 Seeds-config
+35.76.116.54 Seeds-redis
+35.76.116.54 Seeds-mysql
+35.76.116.54 Seeds-config
 注意改成自己的ip
 
 3.首先依次启动seeds-config项目、seeds-gateway
