@@ -3,6 +3,8 @@ package com.seeds.account.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.seeds.account.model.DepositRule;
 
+import java.util.List;
+
 /**
  * <p>
  * 充提规则 Mapper 接口
@@ -13,4 +15,5 @@ import com.seeds.account.model.DepositRule;
  */
 public interface DepositRuleMapper extends BaseMapper<DepositRule> {
 
+    List<DepositRule> selectAll();
 }

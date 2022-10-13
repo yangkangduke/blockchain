@@ -22,7 +22,7 @@ public class ChainContractDto implements Serializable {
     private static final long serialVersionUID = -1L;
 
     /**
-     * @see com.kine.common.enums.Chain
+     * @see com.seeds.common.enums.Chain
      */
     private int chain;
     private String currency;

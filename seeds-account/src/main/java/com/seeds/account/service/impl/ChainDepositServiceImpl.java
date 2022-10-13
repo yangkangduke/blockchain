@@ -106,7 +106,7 @@ public class ChainDepositServiceImpl implements IChainDepositService {
 
     @Override
     public List<DepositRuleDto> loadAll() {
-        return depositRuleMapper.selectList(new QueryWrapper<>()).stream().map(e -> ObjectUtils.copy(e, new DepositRuleDto())).collect(Collectors.toList());
+        return depositRuleMapper.selectAll().stream().map(e -> ObjectUtils.copy(e, new DepositRuleDto())).collect(Collectors.toList());
     }
 
     @Override
