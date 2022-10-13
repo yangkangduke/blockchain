@@ -133,12 +133,12 @@ public enum Chain {
     /**
      * chain code
      */
+    @EnumValue
     private Integer code;
 
     /**
      * chain name
      */
-    @EnumValue
     private String name;
 
     /**

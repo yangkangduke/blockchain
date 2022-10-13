@@ -12,16 +12,16 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <jetcache.latest.version>2.6.0</jetcache.latest.version>
+        <jetcache.latest.version>2.6.0.M1</jetcache.latest.version>
     </properties>
 
     <dependencies>
 
-        <dependency>
-            <groupId>com.alicp.jetcache</groupId>
-            <artifactId>jetcache-starter-redis-lettuce</artifactId>
-            <version>${jetcache.latest.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.alicp.jetcache</groupId>-->
+<!--            <artifactId>jetcache-starter-redis-lettuce</artifactId>-->
+<!--            <version>${jetcache.latest.version}</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>com.seeds</groupId>

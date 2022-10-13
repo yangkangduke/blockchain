@@ -22,7 +22,7 @@ public class MockController {
 
     @GetMapping("scan-block")
     public GenericDto<Boolean> scanBlock() {
-//        accountFeignClient.scanBlock();
+        accountFeignClient.scanBlock();
         return GenericDto.success(true);
     }
 }
