@@ -1,6 +1,7 @@
 package com.seeds.uc.service;
 
 import com.seeds.uc.dto.request.*;
+import com.seeds.uc.dto.response.NFTAuctionResp;
 import com.seeds.uc.dto.response.NFTOfferResp;
 
 import java.util.List;
@@ -57,5 +58,13 @@ public interface UcInterNFTService {
      * @param id 入参
      */
     List<NFTOfferResp> offerList(Long id);
+
+    /**
+     * NFT拍卖信息
+     * @param id NFT的id
+     * @param userId 拥有该NFT的用户id
+     * @return NFT拍卖信息
+     */
+    NFTAuctionResp actionInfo(Long id, Long userId);
 
 }

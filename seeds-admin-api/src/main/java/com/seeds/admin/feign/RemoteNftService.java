@@ -143,21 +143,21 @@ public interface RemoteNftService {
 	GenericDto<Object> settlement(SysNftSettlementReq req);
 
 	/**
-	 * NFT交易列表
+	 * NFT列表
 	 * @param req 分页查询条件
 	 * @return NFT信息
 	 */
-	@PostMapping("/internal-nft/trade-page")
-	@ApiOperation("NFT交易列表")
-	GenericDto<Page<SysNftResp>> tradePage(SysNftPageReq req);
+	@PostMapping("/internal-nft/page-api")
+	@ApiOperation("NFT列表")
+	GenericDto<Page<SysNftResp>> pageApi(SysNftPageReq req);
 
 	/**
-	 * NFT交易详情
+	 * NFT详情
 	 * @param id NFT的id
 	 * @return 系统NFT信息
 	 */
-	@GetMapping("/internal-nft/trade-detail")
-	@ApiOperation("NFT交易详情")
-	GenericDto<SysNftDetailResp> tradeDetail(@RequestParam Long id);
+	@GetMapping("/internal-nft/detail-api")
+	@ApiOperation("NFT详情")
+	GenericDto<SysNftDetailResp> detailApi(@RequestParam Long id);
 
 }

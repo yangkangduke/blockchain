@@ -8,6 +8,7 @@ import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.uc.dto.request.*;
+import com.seeds.uc.dto.response.NFTAuctionResp;
 import com.seeds.uc.dto.response.NFTOfferResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
@@ -45,8 +46,6 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     private IUcNftReverseAuctionService ucNftReverseAuctionService;
     @Autowired
     private IUcUserAccountService ucUserAccountService;
-    @Autowired
-    private IUcNftOfferService ucNftOffersService;
     @Autowired
     private IUcNftOfferService ucNftOfferService;
     @Autowired
@@ -186,7 +185,7 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
 
     @Override
     public void forwardBids(NFTMakeOfferReq req) {
-        ucNftOffersService.makeOffer(req);
+        ucNftOfferService.makeOffer(req);
     }
 
     @Override
@@ -197,5 +196,22 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     @Override
     public List<NFTOfferResp> offerList(Long id) {
         return ucNftOfferService.offerList(id);
+    }
+
+    @Override
+    public NFTAuctionResp actionInfo(Long id, Long userId) {
+        NFTAuctionResp resp = new NFTAuctionResp();
+        UcNftForwardAuction forwardAuction = ucNftForwardAuctionService.queryByUserIdAndNftId(userId, id);
+        UcNftReverseAuction reverseAuction = ucNftReverseAuctionService.queryByUserIdAndNftId(userId, id);
+        if (forwardAuction != null && reverseAuction != null) {
+            resp.setAuctionFlag(NFTAuctionStatusEnum.BOTH.getCode());
+        } else if (forwardAuction != null) {
+            resp.setAuctionFlag(NFTAuctionStatusEnum.FORWARD.getCode());
+        } else if (reverseAuction != null) {
+            resp.setAuctionFlag(NFTAuctionStatusEnum.REVERSE.getCode());
+        } else {
+            resp.setAuctionFlag(NFTAuctionStatusEnum.NONE.getCode());
+        }
+        return resp;
     }
 }

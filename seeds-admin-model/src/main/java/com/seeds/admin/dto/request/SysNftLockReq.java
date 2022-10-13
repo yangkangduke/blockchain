@@ -31,4 +31,10 @@ public class SysNftLockReq {
 	@NotNull(message = "NFT endurance cannot be empty")
 	private Integer endurance;
 
+	/**
+	 * NFT归属人的id
+	 */
+	@ApiModelProperty("NFT归属人的id")
+	private Long userId;
+
 }

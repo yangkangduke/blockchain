@@ -4,6 +4,7 @@ package com.seeds.uc.controller;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.*;
+import com.seeds.uc.dto.response.NFTAuctionResp;
 import com.seeds.uc.dto.response.NFTOfferResp;
 import com.seeds.uc.service.UcInterNFTService;
 import io.swagger.annotations.Api;
@@ -104,6 +105,16 @@ public class InterNFTController {
     @Inner
     public GenericDto<List<NFTOfferResp>> offerList(@RequestParam Long id) {
         return GenericDto.success(ucInterNFTService.offerList(id));
+    }
+
+    /**
+     *  NFT拍卖信息
+     */
+    @GetMapping("/action-info")
+    @ApiOperation("NFT拍卖信息")
+    @Inner
+    public GenericDto<NFTAuctionResp> actionInfo(@RequestParam Long id, @RequestParam Long userId) {
+        return GenericDto.success(ucInterNFTService.actionInfo(id, userId));
     }
 
 }

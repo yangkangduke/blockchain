@@ -9,7 +9,6 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.*;
-import com.seeds.uc.dto.response.NFTOfferResp;
 import com.seeds.uc.feign.RemoteNFTService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * 提供外部调用的NFT相关接口
@@ -33,10 +31,10 @@ import java.util.List;
 public class OpenNftController {
 
     @Autowired
-    private RemoteNftService remoteNftService;
+    private RemoteNftService adminRemoteNftService;
 
     @Autowired
-    private RemoteNFTService remoteNFTService;
+    private RemoteNFTService ucRemoteNftService;
 
     @PostMapping("create")
     @ApiOperation("NFT创建")
@@ -49,7 +47,7 @@ public class OpenNftController {
         req.setOwnerId(UserContext.getCurrentUserId());
         req.setOwnerName(UserContext.getCurrentUserName());
         req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
-        return remoteNftService.create(image, JSONUtil.toJsonStr(req));
+        return adminRemoteNftService.create(image, JSONUtil.toJsonStr(req));
     }
 
     @PostMapping("upgrade")
@@ -61,13 +59,17 @@ public class OpenNftController {
                                     @RequestParam Long timestamp) {
         SysNftUpgradeReq req = JSONUtil.toBean(data, SysNftUpgradeReq.class);
         req.setUserId(UserContext.getCurrentUserId());
-        return remoteNftService.upgrade(image, JSONUtil.toJsonStr(req));
+        req.setOwnerId(UserContext.getCurrentUserId());
+        req.setOwnerName(UserContext.getCurrentUserName());
+        req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
+        return adminRemoteNftService.upgrade(image, JSONUtil.toJsonStr(req));
     }
 
     @PostMapping("lock")
     @ApiOperation("NFT锁定")
     public GenericDto<Object> lock(@Valid @RequestBody OpenNftLockReq req) {
-        return remoteNftService.lock(req);
+        req.setUserId(UserContext.getCurrentUserId());
+        return adminRemoteNftService.lock(req);
     }
 
     @PostMapping("buy")
@@ -75,44 +77,35 @@ public class OpenNftController {
     public GenericDto<Object> buy(@Valid @RequestBody OpenNftBuyReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         req.setSource(RequestSource.GAME);
-        return remoteNFTService.buyNFT(req);
+        return ucRemoteNftService.buyNFT(req);
     }
 
     @PostMapping("forward-auction")
     @ApiOperation("NFT正向拍卖")
     public GenericDto<Object> forwardAuction(@Valid @RequestBody OpenNftForwardAuctionReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return remoteNFTService.forwardAuction(req);
+        return ucRemoteNftService.forwardAuction(req);
     }
 
     @PostMapping("reverse-auction")
     @ApiOperation("NFT反向拍卖")
     public GenericDto<Object> reverseAuction(@Valid @RequestBody OpenNftReverseAuctionReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return remoteNFTService.reverseAuction(req);
+        return ucRemoteNftService.reverseAuction(req);
     }
 
     @PostMapping("forward-bids")
     @ApiOperation("NFT正向出价")
     public GenericDto<Object> forwardBids(@Valid @RequestBody OpenNftForwardBidsReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return remoteNFTService.forwardBids(req);
+        return ucRemoteNftService.forwardBids(req);
     }
 
     @PostMapping("reverse-bids")
     @ApiOperation("NFT反向出价")
     public GenericDto<Object> reverseBids(@Valid @RequestBody OpenNftReverseBidsReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return remoteNFTService.reverseBids(req);
-    }
-
-    @GetMapping("/offer-list")
-    @ApiOperation("NFT出价列表")
-    public GenericDto<List<NFTOfferResp>> offerList(@RequestParam Long id,
-                                                    @RequestParam String accessKey,
-                                                    @RequestParam String signature,
-                                                    @RequestParam Long timestamp) {
-        return GenericDto.success(remoteNFTService.offerList(id));
+        return ucRemoteNftService.reverseBids(req);
     }
 
 }
