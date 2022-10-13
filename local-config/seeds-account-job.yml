@@ -28,3 +28,8 @@ account:
     cron: "0/10 * * * * ?" ## every 10 sec
     shardingCount: 1
     disabled: false
+
+  scanChainBlockTask:
+    cron: "0/2 * * * * ?" ## every 2s
+    shardingCount: 1
+    disabled: false

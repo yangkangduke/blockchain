@@ -2,7 +2,6 @@ package com.seeds.uc.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.web.config.LoginProperties;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
@@ -15,8 +14,8 @@ import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.SendAuthCodeException;
 import com.seeds.uc.model.UcUser;
-import com.seeds.uc.service.IGoogleAuthService;
 import com.seeds.uc.service.IUcUserService;
+import com.seeds.uc.service.IUsUserLoginLogService;
 import com.seeds.uc.service.SendCodeService;
 import com.seeds.uc.service.impl.CacheService;
 import com.seeds.uc.util.RandomUtil;
@@ -27,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -42,10 +43,12 @@ public class AuthController {
     private IUcUserService ucUserService;
     @Autowired
     private SendCodeService sendCodeService;
-    @Autowired
-    private LoginProperties loginProperties;
+    //@Autowired
+    //private LoginProperties loginProperties;
     @Autowired
     private CacheService cacheService;
+    @Autowired
+    private IUsUserLoginLogService userLoginLogService;
 
 
     @PostMapping("/register/email")
@@ -67,8 +70,11 @@ public class AuthController {
     @ApiOperation(value = "账号登陆", notes = "1.调用/auth/login接口，返回token和authType " +
             "2.调用/auth/2fa/login，参数authCode填的值根据上一个接口返回的authType来决定，如果是2就填email的验证码，如果是3就填ga的验证码， 返回的ucToken就是登陆成功的凭证 ")
     public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
-        // 只有正式环境需要2fa认证，其他环境不需要，就直接返回ucToken
-        if (!loginProperties.getTwofa()) {
+        // 校验是否需要2FA认证
+        //获取用户真实ip地址
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String clientIp = WebUtil.getIpAddr(request);
+        if (userLoginLogService.checkNeed2FA(loginReq.getEmail(), clientIp)) {
             // 校验账号、密码
             UserDto userDto = ucUserService.verifyLogin(loginReq);
             LoginResp login = ucUserService.buildLoginResponse(userDto.getUid(), userDto.getEmail());

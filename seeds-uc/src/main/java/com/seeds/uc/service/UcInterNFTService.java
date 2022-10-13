@@ -1,8 +1,10 @@
 package com.seeds.uc.service;
 
-import com.seeds.uc.dto.request.NFTBuyCallbackReq;
-import com.seeds.uc.dto.request.NFTBuyReq;
-import com.seeds.uc.dto.request.NFTMakeOfferReq;
+import com.seeds.uc.dto.request.*;
+import com.seeds.uc.dto.response.NFTAuctionResp;
+import com.seeds.uc.dto.response.NFTOfferResp;
+
+import java.util.List;
 
 
 /**
@@ -28,9 +30,41 @@ public interface UcInterNFTService {
     void buyNFT(NFTBuyReq req);
 
     /**
-     * 出价
+     * 正向拍卖
      * @param req 入参
      */
-    void bids(NFTMakeOfferReq req);
+    void forwardAuction(NFTForwardAuctionReq req);
+
+    /**
+     * 反向拍卖
+     * @param req 入参
+     */
+    void reverseAuction(NFTReverseAuctionReq req);
+
+    /**
+     * 正向出价
+     * @param req 入参
+     */
+    void forwardBids(NFTMakeOfferReq req);
+
+    /**
+     * 反向出价
+     * @param req 入参
+     */
+    void reverseBids(NFTBuyReq req);
+
+    /**
+     * 出价列表
+     * @param id 入参
+     */
+    List<NFTOfferResp> offerList(Long id);
+
+    /**
+     * NFT拍卖信息
+     * @param id NFT的id
+     * @param userId 拥有该NFT的用户id
+     * @return NFT拍卖信息
+     */
+    NFTAuctionResp actionInfo(Long id, Long userId);
 
 }

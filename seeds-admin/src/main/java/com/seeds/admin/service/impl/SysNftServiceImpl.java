@@ -599,6 +599,10 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         if (NftInitStatusEnum.NORMAL.getCode() != nft.getInitStatus()) {
             throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
         }
+        // 校验归属人
+        if (!Objects.equals(req.getUserId(), nft.getOwnerId())) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40012_NFT_ATTRIBUTED_PERSON_MISMATCH.getDescEn());
+        }
         // 判断NFT是否上架
         if (WhetherEnum.YES.value() == nft.getStatus()) {
             throw new SeedsException(AdminErrorCodeEnum.ERR_40008_NFT_ON_SALE_CAN_NOT_LOCKED.getDescEn());
@@ -616,11 +620,11 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             }
             // 更新耐久值
             properties.setValue(Integer.toString(newEndurance));
-            sysNftPropertiesService.save(properties);
+            sysNftPropertiesService.updateById(properties);
         }
         // 锁定NFT
         nft.setLockFlag(WhetherEnum.YES.value());
-        save(nft);
+        updateById(nft);
     }
 
     @Override
@@ -635,9 +639,13 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             if (CollectionUtils.isEmpty(nftList) || nftList.size() != set.size()) {
                 throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
             }
-            // 校验归属人
             nftList.forEach(p -> {
                 SysNftSettlementReq.NftSettlement nftSettlement = settlementMap.get(p.getId());
+                // 判断NFT是否正常
+                if (NftInitStatusEnum.NORMAL.getCode() != p.getInitStatus()) {
+                    throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+                }
+                // 校验归属人
                 if (!Objects.equals(nftSettlement.getOldOwnerId(), p.getOwnerId())) {
                     throw new SeedsException(AdminErrorCodeEnum.ERR_40012_NFT_ATTRIBUTED_PERSON_MISMATCH.getDescEn());
                 }
@@ -655,7 +663,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
-    public SysNftDetailResp tradeDetail(Long id) {
+    public SysNftDetailResp detailApi(Long id) {
         return detail(id);
     }
 

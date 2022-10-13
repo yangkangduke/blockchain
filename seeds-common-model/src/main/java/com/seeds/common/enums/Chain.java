@@ -78,7 +78,8 @@ public enum Chain {
     /**
      * 支持的原生区块链
      */
-    public static List<Chain> SUPPORT_LIST = Lists.newArrayList(ETH, BSC, TRON, MATIC);
+//    public static List<Chain> SUPPORT_LIST = Lists.newArrayList(ETH, BSC, TRON, MATIC);
+    public static List<Chain> SUPPORT_LIST = Lists.newArrayList(ETH, TRON);
 
     /**
      * 支持gas price 区块链
@@ -133,12 +134,12 @@ public enum Chain {
     /**
      * chain code
      */
+    @EnumValue
     private Integer code;
 
     /**
      * chain name
      */
-    @EnumValue
     private String name;
 
     /**

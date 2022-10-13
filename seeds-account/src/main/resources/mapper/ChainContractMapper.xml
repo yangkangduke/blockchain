@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.account.mapper.ChainContractMapper">
+    <resultMap id="BaseResultMap" type="com.seeds.account.model.ChainContract">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
+        <result column="version" jdbcType="BIGINT" property="version"/>
+        <result column="chain" jdbcType="TINYINT" property="chain"/>
+        <result column="currency" jdbcType="VARCHAR" property="currency"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="decimals" jdbcType="TINYINT" property="decimals"/>
+        <result column="transfer_sign" jdbcType="VARCHAR" property="transferSign"/>
+        <result column="is_staking_asset" jdbcType="TINYINT" property="isStakingAsset"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.seeds.account.model.ChainContract" useGeneratedKeys="true" keyProperty="id">
+        insert into chain_contract (id, create_time, update_time, version,
+                                      chain, currency, address, decimals, transfer_sign,
+                                      is_staking_asset, status)
+        values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT},
+                #{version,jdbcType=BIGINT},
+                #{chain,jdbcType=TINYINT}, #{currency,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},
+                #{decimals,jdbcType=TINYINT}, #{transferSign,jdbcType=VARCHAR}, #{isStakingAsset,jdbcType=TINYINT},
+                #{status,jdbcType=TINYINT})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.ChainContract">
+        update chain_contract
+        set create_time      = #{createTime,jdbcType=BIGINT},
+            update_time      = #{updateTime,jdbcType=BIGINT},
+            version          = #{version,jdbcType=BIGINT},
+            chain            = #{chain,jdbcType=TINYINT},
+            currency         = #{currency,jdbcType=VARCHAR},
+            address          = #{address,jdbcType=VARCHAR},
+            decimals         = #{decimals,jdbcType=TINYINT},
+            transfer_sign    = #{transferSign,jdbcType=VARCHAR},
+            is_staking_asset = #{isStakingAsset,jdbcType=TINYINT},
+            status           = #{status,jdbcType=TINYINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select *
+        from chain_contract
+        where `status` = 1
+        order by id desc
+    </select>
+
+    <select id="getByCurrencyAndAddress" resultMap="BaseResultMap">
+        select *
+        from chain_contract
+        where chain = #{chain,jdbcType=TINYINT}
+          and currency = #{currency,jdbcType=VARCHAR}
+          and address = #{address,jdbcType=VARCHAR}
+    </select>
+</mapper>

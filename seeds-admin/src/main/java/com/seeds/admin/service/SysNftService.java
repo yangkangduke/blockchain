@@ -168,6 +168,6 @@ public interface SysNftService extends IService<SysNftEntity> {
      * @param id NFT的id
      * @return 系统NFT信息
      */
-    SysNftDetailResp tradeDetail(Long id);
+    SysNftDetailResp detailApi(Long id);
 
 }

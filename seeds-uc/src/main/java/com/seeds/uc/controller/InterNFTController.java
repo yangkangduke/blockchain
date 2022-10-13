@@ -3,19 +3,17 @@ package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
-import com.seeds.uc.dto.request.NFTBuyCallbackReq;
-import com.seeds.uc.dto.request.NFTBuyReq;
-import com.seeds.uc.dto.request.NFTMakeOfferReq;
+import com.seeds.uc.dto.request.*;
+import com.seeds.uc.dto.response.NFTAuctionResp;
+import com.seeds.uc.dto.response.NFTOfferResp;
 import com.seeds.uc.service.UcInterNFTService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -56,14 +54,67 @@ public class InterNFTController {
     }
 
     /**
-     *  出价接口
+     *  正向拍卖
      */
-    @PostMapping("/bids")
-    @ApiOperation(value = "出价", notes = "出价")
+    @PostMapping("/forward-auction")
+    @ApiOperation(value = "正向拍卖", notes = "正向拍卖")
     @Inner
-    public GenericDto<Object> bids(@Valid @RequestBody NFTMakeOfferReq req) {
-        ucInterNFTService.bids(req);
+    public GenericDto<Object> forwardAuction(@Valid @RequestBody NFTForwardAuctionReq req) {
+        ucInterNFTService.forwardAuction(req);
         return GenericDto.success(null);
+    }
+
+    /**
+     *  反向拍卖
+     */
+    @PostMapping("/reverse-auction")
+    @ApiOperation(value = "反向拍卖", notes = "反向拍卖")
+    @Inner
+    public GenericDto<Object> reverseAuction(@Valid @RequestBody NFTReverseAuctionReq req) {
+        ucInterNFTService.reverseAuction(req);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  正向出价
+     */
+    @PostMapping("/forward-bids")
+    @ApiOperation(value = "正向出价", notes = "正向出价")
+    @Inner
+    public GenericDto<Object> forwardBids(@Valid @RequestBody NFTMakeOfferReq req) {
+        ucInterNFTService.forwardBids(req);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  反向出价
+     */
+    @PostMapping("/reverse-bids")
+    @ApiOperation(value = "反向出价", notes = "反向出价")
+    @Inner
+    public GenericDto<Object> reverseBids(@Valid @RequestBody NFTBuyReq req) {
+        ucInterNFTService.reverseBids(req);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  出价列表
+     */
+    @GetMapping("/offer-list")
+    @ApiOperation("NFT出价列表")
+    @Inner
+    public GenericDto<List<NFTOfferResp>> offerList(@RequestParam Long id) {
+        return GenericDto.success(ucInterNFTService.offerList(id));
+    }
+
+    /**
+     *  NFT拍卖信息
+     */
+    @GetMapping("/action-info")
+    @ApiOperation("NFT拍卖信息")
+    @Inner
+    public GenericDto<NFTAuctionResp> actionInfo(@RequestParam Long id, @RequestParam Long userId) {
+        return GenericDto.success(ucInterNFTService.actionInfo(id, userId));
     }
 
 }

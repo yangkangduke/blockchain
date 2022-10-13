@@ -10,6 +10,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -91,7 +92,7 @@ public interface RemoteNftService {
 	 * @param metaData NFT属性
 	 * @return NFT的唯一标识
 	 */
-	@PostMapping("/internal-nft/create")
+	@PostMapping(value = "/internal-nft/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ApiOperation("NFT创建")
 	GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData);
 
@@ -119,7 +120,7 @@ public interface RemoteNftService {
 	 * @param data NFT升级属性
 	 * @return 响应结果
 	 */
-	@PostMapping("/internal-nft/upgrade")
+	@PostMapping(value = "/internal-nft/upgrade", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ApiOperation("NFT升级")
 	GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data);
 
@@ -142,21 +143,21 @@ public interface RemoteNftService {
 	GenericDto<Object> settlement(SysNftSettlementReq req);
 
 	/**
-	 * NFT交易列表
+	 * NFT列表
 	 * @param req 分页查询条件
 	 * @return NFT信息
 	 */
-	@PostMapping("/internal-nft/trade-page")
-	@ApiOperation("NFT交易列表")
-	GenericDto<Page<SysNftResp>> tradePage(SysNftPageReq req);
+	@PostMapping("/internal-nft/page-api")
+	@ApiOperation("NFT列表")
+	GenericDto<Page<SysNftResp>> pageApi(SysNftPageReq req);
 
 	/**
-	 * NFT交易详情
+	 * NFT详情
 	 * @param id NFT的id
 	 * @return 系统NFT信息
 	 */
-	@GetMapping("/internal-nft/trade-detail")
-	@ApiOperation("NFT交易详情")
-	GenericDto<SysNftDetailResp> tradeDetail(@RequestParam Long id);
+	@GetMapping("/internal-nft/detail-api")
+	@ApiOperation("NFT详情")
+	GenericDto<SysNftDetailResp> detailApi(@RequestParam Long id);
 
 }

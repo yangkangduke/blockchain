@@ -13,6 +13,7 @@
 
     <!-- account tasks -->
     <bean id="autoCreateAddressTask" class="com.seeds.account.task.AutoCreateAddressTask"/>
+    <bean id="scanChainBlockTask" class="com.seeds.account.task.ScanChainBlockTask"/>
 
 
     <reg:zookeeper id="regCenter" server-lists="${seeds.elastic-job.zk.servers}"
@@ -29,6 +30,11 @@
                 disabled="${account.autoCreateAddressTask.disabled}"
                 sharding-total-count="${account.autoCreateAddressTask.shardingCount}"/>
 
-
+    <job:simple id="scanChainBlockTaskJob" job-ref="scanChainBlockTask"
+                registry-center-ref="regCenter"
+                cron="${account.scanChainBlockTask.cron}"
+                overwrite="true"
+                disabled="${account.scanChainBlockTask.disabled}"
+                sharding-total-count="${account.scanChainBlockTask.shardingCount}"/>
 
 </beans>
