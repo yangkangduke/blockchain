@@ -14,22 +14,38 @@ feign:
       default:
         connect-timeout: 45000
         read-timeout: 45000
-
-## elastic-job zookeeper settings
-seeds:
-  elastic-job:
-    zk:
-      servers: ${zookeeper.address}
-    namespace: seeds-elastic-job
-
-## job settings
-account:
-  autoCreateAddressTask:
-    cron: "0/10 * * * * ?" ## every 10 sec
-    shardingCount: 1
-    disabled: false
-
-  scanChainBlockTask:
-    cron: "0/2 * * * * ?" ## every 2s
-    shardingCount: 1
-    disabled: false
+# elasticjob 配置
+elasticjob:
+  # zk地址，命名空间
+  regCenter:
+    serverLists: 192.168.1.101:2181
+    namespace: seeds-account-job
+  jobs:
+    # 自动创建空闲地址job
+    createAddressJob:
+      # 作业job类
+      elasticJobClass: com.seeds.seedsjob.task.AutoCreateAddressTask
+      # 定时cron   every 10 sec
+      cron: "0/10 * * * * ?"
+      # 作业分片总数
+      shardingTotalCount: 1
+      # 作业描述信息
+      description: "自动创建空闲地址"
+      # 错误处理策略
+      # LOG:记录作业异常日志，但不中断作业执行
+      # THROW:抛出系统异常并中断作业执行
+      # IGNORE: 忽略系统异常且不中断作业执行
+      # 略：EMAIL,WECHAT,DINGTALK
+      jobErrorHandlerType: LOG
+      disabled: false
+    # 扫描区块job
+    scanChainBlockJob:
+      # 作业job类
+      elasticJobClass: com.seeds.seedsjob.task.ScanChainBlockTask
+      # 定时cron   every 10 sec
+      cron: "0/2 * * * * ?"
+      # 作业分片总数
+      shardingTotalCount: 1
+      description: "同步块"
+      jobErrorHandlerType: LOG
+      disabled: false

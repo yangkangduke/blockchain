@@ -64,7 +64,7 @@
         <logback-kafka-appender.version>0.1.0</logback-kafka-appender.version>
         <logback-classic.version>1.2.3</logback-classic.version>
         <spring-kafka.version>2.9.0</spring-kafka.version>
-        <elastic-job.version>2.1.5</elastic-job.version>
+        <elastic-job.version>3.0.1</elastic-job.version>
     </properties>
 
     <groupId>com.seeds</groupId>
