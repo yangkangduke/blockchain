@@ -78,7 +78,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         if (amount.compareTo(BigDecimal.ZERO) != 1) {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_AMOUNT_ERROR);
         }
-        UcUserAccountInfoResp info = this.getInfo();
+        UcUserAccountInfoResp info = this.getInfo(currentUserId);
         if (info == null) {
             throw new GenericException(UcErrorCodeEnum.ERR_18002_ACCOUNT_NOT);
         }
@@ -141,8 +141,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     }
 
     @Override
-    public UcUserAccountInfoResp getInfo() {
-        return getInfoByUserId(UserContext.getCurrentUserId());
+    public UcUserAccountInfoResp getInfo(Long userId) {
+        return getInfoByUserId(userId);
     }
 
     @Override
@@ -228,6 +228,10 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
             if (WhetherEnum.YES.value() == sysNftDetailResp.getLockFlag()) {
                 throw new GenericException(UcErrorCodeEnum.ERR_18007_ACCOUNT_BUY_FAIL_NFT_LOCKED);
             }
+            // 买家是否是归属人
+            if (Objects.equals(sysNftDetailResp.getOwnerId(), currentUserId)) {
+                throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
+            }
         }
 
 
@@ -235,7 +239,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         if (!checkBalance(currentUserId, price)) {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
         }
-        buyNFTFreeze(sysNftDetailResp, buyReq.getSource());
+        buyNFTFreeze(sysNftDetailResp, buyReq.getSource(), currentUserId);
     }
 
     /**
@@ -245,14 +249,16 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void buyNFTFreeze(SysNftDetailResp nftDetail, RequestSource source) {
+    public void buyNFTFreeze(SysNftDetailResp nftDetail, RequestSource source, Long currentUserId) {
         Long nftId = nftDetail.getId();
         long currentTimeMillis = System.currentTimeMillis();
         BigDecimal amount = nftDetail.getPrice();
-        Long currentUserId = UserContext.getCurrentUserId();
+        if (currentUserId == null) {
+            currentUserId = UserContext.getCurrentUserId();
+        }
         // todo 远程调用钱包接口
         // 冻结金额
-        UcUserAccountInfoResp info = this.getInfo();
+        UcUserAccountInfoResp info = this.getInfo(currentUserId);
         this.update(UcUserAccount.builder()
                 .balance(info.getBalance().subtract(amount))
                 .freeze(info.getFreeze().add(amount))
