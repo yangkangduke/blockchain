@@ -21,10 +21,10 @@ elasticjob:
     serverLists: 192.168.1.101:2181
     namespace: seeds-account-job
   jobs:
-    # 自动创建空闲地址job
+    # createAddressJob
     createAddressJob:
       # 作业job类
-      elasticJobClass: com.seeds.seedsjob.task.AutoCreateAddressTask
+      elasticJobClass: com.seeds.account.task.AutoCreateAddressTask
       # 定时cron   every 10 sec
       cron: "0/10 * * * * ?"
       # 作业分片总数
@@ -38,14 +38,11 @@ elasticjob:
       # 略：EMAIL,WECHAT,DINGTALK
       jobErrorHandlerType: LOG
       disabled: false
-    # 扫描区块job
+    # scanChainBlockJob
     scanChainBlockJob:
-      # 作业job类
-      elasticJobClass: com.seeds.seedsjob.task.ScanChainBlockTask
-      # 定时cron   every 10 sec
+      elasticJobClass: com.seeds.account.task.ScanChainBlockTask
       cron: "0/2 * * * * ?"
-      # 作业分片总数
       shardingTotalCount: 1
-      description: "同步块"
+      description: "scanChainBlockJob"
       jobErrorHandlerType: LOG
       disabled: false
