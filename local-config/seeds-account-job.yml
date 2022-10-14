@@ -37,7 +37,10 @@ elasticjob:
       # IGNORE: 忽略系统异常且不中断作业执行
       # 略：EMAIL,WECHAT,DINGTALK
       jobErrorHandlerType: LOG
+      #部署作业时，先禁止启动，部署结束后统一启动
       disabled: false
+      #本地配置覆盖注册中心配置,每次启动作业都以本地配置为准
+      overwrite: ture
     # scanChainBlockJob
     scanChainBlockJob:
       elasticJobClass: com.seeds.account.task.ScanChainBlockTask
@@ -46,3 +49,4 @@ elasticjob:
       description: "scanChainBlockJob"
       jobErrorHandlerType: LOG
       disabled: false
+      overwrite: ture
