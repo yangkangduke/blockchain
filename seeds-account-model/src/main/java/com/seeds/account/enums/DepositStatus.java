@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * 充币状态
  *
- * @author milo
+ * @author yk
  *
  */
 public enum DepositStatus implements EnumWithCode {

@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * 包装restful接口的异常
  *
- * @author milo
+ * @author yk
  */
 @Slf4j
 public class Utils {

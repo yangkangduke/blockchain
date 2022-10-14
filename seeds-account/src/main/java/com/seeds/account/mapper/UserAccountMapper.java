@@ -44,4 +44,25 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
      * @return
      */
     int countUserAccount(@Param("userId") long userId, @Param("currency") String currency);
+
+    /**
+     * 更新freeze
+     *
+     * @param userId
+     * @param currency
+     * @param amount
+     * @param geZero
+     * @return
+     */
+    int updateFreeze(@Param("userId") long userId, @Param("currency") String currency, @Param("amount") BigDecimal amount, @Param("geZero") boolean geZero);
+
+    /**
+     * 解冻
+     *
+     * @param userId
+     * @param currency
+     * @param amount
+     * @return
+     */
+    int unfreeze(@Param("userId") long userId, @Param("currency") String currency, @Param("amount") BigDecimal amount);
 }

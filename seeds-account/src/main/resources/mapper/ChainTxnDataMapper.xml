@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.account.mapper.ChainTxnDataMapper">
+    <resultMap id="BaseResultMap" type="com.seeds.account.model.ChainTxnData">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
+        <result column="version" jdbcType="BIGINT" property="version"/>
+        <result column="app_type" jdbcType="TINYINT" property="appType"
+                typeHandler="com.seeds.common.enums.handler.EnumWithCodeTypeHandler"
+                javaType="com.seeds.account.enums.ChainTxnDataAppType"/>
+        <result column="app_id" jdbcType="BIGINT" property="appId"/>
+        <result column="data" jdbcType="LONGVARCHAR" property="data"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from chain_txn_data
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.seeds.account.model.ChainTxnData" useGeneratedKeys="true" keyProperty="id">
+        insert into chain_txn_data (id, create_time, update_time,
+                                      version, app_type, app_id,
+                                      data)
+        values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT},
+                #{version,jdbcType=BIGINT}, #{appType.code,jdbcType=TINYINT}, #{appId,jdbcType=BIGINT},
+                #{data,jdbcType=LONGVARCHAR})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.ChainTxnData">
+        update chain_txn_data
+        set create_time = #{createTime,jdbcType=BIGINT},
+            update_time = #{updateTime,jdbcType=BIGINT},
+            version     = #{version,jdbcType=BIGINT},
+            app_type    = #{appType.code,jdbcType=TINYINT},
+            app_id      = #{appId,jdbcType=BIGINT},
+            data        = #{data,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select id, create_time, update_time, version, app_type, app_id, data
+        from chain_txn_data
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select id, create_time, update_time, version, app_type, app_id, data
+        from chain_txn_data
+    </select>
+    <select id="selectByAppTypeAndId" resultMap="BaseResultMap">
+        select *
+        from chain_txn_data
+        where app_type = #{appType.code,jdbcType=TINYINT}
+          and app_id = #{appId,jdbcType=BIGINT}
+    </select>
+</mapper>

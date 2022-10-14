@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * @author milo
+ * @author yk
  */
 @Slf4j
 @Service
@@ -85,4 +85,58 @@ public class WalletAccountServiceImpl implements IWalletAccountService {
         }
         log.info("initNewAccount account={}", account);
     }
+
+    @Override
+    public boolean updateFreeze(Long userId, String currency, BigDecimal amount, boolean geZero) {
+        log.info("updateFreeze userId={} currency={} amount={} geZero={}", userId, currency, amount, geZero);
+
+        Assert.isTrue(userId != null && userId >= 0, "user Id must > 0");
+        Assert.isTrue(currency != null && currency.length() > 0, "invalid currency");
+        Assert.isTrue(amount != null && amount.signum() != 0, "invalid amount");
+
+        int count = userAccountMapper.updateFreeze(userId, currency, amount, geZero);
+        if (count >= 1) {
+            return true;
+        } else {
+            boolean exists = userAccountMapper.countUserAccount(userId, currency) == 1;
+            if (!exists) {
+                initNewAccount(userId, currency);
+            }
+            count = userAccountMapper.updateFreeze(userId, currency, amount, geZero);
+            return count == 1;
+        }
+    }
+
+    @Override
+    public boolean unfreeze(Long userId, String currency, BigDecimal amount) {
+        log.info("unfreeze userId={} currency={} amount={}", userId, currency, amount);
+
+        Assert.isTrue(userId != null && userId >= 0, "user Id must > 0");
+        Assert.isTrue(currency != null && currency.length() > 0, "invalid currency");
+        Assert.isTrue(amount != null && amount.signum() > 0, "invalid amount");
+        return userAccountMapper.unfreeze(userId, currency, amount) == 1;
+    }
+
+    @Override
+    public boolean updateFreezeAndAvailable(Long userId, String sourceCurrency, BigDecimal sourceAmount, String targetCurrency, BigDecimal targetAmount) {
+        log.info("updateFreezeAndAvailable userId={} sourceCurrency={} sourceAmount={} targetCurrency={} targetAmount={}",
+                userId, sourceCurrency, sourceAmount, targetCurrency, targetAmount);
+
+        // 更新 fromCurrency 冻结
+        boolean isSuccess = updateFreeze(userId, sourceCurrency, sourceAmount, true);
+        if (!isSuccess) {
+            log.error("failed to reduce fromAccount freeze, userId={}, fromCurrency={}, fromAmount={}, toCurrency={}, toAmount={}",
+                    userId, sourceCurrency, sourceAmount, targetCurrency, targetAmount);
+            return false;
+        }
+        // 更新 toCurrency available
+        isSuccess = updateAvailable(userId, targetCurrency, targetAmount, false);
+        if (!isSuccess) {
+            log.error("failed to update toAccount available, userId={}, fromCurrency={}, fromAmount={}, toCurrency={}, toAmount={}",
+                    userId, sourceCurrency, sourceAmount, targetCurrency, targetAmount);
+            return false;
+        }
+        return true;
+    }
+
 }

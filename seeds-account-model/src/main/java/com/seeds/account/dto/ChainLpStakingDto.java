@@ -12,7 +12,7 @@ import java.io.Serializable;
 /**
  * 链上合约配置
  *
- * @author milo
+ * @author yk
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

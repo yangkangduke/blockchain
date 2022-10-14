@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * 由于接口调用通过代理类反射调用， 所以接口方法不要使用基础数据类型。 否则代理调用失败，找不到对应的方法。
  *
- * @author milo
+ * @author yk
  */
 public interface IChainService {
 

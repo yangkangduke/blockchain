@@ -60,7 +60,7 @@ import java.util.stream.Collectors;
 /**
  * 提供对Binance Smart Chain的节点访问
  *
- * @author milo
+ * @author yk
  * @author xu
  * @author cheng
  * @author Ray

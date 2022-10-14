@@ -4,7 +4,7 @@ package com.seeds.account.chain.service;
 import com.seeds.common.enums.Chain;
 
 /**
- * @author milo
+ * @author yk
  */
 public interface IChainProviderService {
 

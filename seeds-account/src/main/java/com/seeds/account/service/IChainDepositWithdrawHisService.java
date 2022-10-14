@@ -2,6 +2,7 @@ package com.seeds.account.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.account.model.ChainDepositWithdrawHis;
+import com.seeds.account.model.ChainDepositWithdrawSigHis;
 import com.seeds.common.enums.Chain;
 
 import java.math.BigDecimal;
@@ -35,4 +36,10 @@ public interface IChainDepositWithdrawHisService extends IService<ChainDepositWi
 
     void createSigHistory(long id, long userId, Chain chain, String currency, BigDecimal amount, String signedSignature, String signedMessage, long deadline);
 
-}
+    /**
+     * 获取签名历史，需要传入userId校验，以免用户尝试id
+     * @param id
+     * @param userId
+     * @return
+     */
+    ChainDepositWithdrawSigHis getSigHistory(long id, long userId);}

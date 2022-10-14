@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * 链类型
  *
- * @author milo
+ * @author yk
  */
 @Getter
 public enum Chain {

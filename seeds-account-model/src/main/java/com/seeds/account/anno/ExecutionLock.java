@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  *
  * Redis锁，操作需要等锁才能执行
  *
- * @author milo
+ * @author yk
  *
  */
 @Retention(RetentionPolicy.RUNTIME)

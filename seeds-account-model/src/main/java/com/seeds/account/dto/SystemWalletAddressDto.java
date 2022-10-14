@@ -11,7 +11,7 @@ import java.io.Serializable;
 /**
  * 系统使用的钱包
  *
- * @author milo
+ * @author yk
  *
  */
 @Data
