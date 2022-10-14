@@ -23,6 +23,7 @@ import com.seeds.admin.mapper.SysNftMapper;
 import com.seeds.admin.mq.producer.KafkaProducer;
 import com.seeds.admin.service.*;
 import com.seeds.chain.config.SmartContractConfig;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.exception.SeedsException;
@@ -334,6 +335,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void ownerChange(List<NftOwnerChangeReq> req) {
         Set<Long> nftIds = req.stream().map(NftOwnerChangeReq::getId).collect(Collectors.toSet());
         List<SysNftEntity> list = listByIds(nftIds);
@@ -690,7 +692,12 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .toAddress(req.getToAddress())
                 .ownerType(req.getOwnerType())
                 .build();
-        if (!remoteNftService.buyNFTCallback(callback).isSuccess()) {
+        try {
+            GenericDto<Object> result = remoteNftService.buyNFTCallback(callback);
+            if (!result.isSuccess()) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+            }
+        } catch (Exception e) {
             throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
         }
         // 请求来源是游戏方，交易完成通知游戏方

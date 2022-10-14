@@ -89,7 +89,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
             throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
         }
         // 冻结金额
-        UcUserAccountInfoResp info = ucUserAccountService.getInfo();
+        UcUserAccountInfoResp info = ucUserAccountService.getInfo(currentUserId);
         ucUserAccountService.update(UcUserAccount.builder()
                 .balance(info.getBalance().subtract(reqPrice))
                 .freeze(info.getFreeze().add(reqPrice))

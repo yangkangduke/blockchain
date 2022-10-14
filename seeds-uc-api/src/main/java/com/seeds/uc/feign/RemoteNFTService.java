@@ -24,7 +24,7 @@ import java.util.List;
 @FeignClient(name = "remoteNFTService", url = "${Seeds-uc}", configuration = {UcFeignInnerRequestInterceptor.class})
 public interface RemoteNFTService {
 
-	@GetMapping("/internal-nft/buy/callback")
+	@PostMapping("/internal-nft/buy/callback")
 	@ApiOperation(value = "购买回调", notes = "购买回调")
 	GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyCallbackReq buyReq);
 

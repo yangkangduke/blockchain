@@ -44,9 +44,10 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
 
     /**
      * 账户详情
+     * @param UserId 用户id
      * @return
      */
-    UcUserAccountInfoResp getInfo();
+    UcUserAccountInfoResp getInfo(Long UserId);
 
     /**
      * 账户详情
@@ -79,7 +80,7 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * 购买nft
      * @param buyReq
      */
-    void buyNFTFreeze(SysNftDetailResp buyReq, RequestSource source);
+    void buyNFTFreeze(SysNftDetailResp buyReq, RequestSource source, Long currentUserId);
 
     /**
      * 账户金额详情
