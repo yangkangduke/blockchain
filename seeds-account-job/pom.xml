@@ -109,12 +109,10 @@
         <dependency>
             <groupId>org.apache.shardingsphere.elasticjob</groupId>
             <artifactId>elasticjob-lite-spring-boot-starter</artifactId>
-            <version>${elastic-job.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.shardingsphere.elasticjob</groupId>
             <artifactId>elasticjob-lite-spring-namespace</artifactId>
-            <version>${elastic-job.version}</version>
         </dependency>
     </dependencies>
     <build>
