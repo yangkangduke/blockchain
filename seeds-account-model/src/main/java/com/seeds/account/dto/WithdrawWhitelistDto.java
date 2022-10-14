@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 /**
  * 提币白名单
  *
- * @author milo
+ * @author yk
  *
  */
 @Data

@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 /**
  * 充提币扩展
  *
- * @author milo
+ * @author yk
  *
  */
 @Data

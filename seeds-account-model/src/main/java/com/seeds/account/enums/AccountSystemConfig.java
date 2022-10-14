@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * 账户系统配置
  *
- * @author milo
+ * @author yk
  */
 @Getter
 public enum AccountSystemConfig {

@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * @author milo
+ * @author yk
  */
 public class AccountConstants {
 

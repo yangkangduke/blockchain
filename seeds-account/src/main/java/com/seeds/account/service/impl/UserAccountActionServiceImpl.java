@@ -49,6 +49,14 @@ public class UserAccountActionServiceImpl implements IUserAccountActionService {
     }
 
     @Override
+    public int updateStatusByActionUserIdSource(AccountAction action, long userId, String source, CommonActionStatus status) {
+        log.info("updateStatusByActionUserIdSource action={} userId={} source={} status={}", action, userId, source, status);
+
+        Assert.isTrue(source != null && source.length() > 0, "invalid source");
+        return userAccountActionHisMapper.updateStatusByActionUserIdSource(action, userId, source, status);
+    }
+
+    @Override
     @Async("executorPool")
     public void createHistory(long userId, String currency, AccountAction action, String source, BigDecimal amount, CommonActionStatus status) {
         UserAccountActionHis o = UserAccountActionHis.builder()

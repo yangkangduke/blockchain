@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.account.mapper.AddressCollectOrderHisMapper">
+    <resultMap id="BaseResultMap" type="com.seeds.account.model.AddressCollectOrderHis">
+        <id column="f_id" jdbcType="BIGINT" property="id"/>
+        <result column="f_create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="f_update_time" jdbcType="BIGINT" property="updateTime"/>
+        <result column="f_version" jdbcType="BIGINT" property="version"/>
+        <result column="f_type" jdbcType="TINYINT" property="type"/>
+        <result column="f_address" jdbcType="VARCHAR" property="address"/>
+        <result column="f_currency" jdbcType="VARCHAR" property="currency"/>
+        <result column="f_amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="f_gas_price" jdbcType="BIGINT" property="gasPrice"/>
+        <result column="f_fee_amount" jdbcType="DECIMAL" property="feeAmount"/>
+        <result column="f_status" jdbcType="TINYINT" property="status"/>
+        <result column="f_chain" jdbcType="TINYINT" property="chain"
+                typeHandler="com.seeds.common.enums.handler.EnumWithCodeTypeHandler"
+                javaType="com.seeds.common.enums.Chain"/>
+    </resultMap>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from address_collect_order_his
+        where f_id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.seeds.account.model.AddressCollectOrderHis" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into address_collect_order_his (f_id, f_create_time, f_update_time, f_version,
+                                                 f_type, f_address, f_currency, f_amount, f_gas_price, f_fee_amount,
+                                                 f_status, f_chain)
+        values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT},
+                #{version,jdbcType=BIGINT},
+                #{type,jdbcType=TINYINT}, #{address,jdbcType=VARCHAR}, #{currency,jdbcType=VARCHAR},
+                #{amount,jdbcType=DECIMAL},
+                #{gasPrice,jdbcType=BIGINT}, #{feeAmount,jdbcType=DECIMAL}, #{status,jdbcType=TINYINT},
+                #{chain.code,jdbcType=TINYINT})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.AddressCollectOrderHis">
+        update address_collect_order_his
+        set update_time = #{updateTime,jdbcType=BIGINT},
+            version     = #{version,jdbcType=BIGINT},
+            fee_amount  = #{feeAmount,jdbcType=DECIMAL},
+            amount      = #{amount,jdbcType=DECIMAL},
+            status      = #{status,jdbcType=TINYINT},
+            chain       = #{chain.code,jdbcType=TINYINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select *
+        from address_collect_order_his
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select *
+        from address_collect_order_his
+        order by id
+    </select>
+
+    <select id="getList" resultMap="BaseResultMap">
+        select *
+        from address_collect_order_his
+        where 1 = 1
+        <if test="chain != null">and chain = #{chain,jdbcType=BIGINT}</if>
+        <if test="startTime > 0">and update_time &gt;= #{startTime,jdbcType=BIGINT}</if>
+        <if test="endTime > 0">and update_time &lt;= #{endTime,jdbcType=BIGINT}</if>
+        <if test="type > 0">and type = #{type,jdbcType=TINYINT}</if>
+        <if test="address != null">and address = #{address,jdbcType=VARCHAR}</if>
+        <if test="currency != null">and currency = #{currency,jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="getByStatus" resultMap="BaseResultMap">
+        select *
+        from address_collect_order_his
+        where status = #{status,jdbcType=TINYINT}
+        order by id
+    </select>
+</mapper>

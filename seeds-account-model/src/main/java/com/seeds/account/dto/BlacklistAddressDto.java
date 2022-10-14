@@ -13,7 +13,7 @@ import java.io.Serializable;
 /**
  * 充提币黑名单
  *
- * @author milo
+ * @author yk
  *
  */
 @Data

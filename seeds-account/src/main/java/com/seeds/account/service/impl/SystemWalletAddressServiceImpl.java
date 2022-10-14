@@ -79,4 +79,13 @@ public class SystemWalletAddressServiceImpl extends ServiceImpl<SystemWalletAddr
                 .map(e -> ObjectUtils.copy(e, new SystemWalletAddressDto()))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<String> getList(Chain chain, WalletAddressType walletAddressType) {
+        return getByChainAndType(chain.getCode(), walletAddressType.getCode())
+                .stream()
+                .filter(e -> e.getStatus() == CommonStatus.ENABLED.getCode())
+                .map(SystemWalletAddressDto::getAddress)
+                .collect(Collectors.toList());
+    }
 }

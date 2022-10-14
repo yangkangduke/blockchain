@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.account.mapper.ChainDividendHisMapper">
+    <resultMap id="BaseResultMap" type="com.seeds.account.model.ChainDividendHis">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
+        <result column="version" jdbcType="BIGINT" property="version"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="chain" jdbcType="TINYINT" property="chain"
+                typeHandler="com.seeds.common.enums.handler.EnumWithCodeTypeHandler"
+                javaType="com.seeds.common.enums.Chain"/>
+        <result column="from_address" jdbcType="VARCHAR" property="fromAddress"/>
+        <result column="to_address" jdbcType="VARCHAR" property="toAddress"/>
+        <result column="currency" jdbcType="VARCHAR" property="currency"/>
+        <result column="action" jdbcType="TINYINT" property="action"
+                typeHandler="com.seeds.common.enums.handler.EnumWithCodeTypeHandler"
+                javaType="com.seeds.account.enums.ChainDividendAction"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="gas_price" jdbcType="BIGINT" property="gasPrice"/>
+        <result column="gas_limit" jdbcType="BIGINT" property="gasLimit"/>
+        <result column="gas_used" jdbcType="BIGINT" property="gasUsed"/>
+        <result column="tx_fee" jdbcType="DECIMAL" property="txFee"/>
+        <result column="block_number" jdbcType="BIGINT" property="blockNumber"/>
+        <result column="block_hash" jdbcType="VARCHAR" property="blockHash"/>
+        <result column="tx_hash" jdbcType="VARCHAR" property="txHash"/>
+        <result column="nonce" jdbcType="VARCHAR" property="nonce"/>
+        <result column="tx_value" jdbcType="VARCHAR" property="txValue"/>
+        <result column="status" jdbcType="TINYINT" property="status"
+                typeHandler="com.seeds.common.enums.handler.EnumWithCodeTypeHandler"
+                javaType="com.seeds.account.enums.ChainCommonStatus"/>
+        <result column="tx_to_address" jdbcType="VARCHAR" property="txToAddress"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from chain_dividend_his
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.seeds.account.model.ChainDividendHis" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into chain_dividend_his (id, create_time, update_time,
+                                          version, user_id, chain,
+                                          from_address, to_address, currency,
+                                          action, amount, gas_price,
+                                          gas_limit, gas_used, tx_fee, block_number,
+                                          block_hash, tx_hash, status, nonce, tx_value, tx_to_address)
+        values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT},
+                #{version,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{chain.code,jdbcType=TINYINT},
+                #{fromAddress,jdbcType=VARCHAR}, #{toAddress,jdbcType=VARCHAR}, #{currency,jdbcType=VARCHAR},
+                #{action.code,jdbcType=TINYINT}, #{amount,jdbcType=DECIMAL}, #{gasPrice,jdbcType=BIGINT},
+                #{gasLimit,jdbcType=BIGINT}, #{gasUsed,jdbcType=BIGINT}, #{txFee,jdbcType=DECIMAL},
+                #{blockNumber,jdbcType=BIGINT},
+                #{blockHash,jdbcType=VARCHAR}, #{txHash,jdbcType=VARCHAR}, #{status.code,jdbcType=TINYINT},
+                #{nonce,jdbcType=VARCHAR}, #{txValue,jdbcType=VARCHAR}, #{txToAddress,jdbcType=VARCHAR})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.ChainDividendHis">
+        update chain_dividend_his
+        set create_time   = #{createTime,jdbcType=BIGINT},
+            update_time   = #{updateTime,jdbcType=BIGINT},
+            version       = #{version,jdbcType=BIGINT},
+            user_id       = #{userId,jdbcType=BIGINT},
+            chain         = #{chain.code,jdbcType=TINYINT},
+            from_address  = #{fromAddress,jdbcType=VARCHAR},
+            to_address    = #{toAddress,jdbcType=VARCHAR},
+            currency      = #{currency,jdbcType=VARCHAR},
+            action        = #{action.code,jdbcType=TINYINT},
+            amount        = #{amount,jdbcType=DECIMAL},
+            gas_price     = #{gasPrice,jdbcType=BIGINT},
+            gas_limit     = #{gasLimit,jdbcType=BIGINT},
+            gas_used      = #{gasUsed,jdbcType=BIGINT},
+            tx_fee        = #{txFee,jdbcType=DECIMAL},
+            block_number  = #{blockNumber,jdbcType=BIGINT},
+            block_hash    = #{blockHash,jdbcType=VARCHAR},
+            tx_hash       = #{txHash,jdbcType=VARCHAR},
+            status        = #{status.code,jdbcType=TINYINT},
+            nonce         = #{nonce,jdbcType=VARCHAR},
+            tx_value      = #{txValue,jdbcType=VARCHAR},
+            tx_to_address = #{txToAddress,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select id,
+               create_time,
+               update_time,
+               version,
+               user_id,
+               `chain`,
+               from_address,
+               to_address,
+               currency,
+               `action`,
+               amount,
+               gas_price,
+               gas_limit,
+               gas_used,
+               tx_fee,
+               block_number,
+               block_hash,
+               tx_hash,
+               status,
+               nonce,
+               tx_value,
+               tx_to_address
+        from chain_dividend_his
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select id,
+               create_time,
+               update_time,
+               version,
+               user_id,
+               `chain`,
+               from_address,
+               to_address,
+               currency,
+               `action`,
+               amount,
+               gas_price,
+               gas_limit,
+               gas_used,
+               tx_fee,
+               block_number,
+               block_hash,
+               tx_hash,
+               status,
+               nonce,
+               tx_value,
+               tx_to_address
+        from chain_dividend_his
+    </select>
+
+    <select id="getListByStatus" resultMap="BaseResultMap">
+        select *
+        from chain_dividend_his
+        where status = #{status.code,jdbcType=TINYINT}
+        order by id
+    </select>
+
+    <select id="getAllByStatus" resultMap="BaseResultMap">
+        select *
+        from chain_dividend_his
+        where `action` = #{action.code,jdbcType=TINYINT}
+          and status = #{status.code,jdbcType=TINYINT}
+    </select>
+
+    <select id="getAllByChain" resultMap="BaseResultMap">
+        select *
+        from chain_dividend_his
+        where chain = #{chain.code,jdbcType=TINYINT}
+    </select>
+
+    <update id="updateStatusByPrimaryKey">
+        <![CDATA[
+        update chain_dividend_his
+        set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
+            version     = version + 1,
+            status      = #{status.code,jdbcType=TINYINT}
+        where id = #{id,jdbcType=BIGINT}
+          and status <> #{status.code,jdbcType=TINYINT}
+        ]]>
+    </update>
+
+    <select id="getByChainHash" resultMap="BaseResultMap">
+        select *
+        from chain_dividend_his
+        where tx_hash = #{txHash,jdbcType=VARCHAR}
+          and chain = #{chain.code,jdbcType=TINYINT}
+    </select>
+
+    <select id="selectByChainStatusAndTimestamp" resultMap="BaseResultMap">
+        <![CDATA[
+        select *
+        from chain_dividend_his
+        where status = #{status.code,jdbcType=TINYINT}
+          and chain = #{chain.code,jdbcType=TINYINT}
+          and update_time <= #{timestamp,jdbcType=BIGINT}
+        ]]>
+    </select>
+
+    <select id="selectByChainAndStatus" resultMap="BaseResultMap">
+        select *
+        from chain_dividend_his
+        where chain = #{chain.code,jdbcType=TINYINT}
+          and status = #{status.code,jdbcType=TINYINT}
+    </select>
+</mapper>

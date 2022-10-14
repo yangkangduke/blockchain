@@ -35,4 +35,5 @@ public interface ISystemWalletAddressService extends IService<SystemWalletAddres
      */
     List<SystemWalletAddressDto> loadAll();
 
+    List<String> getList(Chain chain, WalletAddressType walletAddressType);
 }

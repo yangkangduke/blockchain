@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.seeds.account.model.ChainDepositWithdrawHis;
 import com.seeds.common.enums.Chain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,4 +48,12 @@ public interface ChainDepositWithdrawHisMapper extends BaseMapper<ChainDepositWi
      */
     int rollbackByBlockNumberAndBlockHash(Chain chain, long blockNumber, String blockHash, int status);
 
+    /**
+     * 根据状态来查询
+     *
+     * @param action
+     * @param statusList
+     * @return
+     */
+    List<ChainDepositWithdrawHis> getListByStatus(int action, List<Integer> statusList);
 }
