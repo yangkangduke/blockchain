@@ -1,10 +1,11 @@
 package com.seeds.account.task;
 
-import com.dangdang.ddframe.job.api.ShardingContext;
-import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import com.seeds.account.feign.AccountFeignClient;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shardingsphere.elasticjob.api.ShardingContext;
+import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 同步块,每5秒执行一次
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 @Slf4j
+@Component
 public class ScanChainBlockTask implements SimpleJob {
 
     @Autowired
