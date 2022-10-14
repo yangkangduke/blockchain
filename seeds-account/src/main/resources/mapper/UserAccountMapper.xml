@@ -26,13 +26,15 @@
     </update>
 
     <update id="updateFreeze">
-        update t_user_account
-        set f_update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
-        f_version = f_version + 1,
-        f_freeze = f_freeze + #{amount,jdbcType=DECIMAL}
-        where f_user_id = #{userId,jdbcType=BIGINT}
-        and f_currency = #{currency,jdbcType=VARCHAR}
-        <if test="geZero == true">and f_freeze + #{amount,jdbcType=DECIMAL} &gt;= 0</if>
+        update user_account
+        set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
+        version = version + 1,
+        freeze = freeze + #{amount,jdbcType=DECIMAL}
+        where user_id = #{userId,jdbcType=BIGINT}
+        and currency = #{currency,jdbcType=VARCHAR}
+        <if test="geZero == true">
+          and freeze + #{amount,jdbcType=DECIMAL} &gt;= 0
+        </if>
     </update>
 
     <update id="unfreeze">

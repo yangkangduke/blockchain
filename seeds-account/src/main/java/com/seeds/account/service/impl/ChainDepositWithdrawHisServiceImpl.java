@@ -51,6 +51,16 @@ public class ChainDepositWithdrawHisServiceImpl extends ServiceImpl<ChainDeposit
     }
 
     @Override
+    public void updateHistory(ChainDepositWithdrawHis chainDepositWithdrawHis) {
+        chainDepositWithdrawHisMapper.updateById(chainDepositWithdrawHis);
+    }
+
+    @Override
+    public ChainDepositWithdrawHis getHistory(long id) {
+        return chainDepositWithdrawHisMapper.selectById(id);
+    }
+
+    @Override
     @Async("executorPool")
     public void createSigHistory(long id, long userId, Chain chain, String currency, BigDecimal amount, String signedSignature, String signedMessage, long deadline) {
         ChainDepositWithdrawSigHis chainDepositWithdrawSigHis = ChainDepositWithdrawSigHis.builder()

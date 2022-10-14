@@ -50,5 +50,6 @@ public class SystemWalletAddress implements Serializable {
     private String comments;
 
     private Integer status;
+    private Integer chain;
 
 }

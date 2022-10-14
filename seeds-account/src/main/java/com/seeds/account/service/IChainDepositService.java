@@ -6,6 +6,7 @@ import com.seeds.account.dto.SystemWalletAddressDto;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.common.enums.Chain;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -55,4 +56,10 @@ public interface IChainDepositService {
      * @return
      */
     Map<String, DepositRuleDto> getAllDepositRuleMap();
-}
+
+    /**
+     * 从内存获取充币规则
+     *
+     * @return
+     */
+    List<DepositRuleDto> getAllDepositRules();}

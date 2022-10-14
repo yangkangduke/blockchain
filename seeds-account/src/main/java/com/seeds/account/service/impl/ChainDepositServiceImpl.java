@@ -128,4 +128,9 @@ public class ChainDepositServiceImpl implements IChainDepositService {
     public Map<String, DepositRuleDto> getAllDepositRuleMap() {
         return Objects.requireNonNull(rules.get(ALL)).getMap();
     }
+
+    @Override
+    public List<DepositRuleDto> getAllDepositRules() {
+        return Objects.requireNonNull(rules.get(ALL)).getList();
+    }
 }

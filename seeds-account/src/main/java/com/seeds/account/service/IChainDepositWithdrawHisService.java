@@ -42,4 +42,17 @@ public interface IChainDepositWithdrawHisService extends IService<ChainDepositWi
      * @param userId
      * @return
      */
-    ChainDepositWithdrawSigHis getSigHistory(long id, long userId);}
+    ChainDepositWithdrawSigHis getSigHistory(long id, long userId);
+
+    /**
+     * 更新充提币历史
+     * @param chainDepositWithdrawHis
+     */
+    void updateHistory(ChainDepositWithdrawHis chainDepositWithdrawHis);
+
+    /**
+     * 查询充提币历史
+     * @param id
+     * @return
+     */
+    ChainDepositWithdrawHis getHistory(long id);}

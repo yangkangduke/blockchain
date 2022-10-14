@@ -1,5 +1,7 @@
 package com.seeds.account.controller;
 
+import com.seeds.account.dto.ApproveRejectDto;
+import com.seeds.account.service.IAccountService;
 import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
 import com.seeds.account.util.Utils;
@@ -26,6 +28,8 @@ public class AccountInternalController {
     private IChainActionService chainActionService;
     @Autowired
     IAddressCollectService addressCollectService;
+    @Autowired
+    private IAccountService accountService;
 
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
@@ -47,6 +51,42 @@ public class AccountInternalController {
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("scanBlock", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 充币提币审核通过
+     *
+     * @param approveRejectDto
+     * @return
+     */
+    @PostMapping("/mgt/approve-transaction")
+    @ApiOperation("充币提币审核通过")
+    public GenericDto<Boolean> approveTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
+        try {
+            accountService.approveTransaction(approveRejectDto.getId(), approveRejectDto.getComment());
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("approveWithdraw", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 充币提币审核拒绝
+     *
+     * @param approveRejectDto
+     * @return
+     */
+    @PostMapping("/mgt/reject-transaction")
+    @ApiOperation("充币提币审核拒绝")
+    public GenericDto<Boolean> rejectTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
+        try {
+            accountService.rejectTransaction(approveRejectDto.getId(), approveRejectDto.getComment());
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("rejectWithdraw", e);
             return Utils.returnFromException(e);
         }
     }

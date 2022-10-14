@@ -31,4 +31,19 @@ public interface IAccountService {
      * @return
      */
     BigDecimal getUsedIntradayWithdraw(long userId, String currency);
-}
+
+    /**
+     * MGT同意
+     *
+     * @param id
+     * @param comments
+     */
+    void approveTransaction(long id, String comments);
+
+    /**
+     * MGT拒绝
+     *
+     * @param id
+     * @param comments
+     */
+    void rejectTransaction(long id, String comments);}

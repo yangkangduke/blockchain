@@ -305,7 +305,7 @@ public class ChainActionServiceImpl implements IChainActionService {
         // 更新状态
         chainDepositWithdrawHisMapper.updateById(tx);
 
-        transactionService.afterCommit(() -> {
+//        transactionService.afterCommit(() -> {
             // 发送运维
 //            notificationService.sendNotificationAsync(NotificationDto.builder()
 //                    .notificationType(OpsAction.OPS_TECH.getNotificationType())
@@ -314,7 +314,7 @@ public class ChainActionServiceImpl implements IChainActionService {
 //                            "module", "withdraw",
 //                            "content", tx.getId() + " failed"))
 //                    .build());
-        });
+//        });
     }
 
     /**
@@ -1026,7 +1026,7 @@ public class ChainActionServiceImpl implements IChainActionService {
 //                        "content", tx.getId() + " succeeded"))
 //                .build());
     }
-
+    
     private void scanWithdrawOne(Chain chain, ChainBlock latestChainBlock, ChainDepositWithdrawHis tx) throws Exception {
         ChainTransactionReceipt receipt = chainService.getTransactionReceiptByTxHash(chain, tx.getTxHash());
         if (receipt != null) {
@@ -1097,7 +1097,7 @@ public class ChainActionServiceImpl implements IChainActionService {
             chainTxnReplaceMapper.updateByPrimaryKey(e);
         });
     }
-
+    
     private void updateWithdrawTxn(ChainDepositWithdrawHis tx, ChainTxnReplace replaceTx, long blockNumber, String blockHash, BigDecimal txFee, boolean isReplace) {
         tx.setUpdateTime(System.currentTimeMillis());
         tx.setVersion(tx.getVersion() + 1);
