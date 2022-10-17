@@ -118,6 +118,11 @@ public class WalletAccountServiceImpl implements IWalletAccountService {
     }
 
     @Override
+    public List<UserAccount> getAccounts(long userId) {
+        return userAccountMapper.getUserAccountByUserId(userId);
+    }
+
+    @Override
     public boolean updateFreezeAndAvailable(Long userId, String sourceCurrency, BigDecimal sourceAmount, String targetCurrency, BigDecimal targetAmount) {
         log.info("updateFreezeAndAvailable userId={} sourceCurrency={} sourceAmount={} targetCurrency={} targetAmount={}",
                 userId, sourceCurrency, sourceAmount, targetCurrency, targetAmount);

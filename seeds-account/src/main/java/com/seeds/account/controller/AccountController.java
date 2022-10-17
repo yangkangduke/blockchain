@@ -1,6 +1,7 @@
 package com.seeds.account.controller;
 
 import com.seeds.account.AccountConstants;
+import com.seeds.account.dto.UserAccountSummaryDto;
 import com.seeds.account.dto.WithdrawRequestDto;
 import com.seeds.account.dto.WithdrawResponseDto;
 import com.seeds.account.service.IAccountService;
@@ -33,6 +34,26 @@ public class AccountController {
     IChainDepositService chainDepositService;
     @Autowired
     IAccountService accountService;
+
+
+    /**
+     * 获取钱包账户汇总
+     *
+     * @return
+     */
+    @GetMapping("/wallet-accounts")
+    @ApiOperation("获取钱包账户汇总")
+    public GenericDto<UserAccountSummaryDto> getWalletAccounts() {
+        try {
+            long userId = getUserId();
+            UserAccountSummaryDto summaryDto = accountService.getUserWalletAccountSummaryDto(userId);
+            return GenericDto.success(summaryDto);
+        } catch (Exception e) {
+            log.error("getWalletAccounts", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
 
     /**
      * 获取充币地址

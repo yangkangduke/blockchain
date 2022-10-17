@@ -1,6 +1,7 @@
 package com.seeds.account.service;
 
 
+import com.seeds.account.dto.UserAccountSummaryDto;
 import com.seeds.account.dto.WithdrawRequestDto;
 import com.seeds.account.dto.WithdrawResponseDto;
 
@@ -46,4 +47,23 @@ public interface IAccountService {
      * @param id
      * @param comments
      */
-    void rejectTransaction(long id, String comments);}
+    void rejectTransaction(long id, String comments);
+
+    /**
+     * 获取用户钱包账户数据
+     *
+     * @param userId
+     * @return
+     */
+    UserAccountSummaryDto getUserWalletAccountSummaryDto(long userId);
+
+    /**
+     * 获取用户钱包账户数据
+     *
+     * @param userId
+     * @param priceMap
+     * @return
+     */
+    UserAccountSummaryDto getUserWalletAccountSummaryDto(long userId, Map<String, BigDecimal> priceMap);
+
+}

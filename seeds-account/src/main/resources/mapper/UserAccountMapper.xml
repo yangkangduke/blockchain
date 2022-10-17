@@ -56,4 +56,12 @@
         where user_id = #{userId,jdbcType=BIGINT}
           and currency = #{currency,jdbcType=VARCHAR}
     </select>
+
+    <select id="getUserAccountByUserId" resultType="com.seeds.account.model.UserAccount">
+        select *
+        from user_account
+        where user_id = #{userId,jdbcType=BIGINT}
+    </select>
+
+
 </mapper>

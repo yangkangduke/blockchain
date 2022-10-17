@@ -1,5 +1,6 @@
 package com.seeds.account.service;
 
+import com.seeds.account.model.UserAccount;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -68,4 +69,14 @@ public interface IWalletAccountService {
      */
     @Transactional(rollbackFor = Exception.class)
     boolean updateFreezeAndAvailable(Long userId, String sourceCurrency, BigDecimal sourceAmount, String targetCurrency, BigDecimal targetAmount);
+
+    /**
+     * 账户列表
+     *
+     * @param userId
+     * @return
+     */
+    List<UserAccount> getAccounts(long userId);
+
+
 }

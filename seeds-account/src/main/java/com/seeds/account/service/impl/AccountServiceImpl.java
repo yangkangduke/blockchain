@@ -3,6 +3,7 @@ package com.seeds.account.service.impl;
 import com.google.common.collect.ImmutableMap;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.anno.ExecutionLock;
+import com.seeds.account.calc.AccountCalculator;
 import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.dto.*;
 import com.seeds.account.enums.*;
@@ -10,8 +11,10 @@ import com.seeds.account.ex.ActionDeniedException;
 import com.seeds.account.ex.MissingElementException;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.account.model.ChainDepositWithdrawHis;
+import com.seeds.account.model.UserAccount;
 import com.seeds.account.service.*;
 import com.seeds.account.util.AddressUtils;
+import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
@@ -28,8 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.seeds.account.AccountConstants.WITHDRAW_DECIMALS;
 
@@ -69,6 +72,8 @@ public class AccountServiceImpl implements IAccountService {
     ITransactionService transactionService;
     @Autowired
     IUserAccountActionService userAccountActionService;
+//    @Autowired
+//    IPriceService priceService;
 
 
     @Override
@@ -268,6 +273,32 @@ public class AccountServiceImpl implements IAccountService {
     public void checkFundingStatus() {
         boolean settling = fundingRateActionService.isAnySettlingAsset();
         Utils.check(!settling, ErrorCode.ACCOUNT_IN_SETTLEMENT);
+    }
+
+    @Override
+    public UserAccountSummaryDto getUserWalletAccountSummaryDto(long userId) {
+//        Map<String, BigDecimal> priceMap = priceService.getLatestPriceMap();
+        Map<String, BigDecimal> priceMap = new HashMap<>();
+        priceMap.put("USDT", new BigDecimal(1));
+        return getUserWalletAccountSummaryDto(userId, priceMap);
+    }
+
+    @Override
+    public UserAccountSummaryDto getUserWalletAccountSummaryDto(long userId, Map<String, BigDecimal> priceMap) {
+        List<UserAccount> accounts = walletAccountService.getAccounts(userId);
+        UserAccountSummaryDto userAccountSummaryDto = AccountCalculator.calculateAccountSummary(
+                accounts.stream().map(e -> ObjectUtils.copy(e, new UserAccountDto())).collect(Collectors.toList()),
+                priceMap);
+
+        Set<String> existingCurrencies = userAccountSummaryDto.getAccounts().stream().map(UserAccountDto::getCurrency).collect(Collectors.toSet());
+        chainDepositService.getAllDepositRules().forEach(rule -> {
+            String currency = rule.getCurrency();
+            if (!existingCurrencies.contains(currency)) {
+                userAccountSummaryDto.getAccounts().add(AccountCalculator.createWalletAccountOnFly(currency, priceMap.get(currency)));
+                existingCurrencies.add(currency);
+            }
+        });
+        return userAccountSummaryDto;
     }
 
     @Override
