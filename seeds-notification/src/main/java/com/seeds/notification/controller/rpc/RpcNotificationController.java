@@ -2,11 +2,10 @@ package com.seeds.notification.controller.rpc;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.seeds.common.dto.GenericDto;
 import com.seeds.common.constant.mq.KafkaTopic;
-import com.seeds.notification.dto.NoticeDTO;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.notification.dto.request.NoticePageReq;
-import com.seeds.notification.dto.request.NoticeSaveReq;
+import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.notification.dto.response.NotificationResp;
 import com.seeds.notification.mq.producer.KafkaProducer;
 import com.seeds.notification.service.NotificationService;
@@ -34,12 +33,9 @@ public class RpcNotificationController {
     private NotificationService notificationService;
 
     @PostMapping("/sendMessage")
-    public GenericDto<Object> sendMessage(@RequestBody NoticeSaveReq req) {
+    public GenericDto<Object> sendMessage(@RequestBody NotificationReq req) {
 
-        NoticeDTO msgDTO = new NoticeDTO();
-        msgDTO.setUcUserIds(req.getUcUserIds());
-        msgDTO.setContent(req.getContent());
-        kafkaProducer.send(KafkaTopic.SEND_NOTIFICATION, JSONUtil.toJsonStr(msgDTO));
+        kafkaProducer.sendAsync(KafkaTopic.SEND_NOTIFICATION, JSONUtil.toJsonStr(req));
         return GenericDto.success(null);
     }
 

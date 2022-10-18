@@ -1,5 +1,6 @@
 package com.seeds.account.service.impl;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.chain.dto.NativeChainBlockDto;
@@ -16,10 +17,13 @@ import com.seeds.account.mapper.ChainDepositWithdrawHisMapper;
 import com.seeds.account.model.ChainBlock;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.account.model.ChainDepositWithdrawHis;
+import com.seeds.account.sender.KafkaProducer;
 import com.seeds.account.service.*;
 import com.seeds.account.util.Utils;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.notification.dto.request.NotificationReq;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +63,8 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
 //    @Autowired
 //    AccountAutoExchangeService accountAutoExchangeService;
 
+    @Autowired
+    private KafkaProducer kafkaProducer;
 
     @Override
     public void insert(List<ChainDepositAddress> list) {
@@ -257,15 +263,16 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
             // 充币自动兑换 （不需要审核的外部充币）
 //            accountAutoExchangeService.exchange(transaction.getUserId(), transaction.getCurrency(), transaction.getAmount(), transaction.getInternal() == 1);
 
+
             // 发送通知给客户
-//            notificationService.sendNotificationAsync(NotificationDto.builder()
-//                    .notificationType(AccountAction.DEPOSIT.getNotificationType())
-//                    .userId(transaction.getUserId())
-//                    .values(ImmutableMap.of(
-//                            "ts", System.currentTimeMillis(),
-//                            "currency", transaction.getCurrency(),
-//                            "amount", transaction.getAmount()))
-//                    .build());
+            kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, NotificationReq.builder()
+                    .notificationType(AccountAction.DEPOSIT.getNotificationType())
+                    .ucUserIds(ImmutableList.of(transaction.getUserId()))
+                    .values(ImmutableMap.of(
+                            "ts", System.currentTimeMillis(),
+                            "currency", transaction.getCurrency(),
+                            "amount", transaction.getAmount()))
+                    .build());
         });
     }
 }

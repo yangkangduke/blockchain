@@ -3,7 +3,7 @@ package com.seeds.admin.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.notification.dto.request.NoticePageReq;
-import com.seeds.notification.dto.request.NoticeSaveReq;
+import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.notification.dto.response.NotificationResp;
 import com.seeds.notification.feign.RemoteNoticeService;
 import io.swagger.annotations.Api;
@@ -28,7 +28,7 @@ public class SysNotificationController {
 
     @RequestMapping("send-message")
     @ApiOperation(value = "发送消息")
-    public GenericDto<Object> sendMessage(@RequestBody NoticeSaveReq req) {
+    public GenericDto<Object> sendMessage(@RequestBody NotificationReq req) {
         return remoteNoticeService.sendMessage(req);
     }
 

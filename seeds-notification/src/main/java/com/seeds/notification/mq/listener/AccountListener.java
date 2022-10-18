@@ -13,17 +13,17 @@ import javax.annotation.Resource;
 
 /**
  * @author: hewei
- * @date 2022/9/21
+ * @date 2022/10/18
  */
-@Component
 @Slf4j
-public class SendNotificationListener {
-
+@Component
+public class AccountListener {
     @Resource
     private NotificationService notificationService;
 
-    @KafkaListener(groupId = "notice-consumer-group", topics = {KafkaTopic.SEND_NOTIFICATION})
-    public void sendNotice(String msg) {
+
+    @KafkaListener(groupId = "account-consumer-group", topics = {KafkaTopic.TOPIC_ACCOUNT_UPDATE})
+    public void receiveNotice(String msg) {
         log.info("收到消息：{}", msg);
         NotificationReq notificationReq = JSONUtil.toBean(msg, NotificationReq.class);
         // sava message to db
