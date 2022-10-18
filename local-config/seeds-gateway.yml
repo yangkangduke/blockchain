@@ -33,7 +33,7 @@ spring:
         - id: seeds-account-internal-service
           uri: ${service.url.account}
           predicates:
-            - NormalizedPath=/account-internal/**
+            - Path=/account-internal/**
         - id: seeds-wallet-service
           uri: ${service.url.wallet}
           predicates:
