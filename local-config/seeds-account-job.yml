@@ -21,22 +21,16 @@ elasticjob:
     serverLists: 192.168.1.101:2181
     namespace: seeds-account-job
   jobs:
-    # createAddressJob
+    # 自动创建空闲地址，每分钟运行一次
     createAddressJob:
       # 作业job类
       elasticJobClass: com.seeds.account.task.AutoCreateAddressTask
-      # 定时cron   every 10 sec
-      cron: "0/10 * * * * ?"
+      # 定时cron   every Minutes
+      cron: "* 0/1 * * * ?"
       # 作业分片总数
       shardingTotalCount: 1
       # 作业描述信息
       description: "自动创建空闲地址"
-      # 错误处理策略
-      # LOG:记录作业异常日志，但不中断作业执行
-      # THROW:抛出系统异常并中断作业执行
-      # IGNORE: 忽略系统异常且不中断作业执行
-      # 略：EMAIL,WECHAT,DINGTALK
-      jobErrorHandlerType: LOG
       #部署作业时，先禁止启动，部署结束后统一启动
       disabled: false
       #本地配置覆盖注册中心配置,每次启动作业都以本地配置为准
@@ -44,9 +38,24 @@ elasticjob:
     # scanChainBlockJob
     scanChainBlockJob:
       elasticJobClass: com.seeds.account.task.ScanChainBlockTask
-      cron: "0/2 * * * * ?"
+      cron: "0/5 * * * * ?"
       shardingTotalCount: 1
       description: "scanChainBlockJob"
-      jobErrorHandlerType: LOG
+      disabled: false
+      overwrite: true
+      # 执行提币请求，每5秒执行一次
+    executeWithdrawJob:
+      elasticJobClass: com.seeds.account.task.ExecuteWithdrawTask
+      cron: "0/5 * * * * ?"
+      shardingTotalCount: 1
+      description: "执行提币请求"
+      disabled: false
+      overwrite: true
+      # 查询提币结果，每5秒执行一次
+    scanWithdrawJob:
+      elasticJobClass: com.seeds.account.task.ScanWithdrawTask
+      cron: "0/5 * * * * ?"
+      shardingTotalCount: 1
+      description: "查询提币结果"
       disabled: false
       overwrite: true
