@@ -1,16 +1,18 @@
 package com.seeds.account.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.AccountConstants;
-import com.seeds.account.dto.UserAccountSummaryDto;
-import com.seeds.account.dto.WithdrawRequestDto;
-import com.seeds.account.dto.WithdrawResponseDto;
+import com.seeds.account.dto.*;
+import com.seeds.account.dto.req.AccountHistoryReq;
 import com.seeds.account.service.IAccountService;
 import com.seeds.account.service.IChainDepositService;
+import com.seeds.account.service.IChainDepositWithdrawHisService;
+import com.seeds.account.service.ISystemConfigService;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +33,13 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
     @Autowired
-    IChainDepositService chainDepositService;
+    private IChainDepositService chainDepositService;
     @Autowired
-    IAccountService accountService;
+    private IAccountService accountService;
+    @Autowired
+    private IChainDepositWithdrawHisService chainDepositWithdrawHisService;
+    @Autowired
+    private ISystemConfigService systemConfigService;
 
 
     /**
@@ -104,4 +110,27 @@ public class AccountController {
             return Utils.returnFromException(e);
         }
     }
+
+    /**
+     * 获取充提历史
+     *
+     * @return
+     */
+    @PostMapping("/deposit-withdraw-history")
+    @ApiOperation("获取充提历史")
+    public GenericDto<IPage<ChainDepositWithdrawHisDto>> getDepositWithdrawHistory(@RequestBody AccountHistoryReq accountHistoryReq) {
+        try {
+            long userId = getUserId();
+            accountHistoryReq.setUserId(userId);
+            Page page = new Page();
+            page.setCurrent(accountHistoryReq.getCurrent());
+            page.setSize(accountHistoryReq.getSize());
+            IPage<ChainDepositWithdrawHisDto> list = chainDepositWithdrawHisService.getHistory(page, accountHistoryReq);
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getDepositWithdrawHistory", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
 }

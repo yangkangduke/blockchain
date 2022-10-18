@@ -81,4 +81,12 @@ public class Utils {
         }
     }
 
+    /**
+     * @param page
+     * @param size
+     */
+    public static void checkPage(int page, int size) {
+        Assert.isTrue(page > 0, "checkPage(page,size): invalid page");
+        Assert.isTrue(size > 0 && size <= 50, "checkPage(page,size): invalid size");
+    }
 }

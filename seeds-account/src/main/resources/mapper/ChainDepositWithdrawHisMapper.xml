@@ -47,6 +47,30 @@
         </foreach>
         order by id
     </select>
+
+    <select id="selectByUserAndTime" resultType="com.seeds.account.dto.ChainDepositWithdrawHisDto" parameterType="com.seeds.account.dto.req.AccountHistoryReq">
+        select *
+        from chain_deposit_withdraw_his
+        <where>
+            <if test="query.userId != null">
+                <![CDATA[ and user_id = #{query.userId} ]]>
+            </if>
+            <if test="query.startTime != null">
+                <![CDATA[ and create_time >= #{query.startTime} ]]>
+            </if>
+            <if test="query.endTime != null">
+                <![CDATA[ and create_time < #{query.endTime} ]]>
+            </if>
+            <if test="query.currency != null">
+                <![CDATA[ and currency = #{query.currency} ]]>
+            </if>
+            <if test="query.action != null">
+                <![CDATA[ and `action` = #{query.action} ]]>
+            </if>
+            ORDER BY id DESC
+        </where>
+    </select>
+
     <update id="rollbackByBlockNumberAndBlockHash">
         <![CDATA[
         update chain_deposit_withdraw_his
