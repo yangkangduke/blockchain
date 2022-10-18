@@ -1,21 +1,26 @@
 package com.seeds.notification.dto.request;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: hewei
  * @date 2022/9/21
  */
 @Data
-@ApiModel(value = "保存通知请求入参")
-public class NoticeSaveReq {
+@Builder
+public class NotificationReq {
     @ApiModelProperty("用户id")
     private List<Long> ucUserIds;
 
+    @ApiModelProperty("通知类型")
+    private String notificationType;
+
     @ApiModelProperty("消息内容")
-    private String content;
+    private Map<String, Object> values = new HashMap<>();
 }

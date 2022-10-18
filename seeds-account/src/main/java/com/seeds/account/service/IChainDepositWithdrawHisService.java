@@ -1,6 +1,10 @@
 package com.seeds.account.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.account.dto.ChainDepositWithdrawHisDto;
+import com.seeds.account.dto.req.AccountHistoryReq;
 import com.seeds.account.model.ChainDepositWithdrawHis;
 import com.seeds.account.model.ChainDepositWithdrawSigHis;
 import com.seeds.common.enums.Chain;
@@ -55,4 +59,11 @@ public interface IChainDepositWithdrawHisService extends IService<ChainDepositWi
      * @param id
      * @return
      */
-    ChainDepositWithdrawHis getHistory(long id);}
+    ChainDepositWithdrawHis getHistory(long id);
+
+    /**
+     * 查询某一个人的充提记录
+     * @return
+     */
+    IPage<ChainDepositWithdrawHisDto> getHistory(Page page, AccountHistoryReq accountHistoryReq);
+}

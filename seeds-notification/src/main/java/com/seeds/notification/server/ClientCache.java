@@ -3,7 +3,9 @@ package com.seeds.notification.server;
 import com.corundumstudio.socketio.SocketIOClient;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -16,18 +18,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientCache {
 
     //本地缓存
-    private static Map<Long, SocketIOClient> concurrentHashMap = new ConcurrentHashMap<>();
+    private static Map<Long, HashMap<UUID, SocketIOClient>> concurrentHashMap = new ConcurrentHashMap<>();
 
     /**
      * 存入本地缓存
      *
      * @param userId         用户ID
+     * @param sessionId      连接的sessionID
      * @param socketIOClient 对应的通道连接信息
      */
-    public void saveClient(Long userId, SocketIOClient socketIOClient) {
-        if (null != userId) {
-            concurrentHashMap.put(userId, socketIOClient);
+    public void saveClient(Long userId, UUID sessionId, SocketIOClient socketIOClient) {
+        HashMap<UUID, SocketIOClient> sessionIdClientCache = concurrentHashMap.get(userId);
+        if (sessionIdClientCache == null) {
+            sessionIdClientCache = new HashMap<>();
         }
+        sessionIdClientCache.put(sessionId, socketIOClient);
+        concurrentHashMap.put(userId, sessionIdClientCache);
     }
 
     /**
@@ -36,7 +42,7 @@ public class ClientCache {
      * @param userId
      * @return
      */
-    public SocketIOClient getUserClient(Long userId) {
+    public HashMap<UUID, SocketIOClient> getUserClient(Long userId) {
         return concurrentHashMap.get(userId);
     }
 
@@ -44,7 +50,7 @@ public class ClientCache {
     /**
      * 删除链接信息
      */
-    public void deleteSessionClient(SocketIOClient socketIOClient) {
-        concurrentHashMap.values().remove(socketIOClient);
+    public void deleteSessionClient(Long userId, UUID sessionId) {
+        concurrentHashMap.get(userId).remove(sessionId);
     }
 }

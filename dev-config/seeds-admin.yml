@@ -60,6 +60,6 @@ hystrix:
           thread:
             timeoutInMilliseconds: 5000
 
-Seeds-uc: http://192.168.1.100:10101
-Seeds-notification: http://192.168.1.100:10105
-Seeds-gateway: http://192.168.1.100:9999
+Seeds-uc: http://127.0.0.1:10101
+Seeds-notification: http://127.0.0.1:10105
+Seeds-gateway: http://127.0.0.1:9999
