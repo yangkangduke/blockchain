@@ -16,7 +16,4 @@ public class NFTSoldOutReq {
     @ApiModelProperty(value = "NFT的归属人id")
     private Long userId;
 
-    @ApiModelProperty(value = "状态")
-    @NotNull(message = "The status cannot be empty")
-    private Integer status;
 }

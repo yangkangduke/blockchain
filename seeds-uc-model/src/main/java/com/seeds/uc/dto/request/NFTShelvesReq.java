@@ -22,10 +22,7 @@ public class NFTShelvesReq {
     @ApiModelProperty(value = "单位")
     private String unit;
 
-    @ApiModelProperty(value = "状态")
-    @NotNull(message = "The status cannot be empty")
-    private Integer status;
-
     @ApiModelProperty(value = "NFT的归属人id")
     private Long userId;
+
 }

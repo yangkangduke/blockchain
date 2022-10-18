@@ -13,4 +13,8 @@ public class SysNftSoldOutReq {
     @ApiModelProperty(value = "NFT唯一标识")
     @NotNull(message = "The id cannot be empty")
     private Long nftId;
+
+    @ApiModelProperty(value = "NFT的归属人id")
+    private Long userId;
+
 }

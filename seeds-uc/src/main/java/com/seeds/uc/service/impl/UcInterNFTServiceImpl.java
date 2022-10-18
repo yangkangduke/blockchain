@@ -2,10 +2,9 @@ package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.seeds.admin.dto.request.UcSwitchReq;
-import com.seeds.admin.dto.request.UpOrDownReq;
+import com.seeds.admin.dto.request.SysNftShelvesReq;
+import com.seeds.admin.dto.request.SysNftSoldOutReq;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
-import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.NFTAuctionResp;
@@ -15,13 +14,13 @@ import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.model.*;
 import com.seeds.uc.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -142,17 +141,12 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
             throw new GenericException(AdminErrorCodeEnum.ERR_40013_THIS_NFT_AUCTION_IS_IN_PROGRESS.getDescEn());
         }
         // 上架NFT
-        UcSwitchReq switchReq = new UcSwitchReq();
-        switchReq.setUcUserId(req.getUserId());
-        List<UpOrDownReq> reqs = new ArrayList<>();
-        UpOrDownReq upOrDownReq = new UpOrDownReq();
-        upOrDownReq.setId(req.getNftId());
-        upOrDownReq.setStatus(WhetherEnum.YES.value());
-        upOrDownReq.setPrice(req.getMaxPrice());
-        upOrDownReq.setUnit(req.getCurrency().name());
-        reqs.add(upOrDownReq);
-        switchReq.setReqs(reqs);
-        if (!remoteNftService.ucUpOrDown(switchReq).isSuccess()) {
+        SysNftShelvesReq shelvesReq = new SysNftShelvesReq();
+        shelvesReq.setUserId(req.getUserId());
+        shelvesReq.setNftId(req.getNftId());
+        shelvesReq.setPrice(req.getPrice());
+        shelvesReq.setUnit(req.getCurrency().getCode());
+        if (!remoteNftService.shelves(shelvesReq).isSuccess()) {
             throw new GenericException(UcErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
         }
         // 保存正向拍卖记录
@@ -169,17 +163,10 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
             throw new GenericException(AdminErrorCodeEnum.ERR_40013_THIS_NFT_AUCTION_IS_IN_PROGRESS.getDescEn());
         }
         // 上架NFT
-        UcSwitchReq switchReq = new UcSwitchReq();
-        List<UpOrDownReq> reqs = new ArrayList<>();
-        UpOrDownReq upOrDownReq = new UpOrDownReq();
-        upOrDownReq.setId(req.getNftId());
-        upOrDownReq.setStatus(WhetherEnum.YES.value());
-        upOrDownReq.setPrice(req.getPrice());
-        upOrDownReq.setUnit(req.getCurrency().name());
-        reqs.add(upOrDownReq);
-        switchReq.setUcUserId(req.getUserId());
-        switchReq.setReqs(reqs);
-        if (!remoteNftService.ucUpOrDown(switchReq).isSuccess()) {
+        SysNftSoldOutReq soldOutReq = new SysNftSoldOutReq();
+        soldOutReq.setNftId(req.getNftId());
+        soldOutReq.setUserId(req.getUserId());
+        if (!remoteNftService.soldOut(soldOutReq).isSuccess()) {
             throw new GenericException(UcErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
         }
         // 保存正向拍卖记录
@@ -222,19 +209,16 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     @Override
     public void shelves(NFTShelvesReq req) {
         // NFT上架
-        UcSwitchReq ucSwitchReq = new UcSwitchReq();
-        NFTShelvesReq shelvesReq = new NFTShelvesReq();
-        shelvesReq.setNftId(req.getNftId());
-        shelvesReq.setPrice(req.getPrice());
-        shelvesReq.setUnit(req.getUnit());
-        ucSwitchReq.setUcUserId(req.getUserId());
-        shelvesReq.setStatus(WhetherEnum.YES.value());
+        SysNftShelvesReq shelvesReq = new SysNftShelvesReq();
+        BeanUtils.copyProperties(req, shelvesReq);
+        remoteNftService.shelves(shelvesReq);
     }
 
     @Override
     public void soldOut(NFTSoldOutReq req) {
         // NFT下架
-        NFTSoldOutReq soldOutReq = new NFTSoldOutReq();
-        soldOutReq.setStatus(WhetherEnum.NO.value());
+        SysNftSoldOutReq soldOutReq = new SysNftSoldOutReq();
+        BeanUtils.copyProperties(req, soldOutReq);
+        remoteNftService.soldOut(soldOutReq);
     }
 }
