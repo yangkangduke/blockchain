@@ -28,6 +28,8 @@ import com.seeds.common.enums.ApiType;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.exception.SeedsException;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
+import com.seeds.uc.dto.request.NFTShelvesReq;
+import com.seeds.uc.dto.request.NFTSoldOutReq;
 import com.seeds.uc.enums.AccountActionStatusEnum;
 import com.seeds.uc.enums.NFTOfferStatusEnum;
 import com.seeds.uc.feign.RemoteNFTService;
@@ -667,6 +669,42 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Override
     public SysNftDetailResp detailApi(Long id) {
         return detail(id);
+    }
+
+    @Override
+    public void shelves(NFTShelvesReq req) {
+        Long nftId = req.getNftId();
+        SysNftEntity nft = getById(nftId);
+        // 判断NFT是否正常
+        if (NftInitStatusEnum.NORMAL.getCode() != nft.getInitStatus()) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
+        }
+        // 已锁定的NFT不可上架
+        if (WhetherEnum.YES.value() == nft.getLockFlag()) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40014_NFT_LOCKED_CAN_NOT_SHELVES.getDescEn());
+        }
+        // 判断NFT归属是否一致
+        if (!req.getUserId().equals(nft.getOwnerId())) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40012_NFT_ATTRIBUTED_PERSON_MISMATCH.getDescEn());
+        }
+        //上架
+        nft.setUnit(req.getUnit());
+        nft.setPrice(req.getPrice());
+        nft.setStatus(WhetherEnum.YES.value());
+        updateById(nft);
+    }
+
+    @Override
+    public void soldOut(NFTSoldOutReq req) {
+        Long nftId = req.getNftId();
+        SysNftEntity nft = getById(nftId);
+
+        // 判断NFT归属是否一致
+        if (!req.getUserId().equals(nft.getOwnerId())) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40012_NFT_ATTRIBUTED_PERSON_MISMATCH.getDescEn());
+        }
+        nft.setStatus(WhetherEnum.NO.value());
+        updateById(nft);
     }
 
     @Transactional(rollbackFor = Exception.class)

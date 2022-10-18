@@ -117,4 +117,27 @@ public class InterNFTController {
         return GenericDto.success(ucInterNFTService.actionInfo(id, userId));
     }
 
+    /**
+     *  上架
+     */
+    @PostMapping("/shelves")
+    @ApiOperation(value = "上架", notes = "上架")
+    @Inner
+    public GenericDto<Object> shelves(@Valid @RequestBody NFTShelvesReq req) {
+        ucInterNFTService.shelves(req);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  下架
+     */
+    @PostMapping("/sold-out")
+    @ApiOperation(value = "下架", notes = "下架")
+    @Inner
+    public GenericDto<Object> soldOut(@Valid @RequestBody NFTSoldOutReq req) {
+        ucInterNFTService.soldOut(req);
+        return GenericDto.success(null);
+    }
+
+
 }
