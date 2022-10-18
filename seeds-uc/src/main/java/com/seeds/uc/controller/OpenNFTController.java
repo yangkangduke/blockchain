@@ -4,12 +4,15 @@ package com.seeds.uc.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.SysNftPageReq;
 import com.seeds.admin.dto.request.UcSwitchReq;
+import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.request.NFTMakeOfferReq;
+import com.seeds.uc.enums.UcErrorCodeEnum;
+import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.service.IUcNftOfferService;
 import com.seeds.uc.service.IUcUserAccountService;
 import io.swagger.annotations.Api;
@@ -44,7 +47,13 @@ public class OpenNFTController {
     @PostMapping("/buy")
     @ApiOperation(value = "购买", notes = "购买")
     public GenericDto<Object> buyNFT(@Valid @RequestBody NFTBuyReq buyReq) {
-        ucUserAccountService.buyNFT(buyReq);
+        SysNftDetailResp sysNftDetailResp;
+        try {
+            sysNftDetailResp = remoteNftService.ucDetail(buyReq.getNftId()).getData();
+        } catch (Exception e) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
+        }
+        ucUserAccountService.buyNFT(buyReq, sysNftDetailResp);
         return GenericDto.success(null);
     }
 
@@ -65,7 +74,14 @@ public class OpenNFTController {
     @PostMapping("/make-offer")
     @ApiOperation("NFT出价")
     public GenericDto<Object> makeOffer(@Valid @RequestBody NFTMakeOfferReq req) {
-        ucNftOffersService.makeOffer(req);
+        SysNftDetailResp sysNftDetailResp;
+        try {
+            GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = remoteNftService.ucDetail(req.getNftId());
+            sysNftDetailResp = sysNftDetailRespGenericDto.getData();
+        } catch (Exception e) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
+        }
+        ucNftOffersService.makeOffer(req, sysNftDetailResp);
         return GenericDto.success(null);
     }
 

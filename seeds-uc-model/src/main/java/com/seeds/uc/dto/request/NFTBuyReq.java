@@ -24,7 +24,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class NFTBuyReq implements Serializable {
 
-
     @ApiModelProperty("admin中的NFT的id")
     @NotNull
     private Long nftId;

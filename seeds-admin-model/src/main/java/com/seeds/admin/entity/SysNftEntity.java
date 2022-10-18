@@ -75,7 +75,7 @@ public class SysNftEntity extends BaseEntity {
 	private BigDecimal price;
 
 	/**
-	 * 单位 USDC
+	 * 单位
 	 */
 	@TableField("unit")
 	private String unit;

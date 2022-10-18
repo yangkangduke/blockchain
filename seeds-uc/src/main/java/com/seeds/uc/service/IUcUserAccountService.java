@@ -11,6 +11,7 @@ import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountAmountResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
+import com.seeds.uc.enums.CurrencyEnum;
 import com.seeds.uc.model.UcUserAccount;
 
 import java.math.BigDecimal;
@@ -66,15 +67,17 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      *  检查账户里面的金额是否足够支付
      * @param currentUserId
      * @param amount
+     * @param currency
      * @return
      */
-    Boolean checkBalance(Long currentUserId, BigDecimal amount);
+    Boolean checkBalance(Long currentUserId, BigDecimal amount, CurrencyEnum currency);
 
     /**
      * 购买nft
      * @param buyReq
+     * @param sysNftDetail NFT详情
      */
-    void buyNFT(NFTBuyReq buyReq);
+    void buyNFT(NFTBuyReq buyReq, SysNftDetailResp sysNftDetail);
 
     /**
      * 购买nft

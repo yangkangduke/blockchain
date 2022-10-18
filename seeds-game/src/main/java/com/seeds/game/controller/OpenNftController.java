@@ -118,6 +118,7 @@ public class OpenNftController {
     @PostMapping("sold-out")
     @ApiOperation("NFT下架")
     public GenericDto<Object> soldOut(@Valid @RequestBody OpenNftSoldOutReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         return ucRemoteNftService.soldOut(req);
     }
 

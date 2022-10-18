@@ -47,6 +47,9 @@ public class UcNftReverseAuction implements Serializable {
     @ApiModelProperty("间隔时间")
     private Long intervalTime;
 
+    @ApiModelProperty("间隔时间单位 m,h,d,s")
+    private String intervalUnit;
+
     @ApiModelProperty("下降百分比")
     private BigDecimal dropPoint;
 

@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seeds.admin.dto.request.SysNftShelvesReq;
 import com.seeds.admin.dto.request.SysNftSoldOutReq;
+import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.uc.dto.request.*;
@@ -65,7 +66,7 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
                 //  卖家balance增加
                 LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
                         .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
-                        .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+                        .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
                 UcUserAccount sellerAccount = ucUserAccountService.getOne(wrapper);
                 sellerAccount.setBalance(sellerAccount.getBalance().add(amount));
                 ucUserAccountService.updateById(sellerAccount);
@@ -74,7 +75,7 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
             // 买家freeze减少
             LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
                     .eq(UcUserAccount::getUserId, buyReq.getToUserId())
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
             UcUserAccount buyerAccount = ucUserAccountService.getOne(wrapper);
             buyerAccount.setFreeze(buyerAccount.getFreeze().subtract(amount));
             ucUserAccountService.updateById(buyerAccount);
@@ -83,7 +84,7 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
             // 买家解冻金额，增加余额
             LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
                     .eq(UcUserAccount::getUserId, buyReq.getToUserId())
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
             UcUserAccount buyerAccount = ucUserAccountService.getOne(wrapper);
             buyerAccount.setBalance(buyerAccount.getBalance().add(amount));
             buyerAccount.setFreeze(buyerAccount.getFreeze().subtract(amount));
@@ -128,8 +129,8 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     }
 
     @Override
-    public void buyNFT(NFTBuyReq req) {
-        ucUserAccountService.buyNFT(req);
+    public void buyNFT(NFTBuyReq req, SysNftDetailResp sysNftDetailResp) {
+        ucUserAccountService.buyNFT(req, sysNftDetailResp);
     }
 
     @Override
@@ -157,19 +158,21 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
 
     @Override
     public void reverseAuction(NFTReverseAuctionReq req) {
-        // 判断是否已存在正向拍卖
+        // 判断是否已存在反向拍卖
         UcNftReverseAuction reverseAuction = ucNftReverseAuctionService.queryByUserIdAndNftId(req.getUserId(), req.getNftId());
         if (reverseAuction != null) {
             throw new GenericException(AdminErrorCodeEnum.ERR_40013_THIS_NFT_AUCTION_IS_IN_PROGRESS.getDescEn());
         }
         // 上架NFT
-        SysNftSoldOutReq soldOutReq = new SysNftSoldOutReq();
-        soldOutReq.setNftId(req.getNftId());
-        soldOutReq.setUserId(req.getUserId());
-        if (!remoteNftService.soldOut(soldOutReq).isSuccess()) {
+        SysNftShelvesReq shelvesReq = new SysNftShelvesReq();
+        shelvesReq.setNftId(req.getNftId());
+        shelvesReq.setUserId(req.getUserId());
+        shelvesReq.setPrice(req.getPrice());
+        shelvesReq.setUnit(req.getCurrency().getCode());
+        if (!remoteNftService.shelves(shelvesReq).isSuccess()) {
             throw new GenericException(UcErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
         }
-        // 保存正向拍卖记录
+        // 保存反向拍卖记录
         reverseAuction = UcNftReverseAuction.builder().build();
         BeanUtil.copyProperties(req, reverseAuction);
         ucNftReverseAuctionService.save(reverseAuction);
@@ -177,12 +180,34 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
 
     @Override
     public void forwardBids(NFTMakeOfferReq req) {
-        ucNftOfferService.makeOffer(req);
+        SysNftDetailResp sysNftDetailResp;
+        try {
+            sysNftDetailResp = remoteNftService.ucDetail(req.getNftId()).getData();
+        } catch (Exception e) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18009_FAILED_TO_BID_NFT);
+        }
+        // 判断是否已存在正向拍卖
+        UcNftReverseAuction reverseAuction = ucNftReverseAuctionService.queryByUserIdAndNftId(sysNftDetailResp.getOwnerId(), req.getNftId());
+        if (reverseAuction == null) {
+            throw new GenericException(AdminErrorCodeEnum.ERR_40015_THIS_NFT_IS_NOT_IN_THE_AUCTION.getDescEn());
+        }
+        ucNftOfferService.makeOffer(req, sysNftDetailResp);
     }
 
     @Override
     public void reverseBids(NFTBuyReq req) {
-        buyNFT(req);
+        SysNftDetailResp sysNftDetailResp;
+        try {
+            sysNftDetailResp = remoteNftService.ucDetail(req.getNftId()).getData();
+        } catch (Exception e) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
+        }
+        // 判断是否已存在反向拍卖
+        UcNftReverseAuction reverseAuction = ucNftReverseAuctionService.queryByUserIdAndNftId(sysNftDetailResp.getOwnerId(), req.getNftId());
+        if (reverseAuction == null) {
+            throw new GenericException(AdminErrorCodeEnum.ERR_40015_THIS_NFT_IS_NOT_IN_THE_AUCTION.getDescEn());
+        }
+        buyNFT(req, sysNftDetailResp);
     }
 
     @Override

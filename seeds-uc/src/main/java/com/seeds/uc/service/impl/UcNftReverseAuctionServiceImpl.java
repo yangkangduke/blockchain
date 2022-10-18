@@ -3,7 +3,6 @@ package com.seeds.uc.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.uc.enums.NFTOfferStatusEnum;
 import com.seeds.uc.mapper.UcNftReverseAuctionMapper;
 import com.seeds.uc.model.UcNftReverseAuction;
 import com.seeds.uc.service.IUcNftReverseAuctionService;
@@ -26,7 +25,7 @@ public class UcNftReverseAuctionServiceImpl extends ServiceImpl<UcNftReverseAuct
     @Override
     public UcNftReverseAuction queryByUserIdAndNftId(Long userId, Long nftId) {
         LambdaQueryWrapper<UcNftReverseAuction> query = new QueryWrapper<UcNftReverseAuction>().lambda()
-                .eq(UcNftReverseAuction::getUserId, NFTOfferStatusEnum.BIDDING)
+                .eq(UcNftReverseAuction::getUserId, userId)
                 .eq(UcNftReverseAuction::getNftId, nftId);
         return getOne(query);
     }

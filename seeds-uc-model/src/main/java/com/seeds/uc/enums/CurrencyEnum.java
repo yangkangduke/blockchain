@@ -13,6 +13,8 @@ import lombok.Getter;
 public enum  CurrencyEnum {
     @JsonProperty("USDC")
     USDC("usdc", "usdc"),
+    @JsonProperty("USDT")
+    USDT("usdt", "usdt"),
 
     ;
     @JsonValue

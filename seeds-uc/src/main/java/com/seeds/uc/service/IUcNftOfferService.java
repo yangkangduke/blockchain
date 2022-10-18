@@ -1,6 +1,7 @@
 package com.seeds.uc.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.dto.response.NFTOfferResp;
 import com.seeds.uc.model.UcNftOffer;
@@ -21,8 +22,9 @@ public interface IUcNftOfferService extends IService<UcNftOffer> {
     /**
      * 出价
      * @param req NFT相关入参
+     * @param sysNftDetail NFT详情
      */
-    void makeOffer(NFTMakeOfferReq req);
+    void makeOffer(NFTMakeOfferReq req, SysNftDetailResp sysNftDetail);
 
     /**
      * 出价列表
