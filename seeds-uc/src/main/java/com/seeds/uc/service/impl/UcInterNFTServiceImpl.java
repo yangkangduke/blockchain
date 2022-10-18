@@ -2,10 +2,9 @@ package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.seeds.admin.dto.request.UcSwitchReq;
-import com.seeds.admin.dto.request.UpOrDownReq;
+import com.seeds.admin.dto.request.SysNftShelvesReq;
+import com.seeds.admin.dto.request.SysNftSoldOutReq;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
-import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.NFTAuctionResp;
@@ -15,13 +14,13 @@ import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.model.*;
 import com.seeds.uc.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -59,32 +58,37 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     @Transactional(rollbackFor = Exception.class)
     public void buyNFTCallback(NFTBuyCallbackReq buyReq) {
         BigDecimal amount = buyReq.getAmount();
-        // 如果是admin端mint的nft，在uc端不用记账该账户到uc_user_account，都是uc端的用户则需要记账
-        if (null != buyReq.getOwnerType() && buyReq.getOwnerType() == 1) { // 卖家为UC端用户
-            //  卖家balance增加
+        // 成功
+        if (AccountActionStatusEnum.SUCCESS == buyReq.getActionStatusEnum()) {
+            // 如果是admin端mint的nft，在uc端不用记账该账户到uc_user_account，都是uc端的用户则需要记账，卖家为UC端用户
+            if (null != buyReq.getOwnerType() && buyReq.getOwnerType() == 1) {
+                //  卖家balance增加
+                LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
+                        .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
+                        .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+                UcUserAccount sellerAccount = ucUserAccountService.getOne(wrapper);
+                sellerAccount.setBalance(sellerAccount.getBalance().add(amount));
+                ucUserAccountService.updateById(sellerAccount);
+            }
+
+            // 买家freeze减少
             LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
-                    .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
+                    .eq(UcUserAccount::getUserId, buyReq.getToUserId())
                     .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
-            UcUserAccount account = ucUserAccountService.getOne(wrapper);
-
-            ucUserAccountService.update(UcUserAccount.builder()
-                    .balance(account.getBalance().add(amount))
-                    .build(), new LambdaQueryWrapper<UcUserAccount>()
-                    .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
-
+            UcUserAccount buyerAccount = ucUserAccountService.getOne(wrapper);
+            buyerAccount.setFreeze(buyerAccount.getFreeze().subtract(amount));
+            ucUserAccountService.updateById(buyerAccount);
+        } else {
+            // 失败
+            // 买家解冻金额，增加余额
+            LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
+                    .eq(UcUserAccount::getUserId, buyReq.getToUserId())
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+            UcUserAccount buyerAccount = ucUserAccountService.getOne(wrapper);
+            buyerAccount.setBalance(buyerAccount.getBalance().add(amount));
+            buyerAccount.setFreeze(buyerAccount.getFreeze().subtract(amount));
+            ucUserAccountService.updateById(buyerAccount);
         }
-        // 买家freeze减少
-        LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, buyReq.getToUserId())
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
-        UcUserAccount account = ucUserAccountService.getOne(wrapper);
-
-        ucUserAccountService.update(UcUserAccount.builder()
-                .freeze(account.getFreeze().subtract(amount))
-                .build(), new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, buyReq.getToUserId())
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
 
         // 改变交易记录的状态及其他信息
         ucUserAccountActionHistoryService.updateById(UcUserAccountActionHistory.builder()
@@ -137,17 +141,12 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
             throw new GenericException(AdminErrorCodeEnum.ERR_40013_THIS_NFT_AUCTION_IS_IN_PROGRESS.getDescEn());
         }
         // 上架NFT
-        UcSwitchReq switchReq = new UcSwitchReq();
-        switchReq.setUcUserId(req.getUserId());
-        List<UpOrDownReq> reqs = new ArrayList<>();
-        UpOrDownReq upOrDownReq = new UpOrDownReq();
-        upOrDownReq.setId(req.getNftId());
-        upOrDownReq.setStatus(WhetherEnum.YES.value());
-        upOrDownReq.setPrice(req.getMaxPrice());
-        upOrDownReq.setUnit(req.getCurrency().name());
-        reqs.add(upOrDownReq);
-        switchReq.setReqs(reqs);
-        if (!remoteNftService.ucUpOrDown(switchReq).isSuccess()) {
+        SysNftShelvesReq shelvesReq = new SysNftShelvesReq();
+        shelvesReq.setUserId(req.getUserId());
+        shelvesReq.setNftId(req.getNftId());
+        shelvesReq.setPrice(req.getPrice());
+        shelvesReq.setUnit(req.getCurrency().getCode());
+        if (!remoteNftService.shelves(shelvesReq).isSuccess()) {
             throw new GenericException(UcErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
         }
         // 保存正向拍卖记录
@@ -164,17 +163,10 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
             throw new GenericException(AdminErrorCodeEnum.ERR_40013_THIS_NFT_AUCTION_IS_IN_PROGRESS.getDescEn());
         }
         // 上架NFT
-        UcSwitchReq switchReq = new UcSwitchReq();
-        List<UpOrDownReq> reqs = new ArrayList<>();
-        UpOrDownReq upOrDownReq = new UpOrDownReq();
-        upOrDownReq.setId(req.getNftId());
-        upOrDownReq.setStatus(WhetherEnum.YES.value());
-        upOrDownReq.setPrice(req.getPrice());
-        upOrDownReq.setUnit(req.getCurrency().name());
-        reqs.add(upOrDownReq);
-        switchReq.setUcUserId(req.getUserId());
-        switchReq.setReqs(reqs);
-        if (!remoteNftService.ucUpOrDown(switchReq).isSuccess()) {
+        SysNftSoldOutReq soldOutReq = new SysNftSoldOutReq();
+        soldOutReq.setNftId(req.getNftId());
+        soldOutReq.setUserId(req.getUserId());
+        if (!remoteNftService.soldOut(soldOutReq).isSuccess()) {
             throw new GenericException(UcErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
         }
         // 保存正向拍卖记录
@@ -213,5 +205,20 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
             resp.setAuctionFlag(NFTAuctionStatusEnum.NONE.getCode());
         }
         return resp;
+    }
+    @Override
+    public void shelves(NFTShelvesReq req) {
+        // NFT上架
+        SysNftShelvesReq shelvesReq = new SysNftShelvesReq();
+        BeanUtils.copyProperties(req, shelvesReq);
+        remoteNftService.shelves(shelvesReq);
+    }
+
+    @Override
+    public void soldOut(NFTSoldOutReq req) {
+        // NFT下架
+        SysNftSoldOutReq soldOutReq = new SysNftSoldOutReq();
+        BeanUtils.copyProperties(req, soldOutReq);
+        remoteNftService.soldOut(soldOutReq);
     }
 }

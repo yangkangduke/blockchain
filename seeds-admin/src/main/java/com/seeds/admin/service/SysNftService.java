@@ -8,6 +8,8 @@ import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.SysNftEntity;
+import com.seeds.uc.dto.request.NFTShelvesReq;
+import com.seeds.uc.dto.request.NFTSoldOutReq;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -170,4 +172,15 @@ public interface SysNftService extends IService<SysNftEntity> {
      */
     SysNftDetailResp detailApi(Long id);
 
+    /**
+     * NFT上架
+     * @param req NFT信息
+     */
+    void shelves(NFTShelvesReq req);
+
+    /**
+     * NFT下架
+     * @param req NFT信息
+     */
+    void soldOut(NFTSoldOutReq req);
 }

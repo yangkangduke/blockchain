@@ -160,4 +160,22 @@ public interface RemoteNftService {
 	@ApiOperation("NFT详情")
 	GenericDto<SysNftDetailResp> detailApi(@RequestParam Long id);
 
+	/**
+	 * NFT上架
+	 * @param req NFT信息
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/shelves")
+	@ApiOperation("NFT上架")
+	GenericDto<Object> shelves(SysNftShelvesReq req);
+
+	/**
+	 * NFT下架
+	 * @param req NFT信息
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/sold-out")
+	@ApiOperation("NFT下架")
+	GenericDto<Object> soldOut(SysNftSoldOutReq req);
+
 }

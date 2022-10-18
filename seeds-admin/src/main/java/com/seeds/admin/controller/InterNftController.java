@@ -12,6 +12,8 @@ import com.seeds.admin.service.SysNftService;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
+import com.seeds.uc.dto.request.NFTShelvesReq;
+import com.seeds.uc.dto.request.NFTSoldOutReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -156,5 +158,20 @@ public class InterNftController {
     @Inner
     public GenericDto<SysNftDetailResp> detailApi(@RequestParam Long id) {
         return GenericDto.success(sysNftService.detailApi(id));
+    }
+    @PostMapping("shelves")
+    @ApiOperation("NFT上架")
+    @Inner
+    public GenericDto<Object> shelves(@Valid @RequestBody NFTShelvesReq req) {
+        sysNftService.shelves(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("sold-out")
+    @ApiOperation("NFT下架")
+    @Inner
+    public GenericDto<Object> soldOut(@Valid @RequestBody NFTSoldOutReq req) {
+        sysNftService.soldOut(req);
+        return GenericDto.success(null);
     }
 }

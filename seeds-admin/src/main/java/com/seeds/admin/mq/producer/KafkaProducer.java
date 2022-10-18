@@ -42,7 +42,7 @@ public class KafkaProducer {
      * 回调发送信息 是否成功
      */
     @Transactional
-    public void CallBackSend(String topic, String msg) {
+    public void callBackSend(String topic, String msg) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
             // 在数据库事务提交之后在发送消息
             @Override
