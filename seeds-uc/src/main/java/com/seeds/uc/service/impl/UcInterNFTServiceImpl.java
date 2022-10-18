@@ -59,32 +59,37 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
     @Transactional(rollbackFor = Exception.class)
     public void buyNFTCallback(NFTBuyCallbackReq buyReq) {
         BigDecimal amount = buyReq.getAmount();
-        // 如果是admin端mint的nft，在uc端不用记账该账户到uc_user_account，都是uc端的用户则需要记账
-        if (null != buyReq.getOwnerType() && buyReq.getOwnerType() == 1) { // 卖家为UC端用户
-            //  卖家balance增加
+        // 成功
+        if (AccountActionStatusEnum.SUCCESS == buyReq.getActionStatusEnum()) {
+            // 如果是admin端mint的nft，在uc端不用记账该账户到uc_user_account，都是uc端的用户则需要记账，卖家为UC端用户
+            if (null != buyReq.getOwnerType() && buyReq.getOwnerType() == 1) {
+                //  卖家balance增加
+                LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
+                        .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
+                        .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+                UcUserAccount sellerAccount = ucUserAccountService.getOne(wrapper);
+                sellerAccount.setBalance(sellerAccount.getBalance().add(amount));
+                ucUserAccountService.updateById(sellerAccount);
+            }
+
+            // 买家freeze减少
             LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
-                    .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
+                    .eq(UcUserAccount::getUserId, buyReq.getToUserId())
                     .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
-            UcUserAccount account = ucUserAccountService.getOne(wrapper);
-
-            ucUserAccountService.update(UcUserAccount.builder()
-                    .balance(account.getBalance().add(amount))
-                    .build(), new LambdaQueryWrapper<UcUserAccount>()
-                    .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
-
+            UcUserAccount buyerAccount = ucUserAccountService.getOne(wrapper);
+            buyerAccount.setFreeze(buyerAccount.getFreeze().subtract(amount));
+            ucUserAccountService.updateById(buyerAccount);
+        } else {
+            // 失败
+            // 买家解冻金额，增加余额
+            LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
+                    .eq(UcUserAccount::getUserId, buyReq.getToUserId())
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+            UcUserAccount buyerAccount = ucUserAccountService.getOne(wrapper);
+            buyerAccount.setBalance(buyerAccount.getBalance().add(amount));
+            buyerAccount.setFreeze(buyerAccount.getFreeze().subtract(amount));
+            ucUserAccountService.updateById(buyerAccount);
         }
-        // 买家freeze减少
-        LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, buyReq.getToUserId())
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
-        UcUserAccount account = ucUserAccountService.getOne(wrapper);
-
-        ucUserAccountService.update(UcUserAccount.builder()
-                .freeze(account.getFreeze().subtract(amount))
-                .build(), new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, buyReq.getToUserId())
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
 
         // 改变交易记录的状态及其他信息
         ucUserAccountActionHistoryService.updateById(UcUserAccountActionHistory.builder()

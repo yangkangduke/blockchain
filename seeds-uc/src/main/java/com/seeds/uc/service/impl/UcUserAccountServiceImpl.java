@@ -1,6 +1,7 @@
 package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -9,6 +10,7 @@ import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
@@ -24,6 +26,7 @@ import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.mapper.UcUserAccountMapper;
 import com.seeds.uc.model.*;
+import com.seeds.uc.mq.producer.KafkaProducer;
 import com.seeds.uc.service.*;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +63,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     private RemoteNftService remoteNftService;
     @Autowired
     private IUcUserService ucUserService;
+    @Resource
+    private KafkaProducer kafkaProducer;
 
     /**
      * 冲/提币
@@ -258,13 +264,13 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         }
         // todo 远程调用钱包接口
         // 冻结金额
-        UcUserAccountInfoResp info = this.getInfo(currentUserId);
-        this.update(UcUserAccount.builder()
-                .balance(info.getBalance().subtract(amount))
-                .freeze(info.getFreeze().add(amount))
-                .build(), new LambdaQueryWrapper<UcUserAccount>()
+        LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, currentUserId)
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+        UcUserAccount account = getOne(wrapper);
+        account.setBalance(account.getBalance().subtract(amount));
+        account.setFreeze(account.getFreeze().add(amount));
+        updateById(account);
 
         // 添加记录信息
         UcUserAccountActionHistory ucUserAccountActionHistory = UcUserAccountActionHistory.builder()
@@ -274,12 +280,13 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 .accountType(AccountTypeEnum.ACTUALS)
                 .currency(CurrencyEnum.USDC)
                 .status(AccountActionStatusEnum.PROCESSING)
+                .amount(amount)
                 .build();
         ucUserAccountActionHistoryService.save(ucUserAccountActionHistory);
         Long actionHistoryId = ucUserAccountActionHistory.getId();
 
         // 远程调用admin端归属人变更接口
-        List list = new ArrayList<NftOwnerChangeReq>();
+        List<NftOwnerChangeReq> list = new ArrayList<>();
         NftOwnerChangeReq nftOwnerChangeReq = new NftOwnerChangeReq();
         UcUser buyer = ucUserService.getById(currentUserId);
         if (null != buyer) {
@@ -292,13 +299,14 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         nftOwnerChangeReq.setId(nftId);
         nftOwnerChangeReq.setActionHistoryId(actionHistoryId);
         nftOwnerChangeReq.setOwnerType(nftDetail.getOwnerType());
+        nftOwnerChangeReq.setAmount(amount);
         if (nftDetail.getOwnerType() == 1) {
             // 卖家地址
             UcUser saler = ucUserService.getById(nftDetail.getOwnerId());
             nftOwnerChangeReq.setFromAddress(saler.getPublicAddress());
         }
         list.add(nftOwnerChangeReq);
-        remoteNftService.ownerChange(list);
+        kafkaProducer.send(KafkaTopic.UC_NFT_OWNER_CHANGE, JSONUtil.toJsonStr(list));
     }
 
     @Override

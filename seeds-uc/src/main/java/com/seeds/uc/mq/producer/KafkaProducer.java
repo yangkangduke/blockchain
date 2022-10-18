@@ -1,4 +1,4 @@
-package com.seeds.notification.mq.producer;
+package com.seeds.uc.mq.producer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;

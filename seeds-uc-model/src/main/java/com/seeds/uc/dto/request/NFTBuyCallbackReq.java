@@ -82,4 +82,5 @@ public class NFTBuyCallbackReq implements Serializable {
 
     @ApiModelProperty("区块的hash值")
     private String blockHash;
+
 }
