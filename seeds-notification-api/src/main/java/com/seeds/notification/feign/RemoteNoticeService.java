@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.notification.feign.interceptor.FeignInnerRequestInterceptor;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.notification.dto.request.NoticePageReq;
-import com.seeds.notification.dto.request.NoticeSaveReq;
+import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.notification.dto.response.NotificationResp;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,5 +22,5 @@ public interface RemoteNoticeService {
     GenericDto<Page<NotificationResp>> getNoticeList(@RequestBody NoticePageReq req);
 
     @PostMapping("/sendMessage")
-    GenericDto<Object> sendMessage(@RequestBody NoticeSaveReq req);
+    GenericDto<Object> sendMessage(@RequestBody NotificationReq req);
 }

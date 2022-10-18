@@ -68,6 +68,11 @@
         </dependency>
         <dependency>
             <groupId>com.seeds</groupId>
+            <artifactId>seeds-notification-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.seeds</groupId>
             <artifactId>seeds-wallet-api</artifactId>
             <version>${project.version}</version>
         </dependency>

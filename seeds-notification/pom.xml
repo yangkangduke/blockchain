@@ -96,6 +96,11 @@
         </dependency>
         <dependency>
             <groupId>com.seeds</groupId>
+            <artifactId>seeds-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.seeds</groupId>
             <artifactId>seeds-common-web</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -126,6 +131,11 @@
         <dependency>
             <groupId>com.seeds</groupId>
             <artifactId>seeds-uc-model</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.seeds</groupId>
+            <artifactId>seeds-account-model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

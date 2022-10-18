@@ -1,5 +1,6 @@
 package com.seeds.account.service.impl;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.seeds.account.AccountConstants;
@@ -16,11 +17,14 @@ import com.seeds.account.enums.*;
 import com.seeds.account.ex.AccountException;
 import com.seeds.account.mapper.*;
 import com.seeds.account.model.*;
+import com.seeds.account.sender.KafkaProducer;
 import com.seeds.account.service.*;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.wallet.dto.RawTransactionDto;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tags;
@@ -97,6 +101,9 @@ public class ChainActionServiceImpl implements IChainActionService {
     private IChainDepositWithdrawHisService chainDepositWithdrawHisService;
     @Autowired
     private IChainContractService chainContractService;
+
+    @Autowired
+    private KafkaProducer kafkaProducer;
 
     private final static Event UNISWAP_SWAPEVENT = new Event("Swap",
             Arrays.asList(
@@ -446,28 +453,28 @@ public class ChainActionServiceImpl implements IChainActionService {
                     // 充币自动兑换 （不需要审核的内部充币）
 //                    accountAutoExchangeService.exchange(assignedDepositAddress.getUserId(), tx.getCurrency(), amount, true);
 
-                    // 发送通知给客户 (充币方)
-//                    notificationService.sendNotificationAsync(NotificationDto.builder()
-//                            .notificationType(AccountAction.DEPOSIT.getNotificationType())
-//                            .userId(assignedDepositAddress.getUserId())
-//                            .values(ImmutableMap.of(
-//                                    "ts", System.currentTimeMillis(),
-//                                    "currency", tx.getCurrency(),
-//                                    "amount", amount))
-//                            .build());
+                    // 发送通知给客户(充币方)
+                    kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, NotificationReq.builder()
+                            .notificationType(AccountAction.DEPOSIT.getNotificationType())
+                            .ucUserIds(ImmutableList.of(assignedDepositAddress.getUserId()))
+                            .values(ImmutableMap.of(
+                                    "ts", System.currentTimeMillis(),
+                                    "currency", tx.getCurrency(),
+                                    "amount", amount))
+                            .build());
                 });
             }
         }
 
         // 发送通知用户提示提币成功(提币方)
-//        notificationService.sendNotificationAsync(NotificationDto.builder()
-//                .notificationType(AccountAction.WITHDRAW.getNotificationType())
-//                .userId(tx.getUserId())
-//                .values(ImmutableMap.of(
-//                        "ts", System.currentTimeMillis(),
-//                        "currency", tx.getCurrency(),
-//                        "amount", tx.getAmount()))
-//                .build());
+        kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, NotificationReq.builder()
+                .notificationType(AccountAction.WITHDRAW.getNotificationType())
+                .ucUserIds(ImmutableList.of(tx.getUserId()))
+                .values(ImmutableMap.of(
+                        "ts", System.currentTimeMillis(),
+                        "currency", tx.getCurrency(),
+                        "amount", tx.getAmount()))
+                .build());
     }
 
 
@@ -1110,15 +1117,16 @@ public class ChainActionServiceImpl implements IChainActionService {
         // 更新财务记录为成功
         userAccountActionService.updateStatusByActionUserIdSource(AccountAction.WITHDRAW, tx.getUserId(), String.valueOf(tx.getId()), CommonActionStatus.SUCCESS);
         log.info("updateWithdrawTxn update={}, replaceTx={}", tx, replaceTx);
+
         // 发送通知用户提示提币成功
-//        notificationService.sendNotificationAsync(NotificationDto.builder()
-//                .notificationType(AccountAction.WITHDRAW.getNotificationType())
-//                .userId(tx.getUserId())
-//                .values(ImmutableMap.of(
-//                        "ts", System.currentTimeMillis(),
-//                        "currency", tx.getCurrency(),
-//                        "amount", tx.getAmount()))
-//                .build());
+        kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, NotificationReq.builder()
+                .notificationType(AccountAction.WITHDRAW.getNotificationType())
+                .ucUserIds(ImmutableList.of(tx.getUserId()))
+                .values(ImmutableMap.of(
+                        "ts", System.currentTimeMillis(),
+                        "currency", tx.getCurrency(),
+                        "amount", tx.getAmount()))
+                .build());
     }
 
     /**

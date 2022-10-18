@@ -6,7 +6,7 @@ import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketConfig;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.seeds.notification.dto.NoticeDTO;
+import com.seeds.notification.dto.NotificationDto;
 import com.seeds.notification.enums.NoticeErrorCodeEnum;
 import com.seeds.notification.server.util.ServerConfigUtil;
 import com.seeds.uc.constant.UcRedisKeysConstant;
@@ -16,15 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 public class PushServer {
-
-    @Autowired
-    private RedissonClient redissonClient = SpringUtil.getBean(RedissonClient.class); // 直接使用 @Autowired 无法注入redissonClient
-
     @Autowired
     private ClientCache clientCache = SpringUtil.getBean(ClientCache.class);
 
@@ -53,24 +50,21 @@ public class PushServer {
 
 
         server.addConnectListener(client -> {
-            String token = client.getHandshakeData().getSingleUrlParam("token");
-            LoginUserDTO loginUserDTO = redissonClient.<LoginUserDTO>getBucket(UcRedisKeysConstant.getUcTokenKey(token)).get();
-            if (null == loginUserDTO) {
-                throw new GenericException(NoticeErrorCodeEnum.ERR_1001_WEBSOCKET_AUTH_FAILED.getDescEn());
-            }
-            Long userId = loginUserDTO.getUserId();
+            Long userId = Long.parseLong(client.getHandshakeData().getSingleUrlParam("userId"));
             UUID sessionId = client.getSessionId();
-
             if (null == userId) {
                 client.disconnect();
             }
-            clientCache.saveClient(userId, client);
+            clientCache.saveClient(userId, sessionId, client);
             log.info("Connection established successfully，userid:{},sessionId:{}", userId, sessionId);
         });
 
         // 客户端断开监听器
         server.addDisconnectListener(client -> {
-            clientCache.deleteSessionClient(client);
+
+            Long userId = Long.parseLong(client.getHandshakeData().getSingleUrlParam("userId"));
+
+            clientCache.deleteSessionClient(userId, client.getSessionId());
             client.disconnect();
             log.info("disconnected....", client);
         });
@@ -82,21 +76,23 @@ public class PushServer {
      *
      * @param notice
      */
-    public void push(NoticeDTO notice) {
+    public void push(NotificationDto notice) {
         String json = JSONUtil.toJsonStr(notice);
-        List<Long> ucUserIds = notice.getUcUserIds();
+        List<Long> ucUserIds = notice.getReceivers();
         //loop to send messages to all connected users
-        ucUserIds.forEach(userId -> {
-            SocketIOClient userClient = clientCache.getUserClient(userId);
+        for (Long userId : ucUserIds) {
+            HashMap<UUID, SocketIOClient> userClient = clientCache.getUserClient(userId);
             try {
                 if (userClient != null) {
-                    userClient.sendEvent("new-notice", json);
-                    log.info("push message to user:{} successfully", userId);
+                    userClient.forEach((uuid, socketIOClient) -> {
+                        socketIOClient.sendEvent("new-notice", json);
+                        log.info("push message to user:{} successfully", userId);
+                    });
                 }
             } catch (Exception e) {
                 log.error("push message failed", e);
             }
-        });
+        }
     }
 
     /**
