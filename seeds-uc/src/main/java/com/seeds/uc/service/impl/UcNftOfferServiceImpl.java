@@ -61,19 +61,15 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void makeOffer(NFTMakeOfferReq req) {
+    public void makeOffer(NFTMakeOfferReq req, SysNftDetailResp sysNftDetailResp) {
         Long currentUserId = req.getUserId();
         if (currentUserId == null) {
             currentUserId = UserContext.getCurrentUserId();
         }
-        SysNftDetailResp sysNftDetailResp;
-        BigDecimal price;
-        try {
-            GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = remoteNftService.ucDetail(req.getNftId());
-            sysNftDetailResp = sysNftDetailRespGenericDto.getData();
-            price = sysNftDetailResp.getPrice();
-        } catch (Exception e) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
+        BigDecimal price = sysNftDetailResp.getPrice();
+        // 是否已拥有该NFT
+        if (Objects.equals(sysNftDetailResp.getOwnerId(), currentUserId)) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18008_YOU_ALREADY_OWN_THIS_NFT);
         }
         // 判断NFT是否可以购买
         if (sysNftDetailResp.getStatus() != WhetherEnum.YES.value()) {
@@ -85,7 +81,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
         }
         // 检查余额
         BigDecimal reqPrice = req.getPrice();
-        if (!ucUserAccountService.checkBalance(currentUserId, reqPrice)) {
+        if (!ucUserAccountService.checkBalance(currentUserId, reqPrice, CurrencyEnum.USDT)) {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
         }
         // 冻结金额
@@ -95,7 +91,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
                 .freeze(info.getFreeze().add(reqPrice))
                 .build(), new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, currentUserId)
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
         // 添加记录信息
         long currentTimeMillis = System.currentTimeMillis();
         UcUserAccountActionHistory ucUserAccountActionHistory = UcUserAccountActionHistory.builder()
@@ -103,7 +99,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
                 .createTime(currentTimeMillis)
                 .actionEnum(AccountActionEnum.BUY_NFT)
                 .accountType(AccountTypeEnum.ACTUALS)
-                .currency(CurrencyEnum.USDC)
+                .currency(CurrencyEnum.USDT)
                 .status(AccountActionStatusEnum.PROCESSING)
                 .build();
         ucUserAccountActionHistoryService.save(ucUserAccountActionHistory);
@@ -157,7 +153,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
                 .freeze(info.getFreeze().subtract(price))
                 .build(), new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, userId)
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
         // 修改记录信息
         ucUserAccountActionHistoryService.update(UcUserAccountActionHistory.builder()
                 .status(AccountActionStatusEnum.FAIL)

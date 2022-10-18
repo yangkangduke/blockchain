@@ -1,5 +1,6 @@
 package com.seeds.uc.service;
 
+import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.NFTAuctionResp;
 import com.seeds.uc.dto.response.NFTOfferResp;
@@ -26,8 +27,9 @@ public interface UcInterNFTService {
     /**
      * 购买
      * @param req 入参
+     * @param sysNftDetailResp NFT的详情
      */
-    void buyNFT(NFTBuyReq req);
+    void buyNFT(NFTBuyReq req, SysNftDetailResp sysNftDetailResp);
 
     /**
      * 正向拍卖

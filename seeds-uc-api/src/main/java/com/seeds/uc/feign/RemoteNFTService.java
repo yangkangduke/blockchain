@@ -50,7 +50,7 @@ public interface RemoteNFTService {
 
 	@GetMapping("/internal-nft/offer-list")
 	@ApiOperation("NFT出价列表")
-	List<NFTOfferResp> offerList(Long id);
+	List<NFTOfferResp> offerList(@RequestParam Long id);
 
 	@GetMapping("/internal-nft/action-info")
 	@ApiOperation("NFT拍卖信息")

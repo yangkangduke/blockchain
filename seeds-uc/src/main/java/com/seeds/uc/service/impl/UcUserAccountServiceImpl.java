@@ -100,7 +100,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                         .balance(balance.add(amount))
                     .build(), new LambdaQueryWrapper<UcUserAccount>()
                     .eq(UcUserAccount::getUserId, currentUserId)
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
         } else if (action.equals(AccountActionEnum.WITHDRAW)) {
             if (!address.equals(fromAddress)) {
                 throw new GenericException(UcErrorCodeEnum.ERR_18003_ACCOUNT_ADDRESS_ERROR);
@@ -113,7 +113,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                     .balance(balance.subtract(amount))
                     .build(), new LambdaQueryWrapper<UcUserAccount>()
                     .eq(UcUserAccount::getUserId, currentUserId)
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
         } else {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
         }
@@ -123,7 +123,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         history.setUserId(currentUserId);
         history.setCreateTime(currentTimeMillis);
         history.setAccountType(AccountTypeEnum.ACTUALS);
-        history.setCurrency(CurrencyEnum.USDC);
+        history.setCurrency(CurrencyEnum.USDT);
         ucUserAccountActionHistoryService.save(history);
     }
 
@@ -178,7 +178,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 .userId(userId)
                 .accountType(AccountTypeEnum.ACTUALS)
                 .createTime(currentTimeMillis)
-                .currency(CurrencyEnum.USDC)
+                .currency(CurrencyEnum.USDT)
                 .freeze(new BigDecimal(0))
                 .balance(new BigDecimal(0))
                 .build();
@@ -187,7 +187,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         // 创建地址
         UcUserAddress ucUserAddress = UcUserAddress.builder()
                 .address("0x40141cf4756a72df8d8f81c1e0c2" + randomSalt)
-                .currency(CurrencyEnum.USDC)
+                .currency(CurrencyEnum.USDT)
                 .createTime(currentTimeMillis)
                 .userId(userId)
                 .build();
@@ -201,9 +201,10 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      * @return
      */
     @Override
-    public Boolean checkBalance(Long currentUserId, BigDecimal amount) {
+    public Boolean checkBalance(Long currentUserId, BigDecimal amount, CurrencyEnum currency) {
         UcUserAccount one = this.getOne(new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, currentUserId));
+                .eq(UcUserAccount::getUserId, currentUserId)
+                .eq(UcUserAccount::getCurrency, currency));
         if (one == null || one.getBalance().compareTo(new BigDecimal(0))  != 1 || one.getBalance().compareTo(amount)  != 1) {
             return false;
         }
@@ -211,20 +212,13 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     }
 
     @Override
-    public void buyNFT(NFTBuyReq buyReq) {
+    public void buyNFT(NFTBuyReq buyReq, SysNftDetailResp sysNftDetailResp) {
         Long currentUserId = buyReq.getUserId();
         if (currentUserId == null) {
             currentUserId = UserContext.getCurrentUserId();
         }
-        BigDecimal price;
-        SysNftDetailResp sysNftDetailResp;
-        try {
-            GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = remoteNftService.ucDetail(buyReq.getNftId());
-            sysNftDetailResp = sysNftDetailRespGenericDto.getData();
-            price = sysNftDetailResp.getPrice();
-        } catch (Exception e) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
-        }
+        BigDecimal price = sysNftDetailResp.getPrice();
+
         //  判断nft是否是上架状态、nft是否已经购买过了
         if (!Objects.isNull(sysNftDetailResp)) {
             if (sysNftDetailResp.getStatus() != WhetherEnum.YES.value()) {
@@ -236,13 +230,13 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
             }
             // 买家是否是归属人
             if (Objects.equals(sysNftDetailResp.getOwnerId(), currentUserId)) {
-                throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
+                throw new GenericException(UcErrorCodeEnum.ERR_18008_YOU_ALREADY_OWN_THIS_NFT);
             }
         }
 
 
         // 检查账户里面的金额是否足够支付
-        if (!checkBalance(currentUserId, price)) {
+        if (!checkBalance(currentUserId, price, CurrencyEnum.USDT)) {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
         }
         buyNFTFreeze(sysNftDetailResp, buyReq.getSource(), currentUserId);
@@ -266,7 +260,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         // 冻结金额
         LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, currentUserId)
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC);
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
         UcUserAccount account = getOne(wrapper);
         account.setBalance(account.getBalance().subtract(amount));
         account.setFreeze(account.getFreeze().add(amount));
@@ -278,7 +272,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 .createTime(currentTimeMillis)
                 .actionEnum(AccountActionEnum.BUY_NFT)
                 .accountType(AccountTypeEnum.ACTUALS)
-                .currency(CurrencyEnum.USDC)
+                .currency(CurrencyEnum.USDT)
                 .status(AccountActionStatusEnum.PROCESSING)
                 .amount(amount)
                 .build();

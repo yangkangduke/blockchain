@@ -55,9 +55,9 @@ public class SysGameModifyReq {
 	private BigDecimal price;
 
 	/**
-	 * 单位 USDC
+	 * 单位
 	 */
-	@ApiModelProperty("单位 USDC")
+	@ApiModelProperty("单位")
 	@NotBlank(message = "unit cannot be empty")
 	private String unit;
 

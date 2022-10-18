@@ -57,7 +57,7 @@ public class SysNftAddReq {
 	private BigDecimal price;
 
 	/**
-	 * 单位 USDC
+	 * 单位 usdt
 	 */
 	@ApiModelProperty("NFT价格单位")
 	@NotBlank(message = "NFT price unit cannot be empty")

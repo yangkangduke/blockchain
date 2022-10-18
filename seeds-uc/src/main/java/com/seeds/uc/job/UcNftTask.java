@@ -96,7 +96,7 @@ public class UcNftTask {
                 .balance(info.getBalance().add(price))
                 .build(), new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, userId)
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
         // 修改记录信息
         ucUserAccountActionHistoryService.update(UcUserAccountActionHistory.builder()
                 .status(AccountActionStatusEnum.FAIL)

@@ -40,11 +40,11 @@ public class NFTReverseAuctionReq implements Serializable {
     @ApiModelProperty("间隔时间")
     private Long intervalTime;
 
+    @ApiModelProperty("间隔时间单位 m,h,d,s")
+    private String intervalUnit;
+
     @ApiModelProperty("下降百分比")
     private BigDecimal dropPoint;
-
-    @ApiModelProperty("结算时间")
-    private Long settlementTime;
 
     @ApiModelProperty("拥有NFT的用户id")
     private Long userId;

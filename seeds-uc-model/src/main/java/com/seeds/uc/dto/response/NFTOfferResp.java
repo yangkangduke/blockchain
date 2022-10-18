@@ -1,6 +1,5 @@
 package com.seeds.uc.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.seeds.uc.enums.CurrencyEnum;
 import com.seeds.uc.enums.NFTOfferStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,7 +14,6 @@ import java.math.BigDecimal;
  */
 @Data
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class NFTOfferResp {
 
     @ApiModelProperty("offer的id")
