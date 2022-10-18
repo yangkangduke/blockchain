@@ -108,4 +108,17 @@ public class OpenNftController {
         return ucRemoteNftService.reverseBids(req);
     }
 
+    @PostMapping("shelves")
+    @ApiOperation("NFT上架")
+    public GenericDto<Object> shelves(@Valid @RequestBody OpenNftShelvesReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return ucRemoteNftService.shelves(req);
+    }
+
+    @PostMapping("sold-out")
+    @ApiOperation("NFT下架")
+    public GenericDto<Object> soldOut(@Valid @RequestBody OpenNftSoldOutReq req) {
+        return ucRemoteNftService.soldOut(req);
+    }
+
 }

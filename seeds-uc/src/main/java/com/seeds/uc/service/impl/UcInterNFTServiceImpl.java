@@ -219,4 +219,22 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
         }
         return resp;
     }
+    @Override
+    public void shelves(NFTShelvesReq req) {
+        // NFT上架
+        UcSwitchReq ucSwitchReq = new UcSwitchReq();
+        NFTShelvesReq shelvesReq = new NFTShelvesReq();
+        shelvesReq.setNftId(req.getNftId());
+        shelvesReq.setPrice(req.getPrice());
+        shelvesReq.setUnit(req.getUnit());
+        ucSwitchReq.setUcUserId(req.getUserId());
+        shelvesReq.setStatus(WhetherEnum.YES.value());
+    }
+
+    @Override
+    public void soldOut(NFTSoldOutReq req) {
+        // NFT下架
+        NFTSoldOutReq soldOutReq = new NFTSoldOutReq();
+        soldOutReq.setStatus(WhetherEnum.NO.value());
+    }
 }

@@ -67,4 +67,15 @@ public interface UcInterNFTService {
      */
     NFTAuctionResp actionInfo(Long id, Long userId);
 
+    /**
+     * 上架
+     * @param req 入参
+     */
+    void shelves(NFTShelvesReq req);
+
+    /**
+     * 下架
+     * @param req 入参
+     */
+    void soldOut(NFTSoldOutReq req);
 }

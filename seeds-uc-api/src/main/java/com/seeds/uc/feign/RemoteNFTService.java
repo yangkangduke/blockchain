@@ -56,4 +56,12 @@ public interface RemoteNFTService {
 	@ApiOperation("NFT拍卖信息")
 	GenericDto<NFTAuctionResp> actionInfo(@RequestParam Long id, @RequestParam Long userId);
 
+    @PostMapping("/internal-nft/shelves")
+    @ApiOperation("NFT上架")
+    GenericDto<Object> shelves(NFTShelvesReq req);
+
+    @PostMapping("/internal-nft/sold-out")
+    @ApiOperation("NFT下架")
+    GenericDto<Object> soldOut(NFTSoldOutReq req);
+
 }
