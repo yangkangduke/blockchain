@@ -26,7 +26,7 @@ elasticjob:
       # 作业job类
       elasticJobClass: com.seeds.account.task.AutoCreateAddressTask
       # 定时cron   every Minutes
-      cron: "* 0/1 * * * ?"
+      cron: "0 */1 * * * ?"
       # 作业分片总数
       shardingTotalCount: 1
       # 作业描述信息
