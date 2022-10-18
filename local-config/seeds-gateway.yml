@@ -30,10 +30,10 @@ spring:
             - Path=/account/**
           filters:
             - Auth
-#        - id: seeds-account-internal-service
-#          uri: ${service.url.account}
-#          predicates:
-#            - Path=/account-internal/**
+        - id: seeds-account-internal-service
+          uri: ${service.url.account}
+          predicates:
+            - Path=/account-internal/**
         - id: seeds-wallet-service
           uri: ${service.url.wallet}
           predicates:
