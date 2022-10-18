@@ -23,7 +23,6 @@ public interface AccountFeignClient {
     @PostMapping("/job/scan-block")
     GenericDto<Boolean> scanBlock();
 
-
     /**
      * 执行提币
      *
@@ -31,7 +30,6 @@ public interface AccountFeignClient {
      */
     @PostMapping("/job/execute-withdraw")
     GenericDto<Boolean> executeWithdraw();
-
 
     /**
      * 扫描提币状态
