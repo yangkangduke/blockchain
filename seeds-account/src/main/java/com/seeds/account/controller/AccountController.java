@@ -2,13 +2,11 @@ package com.seeds.account.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Maps;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.AccountHistoryReq;
-import com.seeds.account.service.IAccountService;
-import com.seeds.account.service.IChainDepositService;
-import com.seeds.account.service.IChainDepositWithdrawHisService;
-import com.seeds.account.service.ISystemConfigService;
+import com.seeds.account.service.*;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
@@ -19,6 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @program: seeds-java
@@ -40,13 +43,10 @@ public class AccountController {
     private IChainDepositWithdrawHisService chainDepositWithdrawHisService;
     @Autowired
     private ISystemConfigService systemConfigService;
+    @Autowired
+    private IChainWithdrawService chainWithdrawService;
 
 
-    /**
-     * 获取钱包账户汇总
-     *
-     * @return
-     */
     @GetMapping("/wallet-accounts")
     @ApiOperation("获取钱包账户汇总")
     public GenericDto<UserAccountSummaryDto> getWalletAccounts() {
@@ -61,12 +61,6 @@ public class AccountController {
     }
 
 
-    /**
-     * 获取充币地址
-     *
-     * @param chain default to Chain.ETH.getCode()
-     * @return
-     */
     @GetMapping("/deposit-address")
     @ApiOperation("获取用户的充币地址")
     public GenericDto<String> getDepositAddress(@RequestParam(value = "chain", defaultValue = "1") int chain) {
@@ -92,12 +86,6 @@ public class AccountController {
     }
 
 
-    /**
-     * 提币
-     *
-     * @param withdrawRequestDto
-     * @return
-     */
     @PostMapping("/withdraw")
     @ApiOperation("提交提币请求")
     public GenericDto<WithdrawResponseDto> withdraw(@RequestBody WithdrawRequestDto withdrawRequestDto) {
@@ -111,11 +99,7 @@ public class AccountController {
         }
     }
 
-    /**
-     * 获取充提历史
-     *
-     * @return
-     */
+
     @PostMapping("/deposit-withdraw-history")
     @ApiOperation("获取充提历史")
     public GenericDto<IPage<ChainDepositWithdrawHisDto>> getDepositWithdrawHistory(@RequestBody AccountHistoryReq accountHistoryReq) {
@@ -133,4 +117,21 @@ public class AccountController {
         }
     }
 
+    @GetMapping("/user-rules")
+    @ApiOperation("获取充币规则、提币规则")
+    public GenericDto<Map<String, Object>> getAllRules() {
+        Map<String, Object> rules = Maps.newLinkedHashMap();
+        rules.put("depositRules", getCurrentUserDepositRules());
+        rules.put("withdrawRules", getCurrentUserWithdrawRules());
+        rules.put("withdrawLimitRules", chainWithdrawService.getWithdrawLimitRules());
+        return GenericDto.success(rules);
+    }
+
+    private List<DepositRuleDto> getCurrentUserDepositRules() {
+        return chainDepositService.getAllDepositRules();
+    }
+
+    private List<WithdrawRuleDto> getCurrentUserWithdrawRules() {
+        return chainWithdrawService.getWithdrawRules();
+    }
 }

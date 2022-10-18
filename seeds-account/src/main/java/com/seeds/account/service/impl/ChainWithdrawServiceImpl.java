@@ -103,6 +103,16 @@ public class ChainWithdrawServiceImpl implements IChainWithdrawService {
     }
 
     @Override
+    public List<WithdrawRuleDto> getWithdrawRules() {
+        return Objects.requireNonNull(rules.get(ALL)).getList();
+    }
+
+    @Override
+    public List<WithdrawLimitRuleDto> getWithdrawLimitRules() {
+        return Objects.requireNonNull(limits.get(ALL)).getList();
+    }
+
+    @Override
     public List<WithdrawRuleDto> loadAll() {
         return withdrawRuleMapper.selectList(new QueryWrapper<>())
                 .stream()

@@ -53,4 +53,18 @@ public interface IChainWithdrawService {
      * @return
      */
     Map<String, WithdrawRuleDto> getWithdrawRuleMap();
+
+    /**
+     * 从cache获取所有的提币规则
+     * @return
+     */
+    List<WithdrawRuleDto> getWithdrawRules();
+
+
+    /**
+     * 从cache获取所有的提币规则
+     * @return
+     */
+    List<WithdrawLimitRuleDto> getWithdrawLimitRules();
+
 }
