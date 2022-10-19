@@ -3,6 +3,7 @@ package com.seeds.admin.feign.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.RemoteNftService;
@@ -103,5 +104,10 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	@Override
 	public GenericDto<Object> soldOut(SysNftSoldOutReq req) {
 		return GenericDto.failure("Internal Error:nft soldOut failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<SysNftGasFeesResp> gasFees(SysNftGasFeesReq req) {
+		return GenericDto.failure("Internal Error:nft gasFees failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 }

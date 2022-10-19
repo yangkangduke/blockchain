@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.enums.NftInitStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
@@ -173,5 +174,12 @@ public class InterNftController {
     public GenericDto<Object> soldOut(@Valid @RequestBody NFTSoldOutReq req) {
         sysNftService.soldOut(req);
         return GenericDto.success(null);
+    }
+
+    @PostMapping("/gas-fees")
+    @ApiOperation("NFT费用")
+    @Inner
+    public GenericDto<SysNftGasFeesResp> gasFees(@Valid @RequestBody SysNftGasFeesReq req) {
+        return GenericDto.success(sysNftService.gasFees(req));
     }
 }

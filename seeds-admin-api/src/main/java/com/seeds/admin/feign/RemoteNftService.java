@@ -3,6 +3,7 @@ package com.seeds.admin.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.impl.RemoteNftServiceImpl;
@@ -177,5 +178,14 @@ public interface RemoteNftService {
 	@PostMapping("/internal-nft/sold-out")
 	@ApiOperation("NFT下架")
 	GenericDto<Object> soldOut(SysNftSoldOutReq req);
+
+	/**
+	 * NFT费用
+	 * @param req 上链数据
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/gas-fees")
+	@ApiOperation("NFT费用")
+	GenericDto<SysNftGasFeesResp> gasFees(SysNftGasFeesReq req);
 
 }

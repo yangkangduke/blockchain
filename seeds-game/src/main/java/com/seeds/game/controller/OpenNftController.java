@@ -3,6 +3,7 @@ package com.seeds.game.controller;
 import cn.hutool.json.JSONUtil;
 import com.seeds.admin.dto.request.SysNftAddReq;
 import com.seeds.admin.dto.request.SysNftUpgradeReq;
+import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.enums.SysOwnerTypeEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
@@ -120,6 +121,12 @@ public class OpenNftController {
     public GenericDto<Object> soldOut(@Valid @RequestBody OpenNftSoldOutReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return ucRemoteNftService.soldOut(req);
+    }
+
+    @PostMapping("/gas-fees")
+    @ApiOperation("NFT费用")
+    public GenericDto<SysNftGasFeesResp> gasFees(@Valid @RequestBody OpenNftGasFeesReq req) {
+        return adminRemoteNftService.gasFees(req);
     }
 
 }

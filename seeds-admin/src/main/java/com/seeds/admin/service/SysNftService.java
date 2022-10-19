@@ -6,6 +6,7 @@ import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.mq.NftUpgradeMsgDTO;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.SysNftEntity;
 import com.seeds.uc.dto.request.NFTShelvesReq;
@@ -183,4 +184,12 @@ public interface SysNftService extends IService<SysNftEntity> {
      * @param req NFT信息
      */
     void soldOut(NFTSoldOutReq req);
+
+    /**
+     * NFT费用
+     * @param req 上链参数
+     * @return NFT费用
+     */
+    SysNftGasFeesResp gasFees(SysNftGasFeesReq req);
+
 }

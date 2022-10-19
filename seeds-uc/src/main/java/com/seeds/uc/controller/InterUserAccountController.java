@@ -32,7 +32,7 @@ public class InterUserAccountController {
     @GetMapping("/amount-info")
     @ApiOperation(value = "账户金额详情", notes = "账户金额详情")
     @Inner
-    public GenericDto<List<UcUserAccountAmountResp>> amountInfo() {
-        return GenericDto.success(ucUserAccountService.amountInfo(UserContext.getCurrentUserId()));
+    public GenericDto<List<UcUserAccountAmountResp>> amountInfo(@RequestParam Long userId) {
+        return GenericDto.success(ucUserAccountService.amountInfo(userId));
     }
 }

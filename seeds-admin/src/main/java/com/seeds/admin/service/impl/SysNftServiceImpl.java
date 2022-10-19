@@ -10,13 +10,11 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.mq.NftUpgradeMsgDTO;
+import com.seeds.admin.dto.response.*;
+import com.seeds.chain.service.GameItemsService;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.request.*;
-import com.seeds.admin.dto.response.ChainMintNftResp;
-import com.seeds.admin.dto.response.NftPropertiesResp;
-import com.seeds.admin.dto.response.SysNftDetailResp;
-import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.*;
 import com.seeds.admin.enums.*;
 import com.seeds.admin.mapper.SysNftMapper;
@@ -31,6 +29,7 @@ import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.request.NFTShelvesReq;
 import com.seeds.uc.dto.request.NFTSoldOutReq;
 import com.seeds.uc.enums.AccountActionStatusEnum;
+import com.seeds.uc.enums.CurrencyEnum;
 import com.seeds.uc.enums.NFTOfferStatusEnum;
 import com.seeds.uc.feign.RemoteNFTService;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +42,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -95,6 +96,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Autowired
     private SysNftPropertiesTypeService sysNftPropertiesTypeService;
+
+    @Autowired
+    private GameItemsService gameItemsService;
 
     @Resource
     private KafkaProducer kafkaProducer;
@@ -705,6 +709,15 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         }
         nft.setStatus(WhetherEnum.NO.value());
         updateById(nft);
+    }
+
+    @Override
+    public SysNftGasFeesResp gasFees(SysNftGasFeesReq req) {
+        BigInteger price = gameItemsService.gasFees("ipfs://" + req);
+        SysNftGasFeesResp resp = new SysNftGasFeesResp();
+        resp.setPrice(new BigDecimal(price));
+        resp.setUnit(CurrencyEnum.USDT.getCode());
+        return resp;
     }
 
     @Transactional(rollbackFor = Exception.class)
