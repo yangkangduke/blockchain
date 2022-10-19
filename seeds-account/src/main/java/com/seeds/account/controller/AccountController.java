@@ -48,7 +48,7 @@ public class AccountController {
 
 
     @GetMapping("/wallet-accounts")
-    @ApiOperation("获取钱包账户汇总")
+    @ApiOperation(value = "获取钱包账户汇总", notes = "获取钱包账户汇总")
     public GenericDto<UserAccountSummaryDto> getWalletAccounts() {
         try {
             long userId = getUserId();
@@ -62,7 +62,7 @@ public class AccountController {
 
 
     @GetMapping("/deposit-address")
-    @ApiOperation("获取用户的充币地址")
+    @ApiOperation(value = "获取用户的充币地址", notes = "chain的传值，1：eth链erc20  3：tron链trc20")
     public GenericDto<String> getDepositAddress(@RequestParam(value = "chain", defaultValue = "1") int chain) {
         try {
             long userId = getUserId();
