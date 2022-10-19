@@ -6,6 +6,7 @@ import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class AccountInternalController {
 
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
+    @Inner
     public GenericDto<Boolean> scanAndCreateAddresses() {
         try {
             chainActionService.scanAndCreateAddresses();
@@ -45,6 +47,7 @@ public class AccountInternalController {
 
     @PostMapping("/job/scan-block")
     @ApiOperation("扫描新块")
+    @Inner
     public GenericDto<Boolean> scanBlock() {
         try {
             chainActionService.scanBlock();
@@ -63,6 +66,7 @@ public class AccountInternalController {
      */
     @PostMapping("/mgt/approve-transaction")
     @ApiOperation("充币提币审核通过")
+    @Inner
     public GenericDto<Boolean> approveTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
         try {
             accountService.approveTransaction(approveRejectDto.getId(), approveRejectDto.getComment());
@@ -81,6 +85,7 @@ public class AccountInternalController {
      */
     @PostMapping("/mgt/reject-transaction")
     @ApiOperation("充币提币审核拒绝")
+    @Inner
     public GenericDto<Boolean> rejectTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
         try {
             accountService.rejectTransaction(approveRejectDto.getId(), approveRejectDto.getComment());
@@ -93,6 +98,7 @@ public class AccountInternalController {
 
     @PostMapping("/job/execute-withdraw")
     @ApiOperation("执行提币上链")
+    @Inner
     public GenericDto<Boolean> executeWithdraw() {
         try {
             chainActionService.executeWithdraw();
@@ -105,6 +111,7 @@ public class AccountInternalController {
 
     @PostMapping("/job/scan-withdraw")
     @ApiOperation("扫描提币，归集，空投状态")
+    @Inner
     public GenericDto<Boolean> scanWithdraw() {
         try {
             // 处理提币
