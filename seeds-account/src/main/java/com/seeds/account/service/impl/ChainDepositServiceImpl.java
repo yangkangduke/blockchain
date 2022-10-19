@@ -75,10 +75,10 @@ public class ChainDepositServiceImpl implements IChainDepositService {
         Utils.check(chain != null, ErrorCode.ACCOUNT_INVALID_CHAIN);
 
         // 2021-04-27 milo 如果用户请求的是DEFI充提地址
-        if (Chain.SUPPORT_DEFI_LIST.contains(chain)) {
-            String defiDepositWithdrawAddress = systemWalletAddressService.getOne(chain.getRelayOn(), WalletAddressType.DEFI_DEPOSIT_WITHDRAW_CONTRACT);
-            return defiDepositWithdrawAddress;
-        }
+//        if (Chain.SUPPORT_DEFI_LIST.contains(chain)) {
+//            String defiDepositWithdrawAddress = systemWalletAddressService.getOne(chain.getRelayOn(), WalletAddressType.DEFI_DEPOSIT_WITHDRAW_CONTRACT);
+//            return defiDepositWithdrawAddress;
+//        }
 
         // 2021-04-27 milo 链做个映射，主要的目的是BSC的地址跟ETH的地址共享
         Chain mappedChain = Chain.mapChain(chain);

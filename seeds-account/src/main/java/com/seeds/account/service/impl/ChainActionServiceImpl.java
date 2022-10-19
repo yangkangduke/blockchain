@@ -195,7 +195,7 @@ public class ChainActionServiceImpl implements IChainActionService {
             try {
                 if (Chain.SUPPORT_DEFI_LIST.contains(chain)) {
                     // 2021-04-30 milo
-                    executeWithdrawOneOnChain(chain, tx);
+//                    executeWithdrawOneOnChain(chain, tx);
                 } else if (tx.getInternal() == 1) {
                     // 内部提币
                     transactionService.execute(() -> {
@@ -504,14 +504,14 @@ public class ChainActionServiceImpl implements IChainActionService {
         if (!enabled) {
             return;
         }
-        // 获取数据库中当前链记录的最有一个块
+        // 获取数据库中当前链记录的最后一个块
         ChainBlock chainBlock = chainBlockMapper.getLatestBlock(chain);
         if (chainBlock == null) {
             return;
         }
 
         // 查询此链支持的DEFI充提的信息
-        Chain defiChain = Chain.supportedDefiChain(chain);
+//        Chain defiChain = Chain.supportedDefiChain(chain);
 
         // 读取这个块链上的信息用于判断链是否回滚
         NativeChainBlockDto nativeChainBlockDto = chainService.getChainNativeBlock(chain, chainBlock.getBlockNumber());
@@ -520,9 +520,9 @@ public class ChainActionServiceImpl implements IChainActionService {
             // 回滚链提币
             rollbackBlock(chain, chainBlock.getBlockNumber(), chainBlock.getBlockHash());
             // 回滚DEFI链提币
-            if (defiChain != null) {
-                rollbackBlock(defiChain, chainBlock.getBlockNumber(), chainBlock.getBlockHash());
-            }
+//            if (defiChain != null) {
+//                rollbackBlock(defiChain, chainBlock.getBlockNumber(), chainBlock.getBlockHash());
+//            }
             return;
         }
         Assert.isTrue(nativeChainBlockDto.getChain() != null, "missing chain info");
@@ -531,9 +531,9 @@ public class ChainActionServiceImpl implements IChainActionService {
             // block hash not identical
             log.info("rollback block as block hash changed db-block={} native-chain-block={}", chainBlock, nativeChainBlockDto);
             rollbackBlock(chain, chainBlock.getBlockNumber(), chainBlock.getBlockHash());
-            if (defiChain != null) {
-                rollbackBlock(defiChain, chainBlock.getBlockNumber(), chainBlock.getBlockHash());
-            }
+//            if (defiChain != null) {
+//                rollbackBlock(defiChain, chainBlock.getBlockNumber(), chainBlock.getBlockHash());
+//            }
             return;
         }
         long nextBlockNumber = chainBlock.getBlockNumber() + 1;
@@ -544,7 +544,8 @@ public class ChainActionServiceImpl implements IChainActionService {
         }
 
         long pendingBlocks = chainBlockNumber - chainBlock.getBlockNumber();
-        log.info("scanBlock chain={} defi-chain={} my-last-block-number={} chain-last-block-number={} pendingBlocks={}", chain, defiChain, chainBlock.getBlockNumber(), chainBlockNumber, pendingBlocks);
+//        log.info("scanBlock chain={} defi-chain={} my-last-block-number={} chain-last-block-number={} pendingBlocks={}", chain, defiChain, chainBlock.getBlockNumber(), chainBlockNumber, pendingBlocks);
+        log.info("scanBlock chain={} defi-chain={} my-last-block-number={} chain-last-block-number={} pendingBlocks={}", chain, null, chainBlock.getBlockNumber(), chainBlockNumber, pendingBlocks);
 
         // 使用指标记录一下
         Metrics.summary("chain-pending-blocks", Tags.of("chain", chain.getName())).record(pendingBlocks);
@@ -559,9 +560,9 @@ public class ChainActionServiceImpl implements IChainActionService {
             // new block's parent not link to the block in db
             log.info("rollback block as block parent hash changed db-block={} new-chain-block={}", chainBlock, newNativeChainBlockDto);
             rollbackBlock(chain, chainBlock.getBlockNumber(), chainBlock.getBlockHash());
-            if (defiChain != null) {
-                rollbackBlock(defiChain, chainBlock.getBlockNumber(), chainBlock.getBlockHash());
-            }
+//            if (defiChain != null) {
+//                rollbackBlock(defiChain, chainBlock.getBlockNumber(), chainBlock.getBlockHash());
+//            }
             return;
         }
 
@@ -575,7 +576,8 @@ public class ChainActionServiceImpl implements IChainActionService {
         // 获取新块的Deposit交易（链上）
         List<NativeChainTransactionDto> transactions = assignedAddresses.size() == 0
                 ? Lists.newArrayList()
-                : chainService.getTransactions(chain, defiChain, newNativeChainBlockDto.getBlockNumber(), assignedAddresses);
+//                : chainService.getTransactions(chain, defiChain, newNativeChainBlockDto.getBlockNumber(), assignedAddresses);
+                : chainService.getTransactions(chain, null, newNativeChainBlockDto.getBlockNumber(), assignedAddresses);
 
         if (transactions.size() > 0) {
             // 处理充币精度
@@ -598,9 +600,9 @@ public class ChainActionServiceImpl implements IChainActionService {
         // 获取等待确认的Deposit（数据库）
         List<ChainDepositWithdrawHis> pendingConfirmList = Lists.newArrayList();
         pendingConfirmList.addAll(chainDepositWithdrawHisMapper.getChainDepositWithdrawEarlierThanBlockNumber(chain, ChainAction.DEPOSIT.getCode(), DepositStatus.CREATED.getCode(), canConfirmBlockNumber));
-        if (defiChain != null) {
-            pendingConfirmList.addAll(chainDepositWithdrawHisMapper.getChainDepositWithdrawEarlierThanBlockNumber(defiChain, ChainAction.DEPOSIT.getCode(), DepositStatus.CREATED.getCode(), canConfirmBlockNumber));
-        }
+//        if (defiChain != null) {
+//            pendingConfirmList.addAll(chainDepositWithdrawHisMapper.getChainDepositWithdrawEarlierThanBlockNumber(defiChain, ChainAction.DEPOSIT.getCode(), DepositStatus.CREATED.getCode(), canConfirmBlockNumber));
+//        }
 
         // 读取充币黑地址列表，如果没有新的deposit就没必要读取
         List<String> blacklistAddresses = pendingConfirmList.size() == 0
@@ -678,13 +680,13 @@ public class ChainActionServiceImpl implements IChainActionService {
             // 用事务包住单个的提币，防止由于单个错误导致的回滚
             try {
                 if (Chain.SUPPORT_DEFI_LIST.contains(chain)) {
-                    ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain.getRelayOn());
-                    if (latestChainBlock != null) {
-                        transactionService.execute(() -> {
-                            scanWithdrawOneOnChain(chain, latestChainBlock, tx);
-                            return null;
-                        });
-                    }
+//                    ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain.getRelayOn());
+//                    if (latestChainBlock != null) {
+//                        transactionService.execute(() -> {
+//                            scanWithdrawOneOnChain(chain, latestChainBlock, tx);
+//                            return null;
+//                        });
+//                    }
                 } else {
                     ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain);
                     if (latestChainBlock != null) {

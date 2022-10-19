@@ -110,14 +110,15 @@ public class AccountInternalController {
     }
 
     @PostMapping("/job/scan-withdraw")
-    @ApiOperation("扫描提币，归集，空投状态")
+//    @ApiOperation("扫描提币，归集，空投状态")
+    @ApiOperation("扫描提币状态")
     @Inner
     public GenericDto<Boolean> scanWithdraw() {
         try {
             // 处理提币
             chainActionService.scanWithdraw();
             // 处理归集
-            addressCollectService.scanCollect();
+//            addressCollectService.scanCollect();
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("scanWithdraw", e);

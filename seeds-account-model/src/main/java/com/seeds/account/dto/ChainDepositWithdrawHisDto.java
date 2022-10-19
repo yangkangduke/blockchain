@@ -57,7 +57,7 @@ public class ChainDepositWithdrawHisDto implements Serializable {
      */
     @ApiModelProperty(value = "是否是黑名单地址 0不是 1是")
     int blacklist;
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "充币的看DepositStatus枚举，提币的看WithdrawStatus枚举")
     int status;
     @ApiModelProperty(value = "chain")
     Chain chain;
