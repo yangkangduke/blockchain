@@ -1,6 +1,7 @@
 package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -9,6 +10,7 @@ import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
@@ -24,6 +26,7 @@ import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.mapper.UcUserAccountMapper;
 import com.seeds.uc.model.*;
+import com.seeds.uc.mq.producer.KafkaProducer;
 import com.seeds.uc.service.*;
 import com.seeds.uc.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +63,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     private RemoteNftService remoteNftService;
     @Autowired
     private IUcUserService ucUserService;
+    @Resource
+    private KafkaProducer kafkaProducer;
 
     /**
      * 冲/提币
@@ -78,7 +84,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         if (amount.compareTo(BigDecimal.ZERO) != 1) {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_AMOUNT_ERROR);
         }
-        UcUserAccountInfoResp info = this.getInfo();
+        UcUserAccountInfoResp info = this.getInfo(currentUserId);
         if (info == null) {
             throw new GenericException(UcErrorCodeEnum.ERR_18002_ACCOUNT_NOT);
         }
@@ -94,7 +100,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                         .balance(balance.add(amount))
                     .build(), new LambdaQueryWrapper<UcUserAccount>()
                     .eq(UcUserAccount::getUserId, currentUserId)
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
         } else if (action.equals(AccountActionEnum.WITHDRAW)) {
             if (!address.equals(fromAddress)) {
                 throw new GenericException(UcErrorCodeEnum.ERR_18003_ACCOUNT_ADDRESS_ERROR);
@@ -107,7 +113,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                     .balance(balance.subtract(amount))
                     .build(), new LambdaQueryWrapper<UcUserAccount>()
                     .eq(UcUserAccount::getUserId, currentUserId)
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
         } else {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
         }
@@ -117,7 +123,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         history.setUserId(currentUserId);
         history.setCreateTime(currentTimeMillis);
         history.setAccountType(AccountTypeEnum.ACTUALS);
-        history.setCurrency(CurrencyEnum.USDC);
+        history.setCurrency(CurrencyEnum.USDT);
         ucUserAccountActionHistoryService.save(history);
     }
 
@@ -141,8 +147,8 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     }
 
     @Override
-    public UcUserAccountInfoResp getInfo() {
-        return getInfoByUserId(UserContext.getCurrentUserId());
+    public UcUserAccountInfoResp getInfo(Long userId) {
+        return getInfoByUserId(userId);
     }
 
     @Override
@@ -172,7 +178,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 .userId(userId)
                 .accountType(AccountTypeEnum.ACTUALS)
                 .createTime(currentTimeMillis)
-                .currency(CurrencyEnum.USDC)
+                .currency(CurrencyEnum.USDT)
                 .freeze(new BigDecimal(0))
                 .balance(new BigDecimal(0))
                 .build();
@@ -181,7 +187,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         // 创建地址
         UcUserAddress ucUserAddress = UcUserAddress.builder()
                 .address("0x40141cf4756a72df8d8f81c1e0c2" + randomSalt)
-                .currency(CurrencyEnum.USDC)
+                .currency(CurrencyEnum.USDT)
                 .createTime(currentTimeMillis)
                 .userId(userId)
                 .build();
@@ -195,9 +201,10 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      * @return
      */
     @Override
-    public Boolean checkBalance(Long currentUserId, BigDecimal amount) {
+    public Boolean checkBalance(Long currentUserId, BigDecimal amount, CurrencyEnum currency) {
         UcUserAccount one = this.getOne(new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, currentUserId));
+                .eq(UcUserAccount::getUserId, currentUserId)
+                .eq(UcUserAccount::getCurrency, currency));
         if (one == null || one.getBalance().compareTo(new BigDecimal(0))  != 1 || one.getBalance().compareTo(amount)  != 1) {
             return false;
         }
@@ -205,20 +212,13 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
     }
 
     @Override
-    public void buyNFT(NFTBuyReq buyReq) {
+    public void buyNFT(NFTBuyReq buyReq, SysNftDetailResp sysNftDetailResp) {
         Long currentUserId = buyReq.getUserId();
         if (currentUserId == null) {
             currentUserId = UserContext.getCurrentUserId();
         }
-        BigDecimal price;
-        SysNftDetailResp sysNftDetailResp;
-        try {
-            GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = remoteNftService.ucDetail(buyReq.getNftId());
-            sysNftDetailResp = sysNftDetailRespGenericDto.getData();
-            price = sysNftDetailResp.getPrice();
-        } catch (Exception e) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
-        }
+        BigDecimal price = sysNftDetailResp.getPrice();
+
         //  判断nft是否是上架状态、nft是否已经购买过了
         if (!Objects.isNull(sysNftDetailResp)) {
             if (sysNftDetailResp.getStatus() != WhetherEnum.YES.value()) {
@@ -228,14 +228,18 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
             if (WhetherEnum.YES.value() == sysNftDetailResp.getLockFlag()) {
                 throw new GenericException(UcErrorCodeEnum.ERR_18007_ACCOUNT_BUY_FAIL_NFT_LOCKED);
             }
+            // 买家是否是归属人
+            if (Objects.equals(sysNftDetailResp.getOwnerId(), currentUserId)) {
+                throw new GenericException(UcErrorCodeEnum.ERR_18008_YOU_ALREADY_OWN_THIS_NFT);
+            }
         }
 
 
         // 检查账户里面的金额是否足够支付
-        if (!checkBalance(currentUserId, price)) {
+        if (!checkBalance(currentUserId, price, CurrencyEnum.USDT)) {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
         }
-        buyNFTFreeze(sysNftDetailResp, buyReq.getSource());
+        buyNFTFreeze(sysNftDetailResp, buyReq.getSource(), currentUserId);
     }
 
     /**
@@ -245,20 +249,22 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void buyNFTFreeze(SysNftDetailResp nftDetail, RequestSource source) {
+    public void buyNFTFreeze(SysNftDetailResp nftDetail, RequestSource source, Long currentUserId) {
         Long nftId = nftDetail.getId();
         long currentTimeMillis = System.currentTimeMillis();
         BigDecimal amount = nftDetail.getPrice();
-        Long currentUserId = UserContext.getCurrentUserId();
+        if (currentUserId == null) {
+            currentUserId = UserContext.getCurrentUserId();
+        }
         // todo 远程调用钱包接口
         // 冻结金额
-        UcUserAccountInfoResp info = this.getInfo();
-        this.update(UcUserAccount.builder()
-                .balance(info.getBalance().subtract(amount))
-                .freeze(info.getFreeze().add(amount))
-                .build(), new LambdaQueryWrapper<UcUserAccount>()
+        LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
                 .eq(UcUserAccount::getUserId, currentUserId)
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDC));
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
+        UcUserAccount account = getOne(wrapper);
+        account.setBalance(account.getBalance().subtract(amount));
+        account.setFreeze(account.getFreeze().add(amount));
+        updateById(account);
 
         // 添加记录信息
         UcUserAccountActionHistory ucUserAccountActionHistory = UcUserAccountActionHistory.builder()
@@ -266,14 +272,15 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
                 .createTime(currentTimeMillis)
                 .actionEnum(AccountActionEnum.BUY_NFT)
                 .accountType(AccountTypeEnum.ACTUALS)
-                .currency(CurrencyEnum.USDC)
+                .currency(CurrencyEnum.USDT)
                 .status(AccountActionStatusEnum.PROCESSING)
+                .amount(amount)
                 .build();
         ucUserAccountActionHistoryService.save(ucUserAccountActionHistory);
         Long actionHistoryId = ucUserAccountActionHistory.getId();
 
         // 远程调用admin端归属人变更接口
-        List list = new ArrayList<NftOwnerChangeReq>();
+        List<NftOwnerChangeReq> list = new ArrayList<>();
         NftOwnerChangeReq nftOwnerChangeReq = new NftOwnerChangeReq();
         UcUser buyer = ucUserService.getById(currentUserId);
         if (null != buyer) {
@@ -286,13 +293,14 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
         nftOwnerChangeReq.setId(nftId);
         nftOwnerChangeReq.setActionHistoryId(actionHistoryId);
         nftOwnerChangeReq.setOwnerType(nftDetail.getOwnerType());
+        nftOwnerChangeReq.setAmount(amount);
         if (nftDetail.getOwnerType() == 1) {
             // 卖家地址
             UcUser saler = ucUserService.getById(nftDetail.getOwnerId());
             nftOwnerChangeReq.setFromAddress(saler.getPublicAddress());
         }
         list.add(nftOwnerChangeReq);
-        remoteNftService.ownerChange(list);
+        kafkaProducer.send(KafkaTopic.UC_NFT_OWNER_CHANGE, JSONUtil.toJsonStr(list));
     }
 
     @Override

@@ -2,16 +2,14 @@ package com.seeds.notification.mq.listener;
 
 import cn.hutool.json.JSONUtil;
 import com.seeds.common.constant.mq.KafkaTopic;
-import com.seeds.notification.dto.NoticeDTO;
-import com.seeds.notification.dto.request.NoticeSaveReq;
+import com.seeds.notification.dto.NotificationDto;
+import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.notification.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
 /**
  * @author: hewei
@@ -27,16 +25,16 @@ public class SendNotificationListener {
     @KafkaListener(groupId = "notice-consumer-group", topics = {KafkaTopic.SEND_NOTIFICATION})
     public void sendNotice(String msg) {
         log.info("收到消息：{}", msg);
-        NoticeDTO msgDTO = JSONUtil.toBean(msg, NoticeDTO.class);
+        NotificationReq notificationReq = JSONUtil.toBean(msg, NotificationReq.class);
         // sava message to db
-        NoticeSaveReq saveReq = new NoticeSaveReq();
-        saveReq.setContent(msgDTO.getContent());
-        saveReq.setUcUserIds(msgDTO.getUcUserIds());
-        Boolean result = notificationService.saveNotice(saveReq);
+        Boolean result = notificationService.saveNotice(notificationReq);
         // send notice
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.setSender("seeds-account");
+        notificationDto.setReceivers(notificationReq.getUcUserIds());
+        notificationDto.setValues(notificationReq.getValues());
         if (result) {
-            msgDTO.setPushTime(new Date().getTime());
-            notificationService.sendNotice(msgDTO);
+            notificationService.sendNotice(notificationDto);
         }
     }
 }

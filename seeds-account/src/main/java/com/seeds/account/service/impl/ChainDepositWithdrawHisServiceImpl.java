@@ -1,8 +1,13 @@
 package com.seeds.account.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.AccountConstants;
+import com.seeds.account.dto.ChainDepositWithdrawHisDto;
+import com.seeds.account.dto.req.AccountHistoryReq;
 import com.seeds.account.mapper.ChainDepositWithdrawHisMapper;
 import com.seeds.account.mapper.ChainDepositWithdrawSigHisMapper;
+import com.seeds.account.mapper.UserAccountActionHisMapper;
 import com.seeds.account.model.ChainDepositWithdrawHis;
 import com.seeds.account.model.ChainDepositWithdrawSigHis;
 import com.seeds.account.service.IChainDepositWithdrawHisService;
@@ -32,6 +37,8 @@ public class ChainDepositWithdrawHisServiceImpl extends ServiceImpl<ChainDeposit
     ChainDepositWithdrawHisMapper chainDepositWithdrawHisMapper;
     @Autowired
     ChainDepositWithdrawSigHisMapper chainDepositWithdrawSigHisMapper;
+    @Autowired
+    UserAccountActionHisMapper userAccountActionHisMapper;
 
 
     @Override
@@ -43,6 +50,26 @@ public class ChainDepositWithdrawHisServiceImpl extends ServiceImpl<ChainDeposit
     public void createHistory(ChainDepositWithdrawHis chainDepositWithdrawHis) {
         chainDepositWithdrawHisMapper.insert(chainDepositWithdrawHis);
         log.info("createHistory chainDepositWithdrawHis={}", chainDepositWithdrawHis);
+    }
+
+    @Override
+    public ChainDepositWithdrawSigHis getSigHistory(long id, long userId) {
+        return chainDepositWithdrawSigHisMapper.getByUserId(id, userId);
+    }
+
+    @Override
+    public void updateHistory(ChainDepositWithdrawHis chainDepositWithdrawHis) {
+        chainDepositWithdrawHisMapper.updateById(chainDepositWithdrawHis);
+    }
+
+    @Override
+    public ChainDepositWithdrawHis getHistory(long id) {
+        return chainDepositWithdrawHisMapper.selectById(id);
+    }
+
+    @Override
+    public IPage<ChainDepositWithdrawHisDto> getHistory(Page page, AccountHistoryReq accountHistoryReq) {
+        return chainDepositWithdrawHisMapper.selectByUserAndTime(page, accountHistoryReq);
     }
 
     @Override

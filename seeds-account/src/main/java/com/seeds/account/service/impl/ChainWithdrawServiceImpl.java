@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author milo
+ * @author yk
  *
  */
 @Slf4j
@@ -100,6 +100,16 @@ public class ChainWithdrawServiceImpl implements IChainWithdrawService {
     @Override
     public Map<String, WithdrawRuleDto> getWithdrawRuleMap() {
         return Objects.requireNonNull(rules.get(ALL)).getMap();
+    }
+
+    @Override
+    public List<WithdrawRuleDto> getWithdrawRules() {
+        return Objects.requireNonNull(rules.get(ALL)).getList();
+    }
+
+    @Override
+    public List<WithdrawLimitRuleDto> getWithdrawLimitRules() {
+        return Objects.requireNonNull(limits.get(ALL)).getList();
     }
 
     @Override

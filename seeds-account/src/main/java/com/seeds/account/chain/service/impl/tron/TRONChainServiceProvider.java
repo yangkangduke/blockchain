@@ -24,6 +24,7 @@ import com.seeds.account.util.ObjectUtils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.common.exception.ChainException;
 import com.seeds.wallet.dto.RawTransactionDto;
 import com.seeds.wallet.dto.RawTransactionSignRequest;
 import com.seeds.wallet.dto.SignedMessageDto;
@@ -60,7 +61,7 @@ import java.util.stream.Collectors;
 /**
  * 提供对Binance Smart Chain的节点访问
  *
- * @author milo
+ * @author yk
  * @author xu
  * @author cheng
  * @author Ray
@@ -107,19 +108,68 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
 
     @Override
     public Map<String, BigDecimal> getBalances(Chain chain, String address) throws Exception {
-        return null;
+        List<String> currencyList = chainContractService.getAll().stream()
+                .filter(e -> e.getChain() == chain.getCode())
+                .map(ChainContractDto::getCurrency)
+                .collect(Collectors.toList());
+
+        Map<String, BigDecimal> addressBalances = Maps.newHashMap();
+        BigDecimal nativeTokenBalance = getChainTokenBalance(chain, address);
+        addressBalances.put(currentChain.getNativeToken(), nativeTokenBalance);
+        for (String contract : currencyList) {
+            BigDecimal contractBalance = getContractBalance(chain, address, contract);
+            addressBalances.put(contract, contractBalance);
+        }
+        return addressBalances;
     }
 
     @Override
     public List<Map<String, BigDecimal>> getBalances(Chain chain, List<String> addresses) throws Exception {
+        List<String> currencyList = chainContractService.getAll().stream()
+                .filter(e -> e.getChain() == chain.getCode())
+                .map(ChainContractDto::getCurrency)
+                .collect(Collectors.toList());
 
-        return null;
+        List<Map<String, BigDecimal>> balances = Lists.newArrayList();
+
+        for (String address : addresses) {
+            Map<String, BigDecimal> addressBalances = Maps.newHashMap();
+            BigDecimal nativeTokenBalance = getChainTokenBalance(chain, address);
+            addressBalances.put(currentChain.getNativeToken(), nativeTokenBalance);
+            for (String contract : currencyList) {
+                BigDecimal contractBalance = getContractBalance(chain, address, contract);
+                addressBalances.put(contract, contractBalance);
+            }
+            balances.add(addressBalances);
+        }
+        return balances;
     }
 
     @Override
     public List<AddressBalanceDto> getBalancesOnBatch(Chain chain, List<String> addresses, Long sleepBetween) throws Exception {
+        long startTime = System.currentTimeMillis();
+        List<AddressBalanceDto> list = Lists.newArrayList();
 
-        return null;
+        // 找出充币币种
+        List<String> currencyList = chainDepositService.getAllDepositRules()
+                .stream()
+                .filter(e -> e.getChain() == chain.getCode())
+                .map(DepositRuleDto::getCurrency)
+                .collect(Collectors.toList());
+        for (String address : addresses) {
+            Map<String, BigDecimal> balances = Maps.newHashMap();
+            balances.put(chain.getNativeToken(), getChainTokenBalance(chain, address));
+            for (String currency : currencyList) {
+                BigDecimal balance = getContractBalance(chain, address, currency);
+                balances.put(currency, balance);
+            }
+            list.add(AddressBalanceDto.builder().address(address).balances(balances).build());
+        }
+
+        long endTime = System.currentTimeMillis();
+        log.info("getBalancesOnBatch chain={} address.size={} took.all={}", chain, addresses.size(), (endTime - startTime));
+
+        return list;
     }
 
     @Override
@@ -167,7 +217,8 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
 
     @Override
     public BigDecimal getContractBalance(Chain chain, String address, String currency) throws Exception {
-       return null;
+        ChainContractDto chainContractDto = chainContractService.get(chain.getCode(), currency);
+        return getContractBalance(chain, address, chainContractDto);
     }
 
     @Override
@@ -193,7 +244,25 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
 
     @Override
     public BigDecimal getContractDecimalValue(Chain chain, String currency, String decimalMethodName) throws Exception {
-        return null;
+        ChainContractDto contractConfigDto = chainContractService.get(chain.getCode(), currency);
+        Function function = new Function(decimalMethodName, new ArrayList<>(), Arrays.asList(new TypeReference<Uint256>() {
+        }));
+
+        String contractAddress = contractConfigDto.getAddress();
+        log.debug("contractAddress={} currency={} decimalMethodName={} decimals={}",
+                contractAddress, contractConfigDto.getCurrency(), decimalMethodName, contractConfigDto.getDecimals());
+
+        Response.TransactionExtention txnExt = tronClient.cli().constantCall(contractAddress, contractAddress, function);
+        String result = Numeric.toHexString(txnExt.getConstantResult(0).toByteArray());
+        List<org.tron.trident.abi.datatypes.Type> types = FunctionReturnDecoder.decode(result, function.getOutputParameters());
+
+        if (types != null && types.size() > 0) {
+            BigInteger value = ((Uint256) types.get(0)).getValue();
+            int decimals = contractConfigDto.getDecimals();
+            BigDecimal amount = unscaleAmountByDecimal(value, decimals);
+            return amount;
+        }
+        throw new ChainException("failed to call the chain");
     }
 
     @Override
@@ -419,7 +488,11 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
 
     @Override
     public RawTransactionDto internalSendTransaction(Chain chain, String currency, String fromAddress, String toAddress, BigDecimal amount, Long gasPrice, Long gasLimit) throws Exception {
-      return null;
+        // 发送每笔交易后休眠
+        long sleepFor = getSendTransactionSleep();
+        long nonce = getPendingNonce(chain, fromAddress).longValue();
+        RawTransactionDto raw = internalSendTransaction0(chain, currency, fromAddress, toAddress, amount, gasPrice, gasLimit, nonce, sleepFor);
+        return raw;
     }
 
     private long getSendTransactionSleep() {
@@ -429,6 +502,91 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
     @Override
     public RawTransactionDto internalSendTransaction(Chain chain, String currency, String fromAddress, String toAddress, BigDecimal amount, Long gasPrice, Long gasLimit, Long nonce, Long sleepFor) throws Exception {
         return null;
+    }
+
+    private RawTransactionDto internalSendTransaction0(Chain chain, String currency, String fromAddress, String toAddress, BigDecimal amount, long gasPrice, long gasLimit, long nonce, long sleepFor) throws Exception {
+        log.info("sendTransaction currency={} fromAddress={} toAddress={} amount={} gasPrice={} gasLimit={}",
+                currency, fromAddress, toAddress, amount, gasPrice, gasLimit);
+        Assert.isTrue(currency != null && currency.length() > 0, "invalid currency " + currency);
+        Assert.isTrue(amount != null && amount.signum() > 0, "invalid amount " + amount);
+        Assert.isTrue(AddressUtils.validate(chain, fromAddress), "invalid from address " + fromAddress);
+        Assert.isTrue(AddressUtils.validate(chain, toAddress), "invalid to address " + toAddress);
+
+        RawTransactionDto rawTransactionDto = new RawTransactionDto();
+        rawTransactionDto.setGasLimit(BigInteger.valueOf(gasLimit));
+        rawTransactionDto.setNonce(BigInteger.valueOf(nonce));
+        rawTransactionDto.setGasPrice(BigInteger.valueOf(gasPrice));
+
+        // 2021-05-21 milo
+        // 由于Tron没有GasPrice的概念，因此交易的GasLimit使用参数中的 gasPrice * gasLimit来处理
+        Assert.isTrue(gasLimit == 1, "gasLimit must be 1");
+        Assert.isTrue(gasPrice <= 10_000_000, "gasPrice less than 10_000_000");
+
+        if (Objects.equals(currentChain.getNativeToken(), currency)) {
+            int decimals = currentChain.getDecimals();
+            BigInteger value = scaleAmountByDecimal(amount, decimals);
+            rawTransactionDto.setTo(toAddress);
+            rawTransactionDto.setData("");
+            rawTransactionDto.setValue(value);
+
+            // 构建发送TRX的交易（TransactionExtention）
+            Response.TransactionExtention transactionExtention = tronClient.cli().transfer(fromAddress, toAddress, value.longValue());
+
+            // 对交易进行编码
+            byte[] rawData = transactionExtention.toByteArray();
+            rawTransactionDto.setTronTransactionExtensionBase64(Base64.getEncoder().encodeToString(rawData));
+
+            // 签名
+            RawTransactionSignRequest request = new RawTransactionSignRequest();
+            request.setRawTransaction(rawTransactionDto);
+            request.setFromAddress(fromAddress);
+            GenericDto<String> response = sign(request);
+
+            // 解码签名交易
+            byte[] sourceData = Base64.getDecoder().decode(response.getData());
+            org.tron.trident.proto.Chain.Transaction txn = org.tron.trident.proto.Chain.Transaction.parseFrom(sourceData);
+
+            // 广播交易并得到Hash
+            String txnHash = tronClient.cli().broadcastTransaction(txn);
+            log.info("txHash={}", txnHash);
+            rawTransactionDto.setTxnHash(txnHash);
+        } else {
+            ChainContractDto contractConfigDto = chainContractService.get(chain.getCode(), currency);
+            Assert.isTrue(contractConfigDto != null, "Currency contract config not found");
+
+            String contractAddress = contractConfigDto.getAddress();
+            int decimals = contractConfigDto.getDecimals();
+            BigInteger value = scaleAmountByDecimal(amount, decimals);
+
+            // 构建TRC20的交易
+            Function function = new Function("transfer", Arrays.asList(new Address(toAddress), new Uint256(value)), Collections.emptyList());
+            TransactionBuilder transactionBuilder = tronClient.cli().triggerCall(fromAddress, contractAddress, function);
+            transactionBuilder.setFeeLimit(gasLimit * gasPrice);
+            org.tron.trident.proto.Chain.Transaction transaction = transactionBuilder.build();
+            byte[] rawData = transaction.toByteArray();
+            rawTransactionDto.setTronTransactionBase64(Base64.getEncoder().encodeToString(rawData));
+
+            // 发给合约地址
+            rawTransactionDto.setTo(contractAddress);
+            rawTransactionDto.setData("");
+            // 合约转账时value设置成0
+            rawTransactionDto.setValue(BigInteger.ZERO);
+
+            RawTransactionSignRequest request = new RawTransactionSignRequest();
+            request.setRawTransaction(rawTransactionDto);
+            request.setFromAddress(fromAddress);
+            GenericDto<String> response = sign(request);
+
+            // 1. decodeBase64String
+            byte[] sourceData = Base64.getDecoder().decode(response.getData());
+            // 2. parseFrom
+            org.tron.trident.proto.Chain.Transaction txn = org.tron.trident.proto.Chain.Transaction.parseFrom(sourceData);
+            String txnHash = tronClient.cli().broadcastTransaction(txn);
+            log.info("txHash={}", txnHash);
+            rawTransactionDto.setTxnHash(txnHash);
+        }
+
+        return rawTransactionDto;
     }
 
 

@@ -68,13 +68,13 @@ public class OpenUserAccountController {
             ucUserAccountService.creatAccountByUserId(userId);
         }
 
-        return GenericDto.success(ucUserAccountService.getInfo());
+        return GenericDto.success(ucUserAccountService.getInfo(userId));
     }
 
     @GetMapping("/info")
     @ApiOperation(value = "账户详情", notes = "账户详情")
     public GenericDto<UcUserAccountInfoResp> info() {
-        return GenericDto.success(ucUserAccountService.getInfo());
+        return GenericDto.success(ucUserAccountService.getInfo(UserContext.getCurrentUserId()));
     }
 
     @GetMapping("/amount-info")

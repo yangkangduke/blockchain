@@ -31,7 +31,7 @@ import java.util.List;
 
 
 /**
- * @author milo
+ * @author yk
  *
  * createTransaction -> toByteArray -> encodeToBase64String (kine-account-service)
  * decodeBase64String -> parseToTransaction -> sign -> toByteArray -> encodeToBase64String (kine-wallet-service)

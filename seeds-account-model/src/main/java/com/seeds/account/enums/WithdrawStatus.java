@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * 提币状态
  *
- * @author milo
+ * @author yk
  *
  */
 public enum WithdrawStatus implements EnumWithCode {

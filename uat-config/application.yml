@@ -48,6 +48,9 @@ email:
   user: AKIAQMKUPROLIXMNEIJK
   pass: BBTyucDgyIg8qIDU1ki5XT1x3JEZZSA3cK1FC96TO0r4
 
+zookeeper:
+  address: 35.76.116.54:2181
+
 login:
   twofa: false
 

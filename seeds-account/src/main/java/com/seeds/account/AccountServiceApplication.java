@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
- * @author milo
+ * @author yk
  */
 @MapperScan("com.seeds.account.mapper")
 @EnableFeignClients(basePackages = "com.seeds")

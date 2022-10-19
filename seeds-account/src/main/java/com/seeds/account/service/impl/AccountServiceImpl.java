@@ -1,14 +1,20 @@
 package com.seeds.account.service.impl;
 
+import com.google.common.collect.ImmutableMap;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.anno.ExecutionLock;
+import com.seeds.account.calc.AccountCalculator;
 import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.dto.*;
 import com.seeds.account.enums.*;
+import com.seeds.account.ex.ActionDeniedException;
+import com.seeds.account.ex.MissingElementException;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.account.model.ChainDepositWithdrawHis;
+import com.seeds.account.model.UserAccount;
 import com.seeds.account.service.*;
 import com.seeds.account.util.AddressUtils;
+import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
@@ -25,14 +31,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.seeds.account.AccountConstants.WITHDRAW_DECIMALS;
 
 
 /**
- * @author milo
+ * @author yk
  */
 @Slf4j
 @Service
@@ -66,6 +72,8 @@ public class AccountServiceImpl implements IAccountService {
     ITransactionService transactionService;
     @Autowired
     IUserAccountActionService userAccountActionService;
+//    @Autowired
+//    IPriceService priceService;
 
 
     @Override
@@ -265,6 +273,157 @@ public class AccountServiceImpl implements IAccountService {
     public void checkFundingStatus() {
         boolean settling = fundingRateActionService.isAnySettlingAsset();
         Utils.check(!settling, ErrorCode.ACCOUNT_IN_SETTLEMENT);
+    }
+
+    @Override
+    public UserAccountSummaryDto getUserWalletAccountSummaryDto(long userId) {
+//        Map<String, BigDecimal> priceMap = priceService.getLatestPriceMap();
+        Map<String, BigDecimal> priceMap = new HashMap<>();
+        priceMap.put("USDT", new BigDecimal(1));
+        return getUserWalletAccountSummaryDto(userId, priceMap);
+    }
+
+    @Override
+    public UserAccountSummaryDto getUserWalletAccountSummaryDto(long userId, Map<String, BigDecimal> priceMap) {
+        List<UserAccount> accounts = walletAccountService.getAccounts(userId);
+        UserAccountSummaryDto userAccountSummaryDto = AccountCalculator.calculateAccountSummary(
+                accounts.stream().map(e -> ObjectUtils.copy(e, new UserAccountDto())).collect(Collectors.toList()),
+                priceMap);
+
+        Set<String> existingCurrencies = userAccountSummaryDto.getAccounts().stream().map(UserAccountDto::getCurrency).collect(Collectors.toSet());
+        chainDepositService.getAllDepositRules().forEach(rule -> {
+            String currency = rule.getCurrency();
+            if (!existingCurrencies.contains(currency)) {
+                userAccountSummaryDto.getAccounts().add(AccountCalculator.createWalletAccountOnFly(currency, priceMap.get(currency)));
+                existingCurrencies.add(currency);
+            }
+        });
+        return userAccountSummaryDto;
+    }
+
+    @Override
+    @ExecutionLock(key = "account:deposit-withdraw:lock:{id}")
+    @Transactional(rollbackFor = Exception.class)
+    public void rejectTransaction(long id, String comments) {
+        ChainDepositWithdrawHis tx = chainDepositWithdrawHisService.getHistory(id);
+        log.info("rejectTransaction id={} comments={} tx={}", id, comments, tx);
+        if (tx == null) {
+            throw new MissingElementException("transaction not exists");
+        }
+
+        if (tx.getAction() == ChainAction.DEPOSIT) {
+            if (tx.getStatus() != DepositStatus.PENDING_APPROVE.getCode()) {
+                throw new ActionDeniedException("status is not pending approval");
+            }
+            int manual = 1;
+            int status = WithdrawStatus.REJECTED.getCode();
+            tx.setUpdateTime(System.currentTimeMillis());
+            tx.setVersion(tx.getVersion() + 1);
+            tx.setManual(manual);
+            tx.setStatus(status);
+            tx.setComments(comments != null ? comments : "");
+            chainDepositWithdrawHisService.updateHistory(tx);
+
+            // where does the asset go?
+        } else if (tx.getAction() == ChainAction.WITHDRAW) {
+            if (tx.getStatus() != WithdrawStatus.PENDING_APPROVE.getCode()) {
+                throw new ActionDeniedException("status is not pending approve");
+            }
+            int manual = 1;
+            int status = WithdrawStatus.REJECTED.getCode();
+            tx.setUpdateTime(System.currentTimeMillis());
+            tx.setVersion(tx.getVersion() + 1);
+            tx.setManual(manual);
+            tx.setStatus(status);
+            tx.setComments(comments != null ? comments : "");
+            chainDepositWithdrawHisService.updateHistory(tx);
+
+            // 解冻资产
+            boolean done = walletAccountService.unfreeze(tx.getUserId(), tx.getCurrency(), tx.getAmount());
+            Utils.check(done, ErrorCode.ACCOUNT_INSUFFICIENT_BALANCE);
+            // 更新财务记录状态为失败
+            userAccountActionService.updateStatusByActionUserIdSource(AccountAction.WITHDRAW, tx.getUserId(), String.valueOf(tx.getId()), CommonActionStatus.FAILED);
+
+            transactionService.afterCommit(() -> {
+                // 通知账户变更
+//                accountPublishService.publishAsync(AccountTopics.TOPIC_ACCOUNT_UPDATE,
+//                        AccountUpdateEvent.builder().ts(System.currentTimeMillis()).userId(tx.getUserId()).action(AccountAction.UNFREEZE.getCode()).build());
+
+                // 给提币用户发通知
+//                notificationService.sendNotificationAsync(NotificationDto.builder()
+//                        .notificationType(AccountAction.WITHDRAW_REJECTED.getNotificationType())
+//                        .userId(tx.getUserId())
+//                        .values(ImmutableMap.of(
+//                                "ts", System.currentTimeMillis(),
+//                                "currency", tx.getCurrency(),
+//                                "amount", tx.getAmount()))
+//                        .build());
+            });
+        }
+    }
+
+    @Override
+    @ExecutionLock(key = "account:deposit-withdraw:lock:{id}")
+    @Transactional(rollbackFor = Exception.class)
+    public void approveTransaction(long id, String comments) {
+        ChainDepositWithdrawHis transaction = chainDepositWithdrawHisService.getHistory(id);
+        log.info("approveTransaction id={} comments={} transaction={}", id, comments, transaction);
+        if (transaction == null) {
+            throw new MissingElementException("transaction not exists");
+        }
+
+        if (transaction.getAction() == ChainAction.DEPOSIT) {
+            if (!Objects.equals(transaction.getStatus(), DepositStatus.PENDING_APPROVE.getCode())) {
+                throw new ActionDeniedException("status is not pending approve");
+            }
+            int manual = 1;
+            int status = WithdrawStatus.TRANSACTION_CONFIRMED.getCode();
+            transaction.setUpdateTime(System.currentTimeMillis());
+            transaction.setVersion(transaction.getVersion() + 1);
+            transaction.setManual(manual);
+            // 不用标记成APPROVED，直接标记成上账
+            transaction.setStatus(status);
+            transaction.setComments(comments != null ? comments : "");
+            chainDepositWithdrawHisService.updateHistory(transaction);
+
+            // 用户资产上账
+            boolean result = walletAccountService.updateAvailable(transaction.getUserId(), transaction.getCurrency(), transaction.getAmount(), true);
+            Utils.check(result, ErrorCode.ACCOUNT_INSUFFICIENT_BALANCE);
+
+            transactionService.afterCommit(() -> {
+                // 记录用户财务历史
+                userAccountActionService.createHistory(transaction.getUserId(), transaction.getCurrency(), AccountAction.DEPOSIT, transaction.getAmount());
+
+                // 通知账户变更
+//                accountPublishService.publishAsync(AccountTopics.TOPIC_ACCOUNT_UPDATE,
+//                        AccountUpdateEvent.builder().ts(System.currentTimeMillis()).userId(transaction.getUserId()).action(AccountAction.DEPOSIT.getCode()).build());
+//
+//                // 充币自动兑换（审核后的外部充币，审核后的内部充币）
+//                accountAutoExchangeService.exchange(transaction.getUserId(), transaction.getCurrency(), transaction.getAmount(), transaction.getInternal() == 1);
+
+                // 发送通知给客户
+//                notificationService.sendNotificationAsync(NotificationDto.builder()
+//                        .notificationType(AccountAction.DEPOSIT.getNotificationType())
+//                        .userId(transaction.getUserId())
+//                        .values(ImmutableMap.of(
+//                                "ts", System.currentTimeMillis(),
+//                                "currency", transaction.getCurrency(),
+//                                "amount", transaction.getAmount()))
+//                        .build());
+            });
+        } else if (transaction.getAction() == ChainAction.WITHDRAW) {
+            if (!Objects.equals(transaction.getStatus(), WithdrawStatus.PENDING_APPROVE.getCode())) {
+                throw new ActionDeniedException("status is not pending approval");
+            }
+            int manual = 1;
+            int status = WithdrawStatus.APPROVED.getCode();
+            transaction.setUpdateTime(System.currentTimeMillis());
+            transaction.setVersion(transaction.getVersion() + 1);
+            transaction.setManual(manual);
+            transaction.setStatus(status);
+            transaction.setComments(comments != null ? comments : "");
+            chainDepositWithdrawHisService.updateHistory(transaction);
+        }
     }
 
     @Override

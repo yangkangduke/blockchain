@@ -95,4 +95,13 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 		return GenericDto.failure("Internal Error:nft tradeDetail failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
+	@Override
+	public GenericDto<Object> shelves(SysNftShelvesReq req) {
+		return GenericDto.failure("Internal Error:nft shelves failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<Object> soldOut(SysNftSoldOutReq req) {
+		return GenericDto.failure("Internal Error:nft soldOut failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
 }

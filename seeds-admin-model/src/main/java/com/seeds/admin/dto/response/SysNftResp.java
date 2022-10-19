@@ -41,7 +41,7 @@ public class SysNftResp {
 	@ApiModelProperty(value = "价格")
 	private BigDecimal price;
 
-	@ApiModelProperty(value = "单位 USDC")
+	@ApiModelProperty(value = "单位")
 	private String unit;
 
 	@ApiModelProperty(value = "是否在售  0：否   1：是")

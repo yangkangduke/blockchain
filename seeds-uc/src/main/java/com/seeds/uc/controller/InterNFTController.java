@@ -1,11 +1,15 @@
 package com.seeds.uc.controller;
 
 
+import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.NFTAuctionResp;
 import com.seeds.uc.dto.response.NFTOfferResp;
+import com.seeds.uc.enums.UcErrorCodeEnum;
+import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.service.UcInterNFTService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +35,9 @@ public class InterNFTController {
     @Autowired
     private UcInterNFTService ucInterNFTService;
 
+    @Autowired
+    private RemoteNftService adminRemoteNftService;
+
     /**
      *  购买回调接口
      */
@@ -49,7 +56,13 @@ public class InterNFTController {
     @ApiOperation(value = "购买", notes = "购买")
     @Inner
     public GenericDto<Object> buyNFT(@Valid @RequestBody NFTBuyReq buyReq) {
-        ucInterNFTService.buyNFT(buyReq);
+        SysNftDetailResp sysNftDetailResp;
+        try {
+            sysNftDetailResp = adminRemoteNftService.ucDetail(buyReq.getNftId()).getData();
+        } catch (Exception e) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
+        }
+        ucInterNFTService.buyNFT(buyReq, sysNftDetailResp);
         return GenericDto.success(null);
     }
 
@@ -116,5 +129,28 @@ public class InterNFTController {
     public GenericDto<NFTAuctionResp> actionInfo(@RequestParam Long id, @RequestParam Long userId) {
         return GenericDto.success(ucInterNFTService.actionInfo(id, userId));
     }
+
+    /**
+     *  上架
+     */
+    @PostMapping("/shelves")
+    @ApiOperation(value = "上架", notes = "上架")
+    @Inner
+    public GenericDto<Object> shelves(@Valid @RequestBody NFTShelvesReq req) {
+        ucInterNFTService.shelves(req);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  下架
+     */
+    @PostMapping("/sold-out")
+    @ApiOperation(value = "下架", notes = "下架")
+    @Inner
+    public GenericDto<Object> soldOut(@Valid @RequestBody NFTSoldOutReq req) {
+        ucInterNFTService.soldOut(req);
+        return GenericDto.success(null);
+    }
+
 
 }

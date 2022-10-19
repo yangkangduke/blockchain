@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.account.mapper.UserAccountActionHisMapper">
+
+    <update id="updateStatusByActionUserIdSource">
+        update user_account_action_his
+        set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
+            version = version + 1,
+            status      = #{status.code,jdbcType=TINYINT}
+        where `action`    = #{action.code,jdbcType=SMALLINT}
+          and `source`     = #{source,jdbcType=VARCHAR}
+          and `user_id`    = #{userId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByUserAndTime" resultType="com.seeds.account.model.UserAccountActionHis">
+        select *
+        from user_account_action_his
+        where user_id = #{userId,jdbcType=BIGINT}
+        <if test="startTimestamp > 0"><![CDATA[  and create_time >= #{startTimestamp,jdbcType=BIGINT} ]]></if>
+        <if test="endTimestamp > 0"><![CDATA[  and create_time < #{endTimestamp,jdbcType=BIGINT} ]]></if>
+        <if test="currency != null"><![CDATA[  and currency = #{currency,jdbcType=VARCHAR} ]]></if>
+        <if test="action != null"><![CDATA[  and `action` = #{action.code,jdbcType=TINYINT} ]]></if>
+    </select>
+
+</mapper>

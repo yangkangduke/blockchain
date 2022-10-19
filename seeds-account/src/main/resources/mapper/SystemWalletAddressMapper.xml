@@ -11,9 +11,9 @@
         <result column="tag" jdbcType="VARCHAR" property="tag"/>
         <result column="comments" jdbcType="VARCHAR" property="comments"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
-<!--        <result column="chain" jdbcType="TINYINT" property="chain"/>-->
+        <result column="chain" jdbcType="TINYINT" property="chain"/>
     </resultMap>
-    <select id="selectAll" resultMap="BaseResultMap">
+    <select id="selectAll" resultType="com.seeds.account.model.SystemWalletAddress">
         select *
         from system_wallet_address
         order by id desc

@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * @author milo
+ * @author yk
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

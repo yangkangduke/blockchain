@@ -11,6 +11,7 @@ import com.seeds.uc.dto.request.NFTBuyReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountAmountResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
+import com.seeds.uc.enums.CurrencyEnum;
 import com.seeds.uc.model.UcUserAccount;
 
 import java.math.BigDecimal;
@@ -44,9 +45,10 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
 
     /**
      * 账户详情
+     * @param UserId 用户id
      * @return
      */
-    UcUserAccountInfoResp getInfo();
+    UcUserAccountInfoResp getInfo(Long UserId);
 
     /**
      * 账户详情
@@ -65,21 +67,23 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      *  检查账户里面的金额是否足够支付
      * @param currentUserId
      * @param amount
+     * @param currency
      * @return
      */
-    Boolean checkBalance(Long currentUserId, BigDecimal amount);
+    Boolean checkBalance(Long currentUserId, BigDecimal amount, CurrencyEnum currency);
+
+    /**
+     * 购买nft
+     * @param buyReq
+     * @param sysNftDetail NFT详情
+     */
+    void buyNFT(NFTBuyReq buyReq, SysNftDetailResp sysNftDetail);
 
     /**
      * 购买nft
      * @param buyReq
      */
-    void buyNFT(NFTBuyReq buyReq);
-
-    /**
-     * 购买nft
-     * @param buyReq
-     */
-    void buyNFTFreeze(SysNftDetailResp buyReq, RequestSource source);
+    void buyNFTFreeze(SysNftDetailResp buyReq, RequestSource source, Long currentUserId);
 
     /**
      * 账户金额详情

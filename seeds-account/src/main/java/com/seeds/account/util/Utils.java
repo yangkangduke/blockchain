@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * 包装restful接口的异常
  *
- * @author milo
+ * @author yk
  */
 @Slf4j
 public class Utils {
@@ -81,4 +81,12 @@ public class Utils {
         }
     }
 
+    /**
+     * @param page
+     * @param size
+     */
+    public static void checkPage(int page, int size) {
+        Assert.isTrue(page > 0, "checkPage(page,size): invalid page");
+        Assert.isTrue(size > 0 && size <= 50, "checkPage(page,size): invalid size");
+    }
 }

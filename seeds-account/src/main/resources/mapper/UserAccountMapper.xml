@@ -25,10 +25,43 @@
         <if test="geZero == true">and available + #{amount,jdbcType=DECIMAL} &gt;= 0</if>
     </update>
 
+    <update id="updateFreeze">
+        update user_account
+        set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
+        version = version + 1,
+        freeze = freeze + #{amount,jdbcType=DECIMAL}
+        where user_id = #{userId,jdbcType=BIGINT}
+        and currency = #{currency,jdbcType=VARCHAR}
+        <if test="geZero == true">
+          and freeze + #{amount,jdbcType=DECIMAL} &gt;= 0
+        </if>
+    </update>
+
+    <update id="unfreeze">
+        <![CDATA[
+        update user_account
+        set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
+            version     = version + 1,
+            available   = available + #{amount,jdbcType=DECIMAL},
+            freeze      = freeze - #{amount,jdbcType=DECIMAL}
+        where user_id = #{userId,jdbcType=BIGINT}
+          and currency = #{currency,jdbcType=VARCHAR}
+          and freeze >= #{amount,jdbcType=DECIMAL}
+        ]]>
+    </update>
+
     <select id="countUserAccount" resultType="java.lang.Integer">
         select count(*)
         from user_account
         where user_id = #{userId,jdbcType=BIGINT}
           and currency = #{currency,jdbcType=VARCHAR}
     </select>
+
+    <select id="getUserAccountByUserId" resultType="com.seeds.account.model.UserAccount">
+        select *
+        from user_account
+        where user_id = #{userId,jdbcType=BIGINT}
+    </select>
+
+
 </mapper>

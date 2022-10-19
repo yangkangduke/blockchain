@@ -1,41 +1,22 @@
 package com.seeds.account.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.seeds.account.AccountConstants;
-import com.seeds.account.dto.SystemWalletAddressDto;
-import com.seeds.account.enums.CommonStatus;
-import com.seeds.account.model.ChainDepositAddress;
+import com.seeds.account.dto.ApproveRejectDto;
+import com.seeds.account.service.IAccountService;
+import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
-import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.enums.Chain;
-import com.seeds.common.enums.ErrorCode;
-import com.seeds.common.utils.BasicUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.Valid;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * 账户系统提供的内部调用接口，调用方包括
  * 1. seeds-account-job-service
  *
- * @author milo
+ * @author yk
  */
 @RestController
 @Slf4j
@@ -45,6 +26,10 @@ public class AccountInternalController {
 
     @Autowired
     private IChainActionService chainActionService;
+    @Autowired
+    IAddressCollectService addressCollectService;
+    @Autowired
+    private IAccountService accountService;
 
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
@@ -66,6 +51,69 @@ public class AccountInternalController {
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("scanBlock", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 充币提币审核通过
+     *
+     * @param approveRejectDto
+     * @return
+     */
+    @PostMapping("/mgt/approve-transaction")
+    @ApiOperation("充币提币审核通过")
+    public GenericDto<Boolean> approveTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
+        try {
+            accountService.approveTransaction(approveRejectDto.getId(), approveRejectDto.getComment());
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("approveWithdraw", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 充币提币审核拒绝
+     *
+     * @param approveRejectDto
+     * @return
+     */
+    @PostMapping("/mgt/reject-transaction")
+    @ApiOperation("充币提币审核拒绝")
+    public GenericDto<Boolean> rejectTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
+        try {
+            accountService.rejectTransaction(approveRejectDto.getId(), approveRejectDto.getComment());
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("rejectWithdraw", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/job/execute-withdraw")
+    @ApiOperation("执行提币上链")
+    public GenericDto<Boolean> executeWithdraw() {
+        try {
+            chainActionService.executeWithdraw();
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("executeWithdraw", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/job/scan-withdraw")
+    @ApiOperation("扫描提币，归集，空投状态")
+    public GenericDto<Boolean> scanWithdraw() {
+        try {
+            // 处理提币
+            chainActionService.scanWithdraw();
+            // 处理归集
+            addressCollectService.scanCollect();
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("scanWithdraw", e);
             return Utils.returnFromException(e);
         }
     }

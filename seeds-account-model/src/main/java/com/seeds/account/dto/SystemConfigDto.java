@@ -11,7 +11,7 @@ import java.io.Serializable;
 /**
  * 系统配置
  *
- * @author milo
+ * @author yk
  *
  */
 @Data

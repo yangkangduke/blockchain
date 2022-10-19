@@ -1,5 +1,6 @@
 package com.seeds.game.interceptor;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
@@ -117,7 +118,6 @@ public class OpenContextInterceptor implements HandlerInterceptor {
         // 判断请求方式
         String method = request.getMethod();
         if (POST_METHOD.equals(method)) {
-            log.info("POST请求进入...");
             // 获取请求Body参数，需要使用 BodyReaderHttpServletRequestWrapper进行处理
             // 否则会出现异常：I/O error while reading input message； nested exception is java.io.IOException: Stream closed
             // 原因就是在拦截器已经读取了请求体中的内容，这时候Request请求的流中已经没有了数据
@@ -127,19 +127,22 @@ public class OpenContextInterceptor implements HandlerInterceptor {
             String bodyString = URLDecoder.decode(body, "utf-8");
             if (StringUtils.isEmpty(bodyString)) {
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.putAll(HttpHelper.getAllRequestParam(request));
+                Map<String, String> requestParam = HttpHelper.getAllRequestParam(request);
+                jsonObject.putAll(requestParam);
+                log.info("POST请求进入...入参：{}", JSONUtil.toJsonStr(requestParam));
                 return SignatureUtils.validation(jsonObject, times, getSecretKey(jsonObject));
             }
+            log.info("POST请求进入...入参：{}", bodyString);
             // 解析参数转JSON格式
             JSONObject jsonObject = JSONObject.parseObject(bodyString);
             // 验签
             return SignatureUtils.validation(jsonObject, times, getSecretKey(jsonObject));
         }
         if (GET_METHOD.equals(method)) {
-            log.info("GET请求进入...");
             // 获取请求参数
             Map<String, String> allRequestParam = HttpHelper.getAllRequestParam(request);
             Set<Map.Entry<String, String>> entries = allRequestParam.entrySet();
+            log.info("GET请求进入...入参：{}", JSONUtil.toJsonStr(allRequestParam));
             // 参数转JSON格式
             JSONObject jsonObject = new JSONObject();
             entries.forEach(key -> {

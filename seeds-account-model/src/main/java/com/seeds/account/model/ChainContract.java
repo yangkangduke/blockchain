@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 /**
  * 链上合约配置
  *
- * @author milo
+ * @author yk
  *
  */
 @Data

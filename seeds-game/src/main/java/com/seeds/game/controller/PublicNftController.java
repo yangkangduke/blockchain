@@ -83,6 +83,6 @@ public class PublicNftController {
                                                     @RequestParam String accessKey,
                                                     @RequestParam String signature,
                                                     @RequestParam Long timestamp) {
-        return GenericDto.success(ucRemoteNftService.offerList(id));
+        return ucRemoteNftService.offerList(id);
     }
 }

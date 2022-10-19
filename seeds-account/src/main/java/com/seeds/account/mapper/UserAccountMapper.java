@@ -5,6 +5,7 @@ import com.seeds.account.model.UserAccount;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -44,4 +45,33 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
      * @return
      */
     int countUserAccount(@Param("userId") long userId, @Param("currency") String currency);
+
+    /**
+     * 更新freeze
+     *
+     * @param userId
+     * @param currency
+     * @param amount
+     * @param geZero
+     * @return
+     */
+    int updateFreeze(@Param("userId") long userId, @Param("currency") String currency, @Param("amount") BigDecimal amount, @Param("geZero") boolean geZero);
+
+    /**
+     * 解冻
+     *
+     * @param userId
+     * @param currency
+     * @param amount
+     * @return
+     */
+    int unfreeze(@Param("userId") long userId, @Param("currency") String currency, @Param("amount") BigDecimal amount);
+
+    /**
+     * 获取用户的账户
+     * @param userId
+     * @return
+     */
+    List<UserAccount> getUserAccountByUserId(@Param("userId") long userId);
+
 }

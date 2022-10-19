@@ -7,6 +7,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @Data
 @ApiModel(value = "NftPropertiesValueReq", description = "NFT属性")
@@ -53,5 +54,9 @@ public class NftOwnerChangeReq {
 
     @ApiModelProperty("请求来源")
     private RequestSource source;
+
+    @ApiModelProperty("售卖金额")
+    @NotNull
+    private BigDecimal amount;
 
 }

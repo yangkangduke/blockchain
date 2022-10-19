@@ -13,7 +13,7 @@ import java.util.List;
  *
  * 所有的方法都是事务的
  *
- * @author milo
+ * @author yk
  *
  */
 public interface IChainActionPersistentService {
