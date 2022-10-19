@@ -40,4 +40,10 @@ public class NotificationController {
     GenericDto<Boolean> getUnReadNoticeFlag(@RequestParam("ucUserId") Long ucUserId) {
         return GenericDto.success(notificationService.getUnReadNoticeFlag(ucUserId));
     }
+
+    @DeleteMapping("/delete/{id}")
+    @ApiOperation("删除通知")
+    GenericDto<Boolean> delete(@PathVariable("id") Long id) {
+        return GenericDto.success(notificationService.delete(id));
+    }
 }
