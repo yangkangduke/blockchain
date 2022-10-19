@@ -22,7 +22,7 @@ public class AccountListener {
     private NotificationService notificationService;
 
 
-    @KafkaListener(groupId = "account-consumer-group", topics = {KafkaTopic.TOPIC_ACCOUNT_UPDATE})
+    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.TOPIC_ACCOUNT_UPDATE})
     public void receiveNotice(String msg) {
         log.info("收到消息：{}", msg);
         NotificationReq notificationReq = JSONUtil.toBean(msg, NotificationReq.class);
