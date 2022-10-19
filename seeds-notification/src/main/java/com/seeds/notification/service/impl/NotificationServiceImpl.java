@@ -101,6 +101,11 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
     public Boolean getUnReadNoticeFlag(Long userId) {
         return count(new QueryWrapper<NotificationEntity>().eq("uc_user_id", userId).eq("has_read", 0)) > 0;
     }
+
+    @Override
+    public Boolean delete(Long id) {
+        return this.removeById(id);
+    }
 }
 
 
