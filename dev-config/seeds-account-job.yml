@@ -5,10 +5,6 @@ spring:
       group-id: ${spring.application.name}
 
 feign:
-  account:
-    access:
-      access-key: seeds-account-job
-      secret-key: "xxx"
   client:
     config:
       default:
