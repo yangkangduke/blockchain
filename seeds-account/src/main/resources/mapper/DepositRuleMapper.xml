@@ -4,7 +4,7 @@
 
     <select id="selectAll" resultType="com.seeds.account.model.DepositRule">
         select *
-        from deposit_rule
+        from ac_deposit_rule
         order by id
     </select>
 </mapper>

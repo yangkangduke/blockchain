@@ -6,8 +6,7 @@ import java.security.SecureRandom;
 import java.util.UUID;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/7/28
  */
 @Slf4j

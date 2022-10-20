@@ -6,8 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/7/26
  */
 @Slf4j

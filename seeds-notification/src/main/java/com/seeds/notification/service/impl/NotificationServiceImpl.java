@@ -73,6 +73,7 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
             req.getUcUserIds().forEach(userId -> {
                 NotificationEntity entity = new NotificationEntity();
                 entity.setUcUserId(userId);
+                entity.setNotificationType(req.getNotificationType());
                 entity.setContent(JSONUtil.toJsonStr(req.getValues()));
                 entity.setCreatedAt(new Date().getTime());
                 entity.setUpdatedAt(new Date().getTime());

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import com.seeds.wallet.dto.RawTransactionSignRequest;
 import com.seeds.wallet.dto.SignMessageRequest;
 import com.seeds.wallet.dto.SignedMessageDto;
@@ -42,6 +43,7 @@ public class WalletController {
     }
 
     @PostMapping("create")
+    @Inner
     @ApiOperation(value = "创建", notes = "创建")
     public GenericDto<String> createAccount(@RequestParam("chain") int chain) throws Exception {
         return GenericDto.success(walletService.createNewWallet(chain));
@@ -49,6 +51,7 @@ public class WalletController {
 
     @PostMapping("sign")
     @ApiOperation(value = "签名", notes = "签名")
+    @Inner
     public GenericDto<String> sign( @RequestBody RawTransactionSignRequest request) throws Exception {
         String signedMessage = walletService.signRawTransaction(request.getChain(), request.getChainId(), request.getRawTransaction(), request.getFromAddress());
         return GenericDto.success(signedMessage);
@@ -56,6 +59,7 @@ public class WalletController {
 
     @PostMapping("signMessages")
     @ApiOperation(value = "签名消息", notes = "签名消息")
+    @Inner
     public GenericDto<List<SignedMessageDto>> signMessages(@RequestBody SignMessageRequest request) throws Exception {
         return GenericDto.success(walletService.signMessages(request.getChain(), request.getMessagesToSign(), request.getAddress()));
     }

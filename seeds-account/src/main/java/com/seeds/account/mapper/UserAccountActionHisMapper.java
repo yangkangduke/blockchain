@@ -1,11 +1,9 @@
 package com.seeds.account.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.seeds.account.anno.AssignDataSource;
 import com.seeds.account.enums.AccountAction;
 import com.seeds.account.enums.CommonActionStatus;
 import com.seeds.account.model.UserAccountActionHis;
-import com.seeds.common.enums.DataSources;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

@@ -5,7 +5,7 @@
     <select id="getIntradayWithdraw" resultType="com.seeds.account.model.ChainDepositWithdrawHis">
         <![CDATA[
         select *
-        from chain_deposit_withdraw_his
+        from ac_chain_deposit_withdraw_his
         where action = 2
           and user_id = #{userId,jdbcType=BIGINT}
           and create_time >= #{startTime,jdbcType=TINYINT}
@@ -17,7 +17,7 @@
 
     <update id="updateStatusByPrimaryKey">
         <![CDATA[
-        update chain_deposit_withdraw_his
+        update ac_chain_deposit_withdraw_his
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
             version     = version + 1,
             status      = #{status,jdbcType=TINYINT}
@@ -29,7 +29,7 @@
     <select id="getChainDepositWithdrawEarlierThanBlockNumber" resultType="com.seeds.account.model.ChainDepositWithdrawHis">
         <![CDATA[
         select *
-        from chain_deposit_withdraw_his
+        from ac_chain_deposit_withdraw_his
         where chain = #{chain.code,jdbcType=VARCHAR}
           and `action` = #{action,jdbcType=TINYINT}
           and status = #{status,jdbcType=TINYINT}
@@ -39,7 +39,7 @@
     </select>
     <select id="getListByStatus" resultType="com.seeds.account.model.ChainDepositWithdrawHis">
         select *
-        from chain_deposit_withdraw_his
+        from ac_chain_deposit_withdraw_his
         where `action` = #{action,jdbcType=TINYINT}
         and status in
         <foreach collection="statusList" open="(" separator="," close=")" item="status">
@@ -50,7 +50,7 @@
 
     <select id="selectByUserAndTime" resultType="com.seeds.account.dto.ChainDepositWithdrawHisDto" parameterType="com.seeds.account.dto.req.AccountHistoryReq">
         select *
-        from chain_deposit_withdraw_his
+        from ac_chain_deposit_withdraw_his
         <where>
             <if test="query.userId != null">
                 <![CDATA[ and user_id = #{query.userId} ]]>
@@ -73,7 +73,7 @@
 
     <update id="rollbackByBlockNumberAndBlockHash">
         <![CDATA[
-        update chain_deposit_withdraw_his
+        update ac_chain_deposit_withdraw_his
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
             version     = version + 1,
             status      = #{status,jdbcType=TINYINT}

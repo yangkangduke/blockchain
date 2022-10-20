@@ -14,7 +14,7 @@ spring:
 
     consumer:
       group-id: tomge-consumer-group  # 默认消费者group id
-      auto-offset-reset: earliest
+      auto-offset-reset: latest
       enable-auto-commit: true
       auto-commit-interval: 100
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer

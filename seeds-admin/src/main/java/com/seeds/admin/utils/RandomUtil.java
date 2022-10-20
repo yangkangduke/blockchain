@@ -5,8 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.security.SecureRandom;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/7/28
  */
 @Slf4j

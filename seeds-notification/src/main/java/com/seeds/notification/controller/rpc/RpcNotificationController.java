@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import com.seeds.notification.dto.request.NoticePageReq;
 import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.notification.dto.response.NotificationResp;
@@ -33,6 +34,7 @@ public class RpcNotificationController {
     private NotificationService notificationService;
 
     @PostMapping("/sendMessage")
+    @Inner
     public GenericDto<Object> sendMessage(@RequestBody NotificationReq req) {
 
         kafkaProducer.sendAsync(KafkaTopic.SEND_NOTIFICATION, JSONUtil.toJsonStr(req));
@@ -40,6 +42,7 @@ public class RpcNotificationController {
     }
 
     @PostMapping("/getNoticeList")
+    @Inner
     public GenericDto<IPage<NotificationResp>> getNoticeList(@RequestBody NoticePageReq req) {
         return GenericDto.success(notificationService.getNoticeByUserId(req));
     }

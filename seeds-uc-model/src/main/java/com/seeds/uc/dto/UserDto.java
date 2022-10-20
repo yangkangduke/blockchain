@@ -7,8 +7,7 @@ import com.seeds.uc.enums.ClientTypeEnum;
 import lombok.Data;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/7/31
  */
 @Data

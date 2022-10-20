@@ -15,7 +15,7 @@
     </resultMap>
 
     <insert id="insert" parameterType="com.seeds.account.model.SystemConfig" useGeneratedKeys="true" keyProperty="id">
-        insert into system_config (id, create_time, update_time, version,
+        insert into ac_system_config (id, create_time, update_time, version,
                                      type, key, name, value, comments,
                                      status)
         values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, #{version,jdbcType=BIGINT},
@@ -24,7 +24,7 @@
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.SystemConfig">
-        update system_config
+        update ac_system_config
         set create_time  = #{createTime,jdbcType=BIGINT},
             update_time  = #{updateTime,jdbcType=BIGINT},
             version      = #{version,jdbcType=BIGINT},
@@ -38,13 +38,13 @@
     </update>
 
     <select id="selectAll" resultMap="BaseResultMap">
-        select * from system_config
+        select * from ac_system_config
         where status = 1
         order by id
     </select>
 
     <select id="getByTypeAndKey" resultMap="BaseResultMap">
-        select * from system_config
+        select * from ac_system_config
         where type  = #{type,jdbcType=TINYINT}
           and `key`   = #{key,jdbcType=VARCHAR}
     </select>

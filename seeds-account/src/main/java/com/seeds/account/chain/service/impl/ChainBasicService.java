@@ -44,13 +44,9 @@ public abstract class ChainBasicService implements IChainService {
     @Autowired
     protected ISystemConfigService systemConfigService;
     @Autowired
-    RedissonClient client;
-//    @Autowired
-//    NotificationService notificationService;
+    private RedissonClient client;
     @Autowired
-    WalletFeignClient walletFeignClient;
-//    @Autowired
-//    ChainContractService chainContractService;
+    private WalletFeignClient walletFeignClient;
     @Autowired
     private ISystemWalletAddressService systemWalletAddressService;
 

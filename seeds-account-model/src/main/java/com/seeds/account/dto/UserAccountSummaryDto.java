@@ -1,6 +1,7 @@
 package com.seeds.account.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.util.List;
 
 /**
  *
- * @author milo
+ * @author yk
  *
  */
 @Data
@@ -26,7 +27,9 @@ public class UserAccountSummaryDto implements Serializable {
     /**
      * 交易账户
      */
+    @ApiModelProperty(value = "交易账户")
     List<UserAccountDto> accounts;
 
+    @ApiModelProperty(value = "合计值")
     BigDecimal totalValue;
 }

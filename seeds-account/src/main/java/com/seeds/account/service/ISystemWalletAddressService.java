@@ -7,7 +7,6 @@ import com.seeds.account.model.SystemWalletAddress;
 import com.seeds.common.enums.Chain;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * <p>
