@@ -18,7 +18,7 @@
     </resultMap>
 
     <insert id="insert" parameterType="com.seeds.account.model.ChainDepositWithdrawHis" keyProperty="id">
-        insert into chain_deposit_withdraw_sig_his (id, create_time, update_time, version,
+        insert into ac_chain_deposit_withdraw_sig_his (id, create_time, update_time, version,
                 user_id, chain, currency, amount, deadline, singed_signature, singed_message)
         values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, #{version,jdbcType=BIGINT},
                 #{userId,jdbcType=BIGINT}, #{chain.code,jdbcType=TINYINT}, #{currency,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{deadline,jdbcType=BIGINT},
@@ -27,13 +27,13 @@
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         select *
-        from chain_deposit_withdraw_sig_his
+        from ac_chain_deposit_withdraw_sig_his
         where id = #{id,jdbcType=BIGINT}
     </select>
 
     <select id="getByUserId" resultMap="BaseResultMap">
         select *
-        from chain_deposit_withdraw_sig_his
+        from ac_chain_deposit_withdraw_sig_his
         where id = #{id,jdbcType=BIGINT}
           and user_id = #{userId,jdbcType=BIGINT}
     </select>

@@ -35,12 +35,12 @@
     </resultMap>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete
-        from chain_exchange_his
+        from ac_chain_exchange_his
         where id = #{id,jdbcType=BIGINT}
     </delete>
     <insert id="insert" parameterType="com.seeds.account.model.ChainExchangeHis" useGeneratedKeys="true"
             keyProperty="id">
-        insert into chain_exchange_his (id, create_time, update_time,
+        insert into ac_chain_exchange_his (id, create_time, update_time,
                                           version, user_id, chain,
                                           source_currency, source_amount,
                                           target_currency, target_amount,
@@ -60,7 +60,7 @@
                 #{nonce,jdbcType=VARCHAR}, #{txValue,jdbcType=VARCHAR}, #{txToAddress,jdbcType=VARCHAR})
     </insert>
     <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.ChainExchangeHis">
-        update chain_exchange_his
+        update ac_chain_exchange_his
         set create_time     = #{createTime,jdbcType=BIGINT},
             update_time     = #{updateTime,jdbcType=BIGINT},
             version         = #{version,jdbcType=BIGINT},
@@ -111,7 +111,7 @@
                nonce,
                tx_value,
                tx_to_address
-        from chain_exchange_his
+        from ac_chain_exchange_his
         where id = #{id,jdbcType=BIGINT}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
@@ -139,12 +139,12 @@
                nonce,
                tx_value,
                tx_to_address
-        from chain_exchange_his
+        from ac_chain_exchange_his
     </select>
 
     <select id="getListByStatus" resultMap="BaseResultMap">
         select *
-        from chain_exchange_his
+        from ac_chain_exchange_his
         where `action` = #{action.code,jdbcType=TINYINT}
         and status in
         <foreach collection="statusList" open="(" separator="," close=")" item="status">
@@ -155,7 +155,7 @@
 
     <update id="updateStatusByPrimaryKey">
         <![CDATA[
-        update chain_exchange_his
+        update ac_chain_exchange_his
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
             version     = version + 1,
             status      = #{status.code,jdbcType=TINYINT}
@@ -166,7 +166,7 @@
 
     <select id="getByChainHash" resultMap="BaseResultMap">
         select *
-        from chain_exchange_his
+        from ac_chain_exchange_his
         where tx_hash = #{txHash,jdbcType=VARCHAR}
           and chain = #{chain.code,jdbcType=TINYINT}
     </select>
@@ -174,7 +174,7 @@
     <select id="selectByChainStatusAndTimestamp" resultMap="BaseResultMap">
         <![CDATA[
         select *
-        from chain_exchange_his
+        from ac_chain_exchange_his
         where status = #{status.code,jdbcType=TINYINT}
           and chain = #{chain.code,jdbcType=TINYINT}
           and update_time <= #{timestamp,jdbcType=BIGINT}
@@ -184,7 +184,7 @@
     <select id="selectByChainActionStatusAndTimestamp" resultMap="BaseResultMap">
         <![CDATA[
         select *
-        from chain_exchange_his
+        from ac_chain_exchange_his
         where status = #{status.code,jdbcType=TINYINT}
           and `action` = #{action.code,jdbcType=TINYINT}
           and `chain` = #{chain.code,jdbcType=TINYINT}
@@ -194,7 +194,7 @@
 
     <select id="selectByCurrencyActionAndStatus" resultMap="BaseResultMap">
         select *
-        from chain_exchange_his
+        from ac_chain_exchange_his
         where status = #{status.code,jdbcType=TINYINT}
           and `action` = #{action.code,jdbcType=TINYINT}
           and source_currency = #{sourceCurrency,jdbcType=VARCHAR}
@@ -203,13 +203,13 @@
 
     <select id="selectByAction" resultMap="BaseResultMap">
         select *
-        from chain_exchange_his
+        from ac_chain_exchange_his
         where `action` = #{action.code,jdbcType=TINYINT}
     </select>
 
     <select id="selectByActionAndChain" resultMap="BaseResultMap">
         select *
-        from chain_exchange_his
+        from ac_chain_exchange_his
         where `action` = #{action.code,jdbcType=TINYINT}
           and `chain` = #{chain.code,jdbcType=TINYINT}
     </select>

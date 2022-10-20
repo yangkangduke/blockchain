@@ -1,6 +1,5 @@
 package com.seeds.account.service.impl;
 
-import com.google.common.collect.ImmutableMap;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.anno.ExecutionLock;
 import com.seeds.account.calc.AccountCalculator;
@@ -24,7 +23,6 @@ import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.feign.UserCenterFeignClient;
-import com.seeds.wallet.dto.SignedMessageDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,34 +151,34 @@ public class AccountServiceImpl implements IAccountService {
                 userId, currency, amount, feeAmount, minAmount, maxAmount, intradyAmount, autoAmount, usedIntradayWithdraw);
 
         String withdrawToken = withdrawRequestDto.getWithdrawToken();
-        String publicAddress = withdrawRequestDto.getPublicAddress();
-        String signature = withdrawRequestDto.getSignature();
-        String msg = withdrawRequestDto.getMsg();
+//        String publicAddress = withdrawRequestDto.getPublicAddress();
+//        String signature = withdrawRequestDto.getSignature();
+//        String msg = withdrawRequestDto.getMsg();
 
-//        if (!isDefiWithdraw) {
-//            if (withdrawToken != null) {
-//                // 验证用户的提币Token是否有效
-//                VerifyAuthTokenReq verifyRequest = VerifyAuthTokenReq.builder()
-//                        .uid(userId)
-//                        .authToken(withdrawToken)
-//                        .useType(AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_WITHDRAW)
-//                        .build();
-//                GenericDto<Boolean> verifyResponse = userCenterFeignClient.verifyToken(verifyRequest);
-//                log.info("withdraw userId={} currency={} verifyRequest={} verifyResponse={}", userId, currency, verifyRequest, verifyResponse);
-//                Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
-//            } else if (publicAddress != null && signature != null) {
-//                MetamaskVerifyReq verifyRequest = new MetamaskVerifyReq();
-//                verifyRequest.setPublicAddress(publicAddress);
-//                verifyRequest.setSignature(signature);
-//                verifyRequest.setMessage(msg);
-//                verifyRequest.setUserId(userId);
-//                GenericDto<Boolean> verifyResponse = userCenterFeignClient.metaMaskVerifySignature(verifyRequest);
-//                log.info("withdraw userId={} currency={} verifyRequest={} verifyResponse={}", userId, currency, verifyRequest, verifyResponse);
-//                Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
-//            } else {
-//                Utils.throwError(ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
-//            }
-//        }
+        if (!isDefiWithdraw) {
+            if (withdrawToken != null) {
+                // 验证用户的提币Token是否有效
+                VerifyAuthTokenReq verifyRequest = VerifyAuthTokenReq.builder()
+                        .uid(userId)
+                        .authToken(withdrawToken)
+                        .useType(AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_WITHDRAW)
+                        .build();
+                GenericDto<Boolean> verifyResponse = userCenterFeignClient.verifyToken(verifyRequest);
+                log.info("withdraw userId={} currency={} verifyRequest={} verifyResponse={}", userId, currency, verifyRequest, verifyResponse);
+                Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
+            } /*else if (publicAddress != null && signature != null) {
+                MetamaskVerifyReq verifyRequest = new MetamaskVerifyReq();
+                verifyRequest.setPublicAddress(publicAddress);
+                verifyRequest.setSignature(signature);
+                verifyRequest.setMessage(msg);
+                verifyRequest.setUserId(userId);
+                GenericDto<Boolean> verifyResponse = userCenterFeignClient.metaMaskVerifySignature(verifyRequest);
+                log.info("withdraw userId={} currency={} verifyRequest={} verifyResponse={}", userId, currency, verifyRequest, verifyResponse);
+                Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
+            } */else {
+                Utils.throwError(ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
+            }
+        }
 
         boolean result = walletAccountService.freeze(userId, currency, amount);
         Utils.check(result, ErrorCode.ACCOUNT_INSUFFICIENT_BALANCE);

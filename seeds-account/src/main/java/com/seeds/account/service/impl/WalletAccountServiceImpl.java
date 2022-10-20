@@ -1,19 +1,11 @@
 package com.seeds.account.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.Lists;
 import com.seeds.account.AccountConstants;
-import com.seeds.account.anno.SingletonLock;
 import com.seeds.account.mapper.UserAccountMapper;
 import com.seeds.account.model.UserAccount;
 import com.seeds.account.service.IWalletAccountService;
-import com.seeds.account.util.JsonUtils;
-import com.seeds.account.util.ObjectUtils;
-import com.seeds.common.redis.account.RedisKeys;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
-import org.redisson.client.codec.StringCodec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -21,7 +13,6 @@ import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**

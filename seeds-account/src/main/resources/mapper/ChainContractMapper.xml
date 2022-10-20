@@ -16,7 +16,7 @@
     </resultMap>
 
     <insert id="insert" parameterType="com.seeds.account.model.ChainContract" useGeneratedKeys="true" keyProperty="id">
-        insert into chain_contract (id, create_time, update_time, version,
+        insert into ac_chain_contract (id, create_time, update_time, version,
                                       chain, currency, address, decimals, transfer_sign,
                                       is_staking_asset, status)
         values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT},
@@ -27,7 +27,7 @@
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.ChainContract">
-        update chain_contract
+        update ac_chain_contract
         set create_time      = #{createTime,jdbcType=BIGINT},
             update_time      = #{updateTime,jdbcType=BIGINT},
             version          = #{version,jdbcType=BIGINT},
@@ -43,14 +43,14 @@
 
     <select id="selectAll" resultMap="BaseResultMap">
         select *
-        from chain_contract
+        from ac_chain_contract
         where `status` = 1
         order by id desc
     </select>
 
     <select id="getByCurrencyAndAddress" resultMap="BaseResultMap">
         select *
-        from chain_contract
+        from ac_chain_contract
         where chain = #{chain,jdbcType=TINYINT}
           and currency = #{currency,jdbcType=VARCHAR}
           and address = #{address,jdbcType=VARCHAR}

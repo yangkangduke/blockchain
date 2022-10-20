@@ -10,8 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/7/26
  */
 public class ClientPlatformEnumHandler implements TypeHandler<ClientPlatformEnum> {

@@ -3,15 +3,15 @@ package com.seeds.account.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.math.BigDecimal;
-
 import com.seeds.account.enums.ChainAction;
 import com.seeds.common.enums.Chain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -21,7 +21,7 @@ import lombok.Data;
  * @author yk
  * @since 2022-10-08
  */
-@TableName("chain_deposit_withdraw_his")
+@TableName("ac_chain_deposit_withdraw_his")
 @ApiModel(value = "ChainDepositWithdrawHis对象", description = "充提历史")
 @Data
 @Builder

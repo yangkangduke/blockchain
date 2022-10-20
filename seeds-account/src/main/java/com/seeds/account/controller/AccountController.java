@@ -2,10 +2,12 @@ package com.seeds.account.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.AccountHistoryReq;
+import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.service.*;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +35,7 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 @Api(tags = "账户")
-@RequestMapping("/account")
+@RequestMapping("/account-web")
 public class AccountController {
 
     @Autowired
@@ -42,9 +45,11 @@ public class AccountController {
     @Autowired
     private IChainDepositWithdrawHisService chainDepositWithdrawHisService;
     @Autowired
-    private ISystemConfigService systemConfigService;
-    @Autowired
     private IChainWithdrawService chainWithdrawService;
+    @Autowired
+    private IWithdrawWhitelistService withdrawWhitelistService;
+    @Autowired
+    private IChainContractService chainContractService;
 
 
     @GetMapping("/wallet-accounts")
@@ -59,7 +64,6 @@ public class AccountController {
             return Utils.returnFromException(e);
         }
     }
-
 
     @GetMapping("/deposit-address")
     @ApiOperation(value = "获取用户的充币地址", notes = "chain的传值，1：eth链erc20  3：tron链trc20")
@@ -87,7 +91,7 @@ public class AccountController {
 
 
     @PostMapping("/withdraw")
-    @ApiOperation("提交提币请求")
+    @ApiOperation(value = "提交提币请求", notes = "1.调用发送邮件/email/send接口，传参数VERIFY_SETTING_POLICY_WITHDRAW 2.调用strategy/verify接口返回authToken 3.调用该接口")
     public GenericDto<WithdrawResponseDto> withdraw(@RequestBody WithdrawRequestDto withdrawRequestDto) {
         try {
             long userId = getUserId();
@@ -113,6 +117,62 @@ public class AccountController {
             return GenericDto.success(list);
         } catch (Exception e) {
             log.error("getDepositWithdrawHistory", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @GetMapping("/withdraw-rules")
+    @ApiOperation("获取单币种的提币限制信息")
+    public GenericDto<List<Map<String, Object>>> getWithdrawRules(@RequestParam("currency") String currency) {
+        try {
+            long userId = getUserId();
+
+            List<WithdrawRuleDto> rules = chainWithdrawService.getWithdrawRules()
+                    .stream()
+                    .filter(e -> Objects.equals(e.getCurrency(), currency) && e.getStatus() == CommonStatus.ENABLED)
+                    .collect(Collectors.toList());
+            List<Map<String, Object>> list = Lists.newArrayList();
+            rules.forEach(e -> {
+                Map<String, Object> values = Maps.newLinkedHashMap();
+                values.put("chain", e.getChain());
+                values.put("feeType", e.getFeeType());
+                values.put("feeAmount", e.getFeeAmount());
+                values.put("amountDecimals", e.getDecimals());
+
+                WithdrawLimitRuleDto limitRuleDto = chainWithdrawService.getWithdrawLimitRule(e.getCurrency());
+                BigDecimal minAmount = limitRuleDto.getMinAmount();
+                BigDecimal maxAmount = limitRuleDto.getMaxAmount();
+                BigDecimal intradayAmount = limitRuleDto.getIntradayAmount();
+                BigDecimal autoAmount = limitRuleDto.getAutoAmount();
+
+                WithdrawWhitelistDto withdrawWhitelistDto = withdrawWhitelistService.get(userId, e.getCurrency());
+                if (withdrawWhitelistDto != null) {
+                    maxAmount = withdrawWhitelistDto.getMaxAmount();
+                    intradayAmount = withdrawWhitelistDto.getIntradayAmount();
+                    autoAmount = withdrawWhitelistDto.getAutoAmount();
+                }
+
+                values.put("minAmount", minAmount);
+                values.put("maxAmount", maxAmount);
+                values.put("intradayAmount", intradayAmount);
+                values.put("autoAmount", autoAmount);
+                values.put("zeroFeeOnInternal", limitRuleDto.getZeroFeeOnInternal());
+
+                // 当日已使用额度
+                BigDecimal usedIntradayWithdraw = accountService.getUsedIntradayWithdraw(userId, e.getCurrency());
+                values.put("usedIntradayWithdraw", usedIntradayWithdraw);
+
+                // 合约信息
+                Chain chain = Chain.fromCode(e.getChain().getCode());
+                ChainContractDto chainContractDto = chainContractService.get(Chain.SUPPORT_DEFI_LIST.contains(chain) ? chain.getRelayOn().getCode() : chain.getCode(), e.getCurrency());
+                values.put("contractAddress", chainContractDto != null ? chainContractDto.getAddress() : "");
+                values.put("contractDecimal", chainContractDto != null ? chainContractDto.getDecimals() : "0");
+
+                list.add(values);
+            });
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getWithdrawRules", e);
             return Utils.returnFromException(e);
         }
     }

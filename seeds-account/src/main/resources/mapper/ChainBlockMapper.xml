@@ -4,14 +4,14 @@
 
     <select id="getLatestBlock" resultType="com.seeds.account.model.ChainBlock">
         select *
-        from chain_block
+        from ac_chain_block
         where status = 1 and chain = #{chain.code,jdbcType=TINYINT}
         order by id desc
             limit 1
     </select>
 
     <update id="rollbackBlock">
-        update chain_block
+        update ac_chain_block
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
             version     = version + 1,
             status      = #{status,jdbcType=TINYINT}

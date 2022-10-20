@@ -3,12 +3,13 @@ package com.seeds.account.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.math.BigDecimal;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -18,7 +19,7 @@ import lombok.Data;
  * @author yk
  * @since 2022-10-08
  */
-@TableName("withdraw_limit_rule")
+@TableName("ac_withdraw_limit_rule")
 @ApiModel(value = "WithdrawLimitRule对象", description = "提币限额规则")
 @Data
 @Builder

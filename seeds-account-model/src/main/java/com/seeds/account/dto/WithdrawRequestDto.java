@@ -39,18 +39,18 @@ public class WithdrawRequestDto implements Serializable {
     String address;
 
     /**
-     * 用户使用短信，邮件，Google Auth验证时会得到一个提币Token
+     * 用户使用邮件，Google Auth验证时会得到一个提币Token
      */
-    @ApiModelProperty(value = "用户使用邮件、Google Auth验证时会传。目前暂时关闭了，可以不用传")
+    @ApiModelProperty(value = "用户使用邮件，Google Auth验证时会得到一个提币Token")
     String withdrawToken;
 
-    /**
-     * 用户使用Metamask验证时会得到下面3个信息
-     */
-    @ApiModelProperty(value = "用户使用Metamask验证时会传，publicAddress。目前暂时关闭了，可以不用传")
-    String publicAddress;
-    @ApiModelProperty(value = "用户使用Metamask验证时会传，signature。目前暂时关闭了，可以不用传")
-    String signature;
-    @ApiModelProperty(value = "用户使用Metamask验证时会传，msg。目前暂时关闭了，可以不用传")
-    String msg;
+//    /**
+//     * 用户使用Metamask验证时会得到下面3个信息
+//     */
+//    @ApiModelProperty(value = "用户使用Metamask验证时会传，publicAddress。目前暂时关闭了，可以不用传")
+//    String publicAddress;
+//    @ApiModelProperty(value = "用户使用Metamask验证时会传，signature。目前暂时关闭了，可以不用传")
+//    String signature;
+//    @ApiModelProperty(value = "用户使用Metamask验证时会传，msg。目前暂时关闭了，可以不用传")
+//    String msg;
 }

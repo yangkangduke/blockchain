@@ -1,17 +1,15 @@
 package com.seeds.account.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.seeds.account.dto.DepositRuleDto;
-import com.seeds.account.enums.WalletAddressType;
 import com.seeds.account.mapper.ChainDepositAddressMapper;
 import com.seeds.account.mapper.DepositRuleMapper;
 import com.seeds.account.mapper.SystemWalletAddressMapper;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.account.service.IChainDepositService;
-import com.seeds.account.service.ISystemWalletAddressService;
 import com.seeds.account.service.ILockService;
+import com.seeds.account.service.ISystemWalletAddressService;
 import com.seeds.account.tool.ListMap;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;

@@ -1,6 +1,5 @@
 package com.seeds.account.chain.service.impl.eth;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.seeds.account.AccountConstants;
@@ -28,7 +27,6 @@ import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
-import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.exception.ChainException;
 import com.seeds.common.model.SymbolConstants;
 import com.seeds.common.redis.account.RedisKeys;
@@ -38,7 +36,6 @@ import com.seeds.wallet.dto.RawTransactionSignRequest;
 import com.seeds.wallet.dto.SignMessageRequest;
 import com.seeds.wallet.dto.SignedMessageDto;
 import com.seeds.wallet.feign.WalletFeignClient;
-import io.micrometer.core.instrument.Tags;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
@@ -49,17 +46,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.web3j.abi.*;
 import org.web3j.abi.datatypes.*;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.abi.datatypes.generated.Uint64;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.*;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.*;
 import org.web3j.utils.Convert;
-import org.web3j.utils.Numeric;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -70,7 +66,6 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 提供对Ethereum的节点访问
@@ -91,38 +86,28 @@ public class ETHChainServiceProvider extends ChainBasicService implements IChain
      * 定义当前Chain
      */
     final Chain currentChain = Chain.ETH;
-
-    @Autowired
-    IChainProviderService chainProviderService;
-
     public static final Integer DEFAULT_SCALE = 10;
 
     @Autowired
-    ChainBlockMapper chainBlockMapper;
+    private IChainProviderService chainProviderService;
     @Autowired
-    WalletFeignClient walletFeignClient;
-
-//    @Autowired
-//    IChainFunctionConfig chainFunctionConfig;
+    private ChainBlockMapper chainBlockMapper;
     @Autowired
-    IChainContractService chainContractService;
-
+    private WalletFeignClient walletFeignClient;
     @Autowired
-    ISystemWalletAddressService systemWalletAddressService;
+    private IChainContractService chainContractService;
     @Autowired
-    IChainDepositService chainDepositService;
+    private ISystemWalletAddressService systemWalletAddressService;
     @Autowired
-    RedissonClient client;
+    private IChainDepositService chainDepositService;
     @Autowired
-    FeignClientFactory feignClientFactory;
-//    @Autowired
-//    NotificationService notificationService;
+    private RedissonClient client;
     @Autowired
-    ETHChainConverter chainConverter;
+    private FeignClientFactory feignClientFactory;
     @Autowired
-    ETHWeb3Client web3;
-//    @Autowired
-//    PriceService priceService;
+    private ETHChainConverter chainConverter;
+    @Autowired
+    private ETHWeb3Client web3;
 
     @Autowired
     IActionControlService actionControlService;

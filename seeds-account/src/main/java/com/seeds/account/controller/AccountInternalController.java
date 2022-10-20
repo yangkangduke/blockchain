@@ -11,7 +11,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 账户系统提供的内部调用接口，调用方包括
@@ -28,7 +31,7 @@ public class AccountInternalController {
     @Autowired
     private IChainActionService chainActionService;
     @Autowired
-    IAddressCollectService addressCollectService;
+    private IAddressCollectService addressCollectService;
     @Autowired
     private IAccountService accountService;
 

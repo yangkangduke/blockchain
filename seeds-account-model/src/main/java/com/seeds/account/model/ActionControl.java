@@ -3,11 +3,12 @@ package com.seeds.account.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -17,7 +18,7 @@ import lombok.Data;
  * @author yk
  * @since 2022-09-29
  */
-@TableName("action_control")
+@TableName("ac_action_control")
 @ApiModel(value = "ActionControl对象", description = "操作控制")
 @Data
 @Builder

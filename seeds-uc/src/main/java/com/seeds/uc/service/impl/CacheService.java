@@ -16,8 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/7/29
  */
 

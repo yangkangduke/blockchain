@@ -15,7 +15,7 @@
     </resultMap>
     <select id="selectAll" resultType="com.seeds.account.model.SystemWalletAddress">
         select *
-        from system_wallet_address
+        from ac_system_wallet_address
         order by id desc
     </select>
 </mapper>
