@@ -38,4 +38,8 @@ public class SysNftCreateReq extends SysNftAddReq {
 	@NotBlank(message = "NFT template number cannot be empty")
 	private String nftNo;
 
+	@ApiModelProperty("NFT的gas费")
+	@NotBlank(message = "NFT gas fees cannot be empty")
+	private String gasFees;
+
 }

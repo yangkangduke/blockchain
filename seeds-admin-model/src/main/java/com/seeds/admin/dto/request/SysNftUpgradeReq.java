@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -25,10 +24,6 @@ public class SysNftUpgradeReq extends SysNftCreateReq {
 	 * 操作用户id
 	 */
 	private Long userId;
-
-	@ApiModelProperty("NFT模板编号")
-	@NotBlank(message = "NFT template number cannot be empty")
-	private String nftNo;
 
 	/**
 	 * 保留战绩NFT的id

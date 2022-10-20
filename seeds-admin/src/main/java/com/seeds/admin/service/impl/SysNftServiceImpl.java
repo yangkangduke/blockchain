@@ -694,7 +694,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         }
         // 已锁定的NFT不可上架
         if (WhetherEnum.YES.value() == nft.getLockFlag()) {
-            throw new SeedsException(AdminErrorCodeEnum.ERR_40014_NFT_LOCKED_CAN_NOT_SHELVES.getDescEn());
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40014_NFT_LOCKED_AND_CANNOT_BE_OPERATED.getDescEn());
         }
         // 判断NFT归属是否一致
         if (!req.getUserId().equals(nft.getOwnerId())) {
@@ -809,6 +809,10 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             // 校验nft是否上架中
             if (WhetherEnum.YES.value() == nft.getStatus()) {
                 throw new SeedsException(AdminErrorCodeEnum.ERR_40006_NFT_ON_SALE_CAN_NOT_BE_MODIFIED.getDescEn());
+            }
+            // 校验nft是否已锁定
+            if (WhetherEnum.YES.value() == nft.getLockFlag()) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_40014_NFT_LOCKED_AND_CANNOT_BE_OPERATED.getDescEn());
             }
         }
     }
