@@ -134,7 +134,7 @@ public class AccountController {
             List<Map<String, Object>> list = Lists.newArrayList();
             rules.forEach(e -> {
                 Map<String, Object> values = Maps.newLinkedHashMap();
-                values.put("chain", e.getChain());
+                values.put("chain", e.getChain().getCode());
                 values.put("feeType", e.getFeeType());
                 values.put("feeAmount", e.getFeeAmount());
                 values.put("amountDecimals", e.getDecimals());
