@@ -1,7 +1,7 @@
 package com.seeds.wallet.feign;
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.wallet.config.WalletFeignInnerRequestInterceptor;
+import com.seeds.wallet.config.WalletFeignConfig;
 import com.seeds.wallet.dto.RawTransactionSignRequest;
 import com.seeds.wallet.dto.SignMessageRequest;
 import com.seeds.wallet.dto.SignedMessageDto;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "walletFeignClient", url = "${service.url.wallet}", configuration = WalletFeignInnerRequestInterceptor.class)
+@FeignClient(name = "walletFeignClient", url = "${service.url.wallet}", configuration = WalletFeignConfig.class)
 public interface WalletFeignClient {
 
     @PostMapping("/wallet/create")
