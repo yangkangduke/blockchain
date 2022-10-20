@@ -135,38 +135,14 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 resp.setTypeName(nftType.getName());
             }
             // 图片
-            resp.setPicture(p.getUrl());
+            resp.setPicture(smartContractConfig.getIpfsUrl() + p.getUrl());
             return resp;
         });
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long add(MultipartFile image, SysNftAddReq req) {
-        // 添加NFT
-        SysNftEntity sysNft = new SysNftEntity();
-        BeanUtils.copyProperties(req, sysNft);
-        // 默认停售
-        sysNft.setStatus(WhetherEnum.NO.value());
-        sysNft.setInitStatus(NftInitStatusEnum.CREATING.getCode());
-        // 上传NFT图片
-        String imageFileHash = chainNftService.uploadImage(image);
-        sysNft.setUrl(smartContractConfig.getIpfsUrl() + imageFileHash);
-        // 生成NFT编号
-        sysNft.setNumber(sysSequenceNoService.generateNftNo());
-        // 保存NFT
-        save(sysNft);
-
-        // NFT上链
-        //executorService.submit(() -> {
-        //    mintNft(req, sysNft.getId(), imageFileHash);
-        //});
-        req.setImageFileHash(imageFileHash);
-        return sysNft.getId();
-    }
-
-    @Override
-    public Long addSend(MultipartFile image, SysNftAddReq req, String topic) {
+    public Long add(String imageFileHash, SysNftAddReq req) {
         // 校验基础属性缺失或重复
         List<NftPropertiesReq> propertiesList = req.getPropertiesList();
         List<NftPropertiesReq> enduranceList = propertiesList.stream().filter(p -> p.getTypeId() == 1L).collect(Collectors.toList());
@@ -177,12 +153,54 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         if (!properties.getValue().matches(NUMBER_PATTER)) {
             throw new SeedsException(String.format(AdminErrorCodeEnum.ERR_40011_NFT_PROPERTY_VALUE_IS_NOT_IN_THE_CORRECT_FORMAT.getDescEn(), 1));
         }
+        // 添加NFT
+        SysNftEntity sysNft = new SysNftEntity();
+        BeanUtils.copyProperties(req, sysNft);
+        // 默认停售
+        sysNft.setStatus(WhetherEnum.NO.value());
+        sysNft.setInitStatus(NftInitStatusEnum.CREATING.getCode());
+        // 上传NFT图片
+        sysNft.setUrl(imageFileHash);
+        // 生成NFT编号
+        sysNft.setNumber(sysSequenceNoService.generateNftNo());
+        // 保存NFT
+        save(sysNft);
 
-        Long nftId = add(image, req);
-        // 发NFT保存成功消息
-        NftMintMsgDTO msgDTO = new NftMintMsgDTO();
+        return sysNft.getId();
+    }
+
+    @Override
+    public String addUpload(MultipartFile image, SysNftAddReq req) {
+        // 上传NFT图片
+        String imageFileHash = chainNftService.uploadImage(image);
+        // 上传Metadata
+        String metadataFileHash = chainNftService.uploadMetadata(imageFileHash,
+                ChainMintNftReq.builder()
+                        .name(req.getName())
+                        .description(req.getDescription())
+                        .attributes(buildNftProperties(req.getPropertiesList()))
+                        .build());
+        add(imageFileHash, req);
+
+        return metadataFileHash;
+    }
+
+    @Override
+    public Long createSend(SysNftCreateReq req, String topic) {
+        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                .eq(SysNftEntity::getNumber, req.getNftNo())
+                .eq(SysNftEntity::getInitStatus, NftInitStatusEnum.NORMAL.getCode());
+        SysNftEntity nft = getOne(queryWrap);
+        if (nft == null) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40016_This_type_of_NFT_has_not_yet_been_issued.getDescEn());
+        }
+        String imageFileHash = nft.getUrl();
+        Long nftId = add(imageFileHash, req);
+        // 发NFT创建消息
+        NftUpgradeMsgDTO msgDTO = new NftUpgradeMsgDTO();
         BeanUtils.copyProperties(req, msgDTO);
         msgDTO.setId(nftId);
+        msgDTO.setImageFileHash(imageFileHash);
 
         kafkaProducer.send(topic, JSONUtil.toJsonStr(msgDTO));
         return nftId;
@@ -225,7 +243,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             }
             resp.setPropertiesList(list);
             // 图片
-            resp.setPicture(sysNft.getUrl());
+            resp.setPicture(smartContractConfig.getIpfsUrl() + sysNft.getUrl());
         }
         return resp;
     }
@@ -563,19 +581,10 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long upgradeSend(MultipartFile image, SysNftUpgradeReq req) {
+    public Long upgradeSend(SysNftUpgradeReq req) {
         // 校验NFT
         upgradeValidate(req.getNftIdList(), req.getUserId(), req.getNftId());
-
-        // 添加NFT
-        Long nftId = add(image, req);
-        // 发NFT升级消息
-        NftUpgradeMsgDTO msgDTO = new NftUpgradeMsgDTO();
-        BeanUtils.copyProperties(req, msgDTO);
-        msgDTO.setId(nftId);
-
-        kafkaProducer.send(KafkaTopic.NFT_UPGRADE_SUCCESS, JSONUtil.toJsonStr(msgDTO));
-        return nftId;
+        return createSend(req, KafkaTopic.NFT_UPGRADE_SUCCESS);
     }
 
     @Override

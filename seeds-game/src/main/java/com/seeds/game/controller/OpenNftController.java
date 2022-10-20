@@ -1,8 +1,5 @@
 package com.seeds.game.controller;
 
-import cn.hutool.json.JSONUtil;
-import com.seeds.admin.dto.request.SysNftAddReq;
-import com.seeds.admin.dto.request.SysNftUpgradeReq;
 import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.enums.SysOwnerTypeEnum;
 import com.seeds.admin.feign.RemoteNftService;
@@ -16,7 +13,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -39,31 +35,21 @@ public class OpenNftController {
 
     @PostMapping("create")
     @ApiOperation("NFT创建")
-    public GenericDto<Long> create(@RequestPart("image") MultipartFile image,
-                                   @RequestParam String metaData,
-                                   @RequestParam String accessKey,
-                                   @RequestParam String signature,
-                                   @RequestParam Long timestamp) {
-        SysNftAddReq req = JSONUtil.toBean(metaData, SysNftAddReq.class);
+    public GenericDto<Long> create(@RequestBody OpenNftCreateReq req) {
         req.setOwnerId(UserContext.getCurrentUserId());
         req.setOwnerName(UserContext.getCurrentUserName());
         req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
-        return adminRemoteNftService.create(image, JSONUtil.toJsonStr(req));
+        return adminRemoteNftService.create(req);
     }
 
     @PostMapping("upgrade")
     @ApiOperation("NFT升级")
-    public GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image,
-                                    @RequestParam String data,
-                                    @RequestParam String accessKey,
-                                    @RequestParam String signature,
-                                    @RequestParam Long timestamp) {
-        SysNftUpgradeReq req = JSONUtil.toBean(data, SysNftUpgradeReq.class);
+    public GenericDto<Long> upgrade(@RequestBody OpenNftUpgradeReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         req.setOwnerId(UserContext.getCurrentUserId());
         req.setOwnerName(UserContext.getCurrentUserName());
         req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
-        return adminRemoteNftService.upgrade(image, JSONUtil.toJsonStr(req));
+        return adminRemoteNftService.upgrade(req);
     }
 
     @PostMapping("lock")

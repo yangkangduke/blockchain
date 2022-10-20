@@ -20,7 +20,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -102,8 +101,8 @@ public class InterNftController {
     @PostMapping("create")
     @ApiOperation("NFT创建")
     @Inner
-    public GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData) {
-        return GenericDto.success(sysNftService.addSend(image, JSONUtil.toBean(metaData, SysNftAddReq.class), KafkaTopic.GAME_NFT_SAVE_SUCCESS));
+    public GenericDto<Long> create(@RequestBody SysNftCreateReq req) {
+        return GenericDto.success(sysNftService.createSend(req, KafkaTopic.GAME_NFT_SAVE_SUCCESS));
     }
 
     @PostMapping("modify")
@@ -125,8 +124,8 @@ public class InterNftController {
     @PostMapping("upgrade")
     @ApiOperation("NFT升级")
     @Inner
-    public GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data) {
-        return GenericDto.success(sysNftService.upgradeSend(image, JSONUtil.toBean(data, SysNftUpgradeReq.class)));
+    public GenericDto<Long> upgrade(@RequestBody SysNftUpgradeReq req) {
+        return GenericDto.success(sysNftService.upgradeSend(req));
     }
 
     @PostMapping("lock")
