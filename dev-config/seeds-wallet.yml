@@ -32,3 +32,8 @@ springfox:
 wallet:
   passwordKey: "5bb40a4623ead547e4b2f15a"
   chainId: 1
+  access:
+    allowed-timestamp-range: 10000
+    key-list:
+      - key: XXXXX
+        secret: "5bb40a4623ead547e4b2f15awallet.access.key.secret"
