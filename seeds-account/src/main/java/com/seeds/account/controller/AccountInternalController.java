@@ -6,11 +6,15 @@ import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 账户系统提供的内部调用接口，调用方包括
@@ -27,12 +31,13 @@ public class AccountInternalController {
     @Autowired
     private IChainActionService chainActionService;
     @Autowired
-    IAddressCollectService addressCollectService;
+    private IAddressCollectService addressCollectService;
     @Autowired
     private IAccountService accountService;
 
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
+    @Inner
     public GenericDto<Boolean> scanAndCreateAddresses() {
         try {
             chainActionService.scanAndCreateAddresses();
@@ -45,6 +50,7 @@ public class AccountInternalController {
 
     @PostMapping("/job/scan-block")
     @ApiOperation("扫描新块")
+    @Inner
     public GenericDto<Boolean> scanBlock() {
         try {
             chainActionService.scanBlock();
@@ -63,6 +69,7 @@ public class AccountInternalController {
      */
     @PostMapping("/mgt/approve-transaction")
     @ApiOperation("充币提币审核通过")
+    @Inner
     public GenericDto<Boolean> approveTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
         try {
             accountService.approveTransaction(approveRejectDto.getId(), approveRejectDto.getComment());
@@ -81,6 +88,7 @@ public class AccountInternalController {
      */
     @PostMapping("/mgt/reject-transaction")
     @ApiOperation("充币提币审核拒绝")
+    @Inner
     public GenericDto<Boolean> rejectTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
         try {
             accountService.rejectTransaction(approveRejectDto.getId(), approveRejectDto.getComment());
@@ -93,6 +101,7 @@ public class AccountInternalController {
 
     @PostMapping("/job/execute-withdraw")
     @ApiOperation("执行提币上链")
+    @Inner
     public GenericDto<Boolean> executeWithdraw() {
         try {
             chainActionService.executeWithdraw();
@@ -104,13 +113,15 @@ public class AccountInternalController {
     }
 
     @PostMapping("/job/scan-withdraw")
-    @ApiOperation("扫描提币，归集，空投状态")
+//    @ApiOperation("扫描提币，归集，空投状态")
+    @ApiOperation("扫描提币状态")
+    @Inner
     public GenericDto<Boolean> scanWithdraw() {
         try {
             // 处理提币
             chainActionService.scanWithdraw();
             // 处理归集
-            addressCollectService.scanCollect();
+//            addressCollectService.scanCollect();
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("scanWithdraw", e);

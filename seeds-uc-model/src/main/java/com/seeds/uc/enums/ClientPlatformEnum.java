@@ -6,8 +6,7 @@ import com.seeds.common.exception.SeedsException;
 import lombok.Getter;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/7/25
  */
 @Getter

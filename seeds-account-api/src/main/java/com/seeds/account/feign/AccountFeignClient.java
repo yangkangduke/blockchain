@@ -2,9 +2,9 @@ package com.seeds.account.feign;
 
 import com.seeds.common.dto.GenericDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
 
-@FeignClient(name = "seeds-account", url = "${service.url.account}",path = "/account-internal", configuration = AccountFeignConfig.class)
+@FeignClient(name = "seeds-account", url = "${service.url.account}",path = "/account-internal", configuration = {AccountFeignInnerRequestInterceptor.class})
 public interface AccountFeignClient {
 
     /**

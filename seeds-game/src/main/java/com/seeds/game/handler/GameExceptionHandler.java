@@ -20,8 +20,7 @@ import javax.validation.ValidationException;
 
 */
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/8/29
  *//*
 

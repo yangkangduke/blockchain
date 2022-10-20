@@ -4,7 +4,7 @@ package com.seeds.account.service;
 /**
  * 热钱包归集
  *
- * @author milo
+ * @author yk
  */
 public interface IAddressCollectService {
 

@@ -7,8 +7,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/8/25
  */
 @Data

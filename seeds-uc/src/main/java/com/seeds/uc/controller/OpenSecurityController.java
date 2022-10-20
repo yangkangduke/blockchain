@@ -1,8 +1,7 @@
 package com.seeds.uc.controller;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/8/26
  */
 
@@ -114,9 +113,9 @@ public class OpenSecurityController {
                 securityStrategyList
                         .stream()
                         .collect(Collectors.toMap(UcSecurityStrategy::getAuthType, v -> v));
-        Optional<UcSecurityStrategy> metamaskStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.METAMASK));
+//        Optional<UcSecurityStrategy> metamaskStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.METAMASK));
         Optional<UcSecurityStrategy> emailStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.EMAIL));
-        Optional<UcSecurityStrategy> gaStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.GA));
+//        Optional<UcSecurityStrategy> gaStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.GA));
 
         UcUser ucUser = userService.getById(uid);
 

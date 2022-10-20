@@ -33,11 +33,11 @@
     </resultMap>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete
-        from chain_txn_replace
+        from ac_chain_txn_replace
         where id = #{id,jdbcType=BIGINT}
     </delete>
     <insert id="insert" parameterType="com.seeds.account.model.ChainTxnReplace" useGeneratedKeys="true" keyProperty="id">
-        insert into chain_txn_replace (id, create_time, update_time,
+        insert into ac_chain_txn_replace (id, create_time, update_time,
                                          version, app_type, app_id,
                                          gas_price, gas_limit, gas_used,
                                          tx_fee, block_number, block_hash,
@@ -50,7 +50,7 @@
                 #{txValue,jdbcType=VARCHAR}, #{chain.code,jdbcType=TINYINT})
     </insert>
     <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.ChainTxnReplace">
-        update chain_txn_replace
+        update ac_chain_txn_replace
         set create_time  = #{createTime,jdbcType=BIGINT},
             update_time  = #{updateTime,jdbcType=BIGINT},
             version      = #{version,jdbcType=BIGINT},
@@ -71,16 +71,16 @@
     </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select *
-        from chain_txn_replace
+        from ac_chain_txn_replace
         where id = #{id,jdbcType=BIGINT}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
         select *
-        from chain_txn_replace
+        from ac_chain_txn_replace
     </select>
     <update id="updateStatusByPrimaryKey">
         <![CDATA[
-        update chain_txn_replace
+        update ac_chain_txn_replace
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
             version     = version + 1,
             status      = #{status.code,jdbcType=TINYINT}
@@ -90,14 +90,14 @@
     </update>
     <select id="getListByStatus" resultMap="BaseResultMap">
         select *
-        from chain_txn_replace
+        from ac_chain_txn_replace
         where status = #{status,jdbcType=TINYINT}
         order by id
     </select>
 
     <select id="getListByStatusList" resultMap="BaseResultMap">
         select *
-        from chain_txn_replace
+        from ac_chain_txn_replace
         where status in
         <foreach collection="statusList" open="(" separator="," close=")" item="status">
             #{status,jdbcType=TINYINT}
@@ -107,7 +107,7 @@
 
     <select id="getListByStatusAndType" resultMap="BaseResultMap">
         select *
-        from chain_txn_replace
+        from ac_chain_txn_replace
         where
         status in
         <foreach collection="statusList" open="(" separator="," close=")" item="status">
@@ -118,7 +118,7 @@
 
     <select id="getListByChainStatusAndType" resultMap="BaseResultMap">
         select *
-        from chain_txn_replace
+        from ac_chain_txn_replace
         <where>
             <if test="type != null">app_type = #{type.code,jdbcType=TINYINT}</if>
             <if test="status != null">and status = #{status.code,jdbcType=TINYINT}</if>
@@ -128,7 +128,7 @@
 
     <select id="selectByAppIdAndAppType" resultMap="BaseResultMap">
         select *
-        from chain_txn_replace
+        from ac_chain_txn_replace
         where app_id = #{appId,jdbcType=BIGINT}
           and app_type = #{type.code,jdbcType=TINYINT}
     </select>

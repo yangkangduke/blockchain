@@ -150,7 +150,7 @@ public class AuthController {
         return GenericDto.success(null);
     }
 
-    @ApiOperation(value = "发送邮件", notes = "由于网络问题发送邮件暂时关闭，调用该接口后默认发送的邮箱验证码是123456")
+    @ApiOperation(value = "发送邮件", notes = "如果没有收到邮件，验证码默认是123456")
     @PostMapping("/email/send")
     public GenericDto<Object> sendEmailCode(@Valid @RequestBody AuthCodeSendReq sendReq, HttpServletRequest request) {
         log.info("AuthController - sendEmailCode got request: {}", sendReq);

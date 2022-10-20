@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * 钱包归集订单结果
  *
- * @author milo
+ * @author yk
  * @see CommonActionStatus
  */
 @Getter

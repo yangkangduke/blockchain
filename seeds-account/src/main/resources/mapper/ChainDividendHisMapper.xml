@@ -33,12 +33,12 @@
     </resultMap>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete
-        from chain_dividend_his
+        from ac_chain_dividend_his
         where id = #{id,jdbcType=BIGINT}
     </delete>
     <insert id="insert" parameterType="com.seeds.account.model.ChainDividendHis" useGeneratedKeys="true"
             keyProperty="id">
-        insert into chain_dividend_his (id, create_time, update_time,
+        insert into ac_chain_dividend_his (id, create_time, update_time,
                                           version, user_id, chain,
                                           from_address, to_address, currency,
                                           action, amount, gas_price,
@@ -54,7 +54,7 @@
                 #{nonce,jdbcType=VARCHAR}, #{txValue,jdbcType=VARCHAR}, #{txToAddress,jdbcType=VARCHAR})
     </insert>
     <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.ChainDividendHis">
-        update chain_dividend_his
+        update ac_chain_dividend_his
         set create_time   = #{createTime,jdbcType=BIGINT},
             update_time   = #{updateTime,jdbcType=BIGINT},
             version       = #{version,jdbcType=BIGINT},
@@ -101,7 +101,7 @@
                nonce,
                tx_value,
                tx_to_address
-        from chain_dividend_his
+        from ac_chain_dividend_his
         where id = #{id,jdbcType=BIGINT}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
@@ -127,12 +127,12 @@
                nonce,
                tx_value,
                tx_to_address
-        from chain_dividend_his
+        from ac_chain_dividend_his
     </select>
 
     <select id="getListByStatus" resultMap="BaseResultMap">
         select *
-        from chain_dividend_his
+        from ac_chain_dividend_his
         where status = #{status.code,jdbcType=TINYINT}
         order by id
     </select>
@@ -146,13 +146,13 @@
 
     <select id="getAllByChain" resultMap="BaseResultMap">
         select *
-        from chain_dividend_his
+        from ac_chain_dividend_his
         where chain = #{chain.code,jdbcType=TINYINT}
     </select>
 
     <update id="updateStatusByPrimaryKey">
         <![CDATA[
-        update chain_dividend_his
+        update ac_chain_dividend_his
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
             version     = version + 1,
             status      = #{status.code,jdbcType=TINYINT}
@@ -163,7 +163,7 @@
 
     <select id="getByChainHash" resultMap="BaseResultMap">
         select *
-        from chain_dividend_his
+        from ac_chain_dividend_his
         where tx_hash = #{txHash,jdbcType=VARCHAR}
           and chain = #{chain.code,jdbcType=TINYINT}
     </select>
@@ -171,7 +171,7 @@
     <select id="selectByChainStatusAndTimestamp" resultMap="BaseResultMap">
         <![CDATA[
         select *
-        from chain_dividend_his
+        from ac_chain_dividend_his
         where status = #{status.code,jdbcType=TINYINT}
           and chain = #{chain.code,jdbcType=TINYINT}
           and update_time <= #{timestamp,jdbcType=BIGINT}
@@ -180,7 +180,7 @@
 
     <select id="selectByChainAndStatus" resultMap="BaseResultMap">
         select *
-        from chain_dividend_his
+        from ac_chain_dividend_his
         where chain = #{chain.code,jdbcType=TINYINT}
           and status = #{status.code,jdbcType=TINYINT}
     </select>

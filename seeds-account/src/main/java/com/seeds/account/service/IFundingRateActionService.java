@@ -1,9 +1,5 @@
 package com.seeds.account.service;
 
-import org.redisson.api.RMap;
-
-import java.util.List;
-
 /**
  * @author guocheng
  * @date 2020/12/30

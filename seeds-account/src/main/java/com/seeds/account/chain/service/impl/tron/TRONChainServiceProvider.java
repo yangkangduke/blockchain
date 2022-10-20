@@ -17,7 +17,6 @@ import com.seeds.account.ex.AccountException;
 import com.seeds.account.service.IChainContractService;
 import com.seeds.account.service.IChainDepositService;
 import com.seeds.account.service.ISystemConfigService;
-import com.seeds.account.service.ISystemWalletAddressService;
 import com.seeds.account.util.AddressUtils;
 import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
@@ -78,19 +77,19 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
     String DEFAULT_ILLEGAL_EXCEPTION_MSG = "Query failed. Please check the parameters.";
 
     @Autowired
-    IChainProviderService chainProviderService;
+    private IChainProviderService chainProviderService;
     @Autowired
-    TRONGridClient tronClient;
+    private TRONGridClient tronClient;
     @Autowired
-    IChainDepositService chainDepositService;
+    private IChainDepositService chainDepositService;
     @Autowired
-    ISystemConfigService systemConfigService;
+    private ISystemConfigService systemConfigService;
     @Autowired
-    WalletFeignClient walletFeignClient;
+    private WalletFeignClient walletFeignClient;
     @Autowired
-    TRONChainConverter converter;
+    private TRONChainConverter converter;
     @Autowired
-    IChainContractService chainContractService;
+    private IChainContractService chainContractService;
 
 
     private final TransferFunctionDecoder DEFAULT_DECODER = new TransferFunctionDecoder();

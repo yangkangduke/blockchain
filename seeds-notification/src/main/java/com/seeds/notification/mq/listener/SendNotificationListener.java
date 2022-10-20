@@ -22,7 +22,7 @@ public class SendNotificationListener {
     @Resource
     private NotificationService notificationService;
 
-    @KafkaListener(groupId = "notice-consumer-group", topics = {KafkaTopic.SEND_NOTIFICATION})
+    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.SEND_NOTIFICATION})
     public void sendNotice(String msg) {
         log.info("收到消息：{}", msg);
         NotificationReq notificationReq = JSONUtil.toBean(msg, NotificationReq.class);
@@ -31,6 +31,7 @@ public class SendNotificationListener {
         // send notice
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.setSender("seeds-account");
+        notificationDto.setNotificationType(notificationReq.getNotificationType());
         notificationDto.setReceivers(notificationReq.getUcUserIds());
         notificationDto.setValues(notificationReq.getValues());
         if (result) {

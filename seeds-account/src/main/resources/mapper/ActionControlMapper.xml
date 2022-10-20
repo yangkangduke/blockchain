@@ -15,7 +15,7 @@
     </resultMap>
 
     <insert id="insert" parameterType="com.seeds.account.model.ActionControl" useGeneratedKeys="true" keyProperty="id">
-        insert into action_control (id, create_time, update_time, version,
+        insert ac_into action_control (id, create_time, update_time, version,
                                       type, key, name, value, comments,
                                       status)
         values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, #{version,jdbcType=BIGINT},
@@ -24,7 +24,7 @@
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.ActionControl">
-        update action_control
+        update ac_action_control
         set create_time  = #{createTime,jdbcType=BIGINT},
             update_time  = #{updateTime,jdbcType=BIGINT},
             version      = #{version,jdbcType=BIGINT},
@@ -38,12 +38,12 @@
     </update>
 
     <select id="selectAll" resultMap="BaseResultMap">
-        select * from action_control
+        select * from ac_action_control
         order by id
     </select>
 
     <select id="getByTypeAndKey" resultMap="BaseResultMap">
-        select * from action_control
+        select * from ac_action_control
         where type  = #{type,jdbcType=TINYINT}
           and `key`   = #{key,jdbcType=VARCHAR}
     </select>

@@ -25,8 +25,12 @@ public class AccountHistoryReq extends PageReq {
 
     @ApiModelProperty(hidden = true)
     private Long userId;
+    @ApiModelProperty(value = "开始时间")
     Long startTime;
+    @ApiModelProperty(value = "结束时间")
     Long endTime;
+    @ApiModelProperty(value = "币种")
     String currency;
+    @ApiModelProperty(value = "1：充币 2：提币")
     Integer action;
 }

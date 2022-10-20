@@ -1,41 +1,34 @@
-package com.seeds.notification.config;
+package com.seeds.wallet.config;
 
-import org.apache.commons.lang3.StringUtils;
+import lombok.Data;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
+
 /**
-* @author yk
- * @date 2020/7/30
+ *
+ * @author yk
+ *
  */
+@Data
 @Configuration
-public class RedisCacheConfig {
+@ConfigurationProperties(prefix = "redisson")
+public class RedissonConfig {
 
-    @Value("${redisson.address:redis://127.0.0.1:6379}")
     String address;
-
-    @Value("${redisson.timeout:5000}")
+    String password;
     int timeout;
-
-    @Value("${redisson.max.poolsize:50}")
     int maxPoolSize;
-
-    @Value("${redisson.min.idlesize:50}")
     int minIdleSize;
 
-    @Value("${redisson.password:}")
-    String password;
-
-    @Value("${redisson.database:0}")
-    int database;
-
-    @Bean("defaultRedisClient")
-    public RedissonClient defaultClient() {
+    @Bean
+    public RedissonClient redisson() throws IOException {
         Config config = new Config();
         SingleServerConfig serverConfig = config.useSingleServer();
         serverConfig.setAddress(address);
@@ -43,11 +36,11 @@ public class RedisCacheConfig {
         serverConfig.setConnectTimeout(timeout);
         serverConfig.setConnectionPoolSize(maxPoolSize);
         serverConfig.setConnectionMinimumIdleSize(minIdleSize);
-        serverConfig.setDatabase(database);
-
-        if (!StringUtils.isBlank(password)) {
+        if (password != null && password.length() > 0) {
             serverConfig.setPassword(password);
         }
-        return Redisson.create(config);
+        RedissonClient redisson = Redisson.create(config);
+        return redisson;
     }
+
 }
