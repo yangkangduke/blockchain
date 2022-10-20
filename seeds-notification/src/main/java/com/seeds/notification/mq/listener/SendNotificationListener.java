@@ -31,6 +31,7 @@ public class SendNotificationListener {
         // send notice
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.setSender("seeds-account");
+        notificationDto.setNotificationType(notificationReq.getNotificationType());
         notificationDto.setReceivers(notificationReq.getUcUserIds());
         notificationDto.setValues(notificationReq.getValues());
         if (result) {
