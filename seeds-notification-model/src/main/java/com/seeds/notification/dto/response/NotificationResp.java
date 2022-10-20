@@ -20,6 +20,9 @@ public class NotificationResp implements Serializable {
     @ApiModelProperty("用户id")
     private Long ucUserId;
 
+    @ApiModelProperty("通知类型")
+    private String notificationType;
+
     @ApiModelProperty("消息内容")
     private String content;
 
