@@ -175,10 +175,10 @@ public class InterNftController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("/gas-fees")
+    @GetMapping("/gas-fees")
     @ApiOperation("NFT费用")
     @Inner
-    public GenericDto<SysNftGasFeesResp> gasFees(@Valid @RequestBody SysNftGasFeesReq req) {
-        return GenericDto.success(sysNftService.gasFees(req));
+    public GenericDto<SysNftGasFeesResp> gasFees(@RequestParam String nftNo) {
+        return GenericDto.success(sysNftService.gasFees(nftNo));
     }
 }
