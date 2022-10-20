@@ -26,6 +26,9 @@ public class NotificationDto implements Serializable {
 	@ApiModelProperty("消息接受者")
 	private List<Long> receivers;
 
+	@ApiModelProperty("通知类型")
+	private String notificationType;
+
 	@ApiModelProperty("消息内容")
 	private Map<String, Object> values = new HashMap<>();
 }

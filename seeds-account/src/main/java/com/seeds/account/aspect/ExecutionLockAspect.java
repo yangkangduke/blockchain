@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 /**
  * 使用redis构建一个执行锁
  *
- * @author milo
+ * @author yk
  */
 @Component
 @Aspect

@@ -1,6 +1,5 @@
 package com.seeds.account.service.impl;
 
-import com.google.common.collect.ImmutableMap;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.anno.ExecutionLock;
 import com.seeds.account.calc.AccountCalculator;
@@ -24,7 +23,6 @@ import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.feign.UserCenterFeignClient;
-import com.seeds.wallet.dto.SignedMessageDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,9 +151,9 @@ public class AccountServiceImpl implements IAccountService {
                 userId, currency, amount, feeAmount, minAmount, maxAmount, intradyAmount, autoAmount, usedIntradayWithdraw);
 
         String withdrawToken = withdrawRequestDto.getWithdrawToken();
-        String publicAddress = withdrawRequestDto.getPublicAddress();
-        String signature = withdrawRequestDto.getSignature();
-        String msg = withdrawRequestDto.getMsg();
+//        String publicAddress = withdrawRequestDto.getPublicAddress();
+//        String signature = withdrawRequestDto.getSignature();
+//        String msg = withdrawRequestDto.getMsg();
 
         if (!isDefiWithdraw) {
             if (withdrawToken != null) {
@@ -167,8 +165,8 @@ public class AccountServiceImpl implements IAccountService {
                         .build();
                 GenericDto<Boolean> verifyResponse = userCenterFeignClient.verifyToken(verifyRequest);
                 log.info("withdraw userId={} currency={} verifyRequest={} verifyResponse={}", userId, currency, verifyRequest, verifyResponse);
-//                Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
-            } else if (publicAddress != null && signature != null) {
+                Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
+            } /*else if (publicAddress != null && signature != null) {
                 MetamaskVerifyReq verifyRequest = new MetamaskVerifyReq();
                 verifyRequest.setPublicAddress(publicAddress);
                 verifyRequest.setSignature(signature);
@@ -177,7 +175,7 @@ public class AccountServiceImpl implements IAccountService {
                 GenericDto<Boolean> verifyResponse = userCenterFeignClient.metaMaskVerifySignature(verifyRequest);
                 log.info("withdraw userId={} currency={} verifyRequest={} verifyResponse={}", userId, currency, verifyRequest, verifyResponse);
                 Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
-            } else {
+            } */else {
                 Utils.throwError(ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
             }
         }
@@ -223,28 +221,28 @@ public class AccountServiceImpl implements IAccountService {
         chainDepositWithdrawHisService.createHistory(transaction);
 
         WithdrawResponseDto withdrawResponseDto = new WithdrawResponseDto();
-        if (isDefiWithdraw) {
-            // id要保证唯一
-            long id = transaction.getId();
-            Utils.check(id > 0, "id generation issue");
-            String defiWithdrawContract = systemWalletAddressService.getOne(chain.getRelayOn(), WalletAddressType.DEFI_DEPOSIT_WITHDRAW_CONTRACT);
-            // 截止时间为当前时间后5分钟
-            long deadline = System.currentTimeMillis() / 1000 + Long.parseLong(systemConfigService.getValue(AccountSystemConfig.CHAIN_DEFI_WITHDRAW_DEADLINE, "300"));
-            SignedMessageDto signedMessageDto = chainService.encodeAndSignDefiWithdraw(chain.getRelayOn(), id, "metamaskBinding.getAddress()", currency, amount, deadline);
-            String signedSignature = AddressUtils.leftPad(signedMessageDto.getSignature(), "0x");
-            String signedMessage = AddressUtils.leftPad(signedMessageDto.getMessage(), "0x");
-            log.info("signMessage userId={} id={} chain={} currency={} amount={} signedSignature={} signedMessage={}", userId, id, chain, currency, amount, signedSignature, signedMessage);
-
-            withdrawResponseDto.setDefiWithdrawContract(defiWithdrawContract);
-            withdrawResponseDto.setSignedSignature(signedSignature);
-            withdrawResponseDto.setSignedMessage(signedMessage);
-            withdrawResponseDto.setDeadline(deadline);
-
-            // 如果是Defi提币，需要存储下签名的消息, 已备用户后面查询
-            transactionService.afterCommit(() -> {
-                chainDepositWithdrawHisService.createSigHistory(transaction.getId(), userId, chain, currency, amount, signedSignature, signedMessage, deadline);
-            });
-        }
+//        if (isDefiWithdraw) {
+//            // id要保证唯一
+//            long id = transaction.getId();
+//            Utils.check(id > 0, "id generation issue");
+//            String defiWithdrawContract = systemWalletAddressService.getOne(chain.getRelayOn(), WalletAddressType.DEFI_DEPOSIT_WITHDRAW_CONTRACT);
+//            // 截止时间为当前时间后5分钟
+//            long deadline = System.currentTimeMillis() / 1000 + Long.parseLong(systemConfigService.getValue(AccountSystemConfig.CHAIN_DEFI_WITHDRAW_DEADLINE, "300"));
+//            SignedMessageDto signedMessageDto = chainService.encodeAndSignDefiWithdraw(chain.getRelayOn(), id, "metamaskBinding.getAddress()", currency, amount, deadline);
+//            String signedSignature = AddressUtils.leftPad(signedMessageDto.getSignature(), "0x");
+//            String signedMessage = AddressUtils.leftPad(signedMessageDto.getMessage(), "0x");
+//            log.info("signMessage userId={} id={} chain={} currency={} amount={} signedSignature={} signedMessage={}", userId, id, chain, currency, amount, signedSignature, signedMessage);
+//
+//            withdrawResponseDto.setDefiWithdrawContract(defiWithdrawContract);
+//            withdrawResponseDto.setSignedSignature(signedSignature);
+//            withdrawResponseDto.setSignedMessage(signedMessage);
+//            withdrawResponseDto.setDeadline(deadline);
+//
+//            // 如果是Defi提币，需要存储下签名的消息, 已备用户后面查询
+//            transactionService.afterCommit(() -> {
+//                chainDepositWithdrawHisService.createSigHistory(transaction.getId(), userId, chain, currency, amount, signedSignature, signedMessage, deadline);
+//            });
+//        }
 
         transactionService.afterCommit(() -> {
             // 记录历史执行中

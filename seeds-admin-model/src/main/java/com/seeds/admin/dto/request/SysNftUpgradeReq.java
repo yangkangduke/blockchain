@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(value = "SysNftUpgradeReq", description = "系统NFT升级")
-public class SysNftUpgradeReq extends SysNftAddReq {
+public class SysNftUpgradeReq extends SysNftCreateReq {
 
 	/**
 	 * 操作用户id

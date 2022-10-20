@@ -3,14 +3,14 @@ package com.seeds.account.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.common.enums.Chain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -20,7 +20,7 @@ import lombok.Data;
  * @author yk
  * @since 2022-09-29
  */
-@TableName("chain_block")
+@TableName("ac_chain_block")
 @ApiModel(value = "ChainBlock对象", description = "Ethereum块跟踪")
 @Data
 @Builder

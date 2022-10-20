@@ -1,9 +1,5 @@
 package com.seeds.account.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.*;
 import com.seeds.account.anno.SingletonLock;
 import com.seeds.account.chain.dto.ChainTransactionReceipt;
 import com.seeds.account.chain.service.IChainService;
@@ -24,9 +20,6 @@ import com.seeds.account.service.IChainActionService;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
-import org.redisson.client.codec.StringCodec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -34,10 +27,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j

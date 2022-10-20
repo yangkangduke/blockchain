@@ -1,6 +1,7 @@
 package com.seeds.uc.controller;
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.redis.SecurityAuth;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
 import com.seeds.uc.service.impl.CacheService;
@@ -24,6 +25,7 @@ public class InterTokenController {
     CacheService cacheService;
 
     @PostMapping("verify")
+    @Inner
     public GenericDto<Boolean> verifyAuthToken(@RequestBody VerifyAuthTokenReq tokenReq) {
         SecurityAuth securityAuth =
                 cacheService.getSecurityAuthWithToken(tokenReq.getAuthToken());

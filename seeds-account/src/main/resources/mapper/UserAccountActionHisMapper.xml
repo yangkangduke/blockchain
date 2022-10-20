@@ -3,7 +3,7 @@
 <mapper namespace="com.seeds.account.mapper.UserAccountActionHisMapper">
 
     <update id="updateStatusByActionUserIdSource">
-        update user_account_action_his
+        update ac_user_account_action_his
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
             version = version + 1,
             status      = #{status.code,jdbcType=TINYINT}
@@ -14,7 +14,7 @@
 
     <select id="selectByUserAndTime" resultType="com.seeds.account.model.UserAccountActionHis">
         select *
-        from user_account_action_his
+        from ac_user_account_action_his
         where user_id = #{userId,jdbcType=BIGINT}
         <if test="startTimestamp > 0"><![CDATA[  and create_time >= #{startTimestamp,jdbcType=BIGINT} ]]></if>
         <if test="endTimestamp > 0"><![CDATA[  and create_time < #{endTimestamp,jdbcType=BIGINT} ]]></if>

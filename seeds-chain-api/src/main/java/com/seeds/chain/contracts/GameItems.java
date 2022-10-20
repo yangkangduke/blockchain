@@ -423,6 +423,13 @@ public class GameItems extends Contract {
         return executeRemoteCallTransaction(function);
     }
 
+    public org.web3j.abi.datatypes.Function getMintNewNftFunction(String account, BigInteger amount, String tokenURI) {
+        return new org.web3j.abi.datatypes.Function(FUNC_MINTNEWNFT, Arrays.<Type>asList(
+                new org.web3j.abi.datatypes.Address(160, account),
+                new org.web3j.abi.datatypes.generated.Uint256(amount),
+                new org.web3j.abi.datatypes.Utf8String(tokenURI)), Collections.<TypeReference<?>>emptyList());
+    }
+
     public RemoteFunctionCall<String> owner() {
         final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_OWNER,
                 Arrays.<Type>asList(),

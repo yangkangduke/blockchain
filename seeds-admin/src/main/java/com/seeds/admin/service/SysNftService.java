@@ -6,6 +6,7 @@ import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.mq.NftUpgradeMsgDTO;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.entity.SysNftEntity;
 import com.seeds.uc.dto.request.NFTShelvesReq;
@@ -31,20 +32,27 @@ public interface SysNftService extends IService<SysNftEntity> {
 
     /**
      * 添加系统NFT信息
-     * @param image NFT图片
+     * @param imageUrl NFT图片
      * @param req NFT信息
      * @return NFT的唯一标识
      */
-    Long add(MultipartFile image, SysNftAddReq req);
+    Long add(String imageUrl, SysNftAddReq req);
 
     /**
      * 添加系统NFT信息发送消息
      * @param image NFT图片
      * @param req NFT信息
-     * @param topic 消息方式
      * @return NFT的唯一标识
      */
-    Long addSend(MultipartFile image, SysNftAddReq req, String topic);
+    String addUpload(MultipartFile image, SysNftAddReq req);
+
+    /**
+     * 添加系统NFT信息发送消息
+     * @param req NFT信息
+     * @param topic 主题
+     * @return NFT的唯一标识
+     */
+    Long createSend(SysNftCreateReq req, String topic);
 
     /**
      * 通过id获取系统NFT信息
@@ -138,14 +146,12 @@ public interface SysNftService extends IService<SysNftEntity> {
      */
     void honorModify(List<SysNftHonorModifyReq> req);
 
-
     /**
      * NFT升级发消息
-     * @param image NFT图片
      * @param req NFT信息
      * @return 新NFT的唯一标识
      */
-    Long upgradeSend(MultipartFile image, SysNftUpgradeReq req);
+    Long upgradeSend(SysNftUpgradeReq req);
 
     /**
      * NFT升级
@@ -183,4 +189,12 @@ public interface SysNftService extends IService<SysNftEntity> {
      * @param req NFT信息
      */
     void soldOut(NFTSoldOutReq req);
+
+    /**
+     * NFT费用
+     * @param req 上链参数
+     * @return NFT费用
+     */
+    SysNftGasFeesResp gasFees(SysNftGasFeesReq req);
+
 }

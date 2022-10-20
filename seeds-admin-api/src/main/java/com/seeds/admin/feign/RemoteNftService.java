@@ -3,6 +3,7 @@ package com.seeds.admin.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.impl.RemoteNftServiceImpl;
@@ -10,9 +11,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -88,13 +87,12 @@ public interface RemoteNftService {
 
 	/**
 	 * NFT创建
-	 * @param image NFT图片
-	 * @param metaData NFT属性
+	 * @param req NFT属性
 	 * @return NFT的唯一标识
 	 */
-	@PostMapping(value = "/internal-nft/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/internal-nft/create")
 	@ApiOperation("NFT创建")
-	GenericDto<Long> create(@RequestPart("image") MultipartFile image, @RequestParam String metaData);
+	GenericDto<Long> create(@RequestBody SysNftCreateReq req);
 
 	/**
 	 * NFT修改
@@ -116,13 +114,12 @@ public interface RemoteNftService {
 
 	/**
 	 * NFT升级
-	 * @param image NFT图片
-	 * @param data NFT升级属性
+	 * @param req NFT升级属性
 	 * @return 响应结果
 	 */
-	@PostMapping(value = "/internal-nft/upgrade", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/internal-nft/upgrade")
 	@ApiOperation("NFT升级")
-	GenericDto<Long> upgrade(@RequestPart("image") MultipartFile image, @RequestParam String data);
+	GenericDto<Long> upgrade(@RequestBody SysNftUpgradeReq req);
 
 	/**
 	 * NFT锁定
@@ -177,5 +174,14 @@ public interface RemoteNftService {
 	@PostMapping("/internal-nft/sold-out")
 	@ApiOperation("NFT下架")
 	GenericDto<Object> soldOut(SysNftSoldOutReq req);
+
+	/**
+	 * NFT费用
+	 * @param req 上链数据
+	 * @return 响应结果
+	 */
+	@PostMapping("/internal-nft/gas-fees")
+	@ApiOperation("NFT费用")
+	GenericDto<SysNftGasFeesResp> gasFees(SysNftGasFeesReq req);
 
 }

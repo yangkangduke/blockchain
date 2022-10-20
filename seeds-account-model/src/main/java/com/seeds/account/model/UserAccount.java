@@ -3,12 +3,13 @@ package com.seeds.account.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.math.BigDecimal;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -20,7 +21,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-@TableName("user_account")
+@TableName("ac_user_account")
 @ApiModel(value = "UserAccount对象", description = "钱包账户")
 public class UserAccount implements Serializable {
 

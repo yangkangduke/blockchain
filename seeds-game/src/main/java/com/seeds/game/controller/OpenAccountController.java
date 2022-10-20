@@ -1,6 +1,7 @@
 package com.seeds.game.controller;
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.response.UcUserAccountAmountResp;
 import com.seeds.uc.feign.RemoteUserAccountService;
 import io.swagger.annotations.Api;
@@ -30,7 +31,7 @@ public class OpenAccountController {
     public GenericDto<List<UcUserAccountAmountResp>> amountInfo(@RequestParam String accessKey,
                                                                 @RequestParam String signature,
                                                                 @RequestParam Long timestamp) {
-        return remoteUserAccountService.amountInfo();
+        return remoteUserAccountService.amountInfo(UserContext.getCurrentUserId());
     }
 
 }

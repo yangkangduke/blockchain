@@ -3,10 +3,8 @@ package com.seeds.account.service;
 
 import com.seeds.account.enums.AccountAction;
 import com.seeds.account.enums.CommonActionStatus;
-import com.seeds.account.model.UserAccountActionHis;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * @author guocheng

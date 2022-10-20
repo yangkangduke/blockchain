@@ -29,12 +29,6 @@ account:
     sessionTimeoutMs: 5000
     #连接创建超时时间，单位毫秒
     connection-timeout-ms: 5000
-  access:
-    access-list:
-      - access-key: seeds-account-job
-        secret-key: "xxx"
-        allows:
-          - "/account-internal/job/**"
 
 feign:
   client:

@@ -3,13 +3,13 @@ package com.seeds.admin.feign.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.dto.response.SysNftTypeResp;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	}
 
 	@Override
-	public GenericDto<Long> create(MultipartFile image, String metaData) {
+	public GenericDto<Long> create(SysNftCreateReq req) {
 		return GenericDto.failure("Internal Error:nft create failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
@@ -71,7 +71,7 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	}
 
 	@Override
-	public GenericDto<Long> upgrade(MultipartFile image, String data) {
+	public GenericDto<Long> upgrade(SysNftUpgradeReq req) {
 		return GenericDto.failure("Internal Error:nft upgrade failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
@@ -103,5 +103,10 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	@Override
 	public GenericDto<Object> soldOut(SysNftSoldOutReq req) {
 		return GenericDto.failure("Internal Error:nft soldOut failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<SysNftGasFeesResp> gasFees(SysNftGasFeesReq req) {
+		return GenericDto.failure("Internal Error:nft gasFees failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 }

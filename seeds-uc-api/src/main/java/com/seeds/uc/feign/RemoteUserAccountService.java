@@ -8,6 +8,7 @@ import com.seeds.uc.feign.interceptor.UcFeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -20,6 +21,6 @@ public interface RemoteUserAccountService {
 
 	@GetMapping("/internal-account/amount-info")
 	@ApiOperation(value = "账户金额详情", notes = "账户金额详情")
-	GenericDto<List<UcUserAccountAmountResp>> amountInfo();
+	GenericDto<List<UcUserAccountAmountResp>> amountInfo(@RequestParam Long userId);
 
 }

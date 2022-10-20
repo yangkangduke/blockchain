@@ -85,4 +85,5 @@ public class PublicNftController {
                                                     @RequestParam Long timestamp) {
         return ucRemoteNftService.offerList(id);
     }
+
 }

@@ -44,9 +44,8 @@ public class ETHWeb3Client {
 
     @Autowired
     private ProxyConfig proxyConfig;
-
     @Autowired
-    ISystemConfigService systemConfigService;
+    private ISystemConfigService systemConfigService;
 
     AtomicLong counter = new AtomicLong(0);
     String lastConfig = null;

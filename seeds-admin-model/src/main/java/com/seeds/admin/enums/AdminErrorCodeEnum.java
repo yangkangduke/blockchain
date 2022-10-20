@@ -54,8 +54,9 @@ public enum AdminErrorCodeEnum {
     ERR_40011_NFT_PROPERTY_VALUE_IS_NOT_IN_THE_CORRECT_FORMAT(40011, "NFT属性值格式不正确", "NFT property value is not in the correct format, type id:{%s}"),
     ERR_40012_NFT_ATTRIBUTED_PERSON_MISMATCH(40012, "NFT归属人不匹配", "NFT attributed person mismatch"),
     ERR_40013_THIS_NFT_AUCTION_IS_IN_PROGRESS(40013, "该NFT拍卖正在进行中", "This NFT auction is in progress"),
-    ERR_40014_NFT_LOCKED_CAN_NOT_SHELVES(40014,"NFT已锁定，无法上架","NFT is locked and cannot Not available for sale"),
+    ERR_40014_NFT_LOCKED_AND_CANNOT_BE_OPERATED(40014,"NFT已锁定，不能操作","NFT is locked and cannot be operated"),
     ERR_40015_THIS_NFT_IS_NOT_IN_THE_AUCTION(40015, "该NFT没有在拍卖中", "This NFT is not in the auction"),
+    ERR_40016_This_type_of_NFT_has_not_yet_been_issued(40016, "此类NFT还未发行", "This type of NFT has not yet been issued"),
 
     // merchant
     ERR_50001_MERCHANT_ALREADY_EXIST(50001, "商家已存在", "Merchant already exist"),

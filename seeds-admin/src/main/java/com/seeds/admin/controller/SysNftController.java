@@ -7,7 +7,6 @@ import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.service.SysNftService;
-import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -45,9 +44,8 @@ public class SysNftController {
     @PostMapping("add")
     @ApiOperation("添加")
     @RequiredPermission("sys:nft:add")
-    public GenericDto<Object> add(@RequestPart("image") MultipartFile image, @Valid SysNftAddReq req) {
-        sysNftService.addSend(image, req, KafkaTopic.NFT_SAVE_SUCCESS);
-        return GenericDto.success(null);
+    public GenericDto<String> add(@RequestPart("image") MultipartFile image, @Valid SysNftAddReq req) {
+        return GenericDto.success(sysNftService.addUpload(image, req));
     }
 
     @GetMapping("detail/{id}")

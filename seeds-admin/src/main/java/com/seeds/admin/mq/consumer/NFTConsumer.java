@@ -31,18 +31,6 @@ public class NFTConsumer {
      *
      * @param msg 消息
      */
-    @KafkaListener(groupId = "nft-consumer-group", topics = {KafkaTopic.NFT_SAVE_SUCCESS})
-    public void mintNft(String msg) {
-        log.info("收到消息：{}", msg);
-        NftMintMsgDTO msgDTO = JSONUtil.toBean(msg, NftMintMsgDTO.class);
-        nftService.mintNft(msgDTO);
-    }
-
-    /**
-     * 消费NFT保存成功消息，完成NFT上链操作
-     *
-     * @param msg 消息
-     */
     @KafkaListener(groupId = "nft-consumer-group", topics = {KafkaTopic.GAME_NFT_SAVE_SUCCESS})
     public void gameMintNft(String msg) {
         log.info("收到消息：{}", msg);
