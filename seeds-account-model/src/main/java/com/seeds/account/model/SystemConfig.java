@@ -3,11 +3,12 @@ package com.seeds.account.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -17,7 +18,7 @@ import lombok.Data;
  * @author yk
  * @since 2022-09-29
  */
-@TableName("system_config")
+@TableName("ac_system_config")
 @ApiModel(value = "SystemConfig对象", description = "全局配置")
 @Data
 @Builder

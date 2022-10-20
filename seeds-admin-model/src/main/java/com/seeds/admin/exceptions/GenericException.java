@@ -4,8 +4,7 @@ import com.seeds.admin.enums.AdminErrorCodeEnum;
 import lombok.Getter;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/7/25
  */
 @Getter

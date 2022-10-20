@@ -14,11 +14,11 @@
     </resultMap>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete
-        from chain_txn_data
+        from ac_chain_txn_data
         where id = #{id,jdbcType=BIGINT}
     </delete>
     <insert id="insert" parameterType="com.seeds.account.model.ChainTxnData" useGeneratedKeys="true" keyProperty="id">
-        insert into chain_txn_data (id, create_time, update_time,
+        insert into ac_chain_txn_data (id, create_time, update_time,
                                       version, app_type, app_id,
                                       data)
         values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT},
@@ -26,7 +26,7 @@
                 #{data,jdbcType=LONGVARCHAR})
     </insert>
     <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.ChainTxnData">
-        update chain_txn_data
+        update ac_chain_txn_data
         set create_time = #{createTime,jdbcType=BIGINT},
             update_time = #{updateTime,jdbcType=BIGINT},
             version     = #{version,jdbcType=BIGINT},
@@ -37,16 +37,16 @@
     </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select id, create_time, update_time, version, app_type, app_id, data
-        from chain_txn_data
+        from ac_chain_txn_data
         where id = #{id,jdbcType=BIGINT}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
         select id, create_time, update_time, version, app_type, app_id, data
-        from chain_txn_data
+        from ac_chain_txn_data
     </select>
     <select id="selectByAppTypeAndId" resultMap="BaseResultMap">
         select *
-        from chain_txn_data
+        from ac_chain_txn_data
         where app_type = #{appType.code,jdbcType=TINYINT}
           and app_id = #{appId,jdbcType=BIGINT}
     </select>

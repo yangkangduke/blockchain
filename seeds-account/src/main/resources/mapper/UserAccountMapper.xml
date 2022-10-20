@@ -4,7 +4,7 @@
 
     <update id="freeze">
         <![CDATA[
-        update user_account
+        update ac_user_account
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
             version     = version + 1,
             available   = available - #{amount,jdbcType=DECIMAL},
@@ -16,7 +16,7 @@
     </update>
 
     <update id="updateAvailable">
-        update user_account
+        update ac_user_account
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
         version = version + 1,
         available = available + #{amount,jdbcType=DECIMAL}
@@ -26,7 +26,7 @@
     </update>
 
     <update id="updateFreeze">
-        update user_account
+        update ac_user_account
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
         version = version + 1,
         freeze = freeze + #{amount,jdbcType=DECIMAL}
@@ -39,7 +39,7 @@
 
     <update id="unfreeze">
         <![CDATA[
-        update user_account
+        update ac_user_account
         set update_time = ROUND(UNIX_TIMESTAMP(NOW()) * 1000),
             version     = version + 1,
             available   = available + #{amount,jdbcType=DECIMAL},
@@ -52,14 +52,14 @@
 
     <select id="countUserAccount" resultType="java.lang.Integer">
         select count(*)
-        from user_account
+        from ac_user_account
         where user_id = #{userId,jdbcType=BIGINT}
           and currency = #{currency,jdbcType=VARCHAR}
     </select>
 
     <select id="getUserAccountByUserId" resultType="com.seeds.account.model.UserAccount">
         select *
-        from user_account
+        from ac_user_account
         where user_id = #{userId,jdbcType=BIGINT}
     </select>
 

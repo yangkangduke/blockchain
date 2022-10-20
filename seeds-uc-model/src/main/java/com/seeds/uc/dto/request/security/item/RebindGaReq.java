@@ -3,8 +3,7 @@ package com.seeds.uc.dto.request.security.item;
 import lombok.Data;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/8/31
  */
 @Data

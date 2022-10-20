@@ -6,7 +6,6 @@ import com.seeds.account.dto.WithdrawRequestDto;
 import com.seeds.account.dto.WithdrawResponseDto;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 /**

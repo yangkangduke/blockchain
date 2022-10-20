@@ -2,11 +2,9 @@ package com.seeds.account.service;
 
 
 import com.seeds.account.dto.DepositRuleDto;
-import com.seeds.account.dto.SystemWalletAddressDto;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.common.enums.Chain;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

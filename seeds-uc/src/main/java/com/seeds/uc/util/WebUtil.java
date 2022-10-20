@@ -10,8 +10,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * @author allen
- * @email allen.hua.ai@gmail.com
+* @author yk
  * @date 2020/8/27
  */
 @Slf4j

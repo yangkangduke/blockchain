@@ -1,9 +1,9 @@
 package com.seeds.account.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.account.mapper.UserAccountMapper;
 import com.seeds.account.model.UserAccount;
 import com.seeds.account.service.IUserAccountService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**

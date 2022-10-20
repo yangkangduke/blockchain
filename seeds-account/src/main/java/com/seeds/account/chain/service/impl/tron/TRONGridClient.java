@@ -34,7 +34,7 @@ public class TRONGridClient {
     final static String KEY = "tron_rpc";
 
     @Autowired
-    ISystemConfigService systemConfigService;
+    private ISystemConfigService systemConfigService;
 
     AtomicLong counter = new AtomicLong(0);
     String lastConfig = null;
