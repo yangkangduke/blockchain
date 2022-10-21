@@ -1,5 +1,6 @@
 package com.seeds.account.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.seeds.account.AccountConstants;
@@ -265,14 +266,15 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
 
 
             // 发送通知给客户
-            kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, NotificationReq.builder()
+            kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                     .notificationType(AccountAction.DEPOSIT.getNotificationType())
                     .ucUserIds(ImmutableList.of(transaction.getUserId()))
                     .values(ImmutableMap.of(
                             "ts", System.currentTimeMillis(),
                             "currency", transaction.getCurrency(),
                             "amount", transaction.getAmount()))
-                    .build());
+                    .build()));
+            log.info("send deposit notification ts:{},currency:{},amount:{}", System.currentTimeMillis(), transaction.getCurrency(), transaction.getAmount());
         });
     }
 }
