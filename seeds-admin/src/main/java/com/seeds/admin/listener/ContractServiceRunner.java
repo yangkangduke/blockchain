@@ -2,6 +2,7 @@ package com.seeds.admin.listener;
 
 import com.seeds.admin.entity.SysTransferRecordEntity;
 import com.seeds.admin.service.SysTransferRecordService;
+import com.seeds.chain.contracts.GameItems;
 import io.reactivex.disposables.Disposable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class ContractServiceRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        //uploadProAuth();
+        uploadProAuth();
         log.info("This will be execute when the project was started!");
     }
 
@@ -55,17 +56,17 @@ public class ContractServiceRunner implements ApplicationRunner {
      * 收到上链事件
      */
     public void uploadProAuth() {
-        Event event = new Event("Transfer",
-                Arrays.asList(new TypeReference<Address>(true) {},
-                        new TypeReference<Address>(true) {},
-                        new TypeReference<Uint256>(false) {}));
+        Event event = new Event(GameItems.FUNC_MINTNEWNFT,
+                Arrays.asList(new TypeReference<Address>() {},
+                        new TypeReference<Address>() {},
+                        new TypeReference<Uint256>() {}));
         ethFilter.addSingleTopic(EventEncoder.encode(event));
 
-        log.info("Start contract listener transfer");
+        log.info("Start contract listener mintNewNft");
 
         Disposable subscribe = web3j.ethLogFlowable(ethFilter).subscribe(p -> {
             BigInteger blockNumber = p.getBlockNumber();
-            log.info("收到合约的transfer事件, blockNumber={}", blockNumber);
+            log.info("收到合约的mintNewNft事件, blockNumber={}", blockNumber);
             // 持久化监听到的上链transfer事件
             List<String> topics = p.getTopics();
             String fromAddress = topics.get(1);
