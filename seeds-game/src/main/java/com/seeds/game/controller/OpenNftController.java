@@ -109,10 +109,13 @@ public class OpenNftController {
         return ucRemoteNftService.soldOut(req);
     }
 
-    @PostMapping("/gas-fees")
+    @GetMapping("/gas-fees")
     @ApiOperation("NFT费用")
-    public GenericDto<SysNftGasFeesResp> gasFees(@Valid @RequestBody OpenNftGasFeesReq req) {
-        return adminRemoteNftService.gasFees(req);
+    public GenericDto<SysNftGasFeesResp> gasFees(@RequestParam String nftNo,
+                                                 @RequestParam String accessKey,
+                                                 @RequestParam String signature,
+                                                 @RequestParam Long timestamp) {
+        return adminRemoteNftService.gasFees(nftNo);
     }
 
 }

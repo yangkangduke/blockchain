@@ -60,7 +60,7 @@ public class ChainDepositWithdrawHisDto implements Serializable {
     @ApiModelProperty(value = "充币的看DepositStatus枚举，提币的看WithdrawStatus枚举")
     int status;
     @ApiModelProperty(value = "chain")
-    Chain chain;
+    Integer chain;
     /**
      * 交易Hash
      */

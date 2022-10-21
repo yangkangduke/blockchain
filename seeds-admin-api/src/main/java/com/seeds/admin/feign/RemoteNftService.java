@@ -177,11 +177,11 @@ public interface RemoteNftService {
 
 	/**
 	 * NFT费用
-	 * @param req 上链数据
+	 * @param nftNo NFT模板编号
 	 * @return 响应结果
 	 */
-	@PostMapping("/internal-nft/gas-fees")
+	@GetMapping("/internal-nft/gas-fees")
 	@ApiOperation("NFT费用")
-	GenericDto<SysNftGasFeesResp> gasFees(SysNftGasFeesReq req);
+	GenericDto<SysNftGasFeesResp> gasFees(@RequestParam String nftNo);
 
 }

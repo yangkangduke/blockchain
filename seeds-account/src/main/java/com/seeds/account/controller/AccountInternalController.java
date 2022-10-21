@@ -1,6 +1,7 @@
 package com.seeds.account.controller;
 
 import com.seeds.account.dto.ApproveRejectDto;
+import com.seeds.account.dto.ChainTxnReplayDto;
 import com.seeds.account.service.IAccountService;
 import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 /**
  * 账户系统提供的内部调用接口，调用方包括
@@ -128,4 +131,15 @@ public class AccountInternalController {
             return Utils.returnFromException(e);
         }
     }
+
+//    @PostMapping("/mgt/chain/replay/execute")
+//    @ApiOperation("执行链上 tx replace")
+//    public GenericDto<Boolean> executeChainReplay(@RequestBody @Valid ChainTxnReplayDto chainTxnReplayDto) {
+//        try {
+//            return GenericDto.success(chainTxnReplaceService.replayTransaction(chainTxnReplayDto));
+//        } catch (Exception e) {
+//            log.error("executeChainReplay", e);
+//            return Utils.returnFromException(e);
+//        }
+//    }
 }
