@@ -153,6 +153,12 @@ public class SysNftEntity extends BaseEntity {
 	private BigDecimal creatorFees;
 
 	/**
+	 * 上链加密串
+	 */
+	@TableField("metadata_hash")
+	private String metadataHash;
+
+	/**
 	 * 锁定标记，已锁定不可操作  0：未锁定 1：已锁定
 	 */
 	@TableField("lock_flag")
@@ -164,4 +170,5 @@ public class SysNftEntity extends BaseEntity {
 	@TableLogic(value = "0", delval = "NULL")
 	@TableField("delete_flag")
 	private Integer deleteFlag;
+
 }

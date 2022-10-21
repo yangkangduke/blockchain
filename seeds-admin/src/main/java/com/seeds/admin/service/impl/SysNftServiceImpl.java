@@ -142,10 +142,10 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long add(String imageFileHash, SysNftAddReq req) {
+    public Long add(String imageFileHash, SysNftAddReq req, String metadataHash) {
         // 校验基础属性缺失或重复
         List<NftPropertiesReq> propertiesList = req.getPropertiesList();
-        List<NftPropertiesReq> enduranceList = propertiesList.stream().filter(p -> p.getTypeId() == 1L).collect(Collectors.toList());
+        List<NftPropertiesReq> enduranceList = propertiesList.stream().filter(p -> p.getTypeId() != null && p.getTypeId() == 1L).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(enduranceList) || enduranceList.size() > 1) {
             throw new SeedsException(String.format(AdminErrorCodeEnum.ERR_40010_DUPLICATE_OR_MISSING_BASE_ATTRIBUTES_OF_NFT.getDescEn(), 1));
         }
@@ -163,6 +163,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         sysNft.setUrl(imageFileHash);
         // 生成NFT编号
         sysNft.setNumber(sysSequenceNoService.generateNftNo());
+        sysNft.setMetadataHash(metadataHash);
         // 保存NFT
         save(sysNft);
 
@@ -180,22 +181,20 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                         .description(req.getDescription())
                         .attributes(buildNftProperties(req.getPropertiesList()))
                         .build());
-        add(imageFileHash, req);
 
-        return metadataFileHash;
+        String metadataHash = "ipfs://" + metadataFileHash;
+        add(imageFileHash, req, metadataHash);
+        return metadataHash;
     }
 
     @Override
     public Long createSend(SysNftCreateReq req, String topic) {
-        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
-                .eq(SysNftEntity::getNumber, req.getNftNo())
-                .eq(SysNftEntity::getInitStatus, NftInitStatusEnum.NORMAL.getCode());
-        SysNftEntity nft = getOne(queryWrap);
+        SysNftEntity nft = queryByNumber(req.getNftNo());
         if (nft == null) {
             throw new SeedsException(AdminErrorCodeEnum.ERR_40016_This_type_of_NFT_has_not_yet_been_issued.getDescEn());
         }
         String imageFileHash = nft.getUrl();
-        Long nftId = add(imageFileHash, req);
+        Long nftId = add(imageFileHash, req, nft.getMetadataHash());
         // 发NFT创建消息
         NftUpgradeMsgDTO msgDTO = new NftUpgradeMsgDTO();
         BeanUtils.copyProperties(req, msgDTO);
@@ -479,6 +478,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             nft.setBlockChain(chainMintNftResp.getBlockchain());
             BeanUtils.copyProperties(chainMintNftResp, nft);
             nft.setStatus(msgDTO.getStatus());
+            nft.setMetadataHash("ipfs://" + metadataFileHash);
             // 添加NFT属性
             addNftProperties(msgDTO.getId(), msgDTO.getPropertiesList());
         } catch (Exception e) {
@@ -721,12 +721,24 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
-    public SysNftGasFeesResp gasFees(SysNftGasFeesReq req) {
-        BigInteger price = gameItemsService.gasFees("ipfs://" + req);
+    public SysNftGasFeesResp gasFees(String nftNo) {
+        SysNftEntity nft = queryByNumber(nftNo);
+        if (nft == null) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40016_This_type_of_NFT_has_not_yet_been_issued.getDescEn());
+        }
+        BigDecimal price = gameItemsService.gasFees(nft.getMetadataHash());
         SysNftGasFeesResp resp = new SysNftGasFeesResp();
-        resp.setPrice(new BigDecimal(price));
+        resp.setPrice(price);
         resp.setUnit(CurrencyEnum.USDT.getCode());
         return resp;
+    }
+
+    @Override
+    public SysNftEntity queryByNumber(String number) {
+        LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                .eq(SysNftEntity::getNumber, number)
+                .eq(SysNftEntity::getInitStatus, NftInitStatusEnum.NORMAL.getCode());
+        return getOne(queryWrap);
     }
 
     @Transactional(rollbackFor = Exception.class)

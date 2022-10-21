@@ -1,5 +1,6 @@
 package com.seeds.account.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -454,27 +455,30 @@ public class ChainActionServiceImpl implements IChainActionService {
 //                    accountAutoExchangeService.exchange(assignedDepositAddress.getUserId(), tx.getCurrency(), amount, true);
 
                     // 发送通知给客户(充币方)
-                    kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, NotificationReq.builder()
+                    kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                             .notificationType(AccountAction.DEPOSIT.getNotificationType())
                             .ucUserIds(ImmutableList.of(assignedDepositAddress.getUserId()))
                             .values(ImmutableMap.of(
                                     "ts", System.currentTimeMillis(),
                                     "currency", tx.getCurrency(),
                                     "amount", amount))
-                            .build());
+                            .build()));
+                    log.info("send internal deposit notification ts:{},currency:{},amount:{}", System.currentTimeMillis(), tx.getCurrency(), amount);
+
                 });
             }
         }
 
         // 发送通知用户提示提币成功(提币方)
-        kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, NotificationReq.builder()
+        kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                 .notificationType(AccountAction.WITHDRAW.getNotificationType())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
                         "currency", tx.getCurrency(),
                         "amount", tx.getAmount()))
-                .build());
+                .build()));
+        log.info("send withdraw notification ts:{},currency:{},amount:{}", System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
     }
 
 
@@ -1120,15 +1124,18 @@ public class ChainActionServiceImpl implements IChainActionService {
         userAccountActionService.updateStatusByActionUserIdSource(AccountAction.WITHDRAW, tx.getUserId(), String.valueOf(tx.getId()), CommonActionStatus.SUCCESS);
         log.info("updateWithdrawTxn update={}, replaceTx={}", tx, replaceTx);
 
+
         // 发送通知用户提示提币成功
-        kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, NotificationReq.builder()
+        kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE,JSONUtil.toJsonStr(NotificationReq.builder()
                 .notificationType(AccountAction.WITHDRAW.getNotificationType())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
                         "currency", tx.getCurrency(),
                         "amount", tx.getAmount()))
-                .build());
+                .build()));
+        log.info("send withdraw notification ts:{},currency:{},amount:{}", System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
+
     }
 
     /**

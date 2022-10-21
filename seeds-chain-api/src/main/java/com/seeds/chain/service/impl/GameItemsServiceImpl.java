@@ -17,9 +17,11 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.FastRawTransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.utils.Convert;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -60,8 +62,8 @@ public class GameItemsServiceImpl implements GameItemsService {
     }
 
     @Override
-    public BigInteger gasFees(String uri) {
-        BigInteger gasFees = null;
+    public BigDecimal gasFees(String uri) {
+        BigDecimal gasFees = null;
         gameItems = GameItems.load(smartContractConfig.getGameAddress(), web3, txManager, new DefaultGasProvider());
         try {
             EthGasPrice send = web3.ethGasPrice().send();
@@ -71,7 +73,7 @@ public class GameItemsServiceImpl implements GameItemsService {
                     null, null, null, smartContractConfig.getGameAddress(), FunctionEncoder.encode(function));
             EthEstimateGas ethEstimateGas = web3.ethEstimateGas(transaction).send();
             BigInteger gasLimit = ethEstimateGas.getAmountUsed();
-            gasFees = gasPrice.multiply(gasLimit);
+            gasFees = Convert.fromWei(new BigDecimal(gasPrice.multiply(gasLimit)), Convert.Unit.ETHER);
         } catch (IOException e) {
             log.error("can't get gasPrice from private chain, message：{}", e.getMessage());
         }

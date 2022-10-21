@@ -13,7 +13,7 @@ import lombok.Data;
 @ApiModel(value = "SysNftGasFeesReq", description = "系统NFT费用")
 public class SysNftGasFeesReq {
 
-    @ApiModelProperty(value = "上链加密数据")
-    private String userId;
+    @ApiModelProperty(value = "NFT模板编号")
+    private String nftNo;
 
 }
