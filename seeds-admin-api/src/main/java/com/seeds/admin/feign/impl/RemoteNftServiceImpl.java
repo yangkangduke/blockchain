@@ -106,7 +106,7 @@ public class RemoteNftServiceImpl implements RemoteNftService {
 	}
 
 	@Override
-	public GenericDto<SysNftGasFeesResp> gasFees(SysNftGasFeesReq req) {
+	public GenericDto<SysNftGasFeesResp> gasFees(String nftNo) {
 		return GenericDto.failure("Internal Error:nft gasFees failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 }

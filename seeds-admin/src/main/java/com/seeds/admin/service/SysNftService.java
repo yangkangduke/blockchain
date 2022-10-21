@@ -34,9 +34,10 @@ public interface SysNftService extends IService<SysNftEntity> {
      * 添加系统NFT信息
      * @param imageUrl NFT图片
      * @param req NFT信息
+     * @param metadataHash 上链数据加密串
      * @return NFT的唯一标识
      */
-    Long add(String imageUrl, SysNftAddReq req);
+    Long add(String imageUrl, SysNftAddReq req, String metadataHash);
 
     /**
      * 添加系统NFT信息发送消息
@@ -192,9 +193,17 @@ public interface SysNftService extends IService<SysNftEntity> {
 
     /**
      * NFT费用
-     * @param req 上链参数
+     * @param nftNo NFT模板编号
      * @return NFT费用
      */
-    SysNftGasFeesResp gasFees(SysNftGasFeesReq req);
+    SysNftGasFeesResp gasFees(String nftNo);
+
+    /**
+     * 根据编号查询NFT
+     *
+     * @param number NFT编号
+     * @return NFT信息
+     */
+    SysNftEntity queryByNumber(String number);
 
 }
