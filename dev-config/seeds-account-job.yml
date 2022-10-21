@@ -18,7 +18,7 @@ elasticjob:
     namespace: seeds-account-job
   jobs:
     # 自动创建空闲地址，每分钟运行一次
-    createAddressJob:
+    autoCreateAddressTask:
       # 作业job类
       elasticJobClass: com.seeds.account.task.AutoCreateAddressTask
       # 定时cron   every Minutes
@@ -32,15 +32,15 @@ elasticjob:
       #本地配置覆盖注册中心配置,每次启动作业都以本地配置为准
       overwrite: true
     # scanChainBlockJob
-    scanChainBlockJob:
+    scanChainBlockTask:
       elasticJobClass: com.seeds.account.task.ScanChainBlockTask
       cron: "0/5 * * * * ?"
       shardingTotalCount: 1
-      description: "scanChainBlockJob"
+      description: "扫描新块"
       disabled: false
       overwrite: true
       # 执行提币请求，每5秒执行一次
-    executeWithdrawJob:
+    executeWithdrawTask:
       elasticJobClass: com.seeds.account.task.ExecuteWithdrawTask
       cron: "0/5 * * * * ?"
       shardingTotalCount: 1
@@ -48,7 +48,7 @@ elasticjob:
       disabled: false
       overwrite: true
       # 查询提币结果，每5秒执行一次
-    scanWithdrawJob:
+    scanWithdrawTask:
       elasticJobClass: com.seeds.account.task.ScanWithdrawTask
       cron: "0/5 * * * * ?"
       shardingTotalCount: 1
