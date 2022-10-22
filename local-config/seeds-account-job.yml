@@ -38,7 +38,7 @@ elasticjob:
     # scanChainBlockJob
     scanChainBlockJob:
       elasticJobClass: com.seeds.account.task.ScanChainBlockTask
-      cron: "0/5 * * * * ?"
+      cron: "0/2 * * * * ?"
       shardingTotalCount: 1
       description: "scanChainBlockJob"
       disabled: false
