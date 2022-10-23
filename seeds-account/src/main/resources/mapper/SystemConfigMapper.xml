@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seeds.account.mapper.SystemConfigMapper">
-    <resultMap id="BaseResultMap" type="com.seeds.account.model.SystemConfig">
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
-        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
-        <result column="version" jdbcType="BIGINT" property="version"/>
-        <result column="type" jdbcType="VARCHAR" property="type"/>
-        <result column="key" jdbcType="VARCHAR" property="key"/>
-        <result column="name" jdbcType="VARCHAR" property="name"/>
-        <result column="value" jdbcType="VARCHAR" property="value"/>
-        <result column="comments" jdbcType="VARCHAR" property="comments"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
-    </resultMap>
 
     <insert id="insert" parameterType="com.seeds.account.model.SystemConfig" useGeneratedKeys="true" keyProperty="id">
         insert into ac_system_config (id, create_time, update_time, version,
@@ -37,15 +25,18 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="selectAll" resultMap="BaseResultMap">
-        select * from ac_system_config
-        where status = 1
+    <select id="selectAll" resultType="com.seeds.account.model.SystemConfig">
+        select
+            *
+        from ac_system_config
+        where `status` = 1
         order by id
     </select>
 
-    <select id="getByTypeAndKey" resultMap="BaseResultMap">
-        select * from ac_system_config
-        where type  = #{type,jdbcType=TINYINT}
-          and `key`   = #{key,jdbcType=VARCHAR}
+    <select id="getByTypeAndKey" resultType="com.seeds.account.model.SystemConfig">
+        select
+               `key`,create_time,update_time,version,name,type,`value`,comments,status,id from ac_system_config
+        where `type`  = #{type}
+          and `key`   = #{key}
     </select>
 </mapper>
