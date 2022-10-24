@@ -21,6 +21,7 @@ public interface SystemConfigMapper extends BaseMapper<SystemConfig> {
      * @param record
      * @return
      */
+    @Override
     int insert(SystemConfig record);
 
     /**
