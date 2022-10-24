@@ -166,6 +166,14 @@ public class GameItems extends Contract {
         return responses;
     }
 
+    public MintEventEventResponse getMintEventEvents(Log log) {
+        Contract.EventValuesWithLog eventValue = extractEventParametersWithLog(MINTEVENT_EVENT, log);
+        MintEventEventResponse typedResponse = new MintEventEventResponse();
+        typedResponse.log = eventValue.getLog();
+        typedResponse.newItemId = (BigInteger) eventValue.getNonIndexedValues().get(0).getValue();
+        return typedResponse;
+    }
+
     public Flowable<MintEventEventResponse> mintEventEventFlowable(EthFilter filter) {
         return web3j.ethLogFlowable(filter).map(new Function<Log, MintEventEventResponse>() {
             @Override
