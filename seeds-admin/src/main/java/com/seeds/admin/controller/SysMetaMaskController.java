@@ -1,6 +1,5 @@
 package com.seeds.admin.controller;
 
-import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.admin.dto.request.MetaMaskReq;
 import com.seeds.admin.entity.SysUserEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
@@ -9,15 +8,11 @@ import com.seeds.admin.exceptions.InvalidArgumentsException;
 import com.seeds.admin.service.AdminCacheService;
 import com.seeds.admin.service.SysUserService;
 import com.seeds.admin.utils.CryptoUtils;
-import com.seeds.admin.utils.WebUtil;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.uc.dto.redis.GenMetamaskAuth;
-import com.seeds.uc.enums.UcErrorCodeEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.web3j.crypto.WalletUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**

@@ -1,13 +1,8 @@
 package com.seeds.admin.mapstruct;
 
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
-import com.seeds.account.enums.ChainAction;
 import com.seeds.admin.dto.MgtDepositWithdrawDto;
-import com.seeds.common.enums.Chain;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
-import org.mapstruct.Named;
 
 import java.util.List;
 

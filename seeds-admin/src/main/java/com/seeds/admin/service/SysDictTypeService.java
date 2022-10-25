@@ -2,7 +2,9 @@ package com.seeds.admin.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.request.ListReq;
+import com.seeds.admin.dto.request.SysDictTypeAddReq;
+import com.seeds.admin.dto.request.SysDictTypeModifyReq;
 import com.seeds.admin.dto.response.SysDictTypeResp;
 import com.seeds.admin.entity.SysDictTypeEntity;
 

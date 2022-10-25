@@ -33,6 +33,7 @@ public class AccountPendingTransactionsReq extends PageReq {
     private Integer action;
     @ApiModelProperty(hidden = true)
     private List<Integer> statusList;
+    private Integer status;
     @ApiModelProperty(value = "开始时间")
     private Long startTime;
     @ApiModelProperty(value = "结束时间")

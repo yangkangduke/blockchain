@@ -2,6 +2,7 @@ package com.seeds.account.feign;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.account.dto.ApproveRejectDto;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.common.dto.GenericDto;
@@ -52,7 +53,33 @@ public interface AccountFeignClient {
      *
      * @return
      */
-    @PostMapping("/mgt/pending-transaction")
+    @PostMapping("/sys/pending-transaction")
     GenericDto<Page<ChainDepositWithdrawHisDto>> getPendingTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq);
 
+    /**
+     * 充币提币审核通过
+     *
+     * @param approveRejectDto
+     * @return
+     */
+    @PostMapping("/sys/approve-transaction")
+    GenericDto<Boolean> approveTransaction(@RequestBody ApproveRejectDto approveRejectDto);
+
+
+    /**
+     * 充币提币审核拒绝
+     *
+     * @param approveRejectDto
+     * @return
+     */
+    @PostMapping("/sys/reject-transaction")
+    GenericDto<Boolean> rejectTransaction(@RequestBody ApproveRejectDto approveRejectDto);
+
+    /**
+     * 获取人工处理过的充币提币
+     *
+     * @return
+     */
+    @PostMapping("/sys/processed-transaction")
+    GenericDto<Page<ChainDepositWithdrawHisDto>> getManualProcessedTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq);
 }

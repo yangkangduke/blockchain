@@ -1,9 +1,12 @@
 package com.seeds.admin.service;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.request.ListReq;
+import com.seeds.admin.dto.request.SysDictDataAddReq;
+import com.seeds.admin.dto.request.SysDictDataModifyReq;
+import com.seeds.admin.dto.request.SysDictDataPageReq;
 import com.seeds.admin.dto.response.SysDictDataResp;
-import com.seeds.admin.dto.response.SysOrgResp;
 import com.seeds.admin.entity.SysDictDataEntity;
 
 import java.util.List;

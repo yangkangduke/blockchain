@@ -7,12 +7,14 @@ import com.seeds.account.dto.ApproveRejectDto;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.enums.DepositStatus;
+import com.seeds.account.enums.WithdrawStatus;
 import com.seeds.account.service.IAccountService;
 import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
 import com.seeds.account.service.IChainDepositWithdrawHisService;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.dto.PagedDto;
 import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -103,7 +105,7 @@ public class AccountInternalController {
      * @param approveRejectDto
      * @return
      */
-    @PostMapping("/mgt/approve-transaction")
+    @PostMapping("/sys/approve-transaction")
     @ApiOperation("充币提币审核通过")
     @Inner
     public GenericDto<Boolean> approveTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
@@ -122,7 +124,7 @@ public class AccountInternalController {
      * @param approveRejectDto
      * @return
      */
-    @PostMapping("/mgt/reject-transaction")
+    @PostMapping("/sys/reject-transaction")
     @ApiOperation("充币提币审核拒绝")
     @Inner
     public GenericDto<Boolean> rejectTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
@@ -131,6 +133,36 @@ public class AccountInternalController {
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("rejectWithdraw", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 获取审核的充提
+     *
+     * @return
+     */
+    @PostMapping("/sys/processed-transaction")
+    @ApiOperation("获取审核的充提")
+    public GenericDto<Page<ChainDepositWithdrawHisDto>> getManualProcessedTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq) {
+        try {
+            Integer status = transactionsReq.getStatus();
+            List<Integer> statusList = status == null
+                    ? Lists.newArrayList(DepositStatus.APPROVED.getCode(), DepositStatus.REJECTED.getCode(), DepositStatus.TRANSACTION_CONFIRMED.getCode(),
+                    WithdrawStatus.TRANSACTION_CONFIRMED.getCode(), WithdrawStatus.TRANSACTION_FAILED.getCode())
+                    : Lists.newArrayList(status);
+
+            transactionsReq.setStatusList(statusList);
+            Page page = new Page();
+            page.setCurrent(transactionsReq.getCurrent());
+            page.setSize(transactionsReq.getSize());
+            transactionsReq.setOnlyManualCheck(true);
+            transactionsReq.setStartTime(0L);
+            transactionsReq.setEndTime(System.currentTimeMillis());
+            Page<ChainDepositWithdrawHisDto> list = chainDepositWithdrawHisService.getDepositWithdrawList(page, transactionsReq);
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getPendingTransactions", e);
             return Utils.returnFromException(e);
         }
     }

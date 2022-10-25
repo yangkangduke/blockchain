@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.entity.SysGameApiEntity;
 import com.seeds.admin.mapper.SysGameApiMapper;
-import com.seeds.admin.service.*;
+import com.seeds.admin.service.SysGameApiService;
 import org.springframework.stereotype.Service;
 
 
