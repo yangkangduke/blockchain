@@ -20,6 +20,6 @@ public class NftDeleteListReq  {
     private Integer initStatus;
 
     @ApiModelProperty("错误信息")
-    private String errorMsg;
+    private String message;
 
 }

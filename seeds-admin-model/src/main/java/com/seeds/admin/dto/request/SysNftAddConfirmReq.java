@@ -32,6 +32,9 @@ public class SysNftAddConfirmReq {
 	@NotBlank(message = "NFT token id cannot be empty")
 	private String newItemId;
 
+	@ApiModelProperty("错误信息")
+	private String message;
+
 	/**
 	 * 状态  0：正常  1：创建中  2：创建失败  5：删除中  6：删除失败
 	 */

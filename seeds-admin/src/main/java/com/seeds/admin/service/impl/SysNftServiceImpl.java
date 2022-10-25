@@ -179,6 +179,11 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         nft.setBlockChain(smartContractConfig.getBlockchain());
         nft.setMetadata(smartContractConfig.getMetadataMode());
         nft.setCreatorFees(smartContractConfig.getCreatorFees());
+        String errorMsg = req.getMessage();
+        if (StringUtils.isNotBlank(errorMsg) && errorMsg.length() > 255) {
+            errorMsg = errorMsg.substring(0, 255);
+        }
+        nft.setErrorMsg(errorMsg);
         // 添加NFT属性
         updateById(nft);
     }
@@ -367,7 +372,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 // 删除和NFT属性的关联
                 sysNftPropertiesService.deleteByNftId(p.getId());
             }
-            String errorMsg = nftReq.getErrorMsg();
+            String errorMsg = nftReq.getMessage();
             if (StringUtils.isNotBlank(errorMsg) && errorMsg.length() > 255) {
                 errorMsg = errorMsg.substring(0, 255);
             }
