@@ -2,16 +2,10 @@ package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.admin.dto.request.ListReq;
-import com.seeds.admin.dto.request.SwitchReq;
-import com.seeds.admin.dto.request.SysMerchantAddReq;
-import com.seeds.admin.dto.request.SysMerchantModifyReq;
-import com.seeds.admin.dto.request.SysMerchantPageReq;
-import com.seeds.admin.dto.request.SysMerchantUserAddReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysMerchantResp;
 import com.seeds.admin.entity.SysMerchantEntity;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

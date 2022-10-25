@@ -6,8 +6,8 @@ import com.seeds.admin.dto.request.AdminLoginReq;
 import com.seeds.admin.dto.request.ForgetPasswordReq;
 import com.seeds.admin.dto.response.AdminLoginResp;
 import com.seeds.admin.entity.SysUserEntity;
-import com.seeds.admin.enums.SysAuthTypeEnum;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
+import com.seeds.admin.enums.SysAuthTypeEnum;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.service.AdminCacheService;
@@ -86,6 +86,10 @@ public class AdminAuthController {
                 return GenericDto.failure(AdminErrorCodeEnum.ERR_10032_WRONG_SMS_CODE.getDescEn(), AdminErrorCodeEnum.ERR_10032_WRONG_SMS_CODE.getCode(), null);
             }
             adminUser = sysUserService.queryByMobile(loginReq.getMobile());
+            // 用户不存在
+            if (adminUser == null) {
+                return GenericDto.failure(AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED.getDescEn(), AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED.getCode(), null);
+            }
         } else if (SysAuthTypeEnum.PASSWORD.getCode().equals(authType)) {
             // 账号密码登录
             if (StringUtils.isEmpty(loginReq.getAccount()) || StringUtils.isEmpty(loginReq.getPassword()) || StringUtils.isEmpty(loginReq.getUuid())) {
@@ -97,19 +101,17 @@ public class AdminAuthController {
                 return GenericDto.failure(AdminErrorCodeEnum.ERR_10039_WRONG_GRAPHIC_AUTH_CODE.getDescEn(), AdminErrorCodeEnum.ERR_10039_WRONG_GRAPHIC_AUTH_CODE.getCode(), null);
             }
             adminUser = sysUserService.queryByAccount(loginReq.getAccount());
-        } else {
-            return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
-        }
-        // 用户不存在
-        if (adminUser == null) {
-            return GenericDto.failure(AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED.getDescEn(), AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED.getCode(), null);
-        }
-        // 密码错误
-        if (StringUtils.isNotBlank(loginReq.getPassword())) {
+            // 用户不存在
+            if (adminUser == null) {
+                return GenericDto.failure(AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED.getDescEn(), AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED.getCode(), null);
+            }
+            // 密码错误
             String loginPassword = HashUtil.sha256(loginReq.getPassword() + adminUser.getSalt());
             if (!loginPassword.equals(adminUser.getPassword())) {
                 return GenericDto.failure(AdminErrorCodeEnum.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT.getDescEn(), AdminErrorCodeEnum.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT.getCode(), null);
             }
+        } else {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), null);
         }
         // 账号停用
         if(SysStatusEnum.DISABLE.value() == adminUser.getStatus()){

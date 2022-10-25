@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.annotation.DataFilter;
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.response.SysNftAddResp;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.service.SysNftService;
@@ -44,8 +45,15 @@ public class SysNftController {
     @PostMapping("add")
     @ApiOperation("添加")
     @RequiredPermission("sys:nft:add")
-    public GenericDto<String> add(@RequestPart("image") MultipartFile image, @Valid SysNftAddReq req) {
+    public GenericDto<SysNftAddResp> add(@RequestPart("image") MultipartFile image, @Valid SysNftAddReq req) {
         return GenericDto.success(sysNftService.addUpload(image, req));
+    }
+
+    @PostMapping("add-confirm")
+    @ApiOperation("添加确认")
+    public GenericDto<Object> addConfirm(@Valid @RequestBody SysNftAddConfirmReq req) {
+        sysNftService.addConfirm(req);
+        return GenericDto.success(null);
     }
 
     @GetMapping("detail/{id}")
@@ -66,7 +74,7 @@ public class SysNftController {
     @PostMapping("delete")
     @ApiOperation("删除")
     @RequiredPermission("sys:nft:delete")
-    public GenericDto<Object> delete(@RequestBody ListReq req) {
+    public GenericDto<Object> delete(@RequestBody List<NftDeleteListReq> req) {
         sysNftService.batchDelete(req);
         return GenericDto.success(null);
     }

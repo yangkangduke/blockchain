@@ -20,7 +20,7 @@ import static com.seeds.admin.enums.AdminErrorCodeEnum.ERR_90001_FAIL_TO_EXECUTE
 @Slf4j
 @Api(tags = "区块链")
 @RestController
-@RequestMapping("/chain")
+@RequestMapping("/chain-nft")
 public class ChainNftController {
 
     @Autowired

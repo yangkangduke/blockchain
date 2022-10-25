@@ -1,6 +1,7 @@
 package com.seeds.account.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
@@ -40,20 +41,24 @@ public class SystemConfig implements Serializable {
     private Long version;
 
     @ApiModelProperty("type")
+    @TableField(value = "type")
     private String type;
 
     @ApiModelProperty("name")
     private String name;
 
     @ApiModelProperty("key")
+    @TableField(value = "key")
     private String key;
 
     @ApiModelProperty("value")
+    @TableField(value = "value")
     private String value;
 
     @ApiModelProperty("comments")
     private String comments;
 
+    @TableField(value = "status")
     private Integer status;
 
 }

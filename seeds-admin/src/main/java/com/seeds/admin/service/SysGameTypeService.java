@@ -1,7 +1,10 @@
 package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.request.ListReq;
+import com.seeds.admin.dto.request.SwitchReq;
+import com.seeds.admin.dto.request.SysGameTypeAddReq;
+import com.seeds.admin.dto.request.SysGameTypeModifyReq;
 import com.seeds.admin.dto.response.SysGameTypeResp;
 import com.seeds.admin.entity.SysGameTypeEntity;
 

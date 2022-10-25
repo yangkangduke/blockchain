@@ -34,7 +34,7 @@ elasticjob:
     # scanChainBlockJob
     scanChainBlockTask:
       elasticJobClass: com.seeds.account.task.ScanChainBlockTask
-      cron: "0/5 * * * * ?"
+      cron: "0/2 * * * * ?"
       shardingTotalCount: 1
       description: "扫描新块"
       disabled: false
@@ -55,7 +55,7 @@ elasticjob:
       description: "查询提币结果"
       disabled: false
       overwrite: true
-      # 扫描待归集地址余额 ，由于查询链上余额较慢， 地址较多。 这里15分钟执行一次
+    # 扫描待归集地址余额 ，由于查询链上余额较慢， 地址较多。 这里15分钟执行一次
     scanPendingCollectBalancesTask:
       elasticJobClass: com.seeds.account.task.ScanPendingCollectBalancesTask
       cron: "* 0/15 * * * ?"

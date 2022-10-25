@@ -1,12 +1,24 @@
 package com.seeds.account.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
+import com.seeds.account.dto.ApproveRejectDto;
+import com.seeds.account.dto.ChainTxnDto;
+import com.seeds.account.dto.ChainTxnReplayDto;
+import com.seeds.account.dto.req.ChainTxnPageReq;
+import com.seeds.account.dto.ChainDepositWithdrawHisDto;
+import com.seeds.account.dto.req.AccountPendingTransactionsReq;
+import com.seeds.account.enums.DepositStatus;
+import com.seeds.account.enums.WithdrawStatus;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.*;
 import com.seeds.account.service.IAccountService;
 import com.seeds.account.service.IAddressCollectHisService;
 import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
+import com.seeds.account.service.IChainDepositWithdrawHisService;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
@@ -20,6 +32,8 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 账户系统提供的内部调用接口，调用方包括
@@ -41,6 +55,8 @@ public class AccountInternalController {
     IAddressCollectHisService addressCollectHisService;
     @Autowired
     private IAccountService accountService;
+    @Autowired
+    private IChainDepositWithdrawHisService chainDepositWithdrawHisService;
 
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
@@ -69,12 +85,39 @@ public class AccountInternalController {
     }
 
     /**
+     * 获取需要审核的充提
+     *
+     * @return
+     */
+    @PostMapping("/mgt/pending-transaction")
+    @ApiOperation("获取需要审核的充提")
+    @Inner
+    public GenericDto<Page<ChainDepositWithdrawHisDto>> getPendingTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq) {
+        try {
+            // 待审核状态的提币充币一样的
+            List<Integer> statusList = Lists.newArrayList(DepositStatus.PENDING_APPROVE.getCode());
+            transactionsReq.setStatusList(statusList);
+            Page page = new Page();
+            page.setCurrent(transactionsReq.getCurrent());
+            page.setSize(transactionsReq.getSize());
+            transactionsReq.setOnlyManualCheck(true);
+            transactionsReq.setStartTime(0L);
+            transactionsReq.setEndTime(System.currentTimeMillis());
+            Page<ChainDepositWithdrawHisDto> list = chainDepositWithdrawHisService.getDepositWithdrawList(page, transactionsReq);
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getPendingTransactions", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
      * 充币提币审核通过
      *
      * @param approveRejectDto
      * @return
      */
-    @PostMapping("/mgt/approve-transaction")
+    @PostMapping("/sys/approve-transaction")
     @ApiOperation("充币提币审核通过")
     @Inner
     public GenericDto<Boolean> approveTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
@@ -93,7 +136,7 @@ public class AccountInternalController {
      * @param approveRejectDto
      * @return
      */
-    @PostMapping("/mgt/reject-transaction")
+    @PostMapping("/sys/reject-transaction")
     @ApiOperation("充币提币审核拒绝")
     @Inner
     public GenericDto<Boolean> rejectTransaction(@RequestBody ApproveRejectDto approveRejectDto) {
@@ -102,6 +145,36 @@ public class AccountInternalController {
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("rejectWithdraw", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 获取审核的充提
+     *
+     * @return
+     */
+    @PostMapping("/sys/processed-transaction")
+    @ApiOperation("获取审核的充提")
+    public GenericDto<Page<ChainDepositWithdrawHisDto>> getManualProcessedTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq) {
+        try {
+            Integer status = transactionsReq.getStatus();
+            List<Integer> statusList = status == null
+                    ? Lists.newArrayList(DepositStatus.APPROVED.getCode(), DepositStatus.REJECTED.getCode(), DepositStatus.TRANSACTION_CONFIRMED.getCode(),
+                    WithdrawStatus.TRANSACTION_CONFIRMED.getCode(), WithdrawStatus.TRANSACTION_FAILED.getCode())
+                    : Lists.newArrayList(status);
+
+            transactionsReq.setStatusList(statusList);
+            Page page = new Page();
+            page.setCurrent(transactionsReq.getCurrent());
+            page.setSize(transactionsReq.getSize());
+            transactionsReq.setOnlyManualCheck(true);
+            transactionsReq.setStartTime(0L);
+            transactionsReq.setEndTime(System.currentTimeMillis());
+            Page<ChainDepositWithdrawHisDto> list = chainDepositWithdrawHisService.getDepositWithdrawList(page, transactionsReq);
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getPendingTransactions", e);
             return Utils.returnFromException(e);
         }
     }
@@ -136,6 +209,34 @@ public class AccountInternalController {
         }
     }
 
+    /**
+     * 获取链上原始交易list
+     *
+     * @return
+     */
+    @PostMapping("/sys/chain/transaction")
+    @ApiOperation("获取链上原始交易list")
+    @Inner
+    public GenericDto<IPage<ChainTxnDto>> getChainTxnList(@RequestBody @Valid ChainTxnPageReq req) {
+        try {
+            return GenericDto.success(chainActionService.getTxnList(req));
+        } catch (Exception e) {
+            log.error("getChainTxnList", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/chain/replay/execute")
+    @ApiOperation("执行链上 tx replace")
+    @Inner
+    public GenericDto<Boolean> executeChainReplay(@RequestBody @Valid ChainTxnReplayDto chainTxnReplayDto) {
+        try {
+            return GenericDto.success(chainActionService.replayTransaction(chainTxnReplayDto));
+        } catch (Exception e) {
+            log.error("executeChainReplay", e);
+            return Utils.returnFromException(e);
+        }
+    }
 //    @PostMapping("/mgt/chain/replay/execute")
 //    @ApiOperation("执行链上 tx replace")
 //    public GenericDto<Boolean> executeChainReplay(@RequestBody @Valid ChainTxnReplayDto chainTxnReplayDto) {

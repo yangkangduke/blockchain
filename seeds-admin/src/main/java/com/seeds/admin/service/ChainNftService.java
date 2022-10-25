@@ -5,8 +5,6 @@ import com.seeds.admin.dto.request.ChainUpdateNftReq;
 import com.seeds.admin.dto.response.ChainMintNftResp;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigInteger;
-
 public interface ChainNftService {
     String uploadImage(MultipartFile image);
 
