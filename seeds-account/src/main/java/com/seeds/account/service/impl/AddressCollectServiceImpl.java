@@ -1,25 +1,31 @@
 package com.seeds.account.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.seeds.account.AccountConstants;
 import com.seeds.account.anno.SingletonLock;
 import com.seeds.account.chain.dto.ChainTransactionReceipt;
 import com.seeds.account.chain.service.IChainService;
-import com.seeds.account.enums.ChainCommonStatus;
-import com.seeds.account.enums.ChainTxnReplaceAppType;
-import com.seeds.account.enums.FundCollectOrderStatus;
-import com.seeds.account.enums.FundCollectOrderType;
+import com.seeds.account.dto.*;
+import com.seeds.account.enums.*;
 import com.seeds.account.ex.AccountException;
-import com.seeds.account.mapper.AddressCollectHisMapper;
-import com.seeds.account.mapper.AddressCollectOrderHisMapper;
-import com.seeds.account.mapper.ChainTxnReplaceMapper;
-import com.seeds.account.model.AddressCollectHis;
-import com.seeds.account.model.AddressCollectOrderHis;
-import com.seeds.account.model.ChainBlock;
-import com.seeds.account.model.ChainTxnReplace;
-import com.seeds.account.service.IAddressCollectService;
-import com.seeds.account.service.IChainActionService;
+import com.seeds.account.ex.ActionDeniedException;
+import com.seeds.account.mapper.*;
+import com.seeds.account.model.*;
+import com.seeds.account.service.*;
+import com.seeds.account.util.AddressUtils;
+import com.seeds.account.util.JsonUtils;
+import com.seeds.account.util.ObjectUtils;
+import com.seeds.account.util.Utils;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.common.redis.account.RedisKeys;
+import com.seeds.wallet.dto.RawTransactionDto;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -27,6 +33,10 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,6 +53,25 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
     IChainService chainService;
     @Autowired
     AddressCollectOrderHisMapper addressCollectOrderHisMapper;
+    @Autowired
+    ISystemConfigService systemConfigService;
+    @Autowired
+    IChainContractService chainContractService;
+    @Autowired
+    IChainDepositWithdrawHisService chainDepositWithdrawHisService;
+    @Autowired
+    ChainDepositAddressMapper chainDepositAddressMapper;
+    @Autowired
+    ISystemWalletAddressService systemWalletAddressService;
+    @Autowired
+    IAddressCollectHisService addressCollectHisService;
+    @Autowired
+    ChainTxnDataMapper transactionDataMapper;
+    @Autowired
+    IAsyncService asyncService;
+
+    @Autowired
+    RedissonClient client;
 
     @Override
     @SingletonLock(key = "/seeds/account/chain/collect")
@@ -198,4 +227,320 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
         });
     }
 
+    @Override
+    @SingletonLock(key = "/kine/account/chain/scan-pending-collect-balances")
+    public void scanPendingCollectBalances() {
+        try {
+            getPendingCollectBalances();
+        } catch (Exception e) {
+            log.error("scanPendingCollectBalances", e);
+        }
+    }
+
+
+    @Override
+    public Map<Chain, Map<String, BigDecimal>> getPendingCollectBalances() {
+        Map<Chain, Map<String, BigDecimal>> chainAddressBalanceMap = new ConcurrentHashMap<>();
+        Chain.SUPPORT_LIST.forEach(chain -> {
+            List<AddressBalanceDto> list = this.getPendingCollectBalances(chain);
+
+            Map<String, BigDecimal> total = Maps.newHashMap();
+            list.forEach(e -> e.getBalances().forEach((currency, balance) -> {
+                BigDecimal balanceTotal = total.computeIfAbsent(currency, k -> BigDecimal.ZERO);
+                total.put(currency, balanceTotal.add(balance));
+            }));
+
+            chainAddressBalanceMap.put(chain, total);
+        });
+        return chainAddressBalanceMap;
+    }
+
+    private List<AddressBalanceDto> getPendingCollectBalances(Chain chain) {
+        // 充币行为回查天数
+        int lookback = Integer.parseInt(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_DEPOSIT_ADDRESS_LOOK_BACK, "3"));
+        long startTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(lookback);
+        long endTime = System.currentTimeMillis();
+
+        List<String> addresses = chainDepositWithdrawHisService.getDepositAddress(chain, startTime, endTime);
+
+        // batch操作中间的休眠天数
+        long sleep = Long.parseLong(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_REQUEST_BATCH_SLEEP, "500"));
+        try {
+            return chainService.getBalancesOnBatch(chain, addresses, sleep);
+        } catch (Exception e) {
+            log.error("getPendingCollectBalances, ", e);
+        }
+        return Lists.newArrayList();
+    }
+
+    @Override
+    public AddressCollectHisDto createFundCollect(FundCollectRequestDto requestDto) {
+        log.info("createFundCollect requestDto={}", requestDto);
+        Chain chain = Chain.fromCode(requestDto.getChain());
+        Utils.check(Chain.SUPPORT_LIST.contains(chain), ErrorCode.ACCOUNT_INVALID_CHAIN);
+
+        String currency = requestDto.getCurrency();
+        String toAddress = requestDto.getToAddress();
+
+        // 不支持提币到合约地址
+        if (!Objects.equals(currency, chain.getNativeToken())) {
+            ChainContractDto chainContractDto = chainContractService.get(requestDto.getChain(), currency);
+            if (chainContractDto == null) {
+                throw new ActionDeniedException("no contract for " + currency);
+            }
+            if (ObjectUtils.isAddressEquals(toAddress, chainContractDto.getAddress())) {
+                throw new ActionDeniedException("cannot withdraw to contract address " + toAddress);
+            }
+        }
+
+        List<String> validAddresses = this.getValidTargetAddresses(chain);
+        boolean validAddress = ObjectUtils.containsAddress(validAddresses, toAddress);
+        Utils.check(validAddress, "invalid address");
+
+        long gasPrice = chainService.getGasPrice(chain);
+        long gasLimit = chainService.getGasLimit(chain, currency);
+        long nonce = chainService.getPendingNonce(chain, requestDto.getFromAddress()).longValue();
+        long sleepFor = 0;
+        return this.sendTransaction(chain, FundCollectOrderType.FROM_SYSTEM_TO_SYSTEM, 0L, requestDto.getCurrency(),
+                requestDto.getFromAddress(), requestDto.getToAddress(), requestDto.getAmount(), gasPrice, gasLimit, nonce, sleepFor, requestDto.getComments());
+    }
+
+    @Override
+    public AddressCollectOrderHisDto createFundCollectOrder(AddressCollectOrderRequestDto addressCollectOrderRequestDto) {
+        log.info("createFundCollectOrder addressCollectOrderRequestDto={}", addressCollectOrderRequestDto);
+        Chain chain = Chain.fromCode(addressCollectOrderRequestDto.getChain());
+        Utils.check(Chain.SUPPORT_LIST.contains(chain), ErrorCode.ACCOUNT_INVALID_CHAIN);
+
+        int type = addressCollectOrderRequestDto.getType();
+        String currency = addressCollectOrderRequestDto.getCurrency();
+        long gasPrice = addressCollectOrderRequestDto.getGasPrice();
+        // long gasLimit = chainService.getGasLimit(chain, currency);
+        String address = addressCollectOrderRequestDto.getAddress();
+        List<AddressCollectOrderRequestDto.AddressOrderDetail> list = addressCollectOrderRequestDto.getList();
+
+        FundCollectOrderType orderType = FundCollectOrderType.fromCode(type);
+        Utils.check(orderType == FundCollectOrderType.FROM_USER_TO_SYSTEM || orderType == FundCollectOrderType.FROM_SYSTEM_TO_USER, "invalid order type");
+        Utils.check(currency != null && currency.length() > 0, "invalid currency");
+        Utils.check(AddressUtils.validate(chain, address), "invalid address");
+        Utils.check(gasPrice > 0, "invalid gas price");
+        Utils.check(list != null && list.size() > 0, "missing details");
+
+        List<String> validAddresses = getValidTargetAddresses(chain);
+
+        list.forEach(e -> {
+            Utils.check(AddressUtils.validate(chain, e.getAddress()), "invalid address");
+            Utils.check(e.getAmount() != null && e.getAmount().signum() > 0, "invalid amount");
+
+            if (orderType == FundCollectOrderType.FROM_USER_TO_SYSTEM) {
+                boolean validAddress = ObjectUtils.containsAddress(validAddresses, address);
+                Utils.check(validAddress, "invalid address");
+            } else {
+                boolean validAddress = ObjectUtils.containsAddress(validAddresses, e.getAddress());
+                Utils.check(validAddress, "invalid address");
+            }
+        });
+
+        ChainContractDto chainContractDto = chainContractService.get(addressCollectOrderRequestDto.getChain(), currency);
+        Utils.check(Objects.equals(currency, chain.getNativeToken()) || chainContractDto != null, "unknown currency");
+
+        List<SystemWalletAddressDto> systemWalletAddresses = systemWalletAddressService.getAll()
+                .stream()
+                .filter(e -> e.getChain() == chain.getCode())
+                .collect(Collectors.toList());
+        // 目标地址必须是已知的系统地址地址
+        Utils.check(systemWalletAddresses.stream().anyMatch(e -> ObjectUtils.isAddressEquals(address, e.getAddress())), "unknown address");
+
+        AddressCollectOrderHis orderHis = AddressCollectOrderHis.builder()
+                .createTime(System.currentTimeMillis())
+                .updateTime(System.currentTimeMillis())
+                .version(AccountConstants.DEFAULT_VERSION)
+                .type(type)
+                .address(address)
+                .currency(currency)
+                .gasPrice(gasPrice)
+                .feeAmount(BigDecimal.ZERO)
+                .amount(BigDecimal.ZERO)
+                .status(FundCollectOrderStatus.PROCESSING.getCode())
+                .chain(chain)
+                .build();
+        addressCollectHisService.createOrderHistory(orderHis);
+        long orderId = orderHis.getId();
+
+        asyncService.execute(() -> processChildTransactions(chain, addressCollectOrderRequestDto, orderId));
+
+        return ObjectUtils.copy(orderHis, new AddressCollectOrderHisDto());
+    }
+
+
+    private List<String> getValidTargetAddresses(Chain chain) {
+        List<String> list = Lists.newLinkedList();
+
+        // 已分配的用户地址 (使用map)
+        List<ChainDepositAddress> chainDepositAddresses = chainDepositAddressMapper.getAssignedAddresses(Chain.mapChain(chain).getCode());
+        for (ChainDepositAddress cda : chainDepositAddresses) {
+            list.add(cda.getAddress());
+        }
+
+        // 系统钱包中有私钥的地址以及冷钱包
+        List<SystemWalletAddressDto> systemWalletAddressDtos = systemWalletAddressService.getAll()
+                .stream()
+                .filter(e -> e.getChain() == chain.getCode())
+                .collect(Collectors.toList());
+        for (SystemWalletAddressDto swad : systemWalletAddressDtos) {
+            WalletAddressType wat = WalletAddressType.fromCode(swad.getType());
+            if (wat != null) {
+                if (wat.isRequirePrivateKey() || wat == WalletAddressType.COLD || wat == WalletAddressType.KINE_TREASURY || wat == WalletAddressType.KUSD_VAULT) {
+                    list.add(swad.getAddress());
+                }
+            }
+        }
+
+        return list;
+    }
+
+
+    private AddressCollectHisDto sendTransaction(Chain chain, FundCollectOrderType type, long orderId, String currency, String fromAddress, String toAddress, BigDecimal amount, long gasPrice, long gasLimit,
+                                                 long nonce, long sleepFor, String comments) {
+        int status = ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode();
+        RawTransactionDto tx = null;
+        try {
+            tx = chainService.internalSendTransaction(chain, currency, fromAddress, toAddress, amount, gasPrice, gasLimit, nonce, sleepFor);
+        } catch (Exception e) {
+            log.error("sendTransaction error", e);
+            status = ChainCommonStatus.TRANSACTION_FAILED.getCode();
+        }
+
+        AddressCollectHis his = AddressCollectHis.builder()
+                .createTime(System.currentTimeMillis())
+                .updateTime(System.currentTimeMillis())
+                .version(AccountConstants.DEFAULT_VERSION)
+                .orderId(orderId)
+                .fromAddress(fromAddress)
+                .toAddress(toAddress)
+                .txToAddress(Optional.ofNullable(tx).map(RawTransactionDto::getTo).orElse(""))
+                .currency(currency)
+                .amount(amount)
+                .gasPrice(gasPrice)
+                .gasLimit(gasLimit)
+                .txFee(BigDecimal.ZERO)
+                .blockNumber(0L)
+                .blockHash("")
+                .txHash(Optional.ofNullable(tx).map(RawTransactionDto::getTxnHash).orElse(""))
+                .txValue(Optional.ofNullable(tx).map(e -> e.getValue().toString()).orElse("0"))
+                .nonce(Optional.ofNullable(tx).map(e -> e.getNonce().toString()).orElse("0"))
+                .status(status)
+                .comments(comments != null ? comments : "")
+                .chain(chain)
+                .build();
+        addressCollectHisService.createHistory(his);
+        // add new chain transaction data his
+        ChainTxnData data = ChainTxnData.builder()
+                .version(AccountConstants.DEFAULT_VERSION)
+                .appId(his.getId())
+                .data(Optional.ofNullable(tx).map(RawTransactionDto::getData).orElse(""))
+                .createTime(System.currentTimeMillis())
+                .updateTime(System.currentTimeMillis())
+                .build();
+        switch (type) {
+            case FROM_USER_TO_SYSTEM:
+                // 资金归集
+                data.setAppType(ChainTxnDataAppType.CASH_COLLECT);
+                break;
+            case FROM_SYSTEM_TO_USER:
+                // Gas 划转
+                data.setAppType(ChainTxnDataAppType.GAS_TRANSFER);
+                break;
+            case FROM_SYSTEM_TO_SYSTEM:
+                data.setAppType(ChainTxnDataAppType.HOT_WALLET_TRANSFER);
+                break;
+            default:
+                throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "invalid fund collect order type");
+
+        }
+        transactionDataMapper.insert(data);
+        return ObjectUtils.copy(his, new AddressCollectHisDto());
+    }
+
+    private void processChildTransactions(Chain chain, AddressCollectOrderRequestDto addressCollectOrderRequestDto, long orderId) {
+        int type = addressCollectOrderRequestDto.getType();
+        String currency = addressCollectOrderRequestDto.getCurrency();
+        long gasPrice = addressCollectOrderRequestDto.getGasPrice();
+        long gasLimit = chainService.getGasLimit(chain, currency);
+        String address = addressCollectOrderRequestDto.getAddress();
+        List<AddressCollectOrderRequestDto.AddressOrderDetail> list = addressCollectOrderRequestDto.getList();
+
+        FundCollectOrderType orderType = FundCollectOrderType.fromCode(type);
+
+        if (orderType == FundCollectOrderType.FROM_USER_TO_SYSTEM) {
+            // 1.  如果是是用户地址归集到系统地址，就先减去这次归集的金额，无论成功失败 (此设计是为了加快MGT处理速度)
+            Map<String, BigDecimal> amountMap = list.stream()
+                    .collect(Collectors.toMap(AddressCollectOrderRequestDto.AddressOrderDetail::getAddress, AddressCollectOrderRequestDto.AddressOrderDetail::getAmount));
+
+            RBucket<String> bucket = client.getBucket(RedisKeys.getFundCollectBalanceValue(chain.getCode()), StringCodec.INSTANCE);
+            String json = bucket.get();
+            List<AddressBalanceDto> balanceList = (json != null && json.length() > 0)
+                    ? JsonUtils.readValue(json, new TypeReference<List<AddressBalanceDto>>() {
+            })
+                    : Lists.newArrayList();
+            balanceList.forEach(e -> {
+                //获取这个地址要归集的数量
+                BigDecimal amount = amountMap.getOrDefault(e.getAddress(), BigDecimal.ZERO);
+                if (amount.signum() > 0) {
+                    // 获取这个币种原有的余额
+                    BigDecimal initialAmount = e.getBalances().get(currency);
+                    if (initialAmount.compareTo(amount) >= 0) {
+                        // 减去要归集的金额
+                        e.getBalances().put(currency, initialAmount.subtract(amount));
+                    }
+                }
+            });
+            // 更新redis
+            bucket.set(JsonUtils.writeValue(balanceList));
+
+            // 2. 发送交易，插入数据库
+            for (int i = 0; i < list.size(); i++) {
+                AddressCollectOrderRequestDto.AddressOrderDetail e = list.get(i);
+                // 从用户地址划转到系统钱包地址, 获取用户地址的pendingNonce，发送交易后不需要sleep
+                long nonce = chainService.getPendingNonce(chain, e.getAddress()).longValue();
+                long sleepFor = 0;
+                String comments = orderId + "/" + list.size() + "/" + (i + 1);
+                sendTransaction(chain, FundCollectOrderType.FROM_USER_TO_SYSTEM, orderId, currency, e.getAddress(), address, e.getAmount(), gasPrice, gasLimit, nonce, sleepFor, comments);
+            }
+        } else {
+            // 1.  如果是系统地址划转到用户地址归，就加上这次归集的金额，无论成功失败 (此设计是为了加快MGT处理速度)
+            Map<String, BigDecimal> amountMap = list.stream()
+                    .collect(Collectors.toMap(AddressCollectOrderRequestDto.AddressOrderDetail::getAddress, AddressCollectOrderRequestDto.AddressOrderDetail::getAmount));
+
+            RBucket<String> bucket = client.getBucket(RedisKeys.getFundCollectBalanceValue(addressCollectOrderRequestDto.getChain()), StringCodec.INSTANCE);
+            String json = bucket.get();
+            List<AddressBalanceDto> balanceList = (json != null && json.length() > 0)
+                    ? JsonUtils.readValue(json, new TypeReference<List<AddressBalanceDto>>() {
+            })
+                    : Lists.newArrayList();
+            balanceList.forEach(e -> {
+                //获取这个地址要归集的数量
+                BigDecimal amount = amountMap.getOrDefault(e.getAddress(), BigDecimal.ZERO);
+                if (amount.signum() > 0) {
+                    // 获取这个币种原有的余额
+                    BigDecimal initialAmount = e.getBalances().get(currency);
+                    e.getBalances().put(currency, initialAmount.add(amount));
+                }
+            });
+            // 更新redis
+            bucket.set(JsonUtils.writeValue(balanceList));
+            // 获取一个初始的pendingNonce
+            long nonce = chainService.getPendingNonce(chain, address).longValue();
+            // 发送每笔交易后sleep
+            long sleepFor = 1000;
+            for (int i = 0; i < list.size(); i++) {
+                AddressCollectOrderRequestDto.AddressOrderDetail e = list.get(i);
+                String comments = orderId + "/" + list.size() + "/" + (i + 1);
+                // 从系统钱包地址划转到用户地址（打gas fee）
+                AddressCollectHisDto o = sendTransaction(chain, FundCollectOrderType.FROM_SYSTEM_TO_USER, orderId, currency, address, e.getAddress(), e.getAmount(), gasPrice, gasLimit, nonce, sleepFor, comments);
+                if (o.getStatus() == ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode()) {
+                    nonce++;
+                }
+            }
+        }
+    }
 }

@@ -82,4 +82,13 @@
           and chain = #{chain.code,jdbcType=VARCHAR}
         ]]>
     </update>
+
+    <select id="getDepositAddress" resultType="java.lang.String">
+        select distinct(f_to_address)
+        from t_chain_deposit_withdraw_his
+        where f_action = 1 and f_to_address is not null and f_to_address &lt;&gt; ''
+        <if test="startTime > 0">and f_create_time &gt;= #{startTime,jdbcType=BIGINT}</if>
+        <if test="endTime > 0">and f_create_time &lt;= #{endTime,jdbcType=BIGINT}</if>
+        <if test="chain != null">and f_chain = #{chain.code,jdbcType=TINYINT}</if>
+    </select>
 </mapper>

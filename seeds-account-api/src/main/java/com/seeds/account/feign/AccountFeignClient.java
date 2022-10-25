@@ -38,4 +38,13 @@ public interface AccountFeignClient {
      */
     @PostMapping("/job/scan-withdraw")
     GenericDto<Boolean> scanWithdraw();
+
+
+    /**
+     * 定期收集待归集地址余额
+     *
+     * @return
+     */
+    @PostMapping("/job/fund-collect-scan-pending-balances")
+    GenericDto<Boolean> scanPendingCollectBalances();
 }

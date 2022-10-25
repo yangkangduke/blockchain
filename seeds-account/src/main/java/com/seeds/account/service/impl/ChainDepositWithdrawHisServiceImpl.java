@@ -91,4 +91,9 @@ public class ChainDepositWithdrawHisServiceImpl extends ServiceImpl<ChainDeposit
         log.info("createSigHistory chainDepositWithdrawSigHis={}", chainDepositWithdrawSigHis);
         chainDepositWithdrawSigHisMapper.insert(chainDepositWithdrawSigHis);
     }
+
+    @Override
+    public List<String> getDepositAddress(Chain chain, long startTime, long endTime) {
+        return chainDepositWithdrawHisMapper.getDepositAddress(chain, startTime, endTime);
+    }
 }

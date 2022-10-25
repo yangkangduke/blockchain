@@ -1,23 +1,23 @@
 package com.seeds.account.controller;
 
-import com.seeds.account.dto.ApproveRejectDto;
-import com.seeds.account.dto.ChainTxnReplayDto;
+import com.seeds.account.dto.*;
 import com.seeds.account.service.IAccountService;
+import com.seeds.account.service.IAddressCollectHisService;
 import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.dto.PagedDto;
+import com.seeds.common.enums.Chain;
 import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 账户系统提供的内部调用接口，调用方包括
@@ -35,6 +35,8 @@ public class AccountInternalController {
     private IChainActionService chainActionService;
     @Autowired
     private IAddressCollectService addressCollectService;
+    @Autowired
+    IAddressCollectHisService addressCollectHisService;
     @Autowired
     private IAccountService accountService;
 
@@ -124,7 +126,7 @@ public class AccountInternalController {
             // 处理提币
             chainActionService.scanWithdraw();
             // 处理归集
-//            addressCollectService.scanCollect();
+            addressCollectService.scanCollect();
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("scanWithdraw", e);
@@ -142,4 +144,156 @@ public class AccountInternalController {
 //            return Utils.returnFromException(e);
 //        }
 //    }
+
+
+    /**
+     * 定期收集待归集地址余额
+     *
+     * @return
+     */
+    @PostMapping("/job/fund-collect-scan-pending-balances")
+    @ApiOperation("定期收集待归集地址余额")
+    public GenericDto<Boolean> scanPendingCollectBalances() {
+        try {
+            addressCollectService.scanPendingCollectBalances();
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("scanPendingCollectBalances", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+
+    /**
+     * 钱包账户归集
+     *
+     * @param requestDto
+     * @return
+     */
+    @PostMapping("/mgt/fund-collect")
+    @ApiOperation("钱包账户归集")
+    public GenericDto<AddressCollectHisDto> createFundCollect(@RequestBody FundCollectRequestDto requestDto) {
+        try {
+            AddressCollectHisDto hisDto = addressCollectService.createFundCollect(requestDto);
+            return GenericDto.success(hisDto);
+        } catch (Exception e) {
+            log.error("createFundCollect", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 获取钱包归集历史
+     *
+     * @param chain
+     * @param startTime
+     * @param endTime
+     * @param fromAddress
+     * @param toAddress
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping("/mgt/fund-collect-history")
+    @ApiOperation("获取钱包归集历史")
+    public GenericDto<PagedDto<AddressCollectHisDto>> getFundCollectHistory(@RequestParam("chain") int chain,
+                                                                            @RequestParam("startTime") long startTime,
+                                                                            @RequestParam("endTime") long endTime,
+                                                                            @RequestParam(value = "fromAddress", required = false) String fromAddress,
+                                                                            @RequestParam(value = "toAddress", required = false) String toAddress,
+                                                                            @RequestParam("page") int page,
+                                                                            @RequestParam("size") int size) {
+        try {
+            PagedDto<AddressCollectHisDto> list = addressCollectHisService.getHistory(Chain.fromCode(chain), startTime, endTime, fromAddress, toAddress, page, size);
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getFundCollectHistory", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 根据归集订单Id获取钱包归集历史
+     *
+     * @param orderId
+     * @return
+     */
+    @GetMapping("/mgt/fund-collect-history-by-order")
+    @ApiOperation("根据归集订单Id获取钱包归集历史")
+    public GenericDto<List<AddressCollectHisDto>> getFundCollectHistoryByOrder(@RequestParam("orderId") long orderId) {
+        try {
+            List<AddressCollectHisDto> list = addressCollectHisService.getAddressCollectByOrderId(orderId);
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getFundCollectHistoryByOrder", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 创建钱包账户归集订单
+     *
+     * @param addressCollectOrderRequestDto
+     * @return
+     */
+    @PostMapping("/mgt/fund-collect-order")
+    @ApiOperation("创建钱包账户归集订单")
+    public GenericDto<AddressCollectOrderHisDto> createFundCollectOrder(@RequestBody AddressCollectOrderRequestDto addressCollectOrderRequestDto) {
+        try {
+            AddressCollectOrderHisDto hisDto = addressCollectService.createFundCollectOrder(addressCollectOrderRequestDto);
+            return GenericDto.success(hisDto);
+        } catch (Exception e) {
+            log.error("createFundCollectOrder", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 获取某个钱包账户归集订单
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/mgt/fund-collect-order")
+    @ApiOperation("获取某个钱包账户归集订单")
+    public GenericDto<AddressCollectOrderHisDto> getFundCollectOrder(@RequestParam("id") long id) {
+        try {
+            AddressCollectOrderHisDto hisDto = addressCollectHisService.getAddressCollectOrderById(id);
+            return GenericDto.success(hisDto);
+        } catch (Exception e) {
+            log.error("getFundCollectOrder", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 获取钱包归集历史
+     *
+     * @param startTime
+     * @param endTime
+     * @param type
+     * @param address
+     * @param currency
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping("/mgt/fund-collect-order-history")
+    @ApiOperation("钱包账户归集")
+    public GenericDto<PagedDto<AddressCollectOrderHisDto>> getFundCollectOrderHistory(@RequestParam("chain") int chain,
+                                                                                      @RequestParam("startTime") long startTime,
+                                                                                      @RequestParam("endTime") long endTime,
+                                                                                      @RequestParam(value = "type", required = false, defaultValue = "0") int type,
+                                                                                      @RequestParam(value = "address", required = false) String address,
+                                                                                      @RequestParam(value = "currency", required = false) String currency,
+                                                                                      @RequestParam("page") int page,
+                                                                                      @RequestParam("size") int size) {
+        try {
+            PagedDto<AddressCollectOrderHisDto> list = addressCollectHisService.getOrderHistory(Chain.fromCode(chain), startTime, endTime, type, address, currency, page, size);
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getFundCollectOrderHistory", e);
+            return Utils.returnFromException(e);
+        }
+    }
 }

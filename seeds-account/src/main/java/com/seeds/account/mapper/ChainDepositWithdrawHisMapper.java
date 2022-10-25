@@ -65,4 +65,14 @@ public interface ChainDepositWithdrawHisMapper extends BaseMapper<ChainDepositWi
      * 获取历史
      */
     IPage<ChainDepositWithdrawHisDto> selectByUserAndTime(Page page, @Param("query") AccountHistoryReq accountHistoryReq);
+
+    /**
+     * 获取一段时间内充币的地址
+     * @param chain
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<String> getDepositAddress(@Param("chain") Chain chain, @Param("startTime") long startTime, @Param("endTime") long endTime);
+
 }
