@@ -1,6 +1,7 @@
 package com.seeds.account.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.*;
 import com.seeds.account.service.IAccountService;
 import com.seeds.account.service.IAddressCollectHisService;
@@ -8,7 +9,6 @@ import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.dto.PagedDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
@@ -17,8 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 账户系统提供的内部调用接口，调用方包括
@@ -147,23 +148,80 @@ public class AccountInternalController {
 //    }
 
 
+//    @PostMapping("/job/fund-collect-scan-pending-balances")
+//    @ApiOperation("定期收集待归集地址余额")
+//    public GenericDto<Boolean> scanPendingCollectBalances() {
+//        try {
+//            addressCollectService.scanPendingCollectBalances();
+//            return GenericDto.success(true);
+//        } catch (Exception e) {
+//            log.error("scanPendingCollectBalances", e);
+//            return Utils.returnFromException(e);
+//        }
+//    }
+
     /**
-     * 定期收集待归集地址余额
+     * 获取待归集余额
      *
      * @return
      */
-    @PostMapping("/job/fund-collect-scan-pending-balances")
-    @ApiOperation("定期收集待归集地址余额")
-    public GenericDto<Boolean> scanPendingCollectBalances() {
+    @GetMapping("/mgt/fund-collect-scan-pending-balances")
+    @ApiOperation("获取待归集余额")
+    public GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() {
+        return GenericDto.success(addressCollectService.getPendingCollectBalances());
+    }
+
+    /**
+     * 创建获取用户充币地址余额的请求
+     * @param chain
+     * @return
+     */
+    @PostMapping("/mgt/create-balances-get")
+    @ApiOperation("创建获取用户充币地址余额的请求")
+    public GenericDto<Boolean> createBalanceGet(@RequestParam("chain") int chain) {
         try {
-            addressCollectService.scanPendingCollectBalances();
+            addressCollectService.createBalanceGet(Chain.fromCode(chain));
             return GenericDto.success(true);
         } catch (Exception e) {
-            log.error("scanPendingCollectBalances", e);
+            log.error("createBalanceGet", e);
             return Utils.returnFromException(e);
         }
     }
 
+    /**
+     * 查询获取用户充币地址余额的请求的状态
+     * @param chain
+     * @return
+     */
+    @GetMapping("/mgt/get-balances-get-status")
+    @ApiOperation("查询获取用户充币地址余额的请求的状态")
+    public GenericDto<BalanceGetStatusDto> getBalanceGetStatus(@RequestParam(value = "chain") int chain) {
+        try {
+            BalanceGetStatusDto balanceGetStatusDto = addressCollectService.getBalanceGetStatusDto(Chain.fromCode(chain));
+            return GenericDto.success(balanceGetStatusDto);
+        } catch (Exception e) {
+            log.error("getBalanceGetStatus", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 获取所有分配给用户地址的余额
+     * @param chain
+     * @return
+     */
+    @GetMapping("/mgt/user-address-balances")
+    @ApiOperation("获取所有分配给用户地址的余额")
+    public GenericDto<List<AddressBalanceDto>> getUserAddressBalances(@RequestParam(value = "chain") int chain,
+                                                                      @RequestParam(value = "currency", defaultValue = AccountConstants.QUOTE_CURRENCY) String currency) {
+        try {
+            List<AddressBalanceDto> balances = addressCollectService.getBalances(Chain.fromCode(chain), currency);
+            return GenericDto.success(balances);
+        } catch (Exception e) {
+            log.error("getUserAddressBalances", e);
+            return Utils.returnFromException(e);
+        }
+    }
 
     /**
      * 钱包账户归集
@@ -280,7 +338,7 @@ public class AccountInternalController {
      * @return
      */
     @GetMapping("/mgt/fund-collect-order-history")
-    @ApiOperation("钱包账户归集")
+    @ApiOperation("获取钱包归集历史")
     public GenericDto<IPage<AddressCollectOrderHisDto>> getFundCollectOrderHistory(@RequestParam("chain") int chain,
                                                                                       @RequestParam("startTime") long startTime,
                                                                                       @RequestParam("endTime") long endTime,
@@ -297,4 +355,8 @@ public class AccountInternalController {
             return Utils.returnFromException(e);
         }
     }
+
+
+
+
 }

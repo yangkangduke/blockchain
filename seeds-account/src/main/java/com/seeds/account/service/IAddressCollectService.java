@@ -1,13 +1,11 @@
 package com.seeds.account.service;
 
 
-import com.seeds.account.dto.AddressCollectHisDto;
-import com.seeds.account.dto.AddressCollectOrderHisDto;
-import com.seeds.account.dto.AddressCollectOrderRequestDto;
-import com.seeds.account.dto.FundCollectRequestDto;
+import com.seeds.account.dto.*;
 import com.seeds.common.enums.Chain;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,6 +15,26 @@ import java.util.Map;
  */
 public interface IAddressCollectService {
 
+    /**
+     * 1. 发起余额查询请求
+     */
+    void createBalanceGet(Chain chain);
+
+    /**
+     * 2. 查询余额插叙状态
+     *
+     * @return
+     */
+    BalanceGetStatusDto getBalanceGetStatusDto(Chain chain);
+
+    /**
+     * 3. 获取币种按照大小倒叙排列的列表
+     *
+     * @param chain
+     * @param currency
+     * @return
+     */
+    List<AddressBalanceDto> getBalances(Chain chain, String currency);
     /**
      * 处理状态
      */

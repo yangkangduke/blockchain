@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 @Service
 public class AddressCollectServiceImpl implements IAddressCollectService {
 
-    @Autowired
+    @Resource
     ChainTxnReplaceMapper chainTxnReplaceMapper;
     @Autowired
     IChainActionService chainActionService;
@@ -59,13 +60,13 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
     IChainContractService chainContractService;
     @Autowired
     IChainDepositWithdrawHisService chainDepositWithdrawHisService;
-    @Autowired
+    @Resource
     ChainDepositAddressMapper chainDepositAddressMapper;
     @Autowired
     ISystemWalletAddressService systemWalletAddressService;
     @Autowired
     IAddressCollectHisService addressCollectHisService;
-    @Autowired
+    @Resource
     ChainTxnDataMapper transactionDataMapper;
     @Autowired
     IAsyncService asyncService;
@@ -231,7 +232,8 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
     @SingletonLock(key = "/kine/account/chain/scan-pending-collect-balances")
     public void scanPendingCollectBalances() {
         try {
-            getPendingCollectBalances();
+            // disable
+            // getPendingCollectBalances();
         } catch (Exception e) {
             log.error("scanPendingCollectBalances", e);
         }
@@ -460,6 +462,67 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
         transactionDataMapper.insert(data);
         return ObjectUtils.copy(his, new AddressCollectHisDto());
     }
+
+    @Override
+    public void createBalanceGet(Chain chain) {
+        Utils.check(Chain.SUPPORT_LIST.contains(chain), ErrorCode.ACCOUNT_INVALID_CHAIN);
+
+        BalanceGetStatusDto balanceGetStatusDto = getBalanceGetStatusDto(chain);
+
+        // 设置新的起始时间，结束时间设置为0
+        balanceGetStatusDto.setStartTime(System.currentTimeMillis());
+        balanceGetStatusDto.setEndTime(0L);
+        balanceGetStatusDto.setChain(chain.getCode());
+        RBucket<String> bucket = client.getBucket(RedisKeys.getFundCollectBalanceGetStatus(chain.getCode()), StringCodec.INSTANCE);
+        bucket.set(JsonUtils.writeValue(balanceGetStatusDto));
+
+        asyncService.execute(() -> this.fetchAndCacheBalance(balanceGetStatusDto));
+    }
+
+    private void fetchAndCacheBalance(BalanceGetStatusDto balanceGetStatusDto) {
+        log.info("fetchAndCacheBalance balanceGetStatusDto={}", balanceGetStatusDto);
+        try {
+            Chain chain = Chain.fromCode(balanceGetStatusDto.getChain());
+            List<AddressBalanceDto> list = getPendingCollectBalances(chain);
+            RBucket<String> bucket = client.getBucket(RedisKeys.getFundCollectBalanceValue(chain.getCode()), StringCodec.INSTANCE);
+            bucket.set(JsonUtils.writeValue(list));
+        } catch (Exception e) {
+            log.error("fetchAndCacheBalance", e);
+        }
+
+        balanceGetStatusDto.setEndTime(System.currentTimeMillis());
+        RBucket<String> bucket = client.getBucket(RedisKeys.getFundCollectBalanceGetStatus(balanceGetStatusDto.getChain()), StringCodec.INSTANCE);
+        bucket.set(JsonUtils.writeValue(balanceGetStatusDto));
+        log.info("fetchAndCacheBalance balanceGetStatusDto={}", balanceGetStatusDto);
+    }
+
+    @Override
+    public BalanceGetStatusDto getBalanceGetStatusDto(Chain chain) {
+        RBucket<String> bucket = client.getBucket(RedisKeys.getFundCollectBalanceGetStatus(chain.getCode()), StringCodec.INSTANCE);
+        String json = bucket.get();
+        return (json != null && json.length() > 0)
+                ? JsonUtils.readValue(json, BalanceGetStatusDto.class)
+                : BalanceGetStatusDto.builder().startTime(0L).endTime(0L).build();
+    }
+
+    @Override
+    public List<AddressBalanceDto> getBalances(Chain chain, String currency) {
+        RBucket<String> bucket = client.getBucket(RedisKeys.getFundCollectBalanceValue(chain.getCode()), StringCodec.INSTANCE);
+        String json = bucket.get();
+        List<AddressBalanceDto> list = (json != null && json.length() > 0)
+                ? JsonUtils.readValue(json, new TypeReference<List<AddressBalanceDto>>() {
+        })
+                : Lists.newArrayList();
+
+        // 限定返回地址的条数
+        int limit = Integer.parseInt(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_BALANCE_LIMIT, "500"));
+
+        return list.stream()
+                .sorted((a, b) -> b.getBalances().getOrDefault(currency, BigDecimal.ZERO).compareTo(a.getBalances().getOrDefault(currency, BigDecimal.ZERO)))
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
 
     private void processChildTransactions(Chain chain, AddressCollectOrderRequestDto addressCollectOrderRequestDto, long orderId) {
         int type = addressCollectOrderRequestDto.getType();
