@@ -1,5 +1,6 @@
 package com.seeds.account.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.account.dto.*;
 import com.seeds.account.service.IAccountService;
 import com.seeds.account.service.IAddressCollectHisService;
@@ -196,15 +197,15 @@ public class AccountInternalController {
      */
     @GetMapping("/mgt/fund-collect-history")
     @ApiOperation("获取钱包归集历史")
-    public GenericDto<PagedDto<AddressCollectHisDto>> getFundCollectHistory(@RequestParam("chain") int chain,
-                                                                            @RequestParam("startTime") long startTime,
-                                                                            @RequestParam("endTime") long endTime,
-                                                                            @RequestParam(value = "fromAddress", required = false) String fromAddress,
-                                                                            @RequestParam(value = "toAddress", required = false) String toAddress,
-                                                                            @RequestParam("page") int page,
-                                                                            @RequestParam("size") int size) {
+    public GenericDto<IPage<AddressCollectHisDto>> getFundCollectHistory(@RequestParam("chain") int chain,
+                                                                         @RequestParam("startTime") long startTime,
+                                                                         @RequestParam("endTime") long endTime,
+                                                                         @RequestParam(value = "fromAddress", required = false) String fromAddress,
+                                                                         @RequestParam(value = "toAddress", required = false) String toAddress,
+                                                                         @RequestParam("page") int page,
+                                                                         @RequestParam("size") int size) {
         try {
-            PagedDto<AddressCollectHisDto> list = addressCollectHisService.getHistory(Chain.fromCode(chain), startTime, endTime, fromAddress, toAddress, page, size);
+            IPage<AddressCollectHisDto> list = addressCollectHisService.getHistory(Chain.fromCode(chain), startTime, endTime, fromAddress, toAddress, page, size);
             return GenericDto.success(list);
         } catch (Exception e) {
             log.error("getFundCollectHistory", e);
@@ -280,7 +281,7 @@ public class AccountInternalController {
      */
     @GetMapping("/mgt/fund-collect-order-history")
     @ApiOperation("钱包账户归集")
-    public GenericDto<PagedDto<AddressCollectOrderHisDto>> getFundCollectOrderHistory(@RequestParam("chain") int chain,
+    public GenericDto<IPage<AddressCollectOrderHisDto>> getFundCollectOrderHistory(@RequestParam("chain") int chain,
                                                                                       @RequestParam("startTime") long startTime,
                                                                                       @RequestParam("endTime") long endTime,
                                                                                       @RequestParam(value = "type", required = false, defaultValue = "0") int type,
@@ -289,7 +290,7 @@ public class AccountInternalController {
                                                                                       @RequestParam("page") int page,
                                                                                       @RequestParam("size") int size) {
         try {
-            PagedDto<AddressCollectOrderHisDto> list = addressCollectHisService.getOrderHistory(Chain.fromCode(chain), startTime, endTime, type, address, currency, page, size);
+            IPage<AddressCollectOrderHisDto> list = addressCollectHisService.getOrderHistory(Chain.fromCode(chain), startTime, endTime, type, address, currency, page, size);
             return GenericDto.success(list);
         } catch (Exception e) {
             log.error("getFundCollectOrderHistory", e);

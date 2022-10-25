@@ -69,6 +69,7 @@
         <if test="type > 0">and type = #{type,jdbcType=TINYINT}</if>
         <if test="address != null">and address = #{address,jdbcType=VARCHAR}</if>
         <if test="currency != null">and currency = #{currency,jdbcType=VARCHAR}</if>
+        order by id
     </select>
 
     <select id="getByStatus" resultMap="BaseResultMap">

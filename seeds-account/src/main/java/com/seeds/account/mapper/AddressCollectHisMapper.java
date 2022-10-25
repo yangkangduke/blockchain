@@ -1,5 +1,8 @@
 package com.seeds.account.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.account.dto.AddressCollectHisDto;
 import com.seeds.account.enums.ChainCommonStatus;
 import com.seeds.account.model.AddressCollectHis;
 import com.seeds.common.enums.Chain;
@@ -58,8 +61,8 @@ public interface AddressCollectHisMapper {
      *
      * @return
      */
-    List<AddressCollectHis> getByAddress(@Param("chain") int chain, @Param("startTime") long startTime, @Param("endTime") long endTime,
-                                         @Param("fromAddress") String fromAddress, @Param("toAddress") String toAddress);
+    IPage<AddressCollectHisDto> getByAddress(Page queryPage, @Param("chain") int chain, @Param("startTime") long startTime, @Param("endTime") long endTime,
+                                             @Param("fromAddress") String fromAddress, @Param("toAddress") String toAddress);
 
     /**
      * @param txHash

@@ -1,5 +1,6 @@
 package com.seeds.account.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.account.dto.AddressCollectHisDto;
 import com.seeds.account.dto.AddressCollectOrderHisDto;
 import com.seeds.account.model.AddressCollectHis;
@@ -30,7 +31,7 @@ public interface IAddressCollectHisService {
      * @param size
      * @return
      */
-    PagedDto<AddressCollectHisDto> getHistory(Chain chain, long startTime, long endTime, String fromAddress, String toAddress, int page, int size);
+    IPage<AddressCollectHisDto> getHistory(Chain chain, long startTime, long endTime, String fromAddress, String toAddress, int page, int size);
 
 
     /**
@@ -51,7 +52,7 @@ public interface IAddressCollectHisService {
      * @param size
      * @return
      */
-    PagedDto<AddressCollectOrderHisDto> getOrderHistory(Chain chain, long startTime, long endTime, int type, String address, String currency, int page, int size);
+    IPage<AddressCollectOrderHisDto> getOrderHistory(Chain chain, long startTime, long endTime, int type, String address, String currency, int page, int size);
 
     AddressCollectOrderHisDto getAddressCollectOrderById(long orderId);
 
