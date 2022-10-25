@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
+import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.mapper.ChainDepositWithdrawHisMapper;
 import com.seeds.account.mapper.ChainDepositWithdrawSigHisMapper;
 import com.seeds.account.mapper.UserAccountActionHisMapper;
@@ -70,6 +71,11 @@ public class ChainDepositWithdrawHisServiceImpl extends ServiceImpl<ChainDeposit
     @Override
     public IPage<ChainDepositWithdrawHisDto> getHistory(Page page, AccountHistoryReq accountHistoryReq) {
         return chainDepositWithdrawHisMapper.selectByUserAndTime(page, accountHistoryReq);
+    }
+
+    @Override
+    public Page<ChainDepositWithdrawHisDto> getDepositWithdrawList(Page page, AccountPendingTransactionsReq transactionsReq) {
+        return baseMapper.getDepositWithdrawList(page, transactionsReq);
     }
 
     @Override

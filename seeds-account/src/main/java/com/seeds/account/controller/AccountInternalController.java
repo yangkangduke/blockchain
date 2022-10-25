@@ -1,10 +1,16 @@
 package com.seeds.account.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 import com.seeds.account.dto.ApproveRejectDto;
-import com.seeds.account.dto.ChainTxnReplayDto;
+import com.seeds.account.dto.ChainDepositWithdrawHisDto;
+import com.seeds.account.dto.req.AccountPendingTransactionsReq;
+import com.seeds.account.enums.DepositStatus;
 import com.seeds.account.service.IAccountService;
 import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
+import com.seeds.account.service.IChainDepositWithdrawHisService;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
@@ -12,12 +18,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 账户系统提供的内部调用接口，调用方包括
@@ -37,6 +41,8 @@ public class AccountInternalController {
     private IAddressCollectService addressCollectService;
     @Autowired
     private IAccountService accountService;
+    @Autowired
+    private IChainDepositWithdrawHisService chainDepositWithdrawHisService;
 
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
@@ -60,6 +66,33 @@ public class AccountInternalController {
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("scanBlock", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 获取需要审核的充提
+     *
+     * @return
+     */
+    @PostMapping("/mgt/pending-transaction")
+    @ApiOperation("获取需要审核的充提")
+    @Inner
+    public GenericDto<Page<ChainDepositWithdrawHisDto>> getPendingTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq) {
+        try {
+            // 待审核状态的提币充币一样的
+            List<Integer> statusList = Lists.newArrayList(DepositStatus.PENDING_APPROVE.getCode());
+            transactionsReq.setStatusList(statusList);
+            Page page = new Page();
+            page.setCurrent(transactionsReq.getCurrent());
+            page.setSize(transactionsReq.getSize());
+            transactionsReq.setOnlyManualCheck(true);
+            transactionsReq.setStartTime(0L);
+            transactionsReq.setEndTime(System.currentTimeMillis());
+            Page<ChainDepositWithdrawHisDto> list = chainDepositWithdrawHisService.getDepositWithdrawList(page, transactionsReq);
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getPendingTransactions", e);
             return Utils.returnFromException(e);
         }
     }

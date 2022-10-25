@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
+import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.model.ChainDepositWithdrawHis;
 import com.seeds.common.enums.Chain;
 import org.apache.ibatis.annotations.Param;
@@ -65,4 +66,12 @@ public interface ChainDepositWithdrawHisMapper extends BaseMapper<ChainDepositWi
      * 获取历史
      */
     IPage<ChainDepositWithdrawHisDto> selectByUserAndTime(Page page, @Param("query") AccountHistoryReq accountHistoryReq);
+
+    /**
+     * 获取需要审核的充提
+     * @param page
+     * @param transactionsReq
+     * @return
+     */
+    Page<ChainDepositWithdrawHisDto> getDepositWithdrawList(Page page, @Param("query") AccountPendingTransactionsReq transactionsReq);
 }

@@ -55,6 +55,12 @@
             <artifactId>feign-form-spring</artifactId>
             <version>3.8.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+            <version>3.5.2</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 

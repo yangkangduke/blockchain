@@ -1,8 +1,16 @@
 package com.seeds.account.feign;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.account.dto.ChainDepositWithdrawHisDto;
+import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.dto.PagedDto;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "seeds-account", url = "${service.url.account}",path = "/account-internal", configuration = {AccountFeignInnerRequestInterceptor.class})
 public interface AccountFeignClient {
@@ -38,4 +46,13 @@ public interface AccountFeignClient {
      */
     @PostMapping("/job/scan-withdraw")
     GenericDto<Boolean> scanWithdraw();
+
+    /**
+     * 获取需要审核的充提
+     *
+     * @return
+     */
+    @PostMapping("/mgt/pending-transaction")
+    GenericDto<Page<ChainDepositWithdrawHisDto>> getPendingTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq);
+
 }
