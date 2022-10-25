@@ -21,7 +21,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <docker.image.prefix>ricky</docker.image.prefix>
-        <mapstruct.version>1.3.1.Final</mapstruct.version>
+        <mapstruct.version>1.4.1.Final</mapstruct.version>
         <jetcache.version>2.6.0.M1</jetcache.version>
         <captcha.version>1.6.2</captcha.version>
     </properties>
@@ -135,6 +135,13 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+            <scope>compile</scope>
         </dependency>
         <!-- shiro库 -->
         <dependency>

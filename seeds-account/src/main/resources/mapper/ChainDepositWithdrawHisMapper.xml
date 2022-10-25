@@ -71,6 +71,38 @@
         </where>
     </select>
 
+    <select id="getDepositWithdrawList" resultType="com.seeds.account.dto.ChainDepositWithdrawHisDto" parameterType="com.seeds.account.dto.req.AccountPendingTransactionsReq">
+        select
+            *
+        from ac_chain_deposit_withdraw_his
+        <where>
+            <if test="query.action != null">
+                and `action` = #{query.action}
+            </if>
+            <if test="query.currency != null and  query.currency != '' ">
+                and currency = #{query.currency}
+            </if>
+            <if test="query.userId != null">
+                and user_id = #{query.userId}
+            </if>
+            <if test="query.onlyManualCheck == true">
+                and manual = 1
+            </if>
+            <if test="query.startTime != null ">
+                and create_time &gt;= #{query.startTime}
+            </if>
+            <if test="query.endTime != null ">
+                and create_time &lt;= #{query.endTime}
+            </if>
+            <if test="query.statusList != null and query.statusList.size() > 0">
+                and status in
+                <foreach collection="query.statusList" item="status" index="i" open="(" close=")" separator=",">
+                    #{status}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
     <update id="rollbackByBlockNumberAndBlockHash">
         <![CDATA[
         update ac_chain_deposit_withdraw_his

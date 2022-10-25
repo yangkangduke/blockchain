@@ -11,6 +11,7 @@ import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.ChainTxnDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
 import com.seeds.account.enums.ChainAction;
+import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.mapper.ChainDepositWithdrawHisMapper;
 import com.seeds.account.mapper.ChainDepositWithdrawSigHisMapper;
 import com.seeds.account.mapper.UserAccountActionHisMapper;
@@ -21,7 +22,6 @@ import com.seeds.account.util.ObjectUtils;
 import com.seeds.common.dto.PageReq;
 import com.seeds.common.enums.Chain;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -83,6 +83,11 @@ public class ChainDepositWithdrawHisServiceImpl extends ServiceImpl<ChainDeposit
     @Override
     public IPage<ChainDepositWithdrawHisDto> getHistory(Page page, AccountHistoryReq accountHistoryReq) {
         return chainDepositWithdrawHisMapper.selectByUserAndTime(page, accountHistoryReq);
+    }
+
+    @Override
+    public Page<ChainDepositWithdrawHisDto> getDepositWithdrawList(Page page, AccountPendingTransactionsReq transactionsReq) {
+        return baseMapper.getDepositWithdrawList(page, transactionsReq);
     }
 
     @Override

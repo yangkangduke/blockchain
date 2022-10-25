@@ -4,7 +4,6 @@ import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.exceptions.InvalidArgumentsException;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.exception.PermissionException;
-import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.binding.BindingException;
 import org.springframework.http.HttpStatus;

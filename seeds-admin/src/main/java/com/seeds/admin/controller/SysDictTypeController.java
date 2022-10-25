@@ -1,4 +1,5 @@
 package com.seeds.admin.controller;
+
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SysDictTypeAddReq;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
