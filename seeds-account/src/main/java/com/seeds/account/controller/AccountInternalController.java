@@ -1,7 +1,10 @@
 package com.seeds.account.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.account.dto.ApproveRejectDto;
+import com.seeds.account.dto.ChainTxnDto;
 import com.seeds.account.dto.ChainTxnReplayDto;
+import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.service.IAccountService;
 import com.seeds.account.service.IAddressCollectService;
 import com.seeds.account.service.IChainActionService;
@@ -12,10 +15,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -132,14 +132,32 @@ public class AccountInternalController {
         }
     }
 
-//    @PostMapping("/mgt/chain/replay/execute")
-//    @ApiOperation("执行链上 tx replace")
-//    public GenericDto<Boolean> executeChainReplay(@RequestBody @Valid ChainTxnReplayDto chainTxnReplayDto) {
-//        try {
-//            return GenericDto.success(chainTxnReplaceService.replayTransaction(chainTxnReplayDto));
-//        } catch (Exception e) {
-//            log.error("executeChainReplay", e);
-//            return Utils.returnFromException(e);
-//        }
-//    }
+    /**
+     * 获取链上原始交易list
+     *
+     * @return
+     */
+    @PostMapping("/mgt/chain/transaction")
+    @ApiOperation("获取链上原始交易list")
+    @Inner
+    public GenericDto<IPage<ChainTxnDto>> getChainTxnList(@RequestBody @Valid ChainTxnPageReq req) {
+        try {
+            return GenericDto.success(chainActionService.getTxnList(req));
+        } catch (Exception e) {
+            log.error("getChainTxnList", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/mgt/chain/replay/execute")
+    @ApiOperation("执行链上 tx replace")
+    @Inner
+    public GenericDto<Boolean> executeChainReplay(@RequestBody @Valid ChainTxnReplayDto chainTxnReplayDto) {
+        try {
+            return GenericDto.success(chainActionService.replayTransaction(chainTxnReplayDto));
+        } catch (Exception e) {
+            log.error("executeChainReplay", e);
+            return Utils.returnFromException(e);
+        }
+    }
 }

@@ -1,28 +1,30 @@
 package com.seeds.account.service.impl;
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.anno.SingletonLock;
+import com.seeds.account.chain.dto.ChainTransaction;
 import com.seeds.account.chain.dto.ChainTransactionReceipt;
 import com.seeds.account.chain.dto.NativeChainBlockDto;
 import com.seeds.account.chain.dto.NativeChainTransactionDto;
 import com.seeds.account.chain.service.IChainService;
-import com.seeds.account.dto.BlacklistAddressDto;
-import com.seeds.account.dto.ChainContractDto;
-import com.seeds.account.dto.DepositRuleDto;
-import com.seeds.account.dto.SystemWalletAddressDto;
+import com.seeds.account.dto.*;
+import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.enums.*;
 import com.seeds.account.ex.AccountException;
 import com.seeds.account.mapper.*;
 import com.seeds.account.model.*;
 import com.seeds.account.sender.KafkaProducer;
 import com.seeds.account.service.*;
+import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
 import com.seeds.common.constant.mq.KafkaTopic;
+import com.seeds.common.dto.PageReq;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.notification.dto.request.NotificationReq;
@@ -43,11 +45,13 @@ import org.web3j.abi.datatypes.Event;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.generated.Uint256;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.seeds.account.AccountConstants.DEPOSIT_DECIMALS;
@@ -720,6 +724,61 @@ public class ChainActionServiceImpl implements IChainActionService {
     }
 
     @Override
+    public Boolean replayTransaction(ChainTxnReplayDto chainTxnReplayDto) throws Exception {
+        log.info("replayTransaction, dto={}", chainTxnReplayDto);
+        ChainTxnReplaceAppType appType = ChainTxnReplaceAppType.fromCode(chainTxnReplayDto.getType());
+        switch (appType) {
+            case WITHDRAW:
+                ChainDepositWithdrawHis withdrawHis = chainDepositWithdrawHisService.getById(chainTxnReplayDto.getId());
+                if (withdrawHis == null || (!WithdrawStatus.TRANSACTION_ON_CHAIN.getCode().equals(withdrawHis.getStatus()) &&
+                        !WithdrawStatus.TRANSACTION_FAILED_PENDING_CHECK.getCode().equals(withdrawHis.getStatus())) ||
+                        !withdrawHis.getTxHash().equalsIgnoreCase(chainTxnReplayDto.getTxHash())) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "can not find the txn");
+                }
+                if (System.currentTimeMillis() - withdrawHis.getUpdateTime() < TimeUnit.SECONDS.toMillis(1)) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "not allowed duplicate replay");
+                }
+                ChainTxnData chainTxnData = chainTxnDataMapper.selectByAppTypeAndId(
+                        ChainTxnDataAppType.WITHDRAW,
+                        withdrawHis.getId()
+                );
+                if (chainTxnData == null && !WithdrawStatus.TRANSACTION_FAILED_PENDING_CHECK.getCode().equals(withdrawHis.getStatus())) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "can not find the txn data");
+                }
+                return execute(withdrawHis, chainTxnData) > 0;
+            default:
+                throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "unknown chainTxnReplaceAppType");
+        }
+    }
+
+    @Override
+    public IPage<ChainTxnDto> getTxnList(ChainTxnPageReq req) {
+        Map<Chain, Long> chainExpireMap = getChainExpireTime();
+        Chain chain = Chain.fromCode(req.getChain());
+        long expireTimestamp = System.currentTimeMillis() - (chainExpireMap.containsKey(chain) ?
+                TimeUnit.SECONDS.toMillis(chainExpireMap.get(chain)) : 0);
+        Integer status = req.getStatus();
+        PageReq pageReq = new PageReq();
+        pageReq.setCurrent(req.getCurrent());
+        pageReq.setSize(req.getSize());
+        switch (req.getType()) {
+            case 1:
+                List<Integer> statusList;
+                // 提币
+                if (status == 1) {
+                    statusList = Arrays.asList(WithdrawStatus.TRANSACTION_ON_CHAIN.getCode(), WithdrawStatus.TRANSACTION_FAILED_PENDING_CHECK.getCode());
+                } else if (status == 6) {
+                    statusList = Collections.singletonList(WithdrawStatus.TRANSACTION_CONFIRMED.getCode());
+                } else {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "invalid status");
+                }
+                return chainDepositWithdrawHisService.selectByChainStatusAndTimestamp(chain, statusList, ChainAction.WITHDRAW, expireTimestamp, pageReq);
+            default:
+                throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "unknown type");
+        }
+    }
+
+    @Override
     public void scanTxnReplace(ChainTxnReplaceAppType replaceAppType) throws Exception {
         List<ChainTxnReplace> list = chainTxnReplaceMapper.getListByStatusAndType(
                 Arrays.asList(ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode(), ChainCommonStatus.TRANSACTION_PENDING_CONFIRMED.getCode()),
@@ -1328,6 +1387,132 @@ public class ChainActionServiceImpl implements IChainActionService {
 //                        "module", "exchange",
 //                        "content", tx.getId() + " succeeded"))
 //                .build());
+    }
+
+    private Long execute(ChainDepositWithdrawHis tx, ChainTxnData chainTxnData) throws Exception {
+        // 只有pending超过阈值或者 失败-待处理 的tx 才能进行replay
+        RawTransactionDto rawTransactionDto = WithdrawStatus.TRANSACTION_FAILED_PENDING_CHECK.getCode().equals(tx.getStatus()) ? replayTransaction(tx) :
+                replayTransaction(tx.getChain(), tx.getFromAddress(), tx.getTxToAddress(), tx.getTxHash(), new BigInteger(tx.getTxValue()),
+                        new BigInteger(tx.getNonce()), BigInteger.valueOf(tx.getGasPrice()), BigInteger.valueOf(tx.getGasLimit()), chainTxnData.getData());
+
+        tx.setUpdateTime(System.currentTimeMillis());
+        tx.setVersion(tx.getVersion() + 1);
+        tx.setTxToAddress(rawTransactionDto.getTo());
+        tx.setTxHash(rawTransactionDto.getTxnHash());
+        tx.setTxValue(rawTransactionDto.getValue().toString());
+        tx.setNonce(rawTransactionDto.getNonce().toString());
+        tx.setGasPrice(rawTransactionDto.getGasPrice().longValue());
+        tx.setGasLimit(rawTransactionDto.getGasLimit().longValue());
+        tx.setStatus(WithdrawStatus.TRANSACTION_ON_CHAIN.getCode());
+
+        chainDepositWithdrawHisService.updateById(tx);
+        // add new chain transaction data his
+        if (chainTxnData != null) {
+            chainTxnData.setData(rawTransactionDto.getData());
+            chainTxnData.setUpdateTime(System.currentTimeMillis());
+            chainTxnDataMapper.updateByPrimaryKey(chainTxnData);
+            log.info("update chainTxnData={}", chainTxnData);
+        } else {
+            chainTxnData = ChainTxnData.builder()
+                    .version(AccountConstants.DEFAULT_VERSION)
+                    .appId(tx.getId())
+                    .appType(ChainTxnDataAppType.WITHDRAW)
+                    .data(rawTransactionDto.getData())
+                    .createTime(System.currentTimeMillis())
+                    .updateTime(System.currentTimeMillis())
+                    .build();
+            chainTxnDataMapper.insert(chainTxnData);
+            log.info("insert new chainTxnData={}", chainTxnData);
+        }
+        return tx.getId();
+    }
+
+    private RawTransactionDto replayTransaction(ChainDepositWithdrawHis tx) throws Exception {
+        // 过滤掉DEFI提币
+        if (!Chain.SUPPORT_LIST.contains(tx.getChain())) {
+            throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "chain not in support list");
+        }
+        if (!WithdrawStatus.TRANSACTION_FAILED_PENDING_CHECK.getCode().equals(tx.getStatus())) {
+            throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "not in support status");
+        }
+        // 提币 失败-待处理 case
+        // 1. 链上打包后执行失败，并且经过安全确认
+        // 2. 发送到链上时出现exception 导致未上链
+        // 此时不需要判断tx 直接重新发起链上提币
+        if (Chain.SUPPORT_NONCE_LIST.contains(tx.getChain()) && tx.getNonce() != null) {
+            passSafeNonceCheck(tx.getChain(), tx.getFromAddress(), new BigInteger(tx.getNonce()));
+        }
+
+        RawTransactionDto rawTransactionDto;
+        try {
+            BigDecimal amountToChain = tx.getAmount().subtract(tx.getFeeAmount());
+            rawTransactionDto = chainService.internalSendTransaction(tx.getChain(), tx.getCurrency(), tx.getFromAddress(), tx.getToAddress(), amountToChain, chainService.getGasPrice(tx.getChain()), chainService.getGasLimit(tx.getChain()));
+        } catch (Exception e) {
+            throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, e.getMessage());
+        }
+
+        return rawTransactionDto;
+    }
+
+    private RawTransactionDto replayTransaction(Chain chain, String fromAddress, String toAddress, String txHash, BigInteger txValue,
+                                                BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, String data) throws Exception {
+        return replayTransaction(chain, fromAddress, toAddress, txHash, txValue, nonce, gasPrice, gasLimit, data, false);
+    }
+
+    private RawTransactionDto replayTransaction(Chain chain, String fromAddress, String toAddress, String txHash, BigInteger txValue,
+                                                BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, String data, boolean isForce) throws Exception {
+        // 过滤掉DEFI提币
+        if (!Chain.SUPPORT_LIST.contains(chain)) {
+            throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "chain not in support list");
+        }
+        RawTransactionDto rawTransactionDto;
+        // 正常情况下的replay
+        // 当前tx 是否存在
+        ChainTransaction ethTransaction = chainService.getTransactionByTxHash(chain, txHash);
+
+        if (!isForce && ethTransaction != null) {
+            // 原 transaction 存在，对提币失败/mcd链上失败 case，我们允许进行replay, 其他情况下不允许replay
+            throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "original tx is still pending on chain, replay is not allowed");
+        }
+        if (Chain.SUPPORT_NONCE_LIST.contains(chain)) {
+            passSafeNonceCheck(chain, fromAddress, nonce);
+        }
+        // 发起replay
+        BigInteger pendingNonce = chainService.getPendingNonce(chain, fromAddress);
+        try {
+            rawTransactionDto = chainService.replaceTransaction(chain,
+                    RawTransactionDto.builder()
+                            .value(txValue)
+                            .to(toAddress)
+                            .nonce(pendingNonce)
+                            .gasPrice(gasPrice)
+                            .gasLimit(gasLimit)
+                            .data(data)
+                            .build(),
+                    fromAddress
+            );
+        } catch (Exception e) {
+            throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, e.getMessage());
+        }
+
+        return rawTransactionDto;
+    }
+
+    private void passSafeNonceCheck(Chain chain, String fromAddress, BigInteger nonce) throws IOException {
+        BigInteger confirmedSafeNonce = chainService.getSafeConfirmedNonce(chain, fromAddress);
+        if (confirmedSafeNonce.compareTo(BigInteger.ZERO) <= 0 || confirmedSafeNonce.compareTo(nonce) < 0) {
+            // fromAddress nonce 未被安全确认
+            throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "original tx nonce is greater than safe confirm nonce");
+        }
+    }
+
+    private Map<Chain, Long> getChainExpireTime() {
+        String config = systemConfigService.getValue(AccountSystemConfig.CHAIN_TXN_EXPIRE_TIME);
+        List<ChainExpireConfigDto> expireConfigList = (config != null && config.length() > 0)
+                ? JsonUtils.readValue(config, new com.fasterxml.jackson.core.type.TypeReference<List<ChainExpireConfigDto>>() {
+        })
+                : Lists.newArrayList();
+        return expireConfigList.stream().collect(Collectors.toMap(e -> Chain.fromCode(e.getChain()), ChainExpireConfigDto::getExpireTimeInSec));
     }
 
 }

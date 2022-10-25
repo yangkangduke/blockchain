@@ -4,9 +4,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
+import com.seeds.account.dto.ChainTxnDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
+import com.seeds.account.enums.ChainAction;
 import com.seeds.account.model.ChainDepositWithdrawHis;
 import com.seeds.account.model.ChainDepositWithdrawSigHis;
+import com.seeds.common.dto.PageReq;
 import com.seeds.common.enums.Chain;
 
 import java.math.BigDecimal;
@@ -66,4 +69,8 @@ public interface IChainDepositWithdrawHisService extends IService<ChainDepositWi
      * @return
      */
     IPage<ChainDepositWithdrawHisDto> getHistory(Page page, AccountHistoryReq accountHistoryReq);
+
+
+    IPage<ChainTxnDto> selectByChainStatusAndTimestamp(Chain chain, List<Integer> asList, ChainAction withdraw, long expireTimestamp, PageReq pageReq);
+
 }

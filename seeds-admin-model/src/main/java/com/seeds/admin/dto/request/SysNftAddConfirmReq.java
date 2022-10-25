@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 
@@ -29,7 +28,6 @@ public class SysNftAddConfirmReq {
 	 * NFT上链的tokenId
 	 */
 	@ApiModelProperty("NFT上链的tokenId")
-	@NotBlank(message = "NFT token id cannot be empty")
 	private String newItemId;
 
 	@ApiModelProperty("错误信息")

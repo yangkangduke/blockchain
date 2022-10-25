@@ -1,8 +1,15 @@
 package com.seeds.account.feign;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.account.dto.ChainTxnDto;
+import com.seeds.account.dto.ChainTxnReplayDto;
+import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.validation.Valid;
 
 @FeignClient(name = "seeds-account", url = "${service.url.account}",path = "/account-internal", configuration = {AccountFeignInnerRequestInterceptor.class})
 public interface AccountFeignClient {
@@ -38,4 +45,21 @@ public interface AccountFeignClient {
      */
     @PostMapping("/job/scan-withdraw")
     GenericDto<Boolean> scanWithdraw();
+
+    /**
+     * 获取链上原始交易list
+     *
+     * @return
+     */
+    @PostMapping("/mgt/chain/transaction")
+    GenericDto<Page<ChainTxnDto>> getChainTxnList(@RequestBody @Valid ChainTxnPageReq req);
+
+    /**
+     * 执行重发功能
+     *
+     * @return
+     */
+    @PostMapping("/mgt/chain/replay/execute")
+    GenericDto<Boolean> executeChainReplay(@RequestBody @Valid ChainTxnReplayDto chainTxnReplayDto);
+
 }
