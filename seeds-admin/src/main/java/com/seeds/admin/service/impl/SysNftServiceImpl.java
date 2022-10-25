@@ -43,7 +43,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -171,7 +170,26 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
-    public String addUpload(MultipartFile image, SysNftAddReq req) {
+    public void addConfirm(SysNftAddConfirmReq req) {
+        SysNftEntity nft = getById(req.getNftId());
+        nft.setInitStatus(req.getInitStatus());
+        nft.setTokenId(req.getNewItemId());
+        nft.setContractAddress(smartContractConfig.getGameAddress());
+        nft.setTokenStandard(smartContractConfig.getTokenStandard());
+        nft.setBlockChain(smartContractConfig.getBlockchain());
+        nft.setMetadata(smartContractConfig.getMetadataMode());
+        nft.setCreatorFees(smartContractConfig.getCreatorFees());
+        String errorMsg = req.getMessage();
+        if (StringUtils.isNotBlank(errorMsg) && errorMsg.length() > 255) {
+            errorMsg = errorMsg.substring(0, 255);
+        }
+        nft.setErrorMsg(errorMsg);
+        // 添加NFT属性
+        updateById(nft);
+    }
+
+    @Override
+    public SysNftAddResp addUpload(MultipartFile image, SysNftAddReq req) {
         // 上传NFT图片
         String imageFileHash = chainNftService.uploadImage(image);
         // 上传Metadata
@@ -183,8 +201,10 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                         .build());
 
         String metadataHash = "ipfs://" + metadataFileHash;
-        add(imageFileHash, req, metadataHash);
-        return metadataHash;
+        SysNftAddResp resp = new SysNftAddResp();
+        resp.setNftId(add(imageFileHash, req, metadataHash));
+        resp.setMetadataHash(metadataHash);
+        return resp;
     }
 
     @Override
@@ -320,8 +340,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchDelete(ListReq req) {
-        List<SysNftEntity> sysNftEntities = listByIds(req.getIds());
+    public void batchDelete(List<NftDeleteListReq> req) {
+        Map<Long, NftDeleteListReq> nftMap = req.stream().collect(Collectors.toMap(NftDeleteListReq::getNftId, p -> p));
+        List<SysNftEntity> sysNftEntities = listByIds(new HashSet<>(nftMap.keySet()));
         List<SysNftEntity> deleteList = new ArrayList<>();
         sysNftEntities.forEach(p ->{
             // 创建失败的直接删除
@@ -343,9 +364,22 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         //executorService.submit(() -> {
         //   burnNft(deleteList);
         //});
-
-        // 发NFT删除成功消息
-        kafkaProducer.send(KafkaTopic.NFT_DELETE_SUCCESS, JSONUtil.toJsonStr(deleteList));
+        deleteList.forEach(p -> {
+            NftDeleteListReq nftReq = nftMap.get(p.getId());
+            if (NftInitStatusEnum.DELETE_FAILED.getCode() != nftReq.getInitStatus()) {
+                // 删除NFT
+                removeById(p.getId());
+                // 删除和NFT属性的关联
+                sysNftPropertiesService.deleteByNftId(p.getId());
+            }
+            String errorMsg = nftReq.getMessage();
+            if (StringUtils.isNotBlank(errorMsg) && errorMsg.length() > 255) {
+                errorMsg = errorMsg.substring(0, 255);
+            }
+            p.setErrorMsg(errorMsg);
+            p.setInitStatus(nftReq.getInitStatus());
+            updateById(p);
+        });
     }
 
     @Override
