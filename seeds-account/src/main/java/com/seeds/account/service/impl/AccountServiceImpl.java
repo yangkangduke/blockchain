@@ -338,7 +338,7 @@ public class AccountServiceImpl implements IAccountService {
 
             // 解冻资产
             boolean done = walletAccountService.unfreeze(tx.getUserId(), tx.getCurrency(), tx.getAmount());
-            Utils.check(done, ErrorCode.ACCOUNT_INSUFFICIENT_BALANCE);
+          //  Utils.check(done, ErrorCode.ACCOUNT_INSUFFICIENT_BALANCE);
             // 更新财务记录状态为失败
             userAccountActionService.updateStatusByActionUserIdSource(AccountAction.WITHDRAW, tx.getUserId(), String.valueOf(tx.getId()), CommonActionStatus.FAILED);
 
