@@ -60,15 +60,22 @@ public class SysCashController {
         return mgtWithdrawDepositService.rejectPendingWithdraw(dto);
     }
 
-
+    @ApiImplicitParams({
+            //参数效验
+            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
+            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
+            @ApiImplicitParam(name="status",value="目前交易状态",required=true,dataType="Integer"),
+            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
+            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
+    })
     @GetMapping("/withdraw-history/list")
     @ApiOperation("获取提币审批历史")
 //    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/history/")
-    public GenericDto<Page<MgtDepositWithdrawDto>> listWithdrawHis(@RequestParam(value = "currency", required = false) String currency,
-                                                                               @RequestParam(value = "usdId", required = false) Long userId,
-                                                                               @RequestParam(value = "status", defaultValue = "0") Integer status,
-                                                                               @RequestParam("current") Integer current,
-                                                                               @RequestParam("size") Integer size) {
+    public GenericDto<Page<MgtDepositWithdrawDto>> listWithdrawHis( String currency,
+                                                                               Long userId,
+                                                                               Integer status,
+                                                                               Integer current,
+                                                                               Integer size) {
         return GenericDto.success(mgtWithdrawDepositService.listWithdrawReviewHis(currency, userId, status, current, size));
     }
 
@@ -104,6 +111,14 @@ public class SysCashController {
         return mgtWithdrawDepositService.rejectPendingDeposit(dto);
     }
 
+    @ApiImplicitParams({
+            //参数效验
+            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
+            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
+            @ApiImplicitParam(name="status",value="目前交易状态",required=false,dataType="Integer"),
+            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
+            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
+    })
     @GetMapping("/deposit-history/list")
     @ApiOperation("获取充币审批历史")
 //    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/history/")
