@@ -121,6 +121,38 @@ public class AccountController {
         }
     }
 
+    /**
+     * 获取单币种的充币信息
+     *
+     * @param currency
+     * @return
+     */
+    @GetMapping("/deposit-rules")
+    @ApiOperation("获取单币种的充币限制信息")
+    public GenericDto<List<Map<String, Object>>> getDepositRules(@RequestParam("currency") String currency) {
+        try {
+            List<DepositRuleDto> rules = chainDepositService.getAllDepositRules()
+                    .stream()
+                    .filter(e -> Objects.equals(e.getCurrency(), currency) && e.getStatus() == CommonStatus.ENABLED)
+                    .collect(Collectors.toList());
+            List<Map<String, Object>> list = Lists.newArrayList();
+            rules.forEach(e -> {
+                Map<String, Object> values = Maps.newLinkedHashMap();
+                values.put("chain", e.getChain());
+
+                Chain chain = Chain.fromCode(e.getChain());
+                ChainContractDto chainContractDto = chainContractService.get(Chain.SUPPORT_DEFI_LIST.contains(chain) ? chain.getRelayOn().getCode() : chain.getCode(), e.getCurrency());
+                values.put("contractAddress", chainContractDto != null ? chainContractDto.getAddress() : "");
+                values.put("contractDecimal", chainContractDto != null ? chainContractDto.getDecimals() : "0");
+                list.add(values);
+            });
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getDepositRules", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
     @GetMapping("/withdraw-rules")
     @ApiOperation("获取单币种的提币限制信息")
     public GenericDto<List<Map<String, Object>>> getWithdrawRules(@RequestParam("currency") String currency) {
@@ -178,7 +210,7 @@ public class AccountController {
     }
 
     @GetMapping("/user-rules")
-    @ApiOperation("获取充币规则、提币规则")
+    @ApiOperation("获取充币规则、提币规则(暂时没有用)")
     public GenericDto<Map<String, Object>> getAllRules() {
         Map<String, Object> rules = Maps.newLinkedHashMap();
         rules.put("depositRules", getCurrentUserDepositRules());
