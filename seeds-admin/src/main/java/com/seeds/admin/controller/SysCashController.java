@@ -7,6 +7,8 @@ import com.seeds.admin.dto.MgtDepositWithdrawDto;
 import com.seeds.admin.service.ISysWithdrawDepositService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,13 @@ public class SysCashController {
     private ISysWithdrawDepositService mgtWithdrawDepositService;
 
 
-
+    @ApiImplicitParams({
+            //参数效验
+            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
+            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
+            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
+            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
+    })
     @GetMapping("/pending-withdraw/list")
     @ApiOperation("获取提币申请")
     // todo
@@ -52,6 +60,7 @@ public class SysCashController {
         return mgtWithdrawDepositService.rejectPendingWithdraw(dto);
     }
 
+
     @GetMapping("/withdraw-history/list")
     @ApiOperation("获取提币审批历史")
 //    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/history/")
@@ -63,6 +72,13 @@ public class SysCashController {
         return GenericDto.success(mgtWithdrawDepositService.listWithdrawReviewHis(currency, userId, status, current, size));
     }
 
+    @ApiImplicitParams({
+            //参数效验
+            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
+            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
+            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
+            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
+    })
     @GetMapping("/pending-deposit/list")
     @ApiOperation("获取充币申请")
 //    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/pending/")
