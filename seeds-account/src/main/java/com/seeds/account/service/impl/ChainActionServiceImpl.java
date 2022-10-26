@@ -2,6 +2,7 @@ package com.seeds.account.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -24,7 +25,6 @@ import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
 import com.seeds.common.constant.mq.KafkaTopic;
-import com.seeds.common.dto.PageReq;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.notification.dto.request.NotificationReq;
@@ -34,6 +34,7 @@ import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.web3j.abi.EventEncoder;
@@ -724,6 +725,8 @@ public class ChainActionServiceImpl implements IChainActionService {
     }
 
     @Override
+    @SingletonLock(key = "/seeds/account/chain/replay")
+    @Transactional(rollbackFor = Exception.class)
     public Boolean replayTransaction(ChainTxnReplayDto chainTxnReplayDto) throws Exception {
         log.info("replayTransaction, dto={}", chainTxnReplayDto);
         ChainTxnReplaceAppType appType = ChainTxnReplaceAppType.fromCode(chainTxnReplayDto.getType());
@@ -746,6 +749,62 @@ public class ChainActionServiceImpl implements IChainActionService {
                     throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "can not find the txn data");
                 }
                 return execute(withdrawHis, chainTxnData) > 0;
+
+            case HOT_WALLET_TRANSFER:
+                AddressCollectHis collectHis = addressCollectHisMapper.selectByPrimaryKey(chainTxnReplayDto.getId());
+                if (collectHis == null || !ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode().equals(collectHis.getStatus()) ||
+                        !collectHis.getTxHash().equalsIgnoreCase(chainTxnReplayDto.getTxHash())) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "can not find the txn");
+                }
+                if (System.currentTimeMillis() - collectHis.getUpdateTime() < TimeUnit.SECONDS.toMillis(1)) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "not allowed duplicate replay");
+                }
+                chainTxnData = chainTxnDataMapper.selectByAppTypeAndId(
+                        ChainTxnDataAppType.HOT_WALLET_TRANSFER,
+                        collectHis.getId()
+                );
+                if (chainTxnData == null) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "can not find the txn data");
+                }
+
+                return execute(collectHis, chainTxnData.getData()) > 0;
+            case CASH_COLLECT:
+                collectHis = addressCollectHisMapper.selectByPrimaryKey(chainTxnReplayDto.getId());
+                if (collectHis == null || !ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode().equals(collectHis.getStatus()) ||
+                        !collectHis.getTxHash().equalsIgnoreCase(chainTxnReplayDto.getTxHash())) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "can not find the txn");
+                }
+                if (System.currentTimeMillis() - collectHis.getUpdateTime() < TimeUnit.SECONDS.toMillis(1)) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "not allowed duplicate replay");
+                }
+                chainTxnData = chainTxnDataMapper.selectByAppTypeAndId(
+                        ChainTxnDataAppType.CASH_COLLECT,
+                        collectHis.getId()
+                );
+                if (chainTxnData == null) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "can not find the txn data");
+                }
+
+                return execute(collectHis, chainTxnData.getData()) > 0;
+            case GAS_TRANSFER:
+                collectHis = addressCollectHisMapper.selectByPrimaryKey(chainTxnReplayDto.getId());
+                if (collectHis == null || !ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode().equals(collectHis.getStatus()) ||
+                        !collectHis.getTxHash().equalsIgnoreCase(chainTxnReplayDto.getTxHash())) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "can not find the txn");
+                }
+                if (System.currentTimeMillis() - collectHis.getUpdateTime() < TimeUnit.SECONDS.toMillis(1)) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "not allowed duplicate replay");
+                }
+                chainTxnData = chainTxnDataMapper.selectByAppTypeAndId(
+                        ChainTxnDataAppType.GAS_TRANSFER,
+                        collectHis.getId()
+                );
+                if (chainTxnData == null) {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "can not find the txn data");
+                }
+
+                return execute(collectHis, chainTxnData.getData()) > 0;
+
             default:
                 throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "unknown chainTxnReplaceAppType");
         }
@@ -755,13 +814,17 @@ public class ChainActionServiceImpl implements IChainActionService {
     public IPage<ChainTxnDto> getTxnList(ChainTxnPageReq req) {
         Map<Chain, Long> chainExpireMap = getChainExpireTime();
         Chain chain = Chain.fromCode(req.getChain());
+        BigInteger chainGasPrice = getChainGasPrice(chain);
         long expireTimestamp = System.currentTimeMillis() - (chainExpireMap.containsKey(chain) ?
                 TimeUnit.SECONDS.toMillis(chainExpireMap.get(chain)) : 0);
         Integer status = req.getStatus();
-        PageReq pageReq = new PageReq();
-        pageReq.setCurrent(req.getCurrent());
-        pageReq.setSize(req.getSize());
+        Page page = new Page();
+        page.setCurrent(req.getCurrent());
+        page.setSize(req.getSize());
+        Integer chainStatus;
+        IPage<AddressCollectHis> collectPage;
         switch (req.getType()) {
+
             case 1:
                 List<Integer> statusList;
                 // 提币
@@ -772,7 +835,54 @@ public class ChainActionServiceImpl implements IChainActionService {
                 } else {
                     throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "invalid status");
                 }
-                return chainDepositWithdrawHisService.selectByChainStatusAndTimestamp(chain, statusList, ChainAction.WITHDRAW, expireTimestamp, pageReq);
+                IPage<ChainDepositWithdrawHis> withdrawPage = chainDepositWithdrawHisService.selectByChainStatusAndTimestamp(page, chain, statusList, ChainAction.WITHDRAW, expireTimestamp);
+                if (CollectionUtils.isEmpty(withdrawPage.getRecords())) {
+                    return withdrawPage.convert(p -> null);
+                }
+                return withdrawPage.convert(p -> convert2Dto(p, chainGasPrice, 1));
+
+            case 2:
+                // 热钱包划转
+                if (status == 1) {
+                    chainStatus = ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode();
+                } else if (status == 6) {
+                    chainStatus = ChainCommonStatus.TRANSACTION_CANCELLED_AND_REPLACED.getCode();
+                } else {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "invalid status");
+                }
+                collectPage = addressCollectHisMapper.getHotWalletByChainStatusAndTimestamp(page, chain, chainStatus, expireTimestamp);
+                if (CollectionUtils.isEmpty(collectPage.getRecords())) {
+                    return collectPage.convert(p -> null);
+                }
+                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 1));
+            case 3:
+                // 资金归集
+                if (status == 1) {
+                    chainStatus = ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode();
+                } else if (status == 6) {
+                    chainStatus = ChainCommonStatus.TRANSACTION_CANCELLED_AND_REPLACED.getCode();
+                } else {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "invalid status");
+                }
+                collectPage = addressCollectHisMapper.getByChainStatusOrderTypeAndTimestamp(page, chain, chainStatus, FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode(), expireTimestamp);
+                if (CollectionUtils.isEmpty(collectPage.getRecords())) {
+                    return collectPage.convert(p -> null);
+                }
+                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 1));
+            case 4:
+                // Gas划转
+                if (status == 1) {
+                    chainStatus = ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode();
+                } else if (status == 6) {
+                    chainStatus = ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode();
+                } else {
+                    throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "invalid status");
+                }
+                collectPage = addressCollectHisMapper.getByChainStatusOrderTypeAndTimestamp(page, chain, chainStatus, FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode(), expireTimestamp);
+                if (CollectionUtils.isEmpty(collectPage.getRecords())) {
+                    return collectPage.convert(p -> null);
+                }
+                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 1));
             default:
                 throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "unknown type");
         }
@@ -1427,6 +1537,20 @@ public class ChainActionServiceImpl implements IChainActionService {
         return tx.getId();
     }
 
+    private Long execute(AddressCollectHis tx, String data) throws Exception {
+        RawTransactionDto rawTransactionDto = replayTransaction(tx.getChain(), tx.getFromAddress(), tx.getTxToAddress(), tx.getTxHash(),
+                new BigInteger(tx.getTxValue()), new BigInteger(tx.getNonce()), BigInteger.valueOf(tx.getGasPrice()), BigInteger.valueOf(tx.getGasLimit()), data);
+        // 更新原表
+        tx.setTxHash(rawTransactionDto.getTxnHash());
+        tx.setNonce(rawTransactionDto.getNonce().toString());
+        tx.setStatus(ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode());
+        tx.setVersion(tx.getVersion() + 1);
+        tx.setUpdateTime(System.currentTimeMillis());
+
+        addressCollectHisMapper.updateByPrimaryKey(tx);
+        return tx.getId();
+    }
+
     private RawTransactionDto replayTransaction(ChainDepositWithdrawHis tx) throws Exception {
         // 过滤掉DEFI提币
         if (!Chain.SUPPORT_LIST.contains(tx.getChain())) {
@@ -1513,6 +1637,42 @@ public class ChainActionServiceImpl implements IChainActionService {
         })
                 : Lists.newArrayList();
         return expireConfigList.stream().collect(Collectors.toMap(e -> Chain.fromCode(e.getChain()), ChainExpireConfigDto::getExpireTimeInSec));
+    }
+
+    private BigInteger getChainGasPrice(Chain chain) {
+        return BigInteger.valueOf(chainService.getGasPrice(chain));
+    }
+
+    private ChainTxnDto convert2Dto(ChainDepositWithdrawHis e, BigInteger chainGasPrice, int type) {
+        ChainTxnDto obj = ObjectUtils.copy(e, new ChainTxnDto());
+        obj.setGasPrice(BigInteger.valueOf(e.getGasPrice()));
+        obj.setGasLimit(BigInteger.valueOf(e.getGasLimit()));
+        obj.setType(type);
+        obj.setNonce(new BigInteger(e.getNonce()));
+        obj.setChainGasPrice(chainGasPrice);
+        obj.setChain(e.getChain().getCode());
+        try {
+            obj.setConfirmedSafeNonce(chainService.getSafeConfirmedNonce(e.getChain(), e.getFromAddress()));
+        } catch (IOException ioException) {
+            log.error("error, ", ioException);
+        }
+        return obj;
+    }
+
+    private ChainTxnDto convert2Dto(AddressCollectHis e, BigInteger chainGasPrice, int type) {
+        ChainTxnDto obj = ObjectUtils.copy(e, new ChainTxnDto());
+        obj.setType(type);
+        obj.setNonce(new BigInteger(e.getNonce()));
+        obj.setChainGasPrice(chainGasPrice);
+        obj.setGasPrice(BigInteger.valueOf(e.getGasPrice()));
+        obj.setGasLimit(BigInteger.valueOf(e.getGasLimit()));
+        obj.setChain(e.getChain().getCode());
+        try {
+            obj.setConfirmedSafeNonce(chainService.getSafeConfirmedNonce(e.getChain(), e.getFromAddress()));
+        } catch (IOException ioException) {
+            log.error("error, ", ioException);
+        }
+        return obj;
     }
 
 }

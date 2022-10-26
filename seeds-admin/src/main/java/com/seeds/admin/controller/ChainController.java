@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.dto.ChainTxnDto;
 import com.seeds.account.dto.ChainTxnReplayDto;
 import com.seeds.account.dto.req.ChainTxnPageReq;
-import com.seeds.account.feign.AccountFeignClient;
 import com.seeds.admin.annotation.RequiredPermission;
+import com.seeds.admin.service.ChainReplaceService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,15 +27,22 @@ import javax.validation.Valid;
 public class ChainController {
 
     @Autowired
-    private AccountFeignClient accountFeignClient;
+    private ChainReplaceService chainReplaceService;
 
     @PostMapping("/txn-replay")
     @ApiOperation("执行重发功能")
     @RequiredPermission("sys:chainTxn:replay")
     public GenericDto<Boolean> executeReplay(@RequestBody ChainTxnReplayDto dto) {
+
         switch (dto.getType()) {
             case 1:
-                return accountFeignClient.executeChainReplay(dto);
+                return chainReplaceService.executeWithdraw(dto);
+            case 2:
+                return chainReplaceService.executeWalletTransfer(dto);
+            case 3:
+                return chainReplaceService.executeCreateOrder(dto);
+            case 4:
+                return chainReplaceService.executeCreateGasFeeOrder(dto);
             default:
                 log.info("no type match with {}", dto.getType());
                 return GenericDto.success(true);
@@ -46,7 +53,7 @@ public class ChainController {
     @ApiOperation("获取原始交易分页列表")
     @RequiredPermission("sys:chainTxn:page")
     public GenericDto<Page<ChainTxnDto>> executeReplay(@RequestBody @Valid ChainTxnPageReq req) {
-        return accountFeignClient.getChainTxnList(req);
+        return chainReplaceService.getChainTxnList(req);
     }
 
 }

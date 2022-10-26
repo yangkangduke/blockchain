@@ -1,107 +1,55 @@
 package com.seeds.admin.service.impl;
 
-import com.seeds.admin.dto.request.ChainMintNftReq;
-import com.seeds.admin.dto.request.ChainUpdateNftReq;
-import com.seeds.admin.dto.response.ChainMintNftResp;
-import com.seeds.admin.service.ChainNftService;
-import com.seeds.chain.config.SmartContractConfig;
-import com.seeds.chain.feign.request.PinataPinJsonRequest;
-import com.seeds.chain.service.GameItemsService;
-import com.seeds.chain.service.IpfsService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.account.dto.ChainTxnDto;
+import com.seeds.account.dto.ChainTxnReplayDto;
+import com.seeds.account.dto.req.ChainTxnPageReq;
+import com.seeds.account.feign.AccountFeignClient;
+import com.seeds.admin.annotation.AuditLog;
+import com.seeds.admin.enums.Action;
+import com.seeds.admin.enums.Module;
+import com.seeds.admin.enums.SubModule;
+import com.seeds.admin.service.ChainReplaceService;
+import com.seeds.common.dto.GenericDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigInteger;
 
 @Slf4j
 @Service
-public class ChainNftServiceImpl implements ChainNftService {
+public class ChainReplaceServiceImpl implements ChainReplaceService {
 
     @Autowired
-    private GameItemsService gameItemsService;
-
-    @Autowired
-    private IpfsService ipfsService;
-
-    @Autowired
-    private SmartContractConfig smartContractConfig;
+    private AccountFeignClient accountFeignClient;
 
     @Override
-    public String uploadImage(MultipartFile image) {
-        // upload image to pinata and obtain hash
-        return ipfsService.pinFile(image);
+    @AuditLog(module = Module.REPLACE_MANAGEMENT, subModule = SubModule.CHAIN_REPLACE, action = Action.WITHDRAW)
+    public GenericDto<Boolean> executeWithdraw(ChainTxnReplayDto dto) {
+        return accountFeignClient.executeChainReplay(dto);
     }
 
     @Override
-    public String testAuth() {
-        return ipfsService.testAuth().toString();
+    @AuditLog(module = Module.CASH_MANAGEMENT, subModule = SubModule.WALLET_ACCOUNT, action = Action.TRANSFER)
+    public GenericDto<Boolean> executeWalletTransfer(ChainTxnReplayDto dto) {
+        return accountFeignClient.executeChainReplay(dto);
     }
 
     @Override
-    public String uploadMetadata(String imageFileHash, ChainMintNftReq request) {
-
-        // generate metadata file
-        PinataPinJsonRequest pinRequest = PinataPinJsonRequest.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .attributes(request.getAttributes())
-                .image("ipfs://" + imageFileHash)
-                .build();
-
-        // upload metadata file to pinata and get hash
-        return ipfsService.pinJson(pinRequest);
+    @AuditLog(module = Module.CASH_MANAGEMENT, subModule = SubModule.ACCOUNT_TRANSFER, action = Action.ADD)
+    public GenericDto<Boolean> executeCreateOrder(ChainTxnReplayDto dto) {
+        return accountFeignClient.executeChainReplay(dto);
     }
 
     @Override
-    public String updateMetadata(String imageFileHash, ChainUpdateNftReq updateRequest) {
-        ChainMintNftReq request = ChainMintNftReq.builder()
-                .name(updateRequest.getName())
-                .description(updateRequest.getDescription())
-                .attributes(updateRequest.getAttributes())
-                .build();
-        return uploadMetadata(imageFileHash, request);
+    @AuditLog(module = Module.CASH_MANAGEMENT, subModule = SubModule.GAS_FEE_TRANSFER, action = Action.ADD)
+    public GenericDto<Boolean> executeCreateGasFeeOrder(ChainTxnReplayDto dto) {
+        return accountFeignClient.executeChainReplay(dto);
     }
 
     @Override
-    public ChainMintNftResp mintNft(String metadataFileHash) {
-        // mint nft with ipfs hash
-        BigInteger tokenId = gameItemsService.mintNft("ipfs://" + metadataFileHash);
-        if (tokenId.compareTo(BigInteger.ZERO) > 0) {
-            return generateResponse(tokenId);
-        } else {
-            return null;
-        }
+    public GenericDto<Page<ChainTxnDto>> getChainTxnList(ChainTxnPageReq req) {
+        return accountFeignClient.getChainTxnList(req);
     }
 
-    @Override
-    public String getMetadataFileImageHash(String tokenId) {
-        // get uri with token id
-        String uri = gameItemsService.getUri(new BigInteger(tokenId));
-
-        // get image hash of current metadata file
-        return ipfsService.getImageString(uri.substring(7));
-    }
-
-    @Override
-    public boolean updateNftAttribute(String tokenId, String metadataFileHash) {
-        return gameItemsService.updateNftAttribute(new BigInteger(tokenId), "ipfs://" + metadataFileHash);
-    }
-
-    @Override
-    public boolean burnNft(String tokenId) {
-        return gameItemsService.burnNft(tokenId);
-    }
-
-    private ChainMintNftResp generateResponse(BigInteger tokenId) {
-        ChainMintNftResp response = new ChainMintNftResp();
-        response.setTokenId(tokenId.toString());
-        response.setContractAddress(smartContractConfig.getGameAddress());
-        response.setTokenStandard(smartContractConfig.getTokenStandard());
-        response.setBlockchain(smartContractConfig.getBlockchain());
-        response.setMetadata(smartContractConfig.getMetadataMode());
-        response.setCreatorFees(smartContractConfig.getCreatorFees());
-        return response;
-    }
 }

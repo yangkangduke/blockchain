@@ -127,6 +127,7 @@
           and tach.status = #{status,jdbcType=TINYINT}
           and tach.chain = #{chain.code,jdbcType=TINYINT}
           and tach.update_time <= #{timestamp,jdbcType=BIGINT}
+        ORDER BY id DESC
         ]]>
     </select>
 
@@ -138,6 +139,7 @@
           and order_id = 0
           and chain = #{chain.code,jdbcType=TINYINT}
           and update_time <= #{timestamp,jdbcType=BIGINT}
+        ORDER BY id DESC
         ]]>
     </select>
 
