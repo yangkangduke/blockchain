@@ -1,8 +1,8 @@
-package com.kine.mgt.dto.request;
+package com.seeds.admin.dto;
 
 import com.google.gson.Gson;
-import com.kine.account.dto.ChainTxnReplayDto;
-import com.kine.mgt.audit.Auditable;
+import com.seeds.account.dto.ChainTxnReplayDto;
+import com.seeds.admin.audit.Auditable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

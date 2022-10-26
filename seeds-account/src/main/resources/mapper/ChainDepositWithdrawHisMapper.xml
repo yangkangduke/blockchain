@@ -114,4 +114,11 @@
           and chain = #{chain.code,jdbcType=VARCHAR}
         ]]>
     </update>
+
+    <select id="getByChainHash" resultType="com.seeds.account.model.ChainDepositWithdrawHis">
+        select *
+        from ac_chain_deposit_withdraw_his
+        where tx_hash = #{txHash,jdbcType=VARCHAR}
+          and chain = #{chain.code,jdbcType=TINYINT}
+    </select>
 </mapper>

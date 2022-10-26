@@ -124,6 +124,7 @@
             <if test="status != null">and status = #{status.code,jdbcType=TINYINT}</if>
             <if test="chain != null">and `chain` = #{chain.code,jdbcType=TINYINT}</if>
         </where>
+        order by id desc
     </select>
 
     <select id="selectByAppIdAndAppType" resultMap="BaseResultMap">

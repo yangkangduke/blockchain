@@ -1,11 +1,8 @@
 package com.seeds.account.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.account.dto.ChainTxnDto;
-import com.seeds.account.dto.ChainTxnReplayDto;
+import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.ChainTxnPageReq;
-import com.seeds.account.dto.ApproveRejectDto;
-import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -65,6 +62,21 @@ public interface AccountFeignClient {
     @PostMapping("/sys/chain/replay/execute")
     GenericDto<Boolean> executeChainReplay(@RequestBody @Valid ChainTxnReplayDto chainTxnReplayDto);
 
+    /**
+     * 获取链上替换交易list
+     *
+     * @return
+     */
+    @PostMapping("/sys/chain/replacement")
+    GenericDto<Page<ChainTxnDto>> getChainTxnReplaceList(@RequestBody @Valid ChainTxnPageReq req);
+
+    /**
+     * 执行替换功能
+     *
+     * @return
+     */
+    @PostMapping("/sys/chain/replacement/execute")
+    GenericDto<Long> executeChainReplacement(@RequestBody @Valid ChainTxnReplaceDto chainTxnReplaceDto);
 
     /**
      * 获取需要审核的充提

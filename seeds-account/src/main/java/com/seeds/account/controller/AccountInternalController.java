@@ -3,11 +3,8 @@ package com.seeds.account.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import com.seeds.account.dto.ApproveRejectDto;
-import com.seeds.account.dto.ChainTxnDto;
-import com.seeds.account.dto.ChainTxnReplayDto;
+import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.ChainTxnPageReq;
-import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.enums.DepositStatus;
 import com.seeds.account.enums.WithdrawStatus;
@@ -216,8 +213,20 @@ public class AccountInternalController {
         }
     }
 
+    @PostMapping("/sys/chain/replacement")
+    @ApiOperation("获取链上替换交易list")
+    @Inner
+    public GenericDto<IPage<ChainTxnDto>> getChainTxnReplaceList(@RequestBody @Valid ChainTxnPageReq req) {
+        try {
+            return GenericDto.success(chainActionService.getTxnReplaceList(req));
+        } catch (Exception e) {
+            log.error("getChainTxnReplaceList", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
     @PostMapping("/sys/chain/replay/execute")
-    @ApiOperation("执行链上 tx replace")
+    @ApiOperation("执行链上 tx 重发")
     @Inner
     public GenericDto<Boolean> executeChainReplay(@RequestBody @Valid ChainTxnReplayDto chainTxnReplayDto) {
         try {
@@ -227,4 +236,17 @@ public class AccountInternalController {
             return Utils.returnFromException(e);
         }
     }
+
+    @PostMapping("/sys/chain/replacement/execute")
+    @ApiOperation("执行链上 tx 替换")
+    @Inner
+    public GenericDto<Long> executeChainReplacement(@RequestBody @Valid ChainTxnReplaceDto chainTxnReplaceDto) {
+        try {
+            return GenericDto.success(chainActionService.replaceTransaction(chainTxnReplaceDto));
+        } catch (Exception e) {
+            log.error("executeChainReplacement", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
 }

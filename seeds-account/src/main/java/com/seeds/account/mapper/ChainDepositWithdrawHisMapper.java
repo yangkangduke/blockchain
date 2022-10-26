@@ -74,4 +74,7 @@ public interface ChainDepositWithdrawHisMapper extends BaseMapper<ChainDepositWi
      * @return
      */
     Page<ChainDepositWithdrawHisDto> getDepositWithdrawList(Page page, @Param("query") AccountPendingTransactionsReq transactionsReq);
+
+    ChainDepositWithdrawHis getByChainHash(@Param("chain") Chain chain, @Param("txHash") String txHash);
+
 }
