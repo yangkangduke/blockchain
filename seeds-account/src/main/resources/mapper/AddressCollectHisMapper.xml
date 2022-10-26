@@ -122,7 +122,7 @@
         <![CDATA[
         select tach.*
         from ac_address_collect_his tach
-                 inner join t_address_collect_order_his tacoh on tach.order_id = tacoh.id
+                 inner join ac_address_collect_order_his tacoh on tach.order_id = tacoh.id
         where tacoh.type = #{type,jdbcType=TINYINT}
           and tach.status = #{status,jdbcType=TINYINT}
           and tach.chain = #{chain.code,jdbcType=TINYINT}
