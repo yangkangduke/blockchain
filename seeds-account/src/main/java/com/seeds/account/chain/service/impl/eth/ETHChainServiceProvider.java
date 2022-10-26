@@ -17,6 +17,7 @@ import com.seeds.account.chain.service.impl.ChainBasicService;
 import com.seeds.account.dto.*;
 import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.enums.WalletAddressType;
+import com.seeds.account.ex.AccountException;
 import com.seeds.account.mapper.ChainBlockMapper;
 import com.seeds.account.model.ChainBlock;
 import com.seeds.account.service.IActionControlService;
@@ -28,6 +29,7 @@ import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
+import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.exception.ChainException;
 import com.seeds.common.model.SymbolConstants;
 import com.seeds.common.redis.account.RedisKeys;
@@ -968,7 +970,19 @@ public class ETHChainServiceProvider extends ChainBasicService implements IChain
 
     @Override
     public ChainGasPriceDto getCurrentGasPriceOracle(Chain chain) {
-        return null;
+        EtherscanGasPriceResponse response = scanApiClient.getGasPrice("gastracker", "gasoracle", scanKey);
+        log.info("getCurrentGasPriceOracle, chain={}, response={}", chain, response);
+        if (response.getStatus().equals("1") &&
+                response.getMessage().equalsIgnoreCase("OK")
+                && response.getResult() != null) {
+            return ChainGasPriceDto.builder()
+                    .chain(chain.getCode())
+                    .fastGasPrice(scaleAmountByDecimal(new BigDecimal(response.getResult().getFastGasPrice()), 9).longValue())
+                    .proposeGasPrice(scaleAmountByDecimal(new BigDecimal(response.getResult().getProposeGasPrice()), 9).longValue())
+                    .safeGasPrice(scaleAmountByDecimal(new BigDecimal(response.getResult().getSafeGasPrice()), 9).longValue())
+                    .build();
+        }
+        throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, String.format("failed in calling etherscan api, response=%s", response));
     }
 
     @Override

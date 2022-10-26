@@ -71,5 +71,6 @@ public interface IChainActionService {
      */
     IPage<ChainTxnDto> getTxnList(ChainTxnPageReq req);
 
+    void getAndMetricCurrentGasPriceOracle();
 }
 

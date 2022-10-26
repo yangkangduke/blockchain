@@ -1515,4 +1515,15 @@ public class ChainActionServiceImpl implements IChainActionService {
         return expireConfigList.stream().collect(Collectors.toMap(e -> Chain.fromCode(e.getChain()), ChainExpireConfigDto::getExpireTimeInSec));
     }
 
+
+    @Override
+    public void getAndMetricCurrentGasPriceOracle() {
+        for (Chain chain : Chain.SUPPORT_GAS_PRICE_LIST) {
+            try {
+                chainService.getAndMetricCurrentGasPriceOracle(chain);
+            } catch (Exception e) {
+                log.error("getAndMetricCurrentGasPriceOracle chain={}", chain, e);
+            }
+        }
+    }
 }

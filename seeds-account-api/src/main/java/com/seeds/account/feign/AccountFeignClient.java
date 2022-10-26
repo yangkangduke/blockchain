@@ -1,18 +1,19 @@
 package com.seeds.account.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.account.dto.ChainTxnDto;
-import com.seeds.account.dto.ChainTxnReplayDto;
-import com.seeds.account.dto.req.ChainTxnPageReq;
-import com.seeds.account.dto.ApproveRejectDto;
-import com.seeds.account.dto.ChainDepositWithdrawHisDto;
+import com.seeds.account.AccountConstants;
+import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
+import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @FeignClient(name = "seeds-account", url = "${service.url.account}",path = "/account-internal", configuration = {AccountFeignInnerRequestInterceptor.class})
 public interface AccountFeignClient {
@@ -109,4 +110,137 @@ public interface AccountFeignClient {
      */
     @PostMapping("/job/fund-collect-scan-pending-balances")
     GenericDto<Boolean> scanPendingCollectBalances();
+
+    /**
+     * 获取钱包归集历史
+     *
+     * @param startTime
+     * @param endTime
+     * @param type
+     * @param address
+     * @param currency
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping("/sys/fund-collect-order-history")
+    GenericDto<Page<AddressCollectOrderHisDto>> getFundCollectOrderHistory(@RequestParam("chain") int chain,
+                                                                           @RequestParam("startTime") long startTime,
+                                                                           @RequestParam("endTime") long endTime,
+                                                                           @RequestParam(value = "type", required = false, defaultValue = "0") int type,
+                                                                           @RequestParam(value = "address", required = false) String address,
+                                                                           @RequestParam(value = "currency", required = false) String currency,
+                                                                           @RequestParam("page") int page,
+                                                                           @RequestParam("size") int size);
+
+    /**
+     * 根据归集订单Id获取钱包归集历史
+     *
+     * @param orderId
+     * @return
+     */
+    @GetMapping("/sys/fund-collect-history-by-order")
+    GenericDto<List<AddressCollectHisDto>> getFundCollectHistoryByOrder(@RequestParam("orderId") long orderId);
+
+
+    /**
+     * 创建钱包账户归集订单
+     *
+     * @param addressCollectOrderRequestDto
+     * @return
+     */
+    @PostMapping("/sys/fund-collect-order")
+    GenericDto<AddressCollectOrderHisDto> createFundCollectOrder(@RequestBody AddressCollectOrderRequestDto addressCollectOrderRequestDto);
+
+    /**
+     * 获取某个钱包账户归集订单
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/sys/fund-collect-order")
+    GenericDto<AddressCollectOrderHisDto> getFundCollectOrder(@RequestParam("id") long id);
+
+
+    /**
+     * 获取所有分配给用户地址的余额
+     *
+     * @param chain
+     * @return
+     */
+    @GetMapping("/sys/user-address-balances")
+    GenericDto<List<AddressBalanceDto>> getUserAddressBalances(@RequestParam(value = "chain") int chain, @RequestParam(value = "currency", defaultValue = AccountConstants.QUOTE_CURRENCY) String currency);
+
+
+    /**
+     * 创建获取用户充币地址余额的请求
+     *
+     * @param chain
+     * @return
+     */
+    @PostMapping("/sys/create-balances-get")
+    GenericDto<Boolean> createBalanceGet(@RequestParam("chain") int chain);
+
+    /**
+     * 查询获取用户充币地址余额的请求的状态
+     *
+     * @param chain
+     * @return
+     */
+    @GetMapping("/sys/get-balances-get-status")
+    GenericDto<BalanceGetStatusDto> getBalanceGetStatus(@RequestParam(value = "chain") int chain);
+
+    /**
+     * 获取所有系统使用的钱包地址
+     *
+     * @param chain
+     * @return
+     */
+    @GetMapping("/sys/system-wallet-address")
+    GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam("chain") int chain);
+
+
+    /**
+     * 获取所有系统地址的余额
+     *
+     * @param chain
+     * @return
+     */
+    @GetMapping("/sys/system-address-balances")
+    GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(@RequestParam("chain") int chain);
+
+
+    /**
+     * 钱包归集
+     *
+     * @param requestDto
+     * @return
+     */
+    @PostMapping("/sys/fund-collect")
+    GenericDto<AddressCollectHisDto> createFundCollect(@RequestBody FundCollectRequestDto requestDto);
+
+    /**
+     * 获取chain GasLimit
+     *
+     * @return
+     */
+    @GetMapping("/sys/gas-limit")
+    GenericDto<Long> getGasLimit(@RequestParam(value = "chain") int chain);
+
+    /**
+     * 获取链上最新 gas price
+     *
+     * @param chain
+     * @return
+     */
+    @PostMapping("/sys/gas-price")
+    GenericDto<ChainGasPriceDto> getGasPrice(@RequestParam(value = "chain") int chain);
+
+    /**
+     * 获取链上最新的GasPrice
+     *
+     * @return
+     */
+    @PostMapping("/job/get-and-metric-current-gas-price-oracle")
+    GenericDto<Boolean> getAndMetricCurrentGasPriceOracle();
 }
