@@ -109,6 +109,7 @@
         <if test="endTime > 0">and update_time &lt;= #{endTime,jdbcType=BIGINT}</if>
         <if test="fromAddress != null">and from_address = #{fromAddress,jdbcType=VARCHAR}</if>
         <if test="toAddress != null">and to_address = #{toAddress,jdbcType=VARCHAR}</if>
+        order by id desc
     </select>
 
     <select id="getByChainHash" resultMap="BaseResultMap">

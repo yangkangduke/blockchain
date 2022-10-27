@@ -10,12 +10,14 @@ import com.seeds.account.chain.dto.NativeChainBlockDto;
 import com.seeds.account.chain.dto.NativeChainTransactionDto;
 import com.seeds.account.chain.feigh.ETHScanApiClient;
 import com.seeds.account.chain.feigh.FeignClientFactory;
+import com.seeds.account.chain.service.IBatchBalanceResponseProcessor;
 import com.seeds.account.chain.service.IChainProviderService;
 import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.chain.service.impl.ChainBasicService;
 import com.seeds.account.dto.*;
 import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.enums.WalletAddressType;
+import com.seeds.account.ex.AccountException;
 import com.seeds.account.mapper.ChainBlockMapper;
 import com.seeds.account.model.ChainBlock;
 import com.seeds.account.service.IActionControlService;
@@ -27,6 +29,7 @@ import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
+import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.exception.ChainException;
 import com.seeds.common.model.SymbolConstants;
 import com.seeds.common.redis.account.RedisKeys;
@@ -51,8 +54,7 @@ import org.web3j.abi.datatypes.*;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.abi.datatypes.generated.Uint64;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.*;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.*;
 import org.web3j.utils.Convert;
@@ -968,7 +970,19 @@ public class ETHChainServiceProvider extends ChainBasicService implements IChain
 
     @Override
     public ChainGasPriceDto getCurrentGasPriceOracle(Chain chain) {
-        return null;
+        EtherscanGasPriceResponse response = scanApiClient.getGasPrice("gastracker", "gasoracle", scanKey);
+        log.info("getCurrentGasPriceOracle, chain={}, response={}", chain, response);
+        if (response.getStatus().equals("1") &&
+                response.getMessage().equalsIgnoreCase("OK")
+                && response.getResult() != null) {
+            return ChainGasPriceDto.builder()
+                    .chain(chain.getCode())
+                    .fastGasPrice(scaleAmountByDecimal(new BigDecimal(response.getResult().getFastGasPrice()), 9).longValue())
+                    .proposeGasPrice(scaleAmountByDecimal(new BigDecimal(response.getResult().getProposeGasPrice()), 9).longValue())
+                    .safeGasPrice(scaleAmountByDecimal(new BigDecimal(response.getResult().getSafeGasPrice()), 9).longValue())
+                    .build();
+        }
+        throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, String.format("failed in calling etherscan api, response=%s", response));
     }
 
     @Override
@@ -1068,7 +1082,58 @@ public class ETHChainServiceProvider extends ChainBasicService implements IChain
 
     @Override
     public List<AddressBalanceDto> getBalancesOnBatch(Chain chain, List<String> addresses, Long sleepBetween) throws Exception {
-        return null;
+        long startTime = System.currentTimeMillis();
+        // 找出充币币种
+        List<String> currencyList = chainDepositService.getAllDepositRules()
+                .stream()
+                .filter(e -> e.getChain() == chain.getCode())
+                .map(DepositRuleDto::getCurrency)
+                .collect(Collectors.toList());
+
+        DefaultBlockParameter blockParameter = DefaultBlockParameterName.LATEST;
+        Map<String, AddressBalanceDto> balanceMap = Maps.newHashMap();
+
+        // 获取每次分组的地址大小
+        int batchSize = Integer.parseInt(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_REQUEST_BATCH_ADDRESS_SIZE, "50"));
+        log.info("getBalancesOnBatch chain={} currencyList={} addresses.size={} batchSize={}", chain, currencyList, addresses.size(), batchSize);
+        // 按照大小拆分批次
+        List<List<String>> partitionList = Lists.partition(addresses, batchSize);
+        for (List<String> partitionAddressList : partitionList) {
+            BatchRequest batchRequest = web3.readCli().newBatch();
+            List<IBatchBalanceResponseProcessor> batchBalanceResponseProcessors = Lists.newArrayList();
+
+            for (String address : partitionAddressList) {
+                getNativeTokenBalanceOnBatch(batchRequest, batchBalanceResponseProcessors, address);
+                for (String currency : currencyList) {
+                    ChainContractDto chainContractDto = chainContractService.get(chain.getCode(), currency);
+                    getContractBalanceOnBatch(batchRequest, batchBalanceResponseProcessors, address, chainContractDto, blockParameter);
+                }
+            }
+            long l1 = System.currentTimeMillis();
+            BatchResponse batchResponse = batchRequest.send();
+            long l2 = System.currentTimeMillis();
+            log.info("getBalancesOnBatch chain={} request.size={} took={}", chain, batchRequest.getRequests().size(), (l2 - l1));
+            List<? extends Response<?>> responses = batchResponse.getResponses();
+            for (int i = 0; i < responses.size(); i++) {
+                Response response = responses.get(i);
+                IBatchBalanceResponseProcessor batchBalanceResponseProcessor = batchBalanceResponseProcessors.get(i);
+                if (response != null && batchBalanceResponseProcessor != null) {
+                    batchBalanceResponseProcessor.process(balanceMap, response);
+                }
+            }
+            // 休眠以免触发限频
+            BasicUtils.sleepFor(sleepBetween);
+        }
+
+        List<AddressBalanceDto> balances = addresses.stream()
+                .map(balanceMap::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        long endTime = System.currentTimeMillis();
+        log.info("getBalancesOnBatch chain={} address.size={} took.all={}", chain, addresses.size(), (endTime - startTime));
+
+        return balances;
     }
 
 
@@ -1140,5 +1205,43 @@ public class ETHChainServiceProvider extends ChainBasicService implements IChain
         GenericDto<List<SignedMessageDto>> response = walletFeignClient.signMessages(request);
         log.info("signMessages chain={} response={}", currentChain, response);
         return response;
+    }
+
+
+    public void getNativeTokenBalanceOnBatch(BatchRequest batchRequest, List<IBatchBalanceResponseProcessor> batchBalanceResponseProcessors, String address) {
+        Request<?, EthGetBalance> request = web3.readCli().ethGetBalance(address, DefaultBlockParameterName.LATEST);
+        batchRequest.add(request);
+        batchBalanceResponseProcessors.add((balanceMap, response) -> {
+            BigInteger wei = ((EthGetBalance) response).getBalance();
+            BigDecimal amount = Convert.fromWei(new BigDecimal(wei), Convert.Unit.ETHER);
+            AddressBalanceDto balances = balanceMap.computeIfAbsent(address, k -> AddressBalanceDto.builder().address(k).balances(Maps.newLinkedHashMap()).build());
+            balances.getBalances().put(currentChain.getNativeToken(), amount);
+        });
+    }
+
+    private void getContractBalanceOnBatch(BatchRequest batchRequest, List<IBatchBalanceResponseProcessor> batchBalanceResponseProcessors,
+                                           String address, ChainContractDto chainContractDto, DefaultBlockParameter blockParameter) {
+        Function function = new Function("balanceOf", Arrays.asList(new Address(address)), Arrays.asList(new TypeReference<Uint256>() {
+        }));
+        String data = FunctionEncoder.encode(function);
+        String contractAddress = chainContractDto.getAddress();
+        log.debug("contractAddress={} currency={} decimals={}", contractAddress, chainContractDto.getCurrency(), chainContractDto.getDecimals());
+
+        Transaction transaction = Transaction.createEthCallTransaction(address, contractAddress, data);
+        Request<?, EthCall> request = web3.readCli().ethCall(transaction, blockParameter);
+        batchRequest.add(request);
+
+        batchBalanceResponseProcessors.add((balanceMap, response) -> {
+            String result = ((EthCall) response).getValue();
+            List<Type> types = FunctionReturnDecoder.decode(result, function.getOutputParameters());
+            if (types != null && types.size() > 0) {
+                BigInteger value = ((Uint256) types.get(0)).getValue();
+                int decimals = chainContractDto.getDecimals();
+                BigDecimal amount = unscaleAmountByDecimal(value, decimals);
+
+                AddressBalanceDto balances = balanceMap.computeIfAbsent(address, k -> AddressBalanceDto.builder().address(k).balances(Maps.newLinkedHashMap()).build());
+                balances.getBalances().put(chainContractDto.getCurrency(), amount);
+            }
+        });
     }
 }

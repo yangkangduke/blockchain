@@ -116,4 +116,28 @@ public class ChainDepositWithdrawHisServiceImpl extends ServiceImpl<ChainDeposit
         chainDepositWithdrawSigHisMapper.insert(chainDepositWithdrawSigHis);
     }
 
+    @Override
+    public List<String> getDepositAddress(Chain chain, long startTime, long endTime) {
+        return chainDepositWithdrawHisMapper.getDepositAddress(chain, startTime, endTime);
+    }
+
+    private BigInteger getChainGasPrice(Chain chain) {
+        return BigInteger.valueOf(chainService.getGasPrice(chain));
+    }
+
+    private ChainTxnDto convert2Dto(ChainDepositWithdrawHis e, BigInteger chainGasPrice, int type) {
+        ChainTxnDto obj = ObjectUtils.copy(e, new ChainTxnDto());
+        obj.setGasPrice(BigInteger.valueOf(e.getGasPrice()));
+        obj.setGasLimit(BigInteger.valueOf(e.getGasLimit()));
+        obj.setType(type);
+        obj.setNonce(new BigInteger(e.getNonce()));
+        obj.setChainGasPrice(chainGasPrice);
+        obj.setChain(e.getChain().getCode());
+        try {
+            obj.setConfirmedSafeNonce(chainService.getSafeConfirmedNonce(e.getChain(), e.getFromAddress()));
+        } catch (IOException ioException) {
+            log.error("error, ", ioException);
+        }
+        return obj;
+    }
 }

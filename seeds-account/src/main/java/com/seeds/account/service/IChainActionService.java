@@ -86,5 +86,6 @@ public interface IChainActionService {
      */
     Long replaceTransaction(ChainTxnReplaceDto chainTxnReplaceDto) throws Exception ;
 
+    void getAndMetricCurrentGasPriceOracle();
 }
 

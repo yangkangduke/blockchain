@@ -77,4 +77,14 @@ public interface ChainDepositWithdrawHisMapper extends BaseMapper<ChainDepositWi
 
     ChainDepositWithdrawHis getByChainHash(@Param("chain") Chain chain, @Param("txHash") String txHash);
 
+
+    /**
+     * 获取一段时间内充币的地址
+     * @param chain
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<String> getDepositAddress(@Param("chain") Chain chain, @Param("startTime") long startTime, @Param("endTime") long endTime);
+
 }

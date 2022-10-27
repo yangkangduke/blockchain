@@ -65,6 +65,7 @@ public interface IChainDepositWithdrawHisService extends IService<ChainDepositWi
 
     /**
      * 查询某一个人的充提记录
+     *
      * @return
      */
     IPage<ChainDepositWithdrawHisDto> getHistory(Page page, AccountHistoryReq accountHistoryReq);
@@ -80,4 +81,14 @@ public interface IChainDepositWithdrawHisService extends IService<ChainDepositWi
      * @return
      */
     Page<ChainDepositWithdrawHisDto> getDepositWithdrawList(Page page, AccountPendingTransactionsReq transactionsReq);
+
+    /**
+     * 获取一段时间内充币的地址
+     *
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<String> getDepositAddress(Chain chain, long startTime, long endTime);
+
 }
