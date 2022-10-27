@@ -84,7 +84,8 @@ public enum Chain implements EnumWithCode  {
     /**
      * 支持gas price 区块链
      */
-    public static List<Chain> SUPPORT_GAS_PRICE_LIST = Lists.newArrayList(ETH, BSC, MATIC);
+//    public static List<Chain> SUPPORT_GAS_PRICE_LIST = Lists.newArrayList(ETH, BSC, MATIC);
+    public static List<Chain> SUPPORT_GAS_PRICE_LIST = Lists.newArrayList(ETH);
 
     /**
      * 支持创建和分配充币地址的链
