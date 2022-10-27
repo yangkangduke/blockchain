@@ -35,7 +35,7 @@ public class AddressCollectOrderHisDto implements Serializable {
 
     /**
      *
-     * @see FundCollectOrderStatus
+     * @see FundCollectOrderType
      */
     int type;
     String currency;

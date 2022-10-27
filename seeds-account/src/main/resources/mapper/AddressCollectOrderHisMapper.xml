@@ -21,14 +21,14 @@
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete
         from ac_address_collect_order_his
-        where f_id = #{id,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
     </delete>
 
     <insert id="insert" parameterType="com.seeds.account.model.AddressCollectOrderHis" useGeneratedKeys="true"
             keyProperty="id">
-        insert into ac_address_collect_order_his (f_id, f_create_time, f_update_time, f_version,
-                                                 f_type, f_address, f_currency, f_amount, f_gas_price, f_fee_amount,
-                                                 f_status, f_chain)
+        insert into ac_address_collect_order_his (id, create_time, update_time, version,
+                                                 type, address, currency, amount, gas_price, fee_amount,
+                                                 status, chain)
         values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT},
                 #{version,jdbcType=BIGINT},
                 #{type,jdbcType=TINYINT}, #{address,jdbcType=VARCHAR}, #{currency,jdbcType=VARCHAR},

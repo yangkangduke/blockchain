@@ -4,6 +4,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.dto.BalanceGetStatusDto;
 import com.seeds.admin.dto.*;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.enums.Chain;
+
+import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * @author: hewei
@@ -31,4 +35,5 @@ public interface AssetManagementService {
 
     GenericDto<MgtGasConfig> getGasConfig(int chain);
 
+    GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception;
 }

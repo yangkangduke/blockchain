@@ -6,6 +6,7 @@ import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.enums.Chain;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @FeignClient(name = "seeds-account", url = "${service.url.account}",path = "/account-internal", configuration = {AccountFeignInnerRequestInterceptor.class})
 public interface AccountFeignClient {
@@ -111,6 +114,9 @@ public interface AccountFeignClient {
     @PostMapping("/job/fund-collect-scan-pending-balances")
     GenericDto<Boolean> scanPendingCollectBalances();
 
+
+    @GetMapping("/sys/pending-collect-balances")
+    GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception;
     /**
      * 获取钱包归集历史
      *

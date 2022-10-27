@@ -245,7 +245,7 @@ public class AccountInternalController {
 //        }
 //    }
 
-
+//
 //    @PostMapping("/job/fund-collect-scan-pending-balances")
 //    @ApiOperation("定期收集待归集地址余额")
 //    public GenericDto<Boolean> scanPendingCollectBalances() {
@@ -263,7 +263,7 @@ public class AccountInternalController {
      *
      * @return
      */
-    @GetMapping("/sys/fund-collect-scan-pending-balances")
+    @GetMapping("/sys/pending-collect-balances")
     @ApiOperation("获取待归集余额")
     @Inner
     public GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() {

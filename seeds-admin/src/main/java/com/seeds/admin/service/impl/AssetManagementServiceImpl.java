@@ -276,6 +276,11 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         return GenericDto.success(config);
     }
 
+    @Override
+    public GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception {
+        return accountFeignClient.getPendingCollectBalances();
+    }
+
     private MgtDepositAddressDto getMgtDepositAddressDto(AddressBalanceDto addressBalanceDto) {
         Map<String, BigDecimal> balancesMap = addressBalanceDto.getBalances();
         MgtDepositAddressDto addressDto = MgtDepositAddressDto.builder().address(addressBalanceDto.getAddress()).build();

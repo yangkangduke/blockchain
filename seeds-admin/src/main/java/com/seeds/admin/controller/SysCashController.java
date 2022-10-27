@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.seeds.account.dto.BalanceGetStatusDto;
+import com.seeds.account.enums.FundCollectOrderType;
 import com.seeds.admin.dto.*;
 import com.seeds.admin.service.AssetManagementService;
 import com.seeds.admin.service.ISysWithdrawDepositService;
@@ -16,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 
@@ -121,6 +124,20 @@ public class SysCashController {
         return GenericDto.success(mgtWithdrawDepositService.listDepositReviewHis(currency, userId, status, current, size));
     }
 
+
+
+    @GetMapping("/balance/pending-collect-balances")
+    @ApiOperation("获取所有用户的待归集余额")
+    public GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception {
+        return assetManagementService.getPendingCollectBalances();
+    }
+
+    @GetMapping("/transfer/wallet-transfers/gas-config")
+    @ApiOperation("获取划转gas费用")
+    public GenericDto<MgtGasConfig> gasConfig(@RequestParam(value = "chain", defaultValue = "1") int chain) {
+        return assetManagementService.getGasConfig(chain);
+    }
+
     @PostMapping("/balance/create-balances-get")
     @ApiOperation("刷新用户充币地址余额")
     public GenericDto<Boolean> createBalanceGet(@RequestParam(value = "chain", defaultValue = "1") int chain) {
@@ -165,14 +182,8 @@ public class SysCashController {
         return assetManagementService.walletTransfer(dto);
     }
 
-    @GetMapping("/transfer/wallet-transfers/gas-config")
-    @ApiOperation("获取热钱包划转gas费用")
-    public GenericDto<MgtGasConfig> gasConfig(@RequestParam(value = "chain", defaultValue = "1") int chain) {
-        return assetManagementService.getGasConfig(chain);
-    }
-
     @GetMapping("/transfer/history-list")
-    @ApiOperation("获取资金归集历史记录列表")
+    @ApiOperation("获取资金归集历史记录列表--USER_TO_SYSTEM")
     public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryHistoryList(
             @RequestParam(value = "currency", required = false) String currency,
             @RequestParam(value = "address", required = false) String address,
@@ -185,11 +196,11 @@ public class SysCashController {
         if (isBlank(address)) {
             address = null;
         }
-        return assetManagementService.getFundCollectOrderHistory(chain, currency, address, current, pageSize, 1);
+        return assetManagementService.getFundCollectOrderHistory(chain, currency, address, current, pageSize, FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode());
     }
 
     @GetMapping("/transfer/gas-fee-list")
-    @ApiOperation("获取Gas Fee划转历史记录列表")
+    @ApiOperation("获取Gas Fee划转历史记录列表----SYSTEM_TO_USER")
     public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryGasFeeList(
             @RequestParam(value = "address", required = false) String address,
             @RequestParam(value = "chain", defaultValue = "1") int chain,
@@ -198,7 +209,7 @@ public class SysCashController {
         if (isBlank(address)) {
             address = null;
         }
-        return assetManagementService.getFundCollectOrderHistory(chain, null, address, current, pageSize, 2);
+        return assetManagementService.getFundCollectOrderHistory(chain, null, address, current, pageSize, FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode());
     }
 
     @PostMapping("/transfer/create-order")
