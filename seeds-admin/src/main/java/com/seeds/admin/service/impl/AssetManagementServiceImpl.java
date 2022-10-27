@@ -281,6 +281,11 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         return accountFeignClient.getPendingCollectBalances();
     }
 
+    @Override
+    public GenericDto<ChainGasPriceDto> getGasPrice(int chain) {
+        return accountFeignClient.getGasPrice(chain);
+    }
+
     private MgtDepositAddressDto getMgtDepositAddressDto(AddressBalanceDto addressBalanceDto) {
         Map<String, BigDecimal> balancesMap = addressBalanceDto.getBalances();
         MgtDepositAddressDto addressDto = MgtDepositAddressDto.builder().address(addressBalanceDto.getAddress()).build();

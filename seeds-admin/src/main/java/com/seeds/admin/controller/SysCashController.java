@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.seeds.account.dto.BalanceGetStatusDto;
+import com.seeds.account.dto.ChainGasPriceDto;
 import com.seeds.account.enums.FundCollectOrderType;
 import com.seeds.admin.dto.*;
 import com.seeds.admin.service.AssetManagementService;
@@ -157,7 +158,6 @@ public class SysCashController {
     }
 
 
-
     @GetMapping("/balance/pending-collect-balances")
     @ApiOperation("获取所有用户的待归集余额")
     public GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception {
@@ -168,6 +168,12 @@ public class SysCashController {
     @ApiOperation("获取划转gas费用")
     public GenericDto<MgtGasConfig> gasConfig(@RequestParam(value = "chain", defaultValue = "1") int chain) {
         return assetManagementService.getGasConfig(chain);
+    }
+
+    @GetMapping("/transfer/wallet-transfers/gas-price")
+    @ApiOperation("获取划转gasPrice")
+    public GenericDto<ChainGasPriceDto> getGasPrice(@RequestParam(value = "chain", defaultValue = "1") int chain) {
+        return assetManagementService.getGasPrice(chain);
     }
 
     @PostMapping("/balance/create-balances-get")

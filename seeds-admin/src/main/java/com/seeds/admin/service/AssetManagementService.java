@@ -2,6 +2,7 @@ package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.dto.BalanceGetStatusDto;
+import com.seeds.account.dto.ChainGasPriceDto;
 import com.seeds.admin.dto.*;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
@@ -36,4 +37,7 @@ public interface AssetManagementService {
     GenericDto<MgtGasConfig> getGasConfig(int chain);
 
     GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception;
+
+    GenericDto<ChainGasPriceDto> getGasPrice(int chain);
+
 }
