@@ -16,7 +16,7 @@ import java.util.Objects;
  * @author yk
  */
 @Getter
-public enum Chain {
+public enum Chain implements EnumWithCode{
 
     /**
      * 以太坊 Ethereum
