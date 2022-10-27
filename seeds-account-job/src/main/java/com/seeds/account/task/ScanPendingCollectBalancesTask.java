@@ -12,16 +12,16 @@ import org.springframework.stereotype.Component;
  *
  * @author hewei
  */
-@Slf4j
-@Component
-public class ScanPendingCollectBalancesTask implements SimpleJob {
-    @Autowired
-    private AccountFeignClient accountFeignClient;
-
-    @Override
-    public void execute(ShardingContext shardingContext) {
-        log.info("scanPendingCollectBalancesTask triggered, shardingItem={}", shardingContext.getShardingItem());
-        accountFeignClient.scanPendingCollectBalances();
-        log.info("scanPendingCollectBalancesTask ended, shardingItem={}", shardingContext.getShardingItem());
-    }
-}
+//@Slf4j
+//@Component
+//public class ScanPendingCollectBalancesTask implements SimpleJob {
+//    @Autowired
+//    private AccountFeignClient accountFeignClient;
+//
+//    @Override
+//    public void execute(ShardingContext shardingContext) {
+//        log.info("scanPendingCollectBalancesTask triggered, shardingItem={}", shardingContext.getShardingItem());
+//        accountFeignClient.scanPendingCollectBalances();
+//        log.info("scanPendingCollectBalancesTask ended, shardingItem={}", shardingContext.getShardingItem());
+//    }
+//}
