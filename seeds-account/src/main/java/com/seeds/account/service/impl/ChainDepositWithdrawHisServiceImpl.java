@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
+import com.seeds.account.dto.ChainTxnDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
 import com.seeds.account.enums.ChainAction;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
@@ -17,13 +18,16 @@ import com.seeds.account.mapper.UserAccountActionHisMapper;
 import com.seeds.account.model.ChainDepositWithdrawHis;
 import com.seeds.account.model.ChainDepositWithdrawSigHis;
 import com.seeds.account.service.IChainDepositWithdrawHisService;
+import com.seeds.account.util.ObjectUtils;
 import com.seeds.common.enums.Chain;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
