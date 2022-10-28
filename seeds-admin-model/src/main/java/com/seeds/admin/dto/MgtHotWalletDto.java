@@ -22,13 +22,13 @@ public class MgtHotWalletDto {
 
     private String chain;
 
-    private String kusdBalance;
+//    private String kusdBalance;
+//
+//    private BigDecimal kusdBalanceNum;
 
-    private BigDecimal kusdBalanceNum;
-
-    private String kineBalance;
-
-    private BigDecimal kineBalanceNum;
+//    private String kineBalance;
+//
+//    private BigDecimal kineBalanceNum;
 
     private String chainBalance;
 
@@ -38,19 +38,19 @@ public class MgtHotWalletDto {
 
     private BigDecimal usdtBalanceNum;
 
-    private String usdcBalance;
-
-    private BigDecimal usdcBalanceNum;
+//    private String usdcBalance;
+//
+//    private BigDecimal usdcBalanceNum;
 
     Map<String, String> balances;
 
-    public BigDecimal getKusdBalanceNum() {
-        return isBlank(kusdBalance) ? BigDecimal.ZERO : new BigDecimal(kusdBalance);
-    }
-
-    public BigDecimal getKineBalanceNum() {
-        return isBlank(kineBalance) ? BigDecimal.ZERO : new BigDecimal(kineBalance);
-    }
+//    public BigDecimal getKusdBalanceNum() {
+//        return isBlank(kusdBalance) ? BigDecimal.ZERO : new BigDecimal(kusdBalance);
+//    }
+//
+//    public BigDecimal getKineBalanceNum() {
+//        return isBlank(kineBalance) ? BigDecimal.ZERO : new BigDecimal(kineBalance);
+//    }
 
     public BigDecimal getChainBalanceNum() {
         return isBlank(chainBalance) ? BigDecimal.ZERO : new BigDecimal(chainBalance);
@@ -59,8 +59,8 @@ public class MgtHotWalletDto {
     public BigDecimal getUsdtBalanceNum() {
         return isBlank(usdtBalance) ? BigDecimal.ZERO : new BigDecimal(usdtBalance);
     }
-
-    public BigDecimal getUsdcBalanceNum() {
-        return isBlank(usdcBalance) ? BigDecimal.ZERO : new BigDecimal(usdcBalance);
-    }
+//
+//    public BigDecimal getUsdcBalanceNum() {
+//        return isBlank(usdcBalance) ? BigDecimal.ZERO : new BigDecimal(usdcBalance);
+//    }
 }

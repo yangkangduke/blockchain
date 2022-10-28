@@ -331,7 +331,7 @@ public class AccountInternalController {
     @ApiOperation("获取所有分配给用户地址的余额")
     @Inner
     public GenericDto<List<AddressBalanceDto>> getUserAddressBalances(@RequestParam(value = "chain") int chain,
-                                                                      @RequestParam(value = "currency", defaultValue = AccountConstants.QUOTE_CURRENCY) String currency) {
+                                                                      @RequestParam(value = "currency", defaultValue = AccountConstants.USDT) String currency) {
         try {
             List<AddressBalanceDto> balances = addressCollectService.getBalances(Chain.fromCode(chain), currency);
             return GenericDto.success(balances);

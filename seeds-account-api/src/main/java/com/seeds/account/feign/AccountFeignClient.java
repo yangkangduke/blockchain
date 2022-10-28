@@ -156,6 +156,16 @@ public interface AccountFeignClient {
                                                                            @RequestParam("page") int page,
                                                                            @RequestParam("size") int size);
 
+
+    @GetMapping("/sys/fund-collect-history")
+    GenericDto<Page<AddressCollectHisDto>> getFundCollectHistory(@RequestParam("chain") int chain,
+                                                                     @RequestParam("startTime") long startTime,
+                                                                     @RequestParam("endTime") long endTime,
+                                                                     @RequestParam(value = "fromAddress", required = false) String fromAddress,
+                                                                     @RequestParam(value = "toAddress", required = false) String toAddress,
+                                                                     @RequestParam("page") int page,
+                                                                     @RequestParam("size") int size);
+
     /**
      * 根据归集订单Id获取钱包归集历史
      *
@@ -192,7 +202,7 @@ public interface AccountFeignClient {
      * @return
      */
     @GetMapping("/sys/user-address-balances")
-    GenericDto<List<AddressBalanceDto>> getUserAddressBalances(@RequestParam(value = "chain") int chain, @RequestParam(value = "currency", defaultValue = AccountConstants.QUOTE_CURRENCY) String currency);
+    GenericDto<List<AddressBalanceDto>> getUserAddressBalances(@RequestParam(value = "chain") int chain, @RequestParam(value = "currency", defaultValue = AccountConstants.USDT) String currency);
 
 
     /**
