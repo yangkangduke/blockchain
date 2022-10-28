@@ -3,6 +3,7 @@ package com.seeds.account.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.seeds.account.enums.CommonStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -50,7 +51,7 @@ public class BlacklistAddress implements Serializable {
     @ApiModelProperty("reason")
     private String reason;
 
-    private Integer status;
+    private CommonStatus status;
 
 
 }

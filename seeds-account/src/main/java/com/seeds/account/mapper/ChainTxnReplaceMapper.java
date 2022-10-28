@@ -1,5 +1,7 @@
 package com.seeds.account.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.enums.ChainCommonStatus;
 import com.seeds.account.enums.ChainTxnReplaceAppType;
 import com.seeds.account.model.ChainTxnReplace;
@@ -58,6 +60,11 @@ public interface ChainTxnReplaceMapper {
     List<ChainTxnReplace> getListByChainStatusAndType(@Param("chain") Chain chain,
                                                       @Param("status") ChainCommonStatus status,
                                                       @Param("type") ChainTxnReplaceAppType type);
+
+    IPage<ChainTxnReplace> getListByChainStatusAndType(Page page,
+                                                       @Param("chain") Chain chain,
+                                                       @Param("status") ChainCommonStatus status,
+                                                       @Param("type") ChainTxnReplaceAppType type);
 
     /**
      * 根据状态来查询

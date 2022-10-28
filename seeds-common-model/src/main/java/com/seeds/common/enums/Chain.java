@@ -16,7 +16,7 @@ import java.util.Objects;
  * @author yk
  */
 @Getter
-public enum Chain {
+public enum Chain implements EnumWithCode  {
 
     /**
      * 以太坊 Ethereum
@@ -84,12 +84,14 @@ public enum Chain {
     /**
      * 支持gas price 区块链
      */
-    public static List<Chain> SUPPORT_GAS_PRICE_LIST = Lists.newArrayList(ETH, BSC, MATIC);
+//    public static List<Chain> SUPPORT_GAS_PRICE_LIST = Lists.newArrayList(ETH, BSC, MATIC);
+    public static List<Chain> SUPPORT_GAS_PRICE_LIST = Lists.newArrayList(ETH);
 
     /**
      * 支持创建和分配充币地址的链
      */
-    public static List<Chain> SUPPORT_CREATE_ADDRESS_LIST = Lists.newArrayList(ETH, BSC, TRON, MATIC);
+//    public static List<Chain> SUPPORT_CREATE_ADDRESS_LIST = Lists.newArrayList(ETH, BSC, TRON, MATIC);
+    public static List<Chain> SUPPORT_CREATE_ADDRESS_LIST = Lists.newArrayList(ETH, TRON);
 
     /**
      * 支持kine bridge的链(计算kine流通量使用)

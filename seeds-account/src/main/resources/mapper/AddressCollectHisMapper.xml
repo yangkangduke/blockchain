@@ -109,6 +109,7 @@
         <if test="endTime > 0">and update_time &lt;= #{endTime,jdbcType=BIGINT}</if>
         <if test="fromAddress != null">and from_address = #{fromAddress,jdbcType=VARCHAR}</if>
         <if test="toAddress != null">and to_address = #{toAddress,jdbcType=VARCHAR}</if>
+        order by id desc
     </select>
 
     <select id="getByChainHash" resultMap="BaseResultMap">
@@ -122,11 +123,12 @@
         <![CDATA[
         select tach.*
         from ac_address_collect_his tach
-                 inner join t_address_collect_order_his tacoh on tach.order_id = tacoh.id
+                 inner join ac_address_collect_order_his tacoh on tach.order_id = tacoh.id
         where tacoh.type = #{type,jdbcType=TINYINT}
           and tach.status = #{status,jdbcType=TINYINT}
           and tach.chain = #{chain.code,jdbcType=TINYINT}
           and tach.update_time <= #{timestamp,jdbcType=BIGINT}
+        ORDER BY id DESC
         ]]>
     </select>
 
@@ -138,6 +140,7 @@
           and order_id = 0
           and chain = #{chain.code,jdbcType=TINYINT}
           and update_time <= #{timestamp,jdbcType=BIGINT}
+        ORDER BY id DESC
         ]]>
     </select>
 

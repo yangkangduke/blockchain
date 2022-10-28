@@ -131,4 +131,6 @@ public class ChainDepositServiceImpl implements IChainDepositService {
     public List<DepositRuleDto> getAllDepositRules() {
         return Objects.requireNonNull(rules.get(ALL)).getList();
     }
+
+
 }

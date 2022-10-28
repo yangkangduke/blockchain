@@ -1,7 +1,7 @@
 package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.request.SysGamePageReq;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.enums.WhetherEnum;

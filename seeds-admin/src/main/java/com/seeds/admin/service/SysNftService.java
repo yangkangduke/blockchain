@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.mq.NftUpgradeMsgDTO;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.response.SysNftAddResp;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.dto.response.SysNftResp;
@@ -40,12 +41,18 @@ public interface SysNftService extends IService<SysNftEntity> {
     Long add(String imageUrl, SysNftAddReq req, String metadataHash);
 
     /**
+     * 添加系统NFT信息确认
+     * @param req NFT确认信息
+     */
+    void addConfirm(SysNftAddConfirmReq req);
+
+    /**
      * 添加系统NFT信息发送消息
      * @param image NFT图片
      * @param req NFT信息
-     * @return NFT的唯一标识
+     * @return NFT的信息
      */
-    String addUpload(MultipartFile image, SysNftAddReq req);
+    SysNftAddResp addUpload(MultipartFile image, SysNftAddReq req);
 
     /**
      * 添加系统NFT信息发送消息
@@ -78,7 +85,7 @@ public interface SysNftService extends IService<SysNftEntity> {
      * 批量删除系统NFT信息
      * @param req NFT的id列表
      */
-    void batchDelete(ListReq req);
+    void batchDelete(List<NftDeleteListReq> req);
 
     /**
      * 修改NFT属性值

@@ -43,12 +43,12 @@ public class AccountConstants {
     /**
      * 充币精度
      */
-    public final static int DEPOSIT_DECIMALS = 4;
+    public final static int DEPOSIT_DECIMALS = 6;
 
     /**
      * 提币精度
      */
-    public final static int WITHDRAW_DECIMALS = 4;
+    public final static int WITHDRAW_DECIMALS = 6;
 
     /**
      * 资产精度
@@ -161,23 +161,23 @@ public class AccountConstants {
     /**
      * 系统交易手续费账户
      */
-    private final static long SYSTEM_TRADING_FEE_USER_ID = 1_0000;
-
-    public static long getSystemTradingFeeUserId() {
-        return SYSTEM_TRADING_FEE_USER_ID;
-    }
-
-    public static long getSystemTradingFeeUserId(long userId) {
-        return SYSTEM_TRADING_FEE_USER_ID + 1 + (userId % USER_MOD);
-    }
-
-    public static long getSystemTradingFeeStartUserId() {
-        return SYSTEM_TRADING_FEE_USER_ID + 1;
-    }
-
-    public static long getSystemTradingFeeEndUserId() {
-        return SYSTEM_TRADING_FEE_USER_ID + USER_MOD;
-    }
+//    private final static long SYSTEM_TRADING_FEE_USER_ID = 1_0000;
+//
+//    public static long getSystemTradingFeeUserId() {
+//        return SYSTEM_TRADING_FEE_USER_ID;
+//    }
+//
+//    public static long getSystemTradingFeeUserId(long userId) {
+//        return SYSTEM_TRADING_FEE_USER_ID + 1 + (userId % USER_MOD);
+//    }
+//
+//    public static long getSystemTradingFeeStartUserId() {
+//        return SYSTEM_TRADING_FEE_USER_ID + 1;
+//    }
+//
+//    public static long getSystemTradingFeeEndUserId() {
+//        return SYSTEM_TRADING_FEE_USER_ID + USER_MOD;
+//    }
 
     /**
      * 系统提币手续费账户（钱包账户）
@@ -188,18 +188,18 @@ public class AccountConstants {
         return SYSTEM_WITHDRAW_FEE_USER_ID;
     }
 
-    /**
-     * 系统兑换账户（钱包账户）
-     */
+//    /**
+//     * 系统兑换账户（钱包账户）
+//     */
     private final static long SYSTEM_EXCHANGE_USER_ID = 3_0000;
 
     public static long getSystemExchangeUserId() {
         return SYSTEM_EXCHANGE_USER_ID;
     }
-
-    /**
-     * 链上分红账户（钱包账户）
-     */
+//
+//    /**
+//     * 链上分红账户（钱包账户）
+//     */
     private final static long SYSTEM_DIVIDEND_CHAIN_USER_ID = 4_0000;
 
     public static long getSystemDividendChainUserId() {
@@ -239,81 +239,81 @@ public class AccountConstants {
     /**
      * 系统返佣账户（钱包账户）
      */
-    private final static long SYSTEM_REBATE_USER_ID = 7_0000;
-
-    public static long getSystemRebateUserId() {
-        return SYSTEM_REBATE_USER_ID;
-    }
-
-    public static long getSystemRebateUserId(long userId) {
-        return SYSTEM_REBATE_USER_ID + 1 + (userId % USER_MOD);
-    }
-
-    public static long getSystemRebateStartUserId() {
-        return SYSTEM_REBATE_USER_ID + 1;
-    }
-
-    public static long getSystemRebateEndUserId() {
-        return SYSTEM_REBATE_USER_ID + USER_MOD;
-    }
+//    private final static long SYSTEM_REBATE_USER_ID = 7_0000;
+//
+//    public static long getSystemRebateUserId() {
+//        return SYSTEM_REBATE_USER_ID;
+//    }
+//
+//    public static long getSystemRebateUserId(long userId) {
+//        return SYSTEM_REBATE_USER_ID + 1 + (userId % USER_MOD);
+//    }
+//
+//    public static long getSystemRebateStartUserId() {
+//        return SYSTEM_REBATE_USER_ID + 1;
+//    }
+//
+//    public static long getSystemRebateEndUserId() {
+//        return SYSTEM_REBATE_USER_ID + USER_MOD;
+//    }
 
 
     /**
      * 系统返佣账户（钱包账户）
      */
-    private final static long SYSTEM_PROFIT_TAKEOFF_USER_ID = 8_0000;
-
-    public static long getSystemProfitTakeoffUserId() {
-        return SYSTEM_PROFIT_TAKEOFF_USER_ID;
-    }
-
-    public static long getSystemProfitTakeoffUserId(long userId) {
-        return SYSTEM_PROFIT_TAKEOFF_USER_ID + 1 + (userId % USER_MOD);
-    }
-
-    public static long getSystemProfitTakeoffStartUserId() {
-        return SYSTEM_PROFIT_TAKEOFF_USER_ID + 1;
-    }
-
-    public static long getSystemProfitTakeoffEndUserId() {
-        return SYSTEM_PROFIT_TAKEOFF_USER_ID + USER_MOD;
-    }
+//    private final static long SYSTEM_PROFIT_TAKEOFF_USER_ID = 8_0000;
+//
+//    public static long getSystemProfitTakeoffUserId() {
+//        return SYSTEM_PROFIT_TAKEOFF_USER_ID;
+//    }
+//
+//    public static long getSystemProfitTakeoffUserId(long userId) {
+//        return SYSTEM_PROFIT_TAKEOFF_USER_ID + 1 + (userId % USER_MOD);
+//    }
+//
+//    public static long getSystemProfitTakeoffStartUserId() {
+//        return SYSTEM_PROFIT_TAKEOFF_USER_ID + 1;
+//    }
+//
+//    public static long getSystemProfitTakeoffEndUserId() {
+//        return SYSTEM_PROFIT_TAKEOFF_USER_ID + USER_MOD;
+//    }
 
     /**
      * 爆仓归集账户（钱包账户）
      */
-    private final static long SYSTEM_LIQUIDATE_USER_ID = 9_0000;
+//    private final static long SYSTEM_LIQUIDATE_USER_ID = 9_0000;
 
-    public static long getSystemLiquidateUserId() {
-        return SYSTEM_LIQUIDATE_USER_ID;
-    }
+//    public static long getSystemLiquidateUserId() {
+//        return SYSTEM_LIQUIDATE_USER_ID;
+//    }
 
-    /**
-     * 资金费率归集账户（钱包账户）
-     */
-    private final static long SYSTEM_FUNDING_RATE_USER_ID = 10_0000;
+//    /**
+//     * 资金费率归集账户（钱包账户）
+//     */
+//    private final static long SYSTEM_FUNDING_RATE_USER_ID = 10_0000;
+//
+//    public static long getSystemFundingRateUserId() {
+//        return SYSTEM_FUNDING_RATE_USER_ID;
+//    }
 
-    public static long getSystemFundingRateUserId() {
-        return SYSTEM_FUNDING_RATE_USER_ID;
-    }
-
-    /**
-     * Kine分红系统账户（钱包账户）
-     */
-    private final static long SYSTEM_KINE_REWARD_USER_ID = 11_0000;
-
-    public static long getSystemKineRewardUserId() {
-        return SYSTEM_KINE_REWARD_USER_ID;
-    }
+//    /**
+//     * Kine分红系统账户（钱包账户）
+//     */
+//    private final static long SYSTEM_KINE_REWARD_USER_ID = 11_0000;
+//
+//    public static long getSystemKineRewardUserId() {
+//        return SYSTEM_KINE_REWARD_USER_ID;
+//    }
 
     /**
      * MCD 系统调节账户
      */
-    private final static long SYSTEM_MCD_ADJUST_USER_ID = 12_0000;
-
-    public static long getSystemMcdAdjustUserId() {
-        return SYSTEM_MCD_ADJUST_USER_ID;
-    }
+//    private final static long SYSTEM_MCD_ADJUST_USER_ID = 12_0000;
+//
+//    public static long getSystemMcdAdjustUserId() {
+//        return SYSTEM_MCD_ADJUST_USER_ID;
+//    }
 
     private final static long USERID_RESERVE_INTERVAL = 1_0000;
 

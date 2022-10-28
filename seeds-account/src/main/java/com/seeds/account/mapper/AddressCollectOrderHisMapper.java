@@ -1,5 +1,8 @@
 package com.seeds.account.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.account.dto.AddressCollectOrderHisDto;
 import com.seeds.account.model.AddressCollectOrderHis;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -51,10 +54,11 @@ public interface AddressCollectOrderHisMapper {
 
     /**
      * 获取所有
+     *
      * @return
      */
-    List<AddressCollectOrderHis> getList(@Param("chain") int chain, @Param("startTime") long startTime, @Param("endTime") long endTime,
-                                         @Param("type") int type, @Param("address") String address, @Param("currency") String currency);
+    IPage<AddressCollectOrderHisDto> getList(Page queryPage, @Param("chain") int chain, @Param("startTime") long startTime, @Param("endTime") long endTime,
+                                             @Param("type") int type, @Param("address") String address, @Param("currency") String currency);
 
     /**
      *

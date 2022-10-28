@@ -71,6 +71,38 @@
         </where>
     </select>
 
+    <select id="getDepositWithdrawList" resultType="com.seeds.account.dto.ChainDepositWithdrawHisDto" parameterType="com.seeds.account.dto.req.AccountPendingTransactionsReq">
+        select
+            *
+        from ac_chain_deposit_withdraw_his
+        <where>
+            <if test="query.action != null">
+                and `action` = #{query.action}
+            </if>
+            <if test="query.currency != null and  query.currency != '' ">
+                and currency = #{query.currency}
+            </if>
+            <if test="query.userId != null">
+                and user_id = #{query.userId}
+            </if>
+            <if test="query.onlyManualCheck == true">
+                and manual = 1
+            </if>
+            <if test="query.startTime != null ">
+                and create_time &gt;= #{query.startTime}
+            </if>
+            <if test="query.endTime != null ">
+                and create_time &lt;= #{query.endTime}
+            </if>
+            <if test="query.statusList != null and query.statusList.size() > 0">
+                and status in
+                <foreach collection="query.statusList" item="status" index="i" open="(" close=")" separator=",">
+                    #{status}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
     <update id="rollbackByBlockNumberAndBlockHash">
         <![CDATA[
         update ac_chain_deposit_withdraw_his
@@ -82,4 +114,20 @@
           and chain = #{chain.code,jdbcType=VARCHAR}
         ]]>
     </update>
+
+    <select id="getByChainHash" resultType="com.seeds.account.model.ChainDepositWithdrawHis">
+        select *
+        from ac_chain_deposit_withdraw_his
+        where tx_hash = #{txHash,jdbcType=VARCHAR}
+          and chain = #{chain.code,jdbcType=TINYINT}
+    </select>
+
+    <select id="getDepositAddress" resultType="java.lang.String">
+        select distinct(to_address)
+        from ac_chain_deposit_withdraw_his
+        where action = 1 and to_address is not null and to_address &lt;&gt; ''
+        <if test="startTime > 0">and create_time &gt;= #{startTime,jdbcType=BIGINT}</if>
+        <if test="endTime > 0">and create_time &lt;= #{endTime,jdbcType=BIGINT}</if>
+        <if test="chain != null">and chain = #{chain.code,jdbcType=TINYINT}</if>
+    </select>
 </mapper>

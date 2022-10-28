@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
+import com.seeds.account.enums.ChainAction;
+import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.model.ChainDepositWithdrawHis;
 import com.seeds.account.model.ChainDepositWithdrawSigHis;
 import com.seeds.common.enums.Chain;
@@ -63,7 +65,30 @@ public interface IChainDepositWithdrawHisService extends IService<ChainDepositWi
 
     /**
      * 查询某一个人的充提记录
+     *
      * @return
      */
     IPage<ChainDepositWithdrawHisDto> getHistory(Page page, AccountHistoryReq accountHistoryReq);
+
+
+    IPage<ChainDepositWithdrawHis> selectByChainStatusAndTimestamp(Page page, Chain chain, List<Integer> asList, ChainAction withdraw, long expireTimestamp);
+
+
+    /**
+     * 获取需要审核的充提
+     * @param page
+     * @param transactionsReq
+     * @return
+     */
+    Page<ChainDepositWithdrawHisDto> getDepositWithdrawList(Page page, AccountPendingTransactionsReq transactionsReq);
+
+    /**
+     * 获取一段时间内充币的地址
+     *
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<String> getDepositAddress(Chain chain, long startTime, long endTime);
+
 }
