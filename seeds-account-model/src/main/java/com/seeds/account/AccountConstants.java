@@ -43,12 +43,12 @@ public class AccountConstants {
     /**
      * 充币精度
      */
-    public final static int DEPOSIT_DECIMALS = 4;
+    public final static int DEPOSIT_DECIMALS = 6;
 
     /**
      * 提币精度
      */
-    public final static int WITHDRAW_DECIMALS = 4;
+    public final static int WITHDRAW_DECIMALS = 6;
 
     /**
      * 资产精度
