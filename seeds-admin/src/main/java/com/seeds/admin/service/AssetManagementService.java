@@ -1,12 +1,15 @@
 package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.account.dto.AddressCollectHisDto;
 import com.seeds.account.dto.BalanceGetStatusDto;
+import com.seeds.account.dto.ChainGasPriceDto;
 import com.seeds.admin.dto.*;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,13 +24,13 @@ public interface AssetManagementService {
 
     GenericDto<Boolean> createOrder(MgtAddressCollectOrderRequestDto dto);
 
-    GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address, String sorter);
+    GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address);
 
     GenericDto<BalanceGetStatusDto> getBalanceGetStatus(int chain);
 
     GenericDto<Boolean> createBalanceGet(int chain);
 
-    GenericDto<Page<MgtHotWalletDto>> queryHotWallets(Integer type, int chain, String address, String sorter);
+    GenericDto<Page<MgtHotWalletDto>> queryHotWallets(Integer type, int chain, String address);
 
     GenericDto<Page<MgtWalletTransferDto>> queryWalletTransfers(MgtWalletTransferQueryDto queryDto);
 
@@ -36,4 +39,8 @@ public interface AssetManagementService {
     GenericDto<MgtGasConfig> getGasConfig(int chain);
 
     GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception;
+
+    GenericDto<ChainGasPriceDto> getGasPrice(int chain);
+
+    GenericDto<List<AddressCollectHisDto>> getAddressCollectByOrderId(long orderId);
 }

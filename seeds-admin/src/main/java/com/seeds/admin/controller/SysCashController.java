@@ -3,7 +3,9 @@ package com.seeds.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
+import com.seeds.account.dto.AddressCollectHisDto;
 import com.seeds.account.dto.BalanceGetStatusDto;
+import com.seeds.account.dto.ChainGasPriceDto;
 import com.seeds.account.enums.FundCollectOrderType;
 import com.seeds.admin.dto.*;
 import com.seeds.admin.service.AssetManagementService;
@@ -48,6 +50,21 @@ public class SysCashController {
     public GenericDto<List<MgtChainTypeDto>> queryChainWithdrawTypes() {
         List<MgtChainTypeDto> dtos = Lists.newArrayList();
         Chain.SUPPORT_CREATE_ADDRESS_LIST.forEach(chain ->
+                dtos.add(MgtChainTypeDto.builder()
+                        .code(chain.getCode())
+                        .name(chain.getName())
+                        .nativeToken(chain.getNativeToken())
+                        .decimals(chain.getDecimals())
+                        .build())
+        );
+        return GenericDto.success(dtos);
+    }
+
+    @GetMapping("/chain-type")
+    @ApiOperation("获取支持的币种类型")
+    public GenericDto<List<MgtChainTypeDto>> queryChainTypes() {
+        List<MgtChainTypeDto> dtos = Lists.newArrayList();
+        Chain.SUPPORT_LIST.forEach(chain ->
                 dtos.add(MgtChainTypeDto.builder()
                         .code(chain.getCode())
                         .name(chain.getName())
@@ -155,7 +172,6 @@ public class SysCashController {
     }
 
 
-
     @GetMapping("/balance/pending-collect-balances")
     @ApiOperation("获取所有用户的待归集余额")
     public GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception {
@@ -166,6 +182,12 @@ public class SysCashController {
     @ApiOperation("获取划转gas费用")
     public GenericDto<MgtGasConfig> gasConfig(@RequestParam(value = "chain", defaultValue = "1") int chain) {
         return assetManagementService.getGasConfig(chain);
+    }
+
+    @GetMapping("/transfer/wallet-transfers/gas-price")
+    @ApiOperation("获取划转gasPrice")
+    public GenericDto<ChainGasPriceDto> getGasPrice(@RequestParam(value = "chain", defaultValue = "1") int chain) {
+        return assetManagementService.getGasPrice(chain);
     }
 
     @PostMapping("/balance/create-balances-get")
@@ -181,12 +203,11 @@ public class SysCashController {
     }
 
     @GetMapping("/balance/deposit-address")
-    @ApiOperation("获取用户充币地址列表")
+    @ApiOperation("获取所有分配给用户地址的余额")
     public GenericDto<Page<MgtDepositAddressDto>> depositAddresses(@RequestParam(value = "currency", required = false) String currency,
                                                                    @RequestParam(value = "chain", defaultValue = "1") int chain,
-                                                                   @RequestParam(value = "address", required = false) String address,
-                                                                   @RequestParam(value = "sorter", required = false) String sorter) {
-        return assetManagementService.queryDepositAddress(currency, chain, address, sorter);
+                                                                   @RequestParam(value = "address", required = false) String address) {
+        return assetManagementService.queryDepositAddress(currency, chain, address);
     }
 
 
@@ -194,9 +215,8 @@ public class SysCashController {
     @ApiOperation("获取热钱包列表（所有系统使用的钱包）")
     public GenericDto<Page<MgtHotWalletDto>> hotWallet(@RequestParam(value = "type", required = false) Integer type,
                                                        @RequestParam(value = "chain", defaultValue = "1") int chain,
-                                                       @RequestParam(value = "address", required = false) String address,
-                                                       @RequestParam(value = "sorter", required = false) String sorter) {
-        return assetManagementService.queryHotWallets(type, chain, address, sorter);
+                                                       @RequestParam(value = "address", required = false) String address) {
+        return assetManagementService.queryHotWallets(type, chain, address);
     }
 
     @PostMapping("/transfer/wallet-transfers/list")
@@ -240,6 +260,12 @@ public class SysCashController {
             address = null;
         }
         return assetManagementService.getFundCollectOrderHistory(chain, null, address, current, pageSize, FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode());
+    }
+
+    @GetMapping("/transfer/collect-history-by-order")
+    @ApiOperation("根据归集订单Id获取钱包归集历史")
+    public GenericDto<List<AddressCollectHisDto>> getFundCollectHistoryByOrder(@RequestParam(value = "orderId") long orderId) {
+        return assetManagementService.getAddressCollectByOrderId(orderId);
     }
 
     @PostMapping("/transfer/create-order")

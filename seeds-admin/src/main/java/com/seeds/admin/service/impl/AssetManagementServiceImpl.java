@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import static com.seeds.account.enums.ChainExchangeAction.SYSTEM_EXCHANGE;
 import static com.seeds.admin.constant.MgtConstants.*;
 import static com.seeds.admin.enums.AccountType.*;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -51,9 +50,9 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     {
         accountTypeRm.put(Range.range(0L, BoundType.CLOSED, AccountConstants.getSystemUserId(), BoundType.OPEN), OTHERS.getCode());
         accountTypeRm.put(Range.range(AccountConstants.getSystemUserId(), BoundType.CLOSED, AccountConstants.getSystemUserId() + 1, BoundType.OPEN), SYSTEM_KINE_ACCOUNT.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemTradingFeeUserId(), BoundType.OPEN), SYSTEM_KINE_ACCOUNT_SUB.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemTradingFeeUserId(), BoundType.CLOSED, AccountConstants.getSystemTradingFeeUserId() + 1, BoundType.OPEN), SYSTEM_TRADING_FEE.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemTradingFeeUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemTradingFeeUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_TRADING_FEE_SUB.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemTradingFeeUserId(), BoundType.OPEN), SYSTEM_KINE_ACCOUNT_SUB.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemTradingFeeUserId(), BoundType.CLOSED, AccountConstants.getSystemTradingFeeUserId() + 1, BoundType.OPEN), SYSTEM_TRADING_FEE.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemTradingFeeUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemTradingFeeUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_TRADING_FEE_SUB.getCode());
         accountTypeRm.put(Range.range(AccountConstants.getSystemWithdrawFeeUserId(), BoundType.CLOSED, AccountConstants.getSystemWithdrawFeeUserId() + 1, BoundType.OPEN), SYSTEM_WITHDRAW_FEE.getCode());
         accountTypeRm.put(Range.range(AccountConstants.getSystemWithdrawFeeUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemWithdrawFeeUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_WITHDRAW_FEE_SUB.getCode());
         accountTypeRm.put(Range.range(AccountConstants.getSystemExchangeUserId(), BoundType.CLOSED, AccountConstants.getSystemExchangeUserId() + 1, BoundType.OPEN), SYSTEM_EXCHANGE.getCode());
@@ -64,24 +63,24 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         accountTypeRm.put(Range.range(AccountConstants.getSystemOperationUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemOperationUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_OPERATION_SUB.getCode());
         accountTypeRm.put(Range.range(AccountConstants.getSystemTradeUserId(), BoundType.CLOSED, AccountConstants.getSystemTradeUserId() + 1, BoundType.OPEN), SYSTEM_TRADE.getCode());
         accountTypeRm.put(Range.range(AccountConstants.getSystemTradeUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemTradeUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_TRADE_SUB.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemRebateUserId(), BoundType.CLOSED, AccountConstants.getSystemRebateUserId() + 1, BoundType.OPEN), SYSTEM_REBATE.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemRebateUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemRebateUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_REBATE_SUB.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemRebateUserId() + AccountConstants.getUseridReserveInterval(), BoundType.CLOSED, AccountConstants.getSystemLiquidateUserId(), BoundType.OPEN), OTHERS.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemLiquidateUserId(), BoundType.CLOSED, AccountConstants.getSystemLiquidateUserId() + 1, BoundType.OPEN), SYSTEM_LIQUIDATE.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemLiquidateUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemLiquidateUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_LIQUIDATE_SUB.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemFundingRateUserId(), BoundType.CLOSED, AccountConstants.getSystemFundingRateUserId() + 1, BoundType.OPEN), SYSTEM_FUNDING_RATE.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemFundingRateUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemFundingRateUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_FUNDING_RATE_SUB.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemKineRewardUserId(), BoundType.CLOSED, AccountConstants.getSystemKineRewardUserId() + 1, BoundType.OPEN), SYSTEM_REWARD_ACCOUNT.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemKineRewardUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemKineRewardUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_REWARD_ACCOUNT_SUB.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemMcdAdjustUserId(), BoundType.CLOSED, AccountConstants.getSystemMcdAdjustUserId() + 1, BoundType.OPEN), SYSTEM_MCD_ADJUST.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemMcdAdjustUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemMcdAdjustUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_MCD_ADJUST_SUB.getCode());
-        accountTypeRm.put(Range.range(AccountConstants.getSystemMcdAdjustUserId() + AccountConstants.getUseridReserveInterval(), BoundType.CLOSED, 10000000L, BoundType.OPEN), OTHERS.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemRebateUserId(), BoundType.CLOSED, AccountConstants.getSystemRebateUserId() + 1, BoundType.OPEN), SYSTEM_REBATE.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemRebateUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemRebateUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_REBATE_SUB.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemRebateUserId() + AccountConstants.getUseridReserveInterval(), BoundType.CLOSED, AccountConstants.getSystemLiquidateUserId(), BoundType.OPEN), OTHERS.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemLiquidateUserId(), BoundType.CLOSED, AccountConstants.getSystemLiquidateUserId() + 1, BoundType.OPEN), SYSTEM_LIQUIDATE.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemLiquidateUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemLiquidateUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_LIQUIDATE_SUB.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemFundingRateUserId(), BoundType.CLOSED, AccountConstants.getSystemFundingRateUserId() + 1, BoundType.OPEN), SYSTEM_FUNDING_RATE.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemFundingRateUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemFundingRateUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_FUNDING_RATE_SUB.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemKineRewardUserId(), BoundType.CLOSED, AccountConstants.getSystemKineRewardUserId() + 1, BoundType.OPEN), SYSTEM_REWARD_ACCOUNT.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemKineRewardUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemKineRewardUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_REWARD_ACCOUNT_SUB.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemMcdAdjustUserId(), BoundType.CLOSED, AccountConstants.getSystemMcdAdjustUserId() + 1, BoundType.OPEN), SYSTEM_MCD_ADJUST.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemMcdAdjustUserId() + 1, BoundType.CLOSED, AccountConstants.getSystemMcdAdjustUserId() + AccountConstants.getUseridReserveInterval(), BoundType.OPEN), SYSTEM_MCD_ADJUST_SUB.getCode());
+//        accountTypeRm.put(Range.range(AccountConstants.getSystemMcdAdjustUserId() + AccountConstants.getUseridReserveInterval(), BoundType.CLOSED, 10000000L, BoundType.OPEN), OTHERS.getCode());
 
         sorterMap.put("default", Comparator.comparing(MgtAccountAssetDto::getAccountType));
-        sorterMap.put("{\"kusdBalance\":\"ascend\"}", Comparator.comparing(MgtAccountAssetDto::getKusdBalanceNum));
-        sorterMap.put("{\"kusdBalance\":\"descend\"}", Comparator.comparing(MgtAccountAssetDto::getKusdBalanceNum).reversed());
-        sorterMap.put("{\"kineBalance\":\"ascend\"}", Comparator.comparing(MgtAccountAssetDto::getKineBalanceNum));
-        sorterMap.put("{\"kineBalance\":\"descend\"}", Comparator.comparing(MgtAccountAssetDto::getKineBalanceNum).reversed());
+//        sorterMap.put("{\"kusdBalance\":\"ascend\"}", Comparator.comparing(MgtAccountAssetDto::getKusdBalanceNum));
+//        sorterMap.put("{\"kusdBalance\":\"descend\"}", Comparator.comparing(MgtAccountAssetDto::getKusdBalanceNum).reversed());
+//        sorterMap.put("{\"kineBalance\":\"ascend\"}", Comparator.comparing(MgtAccountAssetDto::getKineBalanceNum));
+//        sorterMap.put("{\"kineBalance\":\"descend\"}", Comparator.comparing(MgtAccountAssetDto::getKineBalanceNum).reversed());
         sorterMap.put("{\"usdtBalance\":\"ascend\"}", Comparator.comparing(MgtAccountAssetDto::getUsdtBalanceNum));
         sorterMap.put("{\"usdtBalance\":\"descend\"}", Comparator.comparing(MgtAccountAssetDto::getUsdtBalanceNum).reversed());
         sorterMap.put("{\"usdcBalance\":\"ascend\"}", Comparator.comparing(MgtAccountAssetDto::getUsdtBalanceNum));
@@ -89,10 +88,10 @@ public class AssetManagementServiceImpl implements AssetManagementService {
 
 
         sorterHotWalletMap.put("default", Comparator.comparing(MgtHotWalletDto::getType));
-        sorterHotWalletMap.put("{\"kusdBalance\":\"ascend\"}", Comparator.comparing(MgtHotWalletDto::getKusdBalanceNum));
-        sorterHotWalletMap.put("{\"kusdBalance\":\"descend\"}", Comparator.comparing(MgtHotWalletDto::getKusdBalanceNum).reversed());
-        sorterHotWalletMap.put("{\"kineBalance\":\"ascend\"}", Comparator.comparing(MgtHotWalletDto::getKineBalanceNum));
-        sorterHotWalletMap.put("{\"kineBalance\":\"descend\"}", Comparator.comparing(MgtHotWalletDto::getKineBalanceNum).reversed());
+//        sorterHotWalletMap.put("{\"kusdBalance\":\"ascend\"}", Comparator.comparing(MgtHotWalletDto::getKusdBalanceNum));
+//        sorterHotWalletMap.put("{\"kusdBalance\":\"descend\"}", Comparator.comparing(MgtHotWalletDto::getKusdBalanceNum).reversed());
+//        sorterHotWalletMap.put("{\"kineBalance\":\"ascend\"}", Comparator.comparing(MgtHotWalletDto::getKineBalanceNum));
+//        sorterHotWalletMap.put("{\"kineBalance\":\"descend\"}", Comparator.comparing(MgtHotWalletDto::getKineBalanceNum).reversed());
         sorterHotWalletMap.put("{\"chainBalance\":\"ascend\"}", Comparator.comparing(MgtHotWalletDto::getChainBalanceNum));
         sorterHotWalletMap.put("{\"chainBalance\":\"descend\"}", Comparator.comparing(MgtHotWalletDto::getChainBalanceNum).reversed());
         sorterHotWalletMap.put("{\"usdtBalance\":\"ascend\"}", Comparator.comparing(MgtHotWalletDto::getUsdtBalanceNum));
@@ -100,11 +99,11 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         sorterHotWalletMap.put("{\"usdcBalance\":\"ascend\"}", Comparator.comparing(MgtHotWalletDto::getUsdtBalanceNum));
         sorterHotWalletMap.put("{\"usdcBalance\":\"descend\"}", Comparator.comparing(MgtHotWalletDto::getUsdtBalanceNum).reversed());
 
-        sorterDepositAddressMap.put(AccountConstants.QUOTE_CURRENCY, Comparator.comparing(MgtDepositAddressDto::getKusdBalanceNum).reversed());
+//        sorterDepositAddressMap.put(AccountConstants.QUOTE_CURRENCY, Comparator.comparing(MgtDepositAddressDto::getKusdBalanceNum).reversed());
         sorterDepositAddressMap.put(USDT, Comparator.comparing(MgtDepositAddressDto::getUsdtBalanceNum).reversed());
         sorterDepositAddressMap.put(NATIVE_TOKEN, Comparator.comparing(MgtDepositAddressDto::getChainBalanceNum).reversed());
-        sorterDepositAddressMap.put(AccountConstants.KINE, Comparator.comparing(MgtDepositAddressDto::getKineBalanceNum).reversed());
-        sorterDepositAddressMap.put(USDC, Comparator.comparing(MgtDepositAddressDto::getUsdcBalanceNum).reversed());
+//        sorterDepositAddressMap.put(AccountConstants.KINE, Comparator.comparing(MgtDepositAddressDto::getKineBalanceNum).reversed());
+//        sorterDepositAddressMap.put(USDC, Comparator.comparing(MgtDepositAddressDto::getUsdcBalanceNum).reversed());
     }
 
 
@@ -127,10 +126,9 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     }
 
 
-
     @Override
-    public GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address, String sorter) {
-        currency = isNotBlank(currency) ? currency : AccountConstants.QUOTE_CURRENCY;
+    public GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address) {
+        currency = isNotBlank(currency) ? currency : AccountConstants.USDT;
         GenericDto<List<AddressBalanceDto>> dto =
                 accountFeignClient.getUserAddressBalances(chain, currency);
         if (!dto.isSuccess()) return GenericDto.failure(dto.getMessage(), dto.getCode());
@@ -181,7 +179,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     }
 
     @Override
-    public GenericDto<Page<MgtHotWalletDto>> queryHotWallets(Integer type, int chain, String address, String sorter) {
+    public GenericDto<Page<MgtHotWalletDto>> queryHotWallets(Integer type, int chain, String address) {
         GenericDto<List<SystemWalletAddressDto>> dto = accountFeignClient.getAllSystemWalletAddress(chain);
         if (!dto.isSuccess()) return GenericDto.failure(dto.getCode(), dto.getMessage());
 
@@ -232,26 +230,52 @@ public class AssetManagementServiceImpl implements AssetManagementService {
             mgtHotWalletDtos.add(MgtHotWalletDto.builder()
                     .address(queryAddress)
                     .type(data.getType())
-                    .kusdBalance(kusdBalance)
-                    .kineBalance(kineBalance)
+                    //.kusdBalance(kusdBalance)
+                    //.kineBalance(kineBalance)
                     .chainBalance(chainBalance)
                     .usdtBalance(usdtBalance)
-                    .usdcBalance(usdcBalance)
+                    //.usdcBalance(usdcBalance)
                     .balances(balances)
                     .chain(Chain.fromCode(data.getChain()).getName())
                     .build());
         }
-        if (isBlank(sorter) || "{}".equals(sorter)) {
-            sorter = "default";
-        }
+//        if (isBlank(sorter) || "{}".equals(sorter)) {
+//            sorter = "default";
+//        }
         Page<MgtHotWalletDto> page = new Page<>();
-        page.setRecords(mgtHotWalletDtos.stream().sorted(sorterHotWalletMap.get(sorter)).collect(Collectors.toList()));
+//        page.setRecords(mgtHotWalletDtos.stream().sorted(sorterHotWalletMap.get(sorter)).collect(Collectors.toList()));
+        page.setRecords(mgtHotWalletDtos.stream().collect(Collectors.toList()));
         return GenericDto.success(page);
     }
 
     @Override
     public GenericDto<Page<MgtWalletTransferDto>> queryWalletTransfers(MgtWalletTransferQueryDto queryDto) {
-        return null;
+        GenericDto<Page<AddressCollectHisDto>> dto = accountFeignClient.getFundCollectHistory(
+                queryDto.getChain(), queryDto.getStartTime(), queryDto.getEndTime(), queryDto.getFromAddress(), queryDto.getToAddress(), queryDto.getCurrent(), queryDto.getPageSize());
+        if (!dto.isSuccess()) {
+            return GenericDto.failure(dto.getMessage(), dto.getCode());
+        }
+        Page<MgtWalletTransferDto> pageList = new Page<>();
+
+        pageList.setRecords(assetManagementMapper.convertToMgtWalletTransferDtos(dto.getData().getRecords().stream().filter(item -> {
+            boolean result = true;
+            if (isNotBlank(queryDto.getFromAddress())) {
+                result = queryDto.getFromAddress().equals(item.getFromAddress());
+            }
+            if (isNotBlank(queryDto.getToAddress())) {
+                result = queryDto.getToAddress().equals(item.getToAddress());
+            }
+            if (queryDto.getStatus() != null) {
+                result = queryDto.getStatus().equals(item.getStatus());
+            }
+            return result;
+        }).collect(Collectors.toList())));
+        pageList.setCurrent(dto.getData().getCurrent());
+        pageList.setSize(dto.getData().getSize());
+        pageList.setPages(dto.getData().getPages());
+        pageList.setTotal(dto.getData().getTotal());
+
+        return GenericDto.success(pageList);
     }
 
     @Override
@@ -281,6 +305,16 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         return accountFeignClient.getPendingCollectBalances();
     }
 
+    @Override
+    public GenericDto<ChainGasPriceDto> getGasPrice(int chain) {
+        return accountFeignClient.getGasPrice(chain);
+    }
+
+    @Override
+    public GenericDto<List<AddressCollectHisDto>> getAddressCollectByOrderId(long orderId) {
+        return accountFeignClient.getFundCollectHistoryByOrder(orderId);
+    }
+
     private MgtDepositAddressDto getMgtDepositAddressDto(AddressBalanceDto addressBalanceDto) {
         Map<String, BigDecimal> balancesMap = addressBalanceDto.getBalances();
         MgtDepositAddressDto addressDto = MgtDepositAddressDto.builder().address(addressBalanceDto.getAddress()).build();
@@ -288,15 +322,15 @@ public class AssetManagementServiceImpl implements AssetManagementService {
             for (String key : balancesMap.keySet()) {
                 String balance = balancesMap.get(key).setScale(8, BigDecimal.ROUND_DOWN).toPlainString();
                 if (AccountConstants.KUSD_CURRENCY.equalsIgnoreCase(key)) {
-                    addressDto.setKusdBalance(balance);
+                    // addressDto.setKusdBalance(balance);
                 } else if (USDT.equalsIgnoreCase(key)) {
                     addressDto.setUsdtBalance(balance);
                 } else if (getNativeTokens().contains(key)) {
                     addressDto.setChainBalance(balance);
                 } else if (AccountConstants.KINE.equalsIgnoreCase(key)) {
-                    addressDto.setKineBalance(balance);
+                    // addressDto.setKineBalance(balance);
                 } else if (USDC.equalsIgnoreCase(key)) {
-                    addressDto.setUsdcBalance(balance);
+                    //  addressDto.setUsdcBalance(balance);
                 }
             }
         }
