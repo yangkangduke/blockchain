@@ -11,8 +11,6 @@ import com.seeds.admin.service.ISysWithdrawDepositService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +36,13 @@ public class SysCashController {
     private AssetManagementService assetManagementService;
 
 
-    @ApiImplicitParams({
+    /*@ApiImplicitParams({
             //参数效验
             @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
             @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
             @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
             @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })
+    })*/
     @GetMapping("/chain-withdraw-deposit-type")
     @ApiOperation("获取充提币地址链信息列表")
     public GenericDto<List<MgtChainTypeDto>> queryChainWithdrawTypes() {
@@ -86,14 +84,14 @@ public class SysCashController {
         return mgtWithdrawDepositService.rejectPendingWithdraw(dto);
     }
 
-    @ApiImplicitParams({
+    /*@ApiImplicitParams({
             //参数效验
             @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
             @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
             @ApiImplicitParam(name="status",value="目前交易状态",required=true,dataType="Integer"),
             @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
             @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })
+    })*/
     @GetMapping("/withdraw-history/list")
     @ApiOperation("获取提币审批历史")
 //    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/history/")
@@ -105,13 +103,13 @@ public class SysCashController {
         return GenericDto.success(mgtWithdrawDepositService.listWithdrawReviewHis(currency, userId, status, current, size));
     }
 
-    @ApiImplicitParams({
+    /*@ApiImplicitParams({
             //参数效验
             @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
             @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
             @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
             @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })
+    })*/
     @GetMapping("/pending-deposit/list")
     @ApiOperation("获取充币申请")
 //    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/pending/")
@@ -137,14 +135,14 @@ public class SysCashController {
         return mgtWithdrawDepositService.rejectPendingDeposit(dto);
     }
 
-    @ApiImplicitParams({
+    /*@ApiImplicitParams({
             //参数效验
             @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
             @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
             @ApiImplicitParam(name="status",value="目前交易状态",required=false,dataType="Integer"),
             @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
             @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })
+    })*/
     @GetMapping("/deposit-history/list")
     @ApiOperation("获取充币审批历史")
 //    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/history/")
