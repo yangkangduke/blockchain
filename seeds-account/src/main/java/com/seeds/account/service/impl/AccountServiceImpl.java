@@ -1,5 +1,8 @@
 package com.seeds.account.service.impl;
 
+import cn.hutool.json.JSONUtil;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.anno.ExecutionLock;
 import com.seeds.account.calc.AccountCalculator;
@@ -11,15 +14,17 @@ import com.seeds.account.ex.MissingElementException;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.account.model.ChainDepositWithdrawHis;
 import com.seeds.account.model.UserAccount;
+import com.seeds.account.sender.KafkaProducer;
 import com.seeds.account.service.*;
 import com.seeds.account.util.AddressUtils;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.utils.BasicUtils;
-import com.seeds.uc.dto.request.MetamaskVerifyReq;
+import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.feign.UserCenterFeignClient;
@@ -72,6 +77,9 @@ public class AccountServiceImpl implements IAccountService {
     IUserAccountActionService userAccountActionService;
 //    @Autowired
 //    IPriceService priceService;
+
+    @Autowired
+    private KafkaProducer kafkaProducer;
 
 
     @Override
@@ -347,15 +355,17 @@ public class AccountServiceImpl implements IAccountService {
 //                accountPublishService.publishAsync(AccountTopics.TOPIC_ACCOUNT_UPDATE,
 //                        AccountUpdateEvent.builder().ts(System.currentTimeMillis()).userId(tx.getUserId()).action(AccountAction.UNFREEZE.getCode()).build());
 
-                // 给提币用户发通知
-//                notificationService.sendNotificationAsync(NotificationDto.builder()
-//                        .notificationType(AccountAction.WITHDRAW_REJECTED.getNotificationType())
-//                        .userId(tx.getUserId())
-//                        .values(ImmutableMap.of(
-//                                "ts", System.currentTimeMillis(),
-//                                "currency", tx.getCurrency(),
-//                                "amount", tx.getAmount()))
-//                        .build());
+                // 发送通知用户提币被拒绝
+                kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE,JSONUtil.toJsonStr(NotificationReq.builder()
+                        .notificationType(AccountAction.WITHDRAW_REJECTED.getNotificationType())
+                        .ucUserIds(ImmutableList.of(tx.getUserId()))
+                        .values(ImmutableMap.of(
+                                "ts", System.currentTimeMillis(),
+                                "currency", tx.getCurrency(),
+                                "amount", tx.getAmount()))
+                        .build()));
+                log.info("send withdraw_rejected notification ts:{},currency:{},amount:{}", System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
+
             });
         }
     }
@@ -400,14 +410,15 @@ public class AccountServiceImpl implements IAccountService {
 //                accountAutoExchangeService.exchange(transaction.getUserId(), transaction.getCurrency(), transaction.getAmount(), transaction.getInternal() == 1);
 
                 // 发送通知给客户
-//                notificationService.sendNotificationAsync(NotificationDto.builder()
-//                        .notificationType(AccountAction.DEPOSIT.getNotificationType())
-//                        .userId(transaction.getUserId())
-//                        .values(ImmutableMap.of(
-//                                "ts", System.currentTimeMillis(),
-//                                "currency", transaction.getCurrency(),
-//                                "amount", transaction.getAmount()))
-//                        .build());
+                kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                        .notificationType(AccountAction.DEPOSIT.getNotificationType())
+                        .ucUserIds(ImmutableList.of(transaction.getUserId()))
+                        .values(ImmutableMap.of(
+                                "ts", System.currentTimeMillis(),
+                                "currency", transaction.getCurrency(),
+                                "amount", transaction.getAmount()))
+                        .build()));
+                log.info("send deposit notification ts:{},currency:{},amount:{}", System.currentTimeMillis(), transaction.getCurrency(), transaction.getAmount());
             });
         } else if (transaction.getAction() == ChainAction.WITHDRAW) {
             if (!Objects.equals(transaction.getStatus(), WithdrawStatus.PENDING_APPROVE.getCode())) {
