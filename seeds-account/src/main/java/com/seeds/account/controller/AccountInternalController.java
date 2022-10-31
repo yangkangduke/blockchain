@@ -153,7 +153,8 @@ public class AccountInternalController {
      * @return
      */
     @PostMapping("/sys/processed-transaction")
-    @ApiOperation("获取审核的充提")
+    @ApiOperation("获取已审核的充提")
+    @Inner
     public GenericDto<Page<ChainDepositWithdrawHisDto>> getManualProcessedTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq) {
         try {
             Integer status = transactionsReq.getStatus();
