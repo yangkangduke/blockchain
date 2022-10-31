@@ -31,7 +31,12 @@ public class OpenAccountController {
     public GenericDto<List<UcUserAccountAmountResp>> amountInfo(@RequestParam String accessKey,
                                                                 @RequestParam String signature,
                                                                 @RequestParam Long timestamp) {
-        return remoteUserAccountService.amountInfo(UserContext.getCurrentUserId());
+        GenericDto<List<UcUserAccountAmountResp>> result = remoteUserAccountService.amountInfo(UserContext.getCurrentUserId());
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
 }
