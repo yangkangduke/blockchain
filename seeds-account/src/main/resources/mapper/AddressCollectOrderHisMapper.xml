@@ -64,12 +64,12 @@
         from ac_address_collect_order_his
         where 1 = 1
         <if test="chain != null">and chain = #{chain,jdbcType=BIGINT}</if>
-        <if test="startTime > 0">and update_time &gt;= #{startTime,jdbcType=BIGINT}</if>
+        <if test="startTime > 0">and create_time &gt;= #{startTime,jdbcType=BIGINT}</if>
         <if test="endTime > 0">and update_time &lt;= #{endTime,jdbcType=BIGINT}</if>
         <if test="type > 0">and type = #{type,jdbcType=TINYINT}</if>
         <if test="address != null">and address = #{address,jdbcType=VARCHAR}</if>
         <if test="currency != null">and currency = #{currency,jdbcType=VARCHAR}</if>
-        order by id
+        order by create_time desc
     </select>
 
     <select id="getByStatus" resultMap="BaseResultMap">

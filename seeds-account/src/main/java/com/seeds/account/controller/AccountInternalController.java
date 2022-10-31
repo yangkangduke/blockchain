@@ -463,7 +463,7 @@ public class AccountInternalController {
 
     /**
      * 获取钱包归集历史
-     *
+     * (热钱包划转历史)
      * @param chain
      * @param startTime
      * @param endTime
@@ -562,7 +562,7 @@ public class AccountInternalController {
      * @return
      */
     @GetMapping("/sys/fund-collect-order-history")
-    @ApiOperation("获取钱包归集历史")
+    @ApiOperation("获取钱包归集订单历史")
     @Inner
     public GenericDto<IPage<AddressCollectOrderHisDto>> getFundCollectOrderHistory(@RequestParam("chain") int chain,
                                                                                       @RequestParam("startTime") long startTime,
