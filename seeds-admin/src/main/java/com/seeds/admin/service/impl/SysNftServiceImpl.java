@@ -38,6 +38,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -171,6 +172,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     public void addConfirm(SysNftAddConfirmReq req) {
+        if (NftInitStatusEnum.NORMAL.getCode() == req.getInitStatus()) {
+            Assert.hasText(req.getNewItemId(), "Token id can not be empty");
+        }
         SysNftEntity nft = getById(req.getNftId());
         nft.setInitStatus(req.getInitStatus());
         nft.setTokenId(req.getNewItemId());
