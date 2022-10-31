@@ -39,7 +39,12 @@ public class OpenNftController {
         req.setOwnerId(UserContext.getCurrentUserId());
         req.setOwnerName(UserContext.getCurrentUserName());
         req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
-        return adminRemoteNftService.create(req);
+        GenericDto<Long> result = adminRemoteNftService.create(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("upgrade")
@@ -49,14 +54,24 @@ public class OpenNftController {
         req.setOwnerId(UserContext.getCurrentUserId());
         req.setOwnerName(UserContext.getCurrentUserName());
         req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
-        return adminRemoteNftService.upgrade(req);
+        GenericDto<Long> result = adminRemoteNftService.upgrade(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("lock")
     @ApiOperation("NFT锁定")
     public GenericDto<Object> lock(@Valid @RequestBody OpenNftLockReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return adminRemoteNftService.lock(req);
+        GenericDto<Object> result = adminRemoteNftService.lock(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("buy")
@@ -64,49 +79,84 @@ public class OpenNftController {
     public GenericDto<Object> buy(@Valid @RequestBody OpenNftBuyReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         req.setSource(RequestSource.GAME);
-        return ucRemoteNftService.buyNFT(req);
+        GenericDto<Object> result = ucRemoteNftService.buyNFT(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("forward-auction")
     @ApiOperation("NFT正向拍卖")
     public GenericDto<Object> forwardAuction(@Valid @RequestBody OpenNftForwardAuctionReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return ucRemoteNftService.forwardAuction(req);
+        GenericDto<Object> result = ucRemoteNftService.forwardAuction(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("reverse-auction")
     @ApiOperation("NFT反向拍卖")
     public GenericDto<Object> reverseAuction(@Valid @RequestBody OpenNftReverseAuctionReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return ucRemoteNftService.reverseAuction(req);
+        GenericDto<Object> result = ucRemoteNftService.reverseAuction(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("forward-bids")
     @ApiOperation("NFT正向出价")
     public GenericDto<Object> forwardBids(@Valid @RequestBody OpenNftForwardBidsReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return ucRemoteNftService.forwardBids(req);
+        GenericDto<Object> result = ucRemoteNftService.forwardBids(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("reverse-bids")
     @ApiOperation("NFT反向出价")
     public GenericDto<Object> reverseBids(@Valid @RequestBody OpenNftReverseBidsReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return ucRemoteNftService.reverseBids(req);
+        GenericDto<Object> result = ucRemoteNftService.reverseBids(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("shelves")
     @ApiOperation("NFT上架")
     public GenericDto<Object> shelves(@Valid @RequestBody OpenNftShelvesReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return ucRemoteNftService.shelves(req);
+        GenericDto<Object> result = ucRemoteNftService.shelves(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("sold-out")
     @ApiOperation("NFT下架")
     public GenericDto<Object> soldOut(@Valid @RequestBody OpenNftSoldOutReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return ucRemoteNftService.soldOut(req);
+        GenericDto<Object> result = ucRemoteNftService.soldOut(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @GetMapping("/gas-fees")
@@ -115,7 +165,12 @@ public class OpenNftController {
                                                  @RequestParam String accessKey,
                                                  @RequestParam String signature,
                                                  @RequestParam Long timestamp) {
-        return adminRemoteNftService.gasFees(nftNo);
+        GenericDto<SysNftGasFeesResp> result = adminRemoteNftService.gasFees(nftNo);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
 }
