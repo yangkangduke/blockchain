@@ -87,7 +87,7 @@ public class AccountInternalController {
      *
      * @return
      */
-    @PostMapping("/mgt/pending-transaction")
+    @PostMapping("/sys/pending-transaction")
     @ApiOperation("获取需要审核的充提")
     @Inner
     public GenericDto<Page<ChainDepositWithdrawHisDto>> getPendingTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq) {

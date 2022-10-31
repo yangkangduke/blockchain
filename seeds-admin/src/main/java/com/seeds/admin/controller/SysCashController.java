@@ -76,9 +76,7 @@ public class SysCashController {
     }
 
     @GetMapping("/pending-withdraw/list")
-    @ApiOperation("获取提币申请")
-    // todo
-//    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/pending/")
+    @ApiOperation(value = "获取提币申请")
     public GenericDto<IPage<MgtDepositWithdrawDto>> listPendingWithdraw(@RequestParam(value = "currency", required = false) String currency,
                                                                         @RequestParam(value = "userId", required = false) Long userId,
                                                                         @RequestParam("current") Integer current,
@@ -88,30 +86,20 @@ public class SysCashController {
     }
 
     @PostMapping("/pending-withdraw/approve")
-    @ApiOperation("批准提币")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/pending/:approve")
+    @ApiOperation(value = "批准提币", notes = "只需要传id、comment参数")
     public GenericDto<Boolean> approveWithdraw(@RequestBody @Valid MgtApproveRejectDto dto) {
         return mgtWithdrawDepositService.approvePendingWithdraw(dto);
     }
 
     @PostMapping("/pending-withdraw/reject")
-    @ApiOperation("拒绝提币")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/pending/:reject")
+    @ApiOperation(value = "拒绝提币", notes = "只需要传id、comment参数")
     public GenericDto<Boolean> rejectWithdraw(@RequestBody @Valid MgtApproveRejectDto dto) {
         return mgtWithdrawDepositService.rejectPendingWithdraw(dto);
     }
 
-    /*@ApiImplicitParams({
-            //参数效验
-            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
-            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
-            @ApiImplicitParam(name="status",value="目前交易状态",required=true,dataType="Integer"),
-            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
-            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })*/
+
     @GetMapping("/withdraw-history/list")
-    @ApiOperation("获取提币审批历史")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/history/")
+    @ApiOperation(value = "获取提币审批历史")
     public GenericDto<Page<MgtDepositWithdrawDto>> listWithdrawHis( String currency,
                                                                                Long userId,
                                                                                Integer status,
@@ -120,16 +108,9 @@ public class SysCashController {
         return GenericDto.success(mgtWithdrawDepositService.listWithdrawReviewHis(currency, userId, status, current, size));
     }
 
-    /*@ApiImplicitParams({
-            //参数效验
-            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
-            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
-            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
-            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })*/
+
     @GetMapping("/pending-deposit/list")
-    @ApiOperation("获取充币申请")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/pending/")
+    @ApiOperation(value = "获取充币申请")
     public GenericDto<Page<MgtDepositWithdrawDto>> listPendingDeposit(@RequestParam(value = "currency", required = false) String currency,
                                                                                   @RequestParam(value = "userId", required = false) Long userId,
                                                                                   @RequestParam("current") Integer current,
@@ -138,31 +119,21 @@ public class SysCashController {
     }
 
     @PostMapping("/pending-deposit/approve")
-    @ApiOperation("批准充币")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/pending/:approve")
+    @ApiOperation(value = "批准充币", notes = "只需要传id、comment参数")
     public GenericDto<Boolean> approveDeposit(@RequestBody @Valid MgtApproveRejectDto dto) {
         dto.setComment("");
         return mgtWithdrawDepositService.approvePendingDeposit(dto);
     }
 
     @PostMapping("/pending-deposit/reject")
-    @ApiOperation("拒绝充币")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/pending/:reject")
+    @ApiOperation(value = "拒绝充币", notes = "只需要传id、comment参数")
     public GenericDto<Boolean> rejectDeposit(@RequestBody @Valid MgtApproveRejectDto dto) {
         return mgtWithdrawDepositService.rejectPendingDeposit(dto);
     }
 
-    /*@ApiImplicitParams({
-            //参数效验
-            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
-            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
-            @ApiImplicitParam(name="status",value="目前交易状态",required=false,dataType="Integer"),
-            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
-            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })*/
+
     @GetMapping("/deposit-history/list")
-    @ApiOperation("获取充币审批历史")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/history/")
+    @ApiOperation(value = "获取充币审批历史")
     public GenericDto<Page<MgtDepositWithdrawDto>> listDepositHis(@RequestParam(value = "currency", required = false) String currency,
                                                                   @RequestParam(value = "userId", required = false) Long userId,
                                                                   @RequestParam(value = "status", required = false) Integer status,
