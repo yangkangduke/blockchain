@@ -238,8 +238,8 @@ public class SysCashController {
             @RequestParam(value = "currency", required = false) String currency,
             @RequestParam(value = "address", required = false) String address,
             @RequestParam(value = "chain", defaultValue = "1") int chain,
-            @RequestParam("current") int current,
-            @RequestParam("pageSize") int pageSize) {
+            @RequestParam("current") Integer current,
+            @RequestParam("pageSize") Integer pageSize) {
         if (isBlank(currency)) {
             currency = null;
         }
@@ -254,8 +254,8 @@ public class SysCashController {
     public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryGasFeeList(
             @RequestParam(value = "address", required = false) String address,
             @RequestParam(value = "chain", defaultValue = "1") int chain,
-            @RequestParam("current") int current,
-            @RequestParam("pageSize") int pageSize) {
+            @RequestParam("current") Integer current,
+            @RequestParam("pageSize") Integer pageSize) {
         if (isBlank(address)) {
             address = null;
         }
