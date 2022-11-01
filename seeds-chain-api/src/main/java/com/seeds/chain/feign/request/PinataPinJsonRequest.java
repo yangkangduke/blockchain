@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PinataPinJsonRequest {
+    private Long id;
     private String name;
     private String description;
     private List<ChainNftAttributes> attributes;

@@ -35,10 +35,9 @@ public interface SysNftService extends IService<SysNftEntity> {
      * 添加系统NFT信息
      * @param imageUrl NFT图片
      * @param req NFT信息
-     * @param metadataHash 上链数据加密串
      * @return NFT的唯一标识
      */
-    Long add(String imageUrl, SysNftAddReq req, String metadataHash);
+    SysNftEntity add(String imageUrl, SysNftAddReq req);
 
     /**
      * 添加系统NFT信息确认

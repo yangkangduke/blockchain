@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 @Builder
 public class ChainUpdateNftReq {
+    private Long id;
     private String tokenId;
     private String name;
     private String description;
