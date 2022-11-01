@@ -22,7 +22,7 @@ public class MgtAddressCollectOrderHisDto {
     long updateTime;
     @ApiModelProperty(value = "币种时间")
     String currency;
-    @ApiModelProperty(value = "交易发起地址")
+    @ApiModelProperty(value = "地址")
     String address;
     @ApiModelProperty(value = "金额")
     String amount;

@@ -8,6 +8,7 @@ import com.seeds.account.dto.BalanceGetStatusDto;
 import com.seeds.account.dto.ChainGasPriceDto;
 import com.seeds.account.enums.FundCollectOrderType;
 import com.seeds.admin.dto.*;
+import com.seeds.admin.dto.request.SysCollectOrderHisReq;
 import com.seeds.admin.service.AssetManagementService;
 import com.seeds.admin.service.ISysWithdrawDepositService;
 import com.seeds.common.dto.GenericDto;
@@ -232,34 +233,25 @@ public class SysCashController {
         return assetManagementService.walletTransfer(dto);
     }
 
-    @GetMapping("/transfer/history-list")
+    @PostMapping("/transfer/history-list")
     @ApiOperation("获取资金归集历史记录列表--USER_TO_SYSTEM")
-    public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryHistoryList(
-            @RequestParam(value = "currency", required = false) String currency,
-            @RequestParam(value = "address", required = false) String address,
-            @RequestParam(value = "chain", defaultValue = "1") Integer chain,
-            @RequestParam("current") Integer current,
-            @RequestParam("pageSize") Integer pageSize) {
-        if (isBlank(currency)) {
-            currency = null;
+    public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryHistoryList(@RequestBody SysCollectOrderHisReq req) {
+        if (isBlank(req.getCurrency())) {
+            req.setCurrency(null);
         }
-        if (isBlank(address)) {
-            address = null;
+        if (isBlank(req.getAddress())) {
+            req.setAddress(null);
         }
-        return assetManagementService.getFundCollectOrderHistory(chain, currency, address, current, pageSize, FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode());
+        return assetManagementService.getFundCollectOrderHistory(req.getChain(), req.getCurrency(), req.getAddress(), req.getCurrent(), req.getSize(), FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode());
     }
 
-    @GetMapping("/transfer/gas-fee-list")
+    @PostMapping("/transfer/gas-fee-list")
     @ApiOperation("获取Gas Fee划转历史记录列表----SYSTEM_TO_USER")
-    public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryGasFeeList(
-            @RequestParam(value = "address", required = false) String address,
-            @RequestParam(value = "chain", defaultValue = "1") Integer chain,
-            @RequestParam("current") Integer current,
-            @RequestParam("pageSize") Integer pageSize) {
-        if (isBlank(address)) {
-            address = null;
+    public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryGasFeeList(@RequestBody SysCollectOrderHisReq req) {
+        if (isBlank(req.getAddress())) {
+            req.setAddress(null);
         }
-        return assetManagementService.getFundCollectOrderHistory(chain, null, address, current, pageSize, FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode());
+        return assetManagementService.getFundCollectOrderHistory(req.getChain(), null, req.getAddress(), req.getCurrent(), req.getSize(), FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode());
     }
 
     @GetMapping("/transfer/collect-history-by-order")
