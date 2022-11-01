@@ -1,9 +1,11 @@
 package com.seeds.uc.handler;
 
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.binding.BindingException;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,15 @@ public class UcExceptionHandler {
         log.error("Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure("Internal Error:" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(FeignException.class)
+    ResponseEntity<GenericDto<String>> handle(FeignException e) {
+        String message = e.getMessage().substring(e.getMessage().lastIndexOf('{'), e.getMessage().length() - 1);
+        return new ResponseEntity<>(
+                GenericDto.failure(JSONUtil.toBean(message, GenericDto.class).getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
