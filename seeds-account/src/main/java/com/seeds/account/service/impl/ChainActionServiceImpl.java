@@ -460,7 +460,7 @@ public class ChainActionServiceImpl implements IChainActionService {
 //                    accountAutoExchangeService.exchange(assignedDepositAddress.getUserId(), tx.getCurrency(), amount, true);
 
                     // 发送通知给客户(充币方)
-                    kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                    kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                             .notificationType(AccountAction.DEPOSIT.getNotificationType())
                             .ucUserIds(ImmutableList.of(assignedDepositAddress.getUserId()))
                             .values(ImmutableMap.of(
@@ -468,7 +468,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                                     "currency", tx.getCurrency(),
                                     "amount", amount))
                             .build()));
-                    log.info("send internal deposit notification ts:{},currency:{},amount:{}", System.currentTimeMillis(), tx.getCurrency(), amount);
+                    log.info("send internal deposit notification userID:{}, ts:{},currency:{},amount:{}", assignedDepositAddress.getUserId(), System.currentTimeMillis(), tx.getCurrency(), amount);
 
                 });
             }

@@ -266,7 +266,7 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
 
 
             // 发送通知给客户
-            kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+            kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                     .notificationType(AccountAction.DEPOSIT.getNotificationType())
                     .ucUserIds(ImmutableList.of(transaction.getUserId()))
                     .values(ImmutableMap.of(
@@ -274,7 +274,7 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
                             "currency", transaction.getCurrency(),
                             "amount", transaction.getAmount()))
                     .build()));
-            log.info("send deposit notification ts:{},currency:{},amount:{}", System.currentTimeMillis(), transaction.getCurrency(), transaction.getAmount());
+            log.info("send deposit notification userid:{}, ts:{},currency:{},amount:{}", transaction.getUserId(), System.currentTimeMillis(), transaction.getCurrency(), transaction.getAmount());
         });
     }
 }
