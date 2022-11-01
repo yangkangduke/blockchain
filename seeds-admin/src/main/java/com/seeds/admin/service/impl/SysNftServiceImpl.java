@@ -218,13 +218,13 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
         String metadataHash = "ipfs://" + metadataFileHash;
         SysNftAddResp resp = new SysNftAddResp();
-        resp.setNftId(sysNft.getId());
         resp.setMetadataHash(metadataHash);
         // 保存NFT
         sysNft.setMetadataHash(metadataHash);
         save(sysNft);
         // 保存NFT属性
         addNftProperties(sysNft.getId(), req.getPropertiesList());
+        resp.setNftId(sysNft.getId());
         return resp;
     }
 
