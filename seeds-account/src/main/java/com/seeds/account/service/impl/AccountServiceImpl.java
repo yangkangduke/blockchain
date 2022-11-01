@@ -322,7 +322,7 @@ public class AccountServiceImpl implements IAccountService {
                 throw new ActionDeniedException("status is not pending approval");
             }
             int manual = 1;
-            int status = WithdrawStatus.REJECTED.getCode();
+            int status = DepositStatus.REJECTED.getCode();
             tx.setUpdateTime(System.currentTimeMillis());
             tx.setVersion(tx.getVersion() + 1);
             tx.setManual(manual);
@@ -385,7 +385,7 @@ public class AccountServiceImpl implements IAccountService {
                 throw new ActionDeniedException("status is not pending approve");
             }
             int manual = 1;
-            int status = WithdrawStatus.TRANSACTION_CONFIRMED.getCode();
+            int status = DepositStatus.TRANSACTION_CONFIRMED.getCode();
             transaction.setUpdateTime(System.currentTimeMillis());
             transaction.setVersion(transaction.getVersion() + 1);
             transaction.setManual(manual);

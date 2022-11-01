@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 @Builder
 public class ChainMintNftReq {
+    private Long id;
     private String name;
     private String description;
     private List<ChainNftAttributes> attributes;

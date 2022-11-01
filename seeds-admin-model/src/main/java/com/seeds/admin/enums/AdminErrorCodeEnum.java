@@ -57,6 +57,9 @@ public enum AdminErrorCodeEnum {
     ERR_40014_NFT_LOCKED_AND_CANNOT_BE_OPERATED(40014,"NFT已锁定，不能操作","NFT is locked and cannot be operated"),
     ERR_40015_THIS_NFT_IS_NOT_IN_THE_AUCTION(40015, "该NFT没有在拍卖中", "This NFT is not in the auction"),
     ERR_40016_This_type_of_NFT_has_not_yet_been_issued(40016, "此类NFT还未发行", "This type of NFT has not yet been issued"),
+    ERR_40017_THE_NFT_TOKEN_ID_ALREADY_EXIST(40017, "tokenId已存在", "The NFT token id already exist"),
+    ERR_40018_NFT_NOT_EXIST(40018, "NFT不存在", "NFT not exist"),
+    ERR_40019_NFT_METADATA_MISMATCH(40019, "NFT元数据不匹配", "NFT metadata mismatch"),
 
     // merchant
     ERR_50001_MERCHANT_ALREADY_EXIST(50001, "商家已存在", "Merchant already exist"),

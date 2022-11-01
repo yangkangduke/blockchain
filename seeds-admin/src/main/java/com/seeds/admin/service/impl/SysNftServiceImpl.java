@@ -44,6 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -142,7 +143,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long add(String imageFileHash, SysNftAddReq req, String metadataHash) {
+    public SysNftEntity add(String imageFileHash, SysNftAddReq req) {
         // 校验基础属性缺失或重复
         List<NftPropertiesReq> propertiesList = req.getPropertiesList();
         List<NftPropertiesReq> enduranceList = propertiesList.stream().filter(p -> p.getTypeId() != null && p.getTypeId() == 1L).collect(Collectors.toList());
@@ -163,19 +164,28 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         sysNft.setUrl(imageFileHash);
         // 生成NFT编号
         sysNft.setNumber(sysSequenceNoService.generateNftNo());
-        sysNft.setMetadataHash(metadataHash);
-        // 保存NFT
-        save(sysNft);
 
-        return sysNft.getId();
+        return sysNft;
     }
 
     @Override
     public void addConfirm(SysNftAddConfirmReq req) {
+        SysNftEntity nft = getById(req.getNftId());
+        if (nft == null) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40018_NFT_NOT_EXIST.getDescEn());
+        }
         if (NftInitStatusEnum.NORMAL.getCode() == req.getInitStatus()) {
             Assert.hasText(req.getNewItemId(), "Token id can not be empty");
+            LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
+                    .eq(SysNftEntity::getTokenId, req.getNewItemId());
+            if (getOne(queryWrap) != null) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_40017_THE_NFT_TOKEN_ID_ALREADY_EXIST.getDescEn());
+            }
+            String uri = gameItemsService.getUri(new BigInteger(req.getNewItemId()));
+            if (!nft.getMetadataHash().equals(uri)) {
+                throw new SeedsException(AdminErrorCodeEnum.ERR_40019_NFT_METADATA_MISMATCH.getDescEn());
+            }
         }
-        SysNftEntity nft = getById(req.getNftId());
         nft.setInitStatus(req.getInitStatus());
         nft.setTokenId(req.getNewItemId());
         nft.setContractAddress(smartContractConfig.getGameAddress());
@@ -196,9 +206,11 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     public SysNftAddResp addUpload(MultipartFile image, SysNftAddReq req) {
         // 上传NFT图片
         String imageFileHash = chainNftService.uploadImage(image);
+        SysNftEntity sysNft = add(imageFileHash, req);
         // 上传Metadata
         String metadataFileHash = chainNftService.uploadMetadata(imageFileHash,
                 ChainMintNftReq.builder()
+                        .id(sysNft.getId())
                         .name(req.getName())
                         .description(req.getDescription())
                         .attributes(buildNftProperties(req.getPropertiesList()))
@@ -206,8 +218,13 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
 
         String metadataHash = "ipfs://" + metadataFileHash;
         SysNftAddResp resp = new SysNftAddResp();
-        resp.setNftId(add(imageFileHash, req, metadataHash));
         resp.setMetadataHash(metadataHash);
+        // 保存NFT
+        sysNft.setMetadataHash(metadataHash);
+        save(sysNft);
+        // 保存NFT属性
+        addNftProperties(sysNft.getId(), req.getPropertiesList());
+        resp.setNftId(sysNft.getId());
         return resp;
     }
 
@@ -218,15 +235,17 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             throw new SeedsException(AdminErrorCodeEnum.ERR_40016_This_type_of_NFT_has_not_yet_been_issued.getDescEn());
         }
         String imageFileHash = nft.getUrl();
-        Long nftId = add(imageFileHash, req, nft.getMetadataHash());
+        SysNftEntity sysNft = add(imageFileHash, req);
+        // 保存NFT
+        save(sysNft);
         // 发NFT创建消息
         NftUpgradeMsgDTO msgDTO = new NftUpgradeMsgDTO();
         BeanUtils.copyProperties(req, msgDTO);
-        msgDTO.setId(nftId);
+        msgDTO.setId(sysNft.getId());
         msgDTO.setImageFileHash(imageFileHash);
 
         kafkaProducer.send(topic, JSONUtil.toJsonStr(msgDTO));
-        return nftId;
+        return sysNft.getId();
     }
 
     @Override
@@ -504,6 +523,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             // 上传Metadata
             String metadataFileHash = chainNftService.uploadMetadata(msgDTO.getImageFileHash(),
                     ChainMintNftReq.builder()
+                            .id(nft.getId())
                             .name(msgDTO.getName())
                             .description(msgDTO.getDescription())
                             .attributes(buildNftProperties(msgDTO.getPropertiesList()))
@@ -543,6 +563,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             String imageFileHash = chainNftService.getMetadataFileImageHash(sysNft.getTokenId());
             String metadataFileHash = chainNftService.updateMetadata(imageFileHash,
                     ChainUpdateNftReq.builder()
+                            .id(sysNft.getId())
                             .name(req.getName())
                             .description(req.getDescription())
                             .attributes(buildNftProperties(req.getPropertiesList()))

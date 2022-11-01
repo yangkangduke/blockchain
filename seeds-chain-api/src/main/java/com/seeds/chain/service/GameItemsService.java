@@ -14,4 +14,5 @@ public interface GameItemsService {
     boolean updateNftAttribute(BigInteger tokenId, String newUri);
 
     boolean burnNft(String tokenId);
+
 }
