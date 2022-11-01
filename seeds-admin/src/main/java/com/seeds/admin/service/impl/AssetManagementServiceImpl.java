@@ -136,7 +136,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
                 dto.getData().stream().collect(Collectors.toMap(AddressBalanceDto::getAddress, e -> e));
         List<MgtDepositAddressDto> dtos = Lists.newArrayList();
         if (isNotBlank(address) && !balanceDtoMap.containsKey(address)) {
-            dtos.add(null);
+
         } else if (isNotBlank(address) && balanceDtoMap.containsKey(address)) {
             dtos.add(getMgtDepositAddressDto(balanceDtoMap.get(address)));
         } else {
