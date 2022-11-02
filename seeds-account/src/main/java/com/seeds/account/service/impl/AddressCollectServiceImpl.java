@@ -70,7 +70,6 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
     ChainTxnDataMapper transactionDataMapper;
     @Autowired
     IAsyncService asyncService;
-
     @Autowired
     RedissonClient client;
 
@@ -265,10 +264,14 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
 
         List<String> addresses = chainDepositWithdrawHisService.getDepositAddress(chain, startTime, endTime);
 
+        List<SystemWalletAddressDto> systemWalletAddress = systemWalletAddressService.getAll();
+        List<String> userAddress = addresses.stream()
+                .filter(p -> systemWalletAddress.stream().noneMatch(i -> Objects.equals(p, i.getAddress())
+        )).collect(Collectors.toList());
         // batch操作中间的休眠天数
         long sleep = Long.parseLong(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_REQUEST_BATCH_SLEEP, "500"));
         try {
-            return chainService.getBalancesOnBatch(chain, addresses, sleep);
+            return chainService.getBalancesOnBatch(chain, userAddress, sleep);
         } catch (Exception e) {
             log.error("getPendingCollectBalances, ", e);
         }
