@@ -54,12 +54,12 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     }
 
     @Override
-    public BlacklistAddressDto get(int type, long userId, String address) {
+    public BlacklistAddressDto get(Integer type, Long userId, String address) {
         // milo 由于要兼容大小写，所以不能直接使用map
         return getAll().stream()
-                .filter(e -> e.getType() == type &&
+                .filter(e -> Objects.equals(e.getType(), type) &&
                         e.getStatus() == CommonStatus.ENABLED &&
-                        (e.getUserId() == userId ||
+                        (Objects.equals(e.getUserId(), userId) ||
                                 ObjectUtils.isAddressEquals(e.getAddress(), address)))
                 .findFirst()
                 .orElse(null);

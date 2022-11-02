@@ -67,6 +67,17 @@ public class InterNFTController {
     }
 
     /**
+     *  手续费扣除接口
+     */
+    @PostMapping("/deduct-gas-fee")
+    @ApiOperation(value = "手续费扣除", notes = "手续费扣除")
+    @Inner
+    public GenericDto<Object> deductGasFee(@Valid @RequestBody NFTDeductGasFeeReq req) {
+        ucInterNFTService.deductGasFee(req);
+        return GenericDto.success(null);
+    }
+
+    /**
      *  正向拍卖
      */
     @PostMapping("/forward-auction")

@@ -80,4 +80,11 @@ public interface UcInterNFTService {
      * @param req 入参
      */
     void soldOut(NFTSoldOutReq req);
+
+    /**
+     * 手续费扣除
+     * @param req 入参
+     */
+    void deductGasFee(NFTDeductGasFeeReq req);
+
 }

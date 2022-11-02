@@ -11,12 +11,12 @@ import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.constant.mq.KafkaTopic;
-import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RequestSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.request.NFTBuyReq;
+import com.seeds.uc.dto.request.NFTDeductGasFeeReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountAmountResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
@@ -316,6 +316,38 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
             });
         }
         return resList;
+    }
+
+    @Override
+    public void deductGasFee(NFTDeductGasFeeReq req) {
+        Long currentUserId = req.getUserId();
+        if (currentUserId == null) {
+            currentUserId = UserContext.getCurrentUserId();
+        }
+        BigDecimal price = req.getPrice();
+        // 检查账户里面的金额是否足够支付
+        if (!checkBalance(currentUserId, price, CurrencyEnum.USDT)) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
+        }
+        // 扣除金额
+        LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
+                .eq(UcUserAccount::getUserId, currentUserId)
+                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
+        UcUserAccount account = getOne(wrapper);
+        account.setBalance(account.getBalance().subtract(price));
+        updateById(account);
+
+        // 添加记录信息
+        UcUserAccountActionHistory ucUserAccountActionHistory = UcUserAccountActionHistory.builder()
+                .userId(currentUserId)
+                .createTime(System.currentTimeMillis())
+                .actionEnum(AccountActionEnum.BUY_NFT)
+                .accountType(AccountTypeEnum.ACTUALS)
+                .currency(CurrencyEnum.USDT)
+                .status(AccountActionStatusEnum.PROCESSING)
+                .amount(price)
+                .build();
+        ucUserAccountActionHistoryService.save(ucUserAccountActionHistory);
     }
 
 }

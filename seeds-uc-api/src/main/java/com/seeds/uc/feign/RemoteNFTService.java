@@ -32,6 +32,10 @@ public interface RemoteNFTService {
 	@ApiOperation(value = "购买", notes = "购买")
 	GenericDto<Object> buyNFT(@Valid @RequestBody NFTBuyReq buyReq) ;
 
+	@PostMapping("/internal-nft/deduct-gas-fee")
+	@ApiOperation(value = "扣除手续费", notes = "扣除手续费")
+	GenericDto<Object> deductGasFee(@Valid @RequestBody NFTDeductGasFeeReq req) ;
+
 	@PostMapping("/internal-nft/forward-auction")
 	@ApiOperation(value = "正向拍卖", notes = "正向拍卖")
 	GenericDto<Object> forwardAuction(NFTForwardAuctionReq req);

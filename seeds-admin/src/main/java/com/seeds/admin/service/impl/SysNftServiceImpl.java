@@ -203,6 +203,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public SysNftAddResp addUpload(MultipartFile image, SysNftAddReq req) {
         // 上传NFT图片
         String imageFileHash = chainNftService.uploadImage(image);
