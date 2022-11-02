@@ -17,6 +17,8 @@ public enum AccountActionEnum {
     WITHDRAW((short) 2,"withdraw","提币"),
     @JsonProperty("3")
     BUY_NFT((short) 3,"buy","购买NFT"),
+    @JsonProperty("4")
+    GAS_FEE((short) 4,"gasFee","扣除手续费"),
     ;
     @JsonValue
     @EnumValue

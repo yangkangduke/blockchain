@@ -8,6 +8,7 @@ import com.seeds.common.enums.RequestSource;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.request.NFTBuyReq;
+import com.seeds.uc.dto.request.NFTDeductGasFeeReq;
 import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.UcUserAccountAmountResp;
 import com.seeds.uc.dto.response.UcUserAccountInfoResp;
@@ -91,5 +92,11 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * @return 账户金额
      */
     List<UcUserAccountAmountResp> amountInfo(Long userId);
+
+    /**
+     * 手续费扣除
+     * @param req
+     */
+    void deductGasFee(NFTDeductGasFeeReq req);
 
 }

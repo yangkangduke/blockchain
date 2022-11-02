@@ -246,4 +246,9 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
         BeanUtils.copyProperties(req, soldOutReq);
         remoteNftService.soldOut(soldOutReq);
     }
+
+    @Override
+    public void deductGasFee(NFTDeductGasFeeReq req) {
+        ucUserAccountService.deductGasFee(req);
+    }
 }
