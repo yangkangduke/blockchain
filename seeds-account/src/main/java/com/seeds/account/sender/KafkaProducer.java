@@ -39,4 +39,13 @@ public class KafkaProducer {
 
     }
 
+    /**
+     * 发送消息
+     */
+    @Transactional
+    public void send(String topic, String msg) {
+        log.info("发送消息： topic - {},msg - {}", topic, msg);
+        kafkaTemplate.send(topic, msg);
+    }
+
 }

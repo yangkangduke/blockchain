@@ -122,7 +122,6 @@ public class SysCashController {
     @PostMapping("/pending-deposit/approve")
     @ApiOperation(value = "批准充币", notes = "只需要传id、comment参数")
     public GenericDto<Boolean> approveDeposit(@RequestBody @Valid MgtApproveRejectDto dto) {
-        dto.setComment("");
         return mgtWithdrawDepositService.approvePendingDeposit(dto);
     }
 

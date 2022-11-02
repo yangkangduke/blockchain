@@ -410,7 +410,7 @@ public class AccountServiceImpl implements IAccountService {
 //                accountAutoExchangeService.exchange(transaction.getUserId(), transaction.getCurrency(), transaction.getAmount(), transaction.getInternal() == 1);
 
                 // 发送通知给客户
-                kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                         .notificationType(AccountAction.DEPOSIT.getNotificationType())
                         .ucUserIds(ImmutableList.of(transaction.getUserId()))
                         .values(ImmutableMap.of(
@@ -418,7 +418,7 @@ public class AccountServiceImpl implements IAccountService {
                                 "currency", transaction.getCurrency(),
                                 "amount", transaction.getAmount()))
                         .build()));
-                log.info("send deposit notification ts:{},currency:{},amount:{}", System.currentTimeMillis(), transaction.getCurrency(), transaction.getAmount());
+                log.info("send deposit notification userid:{}, ts:{},currency:{},amount:{}", transaction.getUserId(), System.currentTimeMillis(), transaction.getCurrency(), transaction.getAmount());
             });
         } else if (transaction.getAction() == ChainAction.WITHDRAW) {
             if (!Objects.equals(transaction.getStatus(), WithdrawStatus.PENDING_APPROVE.getCode())) {
