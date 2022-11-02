@@ -24,7 +24,7 @@ import java.io.Serializable;
 public class BlacklistAddressDto implements Serializable {
     private static final long serialVersionUID = -1L;
 
-    private int type;
+    private Integer type;
 
     @NotNull
     private Long userId;

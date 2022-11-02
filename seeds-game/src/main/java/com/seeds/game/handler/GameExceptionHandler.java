@@ -1,10 +1,12 @@
 /*
 package com.seeds.game.handler;
 
+import cn.hutool.json.JSONUtil;
 import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.exceptions.InvalidArgumentsException;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.exception.PermissionException;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.binding.BindingException;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,15 @@ public class GameExceptionHandler {
     ResponseEntity<GenericDto<String>> handle(Exception e) {
         return new ResponseEntity<>(
                 GenericDto.failure("Internal Error:" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(FeignException.class)
+    ResponseEntity<GenericDto<String>> handle(FeignException e) {
+        String message = e.getMessage().substring(e.getMessage().lastIndexOf('{'), e.getMessage().length() - 1);
+        return new ResponseEntity<>(
+                GenericDto.failure(JSONUtil.toBean(message, GenericDto.class).getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

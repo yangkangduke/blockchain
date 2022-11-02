@@ -8,6 +8,7 @@ import com.seeds.account.dto.BalanceGetStatusDto;
 import com.seeds.account.dto.ChainGasPriceDto;
 import com.seeds.account.enums.FundCollectOrderType;
 import com.seeds.admin.dto.*;
+import com.seeds.admin.dto.request.SysCollectOrderHisReq;
 import com.seeds.admin.service.AssetManagementService;
 import com.seeds.admin.service.ISysWithdrawDepositService;
 import com.seeds.common.dto.GenericDto;
@@ -76,9 +77,7 @@ public class SysCashController {
     }
 
     @GetMapping("/pending-withdraw/list")
-    @ApiOperation("获取提币申请")
-    // todo
-//    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/pending/")
+    @ApiOperation(value = "获取提币申请")
     public GenericDto<IPage<MgtDepositWithdrawDto>> listPendingWithdraw(@RequestParam(value = "currency", required = false) String currency,
                                                                         @RequestParam(value = "userId", required = false) Long userId,
                                                                         @RequestParam("current") Integer current,
@@ -88,30 +87,20 @@ public class SysCashController {
     }
 
     @PostMapping("/pending-withdraw/approve")
-    @ApiOperation("批准提币")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/pending/:approve")
+    @ApiOperation(value = "批准提币", notes = "只需要传id、comment参数")
     public GenericDto<Boolean> approveWithdraw(@RequestBody @Valid MgtApproveRejectDto dto) {
         return mgtWithdrawDepositService.approvePendingWithdraw(dto);
     }
 
     @PostMapping("/pending-withdraw/reject")
-    @ApiOperation("拒绝提币")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/pending/:reject")
+    @ApiOperation(value = "拒绝提币", notes = "只需要传id、comment参数")
     public GenericDto<Boolean> rejectWithdraw(@RequestBody @Valid MgtApproveRejectDto dto) {
         return mgtWithdrawDepositService.rejectPendingWithdraw(dto);
     }
 
-    /*@ApiImplicitParams({
-            //参数效验
-            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
-            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
-            @ApiImplicitParam(name="status",value="目前交易状态",required=true,dataType="Integer"),
-            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
-            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })*/
+
     @GetMapping("/withdraw-history/list")
-    @ApiOperation("获取提币审批历史")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/withdraw/reviews/history/")
+    @ApiOperation(value = "获取提币审批历史")
     public GenericDto<Page<MgtDepositWithdrawDto>> listWithdrawHis( String currency,
                                                                                Long userId,
                                                                                Integer status,
@@ -120,16 +109,9 @@ public class SysCashController {
         return GenericDto.success(mgtWithdrawDepositService.listWithdrawReviewHis(currency, userId, status, current, size));
     }
 
-    /*@ApiImplicitParams({
-            //参数效验
-            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
-            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
-            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
-            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })*/
+
     @GetMapping("/pending-deposit/list")
-    @ApiOperation("获取充币申请")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/pending/")
+    @ApiOperation(value = "获取充币申请")
     public GenericDto<Page<MgtDepositWithdrawDto>> listPendingDeposit(@RequestParam(value = "currency", required = false) String currency,
                                                                                   @RequestParam(value = "userId", required = false) Long userId,
                                                                                   @RequestParam("current") Integer current,
@@ -138,31 +120,20 @@ public class SysCashController {
     }
 
     @PostMapping("/pending-deposit/approve")
-    @ApiOperation("批准充币")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/pending/:approve")
+    @ApiOperation(value = "批准充币", notes = "只需要传id、comment参数")
     public GenericDto<Boolean> approveDeposit(@RequestBody @Valid MgtApproveRejectDto dto) {
-        dto.setComment("");
         return mgtWithdrawDepositService.approvePendingDeposit(dto);
     }
 
     @PostMapping("/pending-deposit/reject")
-    @ApiOperation("拒绝充币")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/pending/:reject")
+    @ApiOperation(value = "拒绝充币", notes = "只需要传id、comment参数")
     public GenericDto<Boolean> rejectDeposit(@RequestBody @Valid MgtApproveRejectDto dto) {
         return mgtWithdrawDepositService.rejectPendingDeposit(dto);
     }
 
-    /*@ApiImplicitParams({
-            //参数效验
-            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
-            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
-            @ApiImplicitParam(name="status",value="目前交易状态",required=false,dataType="Integer"),
-            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
-            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })*/
+
     @GetMapping("/deposit-history/list")
-    @ApiOperation("获取充币审批历史")
-//    @MgtAuthority(path = "/funds/withdraw-deposit/deposit/reviews/history/")
+    @ApiOperation(value = "获取充币审批历史")
     public GenericDto<Page<MgtDepositWithdrawDto>> listDepositHis(@RequestParam(value = "currency", required = false) String currency,
                                                                   @RequestParam(value = "userId", required = false) Long userId,
                                                                   @RequestParam(value = "status", required = false) Integer status,
@@ -180,32 +151,32 @@ public class SysCashController {
 
     @GetMapping("/transfer/wallet-transfers/gas-config")
     @ApiOperation("获取划转gas费用")
-    public GenericDto<MgtGasConfig> gasConfig(@RequestParam(value = "chain", defaultValue = "1") int chain) {
+    public GenericDto<MgtGasConfig> gasConfig(@RequestParam(value = "chain", defaultValue = "1") Integer chain) {
         return assetManagementService.getGasConfig(chain);
     }
 
     @GetMapping("/transfer/wallet-transfers/gas-price")
     @ApiOperation("获取划转gasPrice")
-    public GenericDto<ChainGasPriceDto> getGasPrice(@RequestParam(value = "chain", defaultValue = "1") int chain) {
+    public GenericDto<ChainGasPriceDto> getGasPrice(@RequestParam(value = "chain", defaultValue = "1") Integer chain) {
         return assetManagementService.getGasPrice(chain);
     }
 
     @PostMapping("/balance/create-balances-get")
     @ApiOperation("刷新用户充币地址余额")
-    public GenericDto<Boolean> createBalanceGet(@RequestParam(value = "chain", defaultValue = "1") int chain) {
+    public GenericDto<Boolean> createBalanceGet(@RequestParam(value = "chain", defaultValue = "1") Integer chain) {
         return assetManagementService.createBalanceGet(chain);
     }
 
     @GetMapping("/balance/status")
     @ApiOperation("获取刷新余额时间")
-    public GenericDto<BalanceGetStatusDto> getBalanceGetStatus(@RequestParam(value = "chain", defaultValue = "1") int chain) {
+    public GenericDto<BalanceGetStatusDto> getBalanceGetStatus(@RequestParam(value = "chain", defaultValue = "1") Integer chain) {
         return assetManagementService.getBalanceGetStatus(chain);
     }
 
     @GetMapping("/balance/deposit-address")
     @ApiOperation("获取所有分配给用户地址的余额")
     public GenericDto<Page<MgtDepositAddressDto>> depositAddresses(@RequestParam(value = "currency", required = false) String currency,
-                                                                   @RequestParam(value = "chain", defaultValue = "1") int chain,
+                                                                   @RequestParam(value = "chain", defaultValue = "1") Integer chain,
                                                                    @RequestParam(value = "address", required = false) String address) {
         return assetManagementService.queryDepositAddress(currency, chain, address);
     }
@@ -214,7 +185,7 @@ public class SysCashController {
     @GetMapping("/account/hot-wallet")
     @ApiOperation("获取热钱包列表（所有系统使用的钱包）")
     public GenericDto<Page<MgtHotWalletDto>> hotWallet(@RequestParam(value = "type", required = false) Integer type,
-                                                       @RequestParam(value = "chain", defaultValue = "1") int chain,
+                                                       @RequestParam(value = "chain", defaultValue = "1") Integer chain,
                                                        @RequestParam(value = "address", required = false) String address) {
         return assetManagementService.queryHotWallets(type, chain, address);
     }
@@ -232,39 +203,30 @@ public class SysCashController {
         return assetManagementService.walletTransfer(dto);
     }
 
-    @GetMapping("/transfer/history-list")
+    @PostMapping("/transfer/history-list")
     @ApiOperation("获取资金归集历史记录列表--USER_TO_SYSTEM")
-    public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryHistoryList(
-            @RequestParam(value = "currency", required = false) String currency,
-            @RequestParam(value = "address", required = false) String address,
-            @RequestParam(value = "chain", defaultValue = "1") int chain,
-            @RequestParam("current") int current,
-            @RequestParam("pageSize") int pageSize) {
-        if (isBlank(currency)) {
-            currency = null;
+    public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryHistoryList(@RequestBody SysCollectOrderHisReq req) {
+        if (isBlank(req.getCurrency())) {
+            req.setCurrency(null);
         }
-        if (isBlank(address)) {
-            address = null;
+        if (isBlank(req.getAddress())) {
+            req.setAddress(null);
         }
-        return assetManagementService.getFundCollectOrderHistory(chain, currency, address, current, pageSize, FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode());
+        return assetManagementService.getFundCollectOrderHistory(req.getChain(), req.getCurrency(), req.getAddress(), req.getCurrent(), req.getSize(), FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode());
     }
 
-    @GetMapping("/transfer/gas-fee-list")
+    @PostMapping("/transfer/gas-fee-list")
     @ApiOperation("获取Gas Fee划转历史记录列表----SYSTEM_TO_USER")
-    public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryGasFeeList(
-            @RequestParam(value = "address", required = false) String address,
-            @RequestParam(value = "chain", defaultValue = "1") int chain,
-            @RequestParam("current") int current,
-            @RequestParam("pageSize") int pageSize) {
-        if (isBlank(address)) {
-            address = null;
+    public GenericDto<Page<MgtAddressCollectOrderHisDto>> queryGasFeeList(@RequestBody SysCollectOrderHisReq req) {
+        if (isBlank(req.getAddress())) {
+            req.setAddress(null);
         }
-        return assetManagementService.getFundCollectOrderHistory(chain, null, address, current, pageSize, FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode());
+        return assetManagementService.getFundCollectOrderHistory(req.getChain(), null, req.getAddress(), req.getCurrent(), req.getSize(), FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode());
     }
 
     @GetMapping("/transfer/collect-history-by-order")
     @ApiOperation("根据归集订单Id获取钱包归集历史")
-    public GenericDto<List<AddressCollectHisDto>> getFundCollectHistoryByOrder(@RequestParam(value = "orderId") long orderId) {
+    public GenericDto<List<AddressCollectHisDto>> getFundCollectHistoryByOrder(@RequestParam(value = "orderId") Long orderId) {
         return assetManagementService.getAddressCollectByOrderId(orderId);
     }
 

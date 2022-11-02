@@ -97,7 +97,7 @@
         select *
         from ac_address_collect_his
         where order_id = #{orderId,jdbcType=BIGINT}
-        order by id
+        order by update_time desc
     </select>
 
     <select id="getByAddress" resultMap="BaseResultMap">
@@ -105,11 +105,11 @@
         from ac_address_collect_his
         where 1 = 1
         <if test="chain != null">and chain = #{chain,jdbcType=TINYINT}</if>
-        <if test="startTime > 0">and update_time &gt;= #{startTime,jdbcType=BIGINT}</if>
+        <if test="startTime > 0">and create_time &gt;= #{startTime,jdbcType=BIGINT}</if>
         <if test="endTime > 0">and update_time &lt;= #{endTime,jdbcType=BIGINT}</if>
         <if test="fromAddress != null">and from_address = #{fromAddress,jdbcType=VARCHAR}</if>
         <if test="toAddress != null">and to_address = #{toAddress,jdbcType=VARCHAR}</if>
-        order by id desc
+        order by create_time desc
     </select>
 
     <select id="getByChainHash" resultMap="BaseResultMap">

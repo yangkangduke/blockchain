@@ -460,7 +460,7 @@ public class ChainActionServiceImpl implements IChainActionService {
 //                    accountAutoExchangeService.exchange(assignedDepositAddress.getUserId(), tx.getCurrency(), amount, true);
 
                     // 发送通知给客户(充币方)
-                    kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                    kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                             .notificationType(AccountAction.DEPOSIT.getNotificationType())
                             .ucUserIds(ImmutableList.of(assignedDepositAddress.getUserId()))
                             .values(ImmutableMap.of(
@@ -468,7 +468,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                                     "currency", tx.getCurrency(),
                                     "amount", amount))
                             .build()));
-                    log.info("send internal deposit notification ts:{},currency:{},amount:{}", System.currentTimeMillis(), tx.getCurrency(), amount);
+                    log.info("send internal deposit notification userID:{}, ts:{},currency:{},amount:{}", assignedDepositAddress.getUserId(), System.currentTimeMillis(), tx.getCurrency(), amount);
 
                 });
             }
@@ -854,7 +854,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 if (CollectionUtils.isEmpty(collectPage.getRecords())) {
                     return collectPage.convert(p -> null);
                 }
-                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 1));
+                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 2));
             case 3:
                 // 资金归集
                 if (status == 1) {
@@ -868,13 +868,13 @@ public class ChainActionServiceImpl implements IChainActionService {
                 if (CollectionUtils.isEmpty(collectPage.getRecords())) {
                     return collectPage.convert(p -> null);
                 }
-                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 1));
+                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 3));
             case 4:
                 // Gas划转
                 if (status == 1) {
                     chainStatus = ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode();
                 } else if (status == 6) {
-                    chainStatus = ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode();
+                    chainStatus = ChainCommonStatus.TRANSACTION_CANCELLED_AND_REPLACED.getCode();
                 } else {
                     throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "invalid status");
                 }
@@ -882,7 +882,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 if (CollectionUtils.isEmpty(collectPage.getRecords())) {
                     return collectPage.convert(p -> null);
                 }
-                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 1));
+                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 4));
             default:
                 throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "unknown type");
         }

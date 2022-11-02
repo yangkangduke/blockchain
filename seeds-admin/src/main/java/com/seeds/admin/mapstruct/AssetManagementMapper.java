@@ -22,6 +22,8 @@ public interface AssetManagementMapper extends BaseMapstructMapper {
             @Mapping(source = "amount", target = "amount", qualifiedByName = "convertBigDecimalToString"),
             @Mapping(source = "dto", target = "feeAmount", qualifiedByName = "convertBigDecimalToStringTransfer"),
     })
+    MgtAddressCollectOrderHisDto convertToMgtAddressCollectOrderHisDtoDto(AddressCollectOrderHisDto dto);
+
     List<MgtAddressCollectOrderHisDto> convertToMgtAddressCollectOrderHisDtos(List<AddressCollectOrderHisDto> dtos);
 
 

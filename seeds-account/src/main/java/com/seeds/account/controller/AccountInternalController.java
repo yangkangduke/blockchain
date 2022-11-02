@@ -87,7 +87,7 @@ public class AccountInternalController {
      *
      * @return
      */
-    @PostMapping("/mgt/pending-transaction")
+    @PostMapping("/sys/pending-transaction")
     @ApiOperation("获取需要审核的充提")
     @Inner
     public GenericDto<Page<ChainDepositWithdrawHisDto>> getPendingTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq) {
@@ -153,7 +153,8 @@ public class AccountInternalController {
      * @return
      */
     @PostMapping("/sys/processed-transaction")
-    @ApiOperation("获取审核的充提")
+    @ApiOperation("获取已审核的充提")
+    @Inner
     public GenericDto<Page<ChainDepositWithdrawHisDto>> getManualProcessedTransactions(@RequestBody AccountPendingTransactionsReq transactionsReq) {
         try {
             Integer status = transactionsReq.getStatus();
@@ -463,7 +464,7 @@ public class AccountInternalController {
 
     /**
      * 获取钱包归集历史
-     *
+     * (热钱包划转历史)
      * @param chain
      * @param startTime
      * @param endTime
@@ -562,7 +563,7 @@ public class AccountInternalController {
      * @return
      */
     @GetMapping("/sys/fund-collect-order-history")
-    @ApiOperation("获取钱包归集历史")
+    @ApiOperation("获取钱包归集订单历史")
     @Inner
     public GenericDto<IPage<AddressCollectOrderHisDto>> getFundCollectOrderHistory(@RequestParam("chain") int chain,
                                                                                       @RequestParam("startTime") long startTime,

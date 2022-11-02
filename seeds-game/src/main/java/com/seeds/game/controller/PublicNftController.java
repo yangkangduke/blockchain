@@ -42,26 +42,46 @@ public class PublicNftController {
     @PostMapping("modify")
     @ApiOperation("NFT修改")
     public GenericDto<Object> modify(@Valid @RequestBody OpenNftModifyReq req) {
-        return adminRemoteNftService.modify(req);
+        GenericDto<Object> result = adminRemoteNftService.modify(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("honor-modify")
     @ApiOperation("NFT战绩更新")
     public GenericDto<Object> honorModify(@Valid @RequestBody OpenNftHonorModifyReq req) {
-        return adminRemoteNftService.honorModify(req.getHonorList());
+        GenericDto<Object> result = adminRemoteNftService.honorModify(req.getHonorList());
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("settlement")
     @ApiOperation("NFT结算")
     public GenericDto<Object> lock(@Valid @RequestBody OpenNftSettlementReq req) {
-        return adminRemoteNftService.settlement(req);
+        GenericDto<Object> result = adminRemoteNftService.settlement(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @PostMapping("page")
     @ApiOperation("NFT列表")
     public GenericDto<Page<SysNftResp>> pageApi(@Valid @RequestBody OpenNftPageReq req) {
         Assert.notNull(req.getGameId(), "The game id can not be empty");
-        return adminRemoteNftService.pageApi(req);
+        GenericDto<Page<SysNftResp>> result = adminRemoteNftService.pageApi(req);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
     @GetMapping("/detail")
@@ -71,6 +91,10 @@ public class PublicNftController {
                                                   @RequestParam String signature,
                                                   @RequestParam Long timestamp) {
         GenericDto<SysNftDetailResp> resp = adminRemoteNftService.detailApi(id);
+        if (!resp.isSuccess()) {
+            return GenericDto.failure(resp.getMessage(),
+                    resp.getCode());
+        }
         SysNftDetailResp nftDetailResp = resp.getData();
         GenericDto<NFTAuctionResp> actionInfo = ucRemoteNftService.actionInfo(id, nftDetailResp.getOwnerId());
         nftDetailResp.setAuctionFlag(actionInfo.getData().getAuctionFlag());
@@ -83,7 +107,12 @@ public class PublicNftController {
                                                     @RequestParam String accessKey,
                                                     @RequestParam String signature,
                                                     @RequestParam Long timestamp) {
-        return ucRemoteNftService.offerList(id);
+        GenericDto<List<NFTOfferResp>> result = ucRemoteNftService.offerList(id);
+        if (!result.isSuccess()) {
+            return GenericDto.failure(result.getMessage(),
+                    result.getCode());
+        }
+        return result;
     }
 
 }

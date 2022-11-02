@@ -44,6 +44,7 @@ public class ChainNftServiceImpl implements ChainNftService {
 
         // generate metadata file
         PinataPinJsonRequest pinRequest = PinataPinJsonRequest.builder()
+                .id(request.getId())
                 .name(request.getName())
                 .description(request.getDescription())
                 .attributes(request.getAttributes())
@@ -57,6 +58,7 @@ public class ChainNftServiceImpl implements ChainNftService {
     @Override
     public String updateMetadata(String imageFileHash, ChainUpdateNftReq updateRequest) {
         ChainMintNftReq request = ChainMintNftReq.builder()
+                .id(updateRequest.getId())
                 .name(updateRequest.getName())
                 .description(updateRequest.getDescription())
                 .attributes(updateRequest.getAttributes())
