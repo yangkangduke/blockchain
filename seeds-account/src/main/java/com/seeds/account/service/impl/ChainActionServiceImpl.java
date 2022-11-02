@@ -874,7 +874,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 if (status == 1) {
                     chainStatus = ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode();
                 } else if (status == 6) {
-                    chainStatus = ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode();
+                    chainStatus = ChainCommonStatus.TRANSACTION_CANCELLED_AND_REPLACED.getCode();
                 } else {
                     throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "invalid status");
                 }
