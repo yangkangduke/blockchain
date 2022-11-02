@@ -1,5 +1,6 @@
 package com.seeds.account.chain.service.impl.eth;
 
+import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.seeds.account.AccountConstants;
@@ -1013,6 +1014,7 @@ public class ETHChainServiceProvider extends ChainBasicService implements IChain
     @ExecutionLock(key = "account:chain:exec:lock:{address}")
     public BigInteger getSafeConfirmedNonce(Chain chain, String address) throws IOException {
         ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain);
+        log.info("latestChainBlock={}", JSONUtil.toJsonStr(latestChainBlock));
         if (latestChainBlock == null) {
             return BigInteger.ZERO;
         }

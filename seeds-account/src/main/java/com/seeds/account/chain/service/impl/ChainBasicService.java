@@ -187,6 +187,7 @@ public abstract class ChainBasicService implements IChainService {
             });
             ChainConfirmBlockDto dto = dtos.stream().filter(e -> e.getChain() == chain.getCode()).findFirst().orElse(null);
             if (dto != null) {
+                log.info("ConfirmBlocks = {}", dto.getConfirmBlocks());
                 return dto.getConfirmBlocks();
             }
         }
