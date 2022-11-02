@@ -117,21 +117,14 @@ public class AccountServiceImpl implements IAccountService {
 
         // 是否是内部提币
         boolean internalWithdraw = false;
-//        MetamaskBinding metamaskBinding = null;
-        boolean isDefiWithdraw = Chain.SUPPORT_DEFI_LIST.contains(chain);
-        if (isDefiWithdraw) {
-            // 如果是DEFI提币，目标地址必须是自己的metamask地址
-//            metamaskBinding = metamaskBindingMapper.getByUserId(userId);
-//            Utils.check(metamaskBinding != null && ObjectUtils.isAddressEquals(metamaskBinding.getAddress(), address), ErrorCode.ACCOUNT_INVALID_WITHDRAW_ADDRESS);
-        } else {
-            // 如果不是DEFI提币，不允许提币给自己
-            ChainDepositAddress assignedDepositAddress = chainDepositService.getByAddress(chain, address);
-            if (assignedDepositAddress != null && assignedDepositAddress.getUserId() == userId) {
-                Utils.check(assignedDepositAddress.getUserId() != userId, ErrorCode.ACCOUNT_INVALID_WITHDRAW_TARGET);
-            }
-            // 是否是内部提币
-            internalWithdraw = assignedDepositAddress != null && assignedDepositAddress.getUserId() > 0;
+
+        // 自己不能提币给自己
+        ChainDepositAddress assignedDepositAddress = chainDepositService.getByAddress(chain, address);
+        if (assignedDepositAddress != null && assignedDepositAddress.getUserId() == userId) {
+            Utils.check(assignedDepositAddress.getUserId() != userId, ErrorCode.ACCOUNT_INVALID_WITHDRAW_TARGET);
         }
+        // 是否是内部提币
+        internalWithdraw = assignedDepositAddress != null && assignedDepositAddress.getUserId() > 0;
 
         // 读取提币白名单
         WithdrawLimitRuleDto limitRule = chainWithdrawService.getWithdrawLimitRule(currency);
@@ -159,33 +152,19 @@ public class AccountServiceImpl implements IAccountService {
                 userId, currency, amount, feeAmount, minAmount, maxAmount, intradyAmount, autoAmount, usedIntradayWithdraw);
 
         String withdrawToken = withdrawRequestDto.getWithdrawToken();
-//        String publicAddress = withdrawRequestDto.getPublicAddress();
-//        String signature = withdrawRequestDto.getSignature();
-//        String msg = withdrawRequestDto.getMsg();
 
-        if (!isDefiWithdraw) {
-            if (withdrawToken != null) {
-                // 验证用户的提币Token是否有效
-                VerifyAuthTokenReq verifyRequest = VerifyAuthTokenReq.builder()
-                        .uid(userId)
-                        .authToken(withdrawToken)
-                        .useType(AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_WITHDRAW)
-                        .build();
-                GenericDto<Boolean> verifyResponse = userCenterFeignClient.verifyToken(verifyRequest);
-                log.info("withdraw userId={} currency={} verifyRequest={} verifyResponse={}", userId, currency, verifyRequest, verifyResponse);
-                Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
-            } /*else if (publicAddress != null && signature != null) {
-                MetamaskVerifyReq verifyRequest = new MetamaskVerifyReq();
-                verifyRequest.setPublicAddress(publicAddress);
-                verifyRequest.setSignature(signature);
-                verifyRequest.setMessage(msg);
-                verifyRequest.setUserId(userId);
-                GenericDto<Boolean> verifyResponse = userCenterFeignClient.metaMaskVerifySignature(verifyRequest);
-                log.info("withdraw userId={} currency={} verifyRequest={} verifyResponse={}", userId, currency, verifyRequest, verifyResponse);
-                Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
-            } */else {
-                Utils.throwError(ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
-            }
+        if (withdrawToken != null) {
+            // 验证用户的提币Token是否有效
+            VerifyAuthTokenReq verifyRequest = VerifyAuthTokenReq.builder()
+                    .uid(userId)
+                    .authToken(withdrawToken)
+                    .useType(AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_WITHDRAW)
+                    .build();
+            GenericDto<Boolean> verifyResponse = userCenterFeignClient.verifyToken(verifyRequest);
+            log.info("withdraw userId={} currency={} verifyRequest={} verifyResponse={}", userId, currency, verifyRequest, verifyResponse);
+            Utils.check(verifyResponse != null && verifyResponse.isSuccess() && verifyResponse.getData(), ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
+        } else {
+            Utils.throwError(ErrorCode.ACCOUNT_INVALID_WITHDRAW_AUTHENTICATION);
         }
 
         boolean result = walletAccountService.freeze(userId, currency, amount);
@@ -194,7 +173,7 @@ public class AccountServiceImpl implements IAccountService {
         // 是否内部提币返还手续费
         boolean internalWithdrawFeeReturn = Objects.equals("true", limitRule.getZeroFeeOnInternal());
         // 判断是否属于不需要审核的提币
-        boolean requireReview = amount.compareTo(autoAmount) > 0 && !isDefiWithdraw;
+        boolean requireReview = amount.compareTo(autoAmount) > 0;
         int manual = requireReview ? 1 : 0;
         int status = requireReview ? WithdrawStatus.PENDING_APPROVE.getCode() : WithdrawStatus.CREATED.getCode();
         ChainDepositWithdrawHis transaction = ChainDepositWithdrawHis.builder()
@@ -229,47 +208,11 @@ public class AccountServiceImpl implements IAccountService {
         chainDepositWithdrawHisService.createHistory(transaction);
 
         WithdrawResponseDto withdrawResponseDto = new WithdrawResponseDto();
-//        if (isDefiWithdraw) {
-//            // id要保证唯一
-//            long id = transaction.getId();
-//            Utils.check(id > 0, "id generation issue");
-//            String defiWithdrawContract = systemWalletAddressService.getOne(chain.getRelayOn(), WalletAddressType.DEFI_DEPOSIT_WITHDRAW_CONTRACT);
-//            // 截止时间为当前时间后5分钟
-//            long deadline = System.currentTimeMillis() / 1000 + Long.parseLong(systemConfigService.getValue(AccountSystemConfig.CHAIN_DEFI_WITHDRAW_DEADLINE, "300"));
-//            SignedMessageDto signedMessageDto = chainService.encodeAndSignDefiWithdraw(chain.getRelayOn(), id, "metamaskBinding.getAddress()", currency, amount, deadline);
-//            String signedSignature = AddressUtils.leftPad(signedMessageDto.getSignature(), "0x");
-//            String signedMessage = AddressUtils.leftPad(signedMessageDto.getMessage(), "0x");
-//            log.info("signMessage userId={} id={} chain={} currency={} amount={} signedSignature={} signedMessage={}", userId, id, chain, currency, amount, signedSignature, signedMessage);
-//
-//            withdrawResponseDto.setDefiWithdrawContract(defiWithdrawContract);
-//            withdrawResponseDto.setSignedSignature(signedSignature);
-//            withdrawResponseDto.setSignedMessage(signedMessage);
-//            withdrawResponseDto.setDeadline(deadline);
-//
-//            // 如果是Defi提币，需要存储下签名的消息, 已备用户后面查询
-//            transactionService.afterCommit(() -> {
-//                chainDepositWithdrawHisService.createSigHistory(transaction.getId(), userId, chain, currency, amount, signedSignature, signedMessage, deadline);
-//            });
-//        }
 
         transactionService.afterCommit(() -> {
             // 记录历史执行中
             userAccountActionService.createHistory(userId, currency, AccountAction.WITHDRAW, String.valueOf(transaction.getId()), amount, CommonActionStatus.PROCESSING);
 
-            // 通知账户变更
-//            accountPublishService.publishAsync(AccountTopics.TOPIC_ACCOUNT_UPDATE,
-//                    AccountUpdateEvent.builder().ts(System.currentTimeMillis()).userId(userId).action(AccountAction.WITHDRAW.getCode()).build());
-
-            // 发送通知给运营人员
-//            if (requireReview) {
-//                notificationService.sendNotificationAsync(NotificationDto.builder()
-//                        .notificationType(OpsAction.OPS_SUPPORT.getNotificationType())
-//                        .values(ImmutableMap.of(
-//                                "ts", System.currentTimeMillis(),
-//                                "module", "withdraw",
-//                                "content", transaction.getId() + " pending approval"))
-//                        .build());
-//            }
         });
 
         return withdrawResponseDto;
@@ -318,7 +261,7 @@ public class AccountServiceImpl implements IAccountService {
         }
 
         if (tx.getAction() == ChainAction.DEPOSIT) {
-            if (tx.getStatus() != DepositStatus.PENDING_APPROVE.getCode()) {
+            if (!Objects.equals(tx.getStatus(), DepositStatus.PENDING_APPROVE.getCode())) {
                 throw new ActionDeniedException("status is not pending approval");
             }
             int manual = 1;
@@ -329,10 +272,9 @@ public class AccountServiceImpl implements IAccountService {
             tx.setStatus(status);
             tx.setComments(comments != null ? comments : "");
             chainDepositWithdrawHisService.updateHistory(tx);
-
-            // where does the asset go?
+            // todo 应该需要把用户提币成功的钱返还给用户（表示提币整个过程失败）
         } else if (tx.getAction() == ChainAction.WITHDRAW) {
-            if (tx.getStatus() != WithdrawStatus.PENDING_APPROVE.getCode()) {
+            if (!Objects.equals(tx.getStatus(), WithdrawStatus.PENDING_APPROVE.getCode())) {
                 throw new ActionDeniedException("status is not pending approve");
             }
             int manual = 1;
@@ -346,14 +288,11 @@ public class AccountServiceImpl implements IAccountService {
 
             // 解冻资产
             boolean done = walletAccountService.unfreeze(tx.getUserId(), tx.getCurrency(), tx.getAmount());
-          //  Utils.check(done, ErrorCode.ACCOUNT_INSUFFICIENT_BALANCE);
+            Utils.check(done, ErrorCode.ACCOUNT_INSUFFICIENT_BALANCE);
             // 更新财务记录状态为失败
             userAccountActionService.updateStatusByActionUserIdSource(AccountAction.WITHDRAW, tx.getUserId(), String.valueOf(tx.getId()), CommonActionStatus.FAILED);
 
             transactionService.afterCommit(() -> {
-                // 通知账户变更
-//                accountPublishService.publishAsync(AccountTopics.TOPIC_ACCOUNT_UPDATE,
-//                        AccountUpdateEvent.builder().ts(System.currentTimeMillis()).userId(tx.getUserId()).action(AccountAction.UNFREEZE.getCode()).build());
 
                 // 发送通知用户提币被拒绝
                 kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE,JSONUtil.toJsonStr(NotificationReq.builder()
@@ -401,13 +340,6 @@ public class AccountServiceImpl implements IAccountService {
             transactionService.afterCommit(() -> {
                 // 记录用户财务历史
                 userAccountActionService.createHistory(transaction.getUserId(), transaction.getCurrency(), AccountAction.DEPOSIT, transaction.getAmount());
-
-                // 通知账户变更
-//                accountPublishService.publishAsync(AccountTopics.TOPIC_ACCOUNT_UPDATE,
-//                        AccountUpdateEvent.builder().ts(System.currentTimeMillis()).userId(transaction.getUserId()).action(AccountAction.DEPOSIT.getCode()).build());
-//
-//                // 充币自动兑换（审核后的外部充币，审核后的内部充币）
-//                accountAutoExchangeService.exchange(transaction.getUserId(), transaction.getCurrency(), transaction.getAmount(), transaction.getInternal() == 1);
 
                 // 发送通知给客户
                 kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()

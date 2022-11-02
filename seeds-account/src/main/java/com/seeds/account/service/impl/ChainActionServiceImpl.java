@@ -199,15 +199,13 @@ public class ChainActionServiceImpl implements IChainActionService {
             Chain chain = tx.getChain();
             // 用事务包住单个的提币，防止由于单个错误导致的回滚
             try {
-                if (Chain.SUPPORT_DEFI_LIST.contains(chain)) {
-                    // 2021-04-30 milo
-//                    executeWithdrawOneOnChain(chain, tx);
-                } else if (tx.getInternal() == 1) {
+               if (tx.getInternal() == 1) {
                     // 内部提币
                     transactionService.execute(() -> {
                         executeWithdrawOneInternal(chain, tx);
                         return null;
                     });
+                    // 外部提币
                 } else {
                     // 2021-03-09 把操作放到事务外边，保证减冻结资产有且唯一执行一次
                     executeWithdrawOne(chain, tx);
@@ -361,14 +359,14 @@ public class ChainActionServiceImpl implements IChainActionService {
             BigDecimal amount = tx.getAmount().subtract(tx.getFeeAmount());
             // 获取币种的充币规则
             DepositRuleDto depositRuleDto = chainDepositService.getDepositRule(chain, tx.getCurrency());
-            // 判断是否需要审核 3种情况： 1充提规则不存在，2充币规则禁用，3超过充币额度
+            // 判断需要审核的3种情况： 1充提规则不存在，2充币规则禁用，3超过充币额度
             boolean requireReview = depositRuleDto == null || depositRuleDto.getStatus() == CommonStatus.DISABLED || amount.compareTo(depositRuleDto.getAutoAmount()) > 0;
 
             if (requireReview) {
                 // 需要运营人员审核就标记manual=1, status=PENDING_APPROVE, 并通知运维人员
                 int manual = 1;
                 int status = DepositStatus.PENDING_APPROVE.getCode();
-                ChainDepositWithdrawHis o = ChainDepositWithdrawHis.builder()
+                ChainDepositWithdrawHis depositHis = ChainDepositWithdrawHis.builder()
                         .createTime(System.currentTimeMillis())
                         .updateTime(System.currentTimeMillis())
                         .version(AccountConstants.DEFAULT_VERSION)
@@ -397,22 +395,14 @@ public class ChainActionServiceImpl implements IChainActionService {
                         .status(status)
                         .build();
                 // 插入新的充提
-                log.info("insert new internal deposit transaction={}", o);
-                chainDepositWithdrawHisMapper.insert(o);
+                log.info("insert new internal deposit transaction={}", depositHis);
+                chainDepositWithdrawHisMapper.insert(depositHis);
 
-                // 发送通知给运营人员
-//                notificationService.sendNotificationAsync(NotificationDto.builder()
-//                        .notificationType(OpsAction.OPS_SUPPORT.getNotificationType())
-//                        .values(ImmutableMap.of(
-//                                "ts", System.currentTimeMillis(),
-//                                "module", "deposit",
-//                                "content", o.getId() + " pending approval"))
-//                        .build());
             } else {
                 // 如果不需要审核就 manual=0, status=TRANSACTION_CONFIRMED,上账，给用户发充币成功通知
                 int manual = 0;
                 int status = DepositStatus.TRANSACTION_CONFIRMED.getCode();
-                ChainDepositWithdrawHis o = ChainDepositWithdrawHis.builder()
+                ChainDepositWithdrawHis depositHis = ChainDepositWithdrawHis.builder()
                         .createTime(System.currentTimeMillis())
                         .updateTime(System.currentTimeMillis())
                         .version(AccountConstants.DEFAULT_VERSION)
@@ -441,8 +431,8 @@ public class ChainActionServiceImpl implements IChainActionService {
                         .status(status)
                         .build();
                 // 插入新的充提
-                log.info("insert new internal deposit transaction={}", o);
-                chainDepositWithdrawHisMapper.insert(o);
+                log.info("insert new internal deposit transaction={}", depositHis);
+                chainDepositWithdrawHisMapper.insert(depositHis);
 
                 // 用户资产上账
                 boolean result = walletAccountService.updateAvailable(assignedDepositAddress.getUserId(), tx.getCurrency(), amount, true);
@@ -451,13 +441,6 @@ public class ChainActionServiceImpl implements IChainActionService {
                 transactionService.afterCommit(() -> {
                     // 记录用户财务历史
                     userAccountActionService.createHistory(assignedDepositAddress.getUserId(), tx.getCurrency(), AccountAction.DEPOSIT, amount);
-
-                    // 通知账户变更
-//                    accountPublishService.publishAsync(AccountTopics.TOPIC_ACCOUNT_UPDATE,
-//                            AccountUpdateEvent.builder().ts(System.currentTimeMillis()).userId(assignedDepositAddress.getUserId()).action(AccountAction.DEPOSIT.getCode()).build());
-
-                    // 充币自动兑换 （不需要审核的内部充币）
-//                    accountAutoExchangeService.exchange(assignedDepositAddress.getUserId(), tx.getCurrency(), amount, true);
 
                     // 发送通知给客户(充币方)
                     kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()

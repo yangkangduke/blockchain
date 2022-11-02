@@ -39,13 +39,6 @@ public class SysCashController {
     private AssetManagementService assetManagementService;
 
 
-    /*@ApiImplicitParams({
-            //参数效验
-            @ApiImplicitParam(name="currency",value="USDT",required=false,dataType="String"),
-            @ApiImplicitParam(name="userId",value="用户id",required=false,dataType="Long"),
-            @ApiImplicitParam(name="current",value="当前页码",required=true,dataType="Integer"),
-            @ApiImplicitParam(name="size",value="当前页数据量",required=true,dataType="Integer")
-    })*/
     @GetMapping("/chain-withdraw-deposit-type")
     @ApiOperation("获取充提币地址链信息列表")
     public GenericDto<List<MgtChainTypeDto>> queryChainWithdrawTypes() {
