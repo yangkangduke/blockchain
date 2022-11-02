@@ -854,7 +854,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 if (CollectionUtils.isEmpty(collectPage.getRecords())) {
                     return collectPage.convert(p -> null);
                 }
-                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 1));
+                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 2));
             case 3:
                 // 资金归集
                 if (status == 1) {
@@ -868,7 +868,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 if (CollectionUtils.isEmpty(collectPage.getRecords())) {
                     return collectPage.convert(p -> null);
                 }
-                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 1));
+                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 3));
             case 4:
                 // Gas划转
                 if (status == 1) {
@@ -882,7 +882,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 if (CollectionUtils.isEmpty(collectPage.getRecords())) {
                     return collectPage.convert(p -> null);
                 }
-                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 1));
+                return collectPage.convert(p -> convert2Dto(p, chainGasPrice, 4));
             default:
                 throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "unknown type");
         }
