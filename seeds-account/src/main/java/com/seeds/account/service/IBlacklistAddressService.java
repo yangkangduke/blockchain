@@ -22,7 +22,7 @@ public interface IBlacklistAddressService extends IService<BlacklistAddress> {
      */
     List<BlacklistAddressDto> loadAll();
 
-    BlacklistAddressDto get(int type, long userId, String address);
+    BlacklistAddressDto get(Integer type, Long userId, String address);
 
     /**
      * 从缓存获取
