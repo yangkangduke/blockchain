@@ -1760,6 +1760,7 @@ public class ChainActionServiceImpl implements IChainActionService {
         BigInteger confirmedSafeNonce = chainService.getSafeConfirmedNonce(chain, fromAddress);
         if (confirmedSafeNonce.compareTo(BigInteger.ZERO) <= 0 || confirmedSafeNonce.compareTo(nonce) < 0) {
             // fromAddress nonce 未被安全确认
+            log.error("original tx nonce:{} is greater than safe confirm nonce:{}", nonce, confirmedSafeNonce);
             throw new AccountException(ErrorCode.ACCOUNT_BUSINESS_ERROR, "original tx nonce is greater than safe confirm nonce");
         }
     }
