@@ -1020,11 +1020,12 @@ public class ETHChainServiceProvider extends ChainBasicService implements IChain
         BigInteger safeBlockNumber = new BigInteger(
                 String.valueOf(latestChainBlock.getBlockNumber() - (long) (getConfirmBlocks(chain)))
         );
-        log.info("safeBlockNumber = {}", safeBlockNumber);
-        return web3.readCli().ethGetTransactionCount(
+        EthGetTransactionCount count = web3.readCli().ethGetTransactionCount(
                 address,
                 DefaultBlockParameter.valueOf(safeBlockNumber)
-        ).send().getTransactionCount().subtract(BigInteger.ONE);
+        ).send();
+        log.info("EthGetTransactionCount = {}", JSONUtil.toJsonStr(count));
+        return count.getTransactionCount().subtract(BigInteger.ONE);
     }
 
     @Override
