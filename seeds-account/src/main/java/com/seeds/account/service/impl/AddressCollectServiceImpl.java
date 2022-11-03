@@ -258,7 +258,7 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
 
     private List<AddressBalanceDto> getPendingCollectBalances(Chain chain) {
         // 充币行为回查天数  原值默认为3
-        int lookback = Integer.parseInt(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_DEPOSIT_ADDRESS_LOOK_BACK, "10"));
+        int lookback = Integer.parseInt(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_DEPOSIT_ADDRESS_LOOK_BACK, "100"));
         long startTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(lookback);
         long endTime = System.currentTimeMillis();
 
