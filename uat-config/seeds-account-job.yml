@@ -59,3 +59,11 @@ elasticjob:
       description: "查询提币结果"
       disabled: false
       overwrite: true
+    # 获取链上最新的gasPrice，并缓存到Redis
+    gasPriceTask:
+      elasticJobClass: com.seeds.account.task.GasPriceTask
+      cron: "0/10 * * * * ?"
+      shardingTotalCount: 1
+      description: "获取链上最新的gasPrice"
+      disabled: false
+      overwrite: true
