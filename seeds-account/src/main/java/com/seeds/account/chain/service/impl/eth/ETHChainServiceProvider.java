@@ -1014,17 +1014,16 @@ public class ETHChainServiceProvider extends ChainBasicService implements IChain
     @ExecutionLock(key = "account:chain:exec:lock:{address}")
     public BigInteger getSafeConfirmedNonce(Chain chain, String address) throws IOException {
         ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain);
-        log.info("latestChainBlock={}", JSONUtil.toJsonStr(latestChainBlock));
         if (latestChainBlock == null) {
             return BigInteger.ZERO;
         }
+        BigInteger safeBlockNumber = new BigInteger(
+                String.valueOf(latestChainBlock.getBlockNumber() - (long) (getConfirmBlocks(chain)))
+        );
+        log.info("safeBlockNumber = {}", safeBlockNumber);
         return web3.readCli().ethGetTransactionCount(
                 address,
-                DefaultBlockParameter.valueOf(
-                        new BigInteger(
-                                String.valueOf(latestChainBlock.getBlockNumber() - (long) (getConfirmBlocks(chain)))
-                        )
-                )
+                DefaultBlockParameter.valueOf(safeBlockNumber)
         ).send().getTransactionCount().subtract(BigInteger.ONE);
     }
 
