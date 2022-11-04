@@ -82,11 +82,7 @@ public class AccountInternalController {
         }
     }
 
-    /**
-     * 获取需要审核的充提
-     *
-     * @return
-     */
+
     @PostMapping("/sys/pending-transaction")
     @ApiOperation("获取需要审核的充提")
     @Inner
@@ -109,12 +105,6 @@ public class AccountInternalController {
         }
     }
 
-    /**
-     * 充币提币审核通过
-     *
-     * @param approveRejectDto
-     * @return
-     */
     @PostMapping("/sys/approve-transaction")
     @ApiOperation("充币提币审核通过")
     @Inner
@@ -128,12 +118,7 @@ public class AccountInternalController {
         }
     }
 
-    /**
-     * 充币提币审核拒绝
-     *
-     * @param approveRejectDto
-     * @return
-     */
+
     @PostMapping("/sys/reject-transaction")
     @ApiOperation("充币提币审核拒绝")
     @Inner
@@ -147,11 +132,7 @@ public class AccountInternalController {
         }
     }
 
-    /**
-     * 获取审核的充提
-     *
-     * @return
-     */
+
     @PostMapping("/sys/processed-transaction")
     @ApiOperation("获取已审核的充提")
     @Inner
@@ -192,8 +173,7 @@ public class AccountInternalController {
     }
 
     @PostMapping("/job/scan-withdraw")
-//    @ApiOperation("扫描提币，归集，空投状态")
-    @ApiOperation("扫描提币状态")
+    @ApiOperation("扫描提币、归集的状态")
     @Inner
     public GenericDto<Boolean> scanWithdraw() {
         try {
@@ -261,19 +241,6 @@ public class AccountInternalController {
         }
     }
 
-
-//
-//    @PostMapping("/job/fund-collect-scan-pending-balances")
-//    @ApiOperation("定期收集待归集地址余额")
-//    public GenericDto<Boolean> scanPendingCollectBalances() {
-//        try {
-//            addressCollectService.scanPendingCollectBalances();
-//            return GenericDto.success(true);
-//        } catch (Exception e) {
-//            log.error("scanPendingCollectBalances", e);
-//            return Utils.returnFromException(e);
-//        }
-//    }
 
     /**
      * 获取待归集余额
