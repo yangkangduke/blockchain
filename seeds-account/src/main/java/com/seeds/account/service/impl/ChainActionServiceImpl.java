@@ -1786,10 +1786,13 @@ public class ChainActionServiceImpl implements IChainActionService {
         obj.setNonce(new BigInteger(e.getNonce()));
         obj.setChainGasPrice(chainGasPrice);
         obj.setChain(e.getChain().getCode());
-        try {
-            obj.setConfirmedSafeNonce(chainService.getSafeConfirmedNonce(e.getChain(), e.getFromAddress()));
-        } catch (IOException ioException) {
-            log.error("error, ", ioException);
+        // 内部提币不上链，非内部提币才能查到
+        if (e.getInternal() != 1) {
+            try {
+                obj.setConfirmedSafeNonce(chainService.getSafeConfirmedNonce(e.getChain(), e.getFromAddress()));
+            } catch (IOException ioException) {
+                log.error("error, ", ioException);
+            }
         }
         return obj;
     }
