@@ -57,7 +57,7 @@ public class ISysWithdrawDepositServiceImpl implements ISysWithdrawDepositServic
     public GenericDto<Boolean> approvePendingWithdraw(MgtApproveRejectDto dto) {
         return accountFeignClient.approveTransaction(ApproveRejectDto.builder()
                 .id(dto.getId())
-                .comment("")
+                .comment(dto.getComments())
                 .build());
     }
 

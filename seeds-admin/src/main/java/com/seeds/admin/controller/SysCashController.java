@@ -154,7 +154,7 @@ public class SysCashController {
         return assetManagementService.getGasPrice(chain);
     }
 
-    @PostMapping("/balance/create-balances-get")
+    @GetMapping("/balance/create-balances-get")
     @ApiOperation("刷新用户充币地址余额")
     public GenericDto<Boolean> createBalanceGet(@RequestParam(value = "chain", defaultValue = "1") Integer chain) {
         return assetManagementService.createBalanceGet(chain);
@@ -170,8 +170,9 @@ public class SysCashController {
     @ApiOperation("获取所有分配给用户地址的余额")
     public GenericDto<Page<MgtDepositAddressDto>> depositAddresses(@RequestParam(value = "currency", required = false) String currency,
                                                                    @RequestParam(value = "chain", defaultValue = "1") Integer chain,
-                                                                   @RequestParam(value = "address", required = false) String address) {
-        return assetManagementService.queryDepositAddress(currency, chain, address);
+                                                                   @RequestParam(value = "address", required = false) String address,
+                                                                   @RequestParam(value = "thresholdAmount", required = false) Integer thresholdAmount) {
+        return assetManagementService.queryDepositAddress(currency, chain, address,thresholdAmount);
     }
 
 
