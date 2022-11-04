@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.seeds.account.enums.ChainExchangeAction.SYSTEM_EXCHANGE;
@@ -127,7 +124,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
 
 
     @Override
-    public GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address) {
+    public GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address, Integer thresholdAmount) {
         currency = isNotBlank(currency) ? currency : AccountConstants.USDT;
         GenericDto<List<AddressBalanceDto>> dto =
                 accountFeignClient.getUserAddressBalances(chain, currency);
@@ -143,6 +140,10 @@ public class AssetManagementServiceImpl implements AssetManagementService {
             for (String key : balanceDtoMap.keySet()) {
                 dtos.add(getMgtDepositAddressDto(balanceDtoMap.get(key)));
             }
+        }
+        // 根据输入的门槛金额过滤返回list
+        if (!Objects.isNull(thresholdAmount) && thresholdAmount > 0) {
+            dtos = dtos.stream().filter(p -> p.getUsdtBalanceNum().compareTo(new BigDecimal(thresholdAmount)) >= 0).collect(Collectors.toList());
         }
         if (getNativeTokens().contains(currency)) {
             currency = NATIVE_TOKEN;
