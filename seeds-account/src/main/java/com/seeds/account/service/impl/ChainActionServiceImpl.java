@@ -671,22 +671,12 @@ public class ChainActionServiceImpl implements IChainActionService {
             Chain chain = tx.getChain();
             // 用事务包住单个的提币，防止由于单个错误导致的回滚
             try {
-                if (Chain.SUPPORT_DEFI_LIST.contains(chain)) {
-//                    ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain.getRelayOn());
-//                    if (latestChainBlock != null) {
-//                        transactionService.execute(() -> {
-//                            scanWithdrawOneOnChain(chain, latestChainBlock, tx);
-//                            return null;
-//                        });
-//                    }
-                } else {
-                    ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain);
-                    if (latestChainBlock != null) {
-                        transactionService.execute(() -> {
-                            scanWithdrawOne(chain, latestChainBlock, tx);
-                            return null;
-                        });
-                    }
+                ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain);
+                if (latestChainBlock != null) {
+                    transactionService.execute(() -> {
+                        scanWithdrawOne(chain, latestChainBlock, tx);
+                        return null;
+                    });
                 }
             } catch (Exception e) {
                 log.error("scanWithdraw chain={} tx={}", chain, tx, e);
