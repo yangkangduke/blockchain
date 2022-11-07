@@ -143,5 +143,12 @@ public interface IUcUserService extends IService<UcUser> {
      * @return
      */
     Boolean registerCheckEmail(String email);
+
+    /**
+     * 核销邀请码
+     * @param inviteCode 邀请码
+     */
+    void registerWriteOffsInviteCode(String inviteCode);
+
 }
 

@@ -2,49 +2,50 @@ package com.seeds.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 
 /**
- * 游戏api
+ * 随机码
  * 
  * @author hang.yu
- * @date 2022/10/10
+ * @date 2022/11/07
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName("sys_game_api")
-public class SysGameApiEntity extends BaseEntity {
+@TableName("sys_random_code")
+public class SysRandomCodeEntity extends BaseEntity {
 
 	/**
-	 * 游戏id
+	 * 随机码
 	 */
-	@TableField("game_id")
-	private Long gameId;
+	@TableField("code")
+	private String code;
 
 	/**
-	 * 游戏api类型
+	 * 长度
 	 */
-	@TableField("type")
-	private Integer type;
+	@TableField("length")
+	private Integer length;
 
 	/**
-	 * 游戏api描述
+	 * 使用标记 0：未使用 1：已使用
+	 */
+	@TableField("use_flag")
+	private Integer useFlag;
+
+	/**
+	 * 描述
 	 */
 	@TableField("`desc`")
 	private String desc;
 
 	/**
-	 * 游戏api
+	 * 过期时间
 	 */
-	@TableField("api")
-	private String api;
-
-	/**
-	 * 游戏基础url
-	 */
-	@TableField("base_url")
-	private String baseUrl;
+	@ApiModelProperty("过期时间")
+	private Long expireTime;
 
 }

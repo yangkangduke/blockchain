@@ -531,4 +531,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return true;
     }
 
+    @Override
+    public void registerWriteOffsInviteCode(String inviteCode) {
+
+    }
+
 }

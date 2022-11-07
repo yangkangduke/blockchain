@@ -1,7 +1,7 @@
 package com.seeds.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.seeds.admin.entity.SysGameApiEntity;
+import com.seeds.admin.entity.SysRandomCodeEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 
@@ -12,6 +12,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @date 2022/10/10
  */
 @Mapper
-public interface SysGameApiMapper extends BaseMapper<SysGameApiEntity> {
+public interface SysRandomCodeMapper extends BaseMapper<SysRandomCodeEntity> {
 
 }
