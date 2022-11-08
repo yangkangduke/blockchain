@@ -32,10 +32,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -199,14 +196,22 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
                 log.warn("empty collect his with orderId={}", orderId);
                 return;
             }
-            Map<Long, List<ChainTxnReplace>> pendingReplaceMap = chainTxnReplaceMapper.getListByChainStatusAndType(collectOrder.getChain(),
-                            ChainCommonStatus.TRANSACTION_ON_CHAIN,
-                            FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode().equals(collectOrder.getType()) ? ChainTxnReplaceAppType.CASH_COLLECT : ChainTxnReplaceAppType.GAS_TRANSFER).stream()
-                    .collect(Collectors.groupingBy(ChainTxnReplace::getAppId));
+
+            // 原始交易可能会有多笔替换交易，在最后一笔替换交易成功后，需要更新collectOrder的状态。
+
+            List<String> confirmedReplaceNonce = chainTxnReplaceMapper.getListByChainStatusAndType(collectOrder.getChain(),
+                    ChainCommonStatus.TRANSACTION_CONFIRMED,
+                    FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode().equals(collectOrder.getType()) ? ChainTxnReplaceAppType.CASH_COLLECT : ChainTxnReplaceAppType.GAS_TRANSFER).stream().map(p -> p.getNonce()).collect(Collectors.toList());
+
+
+            List<String> pendingReplaceNonce = chainTxnReplaceMapper.getListByChainStatusAndType(collectOrder.getChain(),
+                    ChainCommonStatus.TRANSACTION_ON_CHAIN,
+                    FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode().equals(collectOrder.getType()) ? ChainTxnReplaceAppType.CASH_COLLECT : ChainTxnReplaceAppType.GAS_TRANSFER).stream().map(p -> p.getNonce()).distinct().collect(Collectors.toList());
+
             // 查看是否所有的都已经处理完了
             if (collectHisList.stream().anyMatch(e -> e.getStatus() == ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode()) ||
-                    // 存在replace中的
-                    !pendingReplaceMap.isEmpty()) {
+                    // 存在replace中的,并且没有已经被链上确认的nonce
+                    (!pendingReplaceNonce.isEmpty() && Collections.disjoint(confirmedReplaceNonce, pendingReplaceNonce))) {
                 return;
             }
             // 统计所花费的txFee (不管成功失败，都统计)
@@ -333,16 +338,20 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
         List<String> validAddresses = getValidTargetAddresses(chain);
 
         list.forEach(e -> {
-            Utils.check(AddressUtils.validate(chain, e.getAddress()), "invalid address");
+            Utils.check(AddressUtils.validate(chain, e.getAddress()), "invalid user address");
+            boolean validSystemAddress = ObjectUtils.containsAddress(validAddresses, address);
+            Utils.check(validSystemAddress, "invalid system address");
+            boolean validUserAddress = ObjectUtils.containsAddress(validAddresses, e.getAddress());
+            Utils.check(validUserAddress, "invalid user address");
             Utils.check(e.getAmount() != null && e.getAmount().signum() > 0, "invalid amount");
 
-            if (orderType == FundCollectOrderType.FROM_USER_TO_SYSTEM) {
-                boolean validAddress = ObjectUtils.containsAddress(validAddresses, address);
-                Utils.check(validAddress, "invalid address");
-            } else {
-                boolean validAddress = ObjectUtils.containsAddress(validAddresses, e.getAddress());
-                Utils.check(validAddress, "invalid address");
-            }
+//            if (orderType == FundCollectOrderType.FROM_USER_TO_SYSTEM) {
+//                boolean validAddress = ObjectUtils.containsAddress(validAddresses, address);
+//                Utils.check(validAddress, "invalid address");
+//            } else {
+//                boolean validAddress = ObjectUtils.containsAddress(validAddresses, e.getAddress());
+//                Utils.check(validAddress, "invalid address");
+//            }
         });
 
         ChainContractDto chainContractDto = chainContractService.get(addressCollectOrderRequestDto.getChain(), currency);
