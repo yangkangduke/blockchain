@@ -36,4 +36,17 @@ public interface IWithdrawWhitelistService extends IService<WithdrawWhitelist> {
      * @return
      */
     List<WithdrawWhitelistDto> loadAll();
+
+    /**
+     * 插入新的
+     * @param withdrawWhitelistDto
+     */
+    void add(WithdrawWhitelistDto withdrawWhitelistDto);
+
+    /**
+     * 更新
+     * @param withdrawWhitelistDto
+     */
+    void update(WithdrawWhitelistDto withdrawWhitelistDto);
 }
+

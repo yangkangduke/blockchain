@@ -276,4 +276,67 @@ public interface AccountFeignClient {
      */
     @PostMapping("/job/get-and-metric-current-gas-price-oracle")
     GenericDto<Boolean> getAndMetricCurrentGasPriceOracle();
+
+    /**
+     * 获取所有提币白名单
+     *
+     * @return
+     */
+    @GetMapping("/sys/withdraw-whitelist-address")
+    GenericDto<List<WithdrawWhitelistDto>> getAllWithdrawWhitelist();
+
+    /**
+     * 添加提币白名单
+     *
+     * @param withdrawWhitelistDto
+     * @return
+     */
+    @PostMapping("/sys/add-withdraw-whitelist-address")
+    GenericDto<Boolean> addWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto);
+
+    /**
+     * 更新提币白名单
+     *
+     * @param withdrawWhitelistDto
+     * @return
+     */
+    @PostMapping("/sys/update-withdraw-whitelist-address")
+    GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto);
+
+    /**
+     * 获取所有充提币黑地址
+     *
+     * @param type 1:充币 2:提币
+     * @return
+     */
+    @GetMapping("/sys/blacklist-address")
+    GenericDto<List<BlacklistAddressDto>> getAllBlacklistAddress(@RequestParam("type") int type);
+
+    /**
+     * 添加新充提币黑地址
+     *
+     * @param blacklistAddressDto
+     * @return
+     */
+    @PostMapping("/sys/add-blacklist-address")
+    GenericDto<Boolean> addBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+
+    /**
+     * 更新充提币黑地址
+     *
+     * @param blacklistAddressDto
+     * @return
+     */
+    @PostMapping("/sys/update-blacklist-address")
+    GenericDto<Boolean> updateBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+
+    /**
+     * 删除充提币黑地址
+     *
+     * @param blacklistAddressDto
+     * @return
+     */
+    @PostMapping("/sys/delete-blacklist-address")
+    GenericDto<Boolean> deleteBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+
 }

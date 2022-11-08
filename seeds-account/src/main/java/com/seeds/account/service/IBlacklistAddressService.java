@@ -29,4 +29,10 @@ public interface IBlacklistAddressService extends IService<BlacklistAddress> {
      * @return
      */
     List<BlacklistAddressDto> getAll();
+
+    void add(BlacklistAddressDto blacklistAddressDto);
+
+    void update(BlacklistAddressDto blacklistAddressDto);
+
+    void delete(BlacklistAddressDto blacklistAddressDto);
 }
