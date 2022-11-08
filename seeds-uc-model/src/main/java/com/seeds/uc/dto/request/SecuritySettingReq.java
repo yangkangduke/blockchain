@@ -1,6 +1,7 @@
 package com.seeds.uc.dto.request;
 
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
+import com.seeds.uc.enums.ClientAuthTypeEnum;
 import lombok.Data;
 
 /**
@@ -11,7 +12,7 @@ import lombok.Data;
 public class SecuritySettingReq {
 //    private ClientAuthTypeEnum item;
     private String emailCode;
-//    private String gaCode;
+    private String gaCode;
     private AuthCodeUseTypeEnum useType;
 //    private String authToken;
 }

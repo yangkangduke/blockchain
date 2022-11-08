@@ -91,7 +91,7 @@ public class AccountController {
 
 
     @PostMapping("/withdraw")
-    @ApiOperation(value = "提交提币申请请求", notes = "1.调用发送邮件/email/send接口，传参数VERIFY_SETTING_POLICY_WITHDRAW 2.调用strategy/verify接口返回authToken 3.调用该接口")
+    @ApiOperation(value = "提交提币申请请求", notes = "1.调用发送邮件/email/send接口，传参数VERIFY_SETTING_POLICY_WITHDRAW 2.调用strategy/verify接口,传入useType=VERIFY_SETTING_POLICY_WITHDRAW，emailcode，gacode返回authToken 3.调用该接口")
     public GenericDto<WithdrawResponseDto> withdraw(@RequestBody WithdrawRequestDto withdrawRequestDto) {
         try {
             long userId = getUserId();
