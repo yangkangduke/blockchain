@@ -26,4 +26,9 @@ public class KafkaTopic {
 
     //account
     public static final String TOPIC_ACCOUNT_UPDATE = "ACCOUNT-UPDATE";
+
+    // random code
+    public final String RANDOM_CODE_GENERATE = "RANDOM_CODE_GENERATE";
+    public final String RANDOM_CODE_EXPORT = "RANDOM_CODE_EXPORT";
+
 }

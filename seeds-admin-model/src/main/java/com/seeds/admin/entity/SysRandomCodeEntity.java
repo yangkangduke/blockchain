@@ -2,7 +2,6 @@ package com.seeds.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,10 +18,16 @@ import lombok.EqualsAndHashCode;
 public class SysRandomCodeEntity extends BaseEntity {
 
 	/**
-	 * 随机码
+	 * 批次号
 	 */
-	@TableField("code")
-	private String code;
+	@TableField("batch_no")
+	private String batchNo;
+
+	/**
+	 * 类型 1：邀请码
+	 */
+	@TableField("type")
+	private Integer type;
 
 	/**
 	 * 长度
@@ -31,10 +36,22 @@ public class SysRandomCodeEntity extends BaseEntity {
 	private Integer length;
 
 	/**
-	 * 使用标记 0：未使用 1：已使用
+	 * 数量
 	 */
-	@TableField("use_flag")
-	private Integer useFlag;
+	@TableField("number")
+	private Integer number;
+
+	/**
+	 * 状态  0：正常  1：生成中  2：生成失败  3：导出中  6：导出失败
+	 */
+	@TableField("status")
+	private Integer status;
+
+	/**
+	 * 表格地址
+	 */
+	@TableField("excelUrl")
+	private String excelUrl;
 
 	/**
 	 * 描述
@@ -45,7 +62,7 @@ public class SysRandomCodeEntity extends BaseEntity {
 	/**
 	 * 过期时间
 	 */
-	@ApiModelProperty("过期时间")
+	@TableField("expire_time")
 	private Long expireTime;
 
 }

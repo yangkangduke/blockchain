@@ -30,4 +30,10 @@ public interface SysSequenceNoService extends IService<SysSequenceNoEntity> {
      */
     Long generateGameAccessNo();
 
+    /**
+     * 生成随机码编号
+     * @return 随机码编号
+     */
+    String generateRandomCodeNo();
+
 }

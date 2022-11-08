@@ -6,6 +6,7 @@ import com.seeds.admin.entity.SysFileEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 
 
 /**
@@ -15,6 +16,17 @@ import javax.servlet.http.HttpServletResponse;
  * @date 2022/8/02
  */
 public interface SysFileService extends IService<SysFileEntity> {
+
+
+    /**
+     * 上传文件
+     * @param inputStream 文件流
+     * @param fileName 文件名
+     * @param type 类型
+     * @param size 文件大小
+     * @return 文件信息
+     */
+    SysFileResp upload(InputStream inputStream, String fileName, String type, Long size);
 
     /**
      * 上传文件
