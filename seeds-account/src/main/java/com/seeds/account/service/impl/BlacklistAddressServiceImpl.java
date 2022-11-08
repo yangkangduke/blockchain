@@ -79,16 +79,52 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     @Override
     public void add(BlacklistAddressDto blacklistAddressDto) {
 
+        log.info("add blacklistAddressDto={}", blacklistAddressDto);
+        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(), blacklistAddressDto.getUserId(), blacklistAddressDto.getAddress());
+        if (blacklistAddress != null) {
+            try {
+                throw new InvalidDataException("trying to add exist record");
+            } catch (InvalidDataException e) {
+                e.printStackTrace();
+            }
+        }
+        addDb(blacklistAddressDto);
+    }
+
+    private void addDb(BlacklistAddressDto blacklistAddressDto) {
+
+        BlacklistAddress blacklistAddress = ObjectUtils.copy(blacklistAddressDto, BlacklistAddress.builder().build());
+        blacklistAddress.setCreateTime(System.currentTimeMillis());
+        blacklistAddress.setUpdateTime(System.currentTimeMillis());
+        blacklistAddress.setVersion(AccountConstants.DEFAULT_VERSION);
+        blacklistAddress.setStatus(CommonStatus.ENABLED);
+        blacklistAddressMapper.insert(blacklistAddress);
     }
 
     @Override
     public void update(BlacklistAddressDto blacklistAddressDto) {
-
+        log.info("update blacklistAddressDto={}", blacklistAddressDto);
+        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(), blacklistAddressDto.getUserId(), blacklistAddressDto.getAddress());
+        if (blacklistAddress == null) {
+            throw new MissingElementException();
+        }
+        updateDb(blacklistAddressDto, blacklistAddress);
     }
 
+    private void updateDb(BlacklistAddressDto blacklistAddressDto, BlacklistAddress blacklistAddress) {
+        ObjectUtils.copy(blacklistAddressDto, blacklistAddress);
+        blacklistAddress.setUpdateTime(System.currentTimeMillis());
+        blacklistAddress.setVersion(blacklistAddress.getVersion() + 1);
+        blacklistAddressMapper.updateByPrimaryKey(blacklistAddress);
+    }
     @Override
     public void delete(BlacklistAddressDto blacklistAddressDto) {
-
+        log.info("delete blacklistAddressDto={}", blacklistAddressDto);
+        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(), blacklistAddressDto.getUserId(), blacklistAddressDto.getAddress());
+        if (blacklistAddress == null) {
+            throw new MissingElementException();
+        }
+        blacklistAddressMapper.deleteByPrimaryKey(blacklistAddress.getId());
     }
 
 

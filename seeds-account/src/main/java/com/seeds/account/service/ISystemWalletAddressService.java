@@ -35,4 +35,16 @@ public interface ISystemWalletAddressService extends IService<SystemWalletAddres
     List<SystemWalletAddressDto> loadAll();
 
     List<String> getList(Chain chain, WalletAddressType walletAddressType);
+
+    /**
+     * 创建热钱包
+     * @param systemWalletAddressDto
+     */
+    void add(SystemWalletAddressDto systemWalletAddressDto);
+
+    /**
+     * 更新系统热钱包
+     * @param systemWalletAddressDto
+     */
+    void update(SystemWalletAddressDto systemWalletAddressDto);
 }

@@ -6,6 +6,7 @@ import com.seeds.admin.dto.MgtBlacklistAddressDto;
 import com.seeds.admin.dto.MgtPageDto;
 import com.seeds.admin.service.MgtRiskService;
 import com.seeds.common.dto.GenericDto;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/risk")
+@Api(tags = "黑地址管理")
 public class SysRiskController {
 
     @Autowired

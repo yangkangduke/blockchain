@@ -339,4 +339,30 @@ public interface AccountFeignClient {
     @PostMapping("/sys/delete-blacklist-address")
     GenericDto<Boolean> deleteBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
 
+    /**
+     * 创建热钱包地址
+     *
+     * @param chain
+     * @return
+     */
+    @PostMapping("/sys/create-system-wallet-address")
+    GenericDto<SystemWalletAddressDto> createSystemWalletAddress(@RequestParam("chain") int chain);
+
+    /**
+     * 添加新的系统钱包地址
+     *
+     * @param systemWalletAddressDto
+     * @return
+     */
+    @PostMapping("/sys/add-system-wallet-address")
+    GenericDto<Boolean> addSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto);
+
+    /**
+     * 更新系统钱包地址
+     *
+     * @param systemWalletAddressDto
+     * @return
+     */
+    @PostMapping("/sys/update-system-wallet-address")
+    GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto);
 }

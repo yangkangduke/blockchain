@@ -647,5 +647,49 @@ public class AccountInternalController {
         }
     }
 
+    /**
+     * 创建热钱包地址
+     * @param chain
+     * @return
+     */
+    @PostMapping("/sys/create-system-wallet-address")
+    @ApiOperation("创建热钱包地址")
+    @Inner
+    public GenericDto<SystemWalletAddressDto> createSystemWalletAddress(@RequestParam("chain") int chain) {
+        try {
+            SystemWalletAddressDto systemWalletAddressDto = chainActionService.createSystemWalletAddress(Chain.fromCode(chain));
+            return GenericDto.success(systemWalletAddressDto);
+        } catch (Exception e) {
+            log.error("createSystemWalletAddress", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/add-system-wallet-address")
+    @ApiOperation("添加系统使用的地址")
+    @Inner
+    public GenericDto<Boolean> addSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
+        try {
+            systemWalletAddressService.add(systemWalletAddressDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("addSystemWalletAddress", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/update-system-wallet-address")
+    @ApiOperation("更新系统使用的地址")
+    @Inner
+    public GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
+        try {
+            systemWalletAddressService.update(systemWalletAddressDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("updateSystemWalletAddress", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
 
 }

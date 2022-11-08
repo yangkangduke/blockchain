@@ -30,9 +30,21 @@ public interface IBlacklistAddressService extends IService<BlacklistAddress> {
      */
     List<BlacklistAddressDto> getAll();
 
+    /**
+     * 添加
+     * @param blacklistAddressDto
+     */
     void add(BlacklistAddressDto blacklistAddressDto);
 
+    /**
+     * 更新
+     * @param blacklistAddressDto
+     */
     void update(BlacklistAddressDto blacklistAddressDto);
 
+    /**
+     * 删除
+     * @param blacklistAddressDto
+     */
     void delete(BlacklistAddressDto blacklistAddressDto);
 }
