@@ -1,30 +1,24 @@
-package com.seeds.account.model;
+package com.seeds.account.dto.req;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.seeds.account.enums.CommonStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * <p>
- * 充提规则
+ * 充币规则新增/编辑
  * </p>
  *
- * @author yk
- * @since 2022-10-10
+ * @author hewei
+ * @since 2022-11-7
  */
-@TableName("ac_deposit_rule")
-@ApiModel(value = "DepositRule对象", description = "充提规则")
 @Data
-@Builder
-public class DepositRule implements Serializable {
+@ApiModel(value = "DepositRuleSaveOrUpdateReq", description = "充币规则新增/编辑")
+public class DepositRuleSaveOrUpdateReq {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,11 +32,8 @@ public class DepositRule implements Serializable {
     @ApiModelProperty("update time")
     private Long updateTime;
 
-    @ApiModelProperty("version")
-    private Long version;
-
     @ApiModelProperty("chain")
-    private int chain;
+    private Integer chain;
 
     @ApiModelProperty("currency")
     private String currency;
@@ -55,6 +46,7 @@ public class DepositRule implements Serializable {
     @ApiModelProperty("auto deposit amount")
     private BigDecimal autoAmount;
 
+    @ApiModelProperty("1: enable 2: disabled")
     private Integer status;
 
 }

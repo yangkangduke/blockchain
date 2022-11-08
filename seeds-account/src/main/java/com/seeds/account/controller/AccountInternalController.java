@@ -6,9 +6,7 @@ import com.google.common.collect.Lists;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.dto.*;
-import com.seeds.account.dto.req.ChainTxnPageReq;
-import com.seeds.account.dto.req.AccountPendingTransactionsReq;
-import com.seeds.account.dto.req.ChainTxnPageReq;
+import com.seeds.account.dto.req.*;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.enums.DepositStatus;
 import com.seeds.account.enums.WithdrawStatus;
@@ -53,6 +51,8 @@ public class AccountInternalController {
     private IChainDepositWithdrawHisService chainDepositWithdrawHisService;
     @Autowired
     private IChainService chainService;
+    @Autowired
+    private IDepositRuleService depositRuleService;
     @Autowired
     private ISystemWalletAddressService systemWalletAddressService;
 
@@ -533,13 +533,13 @@ public class AccountInternalController {
     @ApiOperation("获取钱包归集订单历史")
     @Inner
     public GenericDto<IPage<AddressCollectOrderHisDto>> getFundCollectOrderHistory(@RequestParam("chain") int chain,
-                                                                                      @RequestParam("startTime") long startTime,
-                                                                                      @RequestParam("endTime") long endTime,
-                                                                                      @RequestParam(value = "type", required = false, defaultValue = "0") int type,
-                                                                                      @RequestParam(value = "address", required = false) String address,
-                                                                                      @RequestParam(value = "currency", required = false) String currency,
-                                                                                      @RequestParam("page") int page,
-                                                                                      @RequestParam("size") int size) {
+                                                                                   @RequestParam("startTime") long startTime,
+                                                                                   @RequestParam("endTime") long endTime,
+                                                                                   @RequestParam(value = "type", required = false, defaultValue = "0") int type,
+                                                                                   @RequestParam(value = "address", required = false) String address,
+                                                                                   @RequestParam(value = "currency", required = false) String currency,
+                                                                                   @RequestParam("page") int page,
+                                                                                   @RequestParam("size") int size) {
         try {
             IPage<AddressCollectOrderHisDto> list = addressCollectHisService.getOrderHistory(Chain.fromCode(chain), startTime, endTime, type, address, currency, page, size);
             return GenericDto.success(list);
@@ -549,5 +549,138 @@ public class AccountInternalController {
         }
     }
 
+    /**
+     * 获取充币规则列表
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/get-deposit-rule-list")
+    @Inner
+    public GenericDto<IPage<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRulePageReq req) {
+        try {
+            return GenericDto.success(depositRuleService.getList(req));
+        } catch (Exception e) {
+            log.error("get-deposit-rule-list", e);
+            return Utils.returnFromException(e);
+        }
+    }
 
+    /**
+     * 新增充币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/add-deposit-rule")
+    @Inner
+    public GenericDto<Boolean> addDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(depositRuleService.add(req));
+        } catch (Exception e) {
+            log.error("add-deposit-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 编辑充币规则
+     *
+     * @param req
+     * @return
+     */
+    @PutMapping("/sys/update-deposit-rule")
+    @Inner
+    public GenericDto<Boolean> updateDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(depositRuleService.update(req));
+        } catch (Exception e) {
+            log.error("update-deposit-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 删除充币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/delete-deposit-rule")
+    public GenericDto<Boolean> deleteDepositRule(@Valid @RequestBody ListReq req) {
+        try {
+            return GenericDto.success(depositRuleService.delete(req));
+        } catch (Exception e) {
+            log.error("delete-deposit-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+//
+//    /**
+//     * 获取提币规则列表
+//     *
+//     * @param req
+//     * @return
+//     */
+//    @PostMapping("/sys/get-withdraw-rule-list")
+//    @Inner
+//    public GenericDto<IPage<WithdrawRuleDto>> getWithdrawRuleList(@RequestBody DepositRulePageReq req) {
+//        try {
+//            return GenericDto.success(depositRuleService.getList(req));
+//        } catch (Exception e) {
+//            log.error("get-deposit-rule-list", e);
+//            return Utils.returnFromException(e);
+//        }
+//    }
+//
+//    /**
+//     * 新增充币规则
+//     *
+//     * @param req
+//     * @return
+//     */
+//    @PostMapping("/sys/add-withdraw-rule")
+//    @Inner
+//    public GenericDto<Boolean> addWithdrawRule(@RequestBody DepositRuleSaveOrUpdateReq req) {
+//        try {
+//            return GenericDto.success(depositRuleService.add(req));
+//        } catch (Exception e) {
+//            log.error("add-deposit-rule", e);
+//            return Utils.returnFromException(e);
+//        }
+//    }
+//
+//    /**
+//     * 编辑充币规则
+//     *
+//     * @param req
+//     * @return
+//     */
+//    @PutMapping("/sys/update-withdraw-rule")
+//    @Inner
+//    public GenericDto<Boolean> updateWithdrawRule(@RequestBody DepositRuleSaveOrUpdateReq req) {
+//        try {
+//            return GenericDto.success(depositRuleService.update(req));
+//        } catch (Exception e) {
+//            log.error("update-deposit-rule", e);
+//            return Utils.returnFromException(e);
+//        }
+//    }
+//
+//    /**
+//     * 删除充币规则
+//     *
+//     * @param req
+//     * @return
+//     */
+//    @PostMapping("/sys/delete-withdraw-rule")
+//    public GenericDto<Boolean> deleteWithdrawRule(@Valid @RequestBody ListReq req) {
+//        try {
+//            return GenericDto.success(depositRuleService.delete(req));
+//        } catch (Exception e) {
+//            log.error("delete-deposit-rule", e);
+//            return Utils.returnFromException(e);
+//        }
+//    }
 }

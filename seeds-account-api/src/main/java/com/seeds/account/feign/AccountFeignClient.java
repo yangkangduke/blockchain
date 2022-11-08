@@ -1,19 +1,13 @@
 package com.seeds.account.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.account.dto.*;
-import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.*;
-import com.seeds.account.dto.req.AccountPendingTransactionsReq;
-import com.seeds.account.dto.req.ChainTxnPageReq;
+import com.seeds.account.dto.req.*;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -276,4 +270,41 @@ public interface AccountFeignClient {
      */
     @PostMapping("/job/get-and-metric-current-gas-price-oracle")
     GenericDto<Boolean> getAndMetricCurrentGasPriceOracle();
+
+
+    /**
+     * 获取充币规则列表
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/get-deposit-rule-list")
+    GenericDto<Page<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRulePageReq req);
+
+    /**
+     * 增加充币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/add-deposit-rule")
+    GenericDto<Boolean> addDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req);
+
+    /**
+     * 编辑充币规则
+     *
+     * @param req
+     * @return
+     */
+    @PutMapping("/sys/update-deposit-rule")
+    GenericDto<Boolean> updateDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req);
+
+    /**
+     * 删除充币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/delete-deposit-rule")
+    GenericDto<Boolean> deleteDepositRule(@RequestBody ListReq req);
 }

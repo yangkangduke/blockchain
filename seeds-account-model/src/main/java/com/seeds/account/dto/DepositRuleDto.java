@@ -25,6 +25,8 @@ public class DepositRuleDto implements Serializable {
 
     private static final long serialVersionUID = -1L;
 
+    private Long id;
+
     /**
      * @see com.seeds.common.enums.Chain
      */
@@ -48,4 +50,20 @@ public class DepositRuleDto implements Serializable {
      */
     @ApiModelProperty(value = "是否启用 1：启用 2：停用")
     CommonStatus status;
+
+
+    @ApiModelProperty("create time")
+    private Long createTime;
+
+    @ApiModelProperty("update time")
+    private Long updateTime;
+
+    @ApiModelProperty("version")
+    private Long version;
+
+    @ApiModelProperty("最小提币金额")
+    private BigDecimal minAmount;
+
+    @ApiModelProperty("精度")
+    private Integer decimals;
 }
