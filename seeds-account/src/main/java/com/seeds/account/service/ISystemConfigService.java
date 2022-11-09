@@ -1,6 +1,7 @@
 package com.seeds.account.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.account.dto.AccountSystemConfigDto;
 import com.seeds.account.dto.SystemConfigDto;
 import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.enums.CommonStatus;
@@ -83,4 +84,17 @@ public interface ISystemConfigService extends IService<SystemConfig> {
      * @param systemConfigDto
      */
     void update(SystemConfigDto systemConfigDto);
+
+    /**
+     * 从数据库读取所有的配置
+     * @return 所有的配置
+     */
+    List<AccountSystemConfigDto> accountSystemConfigList();
+
+    /**
+     * 修改配置
+     * @param req 配置
+     */
+    void accountSystemConfigModify(AccountSystemConfigDto req);
+
 }

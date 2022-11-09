@@ -223,7 +223,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         excelWriter.finish();
         byte[] content = os.toByteArray();
         @Cleanup InputStream is = new ByteArrayInputStream(content);
-        SysFileResp resp = sysFileService.upload(is, batchNo + ".xlsx", RandomCodeType.from(randomCode.getType()).getDesc(), null);
+        SysFileResp resp = sysFileService.upload(is, batchNo + ".xlsx", RandomCodeType.from(randomCode.getType()).getDescEn(), null);
         randomCode.setExcelUrl(resp.getUrl());
         updateById(randomCode);
         return resp.getUrl();
