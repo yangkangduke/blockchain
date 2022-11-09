@@ -20,6 +20,8 @@ public class MgtDepositAddressDto {
 //
 //    private BigDecimal kusdBalanceNum;
 
+    private String email;
+
     private String usdtBalance;
 
     private BigDecimal usdtBalanceNum;

@@ -123,8 +123,8 @@
           and chain = #{chain.code,jdbcType=TINYINT}
     </select>
 
-    <select id="getDepositAddress" resultType="java.lang.String">
-        select distinct(to_address)
+    <select id="getDepositAddress" resultType="com.seeds.account.dto.ChainDepositAddressDto">
+        select distinct(to_address) as address, user_id as userId
         from ac_chain_deposit_withdraw_his
         where action = 1 and to_address is not null and to_address &lt;&gt; ''
         <if test="startTime > 0">and create_time &gt;= #{startTime,jdbcType=BIGINT}</if>

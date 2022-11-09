@@ -3,16 +3,20 @@ package com.seeds.account.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.SystemWalletAddressDto;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.enums.WalletAddressType;
 import com.seeds.account.ex.DataInconsistencyException;
+import com.seeds.account.ex.MissingElementException;
 import com.seeds.account.mapper.SystemWalletAddressMapper;
 import com.seeds.account.model.SystemWalletAddress;
 import com.seeds.account.service.ISystemWalletAddressService;
 import com.seeds.account.tool.ListMap;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.common.enums.Chain;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,8 +33,12 @@ import java.util.stream.Collectors;
  * @author yk
  * @since 2022-09-28
  */
+@Slf4j
 @Service
 public class SystemWalletAddressServiceImpl extends ServiceImpl<SystemWalletAddressMapper, SystemWalletAddress> implements ISystemWalletAddressService {
+
+    @Autowired
+    SystemWalletAddressMapper systemWalletAddressMapper;
 
     final static String ALL = "all";
 
@@ -47,6 +55,7 @@ public class SystemWalletAddressServiceImpl extends ServiceImpl<SystemWalletAddr
     private String toKey(int chain, int type, String address) {
         return chain + ":" + type + ":" + address;
     }
+
     @Override
     public String getOne(Chain chain, WalletAddressType walletAddressType) {
         List<SystemWalletAddressDto> list = getByChainAndType(chain.getCode(), walletAddressType.getCode())
@@ -85,5 +94,32 @@ public class SystemWalletAddressServiceImpl extends ServiceImpl<SystemWalletAddr
                 .filter(e -> e.getStatus() == CommonStatus.ENABLED.getCode())
                 .map(SystemWalletAddressDto::getAddress)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void add(SystemWalletAddressDto systemWalletAddressDto) {
+        log.info("insert systemWalletAddressDto={}", systemWalletAddressDto);
+        SystemWalletAddress systemWalletAddress = ObjectUtils.copy(systemWalletAddressDto, SystemWalletAddress.builder().build());
+        systemWalletAddress.setCreateTime(System.currentTimeMillis());
+        systemWalletAddress.setUpdateTime(System.currentTimeMillis());
+        systemWalletAddress.setVersion(AccountConstants.DEFAULT_VERSION);
+        systemWalletAddress.setStatus(CommonStatus.ENABLED.getCode());
+        systemWalletAddressMapper.insert(systemWalletAddress);
+    }
+
+    @Override
+    public void update(SystemWalletAddressDto systemWalletAddressDto) {
+        log.info("update systemWalletAddressDto={}", systemWalletAddressDto);
+        SystemWalletAddress systemWalletAddress = systemWalletAddressMapper.getByChainAndTypeAndAddress(systemWalletAddressDto.getChain(),
+                systemWalletAddressDto.getType(), systemWalletAddressDto.getAddress());
+        if (systemWalletAddress == null) {
+            throw new MissingElementException();
+        }
+        systemWalletAddress.setTag(systemWalletAddressDto.getTag());
+        systemWalletAddress.setComments(systemWalletAddressDto.getComments());
+        systemWalletAddress.setStatus(systemWalletAddress.getStatus());
+        systemWalletAddress.setUpdateTime(System.currentTimeMillis());
+        systemWalletAddress.setVersion(systemWalletAddress.getVersion() + 1);
+        systemWalletAddressMapper.updateByPrimaryKey(systemWalletAddress);
     }
 }

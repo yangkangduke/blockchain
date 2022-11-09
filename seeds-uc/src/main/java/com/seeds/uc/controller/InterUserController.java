@@ -1,19 +1,19 @@
 package com.seeds.uc.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.uc.dto.UserDto;
-import com.seeds.uc.dto.request.LoginReq;
+import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
-import com.seeds.uc.service.impl.CacheService;
-import com.seeds.uc.util.CryptoUtils;
+import com.seeds.uc.service.IUcUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author raowentong
@@ -25,6 +25,8 @@ import java.util.List;
 @RequestMapping("/uc-internal/user")
 public class InterUserController {
 
+    @Autowired
+    private IUcUserService ucUserService;
 
     @PostMapping("/metamask/verify-signature")
     public GenericDto<Boolean> metaMaskVerifySignature(@RequestBody MetamaskVerifyReq metamaskReq) {
@@ -47,5 +49,11 @@ public class InterUserController {
 //            return GenericDto.success(false);
 //        }
         return GenericDto.success(true);
+    }
+
+    @PostMapping("/get-email-by-ids")
+    @Inner
+    public GenericDto<Map<Long, String>> getEmailByIds(@RequestBody List<Long> ids) {
+        return GenericDto.success(ucUserService.queryEmailByIds(ids));
     }
 }

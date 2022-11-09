@@ -7,35 +7,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Map;
 
 /**
- *
- * @author yk
- *
+ * @author: hewei
+ * @date 2022/11/8
  */
+
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class AddressBalanceDto implements Serializable {
+@NoArgsConstructor
+public class ChainDepositAddressDto implements Serializable {
+
     private static final long serialVersionUID = -1L;
 
-    /**
-     * 用户邮箱
-     */
-    String email;
-    /**
-     * 币种
-     */
-    String address;
+    private Long userId;
 
-    String tag;
-
-    /**
-     * 是否启用
-     */
-    Map<String, BigDecimal> balances;
+    private String address;
 }

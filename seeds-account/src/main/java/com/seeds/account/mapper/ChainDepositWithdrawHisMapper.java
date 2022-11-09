@@ -3,6 +3,7 @@ package com.seeds.account.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.account.dto.ChainDepositAddressDto;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
@@ -85,6 +86,6 @@ public interface ChainDepositWithdrawHisMapper extends BaseMapper<ChainDepositWi
      * @param endTime
      * @return
      */
-    List<String> getDepositAddress(@Param("chain") Chain chain, @Param("startTime") long startTime, @Param("endTime") long endTime);
+    List<ChainDepositAddressDto> getDepositAddress(@Param("chain") Chain chain, @Param("startTime") long startTime, @Param("endTime") long endTime);
 
 }
