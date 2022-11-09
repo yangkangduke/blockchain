@@ -57,7 +57,7 @@ public class SysRiskController {
 
     @GetMapping("/withdraw/blacklist/get")
     @ApiOperation("获取提币黑名单列表")
-    @MgtAuthority(path = "/monitor/manual-action/withdraw-disabled/blacklist/")
+    // @MgtAuthority(path = "/monitor/manual-action/withdraw-disabled/blacklist/")
     public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getWithdrawBlackList(@RequestParam(value = "reason",
             required = false) String reason) {
         return mgtRiskService.getBlackList(2, reason);
@@ -65,7 +65,7 @@ public class SysRiskController {
 
     @PostMapping("/withdraw/blacklist/add")
     @ApiOperation("新增提币黑名单")
-    @MgtAuthority(path = "/monitor/manual-action/withdraw-disabled/blacklist/:add")
+   // @MgtAuthority(path = "/monitor/manual-action/withdraw-disabled/blacklist/:add")
     public GenericDto<Boolean> addWithdrawBlackList(@RequestBody @Valid MgtBlacklistAddressDto blacklistAddressDto) {
         blacklistAddressDto.setType(2);
         return mgtRiskService.addWithdrawBlackList(blacklistAddressDto);
@@ -73,7 +73,7 @@ public class SysRiskController {
 
     @PostMapping("/withdraw/blacklist/update")
     @ApiOperation("修改提币黑名单")
-    @MgtAuthority(path = "/monitor/manual-action/withdraw-disabled/blacklist/:edit")
+    // @MgtAuthority(path = "/monitor/manual-action/withdraw-disabled/blacklist/:edit")
     public GenericDto<Boolean> updateWithdrawBlackList(@RequestBody @Valid MgtBlacklistAddressDto blacklistAddressDto) {
         blacklistAddressDto.setType(2);
         return mgtRiskService.updateWithdrawBlackList(blacklistAddressDto);
@@ -81,7 +81,7 @@ public class SysRiskController {
 
     @PostMapping("/withdraw/blacklist/delete")
     @ApiOperation("删除提币黑名单")
-    @MgtAuthority(path = "/monitor/manual-action/withdraw-disabled/blacklist/:delete")
+    // @MgtAuthority(path = "/monitor/manual-action/withdraw-disabled/blacklist/:delete")
     public GenericDto<Boolean> deleteWithdrawBlackList(@RequestBody @Valid MgtBlacklistAddressDto blacklistAddressDto) {
         blacklistAddressDto.setType(2);
         return mgtRiskService.deleteWithdrawBlackList(blacklistAddressDto);
