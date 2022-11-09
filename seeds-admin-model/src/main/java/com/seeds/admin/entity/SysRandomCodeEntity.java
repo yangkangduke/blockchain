@@ -50,7 +50,7 @@ public class SysRandomCodeEntity extends BaseEntity {
 	/**
 	 * 表格地址
 	 */
-	@TableField("excelUrl")
+	@TableField("excel_url")
 	private String excelUrl;
 
 	/**

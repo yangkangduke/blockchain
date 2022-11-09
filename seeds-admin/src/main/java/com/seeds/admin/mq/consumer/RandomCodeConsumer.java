@@ -2,11 +2,13 @@ package com.seeds.admin.mq.consumer;
 
 import com.seeds.admin.service.SysRandomCodeService;
 import com.seeds.common.constant.mq.KafkaTopic;
+import com.seeds.common.exception.SeedsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 /**
  * 消费者
@@ -38,7 +40,11 @@ public class RandomCodeConsumer {
     @KafkaListener(groupId = "random-code-consumer-group", topics = {KafkaTopic.RANDOM_CODE_EXPORT})
     public void exportCode(String msg) {
         log.info("收到消息：{}", msg);
-        sysRandomCodeService.exportCode(msg);
+        try {
+            sysRandomCodeService.exportCode(msg);
+        } catch (IOException e) {
+            throw new SeedsException("Export excel failure");
+        }
     }
 
 }

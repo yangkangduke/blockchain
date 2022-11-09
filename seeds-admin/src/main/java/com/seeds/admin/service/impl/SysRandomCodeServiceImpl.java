@@ -25,6 +25,7 @@ import com.seeds.admin.service.SysRandomCodeDetailService;
 import com.seeds.admin.service.SysRandomCodeService;
 import com.seeds.admin.service.SysSequenceNoService;
 import com.seeds.common.constant.mq.KafkaTopic;
+import com.seeds.common.enums.RandomCodeType;
 import com.seeds.common.exception.SeedsException;
 import lombok.Cleanup;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -53,8 +55,11 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
 
     private final static String SOURCE_STR = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    @Value("${admin.random.code.process.number:10000}")
-    private Long processNumber;
+    @Value("${admin.random.code.generate.number:1000}")
+    private Long generateNumber;
+
+    @Value("${admin.random.code.export.number:10000}")
+    private Long exportNumber;
 
     @Resource
     private KafkaProducer kafkaProducer;
@@ -102,7 +107,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         BeanUtils.copyProperties(req, randomCode);
         randomCode.setStatus(RandomCodeStatusEnum.GENERATING.getCode());
         // 处理数量小于阈值直接同步处理
-        if (req.getNumber() < processNumber) {
+        if (req.getNumber() < generateNumber) {
             Set<String> randoms = getRandomStringArray(req.getLength(), req.getNumber());
             randoms.forEach(p -> {
                 SysRandomCodeDetailEntity randomCodeDetail = new SysRandomCodeDetailEntity();
@@ -178,8 +183,12 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
             return randomCode.getExcelUrl();
         }
         // 处理数量小于阈值直接同步处理
-        if (randomCode.getNumber() < processNumber) {
-            return exportCode(batchNo);
+        if (randomCode.getNumber() < exportNumber) {
+            try {
+                return exportCode(batchNo);
+            } catch (IOException e) {
+                throw new SeedsException("Export excel failure");
+            }
         } else {
             randomCode.setStatus(RandomCodeStatusEnum.EXPORTING.getCode());
             updateById(randomCode);
@@ -190,7 +199,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
     }
 
     @Override
-    public String exportCode(String batchNo) {
+    public String exportCode(String batchNo) throws IOException {
         List<SysRandomCodeExportResp> respList = new ArrayList<>();
         SysRandomCodeEntity randomCode = queryByBatchNo(batchNo);
         List<SysRandomCodeDetailEntity> randomCodeDetails = sysRandomCodeDetailService.queryByBatchNo(batchNo);
@@ -214,7 +223,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         excelWriter.finish();
         byte[] content = os.toByteArray();
         @Cleanup InputStream is = new ByteArrayInputStream(content);
-        SysFileResp resp = sysFileService.upload(is, batchNo + ".xlsx", "randomCode", null);
+        SysFileResp resp = sysFileService.upload(is, batchNo + ".xlsx", RandomCodeType.from(randomCode.getType()).getDesc(), null);
         randomCode.setExcelUrl(resp.getUrl());
         updateById(randomCode);
         return resp.getUrl();
@@ -240,7 +249,6 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
     }
 
     public static Set<String> getRandomStringArray(int length, int size) {
-        char[] chars = SOURCE_STR.toCharArray();
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
         HashSet<String> set = new HashSet<>();
@@ -248,9 +256,9 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         while (set.size() < size){
             sb.setLength(0);
             for (int i = 0; i < length; i++) {
-                sb.append(chars[random.nextInt(62)]);
-                set.add(sb.toString());
+                sb.append(SOURCE_STR.charAt(random.nextInt(62)));
             }
+            set.add(sb.toString());
         }
         return set;
     }

@@ -7,6 +7,8 @@ import com.seeds.admin.dto.response.SysRandomCodeDetailResp;
 import com.seeds.admin.dto.response.SysRandomCodeResp;
 import com.seeds.admin.entity.SysRandomCodeEntity;
 
+import java.io.IOException;
+
 
 /**
  * 随机数
@@ -79,7 +81,7 @@ public interface SysRandomCodeService extends IService<SysRandomCodeEntity> {
      * @param batchNo 批次号
      * @return excel地址
      */
-    String exportCode(String batchNo);
+    String exportCode(String batchNo) throws IOException;
 
     /**
      * 使用随机码

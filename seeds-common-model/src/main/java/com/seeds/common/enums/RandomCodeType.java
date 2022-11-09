@@ -1,6 +1,7 @@
 package com.seeds.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.seeds.common.exception.SeedsException;
 import lombok.Getter;
 
 /**
@@ -23,4 +24,12 @@ public enum RandomCodeType {
         this.desc = desc;
     }
 
+    public static RandomCodeType from(int code) {
+        switch (code) {
+            case 1:
+                return INVITE;
+            default:
+                throw new SeedsException("SortTypeEnum - no such enum for code: " + code);
+        }
+    }
 }

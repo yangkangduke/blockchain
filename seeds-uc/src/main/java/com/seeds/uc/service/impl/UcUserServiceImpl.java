@@ -32,6 +32,7 @@ import com.seeds.uc.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -58,6 +59,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional
 public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> implements IUcUserService {
+
+    @Value("${Use-invite-code-flag:false}")
+    private Boolean inviteFlag;
 
     @Autowired
     private CacheService cacheService;
@@ -543,6 +547,10 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
     @Override
     public void registerWriteOffsInviteCode(String inviteCode) {
+        // 邀请码校验开关
+        if (!inviteFlag) {
+            return;
+        }
         if (StringUtils.isEmpty(inviteCode)) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_11501_INVITATION_CODE_NOT_EXIST.getDescEn());
         }
