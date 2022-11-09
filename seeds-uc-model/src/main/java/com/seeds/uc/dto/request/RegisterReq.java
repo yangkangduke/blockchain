@@ -24,4 +24,7 @@ public class RegisterReq {
     @NotBlank
     private String password;
 
+    @ApiModelProperty(value = "邀请码")
+    private String inviteCode;
+
 }

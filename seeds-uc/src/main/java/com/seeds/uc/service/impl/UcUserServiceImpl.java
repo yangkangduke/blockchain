@@ -5,6 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.dto.request.RandomCodeUseReq;
+import com.seeds.admin.feign.RemoteRandomCodeService;
+import com.seeds.common.dto.GenericDto;
+import com.seeds.common.enums.RandomCodeType;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.*;
 import com.seeds.uc.dto.request.*;
@@ -28,6 +32,7 @@ import com.seeds.uc.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -55,6 +60,9 @@ import java.util.stream.Collectors;
 @Transactional
 public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> implements IUcUserService {
 
+    @Value("${Use-invite-code-flag:false}")
+    private Boolean inviteFlag;
+
     @Autowired
     private CacheService cacheService;
     @Autowired
@@ -65,6 +73,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     private SendCodeService sendCodeService;
     @Autowired
     private IUsUserLoginLogService userLoginLogService;
+    @Autowired
+    private RemoteRandomCodeService remoteRandomCodeService;
 
     /**
      * 注册邮箱账号
@@ -74,6 +84,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      */
     @Override
     public LoginResp registerEmail(RegisterReq registerReq) {
+        // 校验邀请码
+        registerWriteOffsInviteCode(registerReq.getInviteCode());
         String email = registerReq.getEmail();
         sendCodeService.verifyEmailWithUseType(registerReq.getEmail(), registerReq.getCode(), AuthCodeUseTypeEnum.REGISTER);
         // 校验账号重复
@@ -162,6 +174,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      */
     @Override
     public LoginResp metamaskLogin(MetamaskVerifyReq metamaskVerifyReq) {
+        // 校验邀请码
+        registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode());
         String publicAddress = metamaskVerifyReq.getPublicAddress();
         this.verifyMetamask(metamaskVerifyReq);
         long currentTime = System.currentTimeMillis();
@@ -541,6 +555,24 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void registerWriteOffsInviteCode(String inviteCode) {
+        // 邀请码校验开关
+        if (!inviteFlag) {
+            return;
+        }
+        if (StringUtils.isEmpty(inviteCode)) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_11501_INVITATION_CODE_NOT_EXIST.getDescEn());
+        }
+        RandomCodeUseReq req = new RandomCodeUseReq();
+        req.setType(RandomCodeType.INVITE.getCode());
+        req.setCode(inviteCode);
+        GenericDto<Object> result = remoteRandomCodeService.useRandomCode(req);
+        if (!result.isSuccess()) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_11501_INVITATION_CODE_NOT_EXIST.getDescEn());
+        }
     }
 
 }

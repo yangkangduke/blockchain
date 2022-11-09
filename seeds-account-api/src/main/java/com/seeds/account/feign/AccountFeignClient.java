@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.AccountConstants;
-import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
-import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -365,4 +363,21 @@ public interface AccountFeignClient {
      */
     @PostMapping("/sys/update-system-wallet-address")
     GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto);
+
+
+    /**
+     * 获取账户系统配置
+     *
+     * @return 账户系统配置
+     */
+    @GetMapping("/sys/account-system-config-list")
+    GenericDto<List<AccountSystemConfigDto>> accountSystemConfigList();
+
+    /**
+     * 编辑账户系统配置
+     * @param req 系统配置
+     */
+    @PostMapping("/sys/account-system-config-modify")
+    GenericDto<Object> accountSystemConfigModify(@RequestBody AccountSystemConfigDto req);
+
 }
