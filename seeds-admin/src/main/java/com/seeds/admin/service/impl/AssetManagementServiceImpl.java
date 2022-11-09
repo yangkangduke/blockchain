@@ -6,12 +6,17 @@ import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.*;
 import com.seeds.account.enums.FundCollectOrderType;
 import com.seeds.account.feign.AccountFeignClient;
+import com.seeds.admin.annotation.AuditLog;
 import com.seeds.admin.dto.*;
+import com.seeds.admin.enums.Action;
+import com.seeds.admin.enums.Module;
+import com.seeds.admin.enums.SubModule;
 import com.seeds.admin.mapstruct.AssetManagementMapper;
 import com.seeds.admin.mapstruct.WalletTransferRequestMapper;
 import com.seeds.admin.service.AssetManagementService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
+import jodd.bean.BeanCopy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -318,9 +323,20 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         return accountFeignClient.getFundCollectHistoryByOrder(orderId);
     }
 
+    @Override
+    @AuditLog(module = Module.CASH_MANAGEMENT, subModule = SubModule.WALLET_ACCOUNT, action = Action.ADD)
+    public GenericDto<Boolean> createHotWallet(MgtSystemWalletAddressDto dto) {
+        GenericDto<SystemWalletAddressDto> addressDto = accountFeignClient.createSystemWalletAddress(dto.getChain());
+        if (!addressDto.isSuccess()) return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        SystemWalletAddressDto data = addressDto.getData();
+        BeanCopy.beans(data, dto).copy();
+        return GenericDto.success(true);
+    }
+
     private MgtDepositAddressDto getMgtDepositAddressDto(AddressBalanceDto addressBalanceDto) {
         Map<String, BigDecimal> balancesMap = addressBalanceDto.getBalances();
         MgtDepositAddressDto addressDto = MgtDepositAddressDto.builder().address(addressBalanceDto.getAddress()).build();
+        addressDto.setEmail(addressBalanceDto.getEmail());
         if (balancesMap != null && !balancesMap.isEmpty()) {
             for (String key : balancesMap.keySet()) {
                 String balance = balancesMap.get(key).setScale(8, BigDecimal.ROUND_DOWN).toPlainString();

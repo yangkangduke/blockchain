@@ -7,6 +7,7 @@ import com.seeds.account.dto.AddressCollectHisDto;
 import com.seeds.account.dto.BalanceGetStatusDto;
 import com.seeds.account.dto.ChainGasPriceDto;
 import com.seeds.account.enums.FundCollectOrderType;
+import com.seeds.admin.annotation.MgtAuthority;
 import com.seeds.admin.dto.*;
 import com.seeds.admin.dto.request.SysCollectOrderHisReq;
 import com.seeds.admin.service.AssetManagementService;
@@ -236,5 +237,15 @@ public class SysCashController {
     public GenericDto<Boolean> createGasFeeOrder(@RequestBody MgtAddressCollectOrderRequestDto dto) {
         return assetManagementService.createGasFeeOrder(dto);
     }
+
+
+    @PostMapping("/account/create-hot-wallet")
+    @ApiOperation("新增热钱包列表")
+    // @MgtAuthority(path = "/funds/accounts/hot-wallet/:new")
+    public GenericDto<Boolean> createHotWallet(@Valid @RequestBody MgtChainDto dto) {
+        return assetManagementService.createHotWallet(MgtSystemWalletAddressDto.builder().chain(dto.getChain()).build());
+    }
+
+
 
 }

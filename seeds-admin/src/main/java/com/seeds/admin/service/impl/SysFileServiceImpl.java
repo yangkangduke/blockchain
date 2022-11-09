@@ -45,6 +45,35 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public SysFileResp upload(InputStream inputStream, String fileName, String type, Long size) {
+        // 上传文件到oss
+        String bucketName = properties.getBucketName();
+        String objectName = type + "/" + IdUtil.simpleUUID() + StrUtil.DOT + FileUtil.extName(fileName);
+        SysFileEntity sysFile = new SysFileEntity();
+        try {
+            template.putObject(bucketName, objectName, inputStream);
+            // 记录文件信息
+            sysFile.setFileSize(size);
+            sysFile.setObjectName(objectName);
+            sysFile.setBucketName(bucketName);
+            sysFile.setFileName(fileName);
+            sysFile.setType(type);
+            save(sysFile);
+        }
+        catch (Exception e) {
+            log.error("文件上传失败，fileName={}", fileName);
+            throw new GenericException("File upload failed");
+        }
+        SysFileResp res = new SysFileResp();
+        res.setFileId(sysFile.getId());
+        res.setObjectName(objectName);
+        res.setBucketName(properties.getBucketName());
+        res.setUrl(baseUrl + String.format("/admin/public/file/download/%s?objectName=%s", properties.getBucketName(), objectName));
+        return res;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public SysFileResp upload(MultipartFile file, String type) {
         // 上传文件到oss
         String bucketName = properties.getBucketName();

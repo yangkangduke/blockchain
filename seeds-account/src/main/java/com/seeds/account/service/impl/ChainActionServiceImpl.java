@@ -1825,4 +1825,23 @@ public class ChainActionServiceImpl implements IChainActionService {
             }
         }
     }
+
+    @Override
+    public SystemWalletAddressDto createSystemWalletAddress(Chain chain) throws Exception {
+        Utils.check(Chain.SUPPORT_CREATE_ADDRESS_LIST.contains(chain), ErrorCode.ACCOUNT_INVALID_CHAIN);
+
+        List<String> addresses = chainService.createAddresses(chain, 1);
+        Assert.isTrue(addresses.size() == 1, "failed to create new address");
+        SystemWalletAddressDto systemWalletAddressDto = SystemWalletAddressDto.builder()
+                .type(WalletAddressType.HOT.getCode())
+                .chain(chain.getCode())
+                .address(addresses.get(0))
+                .comments("")
+                .tag("hot")
+                .status(CommonStatus.ENABLED.getCode())
+                .build();
+        log.info("createWalletAddress systemWalletAddressDto={}", systemWalletAddressDto);
+        systemWalletAddressService.add(systemWalletAddressDto);
+        return systemWalletAddressDto;
+    }
 }

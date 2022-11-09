@@ -500,7 +500,8 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
 
     @Override
     public RawTransactionDto internalSendTransaction(Chain chain, String currency, String fromAddress, String toAddress, BigDecimal amount, Long gasPrice, Long gasLimit, Long nonce, Long sleepFor) throws Exception {
-        return null;
+        RawTransactionDto raw = internalSendTransaction0(chain, currency, fromAddress, toAddress, amount, gasPrice, gasLimit, nonce, sleepFor);
+        return raw;
     }
 
     private RawTransactionDto internalSendTransaction0(Chain chain, String currency, String fromAddress, String toAddress, BigDecimal amount, long gasPrice, long gasLimit, long nonce, long sleepFor) throws Exception {

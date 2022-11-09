@@ -6,8 +6,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.seeds.account.enums.CommonStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -24,6 +26,8 @@ import java.math.BigDecimal;
 @ApiModel(value = "WithdrawWhitelist对象", description = "提币白名单")
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WithdrawWhitelist implements Serializable {
 
     private static final long serialVersionUID = 1L;

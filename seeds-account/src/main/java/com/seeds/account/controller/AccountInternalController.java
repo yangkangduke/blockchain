@@ -7,6 +7,8 @@ import com.seeds.account.AccountConstants;
 import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.*;
+import com.seeds.account.dto.req.ChainTxnPageReq;
+import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.enums.DepositStatus;
 import com.seeds.account.enums.WithdrawStatus;
@@ -44,7 +46,7 @@ public class AccountInternalController {
     @Autowired
     private IAddressCollectService addressCollectService;
     @Autowired
-    IAddressCollectHisService addressCollectHisService;
+    private IAddressCollectHisService addressCollectHisService;
     @Autowired
     private IAccountService accountService;
     @Autowired
@@ -55,6 +57,12 @@ public class AccountInternalController {
     private IDepositRuleService depositRuleService;
     @Autowired
     private ISystemWalletAddressService systemWalletAddressService;
+    @Autowired
+    private IWithdrawWhitelistService withdrawWhitelistService;
+    @Autowired
+    private IBlacklistAddressService blacklistAddressService;
+    @Autowired
+    private ISystemConfigService systemConfigService;
 
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
@@ -549,6 +557,166 @@ public class AccountInternalController {
         }
     }
 
+    @GetMapping("/sys/withdraw-whitelist-address")
+    @ApiOperation("获取所有提币白名单")
+    @Inner
+    public GenericDto<List<WithdrawWhitelistDto>> getAllWithdrawWhitelist() {
+        try {
+            List<WithdrawWhitelistDto> list = withdrawWhitelistService.loadAll();
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getAllWithdrawWhitelist", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/add-withdraw-whitelist-address")
+    @ApiOperation("添加提币白名单")
+    @Inner
+    public GenericDto<Boolean> addWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto) {
+        try {
+            withdrawWhitelistService.add(withdrawWhitelistDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("addWithdrawWhitelist", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/update-withdraw-whitelist-address")
+    @ApiOperation("更新提币白名单")
+    @Inner
+    public GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto) {
+        try {
+            withdrawWhitelistService.update(withdrawWhitelistDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("updateWithdrawWhitelist", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @GetMapping("/sys/blacklist-address")
+    @ApiOperation("获取所有充提币黑地址")
+    @Inner
+    public GenericDto<List<BlacklistAddressDto>> getAllBlacklistAddress(@RequestParam("type") int type) {
+        try {
+            List<BlacklistAddressDto> list = blacklistAddressService.loadAll()
+                    .stream().filter(e -> e.getType() == type).collect(Collectors.toList());
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getAllBlacklistAddress", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/add-blacklist-address")
+    @ApiOperation("添加新充提币黑地址")
+    @Inner
+    public GenericDto<Boolean> addBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto) {
+        try {
+            blacklistAddressService.add(blacklistAddressDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("addBlacklistAddress", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/update-blacklist-address")
+    @ApiOperation("更新充提币黑地址")
+    @Inner
+    public GenericDto<Boolean> updateBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto) {
+        try {
+            blacklistAddressService.update(blacklistAddressDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("updateBlacklistAddress", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/delete-blacklist-address")
+    @ApiOperation("删除充提币黑地址")
+    @Inner
+    public GenericDto<Boolean> deleteBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto) {
+        try {
+            blacklistAddressService.delete(blacklistAddressDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("deleteBlacklistAddress", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 创建热钱包地址
+     * @param chain
+     * @return
+     */
+    @PostMapping("/sys/create-system-wallet-address")
+    @ApiOperation("创建热钱包地址")
+    @Inner
+    public GenericDto<SystemWalletAddressDto> createSystemWalletAddress(@RequestParam("chain") int chain) {
+        try {
+            SystemWalletAddressDto systemWalletAddressDto = chainActionService.createSystemWalletAddress(Chain.fromCode(chain));
+            return GenericDto.success(systemWalletAddressDto);
+        } catch (Exception e) {
+            log.error("createSystemWalletAddress", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/add-system-wallet-address")
+    @ApiOperation("添加系统使用的地址")
+    @Inner
+    public GenericDto<Boolean> addSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
+        try {
+            systemWalletAddressService.add(systemWalletAddressDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("addSystemWalletAddress", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/update-system-wallet-address")
+    @ApiOperation("更新系统使用的地址")
+    @Inner
+    public GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
+        try {
+            systemWalletAddressService.update(systemWalletAddressDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("updateSystemWalletAddress", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @GetMapping("/sys/account-system-config-list")
+    @ApiOperation("获取账户系统配置")
+    @Inner
+    public GenericDto<List<AccountSystemConfigDto>> accountSystemConfigList() {
+        try {
+            return GenericDto.success(systemConfigService.accountSystemConfigList());
+        } catch (Exception e) {
+            log.error("accountSystemConfigList", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/account-system-config-modify")
+    @ApiOperation("编辑账户系统配置")
+    @Inner
+    public GenericDto<Object> accountSystemConfigModify(@RequestBody AccountSystemConfigDto req) {
+        try {
+            systemConfigService.accountSystemConfigModify(req);
+            return GenericDto.success(null);
+        } catch (Exception e) {
+            log.error("accountSystemConfigModify", e);
+            return Utils.returnFromException(e);
+        }
+    }
     /**
      * 获取充币规则列表
      *
@@ -616,71 +784,4 @@ public class AccountInternalController {
         }
     }
 
-//
-//    /**
-//     * 获取提币规则列表
-//     *
-//     * @param req
-//     * @return
-//     */
-//    @PostMapping("/sys/get-withdraw-rule-list")
-//    @Inner
-//    public GenericDto<IPage<WithdrawRuleDto>> getWithdrawRuleList(@RequestBody DepositRulePageReq req) {
-//        try {
-//            return GenericDto.success(depositRuleService.getList(req));
-//        } catch (Exception e) {
-//            log.error("get-deposit-rule-list", e);
-//            return Utils.returnFromException(e);
-//        }
-//    }
-//
-//    /**
-//     * 新增充币规则
-//     *
-//     * @param req
-//     * @return
-//     */
-//    @PostMapping("/sys/add-withdraw-rule")
-//    @Inner
-//    public GenericDto<Boolean> addWithdrawRule(@RequestBody DepositRuleSaveOrUpdateReq req) {
-//        try {
-//            return GenericDto.success(depositRuleService.add(req));
-//        } catch (Exception e) {
-//            log.error("add-deposit-rule", e);
-//            return Utils.returnFromException(e);
-//        }
-//    }
-//
-//    /**
-//     * 编辑充币规则
-//     *
-//     * @param req
-//     * @return
-//     */
-//    @PutMapping("/sys/update-withdraw-rule")
-//    @Inner
-//    public GenericDto<Boolean> updateWithdrawRule(@RequestBody DepositRuleSaveOrUpdateReq req) {
-//        try {
-//            return GenericDto.success(depositRuleService.update(req));
-//        } catch (Exception e) {
-//            log.error("update-deposit-rule", e);
-//            return Utils.returnFromException(e);
-//        }
-//    }
-//
-//    /**
-//     * 删除充币规则
-//     *
-//     * @param req
-//     * @return
-//     */
-//    @PostMapping("/sys/delete-withdraw-rule")
-//    public GenericDto<Boolean> deleteWithdrawRule(@Valid @RequestBody ListReq req) {
-//        try {
-//            return GenericDto.success(depositRuleService.delete(req));
-//        } catch (Exception e) {
-//            log.error("delete-deposit-rule", e);
-//            return Utils.returnFromException(e);
-//        }
-//    }
 }

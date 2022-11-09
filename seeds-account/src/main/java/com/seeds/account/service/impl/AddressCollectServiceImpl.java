@@ -18,9 +18,11 @@ import com.seeds.account.util.AddressUtils;
 import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.redis.account.RedisKeys;
+import com.seeds.uc.feign.UserCenterFeignClient;
 import com.seeds.wallet.dto.RawTransactionDto;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
@@ -32,10 +34,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -72,6 +71,8 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
     IAsyncService asyncService;
     @Autowired
     RedissonClient client;
+    @Autowired
+    UserCenterFeignClient userCenterFeignClient;
 
     @Override
     @SingletonLock(key = "/seeds/account/chain/collect")
@@ -199,14 +200,22 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
                 log.warn("empty collect his with orderId={}", orderId);
                 return;
             }
-            Map<Long, List<ChainTxnReplace>> pendingReplaceMap = chainTxnReplaceMapper.getListByChainStatusAndType(collectOrder.getChain(),
-                            ChainCommonStatus.TRANSACTION_ON_CHAIN,
-                            FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode().equals(collectOrder.getType()) ? ChainTxnReplaceAppType.CASH_COLLECT : ChainTxnReplaceAppType.GAS_TRANSFER).stream()
-                    .collect(Collectors.groupingBy(ChainTxnReplace::getAppId));
+
+            // 原始交易可能会有多笔替换交易，在最后一笔替换交易成功后，需要更新collectOrder的状态。
+
+            List<String> confirmedReplaceNonce = chainTxnReplaceMapper.getListByChainStatusAndType(collectOrder.getChain(),
+                    ChainCommonStatus.TRANSACTION_CONFIRMED,
+                    FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode().equals(collectOrder.getType()) ? ChainTxnReplaceAppType.CASH_COLLECT : ChainTxnReplaceAppType.GAS_TRANSFER).stream().map(p -> p.getNonce()).collect(Collectors.toList());
+
+
+            List<String> pendingReplaceNonce = chainTxnReplaceMapper.getListByChainStatusAndType(collectOrder.getChain(),
+                    ChainCommonStatus.TRANSACTION_ON_CHAIN,
+                    FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode().equals(collectOrder.getType()) ? ChainTxnReplaceAppType.CASH_COLLECT : ChainTxnReplaceAppType.GAS_TRANSFER).stream().map(p -> p.getNonce()).distinct().collect(Collectors.toList());
+
             // 查看是否所有的都已经处理完了
             if (collectHisList.stream().anyMatch(e -> e.getStatus() == ChainCommonStatus.TRANSACTION_ON_CHAIN.getCode()) ||
-                    // 存在replace中的
-                    !pendingReplaceMap.isEmpty()) {
+                    // 存在replace中的,并且没有已经被链上确认的nonce
+                    (!pendingReplaceNonce.isEmpty() && Collections.disjoint(confirmedReplaceNonce, pendingReplaceNonce))) {
                 return;
             }
             // 统计所花费的txFee (不管成功失败，都统计)
@@ -262,16 +271,37 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
         long startTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(lookback);
         long endTime = System.currentTimeMillis();
 
-        List<String> addresses = chainDepositWithdrawHisService.getDepositAddress(chain, startTime, endTime);
+        List<ChainDepositAddressDto> addresses = chainDepositWithdrawHisService.getDepositAddress(chain, startTime, endTime);
 
         List<SystemWalletAddressDto> systemWalletAddress = systemWalletAddressService.getAll();
         List<String> userAddress = addresses.stream()
-                .filter(p -> systemWalletAddress.stream().noneMatch(i -> Objects.equals(p, i.getAddress())
-        )).collect(Collectors.toList());
+                .filter(p -> systemWalletAddress.stream().noneMatch(i -> Objects.equals(p.getAddress(), i.getAddress())))
+                .map(ChainDepositAddressDto::getAddress)
+                .collect(Collectors.toList());
+
         // batch操作中间的休眠天数
         long sleep = Long.parseLong(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_REQUEST_BATCH_SLEEP, "500"));
         try {
-            return chainService.getBalancesOnBatch(chain, userAddress, sleep);
+            List<AddressBalanceDto> balancesOnBatch = chainService.getBalancesOnBatch(chain, userAddress, sleep);
+
+            List<AddressBalanceDto> resultList = Lists.newArrayList();
+            // rpc 获取用户的email
+            GenericDto<Map<Long, String>> emailMap = userCenterFeignClient.getEmailByIds(addresses.stream().map(ChainDepositAddressDto::getUserId).collect(Collectors.toList()));
+
+            if (null != emailMap && emailMap.getCode() == 200) {
+                for (AddressBalanceDto balanceDto : balancesOnBatch) {
+                    AddressBalanceDto dto = new AddressBalanceDto();
+                    ObjectUtils.copy(balanceDto, dto);
+                    for (ChainDepositAddressDto addressDto : addresses) {
+                        if (addressDto.getAddress().equals(balanceDto.getAddress())) {
+                            dto.setEmail(emailMap.getData().get(addressDto.getUserId()));
+                        }
+                    }
+                    resultList.add(dto);
+                }
+            }
+            return resultList;
+
         } catch (Exception e) {
             log.error("getPendingCollectBalances, ", e);
         }
@@ -333,16 +363,20 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
         List<String> validAddresses = getValidTargetAddresses(chain);
 
         list.forEach(e -> {
-            Utils.check(AddressUtils.validate(chain, e.getAddress()), "invalid address");
+            Utils.check(AddressUtils.validate(chain, e.getAddress()), "invalid user address");
+            boolean validSystemAddress = ObjectUtils.containsAddress(validAddresses, address);
+            Utils.check(validSystemAddress, "invalid system address");
+            boolean validUserAddress = ObjectUtils.containsAddress(validAddresses, e.getAddress());
+            Utils.check(validUserAddress, "invalid user address");
             Utils.check(e.getAmount() != null && e.getAmount().signum() > 0, "invalid amount");
 
-            if (orderType == FundCollectOrderType.FROM_USER_TO_SYSTEM) {
-                boolean validAddress = ObjectUtils.containsAddress(validAddresses, address);
-                Utils.check(validAddress, "invalid address");
-            } else {
-                boolean validAddress = ObjectUtils.containsAddress(validAddresses, e.getAddress());
-                Utils.check(validAddress, "invalid address");
-            }
+//            if (orderType == FundCollectOrderType.FROM_USER_TO_SYSTEM) {
+//                boolean validAddress = ObjectUtils.containsAddress(validAddresses, address);
+//                Utils.check(validAddress, "invalid address");
+//            } else {
+//                boolean validAddress = ObjectUtils.containsAddress(validAddresses, e.getAddress());
+//                Utils.check(validAddress, "invalid address");
+//            }
         });
 
         ChainContractDto chainContractDto = chainContractService.get(addressCollectOrderRequestDto.getChain(), currency);
@@ -516,7 +550,6 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
                 ? JsonUtils.readValue(json, new TypeReference<List<AddressBalanceDto>>() {
         })
                 : Lists.newArrayList();
-
         // 限定返回地址的条数
         int limit = Integer.parseInt(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_BALANCE_LIMIT, "500"));
 

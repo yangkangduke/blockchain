@@ -22,6 +22,11 @@ import java.util.Map;
 @AllArgsConstructor
 public class AddressBalanceDto implements Serializable {
     private static final long serialVersionUID = -1L;
+
+    /**
+     * 用户邮箱
+     */
+    String email;
     /**
      * 币种
      */

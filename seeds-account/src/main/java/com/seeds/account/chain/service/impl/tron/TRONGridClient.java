@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class TRONGridClient {
 
     private String dummyPrivateKey = "ab8f79d299999999999990000000000000000000000999999999999e2b29a905";
-//    private String dummyPrivateKey = "77e2165b-79ab-4d39-b400-7090d17f41dd";
 
     final static String TYPE = "chain";
     final static String KEY = "tron_rpc";

@@ -2,4 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seeds.account.mapper.BlacklistAddressMapper">
 
+    <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.BlacklistAddress">
+        update ac_blacklist_address
+        set create_time = #{createTime,jdbcType=BIGINT},
+            update_time = #{updateTime,jdbcType=BIGINT},
+            version     = #{version,jdbcType=BIGINT},
+            chain      = #{chain,jdbcType=VARCHAR},
+            type       = #{type,jdbcType=TINYINT},
+            address     = #{address,jdbcType=VARCHAR},
+            reason      = #{reason,jdbcType=VARCHAR},
+            status      = #{status,jdbcType=TINYINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from ac_blacklist_address
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <select id="getByTypeUserIdAndAddress" resultType="com.seeds.account.model.BlacklistAddress">
+        select *
+        from ac_blacklist_address
+        where type = #{type,jdbcType=TINYINT}
+          and user_id = #{userId,jdbcType=BIGINT}
+          and address = #{address,jdbcType=VARCHAR}
+    </select>
 </mapper>
