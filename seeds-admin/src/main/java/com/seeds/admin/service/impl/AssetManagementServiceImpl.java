@@ -336,6 +336,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     private MgtDepositAddressDto getMgtDepositAddressDto(AddressBalanceDto addressBalanceDto) {
         Map<String, BigDecimal> balancesMap = addressBalanceDto.getBalances();
         MgtDepositAddressDto addressDto = MgtDepositAddressDto.builder().address(addressBalanceDto.getAddress()).build();
+        addressDto.setEmail(addressBalanceDto.getEmail());
         if (balancesMap != null && !balancesMap.isEmpty()) {
             for (String key : balancesMap.keySet()) {
                 String balance = balancesMap.get(key).setScale(8, BigDecimal.ROUND_DOWN).toPlainString();

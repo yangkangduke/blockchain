@@ -494,6 +494,18 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     }
 
     @Override
+    public Map<Long, String> queryEmailByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        List<UcUser> list = listByIds(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(UcUser::getId, UcUser::getEmail));
+    }
+
+    @Override
     public LoginResp buildLoginResponse(Long userId, String email) {
         // 生成uc token给用户
         String ucToken = RandomUtil.genRandomToken(userId.toString());
