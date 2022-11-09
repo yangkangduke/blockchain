@@ -30,6 +30,7 @@ public class SysRandomCodeDetailServiceImpl extends ServiceImpl<SysRandomCodeDet
     public IPage<SysRandomCodeDetailResp> queryPage(SysRandomCodeDetailPageReq query) {
         LambdaQueryWrapper<SysRandomCodeDetailEntity> queryWrap = new QueryWrapper<SysRandomCodeDetailEntity>().lambda()
                 .eq(SysRandomCodeDetailEntity::getBatchNo, query.getBatchNo())
+                .eq(query.getUseFlag() != null, SysRandomCodeDetailEntity::getUseFlag, query.getUseFlag())
                 .orderByDesc(SysRandomCodeDetailEntity::getId);
         Page<SysRandomCodeDetailEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
         List<SysRandomCodeDetailEntity> records = page.getRecords();

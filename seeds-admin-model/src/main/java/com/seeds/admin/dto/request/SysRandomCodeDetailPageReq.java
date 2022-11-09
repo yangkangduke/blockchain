@@ -21,4 +21,7 @@ public class SysRandomCodeDetailPageReq extends PageReq {
     @NotBlank(message = "Batch number can not be empty!")
     private String batchNo;
 
+    @ApiModelProperty(value = "使用标记 0：未使用 1：已使用")
+    private Integer useFlag;
+
 }
