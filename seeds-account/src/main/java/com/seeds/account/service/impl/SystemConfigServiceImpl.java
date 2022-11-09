@@ -1,9 +1,11 @@
 package com.seeds.account.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.seeds.account.AccountConstants;
+import com.seeds.account.dto.AccountSystemConfigDto;
 import com.seeds.account.dto.SystemConfigDto;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.ex.MissingElementException;
@@ -17,9 +19,13 @@ import com.seeds.common.redis.account.RedisKeys;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -107,5 +113,40 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigMapper, Sys
         systemConfig.setUpdateTime(System.currentTimeMillis());
         systemConfig.setVersion(systemConfig.getVersion() + 1);
         systemConfigMapper.updateByPrimaryKey(systemConfig);
+    }
+
+    @Override
+    public List<AccountSystemConfigDto> accountSystemConfigList() {
+        List<SystemConfig> systemConfigs = systemConfigMapper.selectAll();
+        if (CollectionUtils.isEmpty(systemConfigs)) {
+            return Collections.emptyList();
+        }
+        List<AccountSystemConfigDto> list = new ArrayList<>();
+        systemConfigs.forEach(p -> {
+            AccountSystemConfigDto dto = new AccountSystemConfigDto();
+            BeanUtils.copyProperties(p, dto);
+            String value = dto.getValue();
+            if (value.startsWith("{") && value.endsWith("}")) {
+                dto.setValueList(Collections.singletonList(JSONUtil.toBean(value, Map.class)));
+            } else if (value.startsWith("[") && value.endsWith("]")) {
+                dto.setValueList(JSONUtil.toList(value, Map.class));
+            }
+            list.add(dto);
+        });
+        return list;
+    }
+
+    @Override
+    public void accountSystemConfigModify(AccountSystemConfigDto req) {
+        SystemConfig systemConfig = getById(req.getId());
+        systemConfig.setName(req.getName());
+        if (CollectionUtils.isEmpty(req.getValueList())) {
+            systemConfig.setValue(req.getValue());
+        } else {
+            systemConfig.setValue(JSONUtil.toJsonStr(req.getValueList()));
+        }
+        updateById(systemConfig);
+        // 更新缓存
+        rules.get(ALL).setList(loadAll());
     }
 }

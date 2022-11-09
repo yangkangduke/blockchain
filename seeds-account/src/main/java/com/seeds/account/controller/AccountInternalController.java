@@ -8,7 +8,6 @@ import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
-import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.enums.DepositStatus;
 import com.seeds.account.enums.WithdrawStatus;
@@ -46,7 +45,7 @@ public class AccountInternalController {
     @Autowired
     private IAddressCollectService addressCollectService;
     @Autowired
-    IAddressCollectHisService addressCollectHisService;
+    private IAddressCollectHisService addressCollectHisService;
     @Autowired
     private IAccountService accountService;
     @Autowired
@@ -55,12 +54,12 @@ public class AccountInternalController {
     private IChainService chainService;
     @Autowired
     private ISystemWalletAddressService systemWalletAddressService;
-
     @Autowired
     private IWithdrawWhitelistService withdrawWhitelistService;
-
     @Autowired
     private IBlacklistAddressService blacklistAddressService;
+    @Autowired
+    private ISystemConfigService systemConfigService;
 
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
@@ -691,5 +690,29 @@ public class AccountInternalController {
         }
     }
 
+    @GetMapping("/sys/account-system-config-list")
+    @ApiOperation("获取账户系统配置")
+    @Inner
+    public GenericDto<List<AccountSystemConfigDto>> accountSystemConfigList() {
+        try {
+            return GenericDto.success(systemConfigService.accountSystemConfigList());
+        } catch (Exception e) {
+            log.error("accountSystemConfigList", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/account-system-config-modify")
+    @ApiOperation("编辑账户系统配置")
+    @Inner
+    public GenericDto<Object> accountSystemConfigModify(@RequestBody AccountSystemConfigDto req) {
+        try {
+            systemConfigService.accountSystemConfigModify(req);
+            return GenericDto.success(null);
+        } catch (Exception e) {
+            log.error("accountSystemConfigModify", e);
+            return Utils.returnFromException(e);
+        }
+    }
 
 }

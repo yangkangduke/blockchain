@@ -1,10 +1,12 @@
-package com.seeds.admin.dto.response;
+package com.seeds.account.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -14,9 +16,10 @@ import java.util.List;
  */
 @Data
 @ApiModel(value = "AccountSystemConfigResp", description = "账户系统配置")
-public class AccountSystemConfigResp {
+public class AccountSystemConfigDto {
 
     @ApiModelProperty(value = "配置id")
+    @NotNull(message = "Config id can not be empty!")
     private Long id;
 
     @ApiModelProperty(value = "类型")
@@ -32,15 +35,6 @@ public class AccountSystemConfigResp {
     private String value;
 
     @ApiModelProperty(value = "值列表")
-    private List<AccountSystemConfigValue> valueList;
-
-    @Data
-    @ApiModel(value = "AccountSystemConfigValue", description = "账户系统配置值")
-    public static class AccountSystemConfigValue {
-
-        @ApiModelProperty("需要变更的NFT唯一标识")
-        private Map<String, Object> nftId;
-
-    }
+    private List<Map> valueList;
 
 }
