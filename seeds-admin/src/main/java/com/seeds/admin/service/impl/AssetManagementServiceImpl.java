@@ -133,7 +133,9 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         currency = isNotBlank(currency) ? currency : AccountConstants.USDT;
         GenericDto<List<AddressBalanceDto>> dto =
                 accountFeignClient.getUserAddressBalances(chain, currency);
-        if (!dto.isSuccess()) return GenericDto.failure(dto.getMessage(), dto.getCode());
+        if (!dto.isSuccess()) {
+            return GenericDto.failure(dto.getMessage(), dto.getCode());
+        }
         Map<String, AddressBalanceDto> balanceDtoMap =
                 dto.getData().stream().collect(Collectors.toMap(AddressBalanceDto::getAddress, e -> e));
         List<MgtDepositAddressDto> dtos = Lists.newArrayList();
@@ -162,7 +164,9 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         dto.setType(FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode());
         GenericDto<AddressCollectOrderHisDto> addressDto =
                 accountFeignClient.createFundCollectOrder(walletTransferRequestMapper.convert2AddressCollectOrderRequestDto(dto));
-        if (!addressDto.isSuccess()) return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        if (!addressDto.isSuccess()) {
+            return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        }
         dto.setId(addressDto.getData().getId());
         return GenericDto.success(true);
     }
@@ -171,7 +175,9 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         dto.setType(FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode());
         GenericDto<AddressCollectOrderHisDto> addressDto =
                 accountFeignClient.createFundCollectOrder(walletTransferRequestMapper.convert2AddressCollectOrderRequestDto(dto));
-        if (!addressDto.isSuccess()) return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        if (!addressDto.isSuccess()) {
+            return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        }
         dto.setId(addressDto.getData().getId());
         return GenericDto.success(true);
     }
@@ -189,10 +195,14 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     @Override
     public GenericDto<Page<MgtHotWalletDto>> queryHotWallets(Integer type, int chain, String address) {
         GenericDto<List<SystemWalletAddressDto>> dto = accountFeignClient.getAllSystemWalletAddress(chain);
-        if (!dto.isSuccess()) return GenericDto.failure(dto.getCode(), dto.getMessage());
+        if (!dto.isSuccess()) {
+            return GenericDto.failure(dto.getCode(), dto.getMessage());
+        }
 
         GenericDto<List<AddressBalanceDto>> balancesDto = accountFeignClient.getSystemAddressBalances(chain);
-        if (!balancesDto.isSuccess()) return GenericDto.failure(balancesDto.getCode(), balancesDto.getMessage());
+        if (!balancesDto.isSuccess()) {
+            return GenericDto.failure(balancesDto.getCode(), balancesDto.getMessage());
+        }
         Map<String, AddressBalanceDto> balanceDtoMap =
                 balancesDto.getData().stream().collect(Collectors.toMap(AddressBalanceDto::getAddress, e -> e, (v1,
                                                                                                                 v2) -> v1));
@@ -290,7 +300,9 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     public GenericDto<String> walletTransfer(MgtWalletTransferRequestDto requestDto) {
         GenericDto<AddressCollectHisDto> dto =
                 accountFeignClient.createFundCollect(walletTransferRequestMapper.convert2FundCollectRequestDto(requestDto));
-        if (!dto.isSuccess()) return GenericDto.failure(dto.getMessage(), dto.getCode());
+        if (!dto.isSuccess()) {
+            return GenericDto.failure(dto.getMessage(), dto.getCode());
+        }
         requestDto.setId(dto.getData().getId());
         return GenericDto.success(dto.getData().getFromAddress());
     }
@@ -298,9 +310,13 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     @Override
     public GenericDto<MgtGasConfig> getGasConfig(int chain) {
         GenericDto<Long> respDto = accountFeignClient.getGasLimit(chain);
-        if (!respDto.isSuccess()) return GenericDto.failure(respDto.getCode(), respDto.getMessage());
+        if (!respDto.isSuccess()) {
+            return GenericDto.failure(respDto.getCode(), respDto.getMessage());
+        }
         GenericDto<ChainGasPriceDto> gasPrice = accountFeignClient.getGasPrice(chain);
-        if (!gasPrice.isSuccess()) return GenericDto.failure(gasPrice.getMessage(), gasPrice.getCode());
+        if (!gasPrice.isSuccess()) {
+            return GenericDto.failure(gasPrice.getMessage(), gasPrice.getCode());
+        }
         MgtGasConfig config = new MgtGasConfig();
         config.setGasLimit(respDto.getData());
         config.setGasPrice(gasPrice.getData().getProposeGasPrice());
@@ -327,7 +343,9 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     @AuditLog(module = Module.CASH_MANAGEMENT, subModule = SubModule.WALLET_ACCOUNT, action = Action.ADD)
     public GenericDto<Boolean> createHotWallet(MgtSystemWalletAddressDto dto) {
         GenericDto<SystemWalletAddressDto> addressDto = accountFeignClient.createSystemWalletAddress(dto.getChain());
-        if (!addressDto.isSuccess()) return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        if (!addressDto.isSuccess()) {
+            return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        }
         SystemWalletAddressDto data = addressDto.getData();
         BeanCopy.beans(data, dto).copy();
         return GenericDto.success(true);

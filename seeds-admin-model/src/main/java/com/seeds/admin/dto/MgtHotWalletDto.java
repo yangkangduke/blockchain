@@ -1,5 +1,6 @@
 package com.seeds.admin.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,41 +17,24 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Builder
 public class MgtHotWalletDto {
 
+    @ApiModelProperty(value = "地址")
     private String address;
-
+    @ApiModelProperty(value = "类型")
     private int type;
-
+    @ApiModelProperty(value = "链")
     private String chain;
-
-//    private String kusdBalance;
-//
-//    private BigDecimal kusdBalanceNum;
-
-//    private String kineBalance;
-//
-//    private BigDecimal kineBalanceNum;
-
+    @ApiModelProperty(value = "链余额")
     private String chainBalance;
-
+    @ApiModelProperty(value = "链数量")
     private BigDecimal chainBalanceNum;
-
+    @ApiModelProperty(value = "usdt余额")
     private String usdtBalance;
-
+    @ApiModelProperty(value = "usdt数量")
     private BigDecimal usdtBalanceNum;
-
-//    private String usdcBalance;
-//
-//    private BigDecimal usdcBalanceNum;
-
+    @ApiModelProperty(value = "余额")
     Map<String, String> balances;
 
-//    public BigDecimal getKusdBalanceNum() {
-//        return isBlank(kusdBalance) ? BigDecimal.ZERO : new BigDecimal(kusdBalance);
-//    }
-//
-//    public BigDecimal getKineBalanceNum() {
-//        return isBlank(kineBalance) ? BigDecimal.ZERO : new BigDecimal(kineBalance);
-//    }
+
 
     public BigDecimal getChainBalanceNum() {
         return isBlank(chainBalance) ? BigDecimal.ZERO : new BigDecimal(chainBalance);
@@ -59,8 +43,4 @@ public class MgtHotWalletDto {
     public BigDecimal getUsdtBalanceNum() {
         return isBlank(usdtBalance) ? BigDecimal.ZERO : new BigDecimal(usdtBalance);
     }
-//
-//    public BigDecimal getUsdcBalanceNum() {
-//        return isBlank(usdcBalance) ? BigDecimal.ZERO : new BigDecimal(usdcBalance);
-//    }
 }

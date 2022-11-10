@@ -239,4 +239,10 @@ public class SysCashController {
     }
 
 
+    @PostMapping("/account/create-hot-wallet")
+    @ApiOperation("新增热钱包")
+    public GenericDto<Boolean> createHotWallet(@Valid @RequestBody MgtChainDto dto) {
+        return assetManagementService.createHotWallet(MgtSystemWalletAddressDto.builder().chain(dto.getChain()).build());
+    }
+
 }

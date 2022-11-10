@@ -663,7 +663,7 @@ public class AccountInternalController {
      * @return
      */
     @PostMapping("/sys/create-system-wallet-address")
-    @ApiOperation("创建热钱包地址")
+    @ApiOperation(value = "创建热钱包地址",notes = "chain的值：1 eth， 3 tron")
     @Inner
     public GenericDto<SystemWalletAddressDto> createSystemWalletAddress(@RequestParam("chain") int chain) {
         try {
@@ -676,7 +676,7 @@ public class AccountInternalController {
     }
 
     @PostMapping("/sys/add-system-wallet-address")
-    @ApiOperation("添加系统使用的地址")
+    @ApiOperation("添加系统使用的地址(暂时没用)")
     @Inner
     public GenericDto<Boolean> addSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
         try {
@@ -689,7 +689,7 @@ public class AccountInternalController {
     }
 
     @PostMapping("/sys/update-system-wallet-address")
-    @ApiOperation("更新系统使用的地址")
+    @ApiOperation("更新系统使用的地址(暂时没用)")
     @Inner
     public GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
         try {
