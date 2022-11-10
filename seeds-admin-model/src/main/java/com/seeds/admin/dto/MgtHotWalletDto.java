@@ -19,7 +19,7 @@ public class MgtHotWalletDto {
 
     @ApiModelProperty(value = "地址")
     private String address;
-    @ApiModelProperty(value = "类型")
+    @ApiModelProperty(value = "类型：1 热钱包")
     private int type;
     @ApiModelProperty(value = "链")
     private String chain;
@@ -33,7 +33,12 @@ public class MgtHotWalletDto {
     private BigDecimal usdtBalanceNum;
     @ApiModelProperty(value = "余额")
     Map<String, String> balances;
-
+    @ApiModelProperty(value = "标记")
+    private String tag;
+    @ApiModelProperty(value = "评论")
+    private String comments;
+    @ApiModelProperty(value = "状态 1启用 2停用")
+    private Integer status;
 
 
     public BigDecimal getChainBalanceNum() {

@@ -222,46 +222,33 @@ public class AssetManagementServiceImpl implements AssetManagementService {
             Map<String, String> balances = Maps.newHashMap();
             AddressBalanceDto addressBalanceDto = balanceDtoMap.get(queryAddress);
             Map<String, BigDecimal> balancesMap = (addressBalanceDto != null) ? addressBalanceDto.getBalances() : Maps.newHashMap();
-            String kusdBalance = null;
-            String kineBalance = null;
             String chainBalance = null;
             String usdtBalance = null;
-            String usdcBalance = null;
 
             if (balancesMap != null && !balancesMap.isEmpty()) {
                 for (String key : balancesMap.keySet()) {
                     String balance = balancesMap.get(key).setScale(6, BigDecimal.ROUND_DOWN).toPlainString();
                     balances.put(key, balance);
-                    if (AccountConstants.KUSD_CURRENCY.equalsIgnoreCase(key)) {
-                        kusdBalance = balance;
-                    } else if (KINE.equalsIgnoreCase(key)) {
-                        kineBalance = balance;
-                    } else if (getNativeTokens().contains(key)) {
+                    if (getNativeTokens().contains(key)) {
                         chainBalance = balance;
                     } else if (USDT.equalsIgnoreCase(key)) {
                         usdtBalance = balance;
-                    } else if (USDC.equalsIgnoreCase(key)) {
-                        usdcBalance = balance;
                     }
                 }
             }
             mgtHotWalletDtos.add(MgtHotWalletDto.builder()
                     .address(queryAddress)
                     .type(data.getType())
-                    //.kusdBalance(kusdBalance)
-                    //.kineBalance(kineBalance)
                     .chainBalance(chainBalance)
                     .usdtBalance(usdtBalance)
-                    //.usdcBalance(usdcBalance)
                     .balances(balances)
                     .chain(Chain.fromCode(data.getChain()).getName())
+                    .comments(data.getComments())
+                    .status(data.getStatus())
+                    .tag(data.getTag())
                     .build());
         }
-//        if (isBlank(sorter) || "{}".equals(sorter)) {
-//            sorter = "default";
-//        }
         Page<MgtHotWalletDto> page = new Page<>();
-//        page.setRecords(mgtHotWalletDtos.stream().sorted(sorterHotWalletMap.get(sorter)).collect(Collectors.toList()));
         page.setRecords(mgtHotWalletDtos.stream().collect(Collectors.toList()));
         return GenericDto.success(page);
     }
