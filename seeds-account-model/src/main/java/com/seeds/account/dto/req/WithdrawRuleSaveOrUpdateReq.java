@@ -1,40 +1,39 @@
-package com.seeds.account.dto;
+package com.seeds.account.dto.req;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
+ * <p>
+ * 充币规则新增/编辑
+ * </p>
  *
- * @author yk
- *
+ * @author hewei
+ * @since 2022-11-7
  */
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class WithdrawRuleDto implements Serializable {
-    private static final long serialVersionUID = -1L;
+@ApiModel(value = "DepositRuleSaveOrUpdateReq", description = "充币规则新增/编辑")
+public class WithdrawRuleSaveOrUpdateReq {
 
+    private static final long serialVersionUID = 1L;
     private Long id;
     /**
      * @see com.seeds.common.enums.Chain
      */
     @ApiModelProperty(value = "1：ETH 3：TRON")
-    Integer chain;
+    private Integer chain;
 
     @ApiModelProperty(value = "币种")
-    String currency;
+    private String currency;
+
+    @ApiModelProperty("最小")
+    private BigDecimal minAmount;
 
     @ApiModelProperty(value = "手续费类型")
-    int feeType;
+    private Integer feeType;
 
     @ApiModelProperty(value = "手续费")
     BigDecimal feeAmount;
@@ -42,11 +41,8 @@ public class WithdrawRuleDto implements Serializable {
     @ApiModelProperty(value = "金额精度")
     private Integer decimals;
 
-    @ApiModelProperty(value = "提币状态 1启用 2停用")
+    @ApiModelProperty(value = " 1启用 2停用")
     private Integer status;
-
-    @ApiModelProperty("min amount")
-    private BigDecimal minAmount;
 
     @ApiModelProperty("max amount")
     private BigDecimal maxAmount;
@@ -60,9 +56,4 @@ public class WithdrawRuleDto implements Serializable {
     @ApiModelProperty("是否内部提币面手续费  false、true")
     private String zeroFeeOnInternal;
 
-    @ApiModelProperty("create time")
-    private Long createTime;
-
-    @ApiModelProperty("update time")
-    private Long updateTime;
 }

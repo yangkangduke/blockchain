@@ -23,38 +23,35 @@ import java.math.BigDecimal;
 public class WithdrawLimitRuleDto implements Serializable {
     private static final long serialVersionUID = -1L;
 
-    /**
-     * 币种
-     */
+    private Long id;
+
     @ApiModelProperty(value = "币种")
-    String currency;
-    /**
-     * 最小
-     */
+    private String currency;
+
     @ApiModelProperty(value = "最小")
-    BigDecimal minAmount;
+    private BigDecimal minAmount;
 
-    /**
-     * 最大
-     */
+
     @ApiModelProperty(value = "最大")
-    BigDecimal maxAmount;
+    private BigDecimal maxAmount;
 
-    /**
-     * 当日限额
-     */
+
     @ApiModelProperty(value = "当日限额")
-    BigDecimal intradayAmount;
+    private BigDecimal intradayAmount;
 
-    /**
-     * 免审核提币
-     */
+
     @ApiModelProperty(value = "免审核提币")
-    BigDecimal autoAmount;
+    private BigDecimal autoAmount;
 
-    /**
-     * 是否内部提币免手续费
-     */
+
     @ApiModelProperty(value = "是否内部提币免手续费")
-    String zeroFeeOnInternal;
+    private String zeroFeeOnInternal;
+
+    @ApiModelProperty(value = "createTime")
+    private Long createTime;
+
+    @ApiModelProperty(value = "updateTime")
+    private Long updateTime;
+
+
 }
