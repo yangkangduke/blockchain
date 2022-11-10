@@ -15,7 +15,7 @@ import java.math.BigDecimal;
  * @since 2022-11-7
  */
 @Data
-@ApiModel(value = "DepositRuleSaveOrUpdateReq", description = "充币规则新增/编辑")
+@ApiModel(value = "WithdrawRuleSaveOrUpdateReq", description = "提币规则新增/编辑")
 public class WithdrawRuleSaveOrUpdateReq {
 
     private static final long serialVersionUID = 1L;
