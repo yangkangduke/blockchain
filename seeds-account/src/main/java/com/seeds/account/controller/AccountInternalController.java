@@ -69,6 +69,9 @@ public class AccountInternalController {
     @Autowired
     private ISystemConfigService systemConfigService;
 
+    @Autowired
+    private IActionControlService actionControlService;
+
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
     @Inner
@@ -660,7 +663,7 @@ public class AccountInternalController {
      * @return
      */
     @PostMapping("/sys/create-system-wallet-address")
-    @ApiOperation("创建热钱包地址")
+    @ApiOperation(value = "创建热钱包地址",notes = "chain的值：1 eth， 3 tron")
     @Inner
     public GenericDto<SystemWalletAddressDto> createSystemWalletAddress(@RequestParam("chain") int chain) {
         try {
@@ -673,7 +676,7 @@ public class AccountInternalController {
     }
 
     @PostMapping("/sys/add-system-wallet-address")
-    @ApiOperation("添加系统使用的地址")
+    @ApiOperation("添加系统使用的地址(暂时没用)")
     @Inner
     public GenericDto<Boolean> addSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
         try {
@@ -686,7 +689,7 @@ public class AccountInternalController {
     }
 
     @PostMapping("/sys/update-system-wallet-address")
-    @ApiOperation("更新系统使用的地址")
+    @ApiOperation("更新系统使用的地址(暂时没用)")
     @Inner
     public GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
         try {
@@ -925,4 +928,44 @@ public class AccountInternalController {
             return Utils.returnFromException(e);
         }
     }
+
+    @GetMapping("/sys/action-control")
+    @ApiOperation("获取所有系统操作控制")
+    @Inner
+    public GenericDto<List<ActionControlDto>> getAllActionControl() {
+        try {
+            List<ActionControlDto> list = actionControlService.loadAll();
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getAllActionControl", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/add-action-control")
+    @ApiOperation("添加新系统操作控制")
+    @Inner
+    public GenericDto<Boolean> addActionControl(@RequestBody ActionControlDto actionControlDto) {
+        try {
+            actionControlService.add(actionControlDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("addActionControl", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/update-action-control")
+    @ApiOperation("更新系统操作控制")
+    @Inner
+    public GenericDto<Boolean> updateActionControl(@RequestBody ActionControlDto actionControlDto) {
+        try {
+            actionControlService.update(actionControlDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("updateActionControl", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.seeds.notification.dto.request;
 
+import com.seeds.notification.enums.NoticeTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +19,11 @@ public class NotificationReq {
     @ApiModelProperty("用户id")
     private List<Long> ucUserIds;
 
+    /**
+     * @see NoticeTypeEnum
+     */
     @ApiModelProperty("通知类型")
-    private String notificationType;
+    private Integer notificationType;
 
     @ApiModelProperty("消息内容")
     private Map<String, Object> values = new HashMap<>();

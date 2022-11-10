@@ -1,10 +1,12 @@
 package com.seeds.admin.service.impl;
 
 
+import com.seeds.account.dto.ActionControlDto;
 import com.seeds.account.dto.BlacklistAddressDto;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.feign.AccountFeignClient;
 import com.seeds.admin.annotation.AuditLog;
+import com.seeds.admin.dto.MgtActionControlDto;
 import com.seeds.admin.dto.MgtBlacklistAddressDto;
 import com.seeds.admin.dto.MgtPageDto;
 import com.seeds.admin.enums.Action;
@@ -76,5 +78,40 @@ public class ISysRiskServiceImpl implements MgtRiskService {
     @AuditLog(module = Module.RISK_MANAGEMENT, subModule = SubModule.WITHDRAW_BLACKLIST, action = Action.DELETE)
     public GenericDto<Boolean> deleteWithdrawBlackList(MgtBlacklistAddressDto blacklistAddressDto) {
         return accountFeignClient.deleteBlacklistAddress(blacklistAddressDto);
+    }
+
+    @Override
+    public GenericDto<MgtPageDto<List<ActionControlDto>>> getAllActionControl() {
+        GenericDto<List<ActionControlDto>> dto = accountFeignClient.getAllActionControl();
+        if(!dto.isSuccess()) return GenericDto.failure(dto.getMessage(), dto.getCode());
+        return GenericDto.success(MgtPageDto.<List<ActionControlDto>>builder()
+                .data(dto.getData())
+                .build());
+    }
+
+    @Override
+    @AuditLog(module = Module.RISK_MANAGEMENT, subModule = SubModule.ACTION_CONTROL, action = Action.EDIT)
+    public GenericDto<Boolean> updateActionControl(MgtActionControlDto dto) {
+        return accountFeignClient.updateActionControl(ActionControlDto.builder()
+                .type(dto.getType())
+                .key(dto.getKey())
+                .name(dto.getName())
+                .value(dto.getValue())
+                .comments(dto.getComments())
+                .status(dto.getStatus())
+                .build());
+    }
+
+    @Override
+    @AuditLog(module = Module.RISK_MANAGEMENT, subModule = SubModule.ACTION_CONTROL, action = Action.ADD)
+    public GenericDto<Boolean> addActionControl(MgtActionControlDto dto) {
+        return accountFeignClient.addActionControl(ActionControlDto.builder()
+                .type(dto.getType())
+                .key(dto.getKey())
+                .name(dto.getName())
+                .value(dto.getValue())
+                .comments(dto.getComments())
+                .status(dto.getStatus())
+                .build());
     }
 }

@@ -1,6 +1,8 @@
 package com.seeds.admin.service;
 
+import com.seeds.account.dto.ActionControlDto;
 import com.seeds.account.dto.BlacklistAddressDto;
+import com.seeds.admin.dto.MgtActionControlDto;
 import com.seeds.admin.dto.MgtBlacklistAddressDto;
 import com.seeds.admin.dto.MgtDepositRule;
 import com.seeds.admin.dto.MgtPageDto;
@@ -24,4 +26,10 @@ public interface MgtRiskService {
     GenericDto<Boolean> updateWithdrawBlackList(MgtBlacklistAddressDto blacklistAddressDto);
 
     GenericDto<Boolean> deleteWithdrawBlackList(MgtBlacklistAddressDto blacklistAddressDto);
+
+    GenericDto<MgtPageDto<List<ActionControlDto>>> getAllActionControl();
+
+    GenericDto<Boolean> updateActionControl(MgtActionControlDto dto);
+
+    GenericDto<Boolean> addActionControl(MgtActionControlDto dto);
 }

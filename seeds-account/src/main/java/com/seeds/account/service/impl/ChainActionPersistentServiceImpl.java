@@ -25,6 +25,7 @@ import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.notification.dto.request.NotificationReq;
+import com.seeds.notification.enums.NoticeTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -267,7 +268,7 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
 
             // 发送通知给客户
             kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
-                    .notificationType(AccountAction.DEPOSIT.getNotificationType())
+                    .notificationType(NoticeTypeEnum.ACCOUNT_DEPOSIT.getCode())
                     .ucUserIds(ImmutableList.of(transaction.getUserId()))
                     .values(ImmutableMap.of(
                             "ts", System.currentTimeMillis(),

@@ -28,7 +28,7 @@ public class WithdrawRuleDto implements Serializable {
      * @see com.seeds.common.enums.Chain
      */
     @ApiModelProperty(value = "1：ETH 3：TRON")
-    Integer chain;
+    int chain;
 
     @ApiModelProperty(value = "币种")
     String currency;
@@ -43,7 +43,7 @@ public class WithdrawRuleDto implements Serializable {
     private Integer decimals;
 
     @ApiModelProperty(value = "提币状态 1启用 2停用")
-    private Integer status;
+    private int status;
 
     @ApiModelProperty("min amount")
     private BigDecimal minAmount;
