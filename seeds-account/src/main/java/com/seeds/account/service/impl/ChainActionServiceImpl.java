@@ -28,6 +28,7 @@ import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.notification.dto.request.NotificationReq;
+import com.seeds.notification.enums.NoticeTypeEnum;
 import com.seeds.wallet.dto.RawTransactionDto;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tags;
@@ -444,7 +445,7 @@ public class ChainActionServiceImpl implements IChainActionService {
 
                     // 发送通知给客户(充币方)
                     kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
-                            .notificationType(AccountAction.DEPOSIT.getNotificationType())
+                            .notificationType(NoticeTypeEnum.ACCOUNT_DEPOSIT.getCode())
                             .ucUserIds(ImmutableList.of(assignedDepositAddress.getUserId()))
                             .values(ImmutableMap.of(
                                     "ts", System.currentTimeMillis(),
@@ -459,7 +460,7 @@ public class ChainActionServiceImpl implements IChainActionService {
 
         // 发送通知用户提示提币成功(提币方)
         kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
-                .notificationType(AccountAction.WITHDRAW.getNotificationType())
+                .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW.getCode())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
@@ -1363,7 +1364,7 @@ public class ChainActionServiceImpl implements IChainActionService {
 
         // 发送通知用户提示提币成功
         kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE,JSONUtil.toJsonStr(NotificationReq.builder()
-                .notificationType(AccountAction.WITHDRAW.getNotificationType())
+                .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW.getCode())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),

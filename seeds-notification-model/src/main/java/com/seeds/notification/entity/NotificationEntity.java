@@ -27,7 +27,7 @@ public class NotificationEntity {
     /**
      * 消息类型
      */
-    private String notificationType;
+    private Integer notificationType;
     /**
      * 消息内容
      */
