@@ -32,7 +32,7 @@ public class DepositRuleDto implements Serializable {
      * @see com.seeds.common.enums.Chain
      */
     @ApiModelProperty(value = "1：ETH 3：TRON")
-    private Integer chain;
+    private int chain;
 
     @ApiModelProperty(value = "币种")
     private String currency;
@@ -41,7 +41,7 @@ public class DepositRuleDto implements Serializable {
     private BigDecimal autoAmount;
 
     @ApiModelProperty(value = "是否启用 1：启用 2：停用")
-    private Integer status;
+    private int status;
 
     @ApiModelProperty("create time")
     private Long createTime;
