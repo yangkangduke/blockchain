@@ -39,6 +39,7 @@ public class SystemWalletAddress implements Serializable {
     @ApiModelProperty("version")
     private Long version;
 
+    @ApiModelProperty("类型：1 热钱包")
     private Integer type;
 
     @ApiModelProperty("name")
