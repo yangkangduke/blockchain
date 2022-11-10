@@ -1,7 +1,9 @@
 package com.seeds.admin.controller;
 
+import com.seeds.account.dto.ActionControlDto;
 import com.seeds.account.dto.BlacklistAddressDto;
 import com.seeds.admin.annotation.MgtAuthority;
+import com.seeds.admin.dto.MgtActionControlDto;
 import com.seeds.admin.dto.MgtBlacklistAddressDto;
 import com.seeds.admin.dto.MgtPageDto;
 import com.seeds.admin.service.MgtRiskService;
@@ -85,5 +87,26 @@ public class SysRiskController {
     public GenericDto<Boolean> deleteWithdrawBlackList(@RequestBody @Valid MgtBlacklistAddressDto blacklistAddressDto) {
         blacklistAddressDto.setType(2);
         return mgtRiskService.deleteWithdrawBlackList(blacklistAddressDto);
+    }
+
+    @GetMapping("/action-control")
+    @ApiOperation("获取所有系统操作控制")
+    // @MgtAuthority(path = "/monitor/action-control/")
+    public GenericDto<MgtPageDto<List<ActionControlDto>>> getActionControlList() {
+        return mgtRiskService.getAllActionControl();
+    }
+
+    @PostMapping("/update-action-control")
+    @ApiOperation("更新系统操作控制")
+    // @MgtAuthority(path = "/monitor/action-control/:edit")
+    public GenericDto<Boolean> updateActionControl(@RequestBody MgtActionControlDto dto) {
+        return mgtRiskService.updateActionControl(dto);
+    }
+
+    @PostMapping("/add-action-control")
+    @ApiOperation("添加新的系统操作控制")
+    // @MgtAuthority(path = "/monitor/action-control/:edit")
+    public GenericDto<Boolean> addActionControl(@RequestBody MgtActionControlDto dto) {
+        return mgtRiskService.addActionControl(dto);
     }
 }

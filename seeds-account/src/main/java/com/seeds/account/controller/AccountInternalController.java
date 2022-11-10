@@ -69,6 +69,9 @@ public class AccountInternalController {
     @Autowired
     private ISystemConfigService systemConfigService;
 
+    @Autowired
+    private IActionControlService actionControlService;
+
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
     @Inner
@@ -925,4 +928,44 @@ public class AccountInternalController {
             return Utils.returnFromException(e);
         }
     }
+
+    @GetMapping("/sys/action-control")
+    @ApiOperation("获取所有系统操作控制")
+    @Inner
+    public GenericDto<List<ActionControlDto>> getAllActionControl() {
+        try {
+            List<ActionControlDto> list = actionControlService.loadAll();
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getAllActionControl", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/add-action-control")
+    @ApiOperation("添加新系统操作控制")
+    @Inner
+    public GenericDto<Boolean> addActionControl(@RequestBody ActionControlDto actionControlDto) {
+        try {
+            actionControlService.add(actionControlDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("addActionControl", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/update-action-control")
+    @ApiOperation("更新系统操作控制")
+    @Inner
+    public GenericDto<Boolean> updateActionControl(@RequestBody ActionControlDto actionControlDto) {
+        try {
+            actionControlService.update(actionControlDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("updateActionControl", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
 }

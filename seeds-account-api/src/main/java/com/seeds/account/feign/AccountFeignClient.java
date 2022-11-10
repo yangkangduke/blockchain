@@ -2,10 +2,12 @@ package com.seeds.account.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.AccountConstants;
+import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.*;
 import com.seeds.account.model.SwitchReq;
+import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -130,7 +132,6 @@ public interface AccountFeignClient {
 
     @GetMapping("/sys/pending-collect-balances")
     GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception;
-
     /**
      * 获取钱包归集历史
      *
@@ -156,12 +157,12 @@ public interface AccountFeignClient {
 
     @GetMapping("/sys/fund-collect-history")
     GenericDto<Page<AddressCollectHisDto>> getFundCollectHistory(@RequestParam("chain") int chain,
-                                                                 @RequestParam("startTime") long startTime,
-                                                                 @RequestParam("endTime") long endTime,
-                                                                 @RequestParam(value = "fromAddress", required = false) String fromAddress,
-                                                                 @RequestParam(value = "toAddress", required = false) String toAddress,
-                                                                 @RequestParam("page") int page,
-                                                                 @RequestParam("size") int size);
+                                                                     @RequestParam("startTime") long startTime,
+                                                                     @RequestParam("endTime") long endTime,
+                                                                     @RequestParam(value = "fromAddress", required = false) String fromAddress,
+                                                                     @RequestParam(value = "toAddress", required = false) String toAddress,
+                                                                     @RequestParam("page") int page,
+                                                                     @RequestParam("size") int size);
 
     /**
      * 根据归集订单Id获取钱包归集历史
@@ -455,4 +456,32 @@ public interface AccountFeignClient {
      */
     @PostMapping("/sys/delete-withdraw-limit")
     GenericDto<Boolean> deleteWithdrawLimitRule(@Valid @RequestBody ListReq req);
+
+    /**
+     * 获取所有系统操作控制
+     *
+     * @return
+     */
+    @GetMapping("/sys/action-control")
+    GenericDto<List<ActionControlDto>> getAllActionControl();
+
+    /**
+     * 添加新系统操作控制
+     *
+     * @param actionControlDto
+     * @return
+     */
+    @PostMapping("/sys/add-action-control")
+    GenericDto<Boolean> addActionControl(@RequestBody ActionControlDto actionControlDto);
+
+    /**
+     * 更新系统操作控制
+     *
+     * @param actionControlDto
+     * @return
+     */
+    @PostMapping("/sys/update-action-control")
+    GenericDto<Boolean> updateActionControl(@RequestBody ActionControlDto actionControlDto);
+
+
 }
