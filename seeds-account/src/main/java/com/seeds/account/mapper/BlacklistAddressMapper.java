@@ -18,7 +18,7 @@ public interface BlacklistAddressMapper extends BaseMapper<BlacklistAddress> {
     int updateByPrimaryKey(BlacklistAddress record);
 
     BlacklistAddress getByTypeUserIdAndAddress(@Param("type") int type,
-                                                  @Param("userId") Long userId,
+                                                 // @Param("userId") Long userId,
                                                   @Param("address") String address);
 
     int deleteByPrimaryKey(Long id);
