@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.chain.service.IChainService;
+import com.seeds.account.dto.ChainDepositAddressDto;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.ChainTxnDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
@@ -121,7 +122,7 @@ public class ChainDepositWithdrawHisServiceImpl extends ServiceImpl<ChainDeposit
     }
 
     @Override
-    public List<String> getDepositAddress(Chain chain, long startTime, long endTime) {
+    public List<ChainDepositAddressDto> getDepositAddress(Chain chain, long startTime, long endTime) {
         return chainDepositWithdrawHisMapper.getDepositAddress(chain, startTime, endTime);
     }
 

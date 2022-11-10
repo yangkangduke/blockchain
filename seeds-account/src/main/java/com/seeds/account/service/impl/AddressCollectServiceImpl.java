@@ -18,9 +18,11 @@ import com.seeds.account.util.AddressUtils;
 import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.redis.account.RedisKeys;
+import com.seeds.uc.feign.UserCenterFeignClient;
 import com.seeds.wallet.dto.RawTransactionDto;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
@@ -69,6 +71,8 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
     IAsyncService asyncService;
     @Autowired
     RedissonClient client;
+    @Autowired
+    UserCenterFeignClient userCenterFeignClient;
 
     @Override
     @SingletonLock(key = "/seeds/account/chain/collect")
@@ -267,16 +271,37 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
         long startTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(lookback);
         long endTime = System.currentTimeMillis();
 
-        List<String> addresses = chainDepositWithdrawHisService.getDepositAddress(chain, startTime, endTime);
+        List<ChainDepositAddressDto> addresses = chainDepositWithdrawHisService.getDepositAddress(chain, startTime, endTime);
 
         List<SystemWalletAddressDto> systemWalletAddress = systemWalletAddressService.getAll();
         List<String> userAddress = addresses.stream()
-                .filter(p -> systemWalletAddress.stream().noneMatch(i -> Objects.equals(p, i.getAddress())
-        )).collect(Collectors.toList());
+                .filter(p -> systemWalletAddress.stream().noneMatch(i -> Objects.equals(p.getAddress(), i.getAddress())))
+                .map(ChainDepositAddressDto::getAddress)
+                .collect(Collectors.toList());
+
         // batch操作中间的休眠天数
         long sleep = Long.parseLong(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_REQUEST_BATCH_SLEEP, "500"));
         try {
-            return chainService.getBalancesOnBatch(chain, userAddress, sleep);
+            List<AddressBalanceDto> balancesOnBatch = chainService.getBalancesOnBatch(chain, userAddress, sleep);
+
+            List<AddressBalanceDto> resultList = Lists.newArrayList();
+            // rpc 获取用户的email
+            GenericDto<Map<Long, String>> emailMap = userCenterFeignClient.getEmailByIds(addresses.stream().map(ChainDepositAddressDto::getUserId).collect(Collectors.toList()));
+
+            if (null != emailMap && emailMap.getCode() == 200) {
+                for (AddressBalanceDto balanceDto : balancesOnBatch) {
+                    AddressBalanceDto dto = new AddressBalanceDto();
+                    ObjectUtils.copy(balanceDto, dto);
+                    for (ChainDepositAddressDto addressDto : addresses) {
+                        if (addressDto.getAddress().equals(balanceDto.getAddress())) {
+                            dto.setEmail(emailMap.getData().get(addressDto.getUserId()));
+                        }
+                    }
+                    resultList.add(dto);
+                }
+            }
+            return resultList;
+
         } catch (Exception e) {
             log.error("getPendingCollectBalances, ", e);
         }
@@ -525,7 +550,6 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
                 ? JsonUtils.readValue(json, new TypeReference<List<AddressBalanceDto>>() {
         })
                 : Lists.newArrayList();
-
         // 限定返回地址的条数
         int limit = Integer.parseInt(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_BALANCE_LIMIT, "500"));
 

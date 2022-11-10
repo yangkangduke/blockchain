@@ -3,7 +3,6 @@ package com.seeds.account.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.seeds.account.enums.CommonStatus;
 import com.seeds.common.enums.Chain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -43,7 +42,7 @@ public class WithdrawRule implements Serializable {
     private Long version;
 
     @ApiModelProperty("chain")
-    private Chain chain;
+    private Integer chain;
 
     @ApiModelProperty("currency")
     private String currency;
@@ -68,10 +67,11 @@ public class WithdrawRule implements Serializable {
     @ApiModelProperty("auto withdraw amount")
     private BigDecimal autoAmount;
 
-    @ApiModelProperty("是否内部提币面手续费")
+    @ApiModelProperty("是否内部提币面手续费  false、true")
     private String zeroFeeOnInternal;
 
-    private CommonStatus status;
+    @ApiModelProperty(value = "提币状态 1启用 2停用")
+    private Integer status;
 
 
 }

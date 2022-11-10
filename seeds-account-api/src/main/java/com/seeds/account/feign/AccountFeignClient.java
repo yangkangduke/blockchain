@@ -1,19 +1,15 @@
 package com.seeds.account.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.account.dto.*;
-import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.AccountConstants;
-import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
-import com.seeds.account.dto.req.ChainTxnPageReq;
+import com.seeds.account.dto.*;
+import com.seeds.account.dto.req.*;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -134,6 +130,7 @@ public interface AccountFeignClient {
 
     @GetMapping("/sys/pending-collect-balances")
     GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception;
+
     /**
      * 获取钱包归集历史
      *
@@ -159,12 +156,12 @@ public interface AccountFeignClient {
 
     @GetMapping("/sys/fund-collect-history")
     GenericDto<Page<AddressCollectHisDto>> getFundCollectHistory(@RequestParam("chain") int chain,
-                                                                     @RequestParam("startTime") long startTime,
-                                                                     @RequestParam("endTime") long endTime,
-                                                                     @RequestParam(value = "fromAddress", required = false) String fromAddress,
-                                                                     @RequestParam(value = "toAddress", required = false) String toAddress,
-                                                                     @RequestParam("page") int page,
-                                                                     @RequestParam("size") int size);
+                                                                 @RequestParam("startTime") long startTime,
+                                                                 @RequestParam("endTime") long endTime,
+                                                                 @RequestParam(value = "fromAddress", required = false) String fromAddress,
+                                                                 @RequestParam(value = "toAddress", required = false) String toAddress,
+                                                                 @RequestParam("page") int page,
+                                                                 @RequestParam("size") int size);
 
     /**
      * 根据归集订单Id获取钱包归集历史
@@ -276,4 +273,186 @@ public interface AccountFeignClient {
      */
     @PostMapping("/job/get-and-metric-current-gas-price-oracle")
     GenericDto<Boolean> getAndMetricCurrentGasPriceOracle();
+
+    /**
+     * 获取所有提币白名单
+     *
+     * @return
+     */
+    @GetMapping("/sys/withdraw-whitelist-address")
+    GenericDto<List<WithdrawWhitelistDto>> getAllWithdrawWhitelist();
+
+    /**
+     * 添加提币白名单
+     *
+     * @param withdrawWhitelistDto
+     * @return
+     */
+    @PostMapping("/sys/add-withdraw-whitelist-address")
+    GenericDto<Boolean> addWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto);
+
+    /**
+     * 更新提币白名单
+     *
+     * @param withdrawWhitelistDto
+     * @return
+     */
+    @PostMapping("/sys/update-withdraw-whitelist-address")
+    GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto);
+
+    /**
+     * 获取所有充提币黑地址
+     *
+     * @param type 1:充币 2:提币
+     * @return
+     */
+    @GetMapping("/sys/blacklist-address")
+    GenericDto<List<BlacklistAddressDto>> getAllBlacklistAddress(@RequestParam("type") int type);
+
+    /**
+     * 添加新充提币黑地址
+     *
+     * @param blacklistAddressDto
+     * @return
+     */
+    @PostMapping("/sys/add-blacklist-address")
+    GenericDto<Boolean> addBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+
+    /**
+     * 更新充提币黑地址
+     *
+     * @param blacklistAddressDto
+     * @return
+     */
+    @PostMapping("/sys/update-blacklist-address")
+    GenericDto<Boolean> updateBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+
+    /**
+     * 删除充提币黑地址
+     *
+     * @param blacklistAddressDto
+     * @return
+     */
+    @PostMapping("/sys/delete-blacklist-address")
+    GenericDto<Boolean> deleteBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+
+    /**
+     * 创建热钱包地址
+     *
+     * @param chain
+     * @return
+     */
+    @PostMapping("/sys/create-system-wallet-address")
+    GenericDto<SystemWalletAddressDto> createSystemWalletAddress(@RequestParam("chain") int chain);
+
+    /**
+     * 添加新的系统钱包地址
+     *
+     * @param systemWalletAddressDto
+     * @return
+     */
+    @PostMapping("/sys/add-system-wallet-address")
+    GenericDto<Boolean> addSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto);
+
+    /**
+     * 更新系统钱包地址
+     *
+     * @param systemWalletAddressDto
+     * @return
+     */
+    @PostMapping("/sys/update-system-wallet-address")
+    GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto);
+
+
+    /**
+     * 获取账户系统配置
+     *
+     * @return 账户系统配置
+     */
+    @GetMapping("/sys/account-system-config-list")
+    GenericDto<List<AccountSystemConfigDto>> accountSystemConfigList();
+
+    /**
+     * 编辑账户系统配置
+     * @param req 系统配置
+     */
+    @PostMapping("/sys/account-system-config-modify")
+    GenericDto<Object> accountSystemConfigModify(@RequestBody AccountSystemConfigDto req);
+
+
+
+    /**
+     * 获取充币规则列表
+     *
+     */
+    @PostMapping("/sys/get-deposit-rule-list")
+    GenericDto<List<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRuleReq req);
+
+    /**
+     * 增加充币规则
+     */
+    @PostMapping("/sys/add-deposit-rule")
+    GenericDto<Boolean> addDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req);
+
+    /**
+     * 编辑充币规则
+     *
+     */
+    @PutMapping("/sys/update-deposit-rule")
+    GenericDto<Boolean> updateDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req);
+
+    /**
+     * 删除充币规则
+     */
+    @PostMapping("/sys/delete-deposit-rule")
+    GenericDto<Boolean> deleteDepositRule(@RequestBody SwitchReq req);
+
+
+    /**
+     * 获取提币规则列表
+     */
+    @PostMapping("/sys/get-withdraw-rule-list")
+    GenericDto<List<WithdrawRuleDto>> getWithdrawRuleList(@RequestBody WithdrawRuleReq req);
+
+    /**
+     * 新增提币规则
+     */
+    @PostMapping("/sys/add-withdraw-rule")
+    GenericDto<Boolean> addWithdrawRule(@RequestBody WithdrawRuleSaveOrUpdateReq req);
+
+    /**
+     * 编辑提币规则
+     */
+    @PutMapping("/sys/update-withdraw-rule")
+    GenericDto<Boolean> updateWithdrawRule(@RequestBody WithdrawRuleSaveOrUpdateReq req);
+
+    /**
+     * 删除提币规则
+     */
+    @PostMapping("/sys/delete-withdraw-rule")
+    GenericDto<Boolean> deleteWithdrawRule(@Valid @RequestBody SwitchReq req);
+
+    /**
+     * 获取提币限额规则列表
+     */
+    @PostMapping("/sys/get-withdraw-limit-list")
+    GenericDto<List<WithdrawLimitRuleDto>> getWithdrawLimitRuleList();
+
+    /**
+     * 新增提币规则
+     */
+    @PostMapping("/sys/add-withdraw-limit")
+    GenericDto<Boolean> addWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req);
+
+    /**
+     * 编辑提币规则
+     */
+    @PutMapping("/sys/update-withdraw-limit")
+    GenericDto<Boolean> updateWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req);
+
+    /**
+     * 删除提币规则
+     */
+    @PostMapping("/sys/delete-withdraw-limit")
+    GenericDto<Boolean> deleteWithdrawLimitRule(@Valid @RequestBody ListReq req);
 }

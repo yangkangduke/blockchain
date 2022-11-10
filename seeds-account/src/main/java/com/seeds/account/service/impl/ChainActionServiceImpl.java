@@ -360,7 +360,7 @@ public class ChainActionServiceImpl implements IChainActionService {
             // 获取币种的充币规则
             DepositRuleDto depositRuleDto = chainDepositService.getDepositRule(chain, tx.getCurrency());
             // 判断需要审核的3种情况： 1充提规则不存在，2充币规则禁用，3超过充币额度
-            boolean requireReview = depositRuleDto == null || depositRuleDto.getStatus() == CommonStatus.DISABLED || amount.compareTo(depositRuleDto.getAutoAmount()) > 0;
+            boolean requireReview = depositRuleDto == null || depositRuleDto.getStatus() == CommonStatus.DISABLED.getCode() || amount.compareTo(depositRuleDto.getAutoAmount()) > 0;
 
             if (requireReview) {
                 // 需要运营人员审核就标记manual=1, status=PENDING_APPROVE, 并通知运维人员
@@ -643,7 +643,7 @@ public class ChainActionServiceImpl implements IChainActionService {
     private boolean allowDeposit(NativeChainTransactionDto e) {
         if (e.getAmount().signum() > 0) {
             DepositRuleDto rule = chainDepositService.getDepositRule(e.getChain(), e.getCurrency());
-            return rule != null && rule.getStatus() == CommonStatus.ENABLED;
+            return rule != null && rule.getStatus() == CommonStatus.ENABLED.getCode();
         }
         return false;
     }
@@ -1824,5 +1824,24 @@ public class ChainActionServiceImpl implements IChainActionService {
                 log.error("getAndMetricCurrentGasPriceOracle chain={}", chain, e);
             }
         }
+    }
+
+    @Override
+    public SystemWalletAddressDto createSystemWalletAddress(Chain chain) throws Exception {
+        Utils.check(Chain.SUPPORT_CREATE_ADDRESS_LIST.contains(chain), ErrorCode.ACCOUNT_INVALID_CHAIN);
+
+        List<String> addresses = chainService.createAddresses(chain, 1);
+        Assert.isTrue(addresses.size() == 1, "failed to create new address");
+        SystemWalletAddressDto systemWalletAddressDto = SystemWalletAddressDto.builder()
+                .type(WalletAddressType.HOT.getCode())
+                .chain(chain.getCode())
+                .address(addresses.get(0))
+                .comments("")
+                .tag("hot")
+                .status(CommonStatus.ENABLED.getCode())
+                .build();
+        log.info("createWalletAddress systemWalletAddressDto={}", systemWalletAddressDto);
+        systemWalletAddressService.add(systemWalletAddressDto);
+        return systemWalletAddressDto;
     }
 }

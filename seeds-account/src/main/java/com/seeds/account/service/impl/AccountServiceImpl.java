@@ -112,7 +112,7 @@ public class AccountServiceImpl implements IAccountService {
 
         // 检查提币规则是否启用
         WithdrawRuleDto rule = chainWithdrawService.getWithdrawRule(chain, currency);
-        Utils.check(rule != null && rule.getStatus() == CommonStatus.ENABLED, ErrorCode.ACCOUNT_WITHDRAW_DISABLED);
+        Utils.check(rule != null && rule.getStatus() == CommonStatus.ENABLED.getCode(), ErrorCode.ACCOUNT_WITHDRAW_DISABLED);
         Utils.check(rule.getFeeAmount().compareTo(fee) == 0, ErrorCode.ACCOUNT_INVALID_WITHDRAW_FEE);
 
         // 是否是内部提币

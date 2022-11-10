@@ -43,4 +43,6 @@ public interface AssetManagementService {
     GenericDto<ChainGasPriceDto> getGasPrice(int chain);
 
     GenericDto<List<AddressCollectHisDto>> getAddressCollectByOrderId(long orderId);
+
+    GenericDto<Boolean> createHotWallet(MgtSystemWalletAddressDto dto);
 }

@@ -3,6 +3,7 @@ package com.seeds.account.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.account.dto.ChainDepositAddressDto;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
 import com.seeds.account.enums.ChainAction;
@@ -89,6 +90,6 @@ public interface IChainDepositWithdrawHisService extends IService<ChainDepositWi
      * @param endTime
      * @return
      */
-    List<String> getDepositAddress(Chain chain, long startTime, long endTime);
+    List<ChainDepositAddressDto> getDepositAddress(Chain chain, long startTime, long endTime);
 
 }

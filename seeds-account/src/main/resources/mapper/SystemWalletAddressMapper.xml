@@ -13,9 +13,29 @@
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="chain" jdbcType="TINYINT" property="chain"/>
     </resultMap>
+    <update id="updateByPrimaryKey" parameterType="com.seeds.account.model.SystemWalletAddress">
+            update ac_system_wallet_address
+        set create_time = #{createTime,jdbcType=BIGINT},
+            update_time = #{updateTime,jdbcType=BIGINT},
+            version     = #{version,jdbcType=BIGINT},
+            type        = #{type,jdbcType=TINYINT},
+            address     = #{address,jdbcType=VARCHAR},
+            tag         = #{tag,jdbcType=TINYINT},
+            comments    = #{comments,jdbcType=VARCHAR},
+            chain       = #{chain,jdbcType=TINYINT},
+            status      = #{status,jdbcType=TINYINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
     <select id="selectAll" resultType="com.seeds.account.model.SystemWalletAddress">
         select *
         from ac_system_wallet_address
         order by id desc
+    </select>
+    <select id="getByChainAndTypeAndAddress" resultType="com.seeds.account.model.SystemWalletAddress">
+         select *
+        from  ac_system_wallet_address
+        where chain = #{chain,jdbcType=TINYINT}
+          and type = #{type,jdbcType=TINYINT}
+          and address = #{address,jdbcType=VARCHAR}
     </select>
 </mapper>
