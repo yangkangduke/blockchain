@@ -9,10 +9,7 @@ import com.seeds.notification.feign.RemoteNoticeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author: hewei
@@ -33,7 +30,28 @@ public class SysNotificationController {
     }
 
     @PostMapping("/getNoticeList")
+    @ApiOperation("获取用户的所有通知")
     public GenericDto<Page<NotificationResp>> getNoticeList(@RequestBody NoticePageReq req) {
         return remoteNoticeService.getNoticeList(req);
     }
+
+    @PutMapping("/updateReadStatus/{id}")
+    @ApiOperation("更新通知为已读状态")
+    public GenericDto<Boolean> updateReadStatus(@PathVariable("id") Long id) {
+        return remoteNoticeService.updateReadStatus(id);
+    }
+
+    @GetMapping("/getUnReadNoticeFlag")
+    @ApiOperation("用户是否有未读消息")
+    public GenericDto<Boolean> getUnReadNoticeFlag(@RequestParam("ucUserId") Long ucUserId,
+                                                   @RequestParam("userSource") String userSource) {
+        return remoteNoticeService.getUnReadNoticeFlag(ucUserId, userSource);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @ApiOperation("删除通知")
+    GenericDto<Boolean> delete(@PathVariable("id") Long id) {
+        return remoteNoticeService.delete(id);
+    }
+
 }

@@ -25,6 +25,11 @@ public class NotificationEntity {
     private Long ucUserId;
 
     /**
+     * 用户来源
+     */
+    private String userSource;
+
+    /**
      * 消息类型
      */
     private String notificationType;

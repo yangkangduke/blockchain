@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @Service
 public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRoleMenuEntity> implements SysRoleMenuService {
 
-
     @Override
     public Set<Long> queryMenuByRoleId(Long roleId) {
         LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()

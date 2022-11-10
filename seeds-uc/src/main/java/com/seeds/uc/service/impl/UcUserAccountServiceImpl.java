@@ -11,7 +11,7 @@ import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.constant.mq.KafkaTopic;
-import com.seeds.common.enums.RequestSource;
+import com.seeds.common.enums.TargetSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
@@ -249,7 +249,7 @@ public class UcUserAccountServiceImpl extends ServiceImpl<UcUserAccountMapper, U
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void buyNFTFreeze(SysNftDetailResp nftDetail, RequestSource source, Long currentUserId) {
+    public void buyNFTFreeze(SysNftDetailResp nftDetail, TargetSource source, Long currentUserId) {
         Long nftId = nftDetail.getId();
         long currentTimeMillis = System.currentTimeMillis();
         BigDecimal amount = nftDetail.getPrice();

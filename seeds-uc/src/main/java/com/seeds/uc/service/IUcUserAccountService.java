@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.response.SysNftDetailResp;
-import com.seeds.common.enums.RequestSource;
+import com.seeds.common.enums.TargetSource;
 import com.seeds.uc.dto.request.AccountActionHistoryReq;
 import com.seeds.uc.dto.request.AccountActionReq;
 import com.seeds.uc.dto.request.NFTBuyReq;
@@ -84,7 +84,7 @@ public interface IUcUserAccountService extends IService<UcUserAccount> {
      * 购买nft
      * @param buyReq
      */
-    void buyNFTFreeze(SysNftDetailResp buyReq, RequestSource source, Long currentUserId);
+    void buyNFTFreeze(SysNftDetailResp buyReq, TargetSource source, Long currentUserId);
 
     /**
      * 账户金额详情

@@ -18,22 +18,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientCache {
 
     //本地缓存
-    private static Map<Long, HashMap<UUID, SocketIOClient>> concurrentHashMap = new ConcurrentHashMap<>();
+    private static Map<String, HashMap<UUID, SocketIOClient>> concurrentHashMap = new ConcurrentHashMap<>();
 
     /**
      * 存入本地缓存
      *
-     * @param userId         用户ID
+     * @param sourceUserId   用户来源ID
      * @param sessionId      连接的sessionID
      * @param socketIOClient 对应的通道连接信息
      */
-    public void saveClient(Long userId, UUID sessionId, SocketIOClient socketIOClient) {
-        HashMap<UUID, SocketIOClient> sessionIdClientCache = concurrentHashMap.get(userId);
+    public void saveClient(String sourceUserId, UUID sessionId, SocketIOClient socketIOClient) {
+        HashMap<UUID, SocketIOClient> sessionIdClientCache = concurrentHashMap.get(sourceUserId);
         if (sessionIdClientCache == null) {
             sessionIdClientCache = new HashMap<>();
         }
         sessionIdClientCache.put(sessionId, socketIOClient);
-        concurrentHashMap.put(userId, sessionIdClientCache);
+        concurrentHashMap.put(sourceUserId, sessionIdClientCache);
     }
 
     /**
@@ -42,7 +42,7 @@ public class ClientCache {
      * @param userId
      * @return
      */
-    public HashMap<UUID, SocketIOClient> getUserClient(Long userId) {
+    public HashMap<UUID, SocketIOClient> getUserClient(String userId) {
         return concurrentHashMap.get(userId);
     }
 
@@ -50,7 +50,7 @@ public class ClientCache {
     /**
      * 删除链接信息
      */
-    public void deleteSessionClient(Long userId, UUID sessionId) {
+    public void deleteSessionClient(String userId, UUID sessionId) {
         concurrentHashMap.get(userId).remove(sessionId);
     }
 }

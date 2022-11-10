@@ -4,7 +4,7 @@ import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.enums.SysOwnerTypeEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.enums.RequestSource;
+import com.seeds.common.enums.TargetSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.*;
 import com.seeds.uc.feign.RemoteNFTService;
@@ -78,7 +78,7 @@ public class OpenNftController {
     @ApiOperation("NFT购买")
     public GenericDto<Object> buy(@Valid @RequestBody OpenNftBuyReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        req.setSource(RequestSource.GAME);
+        req.setSource(TargetSource.GAME);
         GenericDto<Object> result = ucRemoteNftService.buyNFT(req);
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),

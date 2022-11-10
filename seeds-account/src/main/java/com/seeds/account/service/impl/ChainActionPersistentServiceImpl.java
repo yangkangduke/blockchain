@@ -24,6 +24,7 @@ import com.seeds.account.util.Utils;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.common.enums.TargetSource;
 import com.seeds.notification.dto.request.NotificationReq;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +128,15 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
                 transaction.setBlacklist(1);
                 // 更新
                 chainDepositWithdrawHisMapper.updateById(transaction);
+                // 充币审核发送通知
+                kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_AUDIT, JSONUtil.toJsonStr(NotificationReq.builder()
+                        .notificationType(AccountAction.AUDIT.getNotificationType())
+                        .userSource(TargetSource.ADMIN.name())
+                        .values(ImmutableMap.of(
+                                "ts", System.currentTimeMillis(),
+                                "type", AccountAction.DEPOSIT.getNotificationType()))
+                        .build()));
+                log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.DEPOSIT.getNotificationType());
                 // 发送通知给运维人员
 //                notificationService.sendNotificationAsync(NotificationDto.builder()
 //                        .notificationType(OpsAction.OPS_SUPPORT.getNotificationType())
@@ -158,6 +168,15 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
                         transaction.setStatus(status);
                         // 更新
                         chainDepositWithdrawHisMapper.updateById(transaction);
+                        // 充币审核发送通知
+                        kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_AUDIT, JSONUtil.toJsonStr(NotificationReq.builder()
+                                .notificationType(AccountAction.AUDIT.getNotificationType())
+                                .userSource(TargetSource.ADMIN.name())
+                                .values(ImmutableMap.of(
+                                        "ts", System.currentTimeMillis(),
+                                        "type", AccountAction.DEPOSIT.getNotificationType()))
+                                .build()));
+                        log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.DEPOSIT.getNotificationType());
                         // 发送通知给运维人员
 //                        notificationService.sendNotificationAsync(NotificationDto.builder()
 //                                .notificationType(OpsAction.OPS_SUPPORT.getNotificationType())

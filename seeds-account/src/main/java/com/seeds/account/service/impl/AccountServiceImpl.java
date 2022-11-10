@@ -23,6 +23,7 @@ import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.common.enums.TargetSource;
 import com.seeds.common.utils.BasicUtils;
 import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
@@ -206,6 +207,17 @@ public class AccountServiceImpl implements IAccountService {
                 .build();
         // 插入新的充提
         chainDepositWithdrawHisService.createHistory(transaction);
+        // 提币审核通知
+        if (WithdrawStatus.PENDING_APPROVE.getCode() == status) {
+            kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_AUDIT, JSONUtil.toJsonStr(NotificationReq.builder()
+                    .notificationType(AccountAction.AUDIT.getNotificationType())
+                    .userSource(TargetSource.ADMIN.name())
+                    .values(ImmutableMap.of(
+                            "ts", System.currentTimeMillis(),
+                            "type", AccountAction.WITHDRAW.getNotificationType()))
+                    .build()));
+            log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.WITHDRAW.getNotificationType());
+        }
 
         WithdrawResponseDto withdrawResponseDto = new WithdrawResponseDto();
 

@@ -27,6 +27,7 @@ import com.seeds.account.util.Utils;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.common.enums.TargetSource;
 import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.wallet.dto.RawTransactionDto;
 import io.micrometer.core.instrument.Metrics;
@@ -397,7 +398,15 @@ public class ChainActionServiceImpl implements IChainActionService {
                 // 插入新的充提
                 log.info("insert new internal deposit transaction={}", depositHis);
                 chainDepositWithdrawHisMapper.insert(depositHis);
-
+                // 充币审核通知管理员
+                kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_AUDIT, JSONUtil.toJsonStr(NotificationReq.builder()
+                        .notificationType(AccountAction.AUDIT.getNotificationType())
+                        .userSource(TargetSource.ADMIN.name())
+                        .values(ImmutableMap.of(
+                                "ts", System.currentTimeMillis(),
+                                "type", AccountAction.DEPOSIT.getNotificationType()))
+                        .build()));
+                log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.DEPOSIT.getNotificationType());
             } else {
                 // 如果不需要审核就 manual=0, status=TRANSACTION_CONFIRMED,上账，给用户发充币成功通知
                 int manual = 0;

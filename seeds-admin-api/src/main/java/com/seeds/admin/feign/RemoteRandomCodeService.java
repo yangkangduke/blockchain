@@ -1,7 +1,7 @@
 package com.seeds.admin.feign;
 
 import com.seeds.admin.dto.request.*;
-import com.seeds.admin.feign.impl.RemoteNftServiceImpl;
+import com.seeds.admin.feign.impl.RemoteRandomCodeServiceImpl;
 import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +16,7 @@ import javax.validation.Valid;
  * @author hang.yu
  * @date 2022/8/19
  */
-@FeignClient(name = "remoteRandomCodeService", url = "${Seeds-admin}", fallback = RemoteNftServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteRandomCodeService", url = "${Seeds-admin}", fallback = RemoteRandomCodeServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
 public interface RemoteRandomCodeService {
 
 	/**

@@ -1,6 +1,6 @@
 package com.seeds.admin.dto.request;
 
-import com.seeds.common.enums.RequestSource;
+import com.seeds.common.enums.TargetSource;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -53,7 +53,7 @@ public class NftOwnerChangeReq {
     private String toAddress;
 
     @ApiModelProperty("请求来源")
-    private RequestSource source;
+    private TargetSource source;
 
     @ApiModelProperty("售卖金额")
     @NotNull
