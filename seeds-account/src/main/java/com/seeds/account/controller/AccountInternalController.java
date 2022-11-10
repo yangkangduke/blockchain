@@ -12,6 +12,7 @@ import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.enums.DepositStatus;
 import com.seeds.account.enums.WithdrawStatus;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.account.service.*;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
@@ -55,6 +56,10 @@ public class AccountInternalController {
     private IChainService chainService;
     @Autowired
     private IDepositRuleService depositRuleService;
+    @Autowired
+    private IWithdrawRuleService withdrawRuleService;
+    @Autowired
+    private IWithdrawLimitRuleService withdrawLimitRuleService;
     @Autowired
     private ISystemWalletAddressService systemWalletAddressService;
     @Autowired
@@ -725,7 +730,7 @@ public class AccountInternalController {
      */
     @PostMapping("/sys/get-deposit-rule-list")
     @Inner
-    public GenericDto<IPage<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRulePageReq req) {
+    public GenericDto<List<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRuleReq req) {
         try {
             return GenericDto.success(depositRuleService.getList(req));
         } catch (Exception e) {
@@ -775,7 +780,8 @@ public class AccountInternalController {
      * @return
      */
     @PostMapping("/sys/delete-deposit-rule")
-    public GenericDto<Boolean> deleteDepositRule(@Valid @RequestBody ListReq req) {
+    @Inner
+    public GenericDto<Boolean> deleteDepositRule(@Valid @RequestBody SwitchReq req) {
         try {
             return GenericDto.success(depositRuleService.delete(req));
         } catch (Exception e) {
@@ -784,4 +790,139 @@ public class AccountInternalController {
         }
     }
 
+
+    /**
+     * 获取提币规则列表
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/get-withdraw-rule-list")
+    @Inner
+    public GenericDto<List<WithdrawRuleDto>> getWithdrawRuleList(@RequestBody WithdrawRuleReq req) {
+        try {
+            return GenericDto.success(withdrawRuleService.getList(req));
+        } catch (Exception e) {
+            log.error("get-withdraw-rule-list", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 新增提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/add-withdraw-rule")
+    @Inner
+    public GenericDto<Boolean> addWithdrawRule(@RequestBody WithdrawRuleSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(withdrawRuleService.add(req));
+        } catch (Exception e) {
+            log.error("add-withdraw-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 编辑提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PutMapping("/sys/update-withdraw-rule")
+    @Inner
+    public GenericDto<Boolean> updateWithdrawRule(@RequestBody WithdrawRuleSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(withdrawRuleService.update(req));
+        } catch (Exception e) {
+            log.error("update-withdraw-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 删除提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/delete-withdraw-rule")
+    @Inner
+    public GenericDto<Boolean> deleteWithdrawRule(@Valid @RequestBody SwitchReq req) {
+        try {
+            return GenericDto.success(withdrawRuleService.delete(req));
+        } catch (Exception e) {
+            log.error("delete-withdraw-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 获取提币限额规则列表
+     *
+     * @return
+     */
+    @PostMapping("/sys/get-withdraw-limit-list")
+    @Inner
+    public GenericDto<List<WithdrawLimitRuleDto>> getWithdrawLimitRuleList() {
+        try {
+            return GenericDto.success(withdrawLimitRuleService.getList());
+        } catch (Exception e) {
+            log.error("get-withdraw-rule-list", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 新增提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/add-withdraw-limit")
+    @Inner
+    public GenericDto<Boolean> addWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(withdrawLimitRuleService.add(req));
+        } catch (Exception e) {
+            log.error("add-withdraw-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 编辑提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PutMapping("/sys/update-withdraw-limit")
+    @Inner
+    public GenericDto<Boolean> updateWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(withdrawLimitRuleService.update(req));
+        } catch (Exception e) {
+            log.error("update-withdraw-limit-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 删除提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/delete-withdraw-limit")
+    @Inner
+    public GenericDto<Boolean> deleteWithdrawLimitRule(@Valid @RequestBody ListReq req) {
+        try {
+            return GenericDto.success(withdrawLimitRuleService.delete(req));
+        } catch (Exception e) {
+            log.error("delete-withdraw-limit-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
 }

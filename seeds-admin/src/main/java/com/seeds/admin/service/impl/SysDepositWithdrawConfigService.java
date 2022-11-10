@@ -1,15 +1,17 @@
 package com.seeds.admin.service.impl;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.dto.DepositRuleDto;
-import com.seeds.account.dto.req.DepositRulePageReq;
-import com.seeds.account.dto.req.DepositRuleSaveOrUpdateReq;
-import com.seeds.account.dto.req.ListReq;
+import com.seeds.account.dto.WithdrawLimitRuleDto;
+import com.seeds.account.dto.WithdrawRuleDto;
+import com.seeds.account.dto.req.*;
 import com.seeds.account.feign.AccountFeignClient;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.admin.service.ISysDepositWithdrawConfigService;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author: hewei
@@ -23,22 +25,63 @@ public class SysDepositWithdrawConfigService implements ISysDepositWithdrawConfi
     private AccountFeignClient accountFeignClient;
 
     @Override
-    public GenericDto<Boolean> add(DepositRuleSaveOrUpdateReq req) {
+    public GenericDto<Boolean> addDepositRule(DepositRuleSaveOrUpdateReq req) {
         return accountFeignClient.addDepositRule(req);
     }
 
     @Override
-    public GenericDto<Page<DepositRuleDto>> getList(DepositRulePageReq req) {
+    public GenericDto<List<DepositRuleDto>> getDepositRuleList(DepositRuleReq req) {
         return accountFeignClient.getDepositRuleList(req);
     }
 
     @Override
-    public GenericDto<Boolean> update(DepositRuleSaveOrUpdateReq req) {
+    public GenericDto<Boolean> updateDepositRule(DepositRuleSaveOrUpdateReq req) {
         return accountFeignClient.updateDepositRule(req);
     }
 
     @Override
-    public GenericDto<Boolean> delete(ListReq req) {
+    public GenericDto<Boolean> deleteDepositRule(SwitchReq req) {
         return accountFeignClient.deleteDepositRule(req);
+    }
+
+    @Override
+    public GenericDto<Boolean> addWithdrawRule(WithdrawRuleSaveOrUpdateReq req) {
+        return accountFeignClient.addWithdrawRule(req);
+    }
+
+    @Override
+    public GenericDto<List<WithdrawRuleDto>> getWithdrawRuleList(WithdrawRuleReq req) {
+        return accountFeignClient.getWithdrawRuleList(req);
+    }
+
+    @Override
+    public GenericDto<Boolean> updateWithdrawRule(WithdrawRuleSaveOrUpdateReq req) {
+        return accountFeignClient.updateWithdrawRule(req);
+    }
+
+    @Override
+    public GenericDto<Boolean> deleteWithdrawRule(SwitchReq req) {
+        return accountFeignClient.deleteWithdrawRule(req);
+    }
+
+    @Override
+    public GenericDto<Boolean> addWithdrawLimitRule(WithdrawLimitSaveOrUpdateReq req) {
+        return accountFeignClient.addWithdrawLimitRule(req);
+    }
+
+    @Override
+    public GenericDto<List<WithdrawLimitRuleDto>> getWithdrawLimitRuleList() {
+        return accountFeignClient.getWithdrawLimitRuleList();
+    }
+
+    @Override
+    public GenericDto<Boolean> updateWithdrawLimitRule(WithdrawLimitSaveOrUpdateReq req) {
+        return accountFeignClient.updateWithdrawLimitRule(req);
+    }
+
+
+    @Override
+    public GenericDto<Boolean> deleteWithdrawLimitRule(ListReq req) {
+        return accountFeignClient.deleteWithdrawLimitRule(req);
     }
 }

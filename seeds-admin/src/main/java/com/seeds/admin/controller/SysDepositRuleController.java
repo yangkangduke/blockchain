@@ -1,10 +1,9 @@
 package com.seeds.admin.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.dto.DepositRuleDto;
-import com.seeds.account.dto.req.DepositRulePageReq;
+import com.seeds.account.dto.req.DepositRuleReq;
 import com.seeds.account.dto.req.DepositRuleSaveOrUpdateReq;
-import com.seeds.account.dto.req.ListReq;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.admin.service.ISysDepositWithdrawConfigService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author: hewei
@@ -31,29 +31,29 @@ public class SysDepositRuleController {
     private ISysDepositWithdrawConfigService depositWithdrawConfigService;
 
 
-    @PostMapping("/sys/get-deposit-rule-list")
+    @PostMapping("get-list")
     @ApiOperation("获取充币规则列表")
-    public GenericDto<Page<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRulePageReq req) {
-        return depositWithdrawConfigService.getList(req);
+    public GenericDto<List<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRuleReq req) {
+        return depositWithdrawConfigService.getDepositRuleList(req);
     }
 
-    @PostMapping("/sys/add-deposit-rule")
+    @PostMapping("/add")
     @ApiOperation("新增充币规则")
     public GenericDto<Boolean> add(@RequestBody DepositRuleSaveOrUpdateReq req) {
-        return depositWithdrawConfigService.add(req);
+        return depositWithdrawConfigService.addDepositRule(req);
     }
 
-    @PutMapping("/sys/update-deposit-rule")
+    @PutMapping("update")
     @ApiOperation("更新充币规则")
     public GenericDto<Boolean> update(@RequestBody DepositRuleSaveOrUpdateReq req) {
-        return depositWithdrawConfigService.update(req);
+        return depositWithdrawConfigService.updateDepositRule(req);
 
     }
 
-    @PostMapping("/sys/delete-deposit-rule")
-    @ApiOperation("删除充币规则")
-    public GenericDto<Boolean> delete(@Valid @RequestBody ListReq req) {
-        return depositWithdrawConfigService.delete(req);
+    @PostMapping("/switch")
+    @ApiOperation("启用、禁用充币规则")
+    public GenericDto<Boolean> delete(@Valid @RequestBody SwitchReq req) {
+        return depositWithdrawConfigService.deleteDepositRule(req);
     }
 
 }

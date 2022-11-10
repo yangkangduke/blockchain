@@ -142,7 +142,7 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
             toConfirmList.forEach(transaction -> {
                 String currency = transaction.getCurrency();
                 DepositRuleDto rule = chainDepositService.getDepositRule(transaction.getChain(), currency);
-                if (rule != null && rule.getStatus() == CommonStatus.ENABLED) {
+                if (rule != null && rule.getStatus() == CommonStatus.ENABLED.getCode()) {
                     if (transaction.getAmount().compareTo(rule.getAutoAmount()) <= 0) {
                         // 满足自动上币条件
                         confirmTransaction(transaction);

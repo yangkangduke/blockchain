@@ -1,7 +1,12 @@
 package com.seeds.account.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.account.dto.WithdrawLimitRuleDto;
+import com.seeds.account.dto.req.ListReq;
+import com.seeds.account.dto.req.WithdrawLimitSaveOrUpdateReq;
 import com.seeds.account.model.WithdrawLimitRule;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +18,11 @@ import com.seeds.account.model.WithdrawLimitRule;
  */
 public interface IWithdrawLimitRuleService extends IService<WithdrawLimitRule> {
 
+    List<WithdrawLimitRuleDto> getList();
+
+    Boolean add(WithdrawLimitSaveOrUpdateReq req);
+
+    Boolean update(WithdrawLimitSaveOrUpdateReq req);
+
+    Boolean delete(ListReq req);
 }

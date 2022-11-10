@@ -55,6 +55,7 @@ public class DepositRule implements Serializable {
     @ApiModelProperty("auto deposit amount")
     private BigDecimal autoAmount;
 
+    @ApiModelProperty(value = "提币状态 1启用 2停用")
     private Integer status;
 
 }

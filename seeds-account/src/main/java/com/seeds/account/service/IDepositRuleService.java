@@ -1,13 +1,14 @@
 package com.seeds.account.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.account.dto.AddressCollectHisDto;
 import com.seeds.account.dto.DepositRuleDto;
-import com.seeds.account.dto.req.DepositRulePageReq;
+import com.seeds.account.dto.req.DepositRuleReq;
 import com.seeds.account.dto.req.DepositRuleSaveOrUpdateReq;
 import com.seeds.account.dto.req.ListReq;
 import com.seeds.account.model.DepositRule;
+import com.seeds.account.model.SwitchReq;
+
+import java.util.List;
 
 /**
  * <p>
@@ -19,11 +20,11 @@ import com.seeds.account.model.DepositRule;
  */
 public interface IDepositRuleService extends IService<DepositRule> {
 
-    IPage<DepositRuleDto> getList(DepositRulePageReq req);
+    List<DepositRuleDto> getList(DepositRuleReq req);
 
     Boolean add(DepositRuleSaveOrUpdateReq req);
 
     Boolean update(DepositRuleSaveOrUpdateReq req);
 
-    Boolean delete(ListReq req);
+    Boolean delete(SwitchReq req);
 }

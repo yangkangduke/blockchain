@@ -360,7 +360,7 @@ public class ChainActionServiceImpl implements IChainActionService {
             // 获取币种的充币规则
             DepositRuleDto depositRuleDto = chainDepositService.getDepositRule(chain, tx.getCurrency());
             // 判断需要审核的3种情况： 1充提规则不存在，2充币规则禁用，3超过充币额度
-            boolean requireReview = depositRuleDto == null || depositRuleDto.getStatus() == CommonStatus.DISABLED || amount.compareTo(depositRuleDto.getAutoAmount()) > 0;
+            boolean requireReview = depositRuleDto == null || depositRuleDto.getStatus() == CommonStatus.DISABLED.getCode() || amount.compareTo(depositRuleDto.getAutoAmount()) > 0;
 
             if (requireReview) {
                 // 需要运营人员审核就标记manual=1, status=PENDING_APPROVE, 并通知运维人员
@@ -643,7 +643,7 @@ public class ChainActionServiceImpl implements IChainActionService {
     private boolean allowDeposit(NativeChainTransactionDto e) {
         if (e.getAmount().signum() > 0) {
             DepositRuleDto rule = chainDepositService.getDepositRule(e.getChain(), e.getCurrency());
-            return rule != null && rule.getStatus() == CommonStatus.ENABLED;
+            return rule != null && rule.getStatus() == CommonStatus.ENABLED.getCode();
         }
         return false;
     }

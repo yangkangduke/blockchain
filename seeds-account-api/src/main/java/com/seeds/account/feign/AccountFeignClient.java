@@ -5,6 +5,7 @@ import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.*;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -129,6 +130,7 @@ public interface AccountFeignClient {
 
     @GetMapping("/sys/pending-collect-balances")
     GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception;
+
     /**
      * 获取钱包归集历史
      *
@@ -154,12 +156,12 @@ public interface AccountFeignClient {
 
     @GetMapping("/sys/fund-collect-history")
     GenericDto<Page<AddressCollectHisDto>> getFundCollectHistory(@RequestParam("chain") int chain,
-                                                                     @RequestParam("startTime") long startTime,
-                                                                     @RequestParam("endTime") long endTime,
-                                                                     @RequestParam(value = "fromAddress", required = false) String fromAddress,
-                                                                     @RequestParam(value = "toAddress", required = false) String toAddress,
-                                                                     @RequestParam("page") int page,
-                                                                     @RequestParam("size") int size);
+                                                                 @RequestParam("startTime") long startTime,
+                                                                 @RequestParam("endTime") long endTime,
+                                                                 @RequestParam(value = "fromAddress", required = false) String fromAddress,
+                                                                 @RequestParam(value = "toAddress", required = false) String toAddress,
+                                                                 @RequestParam("page") int page,
+                                                                 @RequestParam("size") int size);
 
     /**
      * 根据归集订单Id获取钱包归集历史
@@ -382,17 +384,12 @@ public interface AccountFeignClient {
     /**
      * 获取充币规则列表
      *
-     * @param req
-     * @return
      */
     @PostMapping("/sys/get-deposit-rule-list")
-    GenericDto<Page<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRulePageReq req);
+    GenericDto<List<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRuleReq req);
 
     /**
      * 增加充币规则
-     *
-     * @param req
-     * @return
      */
     @PostMapping("/sys/add-deposit-rule")
     GenericDto<Boolean> addDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req);
@@ -400,18 +397,62 @@ public interface AccountFeignClient {
     /**
      * 编辑充币规则
      *
-     * @param req
-     * @return
      */
     @PutMapping("/sys/update-deposit-rule")
     GenericDto<Boolean> updateDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req);
 
     /**
      * 删除充币规则
-     *
-     * @param req
-     * @return
      */
     @PostMapping("/sys/delete-deposit-rule")
-    GenericDto<Boolean> deleteDepositRule(@RequestBody ListReq req);
+    GenericDto<Boolean> deleteDepositRule(@RequestBody SwitchReq req);
+
+
+    /**
+     * 获取提币规则列表
+     */
+    @PostMapping("/sys/get-withdraw-rule-list")
+    GenericDto<List<WithdrawRuleDto>> getWithdrawRuleList(@RequestBody WithdrawRuleReq req);
+
+    /**
+     * 新增提币规则
+     */
+    @PostMapping("/sys/add-withdraw-rule")
+    GenericDto<Boolean> addWithdrawRule(@RequestBody WithdrawRuleSaveOrUpdateReq req);
+
+    /**
+     * 编辑提币规则
+     */
+    @PutMapping("/sys/update-withdraw-rule")
+    GenericDto<Boolean> updateWithdrawRule(@RequestBody WithdrawRuleSaveOrUpdateReq req);
+
+    /**
+     * 删除提币规则
+     */
+    @PostMapping("/sys/delete-withdraw-rule")
+    GenericDto<Boolean> deleteWithdrawRule(@Valid @RequestBody SwitchReq req);
+
+    /**
+     * 获取提币限额规则列表
+     */
+    @PostMapping("/sys/get-withdraw-limit-list")
+    GenericDto<List<WithdrawLimitRuleDto>> getWithdrawLimitRuleList();
+
+    /**
+     * 新增提币规则
+     */
+    @PostMapping("/sys/add-withdraw-limit")
+    GenericDto<Boolean> addWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req);
+
+    /**
+     * 编辑提币规则
+     */
+    @PutMapping("/sys/update-withdraw-limit")
+    GenericDto<Boolean> updateWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req);
+
+    /**
+     * 删除提币规则
+     */
+    @PostMapping("/sys/delete-withdraw-limit")
+    GenericDto<Boolean> deleteWithdrawLimitRule(@Valid @RequestBody ListReq req);
 }

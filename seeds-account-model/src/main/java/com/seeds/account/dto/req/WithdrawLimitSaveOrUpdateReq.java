@@ -16,27 +16,28 @@ import java.math.BigDecimal;
  */
 @Data
 @ApiModel(value = "DepositRuleSaveOrUpdateReq", description = "充币规则新增/编辑")
-public class DepositRuleSaveOrUpdateReq {
+public class WithdrawLimitSaveOrUpdateReq {
 
     private static final long serialVersionUID = 1L;
+
     private Long id;
 
-    @ApiModelProperty("chain 1:eth  3 :tron")
-    private Integer chain;
-
-    @ApiModelProperty("币种")
+    @ApiModelProperty(value = "币种")
     private String currency;
 
-    @ApiModelProperty("最小")
+    @ApiModelProperty(value = "最小")
     private BigDecimal minAmount;
 
-    @ApiModelProperty("精度")
-    private Integer decimals;
+    @ApiModelProperty(value = "最大")
+    private BigDecimal maxAmount;
 
-    @ApiModelProperty("自动上帐，免审核金额")
+    @ApiModelProperty(value = "当日限额")
+    private BigDecimal intradayAmount;
+
+    @ApiModelProperty(value = "免审核提币")
     private BigDecimal autoAmount;
 
-    @ApiModelProperty("1: 开启 2: 禁用")
-    private Integer status;
+    @ApiModelProperty(value = "是否内部提币面手续费  false、true")
+    private String zeroFeeOnInternal;
 
 }
