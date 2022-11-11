@@ -18,6 +18,7 @@ import com.seeds.account.mapper.ChainDepositWithdrawHisMapper;
 import com.seeds.account.model.ChainBlock;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.account.model.ChainDepositWithdrawHis;
+import com.seeds.account.model.UserAccount;
 import com.seeds.account.sender.KafkaProducer;
 import com.seeds.account.service.*;
 import com.seeds.account.util.Utils;
@@ -31,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -280,6 +282,20 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
             // 通知账户变更
 //            accountPublishService.publishAsync(AccountTopics.TOPIC_ACCOUNT_UPDATE,
 //                    AccountUpdateEvent.builder().ts(System.currentTimeMillis()).userId(transaction.getUserId()).action(AccountAction.DEPOSIT.getCode()).build());
+
+            List<UserAccount> accounts = walletAccountService.getAccounts(transaction.getUserId());
+
+            // 通知账户变更
+            kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                    .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                    .ucUserIds(ImmutableList.of(transaction.getUserId()))
+                    .values(ImmutableMap.of(
+                            "ts", System.currentTimeMillis(),
+                            "currency", transaction.getCurrency(),
+                            "change", transaction.getAmount(),
+                            "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
+                    .build()));
+            log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", transaction.getUserId(), System.currentTimeMillis(), transaction.getCurrency(), transaction.getAmount());
 
             // 充币自动兑换 （不需要审核的外部充币）
 //            accountAutoExchangeService.exchange(transaction.getUserId(), transaction.getCurrency(), transaction.getAmount(), transaction.getInternal() == 1);
