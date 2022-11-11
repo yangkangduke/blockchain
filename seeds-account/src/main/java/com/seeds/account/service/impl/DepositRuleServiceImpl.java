@@ -89,7 +89,7 @@ public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, Depos
         DepositRule depositRule = getById(req.getId());
 
         this.update(disableRule, new LambdaUpdateWrapper<DepositRule>().in(DepositRule::getChain, depositRule.getChain()).ne(DepositRule::getId, req.getId()));
-        DepositRule rule = DepositRule.builder().id(req.getId()).chain(depositRule.getChain()).status(CommonStatus.DISABLED.getCode()).build();
+        DepositRule rule = DepositRule.builder().id(req.getId()).chain(depositRule.getChain()).status(req.getStatus()).build();
 
         return updateById(rule);
     }
