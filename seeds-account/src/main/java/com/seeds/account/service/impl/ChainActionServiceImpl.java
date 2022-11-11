@@ -456,6 +456,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                     // 通知账户变更
                     kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                             .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                            .userSource(TargetSource.UC.name())
                             .ucUserIds(ImmutableList.of(tx.getUserId()))
                             .values(ImmutableMap.of(
                                     "ts", System.currentTimeMillis(),
@@ -486,6 +487,7 @@ public class ChainActionServiceImpl implements IChainActionService {
         // 通知账户变更
         kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                 .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                .userSource(TargetSource.UC.name())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
@@ -1405,6 +1407,7 @@ public class ChainActionServiceImpl implements IChainActionService {
         // 通知账户变更
         kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                 .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                .userSource(TargetSource.UC.name())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
