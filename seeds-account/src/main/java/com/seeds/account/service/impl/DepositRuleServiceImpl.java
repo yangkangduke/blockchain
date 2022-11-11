@@ -87,8 +87,9 @@ public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, Depos
     public Boolean delete(SwitchReq req) {
         DepositRule disableRule = DepositRule.builder().status(CommonStatus.DISABLED.getCode()).build();
         DepositRule depositRule = getById(req.getId());
+        disableRule.setChain(depositRule.getChain());
 
-        this.update(disableRule, new LambdaUpdateWrapper<DepositRule>().in(DepositRule::getChain, depositRule.getChain()).ne(DepositRule::getId, req.getId()));
+        this.update(disableRule, new LambdaUpdateWrapper<DepositRule>().eq(DepositRule::getChain, depositRule.getChain()).ne(DepositRule::getId, req.getId()));
         DepositRule rule = DepositRule.builder().id(req.getId()).chain(depositRule.getChain()).status(req.getStatus()).build();
 
         return updateById(rule);

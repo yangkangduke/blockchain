@@ -492,7 +492,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
                         "currency", tx.getCurrency(),
-                        "change", tx.getAmount(),
+                        "change", tx.getAmount().negate(),
                         "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
                 .build()));
         log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", tx.getUserId(), System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
@@ -1412,7 +1412,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
                         "currency", tx.getCurrency(),
-                        "change", tx.getAmount(),
+                        "change", tx.getAmount().negate(),
                         "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
                 .build()));
         log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", tx.getUserId(), System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
