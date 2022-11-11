@@ -26,9 +26,7 @@ public class SysWhitelistController {
 
     @GetMapping("/list")
     @ApiOperation("获取提币白名单列表")
-    //@RequiredPermission("sys:whitelist:list")
-    // @MgtAuthority(path = "/user-center/white-user/withdraw/")
-        public GenericDto<MgtPageDto<List<MgtWithdrawWhitelistDto>>> getWithdrawWhitelist(
+    public GenericDto<MgtPageDto<List<MgtWithdrawWhitelistDto>>> getWithdrawWhitelist(
             @RequestParam(value = "userId", required = false) Long userId,
             @RequestParam(value = "currency", required = false) String currency) {
         return whitelistService.list(userId, currency);
@@ -36,8 +34,6 @@ public class SysWhitelistController {
 
     @PostMapping("/update")
     @ApiOperation("修改提币白名单")
-   // @RequiredPermission("sys:whitelist:update")
-   // @MgtAuthority(path = "/user-center/white-user/withdraw/:edit")
     public GenericDto<Boolean> update(@RequestBody MgtWithdrawWhitelistDto dto) {
         return whitelistService.update(dto);
     }

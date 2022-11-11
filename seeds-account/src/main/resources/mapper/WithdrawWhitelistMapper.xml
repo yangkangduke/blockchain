@@ -29,7 +29,7 @@
             intraday_amount = #{intradayAmount,jdbcType=DECIMAL},
             auto_amount     = #{autoAmount,jdbcType=DECIMAL},
             comments        = #{comments,jdbcType=VARCHAR},
-            status          = #{status,jdbcType=TINYINT}
+            status          = #{status.code,jdbcType=TINYINT}
         where id = #{id,jdbcType=BIGINT}
     </update>
 
@@ -40,4 +40,15 @@
         and   currency = #{currency,jdbcType=VARCHAR}
         order by id
     </select>
+
+    <insert id="insert" parameterType="com.seeds.account.model.WithdrawWhitelist" useGeneratedKeys="true" keyProperty="id">
+        insert into ac_withdraw_whitelist (id, create_time, update_time,
+                                          version, user_id,
+                                          currency, max_amount, intraday_amount, auto_amount,
+                                          comments, status)
+        values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT},
+                #{version,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT},
+                #{currency,jdbcType=VARCHAR}, #{maxAmount,jdbcType=DECIMAL}, #{intradayAmount,jdbcType=DECIMAL}, #{autoAmount,jdbcType=DECIMAL},
+                #{comments,jdbcType=VARCHAR}, #{status.code,jdbcType=TINYINT})
+    </insert>
 </mapper>
