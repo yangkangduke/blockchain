@@ -52,6 +52,7 @@ spring:
               - HEAD
               - PUT
               - POST
+              - DELETE
       default-filters:
         - StripPrefix=1
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
