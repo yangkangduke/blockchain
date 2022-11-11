@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -310,6 +311,7 @@ public class AccountServiceImpl implements IAccountService {
                 // 发送通知用户提币被拒绝
                 kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE,JSONUtil.toJsonStr(NotificationReq.builder()
                         .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW_REJECTED.getCode())
+                        .userSource(TargetSource.UC.name())
                         .ucUserIds(ImmutableList.of(tx.getUserId()))
                         .values(ImmutableMap.of(
                                 "ts", System.currentTimeMillis(),
@@ -354,9 +356,25 @@ public class AccountServiceImpl implements IAccountService {
                 // 记录用户财务历史
                 userAccountActionService.createHistory(transaction.getUserId(), transaction.getCurrency(), AccountAction.DEPOSIT, transaction.getAmount());
 
+                List<UserAccount> accounts = walletAccountService.getAccounts(transaction.getUserId());
+                // 通知账户变更
+                kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                        .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                        .userSource(TargetSource.UC.name())
+                        .ucUserIds(ImmutableList.of(transaction.getUserId()))
+                        .values(ImmutableMap.of(
+                                "ts", System.currentTimeMillis(),
+                                "currency", transaction.getCurrency(),
+                                "change", transaction.getAmount(),
+                                "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
+                        .build()));
+                log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", transaction.getUserId(), System.currentTimeMillis(), transaction.getCurrency(), transaction.getAmount());
+
+
                 // 发送通知给客户
                 kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                         .notificationType(NoticeTypeEnum.ACCOUNT_DEPOSIT.getCode())
+                        .userSource(TargetSource.UC.name())
                         .ucUserIds(ImmutableList.of(transaction.getUserId()))
                         .values(ImmutableMap.of(
                                 "ts", System.currentTimeMillis(),
