@@ -84,7 +84,7 @@ public class WithdrawRuleServiceImpl extends ServiceImpl<WithdrawRuleMapper, Wit
 
     @Override
     public Boolean delete(SwitchReq req) {
-        WithdrawRule disableRule = WithdrawRule.builder().id(req.getId()).status(CommonStatus.DISABLED.getCode()).build();
+        WithdrawRule disableRule = WithdrawRule.builder().status(CommonStatus.DISABLED.getCode()).build();
 
         WithdrawRule withdrawRule = getById(req.getId());
         this.update(disableRule, new LambdaUpdateWrapper<WithdrawRule>().in(WithdrawRule::getChain, withdrawRule.getChain()).ne(WithdrawRule::getId, req.getId()));
