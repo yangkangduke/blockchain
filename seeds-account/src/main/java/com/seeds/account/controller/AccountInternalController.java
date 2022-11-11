@@ -6,11 +6,13 @@ import com.google.common.collect.Lists;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.dto.*;
+import com.seeds.account.dto.req.*;
 import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.enums.DepositStatus;
 import com.seeds.account.enums.WithdrawStatus;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.account.service.*;
 import com.seeds.account.util.Utils;
 import com.seeds.common.dto.GenericDto;
@@ -53,6 +55,12 @@ public class AccountInternalController {
     @Autowired
     private IChainService chainService;
     @Autowired
+    private IDepositRuleService depositRuleService;
+    @Autowired
+    private IWithdrawRuleService withdrawRuleService;
+    @Autowired
+    private IWithdrawLimitRuleService withdrawLimitRuleService;
+    @Autowired
     private ISystemWalletAddressService systemWalletAddressService;
     @Autowired
     private IWithdrawWhitelistService withdrawWhitelistService;
@@ -60,6 +68,9 @@ public class AccountInternalController {
     private IBlacklistAddressService blacklistAddressService;
     @Autowired
     private ISystemConfigService systemConfigService;
+
+    @Autowired
+    private IActionControlService actionControlService;
 
     @PostMapping("/job/scan-and-create-addresses")
     @ApiOperation("扫描并创建空闲地址")
@@ -538,13 +549,13 @@ public class AccountInternalController {
     @ApiOperation("获取钱包归集订单历史")
     @Inner
     public GenericDto<IPage<AddressCollectOrderHisDto>> getFundCollectOrderHistory(@RequestParam("chain") int chain,
-                                                                                      @RequestParam("startTime") long startTime,
-                                                                                      @RequestParam("endTime") long endTime,
-                                                                                      @RequestParam(value = "type", required = false, defaultValue = "0") int type,
-                                                                                      @RequestParam(value = "address", required = false) String address,
-                                                                                      @RequestParam(value = "currency", required = false) String currency,
-                                                                                      @RequestParam("page") int page,
-                                                                                      @RequestParam("size") int size) {
+                                                                                   @RequestParam("startTime") long startTime,
+                                                                                   @RequestParam("endTime") long endTime,
+                                                                                   @RequestParam(value = "type", required = false, defaultValue = "0") int type,
+                                                                                   @RequestParam(value = "address", required = false) String address,
+                                                                                   @RequestParam(value = "currency", required = false) String currency,
+                                                                                   @RequestParam("page") int page,
+                                                                                   @RequestParam("size") int size) {
         try {
             IPage<AddressCollectOrderHisDto> list = addressCollectHisService.getOrderHistory(Chain.fromCode(chain), startTime, endTime, type, address, currency, page, size);
             return GenericDto.success(list);
@@ -652,7 +663,7 @@ public class AccountInternalController {
      * @return
      */
     @PostMapping("/sys/create-system-wallet-address")
-    @ApiOperation("创建热钱包地址")
+    @ApiOperation(value = "创建热钱包地址",notes = "chain的值：1 eth， 3 tron")
     @Inner
     public GenericDto<SystemWalletAddressDto> createSystemWalletAddress(@RequestParam("chain") int chain) {
         try {
@@ -665,7 +676,7 @@ public class AccountInternalController {
     }
 
     @PostMapping("/sys/add-system-wallet-address")
-    @ApiOperation("添加系统使用的地址")
+    @ApiOperation("添加系统使用的地址(暂时没用)")
     @Inner
     public GenericDto<Boolean> addSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
         try {
@@ -678,7 +689,7 @@ public class AccountInternalController {
     }
 
     @PostMapping("/sys/update-system-wallet-address")
-    @ApiOperation("更新系统使用的地址")
+    @ApiOperation("更新系统使用的地址(暂时没用)")
     @Inner
     public GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
         try {
@@ -711,6 +722,248 @@ public class AccountInternalController {
             return GenericDto.success(null);
         } catch (Exception e) {
             log.error("accountSystemConfigModify", e);
+            return Utils.returnFromException(e);
+        }
+    }
+    /**
+     * 获取充币规则列表
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/get-deposit-rule-list")
+    @Inner
+    public GenericDto<List<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRuleReq req) {
+        try {
+            return GenericDto.success(depositRuleService.getList(req));
+        } catch (Exception e) {
+            log.error("get-deposit-rule-list", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 新增充币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/add-deposit-rule")
+    @Inner
+    public GenericDto<Boolean> addDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(depositRuleService.add(req));
+        } catch (Exception e) {
+            log.error("add-deposit-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 编辑充币规则
+     *
+     * @param req
+     * @return
+     */
+    @PutMapping("/sys/update-deposit-rule")
+    @Inner
+    public GenericDto<Boolean> updateDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(depositRuleService.update(req));
+        } catch (Exception e) {
+            log.error("update-deposit-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 删除充币规则(启用/禁用)
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/delete-deposit-rule")
+    @Inner
+    public GenericDto<Boolean> deleteDepositRule(@Valid @RequestBody SwitchReq req) {
+        try {
+            return GenericDto.success(depositRuleService.delete(req));
+        } catch (Exception e) {
+            log.error("delete-deposit-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+
+    /**
+     * 获取提币规则列表
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/get-withdraw-rule-list")
+    @Inner
+    public GenericDto<List<WithdrawRuleDto>> getWithdrawRuleList(@RequestBody WithdrawRuleReq req) {
+        try {
+            return GenericDto.success(withdrawRuleService.getList(req));
+        } catch (Exception e) {
+            log.error("get-withdraw-rule-list", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 新增提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/add-withdraw-rule")
+    @Inner
+    public GenericDto<Boolean> addWithdrawRule(@RequestBody WithdrawRuleSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(withdrawRuleService.add(req));
+        } catch (Exception e) {
+            log.error("add-withdraw-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 编辑提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PutMapping("/sys/update-withdraw-rule")
+    @Inner
+    public GenericDto<Boolean> updateWithdrawRule(@RequestBody WithdrawRuleSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(withdrawRuleService.update(req));
+        } catch (Exception e) {
+            log.error("update-withdraw-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 删除提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/delete-withdraw-rule")
+    @Inner
+    public GenericDto<Boolean> deleteWithdrawRule(@Valid @RequestBody SwitchReq req) {
+        try {
+            return GenericDto.success(withdrawRuleService.delete(req));
+        } catch (Exception e) {
+            log.error("delete-withdraw-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 获取提币限额规则列表
+     *
+     * @return
+     */
+    @PostMapping("/sys/get-withdraw-limit-list")
+    @Inner
+    public GenericDto<List<WithdrawLimitRuleDto>> getWithdrawLimitRuleList() {
+        try {
+            return GenericDto.success(withdrawLimitRuleService.getList());
+        } catch (Exception e) {
+            log.error("get-withdraw-rule-list", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 新增提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/add-withdraw-limit")
+    @Inner
+    public GenericDto<Boolean> addWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(withdrawLimitRuleService.add(req));
+        } catch (Exception e) {
+            log.error("add-withdraw-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 编辑提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PutMapping("/sys/update-withdraw-limit")
+    @Inner
+    public GenericDto<Boolean> updateWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req) {
+        try {
+            return GenericDto.success(withdrawLimitRuleService.update(req));
+        } catch (Exception e) {
+            log.error("update-withdraw-limit-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    /**
+     * 删除提币规则
+     *
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/delete-withdraw-limit")
+    @Inner
+    public GenericDto<Boolean> deleteWithdrawLimitRule(@Valid @RequestBody ListReq req) {
+        try {
+            return GenericDto.success(withdrawLimitRuleService.delete(req));
+        } catch (Exception e) {
+            log.error("delete-withdraw-limit-rule", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @GetMapping("/sys/action-control")
+    @ApiOperation("获取所有系统操作控制")
+    @Inner
+    public GenericDto<List<ActionControlDto>> getAllActionControl() {
+        try {
+            List<ActionControlDto> list = actionControlService.loadAll();
+            return GenericDto.success(list);
+        } catch (Exception e) {
+            log.error("getAllActionControl", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/add-action-control")
+    @ApiOperation("添加新系统操作控制")
+    @Inner
+    public GenericDto<Boolean> addActionControl(@RequestBody ActionControlDto actionControlDto) {
+        try {
+            actionControlService.add(actionControlDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("addActionControl", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/update-action-control")
+    @ApiOperation("更新系统操作控制")
+    @Inner
+    public GenericDto<Boolean> updateActionControl(@RequestBody ActionControlDto actionControlDto) {
+        try {
+            actionControlService.update(actionControlDto);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("updateActionControl", e);
             return Utils.returnFromException(e);
         }
     }

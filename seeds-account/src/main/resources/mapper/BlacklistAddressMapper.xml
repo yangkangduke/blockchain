@@ -25,7 +25,6 @@
         select *
         from ac_blacklist_address
         where type = #{type,jdbcType=TINYINT}
-          and user_id = #{userId,jdbcType=BIGINT}
           and address = #{address,jdbcType=VARCHAR}
     </select>
 </mapper>

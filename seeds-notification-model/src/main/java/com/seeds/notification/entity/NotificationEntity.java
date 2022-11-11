@@ -30,9 +30,9 @@ public class NotificationEntity {
     private String userSource;
 
     /**
-     * 消息类型
+     *  @see com.seeds.notification.enums.NoticeTypeEnum 消息类型
      */
-    private String notificationType;
+    private Integer notificationType;
     /**
      * 消息内容
      */

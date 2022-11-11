@@ -48,8 +48,8 @@ public class ChainWithdrawServiceImpl implements IChainWithdrawService {
             .build(k -> {
                 List<WithdrawRuleDto> list = loadAll();
                 Map<String, WithdrawRuleDto> map = list.stream()
-                        .filter(e -> e.getStatus() == CommonStatus.ENABLED)
-                        .collect(Collectors.toMap(e -> toKey(e.getChain().getCode(), e.getCurrency()), e -> e));
+                        .filter(e -> e.getStatus() == CommonStatus.ENABLED.getCode())
+                        .collect(Collectors.toMap(e -> toKey(e.getChain(), e.getCurrency()), e -> e));
                 return ListMap.init(list, map);
             });
 

@@ -182,11 +182,6 @@ public enum AccountAction {
     UNLOCK(35),
 
     /**
-     * 审核
-     */
-    AUDIT(36, "account-audit"),
-
-    /**
      * 其它
      */
     OTHERS(100);

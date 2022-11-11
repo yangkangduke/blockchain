@@ -1,5 +1,6 @@
 package com.seeds.notification.dto.response;
 
+import com.seeds.notification.enums.NoticeTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,8 +21,11 @@ public class NotificationResp implements Serializable {
     @ApiModelProperty("用户id")
     private Long ucUserId;
 
+    /**
+     * @see NoticeTypeEnum
+     */
     @ApiModelProperty("通知类型")
-    private String notificationType;
+    private Integer notificationType;
 
     @ApiModelProperty("消息内容")
     private String content;

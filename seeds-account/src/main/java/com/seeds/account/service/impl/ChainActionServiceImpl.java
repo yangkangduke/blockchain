@@ -29,6 +29,7 @@ import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.enums.TargetSource;
 import com.seeds.notification.dto.request.NotificationReq;
+import com.seeds.notification.enums.NoticeTypeEnum;
 import com.seeds.wallet.dto.RawTransactionDto;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tags;
@@ -361,7 +362,7 @@ public class ChainActionServiceImpl implements IChainActionService {
             // 获取币种的充币规则
             DepositRuleDto depositRuleDto = chainDepositService.getDepositRule(chain, tx.getCurrency());
             // 判断需要审核的3种情况： 1充提规则不存在，2充币规则禁用，3超过充币额度
-            boolean requireReview = depositRuleDto == null || depositRuleDto.getStatus() == CommonStatus.DISABLED || amount.compareTo(depositRuleDto.getAutoAmount()) > 0;
+            boolean requireReview = depositRuleDto == null || depositRuleDto.getStatus() == CommonStatus.DISABLED.getCode() || amount.compareTo(depositRuleDto.getAutoAmount()) > 0;
 
             if (requireReview) {
                 // 需要运营人员审核就标记manual=1, status=PENDING_APPROVE, 并通知运维人员
@@ -400,7 +401,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 chainDepositWithdrawHisMapper.insert(depositHis);
                 // 充币审核通知管理员
                 kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_AUDIT, JSONUtil.toJsonStr(NotificationReq.builder()
-                        .notificationType(AccountAction.AUDIT.getNotificationType())
+                        .notificationType(NoticeTypeEnum.ACCOUNT_AUDIT.getCode())
                         .userSource(TargetSource.ADMIN.name())
                         .values(ImmutableMap.of(
                                 "ts", System.currentTimeMillis(),
@@ -453,7 +454,7 @@ public class ChainActionServiceImpl implements IChainActionService {
 
                     // 发送通知给客户(充币方)
                     kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
-                            .notificationType(AccountAction.DEPOSIT.getNotificationType())
+                            .notificationType(NoticeTypeEnum.ACCOUNT_DEPOSIT.getCode())
                             .ucUserIds(ImmutableList.of(assignedDepositAddress.getUserId()))
                             .values(ImmutableMap.of(
                                     "ts", System.currentTimeMillis(),
@@ -468,7 +469,7 @@ public class ChainActionServiceImpl implements IChainActionService {
 
         // 发送通知用户提示提币成功(提币方)
         kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
-                .notificationType(AccountAction.WITHDRAW.getNotificationType())
+                .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW.getCode())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
@@ -652,7 +653,7 @@ public class ChainActionServiceImpl implements IChainActionService {
     private boolean allowDeposit(NativeChainTransactionDto e) {
         if (e.getAmount().signum() > 0) {
             DepositRuleDto rule = chainDepositService.getDepositRule(e.getChain(), e.getCurrency());
-            return rule != null && rule.getStatus() == CommonStatus.ENABLED;
+            return rule != null && rule.getStatus() == CommonStatus.ENABLED.getCode();
         }
         return false;
     }
@@ -1372,7 +1373,7 @@ public class ChainActionServiceImpl implements IChainActionService {
 
         // 发送通知用户提示提币成功
         kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE,JSONUtil.toJsonStr(NotificationReq.builder()
-                .notificationType(AccountAction.WITHDRAW.getNotificationType())
+                .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW.getCode())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),

@@ -34,7 +34,13 @@ public class NotificationController {
     @PutMapping("/updateReadStatus/{id}")
     @ApiOperation("更新通知为已读状态")
     GenericDto<Boolean> updateReadStatus(@PathVariable("id") Long id) {
-            return GenericDto.success(notificationService.updateReadStatus(id));
+        return GenericDto.success(notificationService.updateReadStatus(id));
+    }
+
+    @PutMapping("/read-all")
+    @ApiOperation("全部已读")
+    GenericDto<Boolean> readAll(@RequestParam("userId") Long userId) {
+        return GenericDto.success(notificationService.readAll(userId));
     }
 
     @GetMapping("/getUnReadNoticeFlag")
@@ -51,5 +57,11 @@ public class NotificationController {
     @ApiOperation("删除通知")
     GenericDto<Boolean> delete(@PathVariable("id") Long id) {
         return GenericDto.success(notificationService.delete(id));
+    }
+
+    @DeleteMapping("/delete-all")
+    @ApiOperation("删除全部通知")
+    GenericDto<Boolean> deleteAll(@RequestParam(value = "userId") Long userId) {
+        return GenericDto.success(notificationService.deleteAll(userId));
     }
 }

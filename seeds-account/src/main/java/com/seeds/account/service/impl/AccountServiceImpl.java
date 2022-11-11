@@ -26,6 +26,7 @@ import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.enums.TargetSource;
 import com.seeds.common.utils.BasicUtils;
 import com.seeds.notification.dto.request.NotificationReq;
+import com.seeds.notification.enums.NoticeTypeEnum;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.feign.UserCenterFeignClient;
@@ -113,7 +114,7 @@ public class AccountServiceImpl implements IAccountService {
 
         // 检查提币规则是否启用
         WithdrawRuleDto rule = chainWithdrawService.getWithdrawRule(chain, currency);
-        Utils.check(rule != null && rule.getStatus() == CommonStatus.ENABLED, ErrorCode.ACCOUNT_WITHDRAW_DISABLED);
+        Utils.check(rule != null && rule.getStatus() == CommonStatus.ENABLED.getCode(), ErrorCode.ACCOUNT_WITHDRAW_DISABLED);
         Utils.check(rule.getFeeAmount().compareTo(fee) == 0, ErrorCode.ACCOUNT_INVALID_WITHDRAW_FEE);
 
         // 是否是内部提币
@@ -210,7 +211,7 @@ public class AccountServiceImpl implements IAccountService {
         // 提币审核通知
         if (WithdrawStatus.PENDING_APPROVE.getCode() == status) {
             kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_AUDIT, JSONUtil.toJsonStr(NotificationReq.builder()
-                    .notificationType(AccountAction.AUDIT.getNotificationType())
+                    .notificationType(NoticeTypeEnum.ACCOUNT_AUDIT.getCode())
                     .userSource(TargetSource.ADMIN.name())
                     .values(ImmutableMap.of(
                             "ts", System.currentTimeMillis(),
@@ -308,7 +309,7 @@ public class AccountServiceImpl implements IAccountService {
 
                 // 发送通知用户提币被拒绝
                 kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE,JSONUtil.toJsonStr(NotificationReq.builder()
-                        .notificationType(AccountAction.WITHDRAW_REJECTED.getNotificationType())
+                        .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW_REJECTED.getCode())
                         .ucUserIds(ImmutableList.of(tx.getUserId()))
                         .values(ImmutableMap.of(
                                 "ts", System.currentTimeMillis(),
@@ -355,7 +356,7 @@ public class AccountServiceImpl implements IAccountService {
 
                 // 发送通知给客户
                 kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
-                        .notificationType(AccountAction.DEPOSIT.getNotificationType())
+                        .notificationType(NoticeTypeEnum.ACCOUNT_DEPOSIT.getCode())
                         .ucUserIds(ImmutableList.of(transaction.getUserId()))
                         .values(ImmutableMap.of(
                                 "ts", System.currentTimeMillis(),

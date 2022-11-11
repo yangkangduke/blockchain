@@ -80,7 +80,7 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     public void add(BlacklistAddressDto blacklistAddressDto) {
 
         log.info("add blacklistAddressDto={}", blacklistAddressDto);
-        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(), blacklistAddressDto.getUserId(), blacklistAddressDto.getAddress());
+        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(),blacklistAddressDto.getAddress());
         if (blacklistAddress != null) {
             try {
                 throw new InvalidDataException("trying to add exist record");
@@ -104,7 +104,7 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     @Override
     public void update(BlacklistAddressDto blacklistAddressDto) {
         log.info("update blacklistAddressDto={}", blacklistAddressDto);
-        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(), blacklistAddressDto.getUserId(), blacklistAddressDto.getAddress());
+        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(), blacklistAddressDto.getAddress());
         if (blacklistAddress == null) {
             throw new MissingElementException();
         }
@@ -120,7 +120,7 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     @Override
     public void delete(BlacklistAddressDto blacklistAddressDto) {
         log.info("delete blacklistAddressDto={}", blacklistAddressDto);
-        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(), blacklistAddressDto.getUserId(), blacklistAddressDto.getAddress());
+        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(),blacklistAddressDto.getAddress());
         if (blacklistAddress == null) {
             throw new MissingElementException();
         }

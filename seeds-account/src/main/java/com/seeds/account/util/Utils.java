@@ -54,6 +54,7 @@ public class Utils {
         if (t instanceof PriceNotUpdateException
                 || t instanceof MissingElementException
                 || t instanceof ActionDeniedException
+                || t instanceof ConfigException
                 || t instanceof DataInconsistencyException) {
             return GenericDto.<T>failure(ErrorCode.ACCOUNT_BUSINESS_ERROR.getCode(), t.getMessage() != null ? t.getMessage() : t.getClass().getSimpleName());
         }

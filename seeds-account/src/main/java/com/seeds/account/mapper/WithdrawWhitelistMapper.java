@@ -17,5 +17,7 @@ import org.apache.ibatis.annotations.Param;
 public interface WithdrawWhitelistMapper extends BaseMapper<WithdrawWhitelist> {
     WithdrawWhitelist getWithdrawWhitelistByUserIdAndCurrency(@Param("userId") long userId, @Param("currency") String currency);
 
-    Integer updateByPrimaryKey(WithdrawWhitelist withdrawWhitelist);
+    Integer updateByPrimaryKey(WithdrawWhitelist record);
+
+    int insert(WithdrawWhitelist record);
 }

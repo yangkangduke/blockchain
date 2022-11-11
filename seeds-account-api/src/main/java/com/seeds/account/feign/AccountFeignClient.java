@@ -1,17 +1,17 @@
 package com.seeds.account.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.account.dto.*;
-import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.AccountConstants;
+import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
+import com.seeds.account.dto.*;
+import com.seeds.account.dto.req.*;
+import com.seeds.account.model.SwitchReq;
+import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -379,5 +379,109 @@ public interface AccountFeignClient {
      */
     @PostMapping("/sys/account-system-config-modify")
     GenericDto<Object> accountSystemConfigModify(@RequestBody AccountSystemConfigDto req);
+
+
+
+    /**
+     * 获取充币规则列表
+     *
+     */
+    @PostMapping("/sys/get-deposit-rule-list")
+    GenericDto<List<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRuleReq req);
+
+    /**
+     * 增加充币规则
+     */
+    @PostMapping("/sys/add-deposit-rule")
+    GenericDto<Boolean> addDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req);
+
+    /**
+     * 编辑充币规则
+     *
+     */
+    @PutMapping("/sys/update-deposit-rule")
+    GenericDto<Boolean> updateDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req);
+
+    /**
+     * 删除充币规则
+     */
+    @PostMapping("/sys/delete-deposit-rule")
+    GenericDto<Boolean> deleteDepositRule(@RequestBody SwitchReq req);
+
+
+    /**
+     * 获取提币规则列表
+     */
+    @PostMapping("/sys/get-withdraw-rule-list")
+    GenericDto<List<WithdrawRuleDto>> getWithdrawRuleList(@RequestBody WithdrawRuleReq req);
+
+    /**
+     * 新增提币规则
+     */
+    @PostMapping("/sys/add-withdraw-rule")
+    GenericDto<Boolean> addWithdrawRule(@RequestBody WithdrawRuleSaveOrUpdateReq req);
+
+    /**
+     * 编辑提币规则
+     */
+    @PutMapping("/sys/update-withdraw-rule")
+    GenericDto<Boolean> updateWithdrawRule(@RequestBody WithdrawRuleSaveOrUpdateReq req);
+
+    /**
+     * 删除提币规则
+     */
+    @PostMapping("/sys/delete-withdraw-rule")
+    GenericDto<Boolean> deleteWithdrawRule(@Valid @RequestBody SwitchReq req);
+
+    /**
+     * 获取提币限额规则列表
+     */
+    @PostMapping("/sys/get-withdraw-limit-list")
+    GenericDto<List<WithdrawLimitRuleDto>> getWithdrawLimitRuleList();
+
+    /**
+     * 新增提币规则
+     */
+    @PostMapping("/sys/add-withdraw-limit")
+    GenericDto<Boolean> addWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req);
+
+    /**
+     * 编辑提币规则
+     */
+    @PutMapping("/sys/update-withdraw-limit")
+    GenericDto<Boolean> updateWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req);
+
+    /**
+     * 删除提币规则
+     */
+    @PostMapping("/sys/delete-withdraw-limit")
+    GenericDto<Boolean> deleteWithdrawLimitRule(@Valid @RequestBody ListReq req);
+
+    /**
+     * 获取所有系统操作控制
+     *
+     * @return
+     */
+    @GetMapping("/sys/action-control")
+    GenericDto<List<ActionControlDto>> getAllActionControl();
+
+    /**
+     * 添加新系统操作控制
+     *
+     * @param actionControlDto
+     * @return
+     */
+    @PostMapping("/sys/add-action-control")
+    GenericDto<Boolean> addActionControl(@RequestBody ActionControlDto actionControlDto);
+
+    /**
+     * 更新系统操作控制
+     *
+     * @param actionControlDto
+     * @return
+     */
+    @PostMapping("/sys/update-action-control")
+    GenericDto<Boolean> updateActionControl(@RequestBody ActionControlDto actionControlDto);
+
 
 }
