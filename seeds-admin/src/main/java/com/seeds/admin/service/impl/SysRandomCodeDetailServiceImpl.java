@@ -8,12 +8,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.SysRandomCodeDetailPageReq;
 import com.seeds.admin.dto.response.SysRandomCodeDetailResp;
 import com.seeds.admin.entity.SysRandomCodeDetailEntity;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysRandomCodeDetailMapper;
 import com.seeds.admin.service.SysRandomCodeDetailService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -63,6 +65,14 @@ public class SysRandomCodeDetailServiceImpl extends ServiceImpl<SysRandomCodeDet
     public void removeByBatchNo(String batchNo) {
         LambdaQueryWrapper<SysRandomCodeDetailEntity> query = new QueryWrapper<SysRandomCodeDetailEntity>().lambda()
                 .eq(SysRandomCodeDetailEntity::getBatchNo, batchNo);
+        remove(query);
+    }
+
+    @Override
+    public void removeNotUsedByIds(Collection<Long> ids) {
+        LambdaQueryWrapper<SysRandomCodeDetailEntity> query = new QueryWrapper<SysRandomCodeDetailEntity>().lambda()
+                .eq(SysRandomCodeDetailEntity::getUseFlag, WhetherEnum.NO.value())
+                .in(SysRandomCodeDetailEntity::getId, ids);
         remove(query);
     }
 }

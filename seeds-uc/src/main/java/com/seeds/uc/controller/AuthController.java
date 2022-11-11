@@ -117,6 +117,11 @@ public class AuthController {
         return GenericDto.success(ucUserService.metamaskLogin(metamaskVerifyReq));
     }
 
+    @GetMapping("/invite-flag")
+    @ApiOperation(value = "是否需要邀请码")
+    public GenericDto<Boolean> inviteFlag(@RequestParam String account) {
+        return GenericDto.success(ucUserService.inviteFlag(account));
+    }
 
     @PostMapping("/forgot-password/reset")
     @ApiOperation(value = "忘记密码-重置密码", notes = "1.调用/auth/email/send 参数authType=RESET_PASSWORD获取邮箱验证码 " +

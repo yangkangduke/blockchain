@@ -170,7 +170,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
 
     @Override
     public void detailDelete(ListReq req) {
-        sysRandomCodeDetailService.removeBatchByIds(req.getIds());
+        sysRandomCodeDetailService.removeNotUsedByIds(req.getIds());
     }
 
     @Override
@@ -237,12 +237,15 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
                 .orderByDesc(SysRandomCodeEntity::getId);
         List<SysRandomCodeEntity> list = list(query);
         if (CollectionUtils.isEmpty(list)) {
-            throw new SeedsException("invitation not exist");
+            throw new SeedsException("Invitation not exist");
         }
         SysRandomCodeEntity randomCode = list.get(0);
         SysRandomCodeDetailEntity randomCodeDetail = sysRandomCodeDetailService.queryByBatchNoAndCode(randomCode.getBatchNo(), req.getCode());
         if (randomCodeDetail == null) {
-            throw new SeedsException("invitation code not exist");
+            throw new SeedsException("Invitation code not exist");
+        }
+        if (WhetherEnum.YES.value() == randomCodeDetail.getUseFlag()) {
+            throw new SeedsException("The invitation code has already been used");
         }
         randomCodeDetail.setUseFlag(WhetherEnum.YES.value());
         sysRandomCodeDetailService.updateById(randomCodeDetail);

@@ -160,5 +160,13 @@ public interface IUcUserService extends IService<UcUser> {
      */
     void registerWriteOffsInviteCode(String inviteCode);
 
+    /**
+     * 是否需要邀请码
+     *
+     * @param account 账户
+     * @return result
+     */
+    Boolean inviteFlag(String account);
+
 }
 

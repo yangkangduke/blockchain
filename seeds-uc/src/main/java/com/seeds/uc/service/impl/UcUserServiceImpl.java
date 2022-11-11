@@ -174,8 +174,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      */
     @Override
     public LoginResp metamaskLogin(MetamaskVerifyReq metamaskVerifyReq) {
-        // 校验邀请码
-        registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode());
         String publicAddress = metamaskVerifyReq.getPublicAddress();
         this.verifyMetamask(metamaskVerifyReq);
         long currentTime = System.currentTimeMillis();
@@ -185,6 +183,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .eq(UcUser::getPublicAddress, publicAddress));
         Long userId;
         if (one == null) {
+            // 校验邀请码
+            registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode());
             // 新增
             UcUser ucUser = UcUser.builder()
                     .nickname(publicAddress)
@@ -573,6 +573,16 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         if (!result.isSuccess()) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_11501_INVITATION_CODE_NOT_EXIST.getDescEn());
         }
+    }
+
+    @Override
+    public Boolean inviteFlag(String account) {
+        if (StringUtils.isEmpty(account)) {
+            return inviteFlag;
+        }
+        UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
+                .eq(UcUser::getPublicAddress, account));
+        return inviteFlag && one == null;
     }
 
 }
