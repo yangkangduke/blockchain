@@ -28,4 +28,8 @@ public interface NotificationService extends IService<NotificationEntity> {
     Boolean getUnReadNoticeFlag(Long userId);
 
     Boolean delete(Long id);
+
+    Boolean readAll(Long userId);
+
+    Boolean deleteAll(Long userId);
 }

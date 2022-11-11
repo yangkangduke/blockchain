@@ -2,7 +2,7 @@ package com.seeds.notification.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -100,12 +100,26 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
      */
     @Override
     public Boolean getUnReadNoticeFlag(Long userId) {
-        return count(new QueryWrapper<NotificationEntity>().eq("uc_user_id", userId).eq("has_read", 0)) > 0;
+        return count(new LambdaQueryWrapper<NotificationEntity>().eq(NotificationEntity::getUcUserId, userId).eq(NotificationEntity::getHasRead, 0)) > 0;
     }
 
     @Override
     public Boolean delete(Long id) {
         return this.removeById(id);
+    }
+
+    @Override
+    public Boolean readAll(Long userId) {
+        NotificationEntity notificationEntity = new NotificationEntity();
+        notificationEntity.setHasRead(1);
+        notificationEntity.setUpdatedAt(new Date().getTime());
+
+        return this.update(notificationEntity, new LambdaUpdateWrapper<NotificationEntity>().in(NotificationEntity::getUcUserId, userId));
+    }
+
+    @Override
+    public Boolean deleteAll(Long userId) {
+        return this.remove(new LambdaQueryWrapper<NotificationEntity>().in(NotificationEntity::getUcUserId, userId));
     }
 }
 
