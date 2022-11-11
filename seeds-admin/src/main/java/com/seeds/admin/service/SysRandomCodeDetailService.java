@@ -6,6 +6,7 @@ import com.seeds.admin.dto.request.SysRandomCodeDetailPageReq;
 import com.seeds.admin.dto.response.SysRandomCodeDetailResp;
 import com.seeds.admin.entity.SysRandomCodeDetailEntity;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -44,5 +45,11 @@ public interface SysRandomCodeDetailService extends IService<SysRandomCodeDetail
      * @param batchNo 批次号
      */
     void removeByBatchNo(String batchNo);
+
+    /**
+     * 删除未使用的随机码
+     * @param ids 编号列表
+     */
+    void removeNotUsedByIds(Collection<Long> ids);
 
 }
