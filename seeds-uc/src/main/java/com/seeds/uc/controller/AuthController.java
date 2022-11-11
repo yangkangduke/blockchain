@@ -119,7 +119,7 @@ public class AuthController {
 
     @GetMapping("/invite-flag")
     @ApiOperation(value = "是否需要邀请码")
-    public GenericDto<Boolean> inviteFlag(@RequestParam String account) {
+    public GenericDto<Boolean> inviteFlag(@RequestParam(required = false) String account) {
         return GenericDto.success(ucUserService.inviteFlag(account));
     }
 
