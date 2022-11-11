@@ -39,8 +39,12 @@ public class NotificationController {
 
     @PutMapping("/read-all")
     @ApiOperation("全部已读")
-    GenericDto<Boolean> readAll(@RequestParam("userId") Long userId) {
-        return GenericDto.success(notificationService.readAll(userId));
+    GenericDto<Boolean> readAll(@RequestParam("userId") Long userId,
+                                @RequestParam("userSource") String userSource) {
+        if (StringUtils.isEmpty(userSource)) {
+            userSource = TargetSource.UC.name();
+        }
+        return GenericDto.success(notificationService.readAll(userId, userSource));
     }
 
     @GetMapping("/getUnReadNoticeFlag")
@@ -61,7 +65,11 @@ public class NotificationController {
 
     @DeleteMapping("/delete-all")
     @ApiOperation("删除全部通知")
-    GenericDto<Boolean> deleteAll(@RequestParam(value = "userId") Long userId) {
-        return GenericDto.success(notificationService.deleteAll(userId));
+    GenericDto<Boolean> deleteAll(@RequestParam(value = "userId") Long userId,
+                                  @RequestParam("userSource") String userSource) {
+        if (StringUtils.isEmpty(userSource)) {
+            userSource = TargetSource.UC.name();
+        }
+        return GenericDto.success(notificationService.deleteAll(userId, userSource));
     }
 }

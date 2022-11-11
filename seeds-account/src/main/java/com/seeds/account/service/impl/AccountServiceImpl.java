@@ -310,6 +310,7 @@ public class AccountServiceImpl implements IAccountService {
                 // 发送通知用户提币被拒绝
                 kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE,JSONUtil.toJsonStr(NotificationReq.builder()
                         .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW_REJECTED.getCode())
+                        .userSource(TargetSource.UC.name())
                         .ucUserIds(ImmutableList.of(tx.getUserId()))
                         .values(ImmutableMap.of(
                                 "ts", System.currentTimeMillis(),
@@ -357,6 +358,7 @@ public class AccountServiceImpl implements IAccountService {
                 // 发送通知给客户
                 kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                         .notificationType(NoticeTypeEnum.ACCOUNT_DEPOSIT.getCode())
+                        .userSource(TargetSource.UC.name())
                         .ucUserIds(ImmutableList.of(transaction.getUserId()))
                         .values(ImmutableMap.of(
                                 "ts", System.currentTimeMillis(),

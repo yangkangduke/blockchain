@@ -114,17 +114,17 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
     }
 
     @Override
-    public Boolean readAll(Long userId) {
+    public Boolean readAll(Long userId, String userSource) {
         NotificationEntity notificationEntity = new NotificationEntity();
         notificationEntity.setHasRead(1);
         notificationEntity.setUpdatedAt(new Date().getTime());
 
-        return this.update(notificationEntity, new LambdaUpdateWrapper<NotificationEntity>().in(NotificationEntity::getUcUserId, userId));
+        return this.update(notificationEntity, new LambdaUpdateWrapper<NotificationEntity>().in(NotificationEntity::getUcUserId, userId).eq(NotificationEntity::getUserSource, userSource));
     }
 
     @Override
-    public Boolean deleteAll(Long userId) {
-        return this.remove(new LambdaQueryWrapper<NotificationEntity>().in(NotificationEntity::getUcUserId, userId));
+    public Boolean deleteAll(Long userId, String userSource) {
+        return this.remove(new LambdaQueryWrapper<NotificationEntity>().in(NotificationEntity::getUcUserId, userId).eq(NotificationEntity::getUserSource, userSource));
     }
 }
 

@@ -29,7 +29,7 @@ public interface NotificationService extends IService<NotificationEntity> {
 
     Boolean delete(Long id);
 
-    Boolean readAll(Long userId);
+    Boolean readAll(Long userId, String userSource);
 
-    Boolean deleteAll(Long userId);
+    Boolean deleteAll(Long userId, String userSource);
 }
