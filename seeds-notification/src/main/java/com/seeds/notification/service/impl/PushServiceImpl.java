@@ -14,10 +14,10 @@ public class PushServiceImpl implements IPushService {
      * 向页面推送消息
      */
     @Override
-    public void push(NotificationDto message) {
+    public void push(NotificationDto message, String userSource) {
         try {
             long l1 = System.currentTimeMillis();
-            PushServer.pushServer.push(message);
+            PushServer.pushServer.push(message, userSource);
             final long l2 = System.currentTimeMillis() - l1;
             log.info("push耗时,time={}ms", l2);
         } catch (Exception e) {

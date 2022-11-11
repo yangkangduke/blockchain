@@ -9,8 +9,9 @@ import lombok.Getter;
  * @since 2022-10-10
  */
 @Getter
-public enum RequestSource {
+public enum TargetSource {
 
+    ADMIN(0, "管理后台"),
     UC(1, "uc平台"),
     GAME(2, "游戏"),
     ;
@@ -19,7 +20,7 @@ public enum RequestSource {
     private final int code;
     private final String desc;
 
-    RequestSource(int code, String desc) {
+    TargetSource(int code, String desc) {
         this.code = code;
         this.desc = desc;
     }

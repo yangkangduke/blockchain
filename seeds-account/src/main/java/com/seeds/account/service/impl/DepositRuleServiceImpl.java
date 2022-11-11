@@ -2,6 +2,7 @@ package com.seeds.account.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.api.client.util.Lists;
 import com.seeds.account.AccountConstants;
@@ -84,7 +85,13 @@ public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, Depos
 
     @Override
     public Boolean delete(SwitchReq req) {
-        DepositRule rule = DepositRule.builder().id(req.getId()).status(req.getStatus()).build();
+        DepositRule disableRule = DepositRule.builder().status(CommonStatus.DISABLED.getCode()).build();
+        DepositRule depositRule = getById(req.getId());
+        disableRule.setChain(depositRule.getChain());
+
+        this.update(disableRule, new LambdaUpdateWrapper<DepositRule>().eq(DepositRule::getChain, depositRule.getChain()).ne(DepositRule::getId, req.getId()));
+        DepositRule rule = DepositRule.builder().id(req.getId()).chain(depositRule.getChain()).status(req.getStatus()).build();
+
         return updateById(rule);
     }
 

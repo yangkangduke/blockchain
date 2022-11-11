@@ -10,5 +10,5 @@ public interface IPushService {
     /**
      * 向页面推送消息
      */
-    void push(NotificationDto message);
+    void push(NotificationDto message, String userSource);
 }

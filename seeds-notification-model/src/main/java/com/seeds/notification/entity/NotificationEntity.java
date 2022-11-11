@@ -25,7 +25,12 @@ public class NotificationEntity {
     private Long ucUserId;
 
     /**
-     * 消息类型
+     * 用户来源
+     */
+    private String userSource;
+
+    /**
+     *  @see com.seeds.notification.enums.NoticeTypeEnum 消息类型
      */
     private Integer notificationType;
     /**

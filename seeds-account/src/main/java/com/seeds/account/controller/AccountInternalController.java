@@ -777,7 +777,7 @@ public class AccountInternalController {
     }
 
     /**
-     * 删除充币规则
+     * 删除充币规则(启用/禁用)
      *
      * @param req
      * @return

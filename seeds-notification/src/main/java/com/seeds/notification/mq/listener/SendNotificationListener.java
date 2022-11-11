@@ -35,7 +35,7 @@ public class SendNotificationListener {
         notificationDto.setReceivers(notificationReq.getUcUserIds());
         notificationDto.setValues(notificationReq.getValues());
         if (result) {
-            notificationService.sendNotice(notificationDto);
+            notificationService.sendNotice(notificationDto, notificationReq.getUserSource());
         }
     }
 }

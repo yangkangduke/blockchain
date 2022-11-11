@@ -7,8 +7,7 @@ import com.seeds.notification.dto.request.NoticePageReq;
 import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.notification.dto.response.NotificationResp;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -23,4 +22,15 @@ public interface RemoteNoticeService {
 
     @PostMapping("/sendMessage")
     GenericDto<Object> sendMessage(@RequestBody NotificationReq req);
+
+    @PutMapping("/updateReadStatus/{id}")
+    GenericDto<Boolean> updateReadStatus(@PathVariable("id") Long id);
+
+    @GetMapping("/getUnReadNoticeFlag")
+    GenericDto<Boolean> getUnReadNoticeFlag(@RequestParam("ucUserId") Long ucUserId,
+                                            @RequestParam("userSource") String userSource);
+
+    @DeleteMapping("/delete/{id}")
+    GenericDto<Boolean> delete(@PathVariable("id") Long id);
+
 }

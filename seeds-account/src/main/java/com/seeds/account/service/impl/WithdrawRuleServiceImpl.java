@@ -2,6 +2,7 @@ package com.seeds.account.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.api.client.util.Lists;
 import com.seeds.account.AccountConstants;
@@ -83,7 +84,12 @@ public class WithdrawRuleServiceImpl extends ServiceImpl<WithdrawRuleMapper, Wit
 
     @Override
     public Boolean delete(SwitchReq req) {
-        WithdrawRule rule = WithdrawRule.builder().id(req.getId()).status(req.getStatus()).build();
+        WithdrawRule disableRule = WithdrawRule.builder().status(CommonStatus.DISABLED.getCode()).build();
+
+        WithdrawRule withdrawRule = getById(req.getId());
+        this.update(disableRule, new LambdaUpdateWrapper<WithdrawRule>().in(WithdrawRule::getChain, withdrawRule.getChain()).ne(WithdrawRule::getId, req.getId()));
+
+        WithdrawRule rule = WithdrawRule.builder().id(req.getId()).chain(withdrawRule.getChain()).status(req.getStatus()).build();
         return updateById(rule);
     }
 

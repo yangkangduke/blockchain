@@ -27,6 +27,7 @@ import com.seeds.account.util.Utils;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.common.enums.TargetSource;
 import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.notification.enums.NoticeTypeEnum;
 import com.seeds.wallet.dto.RawTransactionDto;
@@ -398,7 +399,15 @@ public class ChainActionServiceImpl implements IChainActionService {
                 // 插入新的充提
                 log.info("insert new internal deposit transaction={}", depositHis);
                 chainDepositWithdrawHisMapper.insert(depositHis);
-
+                // 充币审核通知管理员
+                kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_AUDIT, JSONUtil.toJsonStr(NotificationReq.builder()
+                        .notificationType(NoticeTypeEnum.ACCOUNT_AUDIT.getCode())
+                        .userSource(TargetSource.ADMIN.name())
+                        .values(ImmutableMap.of(
+                                "ts", System.currentTimeMillis(),
+                                "type", AccountAction.DEPOSIT.getNotificationType()))
+                        .build()));
+                log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.DEPOSIT.getNotificationType());
             } else {
                 // 如果不需要审核就 manual=0, status=TRANSACTION_CONFIRMED,上账，给用户发充币成功通知
                 int manual = 0;
@@ -443,9 +452,25 @@ public class ChainActionServiceImpl implements IChainActionService {
                     // 记录用户财务历史
                     userAccountActionService.createHistory(assignedDepositAddress.getUserId(), tx.getCurrency(), AccountAction.DEPOSIT, amount);
 
+                    List<UserAccount> accounts = walletAccountService.getAccounts(tx.getUserId());
+                    // 通知账户变更
+                    kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                            .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                            .userSource(TargetSource.UC.name())
+                            .ucUserIds(ImmutableList.of(tx.getUserId()))
+                            .values(ImmutableMap.of(
+                                    "ts", System.currentTimeMillis(),
+                                    "currency", tx.getCurrency(),
+                                    "change", tx.getAmount(),
+                                    "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
+                            .build()));
+                    log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", tx.getUserId(), System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
+
+
                     // 发送通知给客户(充币方)
                     kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                             .notificationType(NoticeTypeEnum.ACCOUNT_DEPOSIT.getCode())
+                            .userSource(TargetSource.UC.name())
                             .ucUserIds(ImmutableList.of(assignedDepositAddress.getUserId()))
                             .values(ImmutableMap.of(
                                     "ts", System.currentTimeMillis(),
@@ -458,9 +483,26 @@ public class ChainActionServiceImpl implements IChainActionService {
             }
         }
 
+        List<UserAccount> accounts = walletAccountService.getAccounts(tx.getUserId());
+        // 通知账户变更
+        kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                .userSource(TargetSource.UC.name())
+                .ucUserIds(ImmutableList.of(tx.getUserId()))
+                .values(ImmutableMap.of(
+                        "ts", System.currentTimeMillis(),
+                        "currency", tx.getCurrency(),
+                        "change", tx.getAmount().negate(),
+                        "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
+                .build()));
+        log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", tx.getUserId(), System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
+
+
+
         // 发送通知用户提示提币成功(提币方)
         kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                 .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW.getCode())
+                .userSource(TargetSource.UC.name())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
@@ -1361,10 +1403,25 @@ public class ChainActionServiceImpl implements IChainActionService {
         userAccountActionService.updateStatusByActionUserIdSource(AccountAction.WITHDRAW, tx.getUserId(), String.valueOf(tx.getId()), CommonActionStatus.SUCCESS);
         log.info("updateWithdrawTxn update={}, replaceTx={}", tx, replaceTx);
 
+        List<UserAccount> accounts = walletAccountService.getAccounts(tx.getUserId());
+        // 通知账户变更
+        kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                .userSource(TargetSource.UC.name())
+                .ucUserIds(ImmutableList.of(tx.getUserId()))
+                .values(ImmutableMap.of(
+                        "ts", System.currentTimeMillis(),
+                        "currency", tx.getCurrency(),
+                        "change", tx.getAmount().negate(),
+                        "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
+                .build()));
+        log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", tx.getUserId(), System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
+
 
         // 发送通知用户提示提币成功
         kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE,JSONUtil.toJsonStr(NotificationReq.builder()
                 .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW.getCode())
+                .userSource(TargetSource.UC.name())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),

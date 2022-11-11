@@ -18,18 +18,21 @@ import com.seeds.account.mapper.ChainDepositWithdrawHisMapper;
 import com.seeds.account.model.ChainBlock;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.account.model.ChainDepositWithdrawHis;
+import com.seeds.account.model.UserAccount;
 import com.seeds.account.sender.KafkaProducer;
 import com.seeds.account.service.*;
 import com.seeds.account.util.Utils;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.common.enums.TargetSource;
 import com.seeds.notification.dto.request.NotificationReq;
 import com.seeds.notification.enums.NoticeTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -128,6 +131,15 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
                 transaction.setBlacklist(1);
                 // 更新
                 chainDepositWithdrawHisMapper.updateById(transaction);
+                // 充币审核发送通知
+                kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_AUDIT, JSONUtil.toJsonStr(NotificationReq.builder()
+                        .notificationType(NoticeTypeEnum.ACCOUNT_AUDIT.getCode())
+                        .userSource(TargetSource.ADMIN.name())
+                        .values(ImmutableMap.of(
+                                "ts", System.currentTimeMillis(),
+                                "type", AccountAction.DEPOSIT.getNotificationType()))
+                        .build()));
+                log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.DEPOSIT.getNotificationType());
                 // 发送通知给运维人员
 //                notificationService.sendNotificationAsync(NotificationDto.builder()
 //                        .notificationType(OpsAction.OPS_SUPPORT.getNotificationType())
@@ -159,6 +171,15 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
                         transaction.setStatus(status);
                         // 更新
                         chainDepositWithdrawHisMapper.updateById(transaction);
+                        // 充币审核发送通知
+                        kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_AUDIT, JSONUtil.toJsonStr(NotificationReq.builder()
+                                .notificationType(NoticeTypeEnum.ACCOUNT_AUDIT.getCode())
+                                .userSource(TargetSource.ADMIN.name())
+                                .values(ImmutableMap.of(
+                                        "ts", System.currentTimeMillis(),
+                                        "type", AccountAction.DEPOSIT.getNotificationType()))
+                                .build()));
+                        log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.DEPOSIT.getNotificationType());
                         // 发送通知给运维人员
 //                        notificationService.sendNotificationAsync(NotificationDto.builder()
 //                                .notificationType(OpsAction.OPS_SUPPORT.getNotificationType())
@@ -262,6 +283,21 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
 //            accountPublishService.publishAsync(AccountTopics.TOPIC_ACCOUNT_UPDATE,
 //                    AccountUpdateEvent.builder().ts(System.currentTimeMillis()).userId(transaction.getUserId()).action(AccountAction.DEPOSIT.getCode()).build());
 
+            List<UserAccount> accounts = walletAccountService.getAccounts(transaction.getUserId());
+
+            // 通知账户变更
+            kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                    .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                    .userSource(TargetSource.UC.name())
+                    .ucUserIds(ImmutableList.of(transaction.getUserId()))
+                    .values(ImmutableMap.of(
+                            "ts", System.currentTimeMillis(),
+                            "currency", transaction.getCurrency(),
+                            "change", transaction.getAmount(),
+                            "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
+                    .build()));
+            log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", transaction.getUserId(), System.currentTimeMillis(), transaction.getCurrency(), transaction.getAmount());
+
             // 充币自动兑换 （不需要审核的外部充币）
 //            accountAutoExchangeService.exchange(transaction.getUserId(), transaction.getCurrency(), transaction.getAmount(), transaction.getInternal() == 1);
 
@@ -269,6 +305,7 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
             // 发送通知给客户
             kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
                     .notificationType(NoticeTypeEnum.ACCOUNT_DEPOSIT.getCode())
+                    .userSource(TargetSource.UC.name())
                     .ucUserIds(ImmutableList.of(transaction.getUserId()))
                     .values(ImmutableMap.of(
                             "ts", System.currentTimeMillis(),

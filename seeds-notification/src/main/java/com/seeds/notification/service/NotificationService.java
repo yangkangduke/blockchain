@@ -22,10 +22,14 @@ public interface NotificationService extends IService<NotificationEntity> {
     Boolean saveNotice(NotificationReq req);
 
 
-    void sendNotice(NotificationDto Notice);
+    void sendNotice(NotificationDto Notice, String userSource);
 
 
-    Boolean getUnReadNoticeFlag(Long userId);
+    Boolean getUnReadNoticeFlag(Long userId, String userSource);
 
     Boolean delete(Long id);
+
+    Boolean readAll(Long userId, String userSource);
+
+    Boolean deleteAll(Long userId, String userSource);
 }

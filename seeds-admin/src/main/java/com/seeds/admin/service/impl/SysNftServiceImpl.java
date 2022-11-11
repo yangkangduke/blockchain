@@ -23,7 +23,7 @@ import com.seeds.chain.service.GameItemsService;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
-import com.seeds.common.enums.RequestSource;
+import com.seeds.common.enums.TargetSource;
 import com.seeds.common.exception.SeedsException;
 import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.request.NFTShelvesReq;
@@ -833,7 +833,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
         }
         // 请求来源是游戏方，交易完成通知游戏方
-        if (RequestSource.GAME == req.getSource()) {
+        if (TargetSource.GAME == req.getSource()) {
             String url = sysGameApiService.queryUrlByGameAndType(nft.getGameId(), ApiType.TRADE_NOTIFICATION.getCode());
             // todo 通知游戏方交易完成
         }
