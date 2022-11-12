@@ -29,7 +29,7 @@
             intraday_amount = #{intradayAmount,jdbcType=DECIMAL},
             auto_amount     = #{autoAmount,jdbcType=DECIMAL},
             comments        = #{comments,jdbcType=VARCHAR},
-            status          = #{status.code,jdbcType=TINYINT}
+            status          = #{status,jdbcType=TINYINT}
         where id = #{id,jdbcType=BIGINT}
     </update>
 

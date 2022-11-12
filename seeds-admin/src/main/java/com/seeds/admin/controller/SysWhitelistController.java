@@ -1,7 +1,5 @@
 package com.seeds.admin.controller;
 
-import com.seeds.admin.annotation.MgtAuthority;
-import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.MgtPageDto;
 import com.seeds.admin.dto.MgtWithdrawWhitelistDto;
 import com.seeds.admin.service.ISysWhitelistService;
@@ -10,9 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j

@@ -1,6 +1,7 @@
 package com.seeds.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.sun.org.apache.bcel.internal.classfile.Code;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -116,8 +117,13 @@ public enum ErrorCode implements WithDesc {
     //deposit config
     ILLEGAL_DEPOSIT_RULE_CONFIG(323143, "There is already an enabled deposit configuration rule"),
     //withdraw config
-    ILLEGAL_WITHDRAW_RULE_CONFIG(323144, "There is already an enabled withdraw configuration rule");
+    ILLEGAL_WITHDRAW_RULE_CONFIG(323144, "There is already an enabled withdraw configuration rule"),
 
+    //actionControl
+    ILLEGAL_ACTION_CONTROL_CONFIG(323145,"There is already an enabled action control"),
+
+    //blackList
+    ILLEGAL_BLACK_LIST_CONFIG(323146,"There is already an enabled black list");
     @JsonValue
     private final int code;
     private final String desc;

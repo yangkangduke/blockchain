@@ -19,7 +19,7 @@ public interface MgtWhitelistMapper extends BaseMapstructMapper {
             @Mapping(source = "intradayAmount", target = "intradayAmount", qualifiedByName = "convertStringToBigDecimal"),
             @Mapping(source = "autoAmount", target = "autoAmount", qualifiedByName = "convertStringToBigDecimal"),
             @Mapping(source = "comments", target = "comments"),
-//            @Mapping(source = "status", target = "status", qualifiedByName = "getStatusEnum")
+           //@Mapping(source = "status", target = "status", qualifiedByName = "getStatusEnum")
     })
     WithdrawWhitelistDto convertToWithdrawWhitelistDto(MgtWithdrawWhitelistDto dto);
 }

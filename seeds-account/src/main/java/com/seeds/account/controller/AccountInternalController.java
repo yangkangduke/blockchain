@@ -619,11 +619,11 @@ public class AccountInternalController {
     }
 
     @PostMapping("/sys/add-blacklist-address")
-    @ApiOperation("添加新充提币黑地址")
+    @ApiOperation("添加新充币提币黑地址")
     @Inner
-    public GenericDto<Boolean> addBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto) {
+    public GenericDto<Boolean> addBlacklistAddress(@RequestBody BlackListAddressSaveOrUpdateReq req) {
         try {
-            blacklistAddressService.add(blacklistAddressDto);
+            blacklistAddressService.add(req);
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("addBlacklistAddress", e);
@@ -632,11 +632,11 @@ public class AccountInternalController {
     }
 
     @PostMapping("/sys/update-blacklist-address")
-    @ApiOperation("更新充提币黑地址")
+    @ApiOperation("更新充币提币黑地址")
     @Inner
-    public GenericDto<Boolean> updateBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto) {
+    public GenericDto<Boolean> updateBlacklistAddress(@RequestBody BlackListAddressSaveOrUpdateReq req) {
         try {
-            blacklistAddressService.update(blacklistAddressDto);
+            blacklistAddressService.update(req);
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("updateBlacklistAddress", e);
@@ -645,11 +645,11 @@ public class AccountInternalController {
     }
 
     @PostMapping("/sys/delete-blacklist-address")
-    @ApiOperation("删除充提币黑地址")
+    @ApiOperation("删除充币提币黑地址")
     @Inner
-    public GenericDto<Boolean> deleteBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto) {
+    public GenericDto<Boolean> deleteBlacklistAddress(@RequestBody SwitchReq req) {
         try {
-            blacklistAddressService.delete(blacklistAddressDto);
+            blacklistAddressService.delete(req);
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("deleteBlacklistAddress", e);

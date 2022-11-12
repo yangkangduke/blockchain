@@ -310,32 +310,32 @@ public interface AccountFeignClient {
     @GetMapping("/sys/blacklist-address")
     GenericDto<List<BlacklistAddressDto>> getAllBlacklistAddress(@RequestParam("type") int type);
 
-    /**
+   /**
      * 添加新充提币黑地址
      *
-     * @param blacklistAddressDto
+     * @param req
      * @return
      */
     @PostMapping("/sys/add-blacklist-address")
-    GenericDto<Boolean> addBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+    GenericDto<Boolean> addBlacklistAddress(@RequestBody BlackListAddressSaveOrUpdateReq req);
 
     /**
      * 更新充提币黑地址
      *
-     * @param blacklistAddressDto
+     * @param req
      * @return
      */
     @PostMapping("/sys/update-blacklist-address")
-    GenericDto<Boolean> updateBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+    GenericDto<Boolean> updateBlacklistAddress(@RequestBody BlackListAddressSaveOrUpdateReq req);
 
     /**
      * 删除充提币黑地址
      *
-     * @param blacklistAddressDto
+     * @param req
      * @return
      */
     @PostMapping("/sys/delete-blacklist-address")
-    GenericDto<Boolean> deleteBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+    GenericDto<Boolean> deleteBlacklistAddress(@RequestBody SwitchReq req );
 
     /**
      * 创建热钱包地址
@@ -483,5 +483,34 @@ public interface AccountFeignClient {
     @PostMapping("/sys/update-action-control")
     GenericDto<Boolean> updateActionControl(@RequestBody ActionControlDto actionControlDto);
 
+    /**
+     * 添加充币黑名单
+     * @param req
+     * @return
+     *//*
+    @PostMapping("/sys/add-Deposit-blacklist-address")
+    GenericDto<Boolean> addDepositBlackList(@RequestBody BlackListAddressSaveOrUpdateReq req);
 
+    *//**
+     * 更新充币黑名单
+     * @param req
+     * @return
+     *//*
+    @PostMapping("/sys/update-Deposit-blacklist-address")
+    GenericDto<Boolean> updateDepositBlackList(@RequestBody BlackListAddressSaveOrUpdateReq req);
+
+    *//**
+     * 删除充币黑名单
+     * @param req
+     * @return
+     *//*
+    @PostMapping("/sys/delete-Deposit-blacklist-address")
+    GenericDto<Boolean> deleteDepositBlackList(@Valid @RequestBody SwitchReq req);
+
+    *//**
+     *
+     * @param req
+     * @return
+     *//*
+    GenericDto<Boolean> addWithdrawBlackList(RequestBody BlackListAddressSaveOrUpdateReq req);*/
 }

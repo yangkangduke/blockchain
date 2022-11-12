@@ -1,6 +1,7 @@
 package com.seeds.account.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.seeds.account.dto.WithdrawWhitelistDto;
 import com.seeds.account.model.WithdrawWhitelist;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

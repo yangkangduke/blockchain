@@ -44,7 +44,7 @@
 
     <select id="getByTypeAndKey" resultMap="BaseResultMap">
         select * from ac_action_control
-        where type  = #{type,jdbcType=TINYINT}
+        where `type`  = #{type,jdbcType=TINYINT}
           and `key`   = #{key,jdbcType=VARCHAR}
     </select>
 </mapper>

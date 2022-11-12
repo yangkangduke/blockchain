@@ -1,18 +1,25 @@
 package com.seeds.account.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.BlacklistAddressDto;
+import com.seeds.account.dto.req.BlackListAddressSaveOrUpdateReq;
 import com.seeds.account.enums.CommonStatus;
+import com.seeds.account.ex.ConfigException;
 import com.seeds.account.ex.MissingElementException;
 import com.seeds.account.mapper.BlacklistAddressMapper;
 import com.seeds.account.model.BlacklistAddress;
+import com.seeds.account.model.DepositRule;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.account.service.IBlacklistAddressService;
 import com.seeds.account.tool.ListMap;
 import com.seeds.account.util.ObjectUtils;
+import com.sun.deploy.util.BlackList;
 import com.sun.media.sound.InvalidDataException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +31,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.seeds.common.enums.ErrorCode.ILLEGAL_BLACK_LIST_CONFIG;
+import static com.seeds.common.enums.ErrorCode.ILLEGAL_DEPOSIT_RULE_CONFIG;
 
 /**
  * <p>
@@ -64,7 +74,7 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
         // milo 由于要兼容大小写，所以不能直接使用map
         return getAll().stream()
                 .filter(e -> Objects.equals(e.getType(), type) &&
-                        e.getStatus() == CommonStatus.ENABLED &&
+                        e.getStatus() == CommonStatus.ENABLED.getCode() &&
                         (Objects.equals(e.getUserId(), userId) ||
                                 ObjectUtils.isAddressEquals(e.getAddress(), address)))
                 .findFirst()
@@ -77,55 +87,57 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     }
 
     @Override
-    public void add(BlacklistAddressDto blacklistAddressDto) {
+    public Boolean add(BlackListAddressSaveOrUpdateReq req) {
 
-        log.info("add blacklistAddressDto={}", blacklistAddressDto);
-        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(),blacklistAddressDto.getAddress());
-        if (blacklistAddress != null) {
-            try {
-                throw new InvalidDataException("trying to add exist record");
-            } catch (InvalidDataException e) {
-                e.printStackTrace();
-            }
-        }
-        addDb(blacklistAddressDto);
-    }
+        // 该黑地址已经存在，无法添加
+        this.checkEnableBlacklistAddress(req.getAddress());
 
-    private void addDb(BlacklistAddressDto blacklistAddressDto) {
-
-        BlacklistAddress blacklistAddress = ObjectUtils.copy(blacklistAddressDto, BlacklistAddress.builder().build());
+        BlacklistAddress blacklistAddress = ObjectUtils.copy(req, BlacklistAddress.builder().build());
         blacklistAddress.setCreateTime(System.currentTimeMillis());
         blacklistAddress.setUpdateTime(System.currentTimeMillis());
         blacklistAddress.setVersion(AccountConstants.DEFAULT_VERSION);
-        blacklistAddress.setStatus(CommonStatus.ENABLED);
-        blacklistAddressMapper.insert(blacklistAddress);
+        blacklistAddress.setStatus(CommonStatus.ENABLED.getCode());
+        return save(blacklistAddress);
     }
 
     @Override
-    public void update(BlacklistAddressDto blacklistAddressDto) {
-        log.info("update blacklistAddressDto={}", blacklistAddressDto);
-        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(), blacklistAddressDto.getAddress());
-        if (blacklistAddress == null) {
-            throw new MissingElementException();
-        }
-        updateDb(blacklistAddressDto, blacklistAddress);
-    }
+    public Boolean update(BlackListAddressSaveOrUpdateReq req) {
 
-    private void updateDb(BlacklistAddressDto blacklistAddressDto, BlacklistAddress blacklistAddress) {
-        ObjectUtils.copy(blacklistAddressDto, blacklistAddress);
+        BlacklistAddress Address = getById(req.getId());
+        BlacklistAddress blacklistAddress = ObjectUtils.copy(req, BlacklistAddress.builder().build());
         blacklistAddress.setUpdateTime(System.currentTimeMillis());
-        blacklistAddress.setVersion(blacklistAddress.getVersion() + 1);
-        blacklistAddressMapper.updateByPrimaryKey(blacklistAddress);
-    }
-    @Override
-    public void delete(BlacklistAddressDto blacklistAddressDto) {
-        log.info("delete blacklistAddressDto={}", blacklistAddressDto);
-        BlacklistAddress blacklistAddress = blacklistAddressMapper.getByTypeUserIdAndAddress(blacklistAddressDto.getType(),blacklistAddressDto.getAddress());
-        if (blacklistAddress == null) {
-            throw new MissingElementException();
-        }
-        blacklistAddressMapper.deleteByPrimaryKey(blacklistAddress.getId());
+        blacklistAddress.setVersion(Address.getVersion() + 1);
+        blacklistAddress.setStatus(req.getStatus());
+        return updateById(blacklistAddress);
     }
 
+    private void checkEnableBlacklistAddress(String address) {
+
+        LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
+                .eq(BlacklistAddress::getAddress, address)
+                .eq(BlacklistAddress::getStatus, CommonStatus.ENABLED.getCode());
+        BlacklistAddress one = getOne(queryWrap);
+        if (one != null) {
+            throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
+        }
+    }
+
+
+    @Override
+    public Boolean delete(SwitchReq req) {
+        BlacklistAddress disableBlacklistAddress = BlacklistAddress.builder().status(CommonStatus.DISABLED.getCode()).build();
+        BlacklistAddress Address = getById(req.getId());
+        disableBlacklistAddress.setChain(Address.getChain());
+
+        this.update(disableBlacklistAddress, new LambdaUpdateWrapper<BlacklistAddress>().eq(BlacklistAddress::getChain, Address.getChain()).ne(BlacklistAddress::getId, req.getId()));
+        BlacklistAddress blacklistAddress = BlacklistAddress.builder()
+                .id(req.getId())
+                .status(req.getStatus())
+                .build();
+        return updateById(blacklistAddress);
+    }
 
 }
+
+
+

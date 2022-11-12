@@ -1,29 +1,33 @@
 package com.seeds.admin.service.impl;
 
-
 import com.seeds.account.dto.ActionControlDto;
 import com.seeds.account.dto.BlacklistAddressDto;
-import com.seeds.account.enums.CommonStatus;
+import com.seeds.account.dto.req.BlackListAddressSaveOrUpdateReq;
 import com.seeds.account.feign.AccountFeignClient;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.admin.annotation.AuditLog;
 import com.seeds.admin.dto.MgtActionControlDto;
-import com.seeds.admin.dto.MgtBlacklistAddressDto;
 import com.seeds.admin.dto.MgtPageDto;
 import com.seeds.admin.enums.Action;
 import com.seeds.admin.enums.Module;
 import com.seeds.admin.enums.SubModule;
-import com.seeds.admin.service.MgtRiskService;
+import com.seeds.admin.service.ISysRiskService;
 import com.seeds.common.dto.GenericDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import static cn.hutool.core.text.CharSequenceUtil.isNotBlank;
 
+/**
+ * @author: dengyang
+ * @date 2022/11/11
+ */
 @Service
 @Slf4j
-public class ISysRiskServiceImpl implements MgtRiskService {
+public class SysBlackListAddressServiceImpl implements ISysRiskService {
 
     @Autowired
     private AccountFeignClient accountFeignClient;
@@ -43,41 +47,28 @@ public class ISysRiskServiceImpl implements MgtRiskService {
     }
 
     @Override
-    @AuditLog(module = Module.RISK_MANAGEMENT, subModule = SubModule.DEPOSIT_BLACKLIST, action = Action.ADD)
-    public GenericDto<Boolean> addDepositBlackList(MgtBlacklistAddressDto blacklistAddressDto) {
-        blacklistAddressDto.setStatus(CommonStatus.ENABLED);
-        return accountFeignClient.addBlacklistAddress(blacklistAddressDto);
+    public GenericDto<Boolean> addDepositBlackList(BlackListAddressSaveOrUpdateReq req) {
+        return accountFeignClient.addBlacklistAddress(req);
     }
 
     @Override
-    @AuditLog(module = Module.RISK_MANAGEMENT, subModule = SubModule.DEPOSIT_BLACKLIST, action = Action.EDIT)
-    public GenericDto<Boolean> updateDepositBlackList(MgtBlacklistAddressDto blacklistAddressDto) {
-        return accountFeignClient.updateBlacklistAddress(blacklistAddressDto);
+    public GenericDto<Boolean> updateDepositBlackList(BlackListAddressSaveOrUpdateReq req) {
+        return accountFeignClient.updateBlacklistAddress(req);
     }
 
     @Override
-    @AuditLog(module = Module.RISK_MANAGEMENT, subModule = SubModule.DEPOSIT_BLACKLIST, action = Action.DELETE)
-    public GenericDto<Boolean> deleteDepositBlackList(MgtBlacklistAddressDto blacklistAddressDto) {
-        return accountFeignClient.deleteBlacklistAddress(blacklistAddressDto);
+    public GenericDto<Boolean> deleteBlackList(SwitchReq req) {
+        return accountFeignClient.deleteBlacklistAddress(req);
     }
 
     @Override
-    @AuditLog(module = Module.RISK_MANAGEMENT, subModule = SubModule.WITHDRAW_BLACKLIST, action = Action.ADD)
-    public GenericDto<Boolean> addWithdrawBlackList(MgtBlacklistAddressDto blacklistAddressDto) {
-        blacklistAddressDto.setStatus(CommonStatus.ENABLED);
-        return accountFeignClient.addBlacklistAddress(blacklistAddressDto);
+    public GenericDto<Boolean> addWithdrawBlackList(BlackListAddressSaveOrUpdateReq req) {
+        return accountFeignClient.addBlacklistAddress(req);
     }
 
     @Override
-    @AuditLog(module = Module.RISK_MANAGEMENT, subModule = SubModule.WITHDRAW_BLACKLIST, action = Action.EDIT)
-    public GenericDto<Boolean> updateWithdrawBlackList(MgtBlacklistAddressDto blacklistAddressDto) {
-        return accountFeignClient.updateBlacklistAddress(blacklistAddressDto);
-    }
-
-    @Override
-    @AuditLog(module = Module.RISK_MANAGEMENT, subModule = SubModule.WITHDRAW_BLACKLIST, action = Action.DELETE)
-    public GenericDto<Boolean> deleteWithdrawBlackList(MgtBlacklistAddressDto blacklistAddressDto) {
-        return accountFeignClient.deleteBlacklistAddress(blacklistAddressDto);
+    public GenericDto<Boolean> updateWithdrawBlackList(BlackListAddressSaveOrUpdateReq req) {
+        return accountFeignClient.updateBlacklistAddress(req);
     }
 
     @Override
