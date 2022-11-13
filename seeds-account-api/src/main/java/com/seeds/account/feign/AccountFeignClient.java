@@ -278,7 +278,6 @@ public interface AccountFeignClient {
     /**
      * 获取所有提币白名单
      *
-     * @return
      */
     @GetMapping("/sys/withdraw-whitelist-address")
     GenericDto<List<WithdrawWhitelistDto>> getAllWithdrawWhitelist();
@@ -286,20 +285,27 @@ public interface AccountFeignClient {
     /**
      * 添加提币白名单
      *
-     * @param withdrawWhitelistDto
+     * @param req
      * @return
      */
     @PostMapping("/sys/add-withdraw-whitelist-address")
-    GenericDto<Boolean> addWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto);
-
+    GenericDto<Boolean> addWithdrawWhiteList(@RequestBody  WithdrawWhitelistSaveOrUpdateReq req);
     /**
      * 更新提币白名单
      *
-     * @param withdrawWhitelistDto
+     * @param req
      * @return
      */
     @PostMapping("/sys/update-withdraw-whitelist-address")
-    GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto);
+    GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistSaveOrUpdateReq req);
+
+    /**
+     * 启用/停用提币白名单
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/delete-withdraw-whitelist-address")
+    GenericDto<Boolean> deleteWithdrawWhitelist(@RequestBody SwitchReq req);
 
     /**
      * 获取所有充提币黑地址
@@ -483,34 +489,6 @@ public interface AccountFeignClient {
     @PostMapping("/sys/update-action-control")
     GenericDto<Boolean> updateActionControl(@RequestBody ActionControlDto actionControlDto);
 
-    /**
-     * 添加充币黑名单
-     * @param req
-     * @return
-     *//*
-    @PostMapping("/sys/add-Deposit-blacklist-address")
-    GenericDto<Boolean> addDepositBlackList(@RequestBody BlackListAddressSaveOrUpdateReq req);
 
-    *//**
-     * 更新充币黑名单
-     * @param req
-     * @return
-     *//*
-    @PostMapping("/sys/update-Deposit-blacklist-address")
-    GenericDto<Boolean> updateDepositBlackList(@RequestBody BlackListAddressSaveOrUpdateReq req);
 
-    *//**
-     * 删除充币黑名单
-     * @param req
-     * @return
-     *//*
-    @PostMapping("/sys/delete-Deposit-blacklist-address")
-    GenericDto<Boolean> deleteDepositBlackList(@Valid @RequestBody SwitchReq req);
-
-    *//**
-     *
-     * @param req
-     * @return
-     *//*
-    GenericDto<Boolean> addWithdrawBlackList(RequestBody BlackListAddressSaveOrUpdateReq req);*/
 }

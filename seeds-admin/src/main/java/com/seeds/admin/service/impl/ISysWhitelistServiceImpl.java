@@ -1,14 +1,11 @@
 package com.seeds.admin.service.impl;
-
 import com.seeds.account.dto.WithdrawWhitelistDto;
-import com.seeds.account.enums.CommonStatus;
+import com.seeds.account.dto.req.WithdrawWhitelistReq;
+import com.seeds.account.dto.req.WithdrawWhitelistSaveOrUpdateReq;
 import com.seeds.account.feign.AccountFeignClient;
-import com.seeds.admin.annotation.AuditLog;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.admin.dto.MgtPageDto;
 import com.seeds.admin.dto.MgtWithdrawWhitelistDto;
-import com.seeds.admin.enums.Action;
-import com.seeds.admin.enums.Module;
-import com.seeds.admin.enums.SubModule;
 import com.seeds.admin.mapstruct.MgtWhitelistMapper;
 import com.seeds.admin.service.ISysWhitelistService;
 import com.seeds.common.dto.GenericDto;
@@ -19,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static cn.hutool.core.text.CharSequenceUtil.isNotBlank;
+
 
 @Service
 public class ISysWhitelistServiceImpl implements ISysWhitelistService {
@@ -47,18 +45,20 @@ public class ISysWhitelistServiceImpl implements ISysWhitelistService {
                 .build());
     }
 
+
     @Override
-    @AuditLog(module = Module.USER_MANAGEMENT, subModule = SubModule.WHITE_LIST_MANAGEMENT, action = Action.EDIT)
-    public GenericDto<Boolean> update(MgtWithdrawWhitelistDto dto) {
-        return accountFeignClient.updateWithdrawWhitelist(mgtWhitelistMapper.convertToWithdrawWhitelistDto(dto));
+    public GenericDto<Boolean> addWithdrawWhiteList(WithdrawWhitelistSaveOrUpdateReq req) {
+        return accountFeignClient.addWithdrawWhiteList(req);
     }
 
     @Override
-    @AuditLog(module = Module.USER_MANAGEMENT, subModule = SubModule.WHITE_LIST_MANAGEMENT, action = Action.ADD)
-    public GenericDto<Boolean> add(MgtWithdrawWhitelistDto dto) {
-        dto.setStatus(CommonStatus.ENABLED);
-        WithdrawWhitelistDto withdrawWhitelistDto = mgtWhitelistMapper.convertToWithdrawWhitelistDto(dto);
-        withdrawWhitelistDto.setComments(dto.getComments());
-        return accountFeignClient.addWithdrawWhitelist(withdrawWhitelistDto);
+    public GenericDto<Boolean> updateWithdrawWhiteList(WithdrawWhitelistSaveOrUpdateReq req) {
+        return accountFeignClient.updateWithdrawWhitelist(req);
     }
+
+    @Override
+    public GenericDto<Boolean> deleteWithdrawWhiteList(SwitchReq req) {
+        return accountFeignClient.deleteWithdrawWhitelist(req);
+    }
+
 }

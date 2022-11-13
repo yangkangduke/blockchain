@@ -581,10 +581,9 @@ public class AccountInternalController {
     @PostMapping("/sys/add-withdraw-whitelist-address")
     @ApiOperation("添加提币白名单")
     @Inner
-    public GenericDto<Boolean> addWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto) {
+    public GenericDto<Boolean> addWithdrawWhitelist(@RequestBody WithdrawWhitelistSaveOrUpdateReq req) {
         try {
-            withdrawWhitelistService.add(withdrawWhitelistDto);
-            return GenericDto.success(true);
+            return GenericDto.success(withdrawWhitelistService.add(req));
         } catch (Exception e) {
             log.error("addWithdrawWhitelist", e);
             return Utils.returnFromException(e);
@@ -594,12 +593,24 @@ public class AccountInternalController {
     @PostMapping("/sys/update-withdraw-whitelist-address")
     @ApiOperation("更新提币白名单")
     @Inner
-    public GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto) {
+    public GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistSaveOrUpdateReq req) {
         try {
-            withdrawWhitelistService.update(withdrawWhitelistDto);
-            return GenericDto.success(true);
+            return GenericDto.success(withdrawWhitelistService.update(req));
         } catch (Exception e) {
             log.error("updateWithdrawWhitelist", e);
+            return Utils.returnFromException(e);
+        }
+    }
+
+    @PostMapping("/sys/delete-withdraw-whitelist-address")
+    @ApiOperation("启用/停用提币白名单")
+    @Inner
+    public GenericDto<Boolean> deleteWithdrawWhitelist(@RequestBody SwitchReq req) {
+        try {
+            withdrawWhitelistService.delete(req);
+            return GenericDto.success(true);
+        } catch (Exception e) {
+            log.error("deleteWithdrawWhitelist", e);
             return Utils.returnFromException(e);
         }
     }

@@ -123,7 +123,10 @@ public enum ErrorCode implements WithDesc {
     ILLEGAL_ACTION_CONTROL_CONFIG(323145,"There is already an enabled action control"),
 
     //blackList
-    ILLEGAL_BLACK_LIST_CONFIG(323146,"There is already an enabled black list");
+    ILLEGAL_BLACK_LIST_CONFIG(323146,"There is already an enabled black list"),
+
+    //withdrawWhiteList
+    ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(232147,"There is already an enabled withdraw white list");
     @JsonValue
     private final int code;
     private final String desc;

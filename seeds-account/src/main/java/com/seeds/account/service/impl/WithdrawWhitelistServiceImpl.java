@@ -1,14 +1,18 @@
 package com.seeds.account.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.WithdrawWhitelistDto;
+import com.seeds.account.dto.req.WithdrawWhitelistSaveOrUpdateReq;
 import com.seeds.account.enums.CommonStatus;
-import com.seeds.account.ex.MissingElementException;
+import com.seeds.account.ex.ConfigException;
 import com.seeds.account.mapper.WithdrawWhitelistMapper;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.account.model.WithdrawWhitelist;
 import com.seeds.account.service.IWithdrawWhitelistService;
 import com.seeds.account.tool.ListMap;
@@ -22,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import static com.seeds.common.enums.ErrorCode.ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG;
 
 /**
  * <p>
@@ -46,10 +51,11 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
             .build(k -> {
                 List<WithdrawWhitelistDto> list = loadAll();
                 Map<String, WithdrawWhitelistDto> map = list.stream()
-                        .filter(e -> e.getStatus() == CommonStatus.ENABLED)
+                        .filter(e -> e.getStatus() == CommonStatus.ENABLED.getCode())
                         .collect(Collectors.toMap(e -> toKey(e.getUserId(), e.getCurrency()), e -> e));
                 return ListMap.init(list, map);
             });
+
 
     private String toKey(long userId, String currency) {
         return userId + ":" + currency;
@@ -74,26 +80,55 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
     }
 
     @Override
-    public void add(WithdrawWhitelistDto withdrawWhitelistDto) {
-        log.info("add withdrawWhitelistDto={}", withdrawWhitelistDto);
-        WithdrawWhitelist withdrawWhitelist = ObjectUtils.copy(withdrawWhitelistDto, new WithdrawWhitelist());
+    public Boolean add(WithdrawWhitelistSaveOrUpdateReq req) {
+        // 一条链，原则上一个用户只有一个白名单
+        this.checkEnableWithdrawList(req.getUserId(),req.getChain());
+
+        WithdrawWhitelist withdrawWhitelist = ObjectUtils.copy(req, WithdrawWhitelist.builder().build());
         withdrawWhitelist.setCreateTime(System.currentTimeMillis());
         withdrawWhitelist.setUpdateTime(System.currentTimeMillis());
         withdrawWhitelist.setVersion(AccountConstants.DEFAULT_VERSION);
-        withdrawWhitelist.setStatus(CommonStatus.ENABLED);
-        withdrawWhitelistMapper.insert(withdrawWhitelist);
+        withdrawWhitelist.setStatus(CommonStatus.ENABLED.getCode());
+        return save(withdrawWhitelist);
     }
 
     @Override
-    public void update(WithdrawWhitelistDto withdrawWhitelistDto) {
-        log.info("update withdrawWhitelistDto={}", withdrawWhitelistDto);
-        WithdrawWhitelist withdrawWhitelist = withdrawWhitelistMapper.getWithdrawWhitelistByUserIdAndCurrency(withdrawWhitelistDto.getUserId(), withdrawWhitelistDto.getCurrency());
-        if (withdrawWhitelist == null) {
-            throw new MissingElementException();
-        }
-        ObjectUtils.copy(withdrawWhitelistDto, withdrawWhitelist);
+    public Boolean update(WithdrawWhitelistSaveOrUpdateReq req) {
+        WithdrawWhitelist rule = getById(req.getId());
+        WithdrawWhitelist withdrawWhitelist = ObjectUtils.copy(req, WithdrawWhitelist.builder().build());
         withdrawWhitelist.setUpdateTime(System.currentTimeMillis());
-        withdrawWhitelist.setVersion(withdrawWhitelist.getVersion() + 1);
-        withdrawWhitelistMapper.updateByPrimaryKey(withdrawWhitelist);
+        withdrawWhitelist.setVersion(rule.getVersion() + 1);
+        withdrawWhitelist.setStatus(req.getStatus());
+            return updateById(withdrawWhitelist);
+        }
+
+    @Override
+    public Boolean delete(SwitchReq req) {
+        WithdrawWhitelist disableWhitelist = WithdrawWhitelist
+                .builder()
+                .status(CommonStatus.DISABLED.getCode())
+                .build();
+
+        WithdrawWhitelist whitelist = getById(req.getId());
+        disableWhitelist.setChain(whitelist.getChain());
+        this.update(disableWhitelist, new LambdaUpdateWrapper<WithdrawWhitelist>().eq(WithdrawWhitelist::getChain, whitelist.getChain()).ne(WithdrawWhitelist::getId, req.getId()));
+
+        WithdrawWhitelist withdrawWhitelist = WithdrawWhitelist.builder()
+                .id(req.getId())
+                .status(req.getStatus())
+                .build();
+        return updateById(withdrawWhitelist);
+    }
+
+    private void checkEnableWithdrawList(Long userId,Integer chain) {
+        LambdaQueryWrapper<WithdrawWhitelist> queryWrap = new QueryWrapper<WithdrawWhitelist>().lambda()
+                .eq(WithdrawWhitelist::getUserId, userId)
+                .eq(WithdrawWhitelist::getChain,chain)
+                .eq(WithdrawWhitelist::getStatus, CommonStatus.ENABLED.getCode());
+        WithdrawWhitelist one = getOne(queryWrap);
+        if (one != null) {
+            throw new ConfigException(ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG);
+        }
     }
 }
+

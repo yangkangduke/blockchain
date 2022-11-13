@@ -114,8 +114,7 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     private void checkEnableBlacklistAddress(String address) {
 
         LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
-                .eq(BlacklistAddress::getAddress, address)
-                .eq(BlacklistAddress::getStatus, CommonStatus.ENABLED.getCode());
+                .eq(BlacklistAddress::getAddress, address);
         BlacklistAddress one = getOne(queryWrap);
         if (one != null) {
             throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
