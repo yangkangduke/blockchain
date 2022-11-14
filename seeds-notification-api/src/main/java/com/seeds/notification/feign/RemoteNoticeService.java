@@ -33,4 +33,13 @@ public interface RemoteNoticeService {
     @DeleteMapping("/delete/{id}")
     GenericDto<Boolean> delete(@PathVariable("id") Long id);
 
+    @PutMapping("/read-all")
+    GenericDto<Boolean> readAll(@RequestParam("userId") Long userId,
+                                @RequestParam(value = "userSource", required = false) String userSource);
+
+    @DeleteMapping("/delete-all")
+    GenericDto<Boolean> deleteAll(@RequestParam(value = "userId") Long userId,
+                                  @RequestParam(value = "userSource", required = false) String userSource);
+
+
 }
