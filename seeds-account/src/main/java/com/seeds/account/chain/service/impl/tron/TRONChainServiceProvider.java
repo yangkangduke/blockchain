@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.tron.trident.abi.DefaultFunctionEncoder;
 import org.tron.trident.abi.FunctionReturnDecoder;
 import org.tron.trident.abi.TypeDecoder;
@@ -150,27 +149,12 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
         long startTime = System.currentTimeMillis();
         List<AddressBalanceDto> list = Lists.newArrayList();
 
-        ArrayList<Object> objects = Lists.newArrayList();
-        List<DepositRuleDto> allDepositRules = chainDepositService.getAllDepositRules();
-        for (DepositRuleDto depositRule : allDepositRules) {
-            if (depositRule.getChain() == chain.getCode()) {
-                objects.add(depositRule);
-            }
-
-        }
-        log.info("chain {},deposit list {}, objects {}", chain.getCode(), chainDepositService.getAllDepositRules(), objects);
-
         // 找出充币币种
         List<String> currencyList = chainDepositService.getAllDepositRules()
                 .stream()
                 .filter(e -> e.getChain() == chain.getCode())
                 .map(DepositRuleDto::getCurrency)
                 .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(currencyList)) {
-            currencyList = Arrays.asList("USDT");
-        }
-        log.info("currencyList {}", currencyList);
-        log.info("addresses {}", addresses);
         for (String address : addresses) {
             Map<String, BigDecimal> balances = Maps.newHashMap();
             balances.put(chain.getNativeToken(), getChainTokenBalance(chain, address));
