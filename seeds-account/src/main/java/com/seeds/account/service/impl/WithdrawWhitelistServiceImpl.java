@@ -88,7 +88,6 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
         withdrawWhitelist.setCreateTime(System.currentTimeMillis());
         withdrawWhitelist.setUpdateTime(System.currentTimeMillis());
         withdrawWhitelist.setVersion(AccountConstants.DEFAULT_VERSION);
-        withdrawWhitelist.setStatus(CommonStatus.ENABLED.getCode());
         return save(withdrawWhitelist);
     }
 
@@ -120,7 +119,7 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
         return updateById(withdrawWhitelist);
     }
 
-    private void checkEnableWithdrawList(Long userId,Integer chain) {
+   private void checkEnableWithdrawList(Long userId,Integer chain) {
         LambdaQueryWrapper<WithdrawWhitelist> queryWrap = new QueryWrapper<WithdrawWhitelist>().lambda()
                 .eq(WithdrawWhitelist::getUserId, userId)
                 .eq(WithdrawWhitelist::getChain,chain)
