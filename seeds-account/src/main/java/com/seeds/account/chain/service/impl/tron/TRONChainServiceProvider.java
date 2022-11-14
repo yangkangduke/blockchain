@@ -149,6 +149,7 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
         long startTime = System.currentTimeMillis();
         List<AddressBalanceDto> list = Lists.newArrayList();
 
+        log.info("chain{},deposit list,{}", chain.getCode(), chainDepositService.getAllDepositRules());
         // 找出充币币种
         List<String> currencyList = chainDepositService.getAllDepositRules()
                 .stream()
