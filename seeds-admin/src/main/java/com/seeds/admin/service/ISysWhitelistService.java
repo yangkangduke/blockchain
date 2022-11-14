@@ -1,5 +1,7 @@
 package com.seeds.admin.service;
 
+import com.seeds.account.dto.req.WithdrawWhitelistSaveOrUpdateReq;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.admin.dto.MgtPageDto;
 import com.seeds.admin.dto.MgtWithdrawWhitelistDto;
 import com.seeds.common.dto.GenericDto;
@@ -10,7 +12,9 @@ public interface ISysWhitelistService {
 
     GenericDto<MgtPageDto<List<MgtWithdrawWhitelistDto>>> list(Long userId, String currency);
 
-    GenericDto<Boolean> update(MgtWithdrawWhitelistDto dto);
+    GenericDto<Boolean> addWithdrawWhiteList(WithdrawWhitelistSaveOrUpdateReq req);
 
-    GenericDto<Boolean> add(MgtWithdrawWhitelistDto dto);
+    GenericDto<Boolean> updateWithdrawWhiteList(WithdrawWhitelistSaveOrUpdateReq req);
+
+    GenericDto<Boolean> deleteWithdrawWhiteList(SwitchReq req);
 }

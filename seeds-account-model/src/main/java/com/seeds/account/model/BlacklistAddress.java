@@ -40,9 +40,10 @@ public class BlacklistAddress implements Serializable {
     @ApiModelProperty("version")
     private Long version;
 
-    @ApiModelProperty("chain")
-    private String chain;
+    @ApiModelProperty(value = "1：ETH 3：TRON")
+    private Integer chain;
 
+    @ApiModelProperty(value = "1；冲币 2：提币")
     private Integer type;
 
     @ApiModelProperty("address")
@@ -51,7 +52,8 @@ public class BlacklistAddress implements Serializable {
     @ApiModelProperty("reason")
     private String reason;
 
-    private CommonStatus status;
+    @ApiModelProperty(value = "1:启用 2：停用")
+    private Integer status;
 
 
 }

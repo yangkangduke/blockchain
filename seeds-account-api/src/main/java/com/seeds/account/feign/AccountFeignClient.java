@@ -278,7 +278,6 @@ public interface AccountFeignClient {
     /**
      * 获取所有提币白名单
      *
-     * @return
      */
     @GetMapping("/sys/withdraw-whitelist-address")
     GenericDto<List<WithdrawWhitelistDto>> getAllWithdrawWhitelist();
@@ -286,20 +285,27 @@ public interface AccountFeignClient {
     /**
      * 添加提币白名单
      *
-     * @param withdrawWhitelistDto
+     * @param req
      * @return
      */
     @PostMapping("/sys/add-withdraw-whitelist-address")
-    GenericDto<Boolean> addWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto);
-
+    GenericDto<Boolean> addWithdrawWhiteList(@RequestBody  WithdrawWhitelistSaveOrUpdateReq req);
     /**
      * 更新提币白名单
      *
-     * @param withdrawWhitelistDto
+     * @param req
      * @return
      */
     @PostMapping("/sys/update-withdraw-whitelist-address")
-    GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistDto withdrawWhitelistDto);
+    GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistSaveOrUpdateReq req);
+
+    /**
+     * 启用/停用提币白名单
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/delete-withdraw-whitelist-address")
+    GenericDto<Boolean> deleteWithdrawWhitelist(@RequestBody SwitchReq req);
 
     /**
      * 获取所有充提币黑地址
@@ -310,32 +316,32 @@ public interface AccountFeignClient {
     @GetMapping("/sys/blacklist-address")
     GenericDto<List<BlacklistAddressDto>> getAllBlacklistAddress(@RequestParam("type") int type);
 
-    /**
+   /**
      * 添加新充提币黑地址
      *
-     * @param blacklistAddressDto
+     * @param req
      * @return
      */
     @PostMapping("/sys/add-blacklist-address")
-    GenericDto<Boolean> addBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+    GenericDto<Boolean> addBlacklistAddress(@RequestBody BlackListAddressSaveOrUpdateReq req);
 
     /**
      * 更新充提币黑地址
      *
-     * @param blacklistAddressDto
+     * @param req
      * @return
      */
     @PostMapping("/sys/update-blacklist-address")
-    GenericDto<Boolean> updateBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+    GenericDto<Boolean> updateBlacklistAddress(@RequestBody BlackListAddressSaveOrUpdateReq req);
 
     /**
      * 删除充提币黑地址
      *
-     * @param blacklistAddressDto
+     * @param req
      * @return
      */
     @PostMapping("/sys/delete-blacklist-address")
-    GenericDto<Boolean> deleteBlacklistAddress(@RequestBody BlacklistAddressDto blacklistAddressDto);
+    GenericDto<Boolean> deleteBlacklistAddress(@RequestBody SwitchReq req );
 
     /**
      * 创建热钱包地址
@@ -482,6 +488,7 @@ public interface AccountFeignClient {
      */
     @PostMapping("/sys/update-action-control")
     GenericDto<Boolean> updateActionControl(@RequestBody ActionControlDto actionControlDto);
+
 
 
 }

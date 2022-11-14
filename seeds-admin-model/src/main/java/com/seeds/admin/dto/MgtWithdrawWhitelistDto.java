@@ -1,4 +1,5 @@
 package com.seeds.admin.dto;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.Gson;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.admin.annotation.MgtNumberValidator;
@@ -13,35 +14,43 @@ import java.math.BigDecimal;
 
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MgtWithdrawWhitelistDto implements Auditable {
 
-    @NotNull
+    private Long id;
+
     @ApiModelProperty("用户id")
     private Long userId;
-    @NotNull
+
+    @ApiModelProperty(value = "1：ETH 3：TRON")
+    private  Integer chain;
+
+    @ApiModelProperty("create time")
+    private Long createTime;
+
+    @ApiModelProperty("update time")
+    private Long updateTime;
+
     @ApiModelProperty("币种")
     private String currency;
-    @NotNull
-    @MgtNumberValidator
+
     @ApiModelProperty("最大额度")
     private BigDecimal maxAmount;
-    @NotNull
 
-    @MgtNumberValidator
     @ApiModelProperty("单日额度")
     private BigDecimal intradayAmount;
-    @NotNull
-    @MgtNumberValidator
+
     @ApiModelProperty("自动额度，不用走人工审批的额度")
     private BigDecimal autoAmount;
+
     @ApiModelProperty("评语")
     private String comments;
-    //1,启用，2，停用
+
     @ApiModelProperty("状态，1:启用 2：停用")
-    private CommonStatus status;
+    private Integer status;
 
 
     @Override

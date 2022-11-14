@@ -1,6 +1,7 @@
 package com.seeds.account.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.seeds.account.dto.WithdrawWhitelistDto;
 import com.seeds.account.model.WithdrawWhitelist;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,9 +16,5 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface WithdrawWhitelistMapper extends BaseMapper<WithdrawWhitelist> {
-    WithdrawWhitelist getWithdrawWhitelistByUserIdAndCurrency(@Param("userId") long userId, @Param("currency") String currency);
 
-    Integer updateByPrimaryKey(WithdrawWhitelist record);
-
-    int insert(WithdrawWhitelist record);
 }

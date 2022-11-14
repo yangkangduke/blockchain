@@ -34,5 +34,5 @@ public class BlacklistAddressDto implements Serializable {
 
     @NotNull
     private String reason;
-    private CommonStatus status;
+    private Integer status;
 }

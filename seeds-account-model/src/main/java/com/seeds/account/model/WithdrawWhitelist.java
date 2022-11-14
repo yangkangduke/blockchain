@@ -10,9 +10,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -48,8 +50,8 @@ public class WithdrawWhitelist implements Serializable {
     @ApiModelProperty("user id")
     private Long userId;
 
-    @ApiModelProperty("chain")
-    private String chain;
+    @ApiModelProperty(value = "1：ETH 3：TRON")
+    private Integer chain;
 
     @ApiModelProperty("currency")
     private String currency;
@@ -66,7 +68,7 @@ public class WithdrawWhitelist implements Serializable {
     @ApiModelProperty("comments")
     private String comments;
 
-    private CommonStatus status;
-
+    @ApiModelProperty("状态，1:启用 2：停用")
+    private Integer status;
 
 }

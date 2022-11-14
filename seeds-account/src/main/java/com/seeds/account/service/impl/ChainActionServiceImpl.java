@@ -644,7 +644,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 ? Lists.newArrayList()
                 : blacklistAddressService.getAll()
                 .stream()
-                .filter(e -> e.getType() == ChainAction.DEPOSIT.getCode() && e.getStatus() == CommonStatus.ENABLED)
+                .filter(e -> e.getType() == ChainAction.DEPOSIT.getCode() && e.getStatus() == CommonStatus.ENABLED.getCode())
                 .map(BlacklistAddressDto::getAddress)
                 .collect(Collectors.toList());
 

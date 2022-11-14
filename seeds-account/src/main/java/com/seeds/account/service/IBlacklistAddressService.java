@@ -2,7 +2,11 @@ package com.seeds.account.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.account.dto.BlacklistAddressDto;
+import com.seeds.account.dto.req.BlackListAddressReq;
+import com.seeds.account.dto.req.BlackListAddressSaveOrUpdateReq;
 import com.seeds.account.model.BlacklistAddress;
+import com.seeds.account.model.SwitchReq;
+import com.seeds.common.dto.GenericDto;
 
 import java.util.List;
 
@@ -32,19 +36,19 @@ public interface IBlacklistAddressService extends IService<BlacklistAddress> {
 
     /**
      * 添加
-     * @param blacklistAddressDto
+     * @param req
      */
-    void add(BlacklistAddressDto blacklistAddressDto);
+    Boolean add(BlackListAddressSaveOrUpdateReq req);
 
     /**
      * 更新
-     * @param blacklistAddressDto
+     * @param req
      */
-    void update(BlacklistAddressDto blacklistAddressDto);
+    Boolean update(BlackListAddressSaveOrUpdateReq req);
 
     /**
-     * 删除
-     * @param blacklistAddressDto
+     * 删除(启用/停用)
+     * @param req
      */
-    void delete(BlacklistAddressDto blacklistAddressDto);
+    Boolean delete(SwitchReq req);
 }
