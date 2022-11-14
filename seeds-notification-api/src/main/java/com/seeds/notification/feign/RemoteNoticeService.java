@@ -28,7 +28,7 @@ public interface RemoteNoticeService {
 
     @GetMapping("/getUnReadNoticeFlag")
     GenericDto<Boolean> getUnReadNoticeFlag(@RequestParam("ucUserId") Long ucUserId,
-                                            @RequestParam("userSource") String userSource);
+                                            @RequestParam(value = "userSource", required = false) String userSource);
 
     @DeleteMapping("/delete/{id}")
     GenericDto<Boolean> delete(@PathVariable("id") Long id);
