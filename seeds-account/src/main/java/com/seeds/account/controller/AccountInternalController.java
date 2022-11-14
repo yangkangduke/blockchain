@@ -7,8 +7,6 @@ import com.seeds.account.AccountConstants;
 import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.*;
-import com.seeds.account.dto.req.ChainTxnPageReq;
-import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.enums.DepositStatus;
 import com.seeds.account.enums.WithdrawStatus;
@@ -418,6 +416,7 @@ public class AccountInternalController {
                     .filter(e -> e.getStatus() == CommonStatus.ENABLED.getCode() && e.getChain() == chain)
                     .map(SystemWalletAddressDto::getAddress)
                     .collect(Collectors.toList());
+            log.info("address list{}", addresses);
             List<AddressBalanceDto> balances = chainService.getBalancesOnBatch(Chain.fromCode(chain), addresses, 0L);
             return GenericDto.success(balances);
         } catch (Exception e) {

@@ -170,6 +170,7 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
             currencyList = Arrays.asList("USDT");
         }
         log.info("currencyList {}", currencyList);
+        log.info("addresses {}", addresses);
         for (String address : addresses) {
             Map<String, BigDecimal> balances = Maps.newHashMap();
             balances.put(chain.getNativeToken(), getChainTokenBalance(chain, address));
