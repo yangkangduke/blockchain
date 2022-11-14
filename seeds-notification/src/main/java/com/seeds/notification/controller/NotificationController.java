@@ -40,7 +40,7 @@ public class NotificationController {
     @PutMapping("/read-all")
     @ApiOperation("全部已读")
     GenericDto<Boolean> readAll(@RequestParam("userId") Long userId,
-                                @RequestParam("userSource") String userSource) {
+                                @RequestParam(value = "userSource", required = false) String userSource) {
         if (StringUtils.isEmpty(userSource)) {
             userSource = TargetSource.UC.name();
         }
@@ -50,7 +50,7 @@ public class NotificationController {
     @GetMapping("/getUnReadNoticeFlag")
     @ApiOperation("用户是否有未读消息")
     GenericDto<Boolean> getUnReadNoticeFlag(@RequestParam("ucUserId") Long ucUserId,
-                                            @RequestParam("userSource") String userSource) {
+                                            @RequestParam(value = "userSource", required = false) String userSource) {
         if (StringUtils.isEmpty(userSource)) {
             userSource = TargetSource.UC.name();
         }
@@ -66,7 +66,7 @@ public class NotificationController {
     @DeleteMapping("/delete-all")
     @ApiOperation("删除全部通知")
     GenericDto<Boolean> deleteAll(@RequestParam(value = "userId") Long userId,
-                                  @RequestParam("userSource") String userSource) {
+                                  @RequestParam(value = "userSource", required = false) String userSource) {
         if (StringUtils.isEmpty(userSource)) {
             userSource = TargetSource.UC.name();
         }

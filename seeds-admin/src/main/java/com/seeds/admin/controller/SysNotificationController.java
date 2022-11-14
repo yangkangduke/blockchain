@@ -54,4 +54,18 @@ public class SysNotificationController {
         return remoteNoticeService.delete(id);
     }
 
+    @PutMapping("/read-all")
+    @ApiOperation("全部已读")
+    GenericDto<Boolean> readAll(@RequestParam("userId") Long userId,
+                                @RequestParam(value = "userSource") String userSource) {
+        return remoteNoticeService.readAll(userId, userSource);
+    }
+
+    @DeleteMapping("/delete-all")
+    @ApiOperation("删除全部通知")
+    GenericDto<Boolean> deleteAll(@RequestParam(value = "userId") Long userId,
+                                  @RequestParam(value = "userSource") String userSource) {
+        return remoteNoticeService.deleteAll(userId, userSource);
+    }
+
 }
