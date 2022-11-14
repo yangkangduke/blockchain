@@ -19,8 +19,6 @@ import com.seeds.account.model.SwitchReq;
 import com.seeds.account.service.IBlacklistAddressService;
 import com.seeds.account.tool.ListMap;
 import com.seeds.account.util.ObjectUtils;
-import com.sun.deploy.util.BlackList;
-import com.sun.media.sound.InvalidDataException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.seeds.common.enums.ErrorCode.ILLEGAL_BLACK_LIST_CONFIG;
-import static com.seeds.common.enums.ErrorCode.ILLEGAL_DEPOSIT_RULE_CONFIG;
+
 
 /**
  * <p>

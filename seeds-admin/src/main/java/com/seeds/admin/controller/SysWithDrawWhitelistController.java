@@ -15,7 +15,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/WithDrawWhitelist")
+@RequestMapping("/withdraw-whitelist")
 @Api(tags = "提币白名单管理")
 public class SysWithDrawWhitelistController {
 
