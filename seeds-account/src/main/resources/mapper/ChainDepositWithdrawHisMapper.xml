@@ -128,7 +128,7 @@
         from ac_chain_deposit_withdraw_his
         where action = 1 and to_address is not null and to_address &lt;&gt; ''
         <if test="startTime > 0">and create_time &gt;= #{startTime,jdbcType=BIGINT}</if>
-        <if test="endTime > 0">and end_time &lt;= #{endTime,jdbcType=BIGINT}</if>
+        <if test="endTime > 0">and create_time &lt;= #{endTime,jdbcType=BIGINT}</if>
         <if test="chain != null">and chain = #{chain.code,jdbcType=TINYINT}</if>
     </select>
 </mapper>
