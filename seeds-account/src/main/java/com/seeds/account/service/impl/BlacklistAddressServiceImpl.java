@@ -126,10 +126,12 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
         BlacklistAddress Address = getById(req.getId());
         disableBlacklistAddress.setChain(Address.getChain());
 
-        this.update(disableBlacklistAddress, new LambdaUpdateWrapper<BlacklistAddress>().eq(BlacklistAddress::getChain, Address.getChain()).ne(BlacklistAddress::getId, req.getId()));
+        this.update(disableBlacklistAddress, new LambdaUpdateWrapper<BlacklistAddress>()
+                .eq(BlacklistAddress::getId, req.getId()));
+
         BlacklistAddress blacklistAddress = BlacklistAddress.builder()
-                .id(req.getId())
                 .status(req.getStatus())
+                .id(req.getId())
                 .build();
         return updateById(blacklistAddress);
     }
