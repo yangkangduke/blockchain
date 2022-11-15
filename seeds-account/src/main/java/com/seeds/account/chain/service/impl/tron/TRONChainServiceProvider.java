@@ -155,10 +155,14 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
                 .filter(e -> e.getChain() == chain.getCode())
                 .map(DepositRuleDto::getCurrency)
                 .collect(Collectors.toList());
+        log.info("---system address list {}", addresses);
+        log.info("---currencyList{}", currencyList);
         for (String address : addresses) {
             Map<String, BigDecimal> balances = Maps.newHashMap();
             balances.put(chain.getNativeToken(), getChainTokenBalance(chain, address));
+            log.info("---address{}", address);
             for (String currency : currencyList) {
+                log.info("---currency{}", currency);
                 BigDecimal balance = getContractBalance(chain, address, currency);
                 balances.put(currency, balance);
             }
