@@ -93,12 +93,13 @@ public class PushServer {
         List<Long> ucUserIds = notice.getReceivers();
         //loop to send messages to all connected users
         for (Long userId : ucUserIds) {
-            HashMap<UUID, SocketIOClient> userClient = clientCache.getUserClient(userSource + "|" + userId);
+            String sourceUserId = userSource + "|" + userId;
+            HashMap<UUID, SocketIOClient> userClient = clientCache.getUserClient(sourceUserId);
             try {
                 if (userClient != null) {
                     userClient.forEach((uuid, socketIOClient) -> {
                         socketIOClient.sendEvent("new-notice", json);
-                        log.info("push message to user:{} successfully", userId);
+                        log.info("push message to user, sourceUserId:{} successfully", sourceUserId);
                     });
                 }
             } catch (Exception e) {
