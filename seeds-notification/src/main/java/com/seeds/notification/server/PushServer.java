@@ -62,7 +62,7 @@ public class PushServer {
             }
 
             clientCache.saveClient(sourceUserId, sessionId, client);
-            log.info("Connection established successfully，userid:{},sessionId:{}", userId, sessionId);
+            log.info("Connection established successfully，sourceUserId:{},sessionId:{}", sourceUserId, sessionId);
         });
 
         // 客户端断开监听器
@@ -78,7 +78,7 @@ public class PushServer {
             }
             clientCache.deleteSessionClient(sourceUserId, client.getSessionId());
             client.disconnect();
-            log.info("disconnected....", client);
+            log.info("disconnected....sourceUserId:{}", sourceUserId);
         });
 
     }
