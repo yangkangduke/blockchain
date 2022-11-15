@@ -1,7 +1,6 @@
 package com.seeds.account.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.seeds.account.enums.CommonStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +22,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class BlacklistAddressDto implements Serializable {
     private static final long serialVersionUID = -1L;
+    private Long id;
+
 
     private Integer type;
 
@@ -34,5 +35,8 @@ public class BlacklistAddressDto implements Serializable {
 
     @NotNull
     private String reason;
+
     private Integer status;
+
+    private Integer chain;
 }
