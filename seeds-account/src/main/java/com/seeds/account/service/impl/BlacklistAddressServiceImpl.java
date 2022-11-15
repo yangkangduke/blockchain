@@ -122,9 +122,9 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
 
     @Override
     public Boolean delete(SwitchReq req) {
-        BlacklistAddress disableBlacklistAddress = BlacklistAddress.builder().status(CommonStatus.DISABLED.getCode()).build();
-        BlacklistAddress Address = getById(req.getId());
-        disableBlacklistAddress.setChain(Address.getChain());
+        BlacklistAddress disableBlacklistAddress = BlacklistAddress.builder()
+                .status(CommonStatus.DISABLED.getCode())
+                .build();
 
         this.update(disableBlacklistAddress, new LambdaUpdateWrapper<BlacklistAddress>()
                 .eq(BlacklistAddress::getId, req.getId()));
