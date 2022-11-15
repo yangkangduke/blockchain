@@ -65,7 +65,7 @@ public class SysBlacklistController {
         return ISysRiskService.updateWithdrawBlackList(req);
     }
 
-    @PostMapping("/deposit/switch")
+    @PostMapping("/switch")
     @ApiOperation("启用/停用黑名单")
     public GenericDto<Boolean> deleteBlackList(@RequestBody @Valid SwitchReq req) {
         return ISysRiskService.deleteBlackList(req);
