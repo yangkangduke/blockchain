@@ -523,7 +523,7 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
         // 2021-05-21 milo
         // 由于Tron没有GasPrice的概念，因此交易的GasLimit使用参数中的 gasPrice * gasLimit来处理
         Assert.isTrue(gasLimit == 1, "gasLimit must be 1");
-        //Assert.isTrue(gasPrice <= 10_000_000, "gasPrice less than 10_000_000");
+        Assert.isTrue(gasPrice <= 10_000_000, "gasPrice less than 10_000_000");
 
         if (Objects.equals(currentChain.getNativeToken(), currency)) {
             int decimals = currentChain.getDecimals();
