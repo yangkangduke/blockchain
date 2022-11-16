@@ -45,4 +45,11 @@ public interface SysRandomCodeDetailService extends IService<SysRandomCodeDetail
      */
     void removeByBatchNo(String batchNo);
 
+    /**
+     * 通过批次号查询已使用随机码
+     * @param batchNo 批次号
+     * @return 随机码明细
+     */
+    List<SysRandomCodeDetailEntity> queryUsedByBatchNo(String batchNo);
+
 }

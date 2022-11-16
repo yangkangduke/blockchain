@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.SysRandomCodeDetailPageReq;
 import com.seeds.admin.dto.response.SysRandomCodeDetailResp;
 import com.seeds.admin.entity.SysRandomCodeDetailEntity;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysRandomCodeDetailMapper;
 import com.seeds.admin.service.SysRandomCodeDetailService;
 import org.springframework.beans.BeanUtils;
@@ -64,6 +65,14 @@ public class SysRandomCodeDetailServiceImpl extends ServiceImpl<SysRandomCodeDet
         LambdaQueryWrapper<SysRandomCodeDetailEntity> query = new QueryWrapper<SysRandomCodeDetailEntity>().lambda()
                 .eq(SysRandomCodeDetailEntity::getBatchNo, batchNo);
         remove(query);
+    }
+
+    @Override
+    public List<SysRandomCodeDetailEntity> queryUsedByBatchNo(String batchNo) {
+        LambdaQueryWrapper<SysRandomCodeDetailEntity> query = new QueryWrapper<SysRandomCodeDetailEntity>().lambda()
+                .eq(SysRandomCodeDetailEntity::getUseFlag, WhetherEnum.YES.value())
+                .eq(SysRandomCodeDetailEntity::getBatchNo, batchNo);
+        return list(query);
     }
 
 }

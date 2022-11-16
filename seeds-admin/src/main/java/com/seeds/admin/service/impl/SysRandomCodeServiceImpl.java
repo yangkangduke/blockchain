@@ -165,6 +165,10 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         if (randomCode == null) {
             return;
         }
+        List<SysRandomCodeDetailEntity> details = sysRandomCodeDetailService.queryUsedByBatchNo(batchNo);
+        if (!CollectionUtils.isEmpty(details)) {
+            throw new SeedsException("Cannot delete used random codes");
+        }
         removeById(randomCode);
         sysRandomCodeDetailService.removeByBatchNo(batchNo);
     }
