@@ -42,6 +42,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -164,13 +165,25 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         if (randomCode == null) {
             return;
         }
+        List<SysRandomCodeDetailEntity> details = sysRandomCodeDetailService.queryUsedByBatchNo(batchNo);
+        if (!CollectionUtils.isEmpty(details)) {
+            throw new SeedsException("Cannot delete used random codes");
+        }
         removeById(randomCode);
         sysRandomCodeDetailService.removeByBatchNo(batchNo);
     }
 
     @Override
     public void detailDelete(ListReq req) {
-        sysRandomCodeDetailService.removeNotUsedByIds(req.getIds());
+        List<SysRandomCodeDetailEntity> details = sysRandomCodeDetailService.listByIds(req.getIds());
+        if (CollectionUtils.isEmpty(details)) {
+            return;
+        }
+        Set<Integer> useFlags = details.stream().map(SysRandomCodeDetailEntity::getUseFlag).collect(Collectors.toSet());
+        if (useFlags.contains(WhetherEnum.YES.value())) {
+            throw new SeedsException("Cannot delete used random codes");
+        }
+        sysRandomCodeDetailService.removeByIds(req.getIds());
     }
 
     @Override

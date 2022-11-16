@@ -60,6 +60,8 @@ public enum AdminErrorCodeEnum {
     ERR_40017_THE_NFT_TOKEN_ID_ALREADY_EXIST(40017, "tokenId已存在", "The NFT token id already exist"),
     ERR_40018_NFT_NOT_EXIST(40018, "NFT不存在", "NFT not exist"),
     ERR_40019_NFT_METADATA_MISMATCH(40019, "NFT元数据不匹配", "NFT metadata mismatch"),
+    ERR_40020_BUILT_IN_PROPERTIES_CANNOT_BE_MANIPULATED(40020, "内置属性不能进行操作", "Built-in properties cannot be manipulated"),
+    ERR_40021_MISSING_ESSENTIAL_ATTRIBUTES(40021, "必要属性缺失", "Missing essential attributes"),
 
     // merchant
     ERR_50001_MERCHANT_ALREADY_EXIST(50001, "商家已存在", "Merchant already exist"),

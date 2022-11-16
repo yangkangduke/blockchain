@@ -81,6 +81,10 @@ public class SysNftPropertiesTypeController {
         if (nft != null && !Objects.equals(nft.getId(), req.getId())) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_40005_NFT_PROPERTIES_TYPE_ALREADY_EXIST.getDescEn(), AdminErrorCodeEnum.ERR_40005_NFT_PROPERTIES_TYPE_ALREADY_EXIST.getCode(), null);
         }
+        // 内置属性不能修改
+        if (req.getId() == 1) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_40020_BUILT_IN_PROPERTIES_CANNOT_BE_MANIPULATED.getDescEn(), AdminErrorCodeEnum.ERR_40020_BUILT_IN_PROPERTIES_CANNOT_BE_MANIPULATED.getCode(), null);
+        }
         sysNftPropertiesTypeService.modify(req);
         return GenericDto.success(null);
     }
@@ -89,6 +93,10 @@ public class SysNftPropertiesTypeController {
     @ApiOperation("删除")
     @RequiredPermission("sys:nftPT:delete")
     public GenericDto<Object> delete(@RequestBody ListReq req) {
+        // 内置属性不能删除
+        if (req.getIds().contains(1L)) {
+            return GenericDto.failure(AdminErrorCodeEnum.ERR_40020_BUILT_IN_PROPERTIES_CANNOT_BE_MANIPULATED.getDescEn(), AdminErrorCodeEnum.ERR_40020_BUILT_IN_PROPERTIES_CANNOT_BE_MANIPULATED.getCode(), null);
+        }
         sysNftPropertiesTypeService.batchDelete(req);
         return GenericDto.success(null);
     }

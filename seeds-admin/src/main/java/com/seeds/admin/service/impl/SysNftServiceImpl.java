@@ -230,6 +230,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long createSend(SysNftCreateReq req, String topic) {
         SysNftEntity nft = queryByNumber(req.getNftNo());
         if (nft == null) {
@@ -239,6 +240,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         SysNftEntity sysNft = add(imageFileHash, req);
         // 保存NFT
         save(sysNft);
+        // 添加NFT属性
+        addNftProperties(sysNft.getId(), req.getPropertiesList());
         // 发NFT创建消息
         NftUpgradeMsgDTO msgDTO = new NftUpgradeMsgDTO();
         BeanUtils.copyProperties(req, msgDTO);
@@ -489,6 +492,11 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     private void addNftProperties(Long nftId, List<NftPropertiesReq> propertiesList) {
+        // 校验必必要内置属性
+        Set<Long> typeIds = propertiesList.stream().map(NftPropertiesReq::getTypeId).collect(Collectors.toSet());
+        if (!typeIds.contains(1L)) {
+            throw new SeedsException(AdminErrorCodeEnum.ERR_40021_MISSING_ESSENTIAL_ATTRIBUTES.getDescEn());
+        }
         if (!CollectionUtils.isEmpty(propertiesList)) {
             List<SysNftPropertiesEntity> nftPropertiesList = new ArrayList<>();
             propertiesList.forEach(p -> {
@@ -538,8 +546,6 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             BeanUtils.copyProperties(chainMintNftResp, nft);
             nft.setStatus(msgDTO.getStatus());
             nft.setMetadataHash("ipfs://" + metadataFileHash);
-            // 添加NFT属性
-            addNftProperties(msgDTO.getId(), msgDTO.getPropertiesList());
         } catch (Exception e) {
             log.error("NFT创建失败， id={}, msg={}", msgDTO.getId(), e.getMessage());
             initStatus = NftInitStatusEnum.CREATE_FAILED.getCode();
