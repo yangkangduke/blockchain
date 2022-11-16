@@ -19,4 +19,7 @@ public class MetamaskVerifyReq {
     private String message;
     private Long userId;
 
+    @ApiModelProperty(value = "邀请码")
+    private String inviteCode;
+
 }

@@ -7,6 +7,7 @@ import com.seeds.account.dto.AddressCollectHisDto;
 import com.seeds.account.dto.BalanceGetStatusDto;
 import com.seeds.account.dto.ChainGasPriceDto;
 import com.seeds.account.enums.FundCollectOrderType;
+import com.seeds.admin.annotation.MgtAuthority;
 import com.seeds.admin.dto.*;
 import com.seeds.admin.dto.request.SysCollectOrderHisReq;
 import com.seeds.admin.service.AssetManagementService;
@@ -154,7 +155,7 @@ public class SysCashController {
         return assetManagementService.getGasPrice(chain);
     }
 
-    @PostMapping("/balance/create-balances-get")
+    @GetMapping("/balance/create-balances-get")
     @ApiOperation("刷新用户充币地址余额")
     public GenericDto<Boolean> createBalanceGet(@RequestParam(value = "chain", defaultValue = "1") Integer chain) {
         return assetManagementService.createBalanceGet(chain);
@@ -170,13 +171,14 @@ public class SysCashController {
     @ApiOperation("获取所有分配给用户地址的余额")
     public GenericDto<Page<MgtDepositAddressDto>> depositAddresses(@RequestParam(value = "currency", required = false) String currency,
                                                                    @RequestParam(value = "chain", defaultValue = "1") Integer chain,
-                                                                   @RequestParam(value = "address", required = false) String address) {
-        return assetManagementService.queryDepositAddress(currency, chain, address);
+                                                                   @RequestParam(value = "address", required = false) String address,
+                                                                   @RequestParam(value = "thresholdAmount", required = false) Integer thresholdAmount) {
+        return assetManagementService.queryDepositAddress(currency, chain, address,thresholdAmount);
     }
 
 
     @GetMapping("/account/hot-wallet")
-    @ApiOperation("获取热钱包列表（所有系统使用的钱包）")
+    @ApiOperation(value = "获取所有系统钱包",notes = "type：1 热钱包; 链： 1 eth ，3 tron ")
     public GenericDto<Page<MgtHotWalletDto>> hotWallet(@RequestParam(value = "type", required = false) Integer type,
                                                        @RequestParam(value = "chain", defaultValue = "1") Integer chain,
                                                        @RequestParam(value = "address", required = false) String address) {
@@ -234,6 +236,13 @@ public class SysCashController {
     @ApiOperation("Gas Fee划转")
     public GenericDto<Boolean> createGasFeeOrder(@RequestBody MgtAddressCollectOrderRequestDto dto) {
         return assetManagementService.createGasFeeOrder(dto);
+    }
+
+
+    @PostMapping("/account/create-hot-wallet")
+    @ApiOperation("新增热钱包")
+    public GenericDto<Boolean> createHotWallet(@Valid @RequestBody MgtChainDto dto) {
+        return assetManagementService.createHotWallet(MgtSystemWalletAddressDto.builder().chain(dto.getChain()).build());
     }
 
 }

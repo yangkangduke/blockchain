@@ -27,7 +27,9 @@ import com.seeds.account.util.Utils;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.common.enums.TargetSource;
 import com.seeds.notification.dto.request.NotificationReq;
+import com.seeds.notification.enums.NoticeTypeEnum;
 import com.seeds.wallet.dto.RawTransactionDto;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tags;
@@ -360,7 +362,7 @@ public class ChainActionServiceImpl implements IChainActionService {
             // 获取币种的充币规则
             DepositRuleDto depositRuleDto = chainDepositService.getDepositRule(chain, tx.getCurrency());
             // 判断需要审核的3种情况： 1充提规则不存在，2充币规则禁用，3超过充币额度
-            boolean requireReview = depositRuleDto == null || depositRuleDto.getStatus() == CommonStatus.DISABLED || amount.compareTo(depositRuleDto.getAutoAmount()) > 0;
+            boolean requireReview = depositRuleDto == null || depositRuleDto.getStatus() == CommonStatus.DISABLED.getCode() || amount.compareTo(depositRuleDto.getAutoAmount()) > 0;
 
             if (requireReview) {
                 // 需要运营人员审核就标记manual=1, status=PENDING_APPROVE, 并通知运维人员
@@ -397,7 +399,15 @@ public class ChainActionServiceImpl implements IChainActionService {
                 // 插入新的充提
                 log.info("insert new internal deposit transaction={}", depositHis);
                 chainDepositWithdrawHisMapper.insert(depositHis);
-
+                // 充币审核通知管理员
+                kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_AUDIT, JSONUtil.toJsonStr(NotificationReq.builder()
+                        .notificationType(NoticeTypeEnum.ACCOUNT_AUDIT.getCode())
+                        .userSource(TargetSource.ADMIN.name())
+                        .values(ImmutableMap.of(
+                                "ts", System.currentTimeMillis(),
+                                "type", AccountAction.DEPOSIT.getNotificationType()))
+                        .build()));
+                log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.DEPOSIT.getNotificationType());
             } else {
                 // 如果不需要审核就 manual=0, status=TRANSACTION_CONFIRMED,上账，给用户发充币成功通知
                 int manual = 0;
@@ -442,9 +452,25 @@ public class ChainActionServiceImpl implements IChainActionService {
                     // 记录用户财务历史
                     userAccountActionService.createHistory(assignedDepositAddress.getUserId(), tx.getCurrency(), AccountAction.DEPOSIT, amount);
 
+                    List<UserAccount> accounts = walletAccountService.getAccounts(tx.getUserId());
+                    // 通知账户变更
+                    kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                            .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                            .userSource(TargetSource.UC.name())
+                            .ucUserIds(ImmutableList.of(tx.getUserId()))
+                            .values(ImmutableMap.of(
+                                    "ts", System.currentTimeMillis(),
+                                    "currency", tx.getCurrency(),
+                                    "change", tx.getAmount(),
+                                    "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
+                            .build()));
+                    log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", tx.getUserId(), System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
+
+
                     // 发送通知给客户(充币方)
                     kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
-                            .notificationType(AccountAction.DEPOSIT.getNotificationType())
+                            .notificationType(NoticeTypeEnum.ACCOUNT_DEPOSIT.getCode())
+                            .userSource(TargetSource.UC.name())
                             .ucUserIds(ImmutableList.of(assignedDepositAddress.getUserId()))
                             .values(ImmutableMap.of(
                                     "ts", System.currentTimeMillis(),
@@ -457,9 +483,26 @@ public class ChainActionServiceImpl implements IChainActionService {
             }
         }
 
+        List<UserAccount> accounts = walletAccountService.getAccounts(tx.getUserId());
+        // 通知账户变更
+        kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                .userSource(TargetSource.UC.name())
+                .ucUserIds(ImmutableList.of(tx.getUserId()))
+                .values(ImmutableMap.of(
+                        "ts", System.currentTimeMillis(),
+                        "currency", tx.getCurrency(),
+                        "change", tx.getAmount().negate(),
+                        "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
+                .build()));
+        log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", tx.getUserId(), System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
+
+
+
         // 发送通知用户提示提币成功(提币方)
         kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
-                .notificationType(AccountAction.WITHDRAW.getNotificationType())
+                .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW.getCode())
+                .userSource(TargetSource.UC.name())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
@@ -601,7 +644,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                 ? Lists.newArrayList()
                 : blacklistAddressService.getAll()
                 .stream()
-                .filter(e -> e.getType() == ChainAction.DEPOSIT.getCode() && e.getStatus() == CommonStatus.ENABLED)
+                .filter(e -> e.getType() == ChainAction.DEPOSIT.getCode() && e.getStatus() == CommonStatus.ENABLED.getCode())
                 .map(BlacklistAddressDto::getAddress)
                 .collect(Collectors.toList());
 
@@ -643,7 +686,7 @@ public class ChainActionServiceImpl implements IChainActionService {
     private boolean allowDeposit(NativeChainTransactionDto e) {
         if (e.getAmount().signum() > 0) {
             DepositRuleDto rule = chainDepositService.getDepositRule(e.getChain(), e.getCurrency());
-            return rule != null && rule.getStatus() == CommonStatus.ENABLED;
+            return rule != null && rule.getStatus() == CommonStatus.ENABLED.getCode();
         }
         return false;
     }
@@ -671,22 +714,12 @@ public class ChainActionServiceImpl implements IChainActionService {
             Chain chain = tx.getChain();
             // 用事务包住单个的提币，防止由于单个错误导致的回滚
             try {
-                if (Chain.SUPPORT_DEFI_LIST.contains(chain)) {
-//                    ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain.getRelayOn());
-//                    if (latestChainBlock != null) {
-//                        transactionService.execute(() -> {
-//                            scanWithdrawOneOnChain(chain, latestChainBlock, tx);
-//                            return null;
-//                        });
-//                    }
-                } else {
-                    ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain);
-                    if (latestChainBlock != null) {
-                        transactionService.execute(() -> {
-                            scanWithdrawOne(chain, latestChainBlock, tx);
-                            return null;
-                        });
-                    }
+                ChainBlock latestChainBlock = chainBlockMapper.getLatestBlock(chain);
+                if (latestChainBlock != null) {
+                    transactionService.execute(() -> {
+                        scanWithdrawOne(chain, latestChainBlock, tx);
+                        return null;
+                    });
                 }
             } catch (Exception e) {
                 log.error("scanWithdraw chain={} tx={}", chain, tx, e);
@@ -1370,10 +1403,25 @@ public class ChainActionServiceImpl implements IChainActionService {
         userAccountActionService.updateStatusByActionUserIdSource(AccountAction.WITHDRAW, tx.getUserId(), String.valueOf(tx.getId()), CommonActionStatus.SUCCESS);
         log.info("updateWithdrawTxn update={}, replaceTx={}", tx, replaceTx);
 
+        List<UserAccount> accounts = walletAccountService.getAccounts(tx.getUserId());
+        // 通知账户变更
+        kafkaProducer.send(KafkaTopic.TOPIC_ACCOUNT_UPDATE, JSONUtil.toJsonStr(NotificationReq.builder()
+                .notificationType(NoticeTypeEnum.ACCOUNT_BALANCE_CHANGE.getCode())
+                .userSource(TargetSource.UC.name())
+                .ucUserIds(ImmutableList.of(tx.getUserId()))
+                .values(ImmutableMap.of(
+                        "ts", System.currentTimeMillis(),
+                        "currency", tx.getCurrency(),
+                        "change", tx.getAmount().negate(),
+                        "after", CollectionUtils.isEmpty(accounts) ? "" : accounts.get(0).getAvailable()))
+                .build()));
+        log.info("send balance change notification userid:{}, ts:{},currency:{},change:{}", tx.getUserId(), System.currentTimeMillis(), tx.getCurrency(), tx.getAmount());
+
 
         // 发送通知用户提示提币成功
         kafkaProducer.sendAsync(KafkaTopic.TOPIC_ACCOUNT_UPDATE,JSONUtil.toJsonStr(NotificationReq.builder()
-                .notificationType(AccountAction.WITHDRAW.getNotificationType())
+                .notificationType(NoticeTypeEnum.ACCOUNT_WITHDRAW.getCode())
+                .userSource(TargetSource.UC.name())
                 .ucUserIds(ImmutableList.of(tx.getUserId()))
                 .values(ImmutableMap.of(
                         "ts", System.currentTimeMillis(),
@@ -1834,5 +1882,24 @@ public class ChainActionServiceImpl implements IChainActionService {
                 log.error("getAndMetricCurrentGasPriceOracle chain={}", chain, e);
             }
         }
+    }
+
+    @Override
+    public SystemWalletAddressDto createSystemWalletAddress(Chain chain) throws Exception {
+        Utils.check(Chain.SUPPORT_CREATE_ADDRESS_LIST.contains(chain), ErrorCode.ACCOUNT_INVALID_CHAIN);
+
+        List<String> addresses = chainService.createAddresses(chain, 1);
+        Assert.isTrue(addresses.size() == 1, "failed to create new address");
+        SystemWalletAddressDto systemWalletAddressDto = SystemWalletAddressDto.builder()
+                .type(WalletAddressType.HOT.getCode())
+                .chain(chain.getCode())
+                .address(addresses.get(0))
+                .comments("")
+                .tag("hot")
+                .status(CommonStatus.ENABLED.getCode())
+                .build();
+        log.info("createWalletAddress systemWalletAddressDto={}", systemWalletAddressDto);
+        systemWalletAddressService.add(systemWalletAddressDto);
+        return systemWalletAddressDto;
     }
 }

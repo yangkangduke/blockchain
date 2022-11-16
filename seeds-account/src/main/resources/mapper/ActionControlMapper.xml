@@ -15,11 +15,11 @@
     </resultMap>
 
     <insert id="insert" parameterType="com.seeds.account.model.ActionControl" useGeneratedKeys="true" keyProperty="id">
-        insert ac_into action_control (id, create_time, update_time, version,
-                                      type, key, name, value, comments,
+        insert into ac_action_control (id, create_time, update_time, version,
+                                      `type`, `key`, `name`, `value`, comments,
                                       status)
         values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}, #{version,jdbcType=BIGINT},
-                #{type,jdbcType=VARCHAR}, #{key,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, #{comments,jdbcType=TINYINT},
+                #{type,jdbcType=VARCHAR}, #{key,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, #{comments,jdbcType=VARCHAR},
                 #{status,jdbcType=TINYINT})
     </insert>
 
@@ -28,10 +28,10 @@
         set create_time  = #{createTime,jdbcType=BIGINT},
             update_time  = #{updateTime,jdbcType=BIGINT},
             version      = #{version,jdbcType=BIGINT},
-            type         = #{type,jdbcType=VARCHAR},
-            key          = #{key,jdbcType=VARCHAR},
-            name         = #{name,jdbcType=TINYINT},
-            value        = #{value,jdbcType=TINYINT},
+            `type`       = #{type,jdbcType=VARCHAR},
+            `key`        = #{key,jdbcType=VARCHAR},
+            `name`       = #{name,jdbcType=TINYINT},
+            `value`      = #{value,jdbcType=TINYINT},
             comments     = #{comments,jdbcType=VARCHAR},
             status       = #{status,jdbcType=TINYINT}
         where id = #{id,jdbcType=BIGINT}
@@ -44,7 +44,7 @@
 
     <select id="getByTypeAndKey" resultMap="BaseResultMap">
         select * from ac_action_control
-        where type  = #{type,jdbcType=TINYINT}
+        where `type`  = #{type,jdbcType=TINYINT}
           and `key`   = #{key,jdbcType=VARCHAR}
     </select>
 </mapper>

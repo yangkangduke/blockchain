@@ -10,5 +10,6 @@ public enum SequenceNoTypeEnum {
 
     NFT,
     GAME,
+    RANDOM_CODE,
 
 }

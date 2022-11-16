@@ -1,7 +1,9 @@
 package com.seeds.account.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.seeds.account.dto.BlacklistAddressDto;
 import com.seeds.account.model.BlacklistAddress;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -12,5 +14,6 @@ import com.seeds.account.model.BlacklistAddress;
  * @since 2022-10-08
  */
 public interface BlacklistAddressMapper extends BaseMapper<BlacklistAddress> {
+
 
 }

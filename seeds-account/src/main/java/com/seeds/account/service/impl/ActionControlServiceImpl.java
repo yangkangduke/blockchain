@@ -1,11 +1,11 @@
 package com.seeds.account.service.impl;
-
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.ActionControlDto;
 import com.seeds.account.enums.CommonStatus;
+import com.seeds.account.ex.ConfigException;
 import com.seeds.account.ex.MissingElementException;
 import com.seeds.account.mapper.ActionControlMapper;
 import com.seeds.account.model.ActionControl;
@@ -15,12 +15,13 @@ import com.seeds.account.util.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.seeds.common.enums.ErrorCode.*;
 
 /**
  * <p>
@@ -80,6 +81,12 @@ public class ActionControlServiceImpl extends ServiceImpl<ActionControlMapper, A
     @Override
     public void add(ActionControlDto actionControlDto) {
         log.info("insert actionControlDto={}", actionControlDto);
+        //同一条数据，相同的key 和 type 如果存在，则无法新增
+        ActionControl Control = actionControlMapper.getByTypeAndKey(actionControlDto.getType(), actionControlDto.getKey());
+        if (Control != null) {
+            throw new ConfigException(ILLEGAL_ACTION_CONTROL_CONFIG);
+        }
+
         ActionControl actionControl = ObjectUtils.copy(actionControlDto, ActionControl.builder().build());
         actionControl.setCreateTime(System.currentTimeMillis());
         actionControl.setUpdateTime(System.currentTimeMillis());

@@ -1,5 +1,6 @@
 package com.seeds.notification.dto;
 
+import com.seeds.notification.enums.NoticeTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,8 +27,11 @@ public class NotificationDto implements Serializable {
 	@ApiModelProperty("消息接受者")
 	private List<Long> receivers;
 
+	/**
+	 * @see NoticeTypeEnum
+	 */
 	@ApiModelProperty("通知类型")
-	private String notificationType;
+	private Integer notificationType;
 
 	@ApiModelProperty("消息内容")
 	private Map<String, Object> values = new HashMap<>();

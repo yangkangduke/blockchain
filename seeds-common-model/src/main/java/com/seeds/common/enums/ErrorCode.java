@@ -1,6 +1,7 @@
 package com.seeds.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.sun.org.apache.bcel.internal.classfile.Code;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -112,9 +113,20 @@ public enum ErrorCode implements WithDesc {
     ACCOUNT_INVALID_TAG(32139, "invalid tag"),
     ACCOUNT_INVALID_COMMENT(32140, "invalid comment"),
     ACCOUNT_INVALID_TRADING_MARGIN_CURRENCY(32141, "invalid trading margin currency"),
-    ACCOUNT_CONTAIN_TRADING_ASSETS(32142, "contains trading assets")
-    ;
+    ACCOUNT_CONTAIN_TRADING_ASSETS(32142, "contains trading assets"),
+    //deposit config
+    ILLEGAL_DEPOSIT_RULE_CONFIG(323143, "There is already an enabled deposit configuration rule"),
+    //withdraw config
+    ILLEGAL_WITHDRAW_RULE_CONFIG(323144, "There is already an enabled withdraw configuration rule"),
 
+    //actionControl
+    ILLEGAL_ACTION_CONTROL_CONFIG(323145,"There is already an enabled action control"),
+
+    //blackList
+    ILLEGAL_BLACK_LIST_CONFIG(323146,"There is already an enabled black list"),
+
+    //withdrawWhiteList
+    ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(232147,"There is already an enabled withdraw white list");
     @JsonValue
     private final int code;
     private final String desc;

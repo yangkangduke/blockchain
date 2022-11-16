@@ -6,20 +6,22 @@ import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.*;
 import com.seeds.account.enums.FundCollectOrderType;
 import com.seeds.account.feign.AccountFeignClient;
+import com.seeds.admin.annotation.AuditLog;
 import com.seeds.admin.dto.*;
+import com.seeds.admin.enums.Action;
+import com.seeds.admin.enums.Module;
+import com.seeds.admin.enums.SubModule;
 import com.seeds.admin.mapstruct.AssetManagementMapper;
 import com.seeds.admin.mapstruct.WalletTransferRequestMapper;
 import com.seeds.admin.service.AssetManagementService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
+import jodd.bean.BeanCopy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.seeds.account.enums.ChainExchangeAction.SYSTEM_EXCHANGE;
@@ -127,11 +129,13 @@ public class AssetManagementServiceImpl implements AssetManagementService {
 
 
     @Override
-    public GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address) {
+    public GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address, Integer thresholdAmount) {
         currency = isNotBlank(currency) ? currency : AccountConstants.USDT;
         GenericDto<List<AddressBalanceDto>> dto =
                 accountFeignClient.getUserAddressBalances(chain, currency);
-        if (!dto.isSuccess()) return GenericDto.failure(dto.getMessage(), dto.getCode());
+        if (!dto.isSuccess()) {
+            return GenericDto.failure(dto.getMessage(), dto.getCode());
+        }
         Map<String, AddressBalanceDto> balanceDtoMap =
                 dto.getData().stream().collect(Collectors.toMap(AddressBalanceDto::getAddress, e -> e));
         List<MgtDepositAddressDto> dtos = Lists.newArrayList();
@@ -143,6 +147,10 @@ public class AssetManagementServiceImpl implements AssetManagementService {
             for (String key : balanceDtoMap.keySet()) {
                 dtos.add(getMgtDepositAddressDto(balanceDtoMap.get(key)));
             }
+        }
+        // 根据输入的门槛金额过滤返回list
+        if (!Objects.isNull(thresholdAmount) && thresholdAmount > 0) {
+            dtos = dtos.stream().filter(p -> p.getUsdtBalanceNum().compareTo(new BigDecimal(thresholdAmount)) >= 0).collect(Collectors.toList());
         }
         if (getNativeTokens().contains(currency)) {
             currency = NATIVE_TOKEN;
@@ -156,7 +164,9 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         dto.setType(FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode());
         GenericDto<AddressCollectOrderHisDto> addressDto =
                 accountFeignClient.createFundCollectOrder(walletTransferRequestMapper.convert2AddressCollectOrderRequestDto(dto));
-        if (!addressDto.isSuccess()) return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        if (!addressDto.isSuccess()) {
+            return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        }
         dto.setId(addressDto.getData().getId());
         return GenericDto.success(true);
     }
@@ -165,7 +175,9 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         dto.setType(FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode());
         GenericDto<AddressCollectOrderHisDto> addressDto =
                 accountFeignClient.createFundCollectOrder(walletTransferRequestMapper.convert2AddressCollectOrderRequestDto(dto));
-        if (!addressDto.isSuccess()) return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        if (!addressDto.isSuccess()) {
+            return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        }
         dto.setId(addressDto.getData().getId());
         return GenericDto.success(true);
     }
@@ -183,10 +195,14 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     @Override
     public GenericDto<Page<MgtHotWalletDto>> queryHotWallets(Integer type, int chain, String address) {
         GenericDto<List<SystemWalletAddressDto>> dto = accountFeignClient.getAllSystemWalletAddress(chain);
-        if (!dto.isSuccess()) return GenericDto.failure(dto.getCode(), dto.getMessage());
+        if (!dto.isSuccess()) {
+            return GenericDto.failure(dto.getCode(), dto.getMessage());
+        }
 
         GenericDto<List<AddressBalanceDto>> balancesDto = accountFeignClient.getSystemAddressBalances(chain);
-        if (!balancesDto.isSuccess()) return GenericDto.failure(balancesDto.getCode(), balancesDto.getMessage());
+        if (!balancesDto.isSuccess()) {
+            return GenericDto.failure(balancesDto.getCode(), balancesDto.getMessage());
+        }
         Map<String, AddressBalanceDto> balanceDtoMap =
                 balancesDto.getData().stream().collect(Collectors.toMap(AddressBalanceDto::getAddress, e -> e, (v1,
                                                                                                                 v2) -> v1));
@@ -206,46 +222,33 @@ public class AssetManagementServiceImpl implements AssetManagementService {
             Map<String, String> balances = Maps.newHashMap();
             AddressBalanceDto addressBalanceDto = balanceDtoMap.get(queryAddress);
             Map<String, BigDecimal> balancesMap = (addressBalanceDto != null) ? addressBalanceDto.getBalances() : Maps.newHashMap();
-            String kusdBalance = null;
-            String kineBalance = null;
             String chainBalance = null;
             String usdtBalance = null;
-            String usdcBalance = null;
 
             if (balancesMap != null && !balancesMap.isEmpty()) {
                 for (String key : balancesMap.keySet()) {
                     String balance = balancesMap.get(key).setScale(6, BigDecimal.ROUND_DOWN).toPlainString();
                     balances.put(key, balance);
-                    if (AccountConstants.KUSD_CURRENCY.equalsIgnoreCase(key)) {
-                        kusdBalance = balance;
-                    } else if (KINE.equalsIgnoreCase(key)) {
-                        kineBalance = balance;
-                    } else if (getNativeTokens().contains(key)) {
+                    if (getNativeTokens().contains(key)) {
                         chainBalance = balance;
                     } else if (USDT.equalsIgnoreCase(key)) {
                         usdtBalance = balance;
-                    } else if (USDC.equalsIgnoreCase(key)) {
-                        usdcBalance = balance;
                     }
                 }
             }
             mgtHotWalletDtos.add(MgtHotWalletDto.builder()
                     .address(queryAddress)
                     .type(data.getType())
-                    //.kusdBalance(kusdBalance)
-                    //.kineBalance(kineBalance)
                     .chainBalance(chainBalance)
                     .usdtBalance(usdtBalance)
-                    //.usdcBalance(usdcBalance)
                     .balances(balances)
                     .chain(Chain.fromCode(data.getChain()).getName())
+                    .comments(data.getComments())
+                    .status(data.getStatus())
+                    .tag(data.getTag())
                     .build());
         }
-//        if (isBlank(sorter) || "{}".equals(sorter)) {
-//            sorter = "default";
-//        }
         Page<MgtHotWalletDto> page = new Page<>();
-//        page.setRecords(mgtHotWalletDtos.stream().sorted(sorterHotWalletMap.get(sorter)).collect(Collectors.toList()));
         page.setRecords(mgtHotWalletDtos.stream().collect(Collectors.toList()));
         return GenericDto.success(page);
     }
@@ -284,7 +287,9 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     public GenericDto<String> walletTransfer(MgtWalletTransferRequestDto requestDto) {
         GenericDto<AddressCollectHisDto> dto =
                 accountFeignClient.createFundCollect(walletTransferRequestMapper.convert2FundCollectRequestDto(requestDto));
-        if (!dto.isSuccess()) return GenericDto.failure(dto.getMessage(), dto.getCode());
+        if (!dto.isSuccess()) {
+            return GenericDto.failure(dto.getMessage(), dto.getCode());
+        }
         requestDto.setId(dto.getData().getId());
         return GenericDto.success(dto.getData().getFromAddress());
     }
@@ -292,9 +297,13 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     @Override
     public GenericDto<MgtGasConfig> getGasConfig(int chain) {
         GenericDto<Long> respDto = accountFeignClient.getGasLimit(chain);
-        if (!respDto.isSuccess()) return GenericDto.failure(respDto.getCode(), respDto.getMessage());
+        if (!respDto.isSuccess()) {
+            return GenericDto.failure(respDto.getCode(), respDto.getMessage());
+        }
         GenericDto<ChainGasPriceDto> gasPrice = accountFeignClient.getGasPrice(chain);
-        if (!gasPrice.isSuccess()) return GenericDto.failure(gasPrice.getMessage(), gasPrice.getCode());
+        if (!gasPrice.isSuccess()) {
+            return GenericDto.failure(gasPrice.getMessage(), gasPrice.getCode());
+        }
         MgtGasConfig config = new MgtGasConfig();
         config.setGasLimit(respDto.getData());
         config.setGasPrice(gasPrice.getData().getProposeGasPrice());
@@ -317,9 +326,22 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         return accountFeignClient.getFundCollectHistoryByOrder(orderId);
     }
 
+    @Override
+    @AuditLog(module = Module.CASH_MANAGEMENT, subModule = SubModule.WALLET_ACCOUNT, action = Action.ADD)
+    public GenericDto<Boolean> createHotWallet(MgtSystemWalletAddressDto dto) {
+        GenericDto<SystemWalletAddressDto> addressDto = accountFeignClient.createSystemWalletAddress(dto.getChain());
+        if (!addressDto.isSuccess()) {
+            return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
+        }
+        SystemWalletAddressDto data = addressDto.getData();
+        BeanCopy.beans(data, dto).copy();
+        return GenericDto.success(true);
+    }
+
     private MgtDepositAddressDto getMgtDepositAddressDto(AddressBalanceDto addressBalanceDto) {
         Map<String, BigDecimal> balancesMap = addressBalanceDto.getBalances();
         MgtDepositAddressDto addressDto = MgtDepositAddressDto.builder().address(addressBalanceDto.getAddress()).build();
+        addressDto.setEmail(addressBalanceDto.getEmail());
         if (balancesMap != null && !balancesMap.isEmpty()) {
             for (String key : balancesMap.keySet()) {
                 String balance = balancesMap.get(key).setScale(8, BigDecimal.ROUND_DOWN).toPlainString();

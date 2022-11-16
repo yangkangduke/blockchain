@@ -24,7 +24,7 @@ public interface AssetManagementService {
 
     GenericDto<Boolean> createOrder(MgtAddressCollectOrderRequestDto dto);
 
-    GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address);
+    GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address,Integer thresholdAmount);
 
     GenericDto<BalanceGetStatusDto> getBalanceGetStatus(int chain);
 
@@ -43,4 +43,6 @@ public interface AssetManagementService {
     GenericDto<ChainGasPriceDto> getGasPrice(int chain);
 
     GenericDto<List<AddressCollectHisDto>> getAddressCollectByOrderId(long orderId);
+
+    GenericDto<Boolean> createHotWallet(MgtSystemWalletAddressDto dto);
 }

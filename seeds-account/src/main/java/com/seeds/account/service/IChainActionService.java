@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.account.dto.ChainTxnDto;
 import com.seeds.account.dto.ChainTxnReplaceDto;
 import com.seeds.account.dto.ChainTxnReplayDto;
+import com.seeds.account.dto.SystemWalletAddressDto;
 import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.enums.ChainTxnReplaceAppType;
 import com.seeds.account.model.AddressCollectHis;
@@ -87,5 +88,12 @@ public interface IChainActionService {
     Long replaceTransaction(ChainTxnReplaceDto chainTxnReplaceDto) throws Exception ;
 
     void getAndMetricCurrentGasPriceOracle();
+
+    /**
+     * 创建热钱包地址
+     * @param chain
+     * @return
+     */
+    SystemWalletAddressDto createSystemWalletAddress(Chain chain) throws Exception;
 }
 

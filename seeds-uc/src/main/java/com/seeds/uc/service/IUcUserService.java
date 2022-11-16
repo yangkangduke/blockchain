@@ -130,18 +130,43 @@ public interface IUcUserService extends IService<UcUser> {
 
     /**
      * 通过id查询用户昵称
+     *
      * @param ids 用户id列表
      * @return 用户昵称
      */
     Map<Long, String> queryNameByIds(Collection<Long> ids);
 
+    /**
+     * 通过id查询用户邮箱
+     *
+     * @param ids 用户id列表
+     * @return 用户邮箱
+     */
+    Map<Long, String> queryEmailByIds(Collection<Long> ids);
+
     LoginResp buildLoginResponse(Long userId, String email);
 
     /**
      * 校验邮箱
+     *
      * @param email
      * @return
      */
     Boolean registerCheckEmail(String email);
+
+    /**
+     * 核销邀请码
+     * @param inviteCode 邀请码
+     */
+    void registerWriteOffsInviteCode(String inviteCode);
+
+    /**
+     * 是否需要邀请码
+     *
+     * @param account 账户
+     * @return result
+     */
+    Boolean inviteFlag(String account);
+
 }
 

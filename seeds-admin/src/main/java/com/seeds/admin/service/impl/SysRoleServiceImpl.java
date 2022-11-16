@@ -165,6 +165,19 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
         });
     }
 
+    @Override
+    public Set<Long> queryUsersByRole(String roleCode) {
+        SysRoleEntity role = queryByRoleCode(roleCode);
+        if (role == null) {
+            return Collections.emptySet();
+        }
+        List<SysRoleUserEntity> roleUsers = sysRoleUserService.queryByRoleId(role.getId());
+        if (CollectionUtils.isEmpty(roleUsers)) {
+            return Collections.emptySet();
+        }
+        return roleUsers.stream().map(SysRoleUserEntity::getUserId).collect(Collectors.toSet());
+    }
+
     private List<SysRoleResp> convertToResp(List<SysRoleEntity> list){
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();

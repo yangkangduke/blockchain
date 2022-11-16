@@ -91,7 +91,7 @@ public class AccountController {
 
 
     @PostMapping("/withdraw")
-    @ApiOperation(value = "提交提币申请请求", notes = "1.调用发送邮件/email/send接口，传参数VERIFY_SETTING_POLICY_WITHDRAW 2.调用strategy/verify接口返回authToken 3.调用该接口")
+    @ApiOperation(value = "提交提币申请请求", notes = "1.调用发送邮件/email/send接口，传参数VERIFY_SETTING_POLICY_WITHDRAW 2.调用strategy/verify接口,传入useType=VERIFY_SETTING_POLICY_WITHDRAW，emailcode，gacode返回authToken 3.调用该接口")
     public GenericDto<WithdrawResponseDto> withdraw(@RequestBody WithdrawRequestDto withdrawRequestDto) {
         try {
             long userId = getUserId();
@@ -133,7 +133,7 @@ public class AccountController {
         try {
             List<DepositRuleDto> rules = chainDepositService.getAllDepositRules()
                     .stream()
-                    .filter(e -> Objects.equals(e.getCurrency(), currency) && e.getStatus() == CommonStatus.ENABLED)
+                    .filter(e -> Objects.equals(e.getCurrency(), currency) && e.getStatus() == CommonStatus.ENABLED.getCode())
                     .collect(Collectors.toList());
             List<Map<String, Object>> list = Lists.newArrayList();
             rules.forEach(e -> {
@@ -161,12 +161,12 @@ public class AccountController {
 
             List<WithdrawRuleDto> rules = chainWithdrawService.getWithdrawRules()
                     .stream()
-                    .filter(e -> Objects.equals(e.getCurrency(), currency) && e.getStatus() == CommonStatus.ENABLED)
+                    .filter(e -> Objects.equals(e.getCurrency(), currency) && e.getStatus() == CommonStatus.ENABLED.getCode())
                     .collect(Collectors.toList());
             List<Map<String, Object>> list = Lists.newArrayList();
             rules.forEach(e -> {
                 Map<String, Object> values = Maps.newLinkedHashMap();
-                values.put("chain", e.getChain().getCode());
+                values.put("chain", e.getChain());
                 values.put("feeType", e.getFeeType());
                 values.put("feeAmount", e.getFeeAmount());
                 values.put("amountDecimals", e.getDecimals());
@@ -195,7 +195,7 @@ public class AccountController {
                 values.put("usedIntradayWithdraw", usedIntradayWithdraw);
 
                 // 合约信息
-                Chain chain = Chain.fromCode(e.getChain().getCode());
+                Chain chain = Chain.fromCode(e.getChain());
                 ChainContractDto chainContractDto = chainContractService.get(Chain.SUPPORT_DEFI_LIST.contains(chain) ? chain.getRelayOn().getCode() : chain.getCode(), e.getCurrency());
                 values.put("contractAddress", chainContractDto != null ? chainContractDto.getAddress() : "");
                 values.put("contractDecimal", chainContractDto != null ? chainContractDto.getDecimals() : "0");

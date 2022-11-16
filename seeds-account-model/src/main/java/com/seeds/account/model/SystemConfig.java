@@ -48,7 +48,7 @@ public class SystemConfig implements Serializable {
     private String name;
 
     @ApiModelProperty("key")
-    @TableField(value = "key")
+    @TableField(value = "`key`")
     private String key;
 
     @ApiModelProperty("value")

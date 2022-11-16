@@ -217,6 +217,7 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
     @Override
     public BigDecimal getContractBalance(Chain chain, String address, String currency) throws Exception {
         ChainContractDto chainContractDto = chainContractService.get(chain.getCode(), currency);
+        log.info("chainContractDto{}", chainContractDto);
         return getContractBalance(chain, address, chainContractDto);
     }
 
@@ -230,7 +231,9 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
 
         //This is core.contract.Contract, not from the proto
         Contract contract = tronClient.cli().getContract(contractAddress);
+        log.info("---contract {}---", contract);
         Trc20Contract token = new Trc20Contract(contract, address, tronClient.cli());
+        log.info("---Trc20Contract {}---", token);
         int decimals = chainContractDto.getDecimals();
         BigInteger value = token.balanceOf(address);
         if (value != null) {
@@ -500,7 +503,8 @@ public class TRONChainServiceProvider extends ChainBasicService implements IChai
 
     @Override
     public RawTransactionDto internalSendTransaction(Chain chain, String currency, String fromAddress, String toAddress, BigDecimal amount, Long gasPrice, Long gasLimit, Long nonce, Long sleepFor) throws Exception {
-        return null;
+        RawTransactionDto raw = internalSendTransaction0(chain, currency, fromAddress, toAddress, amount, gasPrice, gasLimit, nonce, sleepFor);
+        return raw;
     }
 
     private RawTransactionDto internalSendTransaction0(Chain chain, String currency, String fromAddress, String toAddress, BigDecimal amount, long gasPrice, long gasLimit, long nonce, long sleepFor) throws Exception {

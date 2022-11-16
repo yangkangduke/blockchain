@@ -28,6 +28,9 @@ public class SysSequenceNoServiceImpl extends ServiceImpl<SysSequenceNoMapper, S
     @Value("${admin.generateNo.nft.format:%07d}")
     private String nftFormat;
 
+    @Value("${admin.generateNo.random.code.format:%08d}")
+    private String randomCodeFormat;
+
     @Override
     public SysSequenceNoEntity queryByType(String type) {
         LambdaQueryWrapper<SysSequenceNoEntity> query = new QueryWrapper<SysSequenceNoEntity>().lambda()
@@ -65,5 +68,21 @@ public class SysSequenceNoServiceImpl extends ServiceImpl<SysSequenceNoMapper, S
             save(sysSequenceNo);
         }
         return sysSequenceNo.getNumber();
+    }
+
+    @Override
+    public String generateRandomCodeNo() {
+        SysSequenceNoEntity sysSequenceNo = queryByType(SequenceNoTypeEnum.RANDOM_CODE.name());
+        if (sysSequenceNo != null) {
+            sysSequenceNo.setNumber(sysSequenceNo.getNumber() + 1);
+            updateById(sysSequenceNo);
+        } else {
+            sysSequenceNo = new SysSequenceNoEntity();
+            sysSequenceNo.setType(SequenceNoTypeEnum.RANDOM_CODE.name());
+            sysSequenceNo.setNumber(1L);
+            sysSequenceNo.setPrefix("BN");
+            save(sysSequenceNo);
+        }
+        return sysSequenceNo.getPrefix() + String.format(randomCodeFormat, sysSequenceNo.getNumber());
     }
 }

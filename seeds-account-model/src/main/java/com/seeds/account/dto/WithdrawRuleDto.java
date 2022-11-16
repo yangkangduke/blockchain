@@ -1,8 +1,6 @@
 package com.seeds.account.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.seeds.account.enums.CommonStatus;
-import com.seeds.common.enums.Chain;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,39 +23,46 @@ import java.math.BigDecimal;
 public class WithdrawRuleDto implements Serializable {
     private static final long serialVersionUID = -1L;
 
+    private Long id;
     /**
-     *
      * @see com.seeds.common.enums.Chain
      */
     @ApiModelProperty(value = "1：ETH 3：TRON")
-    Chain chain;
-    /**
-     * 币种
-     */
+    int chain;
+
     @ApiModelProperty(value = "币种")
     String currency;
 
-    /**
-     * 手续费类型
-     */
     @ApiModelProperty(value = "手续费类型")
     int feeType;
 
-    /**
-     * 手续费
-     */
     @ApiModelProperty(value = "手续费")
     BigDecimal feeAmount;
 
-    /**
-     * 金额精度
-     */
     @ApiModelProperty(value = "金额精度")
-    int decimals;
+    private Integer decimals;
 
-    /**
-     * 提币状态
-     */
     @ApiModelProperty(value = "提币状态 1启用 2停用")
-    CommonStatus status;
+    private int status;
+
+    @ApiModelProperty("min amount")
+    private BigDecimal minAmount;
+
+    @ApiModelProperty("max amount")
+    private BigDecimal maxAmount;
+
+    @ApiModelProperty("intrady amount")
+    private BigDecimal intradayAmount;
+
+    @ApiModelProperty("auto withdraw amount")
+    private BigDecimal autoAmount;
+
+    @ApiModelProperty("是否内部提币面手续费  false、true")
+    private String zeroFeeOnInternal;
+
+    @ApiModelProperty("create time")
+    private Long createTime;
+
+    @ApiModelProperty("update time")
+    private Long updateTime;
 }

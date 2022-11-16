@@ -2,7 +2,7 @@ package com.seeds.notification.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -38,6 +38,7 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
         LambdaQueryWrapper<NotificationEntity> wrapper = new LambdaQueryWrapper<>();
 
         wrapper.eq(!ObjectUtils.isEmpty(req.getUcUserId()), NotificationEntity::getUcUserId, req.getUcUserId())
+                .eq(NotificationEntity::getUserSource, req.getUserSource())
                 .orderByAsc(NotificationEntity::getHasRead).orderByDesc(NotificationEntity::getCreatedAt);
 
         Page<NotificationEntity> page = new Page<>(req.getCurrent(), req.getSize());
@@ -72,6 +73,7 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
         if (null != req && null != req.getUcUserIds()) {
             req.getUcUserIds().forEach(userId -> {
                 NotificationEntity entity = new NotificationEntity();
+                entity.setUserSource(req.getUserSource());
                 entity.setUcUserId(userId);
                 entity.setNotificationType(req.getNotificationType());
                 entity.setContent(JSONUtil.toJsonStr(req.getValues()));
@@ -85,11 +87,11 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
     }
 
     @Override
-    public void sendNotice(NotificationDto Notice) {
-        if (null == Notice) {
+    public void sendNotice(NotificationDto notice, String userSource) {
+        if (null == notice) {
             return;
         }
-        PushServer.pushServer.push(Notice);
+        PushServer.pushServer.push(notice, userSource);
     }
 
     /**
@@ -99,13 +101,30 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
      * @return
      */
     @Override
-    public Boolean getUnReadNoticeFlag(Long userId) {
-        return count(new QueryWrapper<NotificationEntity>().eq("uc_user_id", userId).eq("has_read", 0)) > 0;
+    public Boolean getUnReadNoticeFlag(Long userId, String userSource) {
+        return count(new LambdaQueryWrapper<NotificationEntity>()
+                .eq(NotificationEntity::getUserSource, userSource)
+                .eq(NotificationEntity::getUcUserId, userId)
+                .eq(NotificationEntity::getHasRead, 0)) > 0;
     }
 
     @Override
     public Boolean delete(Long id) {
         return this.removeById(id);
+    }
+
+    @Override
+    public Boolean readAll(Long userId, String userSource) {
+        NotificationEntity notificationEntity = new NotificationEntity();
+        notificationEntity.setHasRead(1);
+        notificationEntity.setUpdatedAt(new Date().getTime());
+
+        return this.update(notificationEntity, new LambdaUpdateWrapper<NotificationEntity>().in(NotificationEntity::getUcUserId, userId).eq(NotificationEntity::getUserSource, userSource));
+    }
+
+    @Override
+    public Boolean deleteAll(Long userId, String userSource) {
+        return this.remove(new LambdaQueryWrapper<NotificationEntity>().in(NotificationEntity::getUcUserId, userId).eq(NotificationEntity::getUserSource, userSource));
     }
 }
 

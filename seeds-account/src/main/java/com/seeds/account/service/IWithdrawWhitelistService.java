@@ -2,6 +2,9 @@ package com.seeds.account.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.account.dto.WithdrawWhitelistDto;
+import com.seeds.account.dto.req.WithdrawWhitelistReq;
+import com.seeds.account.dto.req.WithdrawWhitelistSaveOrUpdateReq;
+import com.seeds.account.model.SwitchReq;
 import com.seeds.account.model.WithdrawWhitelist;
 
 import java.util.List;
@@ -36,4 +39,23 @@ public interface IWithdrawWhitelistService extends IService<WithdrawWhitelist> {
      * @return
      */
     List<WithdrawWhitelistDto> loadAll();
+
+    /**
+     * 插入新的
+     * @param req
+     */
+    Boolean add(WithdrawWhitelistSaveOrUpdateReq req);
+
+    /**
+     * 更新
+     * @param req
+     */
+    Boolean update(WithdrawWhitelistSaveOrUpdateReq req);
+
+    /**
+     * 启用/停用
+     * @param req
+     */
+    Boolean delete(SwitchReq req);
 }
+

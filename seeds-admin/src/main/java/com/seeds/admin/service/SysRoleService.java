@@ -12,6 +12,7 @@ import com.seeds.admin.entity.SysRoleEntity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 系统角色
@@ -85,5 +86,12 @@ public interface SysRoleService extends IService<SysRoleEntity> {
      * @param req 角色id列表
      */
     void assign(SysRoleAssignReq req);
+
+    /**
+     * 根据角色编码查询用户id列表
+     * @param roleCode 角色编码
+     * @return 用户id列表
+     */
+    Set<Long> queryUsersByRole(String roleCode);
 
 }
