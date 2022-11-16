@@ -9,11 +9,6 @@ spring:
     password: Seeds123!
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-management:
-  endpoints:
-    web:
-      base-path: /
-
 mybatis:
   type-aliases-package*: com.seeds.admin.entity
 

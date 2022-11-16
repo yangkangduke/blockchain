@@ -60,3 +60,16 @@ service:
     wallet: http://127.0.0.1:10104
     notification: http://127.0.0.1:10105
     game: http://127.0.0.1:10106
+
+# Springboot Actuator
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: caches,health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus: true
+    tags:
+      application: ${spring.application.name}
