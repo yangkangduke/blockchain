@@ -30,4 +30,4 @@ springfox:
 
 
 Seeds-admin: http://35.76.116.54:10102
-Use-invite-code-flag: true
+Use-invite-code-flag: false
