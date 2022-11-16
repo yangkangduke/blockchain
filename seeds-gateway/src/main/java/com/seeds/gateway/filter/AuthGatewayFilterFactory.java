@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
-import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.gateway.service.AuthService;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -33,6 +33,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
     public static String SWAGGER_URI = "/v2/api-docs";
     public static String AUTH = "/auth/";
     public static String PUBLIC = "/public/";
+    public static String ACTUATOR = "/actuator";
     @Autowired
     private AuthService authService;
 
@@ -54,7 +55,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
             URI uri = exchange.getRequest().getURI();
             log.info("URL信息: {}", uri);
             // 不需要鉴权的
-            if (uri.toString().contains(SWAGGER_URI) || uri.toString().contains(AUTH) || uri.toString().contains(PUBLIC)){
+            if (uri.toString().contains(SWAGGER_URI) || uri.toString().contains(AUTH) || uri.toString().contains(PUBLIC) || uri.toString().contains(ACTUATOR)) {
                 return success(chain, exchange, null);
             }
             String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_TOKEN);
