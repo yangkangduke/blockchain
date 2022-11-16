@@ -68,8 +68,16 @@ management:
       base-path: /actuator
       exposure:
         include: caches,health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+    httptrace:
+      enabled: true
+    metrics:
+      enabled: true
   metrics:
     export:
-      prometheus: true
+      prometheus:
+        enabled: true
     tags:
       application: ${spring.application.name}
