@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ISysWhitelistService {
 
-    GenericDto<MgtPageDto<List<MgtWithdrawWhitelistDto>>> list(Long userId, String currency);
+    GenericDto<MgtPageDto<List<MgtWithdrawWhitelistDto>>> list(Long userId, String currency,Integer chain);
 
     GenericDto<Boolean> addWithdrawWhiteList(WithdrawWhitelistSaveOrUpdateReq req);
 

@@ -28,7 +28,7 @@ public class ISysWhitelistServiceImpl implements ISysWhitelistService {
     private MgtWhitelistMapper mgtWhitelistMapper;
 
     @Override
-    public GenericDto<MgtPageDto<List<MgtWithdrawWhitelistDto>>> list(Long userId, String currency) {
+    public GenericDto<MgtPageDto<List<MgtWithdrawWhitelistDto>>> list(Long userId, String currency,Integer chain) {
         GenericDto<List<WithdrawWhitelistDto>> dto = accountFeignClient.getAllWithdrawWhitelist();
         if (!dto.isSuccess()) return GenericDto.failure(dto.getCode(), dto.getMessage());
         return GenericDto.success(MgtPageDto.<List<MgtWithdrawWhitelistDto>>builder()
@@ -39,6 +39,9 @@ public class ISysWhitelistServiceImpl implements ISysWhitelistService {
                     }
                     if (isNotBlank(currency)) {
                         result = currency.equalsIgnoreCase(item.getCurrency());
+                    }
+                    if (chain != null){
+                        result = item.getChain().equals(chain);
                     }
                     return result;
                 }).collect(Collectors.toList())))
