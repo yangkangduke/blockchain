@@ -56,6 +56,7 @@ public class RpcNotificationController {
 
     @PutMapping("/read-all")
     @ApiOperation("全部已读")
+    @Inner
     GenericDto<Boolean> readAll(@RequestParam("userId") Long userId,
                                 @RequestParam(value = "userSource", required = false) String userSource) {
         if (StringUtils.isEmpty(userSource)) {
@@ -86,6 +87,7 @@ public class RpcNotificationController {
 
     @DeleteMapping("/delete-all")
     @ApiOperation("删除全部通知")
+    @Inner
     GenericDto<Boolean> deleteAll(@RequestParam(value = "userId") Long userId,
                                   @RequestParam(value = "userSource", required = false) String userSource) {
         if (StringUtils.isEmpty(userSource)) {

@@ -1,5 +1,4 @@
 package com.seeds.admin.dto;
-
 import com.seeds.account.enums.ChainAction;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -49,8 +48,6 @@ public class MgtDepositWithdrawDto {
     @ApiModelProperty(value = "充币的看DepositStatus枚举，提币的看WithdrawStatus枚举")
     int status;
 
-    String statusDesc;
-
     @ApiModelProperty(value = "是否是黑名单地址 0不是 1是")
     int blacklist;
     /**
@@ -59,11 +56,8 @@ public class MgtDepositWithdrawDto {
     @ApiModelProperty(value = "评语")
     String comments;
 
-    @ApiModelProperty(value = "链编码")
-    Integer chainCode;
-
-    @ApiModelProperty(value = "链名称")
-    String chainName;
+    @ApiModelProperty(value = "chain")
+    Integer chain;
 
     /**
      * 交易Hash

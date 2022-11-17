@@ -62,7 +62,7 @@ public class PushServer {
             }
 
             clientCache.saveClient(sourceUserId, sessionId, client);
-            log.info("Connection established successfully，userid:{},sessionId:{}", userId, sessionId);
+            log.info("Connection established successfully，sourceUserId:{},sessionId:{}", sourceUserId, sessionId);
         });
 
         // 客户端断开监听器
@@ -78,7 +78,7 @@ public class PushServer {
             }
             clientCache.deleteSessionClient(sourceUserId, client.getSessionId());
             client.disconnect();
-            log.info("disconnected....", client);
+            log.info("disconnected....sourceUserId:{}", sourceUserId);
         });
 
     }
@@ -93,12 +93,13 @@ public class PushServer {
         List<Long> ucUserIds = notice.getReceivers();
         //loop to send messages to all connected users
         for (Long userId : ucUserIds) {
-            HashMap<UUID, SocketIOClient> userClient = clientCache.getUserClient(userSource + "|" + userId);
+            String sourceUserId = userSource + "|" + userId;
+            HashMap<UUID, SocketIOClient> userClient = clientCache.getUserClient(sourceUserId);
             try {
                 if (userClient != null) {
                     userClient.forEach((uuid, socketIOClient) -> {
                         socketIOClient.sendEvent("new-notice", json);
-                        log.info("push message to user:{} successfully", userId);
+                        log.info("push message to user, sourceUserId:{} successfully", sourceUserId);
                     });
                 }
             } catch (Exception e) {

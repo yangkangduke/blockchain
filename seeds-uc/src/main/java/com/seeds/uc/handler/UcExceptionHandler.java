@@ -3,6 +3,7 @@ package com.seeds.uc.handler;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.exception.SeedsException;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import feign.FeignException;
@@ -43,6 +44,12 @@ public class UcExceptionHandler {
         return new ResponseEntity<>(
                 GenericDto.failure(JSONUtil.toBean(message, GenericDto.class).getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(SeedsException.class)
+    ResponseEntity<GenericDto<String>> handle(SeedsException e) {
+        return new ResponseEntity<>(GenericDto.failure(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()), HttpStatus.OK);
     }
 
     @ResponseBody

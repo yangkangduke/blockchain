@@ -33,7 +33,7 @@ public class ActionControlDto implements Serializable {
     @ApiModelProperty("操作名称")
     private String name;
 
-    @ApiModelProperty("控制开关属性，true：开启，false：关闭")
+    @ApiModelProperty("true或者其他,用于操作校验的字段")
     private String value;
 
     @ApiModelProperty("评语")
