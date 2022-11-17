@@ -4,8 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 
@@ -31,7 +29,6 @@ public class SysRandomCodeGenerateReq {
 	 */
 	@ApiModelProperty("长度")
 	@NotNull(message = "Random code length cannot be empty")
-	@Min(value = 6, message = "Length should be greater than 6")
 	private Integer length;
 
 	/**
@@ -39,7 +36,6 @@ public class SysRandomCodeGenerateReq {
 	 */
 	@ApiModelProperty("数量")
 	@NotNull(message = "Random code number cannot be empty")
-	@Max(value = 600000, message = "Number should be less than 600000")
 	private Integer number;
 
 	/**

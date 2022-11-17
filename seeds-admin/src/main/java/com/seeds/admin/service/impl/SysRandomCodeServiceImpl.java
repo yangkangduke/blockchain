@@ -41,6 +41,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -90,6 +92,10 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         return page.convert(p -> {
             SysRandomCodeResp resp = new SysRandomCodeResp();
             BeanUtils.copyProperties(p, resp);
+            // 失效状态
+            if (resp.getExpireTime() < System.currentTimeMillis()) {
+                resp.setStatus(RandomCodeStatusEnum.EXPIRED.getCode());
+            }
             return resp;
         });
     }
@@ -102,6 +108,28 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void generate(SysRandomCodeGenerateReq req) {
+        // 根据位数限制生成随机码的最大个数
+        int j = SOURCE_STR.length();
+        long x = 1L;
+        for (int i = 0; i < req.getLength(); i++) {
+            x = x * j;
+        }
+        double sqrt = Math.sqrt(x);
+        long l = new BigDecimal(sqrt).setScale(0, RoundingMode.HALF_UP).longValue();
+        if (l < req.getNumber()) {
+            throw new SecurityException(String.format("Number should be less than %s", l));
+        }
+        // 查询是否已存在相同类型的随机码
+        LambdaQueryWrapper<SysRandomCodeEntity> query = new QueryWrapper<SysRandomCodeEntity>().lambda()
+                .eq(SysRandomCodeEntity::getType, req.getType());
+        List<SysRandomCodeEntity> list = list(query);
+        if (!CollectionUtils.isEmpty(list)) {
+            list.forEach(p -> {
+                // 置为失效
+                p.setExpireTime(0L);
+                updateById(p);
+            });
+        }
         String batchNo = sysSequenceNoService.generateRandomCodeNo();
         SysRandomCodeEntity randomCode = new SysRandomCodeEntity();
         randomCode.setBatchNo(batchNo);
@@ -260,6 +288,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         if (WhetherEnum.YES.value() == randomCodeDetail.getUseFlag()) {
             throw new SeedsException("The invitation code has already been used");
         }
+        randomCodeDetail.setUserIdentity(req.getUserIdentity());
         randomCodeDetail.setUseFlag(WhetherEnum.YES.value());
         sysRandomCodeDetailService.updateById(randomCodeDetail);
     }
@@ -272,7 +301,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         while (set.size() < size){
             sb.setLength(0);
             for (int i = 0; i < length; i++) {
-                sb.append(SOURCE_STR.charAt(random.nextInt(62)));
+                sb.append(SOURCE_STR.charAt(random.nextInt(SOURCE_STR.length())));
             }
             set.add(sb.toString());
         }

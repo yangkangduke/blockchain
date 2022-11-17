@@ -85,7 +85,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp registerEmail(RegisterReq registerReq) {
         // 校验邀请码
-        registerWriteOffsInviteCode(registerReq.getInviteCode());
+        registerWriteOffsInviteCode(registerReq.getInviteCode(), registerReq.getEmail());
         String email = registerReq.getEmail();
         sendCodeService.verifyEmailWithUseType(registerReq.getEmail(), registerReq.getCode(), AuthCodeUseTypeEnum.REGISTER);
         // 校验账号重复
@@ -184,7 +184,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         Long userId;
         if (one == null) {
             // 校验邀请码
-            registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode());
+            registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), publicAddress);
             // 新增
             UcUser ucUser = UcUser.builder()
                     .nickname(publicAddress)
@@ -558,7 +558,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     }
 
     @Override
-    public void registerWriteOffsInviteCode(String inviteCode) {
+    public void registerWriteOffsInviteCode(String inviteCode, String userIdentity) {
         // 邀请码校验开关
         if (!inviteFlag) {
             return;
@@ -567,6 +567,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_11501_INVITATION_CODE_NOT_EXIST.getDescEn());
         }
         RandomCodeUseReq req = new RandomCodeUseReq();
+        req.setUserIdentity(userIdentity);
         req.setType(RandomCodeType.INVITE.getCode());
         req.setCode(inviteCode);
         GenericDto<Object> result = remoteRandomCodeService.useRandomCode(req);

@@ -15,6 +15,10 @@ public class RandomCodeUseReq {
     @NotBlank(message = "Random code cannot be empty")
     private String code;
 
+    @ApiModelProperty(value = "关联用户标识")
+    @NotBlank(message = "User identity cannot be empty")
+    private String userIdentity;
+
     @ApiModelProperty("随机码类型 1:邀请码")
     @NotNull(message = "Random code type cannot be empty")
     private Integer type;
