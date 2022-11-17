@@ -101,6 +101,9 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     @Override
     public Boolean update(BlackListAddressSaveOrUpdateReq req) {
 
+        //要修改的地址已经存在，无法修改
+        this.checkEnableBlacklistAddress(req.getAddress());
+
         BlacklistAddress Address = getById(req.getId());
         BlacklistAddress blacklistAddress = ObjectUtils.copy(req, BlacklistAddress.builder().build());
         blacklistAddress.setUpdateTime(System.currentTimeMillis());

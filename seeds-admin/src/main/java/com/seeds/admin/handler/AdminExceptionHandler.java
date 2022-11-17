@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.exceptions.InvalidArgumentsException;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.exception.SeedsException;
 import com.seeds.common.web.exception.PermissionException;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,12 @@ public class AdminExceptionHandler {
         return new ResponseEntity<>(
                 GenericDto.failure(JSONUtil.toBean(message, GenericDto.class).getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(SeedsException.class)
+    ResponseEntity<GenericDto<String>> handle(SeedsException e) {
+        return new ResponseEntity<>(GenericDto.failure(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()), HttpStatus.OK);
     }
 
     @ResponseBody

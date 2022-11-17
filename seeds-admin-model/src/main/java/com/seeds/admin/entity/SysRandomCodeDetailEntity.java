@@ -30,6 +30,12 @@ public class SysRandomCodeDetailEntity extends BaseEntity {
 	private String code;
 
 	/**
+	 * 关联用户标识
+	 */
+	@TableField("user_identity")
+	private String userIdentity;
+
+	/**
 	 * 使用标记 0：未使用 1：已使用
 	 */
 	@TableField("use_flag")

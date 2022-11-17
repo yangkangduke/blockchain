@@ -15,7 +15,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
 import java.util.List;
 
 
@@ -69,11 +68,12 @@ public class SysRandomCodeDetailServiceImpl extends ServiceImpl<SysRandomCodeDet
     }
 
     @Override
-    public void removeNotUsedByIds(Collection<Long> ids) {
+    public List<SysRandomCodeDetailEntity> queryUsedByBatchNo(String batchNo) {
         LambdaQueryWrapper<SysRandomCodeDetailEntity> query = new QueryWrapper<SysRandomCodeDetailEntity>().lambda()
-                .eq(SysRandomCodeDetailEntity::getUseFlag, WhetherEnum.NO.value())
-                .in(SysRandomCodeDetailEntity::getId, ids);
-        remove(query);
+                .eq(SysRandomCodeDetailEntity::getUseFlag, WhetherEnum.YES.value())
+                .eq(SysRandomCodeDetailEntity::getBatchNo, batchNo);
+        return list(query);
     }
+
 }
 
