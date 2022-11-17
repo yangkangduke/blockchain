@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.List;
 
@@ -25,9 +26,9 @@ public class SysBlacklistController {
 
     @GetMapping("/deposit/get")
     @ApiOperation("获取充币黑名单列表")
-    public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getDepositBlackList(@RequestParam(value = "reason",
-            required = false) String reason) {
-        return ISysRiskService.getBlackList(ChainAction.DEPOSIT.getCode(), reason);
+    public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getDepositBlackList(@RequestParam(value = "reason", required = false) String reason,
+                                                                                 @RequestParam(value = "address",required = false) String address) {
+        return ISysRiskService.getBlackList(ChainAction.DEPOSIT.getCode(), reason, address);
     }
 
     @PostMapping("/deposit/add")
@@ -46,9 +47,9 @@ public class SysBlacklistController {
 
     @GetMapping("/withdraw/get")
     @ApiOperation("获取提币黑名单列表")
-    public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getWithdrawBlackList(@RequestParam(value = "reason",
-            required = false) String reason) {
-        return ISysRiskService.getBlackList(ChainAction.WITHDRAW.getCode(), reason);
+    public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getWithdrawBlackList(@RequestParam(value = "reason", required = false) String reason,
+                                                                                  @RequestParam(value = "address",required = false) String address) {
+        return ISysRiskService.getBlackList(ChainAction.WITHDRAW.getCode(), reason, address);
     }
 
     @PostMapping("/withdraw/add")
