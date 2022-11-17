@@ -14,6 +14,7 @@ public enum RandomCodeStatusEnum {
     GENERATE_FAILED(2, "生成失败"),
     EXPORTING(3, "导出中"),
     EXPORT_FAILED(4, "导出失败"),
+    EXPIRED(5, "已失效"),
     ;
 
     private final int code;

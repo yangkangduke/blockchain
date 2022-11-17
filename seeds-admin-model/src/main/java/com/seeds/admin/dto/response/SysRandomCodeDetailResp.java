@@ -24,6 +24,9 @@ public class SysRandomCodeDetailResp {
 	@ApiModelProperty(value = "随机码")
 	private String code;
 
+	@ApiModelProperty(value = "关联用户标识")
+	private String userIdentity;
+
 	@ApiModelProperty(value = "使用标记 0：未使用 1：已使用")
 	private Integer useFlag;
 
