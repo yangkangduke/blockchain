@@ -3,6 +3,7 @@ package com.seeds.account.service.impl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.seeds.account.dto.DepositRuleDto;
+import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.mapper.ChainDepositAddressMapper;
 import com.seeds.account.mapper.DepositRuleMapper;
 import com.seeds.account.mapper.SystemWalletAddressMapper;
@@ -54,7 +55,9 @@ public class ChainDepositServiceImpl implements IChainDepositService {
             .recordStats()
             .build(k -> {
                 List<DepositRuleDto> list = loadAll();
-                Map<String, DepositRuleDto> map = list.stream().collect(Collectors.toMap(e -> toKey(e.getChain(), e.getCurrency()), e -> e));
+                Map<String, DepositRuleDto> map = list.stream().
+                        filter(p -> p.getStatus() == CommonStatus.ENABLED.getCode())
+                        .collect(Collectors.toMap(e -> toKey(e.getChain(), e.getCurrency()), e -> e));
                 return ListMap.init(list, map);
             });
 
