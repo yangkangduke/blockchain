@@ -117,7 +117,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         double sqrt = Math.sqrt(x);
         long l = new BigDecimal(sqrt).setScale(0, RoundingMode.HALF_UP).longValue();
         if (l < req.getNumber()) {
-            throw new SecurityException(String.format("Number should be less than %s", l));
+            throw new SeedsException(String.format("Number should be less than %s", l));
         }
         // 查询是否已存在相同类型的随机码
         LambdaQueryWrapper<SysRandomCodeEntity> query = new QueryWrapper<SysRandomCodeEntity>().lambda()
