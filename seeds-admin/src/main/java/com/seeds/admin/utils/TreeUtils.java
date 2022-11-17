@@ -1,7 +1,6 @@
 package com.seeds.admin.utils;
 
 import com.seeds.admin.dto.TreeNode;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -15,20 +14,6 @@ import java.util.Map;
  * @date 2022/7/14
  */
 public class TreeUtils {
-
-    /**
-     * 根据父级code，构建树节点
-     */
-    public static <T extends TreeNode> List<T> buildTree(List<T> treeNodes) {
-        List<T> treeList = new ArrayList<>();
-        for(T treeNode : treeNodes) {
-            if (StringUtils.isEmpty(treeNode.getParentCode())) {
-                treeList.add(findChildren(treeNodes, treeNode));
-            }
-        }
-
-        return treeList;
-    }
 
     /**
      * 查找子节点
