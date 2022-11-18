@@ -84,8 +84,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      */
     @Override
     public LoginResp registerEmail(RegisterReq registerReq) {
-        // 校验邀请码
-        registerWriteOffsInviteCode(registerReq.getInviteCode(), registerReq.getEmail());
         String email = registerReq.getEmail();
         sendCodeService.verifyEmailWithUseType(registerReq.getEmail(), registerReq.getCode(), AuthCodeUseTypeEnum.REGISTER);
         // 校验账号重复
@@ -183,8 +181,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .eq(UcUser::getPublicAddress, publicAddress));
         Long userId;
         if (one == null) {
-            // 校验邀请码
-            registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), publicAddress);
             // 新增
             UcUser ucUser = UcUser.builder()
                     .nickname(publicAddress)
