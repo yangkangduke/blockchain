@@ -367,8 +367,8 @@ public interface AccountFeignClient {
      * @param systemWalletAddressDto
      * @return
      */
-    @PostMapping("/sys/update-system-wallet-address")
-    GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto);
+    @PutMapping("/sys/update-system-wallet-address")
+    GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressUpdateDto systemWalletAddressDto);
 
 
     /**

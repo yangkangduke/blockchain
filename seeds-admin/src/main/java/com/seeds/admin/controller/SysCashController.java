@@ -3,10 +3,9 @@ package com.seeds.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import com.seeds.account.dto.AddressCollectHisDto;
-import com.seeds.account.dto.BalanceGetStatusDto;
-import com.seeds.account.dto.ChainGasPriceDto;
+import com.seeds.account.dto.*;
 import com.seeds.account.enums.FundCollectOrderType;
+import com.seeds.account.feign.AccountFeignClient;
 import com.seeds.admin.annotation.MgtAuthority;
 import com.seeds.admin.dto.*;
 import com.seeds.admin.dto.request.SysCollectOrderHisReq;
@@ -16,6 +15,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import jodd.bean.BeanCopy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +38,8 @@ public class SysCashController {
     private ISysWithdrawDepositService mgtWithdrawDepositService;
     @Autowired
     private AssetManagementService assetManagementService;
+    @Autowired
+    private AccountFeignClient accountFeignClient;
 
 
     @GetMapping("/chain-withdraw-deposit-type")
@@ -243,6 +245,17 @@ public class SysCashController {
     @ApiOperation("新增热钱包")
     public GenericDto<Boolean> createHotWallet(@Valid @RequestBody MgtChainDto dto) {
         return assetManagementService.createHotWallet(MgtSystemWalletAddressDto.builder().chain(dto.getChain()).build());
+    }
+
+    @PutMapping("/account/update-system-wallet")
+    @ApiOperation(value = "修改系统钱包", notes = "根据type、chain、address 来修改状态等信息")
+    public GenericDto<Boolean> updateSysWallet(@RequestBody SystemWalletAddressUpdateDto updateDto) {
+        GenericDto<Boolean> resultData = accountFeignClient.updateSystemWalletAddress(updateDto);
+        if (!resultData.isSuccess()) {
+            return GenericDto.failure(resultData.getMessage(), resultData.getCode());
+        }
+        Boolean data = resultData.getData();
+        return GenericDto.success(data);
     }
 
 }
