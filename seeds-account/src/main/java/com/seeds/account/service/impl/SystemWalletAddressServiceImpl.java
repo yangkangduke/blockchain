@@ -117,7 +117,7 @@ public class SystemWalletAddressServiceImpl extends ServiceImpl<SystemWalletAddr
         }
         systemWalletAddress.setTag(systemWalletAddressDto.getTag());
         systemWalletAddress.setComments(systemWalletAddressDto.getComments());
-        systemWalletAddress.setStatus(systemWalletAddress.getStatus());
+        systemWalletAddress.setStatus(systemWalletAddressDto.getStatus());
         systemWalletAddress.setUpdateTime(System.currentTimeMillis());
         systemWalletAddress.setVersion(systemWalletAddress.getVersion() + 1);
         systemWalletAddressMapper.updateByPrimaryKey(systemWalletAddress);

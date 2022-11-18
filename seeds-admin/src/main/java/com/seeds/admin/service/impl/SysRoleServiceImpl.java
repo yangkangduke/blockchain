@@ -10,9 +10,11 @@ import com.seeds.admin.dto.request.SysRoleAssignReq;
 import com.seeds.admin.dto.request.SysRoleModifyReq;
 import com.seeds.admin.dto.request.SysRolePageReq;
 import com.seeds.admin.dto.response.SysRoleResp;
+import com.seeds.admin.entity.SysMenuEntity;
 import com.seeds.admin.entity.SysRoleEntity;
 import com.seeds.admin.entity.SysRoleUserEntity;
 import com.seeds.admin.mapper.SysRoleMapper;
+import com.seeds.admin.service.SysMenuService;
 import com.seeds.admin.service.SysRoleMenuService;
 import com.seeds.admin.service.SysRoleService;
 import com.seeds.admin.service.SysRoleUserService;
@@ -41,6 +43,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
     @Autowired
     private SysRoleUserService sysRoleUserService;
 
+    @Autowired
+    private SysMenuService sysMenuService;
+
     @Override
     public IPage<SysRoleResp> queryPage(SysRolePageReq query) {
         LambdaQueryWrapper<SysRoleEntity> queryWrap = new QueryWrapper<SysRoleEntity>().lambda()
@@ -53,11 +58,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
         }
         // 查询角色对应的菜单
         Set<Long> roleIds = records.stream().map(SysRoleEntity::getId).collect(Collectors.toSet());
-        Map<Long, Set<Long>> menuMap = sysRoleMenuService.queryMenuMapByRoleIds(roleIds);
         return page.convert(p -> {
             SysRoleResp resp = new SysRoleResp();
             BeanUtils.copyProperties(p, resp);
-            resp.setMenuIdList(menuMap.get(p.getId()));
             return resp;
         });
     }
@@ -121,7 +124,27 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
         if (role != null) {
             BeanUtils.copyProperties(role, resp);
             // 查询角色对应的菜单
-            resp.setMenuIdList(sysRoleMenuService.queryMenuByRoleId(role.getId()));
+            Set<Long> menuIds = sysRoleMenuService.queryMenuByRoleId(role.getId());
+            if (!CollectionUtils.isEmpty(menuIds)) {
+                List<SysMenuEntity> menuList = sysMenuService.listByIds(menuIds);
+                Map<String, Long> parentMap = menuList.stream().filter(p -> StringUtils.isEmpty(p.getParentCode()))
+                        .collect(Collectors.toMap(SysMenuEntity::getCode, SysMenuEntity::getId));
+                Map<String, List<SysMenuEntity>> groupMap = menuList.stream()
+                        .filter(p -> StringUtils.isNotBlank(p.getParentCode()))
+                        .collect(Collectors.groupingBy(SysMenuEntity::getParentCode));
+                List<List<Long>> menuIdList = new ArrayList<>();
+                for (String key : groupMap.keySet()) {
+                    List<SysMenuEntity> menus = groupMap.get(key);
+                    Long parentId = parentMap.get(key);
+                    menus.forEach(p -> {
+                        List<Long> list = new ArrayList<>();
+                        list.add(parentId);
+                        list.add(p.getId());
+                        menuIdList.add(list);
+                    });
+                }
+                resp.setMenuIdList(menuIdList);
+            }
         }
         return resp;
     }

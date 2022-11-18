@@ -18,7 +18,10 @@ import com.seeds.account.model.DepositRule;
 import com.seeds.account.model.SwitchReq;
 import com.seeds.account.service.IBlacklistAddressService;
 import com.seeds.account.tool.ListMap;
+import com.seeds.account.util.AddressUtils;
 import com.seeds.account.util.ObjectUtils;
+import com.seeds.account.util.Utils;
+import com.seeds.common.enums.Chain;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +93,10 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
         // 该黑地址已经存在，无法添加
         this.checkEnableBlacklistAddress(req.getAddress());
 
+        //新增chain开启校验功能
+        Chain chain = Chain.fromCode(req.getChain());
+        Utils.check(AddressUtils.validate(chain, req.getAddress()), "invalid address");
+
         BlacklistAddress blacklistAddress = ObjectUtils.copy(req, BlacklistAddress.builder().build());
         blacklistAddress.setCreateTime(System.currentTimeMillis());
         blacklistAddress.setUpdateTime(System.currentTimeMillis());
@@ -103,6 +110,10 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
 
         //要修改的地址已经存在，无法修改
         this.checkEnableBlacklistAddress(req.getAddress());
+
+        //编辑chain开启校验功能
+        Chain chain = Chain.fromCode(req.getChain());
+        Utils.check(AddressUtils.validate(chain, req.getAddress()), "invalid address");
 
         BlacklistAddress Address = getById(req.getId());
         BlacklistAddress blacklistAddress = ObjectUtils.copy(req, BlacklistAddress.builder().build());
