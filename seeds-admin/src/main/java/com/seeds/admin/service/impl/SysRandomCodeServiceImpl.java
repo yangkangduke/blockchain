@@ -111,7 +111,8 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         // 根据位数限制生成随机码的最大个数
         int j = SOURCE_STR.length();
         long x = 1L;
-        for (int i = 0; i < req.getLength(); i++) {
+        int length = req.getLength() > 6 ? 7 : req.getLength();
+        for (int i = 0; i < length; i++) {
             x = x * j;
         }
         double sqrt = Math.sqrt(x);
