@@ -22,6 +22,9 @@ public class SysRoleResp {
 	@ApiModelProperty(value = "角色名称")
 	private String roleName;
 
+	@ApiModelProperty(value = "角色代码")
+	private String roleCode;
+
 	@ApiModelProperty(value = "备注")
 	private String remark;
 

@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.List;
 
@@ -26,8 +27,9 @@ public class SysWithDrawWhitelistController {
     @ApiOperation("获取提币白名单列表")
     public GenericDto<MgtPageDto<List<MgtWithdrawWhitelistDto>>> getWithdrawWhitelist(
             @RequestParam(value = "userId", required = false) Long userId,
-            @RequestParam(value = "currency", required = false) String currency) {
-        return whitelistService.list(userId, currency);
+            @RequestParam(value = "currency", required = false) String currency,
+            @RequestParam(value = "chain", required = false) Integer chain) {
+        return whitelistService.list(userId, currency,chain);
     }
 
     @PostMapping("/update")

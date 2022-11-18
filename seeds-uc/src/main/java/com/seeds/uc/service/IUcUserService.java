@@ -157,8 +157,9 @@ public interface IUcUserService extends IService<UcUser> {
     /**
      * 核销邀请码
      * @param inviteCode 邀请码
+     * @param userIdentity 关联用户标识
      */
-    void registerWriteOffsInviteCode(String inviteCode);
+    void registerWriteOffsInviteCode(String inviteCode, String userIdentity);
 
     /**
      * 是否需要邀请码
