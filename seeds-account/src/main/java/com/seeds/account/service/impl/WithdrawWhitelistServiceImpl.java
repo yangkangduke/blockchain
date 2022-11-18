@@ -81,7 +81,7 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
 
     @Override
     public Boolean add(WithdrawWhitelistSaveOrUpdateReq req) {
-        // 一条链，原则上一个用户只有一个白名单
+        // 如果用户已经在白名单中，则无法新增；
         this.checkEnableWithdrawList(req.getUserId(),req.getChain());
 
         WithdrawWhitelist withdrawWhitelist = ObjectUtils.copy(req, WithdrawWhitelist.builder().build());
@@ -93,6 +93,10 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
 
     @Override
     public Boolean update(WithdrawWhitelistSaveOrUpdateReq req) {
+
+        //同一条链上，userId已经存在，则无法修改
+        this.checkEnableWithdrawList(req.getUserId(),req.getChain());
+
         WithdrawWhitelist rule = getById(req.getId());
         WithdrawWhitelist withdrawWhitelist = ObjectUtils.copy(req, WithdrawWhitelist.builder().build());
         withdrawWhitelist.setUpdateTime(System.currentTimeMillis());
@@ -110,7 +114,9 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
 
         WithdrawWhitelist whitelist = getById(req.getId());
         disableWhitelist.setChain(whitelist.getChain());
-        this.update(disableWhitelist, new LambdaUpdateWrapper<WithdrawWhitelist>().eq(WithdrawWhitelist::getChain, whitelist.getChain()).ne(WithdrawWhitelist::getId, req.getId()));
+        this.update(disableWhitelist, new LambdaUpdateWrapper<WithdrawWhitelist>()
+                .eq(WithdrawWhitelist::getChain, whitelist.getChain())
+                .eq(WithdrawWhitelist::getId, req.getId()));
 
         WithdrawWhitelist withdrawWhitelist = WithdrawWhitelist.builder()
                 .id(req.getId())
@@ -122,8 +128,7 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
    private void checkEnableWithdrawList(Long userId,Integer chain) {
         LambdaQueryWrapper<WithdrawWhitelist> queryWrap = new QueryWrapper<WithdrawWhitelist>().lambda()
                 .eq(WithdrawWhitelist::getUserId, userId)
-                .eq(WithdrawWhitelist::getChain,chain)
-                .eq(WithdrawWhitelist::getStatus, CommonStatus.ENABLED.getCode());
+                .eq(WithdrawWhitelist::getChain,chain);
         WithdrawWhitelist one = getOne(queryWrap);
         if (one != null) {
             throw new ConfigException(ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG);
