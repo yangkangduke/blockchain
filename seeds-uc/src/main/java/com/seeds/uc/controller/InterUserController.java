@@ -1,15 +1,18 @@
 package com.seeds.uc.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
+import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
+import com.seeds.uc.dto.response.UcUserResp;
+import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IUcUserService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -55,5 +58,15 @@ public class InterUserController {
     @Inner
     public GenericDto<Map<Long, String>> getEmailByIds(@RequestBody List<Long> ids) {
         return GenericDto.success(ucUserService.queryEmailByIds(ids));
+    }
+
+    @PostMapping("/all-user")
+    @ApiOperation("获取所有用户信息")
+    @Inner
+    public GenericDto<Page<UcUserResp>> getAllUser(@RequestBody AllUserReq allUserReq) {
+        Page page = new Page();
+        page.setCurrent(allUserReq.getCurrent());
+        page.setSize(allUserReq.getSize());
+        return GenericDto.success(ucUserService.getAllUser(page, allUserReq));
     }
 }

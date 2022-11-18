@@ -51,7 +51,7 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
             .build(k -> {
                 List<WithdrawWhitelistDto> list = loadAll();
                 Map<String, WithdrawWhitelistDto> map = list.stream()
-                        .filter(e -> e.getStatus() == CommonStatus.ENABLED.getCode())
+                        .filter(e -> Objects.equals(e.getStatus(), CommonStatus.ENABLED.getCode()))
                         .collect(Collectors.toMap(e -> toKey(e.getUserId(), e.getCurrency()), e -> e));
                 return ListMap.init(list, map);
             });
