@@ -1,8 +1,12 @@
 package com.seeds.uc.feign;
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
+import com.seeds.uc.dto.response.UcUserResp;
+import com.seeds.uc.model.UcUser;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,4 +37,7 @@ public interface UserCenterFeignClient {
     @PostMapping("/uc-internal/user/get-email-by-ids")
     GenericDto<Map<Long, String>> getEmailByIds(@RequestBody List<Long> ids);
 
+    @PostMapping("/uc-internal/user/all-user")
+    @ApiOperation("获取所有用户信息")
+    GenericDto<com.baomidou.mybatisplus.extension.plugins.pagination.Page <UcUserResp>> getAllUser(@RequestBody AllUserReq allUserReq);
 }

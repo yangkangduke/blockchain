@@ -1,12 +1,15 @@
 package com.seeds.uc.service;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthTokenDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
+import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.model.UcUser;
 
@@ -169,5 +172,12 @@ public interface IUcUserService extends IService<UcUser> {
      */
     Boolean inviteFlag(String account);
 
+    /**
+     * 获取所有用户信息
+     * @param page
+     * @param allUserReq
+     * @return
+     */
+    Page<UcUserResp> getAllUser(Page page, AllUserReq allUserReq);
 }
 

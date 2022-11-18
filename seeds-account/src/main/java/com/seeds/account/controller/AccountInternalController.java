@@ -393,7 +393,7 @@ public class AccountInternalController {
     public GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam("chain") int chain) {
         try {
             List<SystemWalletAddressDto> list = systemWalletAddressService.loadAll()
-                    .stream().filter(e -> e.getStatus() == CommonStatus.ENABLED.getCode() && e.getChain() == chain)
+                    .stream().filter(e -> /*e.getStatus() == CommonStatus.ENABLED.getCode() &&*/ e.getChain() == chain)
                     .collect(Collectors.toList());
             return GenericDto.success(list);
         } catch (Exception e) {
@@ -699,12 +699,21 @@ public class AccountInternalController {
         }
     }
 
-    @PostMapping("/sys/update-system-wallet-address")
-    @ApiOperation("更新系统使用的地址(暂时没用)")
+    @PutMapping("/sys/update-system-wallet-address")
+    @ApiOperation("修改系统钱包")
     @Inner
-    public GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressDto systemWalletAddressDto) {
+    public GenericDto<Boolean> updateSystemWalletAddress(@RequestBody SystemWalletAddressUpdateDto updateDto) {
         try {
-            systemWalletAddressService.update(systemWalletAddressDto);
+            SystemWalletAddressDto addressDto = SystemWalletAddressDto.builder()
+                    .address(updateDto.getAddress())
+                    .type(updateDto.getType())
+                    .chain(updateDto.getType())
+                    .tag(updateDto.getTag())
+                    .comments(updateDto.getComments())
+                    .status(updateDto.getStatus())
+                    .build();
+
+            systemWalletAddressService.update(addressDto);
             return GenericDto.success(true);
         } catch (Exception e) {
             log.error("updateSystemWalletAddress", e);
@@ -978,5 +987,7 @@ public class AccountInternalController {
             return Utils.returnFromException(e);
         }
     }
+
+
 
 }
