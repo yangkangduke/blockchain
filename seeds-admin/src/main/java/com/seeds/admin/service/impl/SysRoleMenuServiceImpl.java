@@ -48,21 +48,6 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
     }
 
     @Override
-    public Map<Long, Set<Long>> queryMenuMapByRoleIds(Collection<Long> roleIds) {
-        if (CollectionUtils.isEmpty(roleIds)) {
-            return Collections.emptyMap();
-        }
-        LambdaQueryWrapper<SysRoleMenuEntity> query = new QueryWrapper<SysRoleMenuEntity>().lambda()
-                .in(SysRoleMenuEntity::getRoleId, roleIds);
-        List<SysRoleMenuEntity> list = list(query);
-        if (CollectionUtils.isEmpty(list)) {
-            return Collections.emptyMap();
-        }
-        return list.stream().collect(Collectors.groupingBy(SysRoleMenuEntity::getRoleId,
-                Collectors.mapping(SysRoleMenuEntity::getMenuId, Collectors.toSet())));
-    }
-
-    @Override
     public void deleteByMenuIds(Collection<Long> menuIds) {
         if (CollectionUtils.isEmpty(menuIds)) {
             return;
