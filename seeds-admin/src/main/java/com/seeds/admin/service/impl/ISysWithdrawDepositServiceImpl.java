@@ -76,6 +76,7 @@ public class ISysWithdrawDepositServiceImpl implements ISysWithdrawDepositServic
         transactionsReq.setAction(ChainAction.WITHDRAW.getCode());
         transactionsReq.setCurrency(currency);
         transactionsReq.setUserId(userId);
+        transactionsReq.setStatus(status);
         transactionsReq.setCurrent(page);
         transactionsReq.setSize(size);
         GenericDto<Page<ChainDepositWithdrawHisDto>> dto = accountFeignClient.getManualProcessedTransactions(transactionsReq);
@@ -116,6 +117,7 @@ public class ISysWithdrawDepositServiceImpl implements ISysWithdrawDepositServic
         transactionsReq.setAction(ChainAction.DEPOSIT.getCode());
         transactionsReq.setCurrency(currency);
         transactionsReq.setUserId(userId);
+        transactionsReq.setStatus(status);
         transactionsReq.setCurrent(page);
         transactionsReq.setSize(size);
         GenericDto<Page<ChainDepositWithdrawHisDto>> dto = accountFeignClient.getManualProcessedTransactions(transactionsReq);
