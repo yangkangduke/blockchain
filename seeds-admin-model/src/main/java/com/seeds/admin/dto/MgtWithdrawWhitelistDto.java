@@ -22,6 +22,11 @@ public class MgtWithdrawWhitelistDto implements Auditable {
 
     private Long id;
 
+    /**
+     * 用户邮箱
+     */
+    private String email;
+
     @ApiModelProperty("用户id")
     private Long userId;
 
