@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import static com.seeds.common.enums.ErrorCode.ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG;
+
+import static com.seeds.common.enums.ErrorCode.*;
 
 /**
  * <p>
@@ -93,9 +94,14 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
 
     @Override
     public Boolean update(WithdrawWhitelistSaveOrUpdateReq req) {
-
-        //同一条链上，userId已经存在，则无法修改
-        this.checkEnableWithdrawList(req.getUserId(),req.getChain());
+        //userId不能修改为已存在的白名单用户;
+        LambdaQueryWrapper<WithdrawWhitelist> queryWrap = new QueryWrapper<WithdrawWhitelist>().lambda()
+                .eq(WithdrawWhitelist::getUserId,req.getUserId())
+                .eq(WithdrawWhitelist::getChain,req.getChain());
+        WithdrawWhitelist one = getOne(queryWrap);
+        if (null != one){
+            throw  new ConfigException(USER_ID_ON_CHAIN_ALREADY_EXIST);
+        }
 
         WithdrawWhitelist rule = getById(req.getId());
         WithdrawWhitelist withdrawWhitelist = ObjectUtils.copy(req, WithdrawWhitelist.builder().build());

@@ -126,7 +126,8 @@ public enum ErrorCode implements WithDesc {
     ILLEGAL_BLACK_LIST_CONFIG(323146,"There is already an enabled black list"),
 
     //withdrawWhiteList
-    ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(232147,"There is already an enabled withdraw white list");
+    ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(232147,"There is already an enabled withdraw white list"),
+    USER_ID_ON_CHAIN_ALREADY_EXIST(232148,"User id on chain already exist");
     @JsonValue
     private final int code;
     private final String desc;
