@@ -89,9 +89,14 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
 
     @Override
     public Boolean add(BlackListAddressSaveOrUpdateReq req) {
-
-        // 该黑地址已经存在，无法添加
-        this.checkEnableBlacklistAddress(req.getAddress());
+        // 冲币或者提币，已存在的地址无法重复新增；
+        LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
+                .eq(BlacklistAddress::getAddress, req.getAddress())
+                .eq(BlacklistAddress::getType,req.getType());
+        BlacklistAddress one = getOne(queryWrap);
+        if (one != null) {
+            throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
+        }
 
         //新增chain开启校验功能
         Chain chain = Chain.fromCode(req.getChain());
