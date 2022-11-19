@@ -2,4 +2,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seeds.uc.mapper.UcUserMapper">
 
+    <select id="getAllUser" resultType="com.seeds.uc.dto.response.UcUserResp" parameterType="com.seeds.uc.dto.request.AllUserReq">
+        SELECT
+               id,email,state,nickname,public_address,created_at,updated_at
+        FROM
+             uc_user
+        <where>
+            <if test="query.nickname != null and query.nickname != ''">
+                AND nickname LIKE CONCAT('%', #{query.nickname}, '%')
+            </if>
+            <if test="query.email != null and query.email != ''">
+                AND email LIKE CONCAT('%', #{query.email}, '%')
+            </if>
+            <if test="query.publicAddress != null and query.publicAddress != ''">
+                AND public_address LIKE CONCAT('%', #{query.publicAddress}, '%')
+            </if>
+            <if test="query.id != null">
+                AND id = #{query.id }
+            </if>
+            <if test="query.state != null">
+                AND `state` = #{state}
+            </if>
+        </where>
+    </select>
 </mapper>

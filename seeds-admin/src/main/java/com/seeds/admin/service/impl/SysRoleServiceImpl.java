@@ -127,22 +127,30 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
             Set<Long> menuIds = sysRoleMenuService.queryMenuByRoleId(role.getId());
             if (!CollectionUtils.isEmpty(menuIds)) {
                 List<SysMenuEntity> menuList = sysMenuService.listByIds(menuIds);
-                Map<String, Long> parentMap = menuList.stream().filter(p -> StringUtils.isEmpty(p.getParentCode()))
+                Map<String, Long> map = new HashMap<>(menuList.size());
+                menuList.forEach(p -> {
+                    String parentCode = p.getParentCode();
+                    if (StringUtils.isNotBlank(parentCode)) {
+                        map.putIfAbsent(parentCode, null);
+                    }
+                });
+                Map<String, Long> parentMap = menuList.stream().filter(p -> map.containsKey(p.getCode()))
                         .collect(Collectors.toMap(SysMenuEntity::getCode, SysMenuEntity::getId));
-                Map<String, List<SysMenuEntity>> groupMap = menuList.stream()
-                        .filter(p -> StringUtils.isNotBlank(p.getParentCode()))
-                        .collect(Collectors.groupingBy(SysMenuEntity::getParentCode));
                 List<List<Long>> menuIdList = new ArrayList<>();
-                for (String key : groupMap.keySet()) {
-                    List<SysMenuEntity> menus = groupMap.get(key);
-                    Long parentId = parentMap.get(key);
-                    menus.forEach(p -> {
-                        List<Long> list = new ArrayList<>();
-                        list.add(parentId);
+                menuList.forEach(p -> {
+                    List<Long> list = new ArrayList<>();
+                    if (StringUtils.isEmpty(p.getParentCode())) {
+                        if (parentMap.get(p.getCode()) == null) {
+                            list.add(p.getId());
+                        }
+                    } else {
+                        list.add(parentMap.get(p.getParentCode()));
                         list.add(p.getId());
+                    }
+                    if (!CollectionUtils.isEmpty(list)) {
                         menuIdList.add(list);
-                    });
-                }
+                    }
+                });
                 resp.setMenuIdList(menuIdList);
             }
         }

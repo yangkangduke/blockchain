@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.RandomCodeUseReq;
 import com.seeds.admin.feign.RemoteRandomCodeService;
@@ -12,7 +14,9 @@ import com.seeds.common.enums.RandomCodeType;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.*;
 import com.seeds.uc.dto.request.*;
+import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.LoginResp;
+import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
@@ -31,6 +35,7 @@ import com.seeds.uc.util.RandomUtil;
 import com.seeds.uc.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,6 +46,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.web3j.crypto.WalletUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -84,8 +90,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      */
     @Override
     public LoginResp registerEmail(RegisterReq registerReq) {
-        // 校验邀请码
-        registerWriteOffsInviteCode(registerReq.getInviteCode(), registerReq.getEmail());
         String email = registerReq.getEmail();
         sendCodeService.verifyEmailWithUseType(registerReq.getEmail(), registerReq.getCode(), AuthCodeUseTypeEnum.REGISTER);
         // 校验账号重复
@@ -183,8 +187,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .eq(UcUser::getPublicAddress, publicAddress));
         Long userId;
         if (one == null) {
-            // 校验邀请码
-            registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), publicAddress);
             // 新增
             UcUser ucUser = UcUser.builder()
                     .nickname(publicAddress)
@@ -584,6 +586,18 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getPublicAddress, account));
         return inviteFlag && one == null;
+    }
+
+    /**
+     * 获取所有用户信息
+     * @param page
+     * @param allUserReq
+     * @return
+     */
+    @Override
+    public Page<UcUserResp> getAllUser(Page page, AllUserReq allUserReq) {
+        Page<UcUserResp> respPage = baseMapper.getAllUser(page, allUserReq);
+        return respPage;
     }
 
 }

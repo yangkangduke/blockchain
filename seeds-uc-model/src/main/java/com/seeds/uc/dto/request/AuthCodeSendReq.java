@@ -16,4 +16,6 @@ public class AuthCodeSendReq {
     private AuthCodeUseTypeEnum useType;
     @ApiModelProperty(value = "二次验证再次发送的时候用到")
     private String token;
+    @ApiModelProperty(value = "邀请码")
+    private String inviteCode;
 }
