@@ -57,7 +57,7 @@ public class WithdrawRuleServiceImpl extends ServiceImpl<WithdrawRuleMapper, Wit
     @Override
     public Boolean add(WithdrawRuleSaveOrUpdateReq req) {
 
-        // 存在已启用的提币规则，不让添加
+        // 一条链已经有提币规则，无法新增,只能在原来规则的基础上修改
         this.checkEnableWithdrawRule(req.getChain());
 
         WithdrawRule withdrawRule = ObjectUtils.copy(req, WithdrawRule.builder().build());
@@ -70,10 +70,9 @@ public class WithdrawRuleServiceImpl extends ServiceImpl<WithdrawRuleMapper, Wit
 
     @Override
     public Boolean update(WithdrawRuleSaveOrUpdateReq req) {
-        // 存在已启用的提币规则，不让再启用
-        if (req.getStatus() == CommonStatus.ENABLED.getCode()) {
-            this.checkEnableWithdrawRule(req.getChain());
-        }
+        // chain 不能修改为已经存在的提币规则；
+        this.checkEnableWithdrawRule(req.getChain());
+
         WithdrawRule rule = getById(req.getId());
         WithdrawRule withdrawRule = ObjectUtils.copy(req, WithdrawRule.builder().build());
         withdrawRule.setUpdateTime(System.currentTimeMillis());
@@ -84,21 +83,28 @@ public class WithdrawRuleServiceImpl extends ServiceImpl<WithdrawRuleMapper, Wit
 
     @Override
     public Boolean delete(SwitchReq req) {
-        WithdrawRule disableRule = WithdrawRule.builder().status(CommonStatus.DISABLED.getCode()).build();
+        WithdrawRule disableRule = WithdrawRule.builder()
+                .status(CommonStatus.DISABLED.getCode())
+                .build();
 
         WithdrawRule withdrawRule = getById(req.getId());
-        this.update(disableRule, new LambdaUpdateWrapper<WithdrawRule>().in(WithdrawRule::getChain, withdrawRule.getChain()).ne(WithdrawRule::getId, req.getId()));
+        disableRule.setChain(withdrawRule.getChain());
+        this.update(disableRule, new LambdaUpdateWrapper<WithdrawRule>()
+                .eq(WithdrawRule::getChain, withdrawRule.getChain())
+                .eq(WithdrawRule::getId, req.getId()));
 
-        WithdrawRule rule = WithdrawRule.builder().id(req.getId()).chain(withdrawRule.getChain()).status(req.getStatus()).build();
+        WithdrawRule rule = WithdrawRule.builder()
+                .id(req.getId())
+                .status(req.getStatus())
+                .build();
         return updateById(rule);
     }
 
 
     private void checkEnableWithdrawRule(Integer chain) {
-        // 存在已启用的提币规则，不让添加
+        // 该链上存在提币规则，无法添加
         LambdaQueryWrapper<WithdrawRule> queryWrap = new QueryWrapper<WithdrawRule>().lambda()
-                .eq(WithdrawRule::getChain, chain)
-                .eq(WithdrawRule::getStatus, CommonStatus.ENABLED.getCode());
+                .eq(WithdrawRule::getChain, chain);
         WithdrawRule one = getOne(queryWrap);
         if (one != null) {
             throw new ConfigException(ILLEGAL_WITHDRAW_RULE_CONFIG);
