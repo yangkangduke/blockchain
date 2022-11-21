@@ -33,9 +33,9 @@ public class SysActionControlController {
         return ISysRiskService.updateActionControl(dto);
     }
 
-    @PostMapping("/add-action-control")
+    /*@PostMapping("/add-action-control")
     @ApiOperation("添加新的系统操作控制")
     public GenericDto<Boolean> addActionControl(@RequestBody MgtActionControlDto dto) {
         return ISysRiskService.addActionControl(dto);
-    }
+    }*/
 }
