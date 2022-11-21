@@ -90,7 +90,6 @@ public class WithdrawRuleServiceImpl extends ServiceImpl<WithdrawRuleMapper, Wit
         WithdrawRule withdrawRule = getById(req.getId());
         disableRule.setChain(withdrawRule.getChain());
         this.update(disableRule, new LambdaUpdateWrapper<WithdrawRule>()
-                .eq(WithdrawRule::getChain, withdrawRule.getChain())
                 .eq(WithdrawRule::getId, req.getId()));
 
         WithdrawRule rule = WithdrawRule.builder()
