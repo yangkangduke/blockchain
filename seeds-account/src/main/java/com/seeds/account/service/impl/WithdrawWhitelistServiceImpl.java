@@ -87,11 +87,11 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
         GenericDto<Map<Long, String>> emailMap = userCenterFeignClient.getEmailByIds(withdraw.stream().map(WithdrawWhitelistDto::getUserId).collect(Collectors.toList()));
 
         List<WithdrawWhitelistDto> resultList = Lists.newArrayList();
-
         if (null != emailMap && emailMap.getCode() == 200) {
             for (WithdrawWhitelistDto withdrawDto : withdraw) {
                 WithdrawWhitelistDto dto = new WithdrawWhitelistDto();
                 ObjectUtils.copy(withdrawDto, dto);
+                dto.setEmail(emailMap.getData().get(withdrawDto.getUserId()) == null ? "" : emailMap.getData().get(withdrawDto.getUserId()));
                 resultList.add(dto);
             }
         }

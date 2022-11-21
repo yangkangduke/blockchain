@@ -34,16 +34,19 @@ public class SysBlackListAddressServiceImpl implements ISysRiskService {
 
 
     @Override
-    public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getBlackList(Integer type, String reason,String address) {
+    public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getBlackList(Integer type, String reason,String address,Integer chain) {
         GenericDto<List<BlacklistAddressDto>> dto = accountFeignClient.getAllBlacklistAddress(type);
         if (!dto.isSuccess()) GenericDto.failure(dto.getMessage(), dto.getCode());
         return GenericDto.success(MgtPageDto.<List<BlacklistAddressDto>>builder().data(dto.getData().stream().filter(item -> {
             boolean result = true;
             if (isNotBlank(reason)) {
-                result = reason.equalsIgnoreCase(item.getReason());
+                result = reason.contains(item.getReason());
             }
             if (isNotBlank(address)){
                 result = address.equals(item.getAddress());
+            }
+            if (null != chain){
+                result = chain.equals(item.getChain());
             }
             return result;
         }).collect(Collectors.toList())).build());
