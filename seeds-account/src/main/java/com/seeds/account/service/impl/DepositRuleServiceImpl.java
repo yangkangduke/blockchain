@@ -72,7 +72,7 @@ public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, Depos
         LambdaQueryWrapper<DepositRule> queryWrap = new QueryWrapper<DepositRule>().lambda()
                 .eq(DepositRule::getChain,req.getChain());
         DepositRule one = getOne(queryWrap);
-        if (null != one && one.getId() != req.getId()){
+        if (null != one && !one.getId().equals(req.getId())){
             throw new ConfigException(DEPOSIT_RULE_ON_CHAIN_ALREADY_EXIST);
         }
 
