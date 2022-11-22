@@ -7,7 +7,6 @@ import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.*;
 import com.seeds.account.enums.FundCollectOrderType;
 import com.seeds.account.ex.AccountException;
-import com.seeds.account.ex.MissingElementException;
 import com.seeds.account.feign.AccountFeignClient;
 import com.seeds.admin.annotation.AuditLog;
 import com.seeds.admin.dto.*;
@@ -133,7 +132,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
 
 
     @Override
-    public GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address, Integer thresholdAmount) {
+    public GenericDto<List<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address, Integer thresholdAmount) {
         currency = isNotBlank(currency) ? currency : AccountConstants.USDT;
         GenericDto<List<AddressBalanceDto>> dto =
                 accountFeignClient.getUserAddressBalances(chain, currency);
@@ -159,9 +158,8 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         if (getNativeTokens().contains(currency)) {
             currency = NATIVE_TOKEN;
         }
-        Page<MgtDepositAddressDto> page = new Page<>();
-        page.setRecords(dtos.stream().sorted(sorterDepositAddressMap.get(currency)).collect(Collectors.toList()));
-        return GenericDto.success(page);
+        dtos = dtos.stream().sorted(sorterDepositAddressMap.get(currency)).collect(Collectors.toList());
+        return GenericDto.success(dtos);
     }
     @Override
     public GenericDto<Boolean> createOrder(MgtAddressCollectOrderRequestDto dto) {
