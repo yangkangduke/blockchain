@@ -24,7 +24,7 @@ public interface AssetManagementService {
 
     GenericDto<Boolean> createOrder(MgtAddressCollectOrderRequestDto dto);
 
-    GenericDto<Page<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address,Integer thresholdAmount);
+    GenericDto<List<MgtDepositAddressDto>> queryDepositAddress(String currency, int chain, String address,Integer thresholdAmount);
 
     GenericDto<BalanceGetStatusDto> getBalanceGetStatus(int chain);
 
