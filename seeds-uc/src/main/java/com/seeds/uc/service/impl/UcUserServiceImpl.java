@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.RandomCodeUseReq;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteRandomCodeService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RandomCodeType;
@@ -86,8 +87,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      */
     @Override
     public LoginResp registerEmail(RegisterReq registerReq) {
-        // 校验邀请码
-        registerWriteOffsInviteCode(registerReq.getInviteCode(), registerReq.getEmail());
+        // 消耗邀请码
+        registerWriteOffsInviteCode(registerReq.getInviteCode(), registerReq.getEmail(), WhetherEnum.YES.value());
         String email = registerReq.getEmail();
         sendCodeService.verifyEmailWithUseType(registerReq.getEmail(), registerReq.getCode(), AuthCodeUseTypeEnum.REGISTER);
         // 校验账号重复
@@ -185,8 +186,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .eq(UcUser::getPublicAddress, publicAddress));
         Long userId;
         if (one == null) {
-            // 校验邀请码
-            registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), publicAddress);
+            // 消耗邀请码
+            registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), publicAddress, WhetherEnum.YES.value());
             // 新增
             UcUser ucUser = UcUser.builder()
                     .nickname(publicAddress)
@@ -560,7 +561,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     }
 
     @Override
-    public void registerWriteOffsInviteCode(String inviteCode, String userIdentity) {
+    public void registerWriteOffsInviteCode(String inviteCode, String userIdentity, Integer useFlag) {
         // 邀请码校验开关
         if (!inviteFlag) {
             return;
@@ -569,6 +570,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_11501_INVITATION_CODE_NOT_EXIST.getDescEn());
         }
         RandomCodeUseReq req = new RandomCodeUseReq();
+        req.setUseFlag(useFlag);
         req.setUserIdentity(userIdentity);
         req.setType(RandomCodeType.INVITE.getCode());
         req.setCode(inviteCode);
