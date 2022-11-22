@@ -1,7 +1,6 @@
 package com.seeds.uc.service;
 
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.uc.dto.UserDto;
@@ -179,5 +178,6 @@ public interface IUcUserService extends IService<UcUser> {
      * @return
      */
     Page<UcUserResp> getAllUser(Page page, AllUserReq allUserReq);
+
 }
 
