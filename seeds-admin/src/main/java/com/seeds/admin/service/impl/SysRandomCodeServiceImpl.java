@@ -286,12 +286,15 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         if (randomCodeDetail == null) {
             throw new SeedsException("Invitation code not exist");
         }
-        if (WhetherEnum.YES.value() == randomCodeDetail.getUseFlag() && !req.getUserIdentity().equals(randomCodeDetail.getUserIdentity())) {
+        if (WhetherEnum.YES.value() == randomCodeDetail.getUseFlag()) {
             throw new SeedsException("The invitation code has already been used");
         }
-        randomCodeDetail.setUserIdentity(req.getUserIdentity());
-        randomCodeDetail.setUseFlag(WhetherEnum.YES.value());
-        sysRandomCodeDetailService.updateById(randomCodeDetail);
+        // 是否进行邀请码消耗
+        if (WhetherEnum.YES.value() == req.getUseFlag()) {
+            randomCodeDetail.setUserIdentity(req.getUserIdentity());
+            randomCodeDetail.setUseFlag(req.getUseFlag() == null ? WhetherEnum.NO.value() : req.getUseFlag());
+            sysRandomCodeDetailService.updateById(randomCodeDetail);
+        }
     }
 
     public static Set<String> getRandomStringArray(int length, int size) {

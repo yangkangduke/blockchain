@@ -23,4 +23,7 @@ public class RandomCodeUseReq {
     @NotNull(message = "Random code type cannot be empty")
     private Integer type;
 
+    @ApiModelProperty("是否使用 1：使用 0：不使用")
+    private Integer useFlag;
+
 }
