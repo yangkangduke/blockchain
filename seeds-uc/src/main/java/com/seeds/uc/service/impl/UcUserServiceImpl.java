@@ -86,9 +86,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public LoginResp registerEmail(RegisterReq registerReq) {
-        // 消耗邀请码
-        registerWriteOffsInviteCode(registerReq.getInviteCode(), registerReq.getEmail(), WhetherEnum.YES.value());
         String email = registerReq.getEmail();
         sendCodeService.verifyEmailWithUseType(registerReq.getEmail(), registerReq.getCode(), AuthCodeUseTypeEnum.REGISTER);
         // 校验账号重复
@@ -111,6 +110,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .build();
         this.save(ucUser);
         Long id = ucUser.getId();
+
+        // 消耗邀请码
+        registerWriteOffsInviteCode(registerReq.getInviteCode(), id.toString(), WhetherEnum.YES.value());
 
         ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
                 .uid(id)
@@ -186,8 +188,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .eq(UcUser::getPublicAddress, publicAddress));
         Long userId;
         if (one == null) {
-            // 消耗邀请码
-            registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), publicAddress, WhetherEnum.YES.value());
             // 新增
             UcUser ucUser = UcUser.builder()
                     .nickname(publicAddress)
@@ -200,6 +200,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .build();
             this.save(ucUser);
             userId = ucUser.getId();
+            // 消耗邀请码
+            registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), userId.toString(), WhetherEnum.YES.value());
         } else {
             userId = one.getId();
             this.updateById(UcUser.builder()
