@@ -117,7 +117,7 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
                 .eq(WithdrawWhitelist::getUserId,req.getUserId())
                 .eq(WithdrawWhitelist::getChain,req.getChain());
         WithdrawWhitelist one = getOne(queryWrap);
-        if (null != one){
+        if (null != one && one.getId() != req.getId()){
             throw  new ConfigException(USER_ID_ON_CHAIN_ALREADY_EXIST);
         }
 
