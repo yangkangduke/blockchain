@@ -1,6 +1,7 @@
 package com.seeds.uc.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
@@ -61,8 +62,8 @@ public class AuthController {
 
     @ApiOperation(value = "校验邀请码", notes = "校验邀请码")
     @PostMapping("/register/validate-invite-code")
-    public GenericDto<Object> validateInviteCode(@Valid @RequestBody RegisterReq registerReq) {
-        ucUserService.registerWriteOffsInviteCode(registerReq.getInviteCode(), registerReq.getEmail());
+    public GenericDto<Object> validateInviteCode(@Valid @RequestBody InviteCodeReq req) {
+        ucUserService.registerWriteOffsInviteCode(req.getInviteCode(), req.getEmail(), WhetherEnum.NO.value());
         return GenericDto.success(null);
     }
 

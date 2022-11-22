@@ -1,10 +1,13 @@
 package com.seeds.admin.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.*;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.*;
 import com.seeds.account.enums.FundCollectOrderType;
+import com.seeds.account.ex.AccountException;
+import com.seeds.account.ex.MissingElementException;
 import com.seeds.account.feign.AccountFeignClient;
 import com.seeds.admin.annotation.AuditLog;
 import com.seeds.admin.dto.*;
@@ -16,6 +19,7 @@ import com.seeds.admin.mapstruct.WalletTransferRequestMapper;
 import com.seeds.admin.service.AssetManagementService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
+import com.seeds.common.enums.ErrorCode;
 import jodd.bean.BeanCopy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -193,7 +197,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     }
 
     @Override
-    public GenericDto<Page<MgtHotWalletDto>> queryHotWallets(Integer type, int chain, String address) {
+    public GenericDto<List<MgtHotWalletDto>> queryHotWallets(Integer type, int chain, String address) {
         GenericDto<List<SystemWalletAddressDto>> dto = accountFeignClient.getAllSystemWalletAddress(chain);
         if (!dto.isSuccess()) {
             return GenericDto.failure(dto.getCode(), dto.getMessage());
@@ -248,9 +252,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
                     .tag(data.getTag())
                     .build());
         }
-        Page<MgtHotWalletDto> page = new Page<>();
-        page.setRecords(mgtHotWalletDtos.stream().collect(Collectors.toList()));
-        return GenericDto.success(page);
+        return GenericDto.success(mgtHotWalletDtos);
     }
 
     @Override
@@ -329,6 +331,16 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     @Override
     @AuditLog(module = Module.CASH_MANAGEMENT, subModule = SubModule.WALLET_ACCOUNT, action = Action.ADD)
     public GenericDto<Boolean> createHotWallet(MgtSystemWalletAddressDto dto) {
+        GenericDto<List<SystemWalletAddressDto>> systemWalletAddressDtoList = accountFeignClient.getAllSystemWalletAddress(dto.getChain());
+        if (!systemWalletAddressDtoList.isSuccess()) {
+            return GenericDto.failure(systemWalletAddressDtoList.getCode(), systemWalletAddressDtoList.getMessage());
+        }
+        List<SystemWalletAddressDto> walletList = systemWalletAddressDtoList.getData();
+        if (CollUtil.isNotEmpty(walletList)) {
+            // 判断每条链只能有一个热钱包
+            throw new AccountException(ErrorCode.SYSTEM_WALLET_ADDRESS_REPEAT);
+        }
+
         GenericDto<SystemWalletAddressDto> addressDto = accountFeignClient.createSystemWalletAddress(dto.getChain());
         if (!addressDto.isSuccess()) {
             return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
