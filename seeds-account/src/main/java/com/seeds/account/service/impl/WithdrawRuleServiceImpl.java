@@ -74,7 +74,7 @@ public class WithdrawRuleServiceImpl extends ServiceImpl<WithdrawRuleMapper, Wit
         LambdaQueryWrapper<WithdrawRule> queryWrap = new QueryWrapper<WithdrawRule>().lambda()
                 .eq(WithdrawRule::getChain,req.getChain());
         WithdrawRule one = getOne(queryWrap);
-        if (null != one){
+        if (!one.getChain().equals(req.getChain()) || one.getId() != req.getId()){
             throw new ConfigException(WITHDRAW_RULE_ON_CHAIN_ALREADY_EXIST);
         }
 
@@ -103,7 +103,6 @@ public class WithdrawRuleServiceImpl extends ServiceImpl<WithdrawRuleMapper, Wit
                 .build();
         return updateById(rule);
     }
-
 
     private void checkEnableWithdrawRule(Integer chain) {
         // 该链上存在提币规则，无法添加
