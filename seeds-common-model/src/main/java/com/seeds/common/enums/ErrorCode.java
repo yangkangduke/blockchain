@@ -128,9 +128,14 @@ public enum ErrorCode implements WithDesc {
     //blackList
     ILLEGAL_BLACK_LIST_CONFIG(323148,"There is already an enabled black list"),
 
+
     //withdrawWhiteList
     ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(323149,"There is already an enabled withdraw white list"),
-    USER_ID_ON_CHAIN_ALREADY_EXIST(323150,"User id on chain already exist");
+    USER_ID_ON_CHAIN_ALREADY_EXIST(323150,"User id on chain already exist"),
+
+    // 系统钱包配置
+    SYSTEM_WALLET_ADDRESS_REPEAT(323151,"Each chain can only have one address");
+
     @JsonValue
     private final int code;
     private final String desc;
