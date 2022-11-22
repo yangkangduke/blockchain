@@ -127,42 +127,31 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
             Set<Long> menuIds = sysRoleMenuService.queryMenuByRoleId(role.getId());
             if (!CollectionUtils.isEmpty(menuIds)) {
                 List<SysMenuEntity> menuList = sysMenuService.listByIds(menuIds);
-                Map<String, Long> map = new HashMap<>(menuList.size());
-                Set<Long> allIds = new HashSet<>();
-                menuList.forEach(p -> {
-                    allIds.add(p.getId());
-                    String parentCode = p.getParentCode();
-                    if (StringUtils.isNotBlank(parentCode)) {
-                        map.putIfAbsent(parentCode, null);
-                    }
-                });
-                Map<String, SysMenuEntity> parentMap = menuList.stream().filter(p -> map.containsKey(p.getCode()))
-                        .collect(Collectors.toMap(SysMenuEntity::getCode, p -> p));
+                Set<Long> allIds = menuList.stream().map(SysMenuEntity::getId).collect(Collectors.toSet());
+                Map<String, SysMenuEntity> menuMap = menuList.stream().collect(Collectors.toMap(SysMenuEntity::getCode, p -> p));
+                Map<String, List<SysMenuEntity>> parentMap = menuList.stream()
+                        .filter(p -> StringUtils.isNotBlank(p.getParentCode()))
+                        .collect(Collectors.groupingBy(SysMenuEntity::getParentCode));
                 List<List<Long>> menuIdList = new ArrayList<>();
                 menuList.forEach(p -> {
                     if (!allIds.contains(p.getId())) {
                         return;
                     }
                     LinkedList<Long> list = new LinkedList<>();
-                    if (StringUtils.isEmpty(p.getParentCode())) {
-                        if (parentMap.get(p.getCode()) == null) {
-                            list.add(p.getId());
-                        }
-                    } else {
-                        String parentCode = p.getParentCode();
-                        while (StringUtils.isNotBlank(parentCode)) {
-                            SysMenuEntity parentMenu = parentMap.get(parentCode);
-                            Long parentMenuId = parentMenu.getId();
-                            list.add(parentMenuId);
-                            allIds.remove(parentMenuId);
-                            parentCode = parentMenu.getParentCode();
-                        }
-                        list.addFirst(p.getId());
-                        allIds.remove(p.getId());
+                    String parentCode = p.getParentCode();
+                    // 先把自己放进集合
+                    list.add(p.getId());
+                    allIds.remove(p.getId());
+                    // 把所有父级放进集合
+                    while (StringUtils.isNotBlank(parentCode)) {
+                        SysMenuEntity menu = menuMap.get(parentCode);
+                        Long parentMenuId = menu.getId();
+                        list.addFirst(parentMenuId);
+                        allIds.remove(parentMenuId);
+                        parentCode = menu.getParentCode();
                     }
-                    if (!CollectionUtils.isEmpty(list)) {
-                        menuIdList.add(list);
-                    }
+                    // 把所有子级放进集合
+                    addChildMenu(parentMap.get(p.getCode()), list, allIds, parentMap, menuIdList);
                 });
                 resp.setMenuIdList(menuIdList);
             }
@@ -233,5 +222,19 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
             respList.add(resp);
         });
         return respList;
+    }
+
+    private void addChildMenu(List<SysMenuEntity> childList, LinkedList<Long> list, Set<Long> allIds, Map<String, List<SysMenuEntity>> parentMap, List<List<Long>> menuIdList) {
+        for (SysMenuEntity child : childList) {
+            LinkedList<Long> cloneList = new LinkedList<>(list);
+            Long childId = child.getId();
+            cloneList.addLast(childId);
+            allIds.remove(childId);
+            List<SysMenuEntity> childMenus = parentMap.get(child.getCode());
+            if (!CollectionUtils.isEmpty(childMenus)) {
+                addChildMenu(childMenus, cloneList, allIds, parentMap, menuIdList);
+            }
+            menuIdList.add(cloneList);
+        }
     }
 }
