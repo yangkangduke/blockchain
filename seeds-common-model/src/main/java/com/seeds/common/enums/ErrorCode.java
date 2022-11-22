@@ -126,7 +126,7 @@ public enum ErrorCode implements WithDesc {
     ILLEGAL_ACTION_CONTROL_CONFIG(323147,"There is already an enabled action control"),
 
     //blackList
-    ILLEGAL_BLACK_LIST_CONFIG(323148,"There is already an enabled black list"),
+    ILLEGAL_BLACK_LIST_CONFIG(323148,"black list is already exist"),
 
 
     //withdrawWhiteList
