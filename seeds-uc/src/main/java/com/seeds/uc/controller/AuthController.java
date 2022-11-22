@@ -61,8 +61,8 @@ public class AuthController {
 
     @ApiOperation(value = "校验邀请码", notes = "校验邀请码")
     @PostMapping("/register/validate-invite-code")
-    public GenericDto<Object> validateInviteCode(@Valid @RequestBody RegisterReq registerReq) {
-        ucUserService.registerWriteOffsInviteCode(registerReq.getInviteCode(), registerReq.getEmail());
+    public GenericDto<Object> validateInviteCode(@Valid @RequestBody InviteCodeReq req) {
+        ucUserService.registerWriteOffsInviteCode(req.getInviteCode(), req.getEmail());
         return GenericDto.success(null);
     }
 
