@@ -151,7 +151,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
                         parentCode = menu.getParentCode();
                     }
                     // 把所有子级放进集合
-                    addChildMenu(parentMap.get(p.getCode()), list, allIds, parentMap, menuIdList);
+                    List<SysMenuEntity> childList = parentMap.get(p.getCode());
+                    if (!CollectionUtils.isEmpty(childList)) {
+                        addChildMenu(childList, list, allIds, parentMap, menuIdList);
+                    } else {
+                        menuIdList.add(list);
+                    }
                 });
                 resp.setMenuIdList(menuIdList);
             }
@@ -233,8 +238,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
             List<SysMenuEntity> childMenus = parentMap.get(child.getCode());
             if (!CollectionUtils.isEmpty(childMenus)) {
                 addChildMenu(childMenus, cloneList, allIds, parentMap, menuIdList);
+            } else {
+                menuIdList.add(cloneList);
             }
-            menuIdList.add(cloneList);
         }
     }
 }
