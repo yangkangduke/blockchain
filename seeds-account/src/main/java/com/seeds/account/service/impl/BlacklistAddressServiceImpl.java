@@ -30,7 +30,6 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.seeds.common.enums.ErrorCode.DEPOSIT_RULE_ON_CHAIN_ALREADY_EXIST;
 import static com.seeds.common.enums.ErrorCode.ILLEGAL_BLACK_LIST_CONFIG;
 
 
@@ -116,7 +115,7 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
                 .eq(BlacklistAddress::getAddress,req.getAddress())
                 .eq(BlacklistAddress::getType,req.getType());
         BlacklistAddress one = getOne(queryWrap);
-        if (null != one && one.getId() != req.getId()){
+        if (null != one && !one.getId().equals(req.getId())){
             throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
         }
 
@@ -130,16 +129,6 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
         blacklistAddress.setVersion(Address.getVersion() + 1);
         blacklistAddress.setStatus(req.getStatus());
         return updateById(blacklistAddress);
-    }
-
-    private void checkEnableBlacklistAddress(String address) {
-
-        LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
-                .eq(BlacklistAddress::getAddress, address);
-        BlacklistAddress one = getOne(queryWrap);
-        if (one != null) {
-            throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
-        }
     }
 
 
