@@ -18,11 +18,10 @@ import com.seeds.account.service.IDepositRuleService;
 import com.seeds.account.util.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static com.seeds.common.enums.ErrorCode.ILLEGAL_DEPOSIT_RULE_CONFIG;
+import static com.seeds.common.enums.ErrorCode.WITHDRAW_RULE_ON_CHAIN_ALREADY_EXIST;
 
 /**
  * <p>
@@ -70,7 +69,12 @@ public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, Depos
     @Override
     public Boolean update(DepositRuleSaveOrUpdateReq req) {
         // chain 不能修改为已经存在的充币规则
-        this.checkEnableDepositRule(req.getChain());
+        LambdaQueryWrapper<DepositRule> queryWrap = new QueryWrapper<DepositRule>().lambda()
+                .eq(DepositRule::getChain,req.getChain());
+        DepositRule one = getOne(queryWrap);
+        if (null != one){
+            throw new ConfigException(WITHDRAW_RULE_ON_CHAIN_ALREADY_EXIST);
+        }
 
         DepositRule rule = getById(req.getId());
         DepositRule depositRule = ObjectUtils.copy(req, DepositRule.builder().build());
