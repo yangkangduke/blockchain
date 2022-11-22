@@ -286,7 +286,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         if (randomCodeDetail == null) {
             throw new SeedsException("Invitation code not exist");
         }
-        if (WhetherEnum.YES.value() == randomCodeDetail.getUseFlag()) {
+        if (WhetherEnum.YES.value() == randomCodeDetail.getUseFlag() && !req.getUserIdentity().equals(randomCodeDetail.getUserIdentity())) {
             throw new SeedsException("The invitation code has already been used");
         }
         // 是否进行邀请码消耗
