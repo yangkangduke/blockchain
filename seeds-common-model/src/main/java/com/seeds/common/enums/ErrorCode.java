@@ -124,6 +124,8 @@ public enum ErrorCode implements WithDesc {
 
     //blackList
     ILLEGAL_BLACK_LIST_CONFIG(323146,"There is already an enabled black list"),
+    // 系统钱包配置
+    SYSTEM_WALLET_ADDRESS_REPEAT(323147,"Each chain can only have one address"),
 
     //withdrawWhiteList
     ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(232147,"There is already an enabled withdraw white list"),
