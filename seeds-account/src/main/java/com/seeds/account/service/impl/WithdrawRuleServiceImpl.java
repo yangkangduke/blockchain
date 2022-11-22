@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.seeds.common.enums.ErrorCode.ILLEGAL_WITHDRAW_RULE_CONFIG;
+import static com.seeds.common.enums.ErrorCode.*;
 
 /**
  * <p>
@@ -71,7 +71,12 @@ public class WithdrawRuleServiceImpl extends ServiceImpl<WithdrawRuleMapper, Wit
     @Override
     public Boolean update(WithdrawRuleSaveOrUpdateReq req) {
         // chain 不能修改为已经存在的提币规则；
-        this.checkEnableWithdrawRule(req.getChain());
+        LambdaQueryWrapper<WithdrawRule> queryWrap = new QueryWrapper<WithdrawRule>().lambda()
+                .eq(WithdrawRule::getChain,req.getChain());
+        WithdrawRule one = getOne(queryWrap);
+        if (null != one){
+            throw new ConfigException(WITHDRAW_RULE_ON_CHAIN_ALREADY_EXIST);
+        }
 
         WithdrawRule rule = getById(req.getId());
         WithdrawRule withdrawRule = ObjectUtils.copy(req, WithdrawRule.builder().build());

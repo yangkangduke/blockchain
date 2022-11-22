@@ -116,20 +116,21 @@ public enum ErrorCode implements WithDesc {
     ACCOUNT_CONTAIN_TRADING_ASSETS(32142, "contains trading assets"),
     //deposit config
     ILLEGAL_DEPOSIT_RULE_CONFIG(323143, "deposit configuration rule already exist"),
+    DEPOSIT_RULE_ON_CHAIN_ALREADY_EXIST(323144,"deposit rule on chain already exist"),
+
     //withdraw config
-    ILLEGAL_WITHDRAW_RULE_CONFIG(323144, "withdraw configuration rule already exist"),
+    ILLEGAL_WITHDRAW_RULE_CONFIG(323145, "withdraw configuration rule already exist"),
+    WITHDRAW_RULE_ON_CHAIN_ALREADY_EXIST(323146,"withdraw rule on chain already exist"),
 
     //actionControl
-    ILLEGAL_ACTION_CONTROL_CONFIG(323145,"There is already an enabled action control"),
+    ILLEGAL_ACTION_CONTROL_CONFIG(323147,"There is already an enabled action control"),
 
     //blackList
-    ILLEGAL_BLACK_LIST_CONFIG(323146,"There is already an enabled black list"),
-    // 系统钱包配置
-    SYSTEM_WALLET_ADDRESS_REPEAT(323147,"Each chain can only have one address"),
+    ILLEGAL_BLACK_LIST_CONFIG(323148,"There is already an enabled black list"),
 
     //withdrawWhiteList
-    ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(232147,"There is already an enabled withdraw white list"),
-    USER_ID_ON_CHAIN_ALREADY_EXIST(232148,"User id on chain already exist");
+    ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(323149,"There is already an enabled withdraw white list"),
+    USER_ID_ON_CHAIN_ALREADY_EXIST(323150,"User id on chain already exist");
     @JsonValue
     private final int code;
     private final String desc;
