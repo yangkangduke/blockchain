@@ -128,24 +128,37 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
             if (!CollectionUtils.isEmpty(menuIds)) {
                 List<SysMenuEntity> menuList = sysMenuService.listByIds(menuIds);
                 Map<String, Long> map = new HashMap<>(menuList.size());
+                Set<Long> allIds = new HashSet<>();
                 menuList.forEach(p -> {
+                    allIds.add(p.getId());
                     String parentCode = p.getParentCode();
                     if (StringUtils.isNotBlank(parentCode)) {
                         map.putIfAbsent(parentCode, null);
                     }
                 });
-                Map<String, Long> parentMap = menuList.stream().filter(p -> map.containsKey(p.getCode()))
-                        .collect(Collectors.toMap(SysMenuEntity::getCode, SysMenuEntity::getId));
+                Map<String, SysMenuEntity> parentMap = menuList.stream().filter(p -> map.containsKey(p.getCode()))
+                        .collect(Collectors.toMap(SysMenuEntity::getCode, p -> p));
                 List<List<Long>> menuIdList = new ArrayList<>();
                 menuList.forEach(p -> {
-                    List<Long> list = new ArrayList<>();
+                    if (!allIds.contains(p.getId())) {
+                        return;
+                    }
+                    LinkedList<Long> list = new LinkedList<>();
                     if (StringUtils.isEmpty(p.getParentCode())) {
                         if (parentMap.get(p.getCode()) == null) {
                             list.add(p.getId());
                         }
                     } else {
-                        list.add(parentMap.get(p.getParentCode()));
-                        list.add(p.getId());
+                        String parentCode = p.getParentCode();
+                        while (StringUtils.isNotBlank(parentCode)) {
+                            SysMenuEntity parentMenu = parentMap.get(parentCode);
+                            Long parentMenuId = parentMenu.getId();
+                            list.add(parentMenuId);
+                            allIds.remove(parentMenuId);
+                            parentCode = parentMenu.getParentCode();
+                        }
+                        list.addFirst(p.getId());
+                        allIds.remove(p.getId());
                     }
                     if (!CollectionUtils.isEmpty(list)) {
                         menuIdList.add(list);

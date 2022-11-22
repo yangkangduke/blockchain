@@ -59,6 +59,13 @@ public class AuthController {
         return GenericDto.success(ucUserService.registerEmail(registerReq));
     }
 
+    @ApiOperation(value = "校验邀请码", notes = "校验邀请码")
+    @PostMapping("/register/validate-invite-code")
+    public GenericDto<Object> validateInviteCode(@Valid @RequestBody RegisterReq registerReq) {
+        ucUserService.registerWriteOffsInviteCode(registerReq.getInviteCode(), registerReq.getEmail());
+        return GenericDto.success(null);
+    }
+
     @GetMapping("/register/check-email")
     @ApiOperation(value = "校验邮箱", notes = "校验邮箱")
     public GenericDto<Boolean> registerCheckEmail(@Valid @NotNull String email) {
@@ -99,8 +106,6 @@ public class AuthController {
     @ApiOperation(value = "生成metamask的nonce", notes = "生成metamask的nonce")
     @PostMapping("/metamask/generate-nonce")
     public GenericDto<MetamaskAuthResp> generateNonce(@Valid @RequestBody MetamaskVerifyReq metamaskVerifyReq) {
-        // 校验邀请码
-        ucUserService.registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), metamaskVerifyReq.getPublicAddress());
         String nonce = RandomUtil.getRandomSalt();
         cacheService.putGenerateMetamaskAuth(metamaskVerifyReq.getPublicAddress(), nonce);
         return GenericDto.success(
@@ -160,8 +165,6 @@ public class AuthController {
     @ApiOperation(value = "发送邮件", notes = "如果没有收到邮件，验证码默认是123456")
     @PostMapping("/email/send")
     public GenericDto<Object> sendEmailCode(@Valid @RequestBody AuthCodeSendReq sendReq, HttpServletRequest request) {
-        // 校验邀请码
-        ucUserService.registerWriteOffsInviteCode(sendReq.getInviteCode(), sendReq.getEmail());
         log.info("AuthController - sendEmailCode got request: {}", sendReq);
         if (AuthCodeUseTypeEnum.CODE_NO_NEED_LOGIN_READ_REQUEST.contains(sendReq.getUseType())) {
             // 不需要登陆，请求里带邮箱，如: REGISTER
