@@ -57,25 +57,22 @@ public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, Depos
     @Override
     public Boolean add(DepositRuleSaveOrUpdateReq req) {
 
-        // 存在已启用的充币规则，不让添加
+        // 一条链已经存在充币规则，不让添加,只能在原有的规则基础上修改
         this.checkEnableDepositRule(req.getChain());
 
         DepositRule depositRule = ObjectUtils.copy(req, DepositRule.builder().build());
         depositRule.setCreateTime(System.currentTimeMillis());
         depositRule.setUpdateTime(System.currentTimeMillis());
         depositRule.setVersion(AccountConstants.DEFAULT_VERSION);
-        depositRule.setStatus(CommonStatus.ENABLED.getCode());
         return save(depositRule);
     }
 
     @Override
     public Boolean update(DepositRuleSaveOrUpdateReq req) {
-        // 存在已启用的充币规则，不让再启用
-        DepositRule rule = getById(req.getId());
-        if (req.getStatus() == CommonStatus.ENABLED.getCode() && req.getChain() == rule.getChain()) {
-            this.checkEnableDepositRule(req.getChain());
-        }
+        // chain 不能修改为已经存在的充币规则
+        this.checkEnableDepositRule(req.getChain());
 
+        DepositRule rule = getById(req.getId());
         DepositRule depositRule = ObjectUtils.copy(req, DepositRule.builder().build());
         depositRule.setUpdateTime(System.currentTimeMillis());
         depositRule.setVersion(rule.getVersion() + 1);
@@ -85,22 +82,26 @@ public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, Depos
 
     @Override
     public Boolean delete(SwitchReq req) {
-        DepositRule disableRule = DepositRule.builder().status(CommonStatus.DISABLED.getCode()).build();
+        DepositRule disableRule = DepositRule.builder()
+                .status(CommonStatus.DISABLED.getCode())
+                .build();
+
         DepositRule depositRule = getById(req.getId());
         disableRule.setChain(depositRule.getChain());
+        this.update(disableRule, new LambdaUpdateWrapper<DepositRule>()
+                .eq(DepositRule::getId, req.getId()));
 
-        this.update(disableRule, new LambdaUpdateWrapper<DepositRule>().eq(DepositRule::getChain, depositRule.getChain()).ne(DepositRule::getId, req.getId()));
-        DepositRule rule = DepositRule.builder().id(req.getId()).chain(depositRule.getChain()).status(req.getStatus()).build();
-
+        DepositRule rule = DepositRule.builder()
+                .id(req.getId())
+                .status(req.getStatus())
+                .build();
         return updateById(rule);
     }
 
-
     private void checkEnableDepositRule(Integer chain) {
-        // 该链存在已启用的充币规则，不让添加
+        // 该链已存在充币规则，不让添加
         LambdaQueryWrapper<DepositRule> queryWrap = new QueryWrapper<DepositRule>().lambda()
-                .eq(DepositRule::getChain, chain)
-                .eq(DepositRule::getStatus, CommonStatus.ENABLED.getCode());
+                .eq(DepositRule::getChain, chain);
         DepositRule one = getOne(queryWrap);
         if (one != null) {
             throw new ConfigException(ILLEGAL_DEPOSIT_RULE_CONFIG);

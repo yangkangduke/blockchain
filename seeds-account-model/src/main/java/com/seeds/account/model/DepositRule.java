@@ -42,7 +42,7 @@ public class DepositRule implements Serializable {
     private Long version;
 
     @ApiModelProperty("chain")
-    private int chain;
+    private Integer chain;
 
     @ApiModelProperty("currency")
     private String currency;

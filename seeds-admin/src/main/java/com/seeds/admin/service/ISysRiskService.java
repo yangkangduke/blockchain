@@ -12,7 +12,7 @@ import java.util.List;
 public interface ISysRiskService {
 
 
-    GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getBlackList(Integer type, String reason,String address);
+    GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getBlackList(Integer type, String reason,String address ,Integer chain);
 
     GenericDto<Boolean> addDepositBlackList(BlackListAddressSaveOrUpdateReq req);
 

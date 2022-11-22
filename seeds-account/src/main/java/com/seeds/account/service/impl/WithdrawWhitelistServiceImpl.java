@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.collect.Lists;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.WithdrawWhitelistDto;
 import com.seeds.account.dto.req.WithdrawWhitelistSaveOrUpdateReq;
@@ -17,6 +18,8 @@ import com.seeds.account.model.WithdrawWhitelist;
 import com.seeds.account.service.IWithdrawWhitelistService;
 import com.seeds.account.tool.ListMap;
 import com.seeds.account.util.ObjectUtils;
+import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import static com.seeds.common.enums.ErrorCode.ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG;
+
+import static com.seeds.common.enums.ErrorCode.*;
 
 /**
  * <p>
@@ -44,6 +48,9 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
 
     @Autowired
     WithdrawWhitelistMapper withdrawWhitelistMapper;
+
+    @Autowired
+    UserCenterFeignClient userCenterFeignClient;
 
     LoadingCache<String, ListMap<WithdrawWhitelistDto>> rules = Caffeine.newBuilder()
             .refreshAfterWrite(15, TimeUnit.SECONDS)
@@ -73,10 +80,22 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
 
     @Override
     public List<WithdrawWhitelistDto> loadAll() {
-        return withdrawWhitelistMapper.selectList(new QueryWrapper<>())
+        List<WithdrawWhitelistDto> withdraw = withdrawWhitelistMapper.selectList(new QueryWrapper<>())
                 .stream()
                 .map(e -> ObjectUtils.copy(e, new WithdrawWhitelistDto()))
                 .collect(Collectors.toList());
+        GenericDto<Map<Long, String>> emailMap = userCenterFeignClient.getEmailByIds(withdraw.stream().map(WithdrawWhitelistDto::getUserId).collect(Collectors.toList()));
+
+        List<WithdrawWhitelistDto> resultList = Lists.newArrayList();
+        if (null != emailMap && emailMap.getCode() == 200) {
+            for (WithdrawWhitelistDto withdrawDto : withdraw) {
+                WithdrawWhitelistDto dto = new WithdrawWhitelistDto();
+                ObjectUtils.copy(withdrawDto, dto);
+                dto.setEmail(emailMap.getData().get(withdrawDto.getUserId()) == null ? "" : emailMap.getData().get(withdrawDto.getUserId()));
+                resultList.add(dto);
+            }
+        }
+        return resultList;
     }
 
     @Override
@@ -93,9 +112,14 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
 
     @Override
     public Boolean update(WithdrawWhitelistSaveOrUpdateReq req) {
-
-        //同一条链上，userId已经存在，则无法修改
-        this.checkEnableWithdrawList(req.getUserId(),req.getChain());
+        //userId不能修改为已存在的白名单用户;
+        LambdaQueryWrapper<WithdrawWhitelist> queryWrap = new QueryWrapper<WithdrawWhitelist>().lambda()
+                .eq(WithdrawWhitelist::getUserId,req.getUserId())
+                .eq(WithdrawWhitelist::getChain,req.getChain());
+        WithdrawWhitelist one = getOne(queryWrap);
+        if (null != one){
+            throw  new ConfigException(USER_ID_ON_CHAIN_ALREADY_EXIST);
+        }
 
         WithdrawWhitelist rule = getById(req.getId());
         WithdrawWhitelist withdrawWhitelist = ObjectUtils.copy(req, WithdrawWhitelist.builder().build());

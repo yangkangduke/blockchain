@@ -115,9 +115,9 @@ public enum ErrorCode implements WithDesc {
     ACCOUNT_INVALID_TRADING_MARGIN_CURRENCY(32141, "invalid trading margin currency"),
     ACCOUNT_CONTAIN_TRADING_ASSETS(32142, "contains trading assets"),
     //deposit config
-    ILLEGAL_DEPOSIT_RULE_CONFIG(323143, "There is already an enabled deposit configuration rule"),
+    ILLEGAL_DEPOSIT_RULE_CONFIG(323143, "deposit configuration rule already exist"),
     //withdraw config
-    ILLEGAL_WITHDRAW_RULE_CONFIG(323144, "There is already an enabled withdraw configuration rule"),
+    ILLEGAL_WITHDRAW_RULE_CONFIG(323144, "withdraw configuration rule already exist"),
 
     //actionControl
     ILLEGAL_ACTION_CONTROL_CONFIG(323145,"There is already an enabled action control"),
@@ -126,7 +126,8 @@ public enum ErrorCode implements WithDesc {
     ILLEGAL_BLACK_LIST_CONFIG(323146,"There is already an enabled black list"),
 
     //withdrawWhiteList
-    ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(232147,"There is already an enabled withdraw white list");
+    ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(232147,"There is already an enabled withdraw white list"),
+    USER_ID_ON_CHAIN_ALREADY_EXIST(232148,"User id on chain already exist");
     @JsonValue
     private final int code;
     private final String desc;
