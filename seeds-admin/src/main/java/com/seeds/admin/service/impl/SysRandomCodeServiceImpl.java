@@ -83,7 +83,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
                 .eq(query.getType() != null, SysRandomCodeEntity::getType, query.getType())
                 .eq(query.getLength() != null, SysRandomCodeEntity::getLength, query.getLength())
                 .eq(query.getNumber() != null, SysRandomCodeEntity::getNumber, query.getNumber())
-                .orderByDesc(SysRandomCodeEntity::getId);
+                .orderByDesc(SysRandomCodeEntity::getBatchNo);
         Page<SysRandomCodeEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
         List<SysRandomCodeEntity> records = page.getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -276,7 +276,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         LambdaQueryWrapper<SysRandomCodeEntity> query = new QueryWrapper<SysRandomCodeEntity>().lambda()
                 .eq(SysRandomCodeEntity::getType, req.getType())
                 .gt(SysRandomCodeEntity::getExpireTime, System.currentTimeMillis())
-                .orderByDesc(SysRandomCodeEntity::getId);
+                .orderByDesc(SysRandomCodeEntity::getBatchNo);
         List<SysRandomCodeEntity> list = list(query);
         if (CollectionUtils.isEmpty(list)) {
             throw new SeedsException("Invitation not exist");
@@ -286,12 +286,15 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         if (randomCodeDetail == null) {
             throw new SeedsException("Invitation code not exist");
         }
-        if (WhetherEnum.YES.value() == randomCodeDetail.getUseFlag()) {
+        if (WhetherEnum.YES.value() == randomCodeDetail.getUseFlag() && !req.getUserIdentity().equals(randomCodeDetail.getUserIdentity())) {
             throw new SeedsException("The invitation code has already been used");
         }
-        randomCodeDetail.setUserIdentity(req.getUserIdentity());
-        randomCodeDetail.setUseFlag(WhetherEnum.YES.value());
-        sysRandomCodeDetailService.updateById(randomCodeDetail);
+        // 是否进行邀请码消耗
+        if (WhetherEnum.YES.value() == req.getUseFlag()) {
+            randomCodeDetail.setUserIdentity(req.getUserIdentity());
+            randomCodeDetail.setUseFlag(req.getUseFlag() == null ? WhetherEnum.NO.value() : req.getUseFlag());
+            sysRandomCodeDetailService.updateById(randomCodeDetail);
+        }
     }
 
     public static Set<String> getRandomStringArray(int length, int size) {

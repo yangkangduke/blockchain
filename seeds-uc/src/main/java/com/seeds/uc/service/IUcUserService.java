@@ -1,7 +1,6 @@
 package com.seeds.uc.service;
 
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.uc.dto.UserDto;
@@ -161,8 +160,9 @@ public interface IUcUserService extends IService<UcUser> {
      * 核销邀请码
      * @param inviteCode 邀请码
      * @param userIdentity 关联用户标识
+     * @param useFlag 是否消耗标识
      */
-    void registerWriteOffsInviteCode(String inviteCode, String userIdentity);
+    void registerWriteOffsInviteCode(String inviteCode, String userIdentity, Integer useFlag);
 
     /**
      * 是否需要邀请码
@@ -179,5 +179,6 @@ public interface IUcUserService extends IService<UcUser> {
      * @return
      */
     Page<UcUserResp> getAllUser(Page page, AllUserReq allUserReq);
+
 }
 

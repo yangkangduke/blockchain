@@ -4,17 +4,16 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.RandomCodeUseReq;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteRandomCodeService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RandomCodeType;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.*;
 import com.seeds.uc.dto.request.*;
-import com.seeds.uc.dto.response.AccountActionResp;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserInfoResp;
@@ -35,7 +34,6 @@ import com.seeds.uc.util.RandomUtil;
 import com.seeds.uc.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -46,7 +44,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.web3j.crypto.WalletUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -89,6 +86,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public LoginResp registerEmail(RegisterReq registerReq) {
         String email = registerReq.getEmail();
         sendCodeService.verifyEmailWithUseType(registerReq.getEmail(), registerReq.getCode(), AuthCodeUseTypeEnum.REGISTER);
@@ -112,6 +110,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .build();
         this.save(ucUser);
         Long id = ucUser.getId();
+
+        // 消耗邀请码
+        registerWriteOffsInviteCode(registerReq.getInviteCode(), id.toString(), WhetherEnum.YES.value());
 
         ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
                 .uid(id)
@@ -199,6 +200,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .build();
             this.save(ucUser);
             userId = ucUser.getId();
+            // 消耗邀请码
+            registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), userId.toString(), WhetherEnum.YES.value());
         } else {
             userId = one.getId();
             this.updateById(UcUser.builder()
@@ -560,7 +563,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     }
 
     @Override
-    public void registerWriteOffsInviteCode(String inviteCode, String userIdentity) {
+    public void registerWriteOffsInviteCode(String inviteCode, String userIdentity, Integer useFlag) {
         // 邀请码校验开关
         if (!inviteFlag) {
             return;
@@ -569,6 +572,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_11501_INVITATION_CODE_NOT_EXIST.getDescEn());
         }
         RandomCodeUseReq req = new RandomCodeUseReq();
+        req.setUseFlag(useFlag);
         req.setUserIdentity(userIdentity);
         req.setType(RandomCodeType.INVITE.getCode());
         req.setCode(inviteCode);
