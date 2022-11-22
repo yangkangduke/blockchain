@@ -112,6 +112,7 @@ public class WithdrawWhitelistServiceImpl extends ServiceImpl<WithdrawWhitelistM
 
     @Override
     public Boolean update(WithdrawWhitelistSaveOrUpdateReq req) {
+        log.info("WithdrawWhitelist req = {}",req);
         //userId不能修改为已存在的白名单用户;
         LambdaQueryWrapper<WithdrawWhitelist> queryWrap = new QueryWrapper<WithdrawWhitelist>().lambda()
                 .eq(WithdrawWhitelist::getUserId,req.getUserId())
