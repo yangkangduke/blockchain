@@ -75,7 +75,7 @@ public class WithdrawRuleServiceImpl extends ServiceImpl<WithdrawRuleMapper, Wit
                 .eq(WithdrawRule::getChain,req.getChain());
         WithdrawRule one = getOne(queryWrap);
         if (null != one){
-            throw new ConfigException(DEPOSIT_RULE_ON_CHAIN_ALREADY_EXIST);
+            throw new ConfigException(WITHDRAW_RULE_ON_CHAIN_ALREADY_EXIST);
         }
 
         WithdrawRule rule = getById(req.getId());

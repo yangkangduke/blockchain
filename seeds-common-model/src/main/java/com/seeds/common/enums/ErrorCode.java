@@ -116,7 +116,7 @@ public enum ErrorCode implements WithDesc {
     ACCOUNT_CONTAIN_TRADING_ASSETS(32142, "contains trading assets"),
     //deposit config
     ILLEGAL_DEPOSIT_RULE_CONFIG(323143, "deposit configuration rule already exist"),
-    DEPOSIT_RULE_ON_CHAIN_ALREADY_EXIST(323144,"withdraw rule on chain already exist"),
+    DEPOSIT_RULE_ON_CHAIN_ALREADY_EXIST(323144,"deposit rule on chain already exist"),
 
     //withdraw config
     ILLEGAL_WITHDRAW_RULE_CONFIG(323145, "withdraw configuration rule already exist"),

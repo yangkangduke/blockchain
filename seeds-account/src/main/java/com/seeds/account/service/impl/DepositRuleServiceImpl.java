@@ -20,8 +20,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
-import static com.seeds.common.enums.ErrorCode.ILLEGAL_DEPOSIT_RULE_CONFIG;
-import static com.seeds.common.enums.ErrorCode.WITHDRAW_RULE_ON_CHAIN_ALREADY_EXIST;
+
+import static com.seeds.common.enums.ErrorCode.*;
 
 /**
  * <p>
@@ -73,7 +73,7 @@ public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, Depos
                 .eq(DepositRule::getChain,req.getChain());
         DepositRule one = getOne(queryWrap);
         if (null != one){
-            throw new ConfigException(WITHDRAW_RULE_ON_CHAIN_ALREADY_EXIST);
+            throw new ConfigException(DEPOSIT_RULE_ON_CHAIN_ALREADY_EXIST);
         }
 
         DepositRule rule = getById(req.getId());
