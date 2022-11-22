@@ -11,10 +11,8 @@ import com.seeds.account.dto.BlacklistAddressDto;
 import com.seeds.account.dto.req.BlackListAddressSaveOrUpdateReq;
 import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.ex.ConfigException;
-import com.seeds.account.ex.MissingElementException;
 import com.seeds.account.mapper.BlacklistAddressMapper;
 import com.seeds.account.model.BlacklistAddress;
-import com.seeds.account.model.DepositRule;
 import com.seeds.account.model.SwitchReq;
 import com.seeds.account.service.IBlacklistAddressService;
 import com.seeds.account.tool.ListMap;
@@ -23,7 +21,6 @@ import com.seeds.account.util.ObjectUtils;
 import com.seeds.account.util.Utils;
 import com.seeds.common.enums.Chain;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -114,7 +111,13 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     public Boolean update(BlackListAddressSaveOrUpdateReq req) {
 
         //要修改的地址已经存在，无法修改
-        this.checkEnableBlacklistAddress(req.getAddress());
+        LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
+                .eq(BlacklistAddress::getAddress,req.getAddress())
+                .eq(BlacklistAddress::getType,req.getType());
+        BlacklistAddress one = getOne(queryWrap);
+        if (null != one && !one.getId().equals(req.getId())){
+            throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
+        }
 
         //编辑chain开启校验功能
         Chain chain = Chain.fromCode(req.getChain());
@@ -126,16 +129,6 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
         blacklistAddress.setVersion(Address.getVersion() + 1);
         blacklistAddress.setStatus(req.getStatus());
         return updateById(blacklistAddress);
-    }
-
-    private void checkEnableBlacklistAddress(String address) {
-
-        LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
-                .eq(BlacklistAddress::getAddress, address);
-        BlacklistAddress one = getOne(queryWrap);
-        if (one != null) {
-            throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
-        }
     }
 
 
