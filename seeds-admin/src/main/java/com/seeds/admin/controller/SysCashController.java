@@ -171,7 +171,7 @@ public class SysCashController {
 
     @GetMapping("/balance/deposit-address")
     @ApiOperation("获取所有分配给用户地址的余额")
-    public GenericDto<Page<MgtDepositAddressDto>> depositAddresses(@RequestParam(value = "currency", required = false) String currency,
+    public GenericDto<List<MgtDepositAddressDto>> depositAddresses(@RequestParam(value = "currency", required = false) String currency,
                                                                    @RequestParam(value = "chain", defaultValue = "1") Integer chain,
                                                                    @RequestParam(value = "address", required = false) String address,
                                                                    @RequestParam(value = "thresholdAmount", required = false) Integer thresholdAmount) {
