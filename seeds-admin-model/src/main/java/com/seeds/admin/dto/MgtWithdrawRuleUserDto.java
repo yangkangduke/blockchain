@@ -1,15 +1,13 @@
 package com.seeds.admin.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.Gson;
-import com.seeds.account.enums.CommonStatus;
-import com.seeds.admin.annotation.MgtNumberValidator;
 import com.seeds.admin.audit.Auditable;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import javax.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 
 
@@ -18,7 +16,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MgtWithdrawWhitelistDto implements Auditable {
+public class MgtWithdrawRuleUserDto implements Auditable {
 
     private Long id;
 

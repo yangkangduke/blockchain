@@ -1,7 +1,6 @@
 package com.seeds.account.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.seeds.account.enums.CommonStatus;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +11,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * 提币白名单
+ * 提币用户规则
  *
  * @author yk
  *
@@ -22,7 +21,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WithdrawWhitelistDto implements Serializable {
+public class WithdrawRuleUserDto implements Serializable {
     private static final long serialVersionUID = -1L;
 
     private Long id;

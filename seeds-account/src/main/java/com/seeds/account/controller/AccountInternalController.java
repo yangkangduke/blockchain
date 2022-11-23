@@ -63,7 +63,7 @@ public class AccountInternalController {
     @Autowired
     private ISystemWalletAddressService systemWalletAddressService;
     @Autowired
-    private IWithdrawWhitelistService withdrawWhitelistService;
+    private IWithdrawRuleUserService withdrawRuleUserService;
     @Autowired
     private IBlacklistAddressService blacklistAddressService;
     @Autowired
@@ -565,52 +565,52 @@ public class AccountInternalController {
         }
     }
 
-    @GetMapping("/sys/withdraw-whitelist-address")
-    @ApiOperation("获取所有提币白名单")
+    @GetMapping("/sys/withdraw-rule-user-address")
+    @ApiOperation("获取所有提币用户规则")
     @Inner
-    public GenericDto<List<WithdrawWhitelistDto>> getAllWithdrawWhitelist() {
+    public GenericDto<List<WithdrawRuleUserDto>> getAllWithdrawRuleUser() {
         try {
-            List<WithdrawWhitelistDto> list = withdrawWhitelistService.loadAll();
+            List<WithdrawRuleUserDto> list = withdrawRuleUserService.loadAll();
             return GenericDto.success(list);
         } catch (Exception e) {
-            log.error("getAllWithdrawWhitelist", e);
+            log.error("getAllWithdrawRuleUser", e);
             return Utils.returnFromException(e);
         }
     }
 
-    @PostMapping("/sys/add-withdraw-whitelist-address")
-    @ApiOperation("添加提币白名单")
+    @PostMapping("/sys/add-withdraw-rule-user-address")
+    @ApiOperation("添加提币用户规则")
     @Inner
-    public GenericDto<Boolean> addWithdrawWhitelist(@RequestBody WithdrawWhitelistSaveOrUpdateReq req) {
+    public GenericDto<Boolean> addWithdrawRuleUser(@RequestBody WithdrawRuleUserSaveOrUpdateReq req) {
         try {
-            return GenericDto.success(withdrawWhitelistService.add(req));
+            return GenericDto.success(withdrawRuleUserService.add(req));
         } catch (Exception e) {
-            log.error("addWithdrawWhitelist", e);
+            log.error("addWithdrawRuleUser", e);
             return Utils.returnFromException(e);
         }
     }
 
-    @PostMapping("/sys/update-withdraw-whitelist-address")
-    @ApiOperation("更新提币白名单")
+    @PostMapping("/sys/update-withdraw-rule-user-address")
+    @ApiOperation("更新提币用户规则")
     @Inner
-    public GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistSaveOrUpdateReq req) {
+    public GenericDto<Boolean> updateWithdrawRuleUser(@RequestBody WithdrawRuleUserSaveOrUpdateReq req) {
         try {
-            return GenericDto.success(withdrawWhitelistService.update(req));
+            return GenericDto.success(withdrawRuleUserService.update(req));
         } catch (Exception e) {
-            log.error("updateWithdrawWhitelist", e);
+            log.error("updateWithdrawRuleUser", e);
             return Utils.returnFromException(e);
         }
     }
 
-    @PostMapping("/sys/delete-withdraw-whitelist-address")
-    @ApiOperation("启用/停用提币白名单")
+    @PostMapping("/sys/delete-withdraw-rule-user-address")
+    @ApiOperation("启用/停用提币用户规则")
     @Inner
-    public GenericDto<Boolean> deleteWithdrawWhitelist(@RequestBody SwitchReq req) {
+    public GenericDto<Boolean> deleteWithdrawRuleUser(@RequestBody SwitchReq req) {
         try {
-            withdrawWhitelistService.delete(req);
+            withdrawRuleUserService.delete(req);
             return GenericDto.success(true);
         } catch (Exception e) {
-            log.error("deleteWithdrawWhitelist", e);
+            log.error("deleteWithdrawRuleUser", e);
             return Utils.returnFromException(e);
         }
     }

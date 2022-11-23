@@ -61,7 +61,7 @@ public class AccountServiceImpl implements IAccountService {
     @Autowired
     IChainDepositService chainDepositService;
     @Autowired
-    IWithdrawWhitelistService withdrawWhitelistService;
+    IWithdrawRuleUserService withdrawRuleUserService;
     @Autowired
     IChainDepositWithdrawHisService chainDepositWithdrawHisService;
     @Autowired
@@ -129,13 +129,13 @@ public class AccountServiceImpl implements IAccountService {
         // 是否是内部提币
         internalWithdraw = assignedDepositAddress != null && assignedDepositAddress.getUserId() > 0;
 
-        // 读取提币白名单
+        // 读取提币用户规则
         WithdrawLimitRuleDto limitRule = chainWithdrawService.getWithdrawLimitRule(currency);
-        WithdrawWhitelistDto withdrawWhitelistDto = withdrawWhitelistService.get(userId, currency);
+        WithdrawRuleUserDto withdrawRuleUserDto = withdrawRuleUserService.get(userId, currency);
         BigDecimal minAmount = limitRule.getMinAmount();
-        BigDecimal maxAmount = withdrawWhitelistDto != null ? withdrawWhitelistDto.getMaxAmount() : limitRule.getMaxAmount();
-        BigDecimal intradyAmount = withdrawWhitelistDto != null ? withdrawWhitelistDto.getIntradayAmount() : limitRule.getIntradayAmount();
-        BigDecimal autoAmount = withdrawWhitelistDto != null ? withdrawWhitelistDto.getAutoAmount() : limitRule.getAutoAmount();
+        BigDecimal maxAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getMaxAmount() : limitRule.getMaxAmount();
+        BigDecimal intradyAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getIntradayAmount() : limitRule.getIntradayAmount();
+        BigDecimal autoAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getAutoAmount() : limitRule.getAutoAmount();
 
         // 校验提币精度
         int decimals = rule.getDecimals();

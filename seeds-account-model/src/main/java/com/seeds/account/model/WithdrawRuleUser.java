@@ -3,34 +3,31 @@ package com.seeds.account.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.seeds.account.enums.CommonStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 /**
  * <p>
- * 提币白名单
+ * 提币用户规则
  * </p>
  *
  * @author yk
  * @since 2022-10-08
  */
-@TableName("ac_withdraw_whitelist")
-@ApiModel(value = "WithdrawWhitelist对象", description = "提币白名单")
+@TableName("ac_withdraw_rule_user")
+@ApiModel(value = "WithdrawRuleUser对象", description = "提币用户规则")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WithdrawWhitelist implements Serializable {
+public class WithdrawRuleUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

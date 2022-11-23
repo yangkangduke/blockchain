@@ -129,8 +129,8 @@ public enum ErrorCode implements WithDesc {
     ILLEGAL_BLACK_LIST_CONFIG(323148,"black list is already exist"),
 
 
-    //withdrawWhiteList
-    ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(323149,"There is already an enabled withdraw white list"),
+    //withdraw rule user
+    ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG(323149,"There is already an enabled withdraw user rule list"),
     USER_ID_ON_CHAIN_ALREADY_EXIST(323150,"User id on chain already exist"),
 
     // 系统钱包配置

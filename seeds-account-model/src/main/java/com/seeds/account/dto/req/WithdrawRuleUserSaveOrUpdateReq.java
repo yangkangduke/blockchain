@@ -1,7 +1,5 @@
 package com.seeds.account.dto.req;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,15 +7,15 @@ import lombok.Data;
 import java.math.BigDecimal;
 /**
  * <p>
- * 提币白名单新增/编辑
+ * 提币用户规则新增/编辑
  * </p>
  *
  * @author dengyang
  * @since 2022-11-12
  */
 @Data
-@ApiModel(value = "WithdrawWhitelistSaveOrUpdateReq", description = "提币白名单新增/编辑")
-public class WithdrawWhitelistSaveOrUpdateReq {
+@ApiModel(value = "WithdrawRuleUserSaveOrUpdateReq", description = "提币用户规则新增/编辑")
+public class WithdrawRuleUserSaveOrUpdateReq {
     private static final long serialVersionUID = 1L;
 
     private Long id;

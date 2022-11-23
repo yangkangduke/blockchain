@@ -47,7 +47,7 @@ public class AccountController {
     @Autowired
     private IChainWithdrawService chainWithdrawService;
     @Autowired
-    private IWithdrawWhitelistService withdrawWhitelistService;
+    private IWithdrawRuleUserService withdrawRuleUserService;
     @Autowired
     private IChainContractService chainContractService;
 
@@ -177,11 +177,11 @@ public class AccountController {
                 BigDecimal intradayAmount = limitRuleDto.getIntradayAmount();
                 BigDecimal autoAmount = limitRuleDto.getAutoAmount();
 
-                WithdrawWhitelistDto withdrawWhitelistDto = withdrawWhitelistService.get(userId, e.getCurrency());
-                if (withdrawWhitelistDto != null) {
-                    maxAmount = withdrawWhitelistDto.getMaxAmount();
-                    intradayAmount = withdrawWhitelistDto.getIntradayAmount();
-                    autoAmount = withdrawWhitelistDto.getAutoAmount();
+                WithdrawRuleUserDto withdrawRuleUserDto = withdrawRuleUserService.get(userId, e.getCurrency());
+                if (withdrawRuleUserDto != null) {
+                    maxAmount = withdrawRuleUserDto.getMaxAmount();
+                    intradayAmount = withdrawRuleUserDto.getIntradayAmount();
+                    autoAmount = withdrawRuleUserDto.getAutoAmount();
                 }
 
                 values.put("minAmount", minAmount);

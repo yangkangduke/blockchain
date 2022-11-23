@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
-import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.*;
 import com.seeds.account.model.SwitchReq;
 import com.seeds.account.dto.req.ChainTxnPageReq;
@@ -276,36 +275,37 @@ public interface AccountFeignClient {
     GenericDto<Boolean> getAndMetricCurrentGasPriceOracle();
 
     /**
-     * 获取所有提币白名单
+     * 获取所有提币用户规则
      *
      */
-    @GetMapping("/sys/withdraw-whitelist-address")
-    GenericDto<List<WithdrawWhitelistDto>> getAllWithdrawWhitelist();
+    @GetMapping("/sys/withdraw-rule-user-address")
+    GenericDto<List<WithdrawRuleUserDto>> getAllWithdrawRuleUser();
 
     /**
-     * 添加提币白名单
+     * 添加提币用户规则
      *
      * @param req
      * @return
      */
-    @PostMapping("/sys/add-withdraw-whitelist-address")
-    GenericDto<Boolean> addWithdrawWhiteList(@RequestBody  WithdrawWhitelistSaveOrUpdateReq req);
-    /**
-     * 更新提币白名单
-     *
-     * @param req
-     * @return
-     */
-    @PostMapping("/sys/update-withdraw-whitelist-address")
-    GenericDto<Boolean> updateWithdrawWhitelist(@RequestBody WithdrawWhitelistSaveOrUpdateReq req);
+    @PostMapping("/sys/add-withdraw-rule-user-address")
+    GenericDto<Boolean> addWithdrawRuleUser(@RequestBody WithdrawRuleUserSaveOrUpdateReq req);
 
     /**
-     * 启用/停用提币白名单
+     * 更新提币用户规则
+     *
      * @param req
      * @return
      */
-    @PostMapping("/sys/delete-withdraw-whitelist-address")
-    GenericDto<Boolean> deleteWithdrawWhitelist(@RequestBody SwitchReq req);
+    @PostMapping("/sys/update-withdraw-rule-user-address")
+    GenericDto<Boolean> updateWithdrawRuleUser(@RequestBody WithdrawRuleUserSaveOrUpdateReq req);
+
+    /**
+     * 启用/停用提币用户规则
+     * @param req
+     * @return
+     */
+    @PostMapping("/sys/delete-withdraw-rule-user-address")
+    GenericDto<Boolean> deleteWithdrawRuleUser(@RequestBody SwitchReq req);
 
     /**
      * 获取所有充提币黑地址
