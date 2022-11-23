@@ -1,16 +1,11 @@
 package com.seeds.uc.job;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.enums.AccountActionStatusEnum;
 import com.seeds.uc.enums.CurrencyEnum;
 import com.seeds.uc.enums.NFTOfferStatusEnum;
 import com.seeds.uc.model.UcNftOffer;
-import com.seeds.uc.model.UcUserAccount;
-import com.seeds.uc.model.UcUserAccountActionHistory;
 import com.seeds.uc.service.IUcNftOfferService;
-import com.seeds.uc.service.IUcUserAccountActionHistoryService;
-import com.seeds.uc.service.IUcUserAccountService;
 import com.seeds.uc.service.impl.CacheService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,11 +47,6 @@ public class UcNftTask {
     @Autowired
     private IUcNftOfferService ucNftOfferService;
 
-    @Autowired
-    private IUcUserAccountService ucUserAccountService;
-
-    @Autowired
-    private IUcUserAccountActionHistoryService ucUserAccountActionHistoryService;
 
     @Scheduled(cron = "0 0 3 * * ?")
     @PostMapping("/expired-offer")
@@ -90,18 +80,18 @@ public class UcNftTask {
         Long userId = offer.getUserId();
         // 解冻金额
         BigDecimal price = offer.getPrice();
-        UcUserAccountInfoResp info = ucUserAccountService.getInfoByUserId(userId);
-        ucUserAccountService.update(UcUserAccount.builder()
-                .freeze(info.getFreeze().subtract(price))
-                .balance(info.getBalance().add(price))
-                .build(), new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, userId)
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
-        // 修改记录信息
-        ucUserAccountActionHistoryService.update(UcUserAccountActionHistory.builder()
-                .status(AccountActionStatusEnum.FAIL)
-                .build(), new LambdaQueryWrapper<UcUserAccountActionHistory>()
-                .eq(UcUserAccountActionHistory::getId, offer.getActionHistoryId()));
+//        UcUserAccountInfoResp info = ucUserAccountService.getInfoByUserId(userId);
+//        ucUserAccountService.update(UcUserAccount.builder()
+//                .freeze(info.getFreeze().subtract(price))
+//                .balance(info.getBalance().add(price))
+//                .build(), new LambdaQueryWrapper<UcUserAccount>()
+//                .eq(UcUserAccount::getUserId, userId)
+//                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
+//        // 修改记录信息
+//        ucUserAccountActionHistoryService.update(UcUserAccountActionHistory.builder()
+//                .status(AccountActionStatusEnum.FAIL)
+//                .build(), new LambdaQueryWrapper<UcUserAccountActionHistory>()
+//                .eq(UcUserAccountActionHistory::getId, offer.getActionHistoryId()));
         // 修改offer
         offer.setStatus(NFTOfferStatusEnum.EXPIRED);
         ucNftOfferService.updateById(offer);
