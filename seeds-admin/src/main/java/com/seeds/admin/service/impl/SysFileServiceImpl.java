@@ -61,7 +61,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
             save(sysFile);
         }
         catch (Exception e) {
-            log.error("文件上传失败，fileName={}", fileName);
+            log.error("文件上传失败，fileName={}, message={}", fileName, e.getMessage());
             throw new GenericException("File upload failed");
         }
         SysFileResp res = new SysFileResp();
