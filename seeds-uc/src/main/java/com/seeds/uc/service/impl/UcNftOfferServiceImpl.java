@@ -11,17 +11,12 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.dto.response.NFTOfferResp;
-import com.seeds.uc.dto.response.UcUserAccountInfoResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.mapper.UcNftOfferMapper;
 import com.seeds.uc.model.UcNftOffer;
 import com.seeds.uc.model.UcUser;
-import com.seeds.uc.model.UcUserAccount;
-import com.seeds.uc.model.UcUserAccountActionHistory;
 import com.seeds.uc.service.IUcNftOfferService;
-import com.seeds.uc.service.IUcUserAccountActionHistoryService;
-import com.seeds.uc.service.IUcUserAccountService;
 import com.seeds.uc.service.IUcUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -53,11 +48,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
     @Autowired
     private RemoteNftService remoteNftService;
 
-    @Autowired
-    private IUcUserAccountService ucUserAccountService;
 
-    @Autowired
-    private IUcUserAccountActionHistoryService ucUserAccountActionHistoryService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -81,28 +72,28 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
         }
         // 检查余额
         BigDecimal reqPrice = req.getPrice();
-        if (!ucUserAccountService.checkBalance(currentUserId, reqPrice, CurrencyEnum.USDT)) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
-        }
+//        if (!ucUserAccountService.checkBalance(currentUserId, reqPrice, CurrencyEnum.USDT)) {
+//            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
+//        }
         // 冻结金额
-        UcUserAccountInfoResp info = ucUserAccountService.getInfo(currentUserId);
-        ucUserAccountService.update(UcUserAccount.builder()
-                .balance(info.getBalance().subtract(reqPrice))
-                .freeze(info.getFreeze().add(reqPrice))
-                .build(), new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, currentUserId)
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
+//        UcUserAccountInfoResp info = ucUserAccountService.getInfo(currentUserId);
+//        ucUserAccountService.update(UcUserAccount.builder()
+//                .balance(info.getBalance().subtract(reqPrice))
+//                .freeze(info.getFreeze().add(reqPrice))
+//                .build(), new LambdaQueryWrapper<UcUserAccount>()
+//                .eq(UcUserAccount::getUserId, currentUserId)
+//                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
         // 添加记录信息
         long currentTimeMillis = System.currentTimeMillis();
-        UcUserAccountActionHistory ucUserAccountActionHistory = UcUserAccountActionHistory.builder()
-                .userId(currentUserId)
-                .createTime(currentTimeMillis)
-                .actionEnum(AccountActionEnum.BUY_NFT)
-                .accountType(AccountTypeEnum.ACTUALS)
-                .currency(CurrencyEnum.USDT)
-                .status(AccountActionStatusEnum.PROCESSING)
-                .build();
-        ucUserAccountActionHistoryService.save(ucUserAccountActionHistory);
+//        UcUserAccountActionHistory ucUserAccountActionHistory = UcUserAccountActionHistory.builder()
+//                .userId(currentUserId)
+//                .createTime(currentTimeMillis)
+//                .actionEnum(AccountActionEnum.BUY_NFT)
+//                .accountType(AccountTypeEnum.ACTUALS)
+//                .currency(CurrencyEnum.USDT)
+//                .status(AccountActionStatusEnum.PROCESSING)
+//                .build();
+//        ucUserAccountActionHistoryService.save(ucUserAccountActionHistory);
         // 存储offer
         UcNftOffer nftOffer = UcNftOffer.builder().build();
         BeanUtils.copyProperties(req, nftOffer);
@@ -110,7 +101,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
         nftOffer.setCreateTime(currentTimeMillis);
         nftOffer.setUpdateTime(currentTimeMillis);
         nftOffer.setStatus(NFTOfferStatusEnum.BIDDING);
-        nftOffer.setActionHistoryId(ucUserAccountActionHistory.getId());
+//        nftOffer.setActionHistoryId(ucUserAccountActionHistory.getId());
         // TODO 汇率转换
         // 计算差异
         nftOffer.setDifference(reqPrice.subtract(price));
@@ -147,18 +138,18 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
         Long userId = offer.getUserId();
         // 解冻金额
         BigDecimal price = offer.getPrice();
-        UcUserAccountInfoResp info = ucUserAccountService.getInfoByUserId(userId);
-        ucUserAccountService.update(UcUserAccount.builder()
-                .balance(info.getBalance().add(price))
-                .freeze(info.getFreeze().subtract(price))
-                .build(), new LambdaQueryWrapper<UcUserAccount>()
-                .eq(UcUserAccount::getUserId, userId)
-                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
-        // 修改记录信息
-        ucUserAccountActionHistoryService.update(UcUserAccountActionHistory.builder()
-                .status(AccountActionStatusEnum.FAIL)
-                .build(), new LambdaQueryWrapper<UcUserAccountActionHistory>()
-                .eq(UcUserAccountActionHistory::getId, offer.getActionHistoryId()));
+//        UcUserAccountInfoResp info = ucUserAccountService.getInfoByUserId(userId);
+//        ucUserAccountService.update(UcUserAccount.builder()
+//                .balance(info.getBalance().add(price))
+//                .freeze(info.getFreeze().subtract(price))
+//                .build(), new LambdaQueryWrapper<UcUserAccount>()
+//                .eq(UcUserAccount::getUserId, userId)
+//                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
+//        // 修改记录信息
+//        ucUserAccountActionHistoryService.update(UcUserAccountActionHistory.builder()
+//                .status(AccountActionStatusEnum.FAIL)
+//                .build(), new LambdaQueryWrapper<UcUserAccountActionHistory>()
+//                .eq(UcUserAccountActionHistory::getId, offer.getActionHistoryId()));
         // 修改offer
         offer.setStatus(NFTOfferStatusEnum.REJECTED);
         updateById(offer);
