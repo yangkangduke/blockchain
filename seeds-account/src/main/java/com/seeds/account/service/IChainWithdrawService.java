@@ -1,7 +1,5 @@
 package com.seeds.account.service;
 
-
-import com.seeds.account.dto.WithdrawLimitRuleDto;
 import com.seeds.account.dto.WithdrawRuleDto;
 import com.seeds.common.enums.Chain;
 
@@ -14,25 +12,6 @@ import java.util.Map;
  *
  */
 public interface IChainWithdrawService {
-
-    /**
-     * 从cache获提币限额规则
-     * @param currency
-     * @return
-     */
-    WithdrawLimitRuleDto getWithdrawLimitRule(String currency);
-
-    /**
-     * 从cache获取所有的提币限额规则
-     * @return
-     */
-    Map<String, WithdrawLimitRuleDto> getWithdrawLimitRuleMap();
-
-    /**
-     * 从数据库获取所有
-     * @return
-     */
-    List<WithdrawLimitRuleDto> loadAllLimit();
 
     /**
      * 从数据库获取所有
@@ -59,12 +38,5 @@ public interface IChainWithdrawService {
      * @return
      */
     List<WithdrawRuleDto> getWithdrawRules();
-
-
-    /**
-     * 从cache获取所有的提币规则
-     * @return
-     */
-    List<WithdrawLimitRuleDto> getWithdrawLimitRules();
 
 }

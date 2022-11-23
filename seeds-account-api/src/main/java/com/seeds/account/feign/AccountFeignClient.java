@@ -440,30 +440,6 @@ public interface AccountFeignClient {
     GenericDto<Boolean> deleteWithdrawRule(@Valid @RequestBody SwitchReq req);
 
     /**
-     * 获取提币限额规则列表
-     */
-    @PostMapping("/sys/get-withdraw-limit-list")
-    GenericDto<List<WithdrawLimitRuleDto>> getWithdrawLimitRuleList();
-
-    /**
-     * 新增提币规则
-     */
-    @PostMapping("/sys/add-withdraw-limit")
-    GenericDto<Boolean> addWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req);
-
-    /**
-     * 编辑提币规则
-     */
-    @PutMapping("/sys/update-withdraw-limit")
-    GenericDto<Boolean> updateWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req);
-
-    /**
-     * 删除提币规则
-     */
-    @PostMapping("/sys/delete-withdraw-limit")
-    GenericDto<Boolean> deleteWithdrawLimitRule(@Valid @RequestBody ListReq req);
-
-    /**
      * 获取所有系统操作控制
      *
      * @return

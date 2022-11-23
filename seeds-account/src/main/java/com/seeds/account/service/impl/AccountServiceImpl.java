@@ -130,12 +130,11 @@ public class AccountServiceImpl implements IAccountService {
         internalWithdraw = assignedDepositAddress != null && assignedDepositAddress.getUserId() > 0;
 
         // 读取提币用户规则
-        WithdrawLimitRuleDto limitRule = chainWithdrawService.getWithdrawLimitRule(currency);
         WithdrawRuleUserDto withdrawRuleUserDto = withdrawRuleUserService.get(userId, currency);
-        BigDecimal minAmount = limitRule.getMinAmount();
-        BigDecimal maxAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getMaxAmount() : limitRule.getMaxAmount();
-        BigDecimal intradyAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getIntradayAmount() : limitRule.getIntradayAmount();
-        BigDecimal autoAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getAutoAmount() : limitRule.getAutoAmount();
+        BigDecimal minAmount = rule.getMinAmount();
+        BigDecimal maxAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getMaxAmount() : rule.getMaxAmount();
+        BigDecimal intradyAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getIntradayAmount() : rule.getIntradayAmount();
+        BigDecimal autoAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getAutoAmount() : rule.getAutoAmount();
 
         // 校验提币精度
         int decimals = rule.getDecimals();
@@ -174,7 +173,7 @@ public class AccountServiceImpl implements IAccountService {
         Utils.check(result, ErrorCode.ACCOUNT_INSUFFICIENT_BALANCE);
 
         // 是否内部提币返还手续费
-        boolean internalWithdrawFeeReturn = Objects.equals("true", limitRule.getZeroFeeOnInternal());
+        boolean internalWithdrawFeeReturn = Objects.equals("true", rule.getZeroFeeOnInternal());
         // 判断是否属于不需要审核的提币
         boolean requireReview = amount.compareTo(autoAmount) > 0;
         int manual = requireReview ? 1 : 0;

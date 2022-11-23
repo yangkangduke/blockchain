@@ -59,8 +59,6 @@ public class AccountInternalController {
     @Autowired
     private IWithdrawRuleService withdrawRuleService;
     @Autowired
-    private IWithdrawLimitRuleService withdrawLimitRuleService;
-    @Autowired
     private ISystemWalletAddressService systemWalletAddressService;
     @Autowired
     private IWithdrawRuleUserService withdrawRuleUserService;
@@ -878,73 +876,6 @@ public class AccountInternalController {
             return GenericDto.success(withdrawRuleService.delete(req));
         } catch (Exception e) {
             log.error("delete-withdraw-rule", e);
-            return Utils.returnFromException(e);
-        }
-    }
-
-    /**
-     * 获取提币限额规则列表
-     *
-     * @return
-     */
-    @PostMapping("/sys/get-withdraw-limit-list")
-    @Inner
-    public GenericDto<List<WithdrawLimitRuleDto>> getWithdrawLimitRuleList() {
-        try {
-            return GenericDto.success(withdrawLimitRuleService.getList());
-        } catch (Exception e) {
-            log.error("get-withdraw-rule-list", e);
-            return Utils.returnFromException(e);
-        }
-    }
-
-    /**
-     * 新增提币规则
-     *
-     * @param req
-     * @return
-     */
-    @PostMapping("/sys/add-withdraw-limit")
-    @Inner
-    public GenericDto<Boolean> addWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req) {
-        try {
-            return GenericDto.success(withdrawLimitRuleService.add(req));
-        } catch (Exception e) {
-            log.error("add-withdraw-rule", e);
-            return Utils.returnFromException(e);
-        }
-    }
-
-    /**
-     * 编辑提币规则
-     *
-     * @param req
-     * @return
-     */
-    @PutMapping("/sys/update-withdraw-limit")
-    @Inner
-    public GenericDto<Boolean> updateWithdrawLimitRule(@RequestBody WithdrawLimitSaveOrUpdateReq req) {
-        try {
-            return GenericDto.success(withdrawLimitRuleService.update(req));
-        } catch (Exception e) {
-            log.error("update-withdraw-limit-rule", e);
-            return Utils.returnFromException(e);
-        }
-    }
-
-    /**
-     * 删除提币规则
-     *
-     * @param req
-     * @return
-     */
-    @PostMapping("/sys/delete-withdraw-limit")
-    @Inner
-    public GenericDto<Boolean> deleteWithdrawLimitRule(@Valid @RequestBody ListReq req) {
-        try {
-            return GenericDto.success(withdrawLimitRuleService.delete(req));
-        } catch (Exception e) {
-            log.error("delete-withdraw-limit-rule", e);
             return Utils.returnFromException(e);
         }
     }
