@@ -5,12 +5,10 @@ import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
 import com.seeds.uc.dto.response.UcUserResp;
-import com.seeds.uc.model.UcUser;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +34,14 @@ public interface UserCenterFeignClient {
      */
     @PostMapping("/uc-internal/user/get-email-by-ids")
     GenericDto<Map<Long, String>> getEmailByIds(@RequestBody List<Long> ids);
+
+    /**
+     * 根据用户ids获取钱包地址
+     * @param ids
+     * @return
+     */
+    @PostMapping("/uc-internal/user/get-public-address-by-ids")
+    GenericDto<Map<Long, String>> getPublicAddressByIds(@RequestBody List<Long> ids);
 
     @PostMapping("/uc-internal/user/all-user")
     @ApiOperation("获取所有用户信息")

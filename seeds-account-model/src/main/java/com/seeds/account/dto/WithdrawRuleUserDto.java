@@ -31,6 +31,11 @@ public class WithdrawRuleUserDto implements Serializable {
      */
     private String email;
 
+    /**
+     * 钱包地址
+     */
+    private String publicAddress;
+
     @ApiModelProperty("用户id")
     private Long userId;
 

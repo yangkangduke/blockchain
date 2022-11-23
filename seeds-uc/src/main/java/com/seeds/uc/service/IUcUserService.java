@@ -1,6 +1,4 @@
 package com.seeds.uc.service;
-
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.uc.dto.UserDto;
@@ -11,7 +9,6 @@ import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.model.UcUser;
-
 import java.util.Collection;
 import java.util.Map;
 
@@ -180,5 +177,11 @@ public interface IUcUserService extends IService<UcUser> {
      */
     Page<UcUserResp> getAllUser(Page page, AllUserReq allUserReq);
 
+    /**
+     * 通过id查询用户钱包地址
+     * @param ids 用户id列表
+     * @return 钱包地址
+     */
+    Map<Long, String> queryPublicAddressByIds(Collection<Long> ids);
 }
 

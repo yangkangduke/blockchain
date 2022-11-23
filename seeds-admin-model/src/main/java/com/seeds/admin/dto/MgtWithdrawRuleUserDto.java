@@ -25,6 +25,11 @@ public class MgtWithdrawRuleUserDto implements Auditable {
      */
     private String email;
 
+    /**
+     * 用户钱包地址
+     */
+    private String publicAddress;
+
     @ApiModelProperty("用户id")
     private Long userId;
 

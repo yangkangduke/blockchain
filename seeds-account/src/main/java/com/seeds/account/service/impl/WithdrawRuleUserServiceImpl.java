@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 import static com.seeds.common.enums.ErrorCode.*;
 
 /**
@@ -85,16 +84,24 @@ public class WithdrawRuleUserServiceImpl extends ServiceImpl<WithdrawRuleUserMap
                 .map(e -> ObjectUtils.copy(e, new WithdrawRuleUserDto()))
                 .collect(Collectors.toList());
         GenericDto<Map<Long, String>> emailMap = userCenterFeignClient.getEmailByIds(withdraw.stream().map(WithdrawRuleUserDto::getUserId).collect(Collectors.toList()));
-
+       // GenericDto<Map<Long, String>> publicAddressMap = userCenterFeignClient.getPublicAddressByIds(withdraw.stream().map(WithdrawRuleUserDto::getUserId).collect(Collectors.toList()));
         List<WithdrawRuleUserDto> resultList = Lists.newArrayList();
         if (null != emailMap && emailMap.getCode() == 200) {
             for (WithdrawRuleUserDto withdrawDto : withdraw) {
                 WithdrawRuleUserDto dto = new WithdrawRuleUserDto();
                 ObjectUtils.copy(withdrawDto, dto);
-                dto.setEmail(emailMap.getData().get(withdrawDto.getUserId()) == null ? "" : emailMap.getData().get(withdrawDto.getUserId()));
+                dto.setEmail(emailMap.getData().get(withdrawDto.getUserId()) == null ? "": emailMap.getData().get(withdrawDto.getUserId()));
                 resultList.add(dto);
             }
         }
+        /*if (null != publicAddressMap && publicAddressMap.getCode() == 200){
+           for (WithdrawRuleUserDto withdrawDto : withdraw) {
+               WithdrawRuleUserDto  ruleUserDto = new WithdrawRuleUserDto();
+               ObjectUtils.copy(withdrawDto, ruleUserDto);
+               ruleUserDto.setPublicAddress(publicAddressMap.getData().get(withdrawDto.getUserId()) == null ? "": publicAddressMap.getData().get(withdrawDto.getUserId()));
+               resultList.add(ruleUserDto);
+           }
+        }*/
         return resultList;
     }
 
@@ -118,7 +125,7 @@ public class WithdrawRuleUserServiceImpl extends ServiceImpl<WithdrawRuleUserMap
                 .eq(WithdrawRuleUser::getUserId,req.getUserId())
                 .eq(WithdrawRuleUser::getChain,req.getChain());
         WithdrawRuleUser one = getOne(queryWrap);
-        if (null != one && one.getId() != req.getId()){
+        if (null != one && !one.getId().equals(req.getId())){
             throw  new ConfigException(USER_ID_ON_CHAIN_ALREADY_EXIST);
         }
 
