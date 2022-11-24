@@ -181,9 +181,7 @@ public class SysCashController {
 
     @GetMapping("/account/hot-wallet")
     @ApiOperation(value = "获取所有系统钱包",notes = "type：1 热钱包; 链： 1 eth ，3 tron ")
-    public GenericDto<List<MgtHotWalletDto>> hotWallet(@RequestParam(value = "type", required = false) Integer type,
-                                                       @RequestParam(value = "chain", defaultValue = "1") Integer chain,
-                                                       @RequestParam(value = "address", required = false) String address) {
+    public GenericDto<List<MgtHotWalletDto>> hotWallet( Integer type, Integer chain, String address) {
         return assetManagementService.queryHotWallets(type, chain, address);
     }
 
