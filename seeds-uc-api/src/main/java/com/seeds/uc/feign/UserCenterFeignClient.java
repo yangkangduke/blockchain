@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
 import java.util.List;
 import java.util.Map;
 
@@ -37,5 +38,9 @@ public interface UserCenterFeignClient {
 
     @PostMapping("/uc-internal/user/all-user")
     @ApiOperation("获取所有用户信息")
-    GenericDto<com.baomidou.mybatisplus.extension.plugins.pagination.Page <UcUserResp>> getAllUser(@RequestBody AllUserReq allUserReq);
+    GenericDto<com.baomidou.mybatisplus.extension.plugins.pagination.Page<UcUserResp>> getAllUser(@RequestBody AllUserReq allUserReq);
+
+    @PostMapping("/uc-internal/user/user-list")
+    @ApiOperation("获取用户信息列表")
+    GenericDto<List<UcUserResp>> getUserList(@RequestBody List<Long> ids);
 }

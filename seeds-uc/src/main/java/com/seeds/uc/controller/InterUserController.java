@@ -1,20 +1,21 @@
 package com.seeds.uc.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.response.UcUserResp;
-import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IUcUserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -68,5 +69,12 @@ public class InterUserController {
         page.setCurrent(allUserReq.getCurrent());
         page.setSize(allUserReq.getSize());
         return GenericDto.success(ucUserService.getAllUser(page, allUserReq));
+    }
+
+    @PostMapping("/user-list")
+    @ApiOperation("获取用户信息列表")
+    @Inner
+    public GenericDto<List<UcUserResp>> getUserList(@RequestBody List<Long> ids) {
+        return GenericDto.success(ucUserService.getUserList(ids));
     }
 }
