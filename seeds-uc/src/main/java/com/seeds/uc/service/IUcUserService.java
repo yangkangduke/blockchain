@@ -177,11 +177,5 @@ public interface IUcUserService extends IService<UcUser> {
      */
     Page<UcUserResp> getAllUser(Page page, AllUserReq allUserReq);
 
-    /**
-     * 通过id查询用户钱包地址
-     * @param ids 用户id列表
-     * @return 钱包地址
-     */
-    Map<Long, String> queryPublicAddressByIds(Collection<Long> ids);
 }
 

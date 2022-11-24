@@ -19,9 +19,11 @@ import com.seeds.admin.service.AssetManagementService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
+import com.seeds.uc.enums.CurrencyEnum;
 import jodd.bean.BeanCopy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -172,6 +174,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         dto.setId(addressDto.getData().getId());
         return GenericDto.success(true);
     }
+
     @Override
     public GenericDto<Boolean> createGasFeeOrder(MgtAddressCollectOrderRequestDto dto) {
         dto.setType(FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode());
@@ -181,6 +184,91 @@ public class AssetManagementServiceImpl implements AssetManagementService {
             return GenericDto.failure(addressDto.getMessage(), addressDto.getCode());
         }
         dto.setId(addressDto.getData().getId());
+        return GenericDto.success(true);
+    }
+
+    @Override
+    public GenericDto<Boolean> createGasFeeAndCollectOrder(MgtGasFeeAndCollectOrderRequestDto requestDto) {
+
+        // 获取预计gasFee = gasPrice(链上获取，没取到则读数据库配置) * gasLimit （数据库配置）
+        Long gasFee = 0L;
+        GenericDto<Long> respDto = accountFeignClient.getGasLimit(requestDto.getChain());
+        if (!respDto.isSuccess()) {
+            return GenericDto.failure(respDto.getCode(), respDto.getMessage());
+        }
+        GenericDto<ChainGasPriceDto> gasPrice = accountFeignClient.getGasPrice(requestDto.getChain());
+        if (!gasPrice.isSuccess()) {
+            return GenericDto.failure(gasPrice.getMessage(), gasPrice.getCode());
+        }
+        gasFee = respDto.getData() * gasPrice.getData().getProposeGasPrice();
+
+        BigDecimal gasFeeDecimal;
+        if (requestDto.getChain() == Chain.ETH.getCode()) {
+            gasFeeDecimal = new BigDecimal(gasFee).divide(new BigDecimal(10).pow(18));
+
+        } else {
+            gasFeeDecimal = new BigDecimal(gasFee).divide(new BigDecimal(10).pow(6));
+
+        }
+        // 链上余额大于等于预估的gasfee,则可以直接发起归集操作
+        List<MgtGasFeeAndCollectOrderRequestDto.MgtGasFeeAndCollectOrderDetail> collectList = requestDto.getList().stream()
+                .filter(p -> new BigDecimal(p.getChainBalance()).compareTo(gasFeeDecimal) >= 0).collect(Collectors.toList());
+
+        // 系统钱包地址
+        String address = this.getSystemWalletAddress(requestDto.getChain());
+
+        // 拼装数据
+        if (!CollectionUtils.isEmpty(collectList)) {
+            MgtAddressCollectOrderRequestDto dto = this.getMgtAddressCollectOrderRequestDto(requestDto);
+            dto.setType(FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode());
+            dto.setCurrency(CurrencyEnum.USDT.getCode().toUpperCase());
+            dto.setGasPrice(String.valueOf(gasPrice.getData().getProposeGasPrice()));
+
+            dto.setAddress(address);
+            List<MgtAddressCollectOrderRequestDto.MgtAddressOrderDetail> collect = collectList.stream().map(p -> {
+                MgtAddressCollectOrderRequestDto.MgtAddressOrderDetail detail = new MgtAddressCollectOrderRequestDto.MgtAddressOrderDetail();
+                detail.setAddress(p.getAddress());
+                detail.setAmount(p.getUsdtBalance());
+                return detail;
+            }).collect(Collectors.toList());
+            dto.setList(collect);
+
+            // 发起归集
+            GenericDto<AddressCollectOrderHisDto> collectOrder =
+                    accountFeignClient.createFundCollectOrder(walletTransferRequestMapper.convert2AddressCollectOrderRequestDto(dto));
+            if (!collectOrder.isSuccess()) {
+                return GenericDto.failure(collectOrder.getMessage(), collectOrder.getCode());
+            }
+        }
+        // 链上余额小于预估的gasfee,则需要先进行资金划转再进行归集操作
+        List<MgtGasFeeAndCollectOrderRequestDto.MgtGasFeeAndCollectOrderDetail> transferGasFeeList = requestDto.getList().stream()
+                .filter(p -> new BigDecimal(p.getChainBalance()).compareTo(gasFeeDecimal) < 0 && new BigDecimal(p.getUsdtBalance()).compareTo(new BigDecimal(0)) > 0)
+                .collect(Collectors.toList());
+
+        if (!CollectionUtils.isEmpty(transferGasFeeList)) {
+            // 拼装数据
+            MgtAddressCollectOrderRequestDto gasFeedto = this.getMgtAddressCollectOrderRequestDto(requestDto);
+            gasFeedto.setType(FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode());
+            gasFeedto.setGasPrice(String.valueOf(gasPrice.getData().getProposeGasPrice()));
+            gasFeedto.setAddress(address);
+            List<MgtAddressCollectOrderRequestDto.MgtAddressOrderDetail> gasFeeList = transferGasFeeList.stream().map(p -> {
+                MgtAddressCollectOrderRequestDto.MgtAddressOrderDetail detail = new MgtAddressCollectOrderRequestDto.MgtAddressOrderDetail();
+                detail.setAddress(p.getAddress());
+                // 划转的金额为预估的手续费减去已有的金额
+                detail.setAmount(String.valueOf(gasFeeDecimal.subtract(new BigDecimal(p.getChainBalance()))));
+                return detail;
+            }).collect(Collectors.toList());
+            gasFeedto.setList(gasFeeList);
+
+            // 发起gasFee划转
+            GenericDto<AddressCollectOrderHisDto> transferOrder =
+                    accountFeignClient.createFundCollectOrder(walletTransferRequestMapper.convert2AddressCollectOrderRequestDto(gasFeedto));
+            if (!transferOrder.isSuccess()) {
+                return GenericDto.failure(transferOrder.getMessage(), transferOrder.getCode());
+            }
+        }
+
+
         return GenericDto.success(true);
     }
 
@@ -195,7 +283,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     }
 
     @Override
-    public GenericDto<List<MgtHotWalletDto>> queryHotWallets(Integer type, int chain, String address) {
+    public GenericDto<List<MgtHotWalletDto>> queryHotWallets(Integer type, Integer chain, String address) {
         GenericDto<List<SystemWalletAddressDto>> dto = accountFeignClient.getAllSystemWalletAddress(chain);
         if (!dto.isSuccess()) {
             return GenericDto.failure(dto.getCode(), dto.getMessage());
@@ -217,6 +305,10 @@ public class AssetManagementServiceImpl implements AssetManagementService {
             }
             if (isNotBlank(address)) {
                 result = address.equals(item.getAddress());
+            }
+            // 表示查所有
+            if (chain == null) {
+                return result ;
             }
             return result && item.getChain() == chain;
         }).collect(Collectors.toList())) {
@@ -377,5 +469,22 @@ public class AssetManagementServiceImpl implements AssetManagementService {
             tokens.add(chain.getNativeToken());
         }
         return tokens;
+    }
+
+    private MgtAddressCollectOrderRequestDto getMgtAddressCollectOrderRequestDto(MgtGasFeeAndCollectOrderRequestDto requestDto) {
+        MgtAddressCollectOrderRequestDto dto = new MgtAddressCollectOrderRequestDto();
+        dto.setChain(requestDto.getChain());
+        dto.setCurrency(Chain.fromCode(requestDto.getChain()).getNativeToken());
+        return dto;
+    }
+
+    // 获取chain 对应的系统钱包地址，可修改为读取数据库配置
+    private String getSystemWalletAddress(int chain) {
+        String address = "";
+        List<SystemWalletAddressDto> data = accountFeignClient.getAllSystemWalletAddress(chain).getData();
+        if (!CollectionUtils.isEmpty(data)) {
+            address = data.get(0).getAddress();
+        }
+        return address;
     }
 }
