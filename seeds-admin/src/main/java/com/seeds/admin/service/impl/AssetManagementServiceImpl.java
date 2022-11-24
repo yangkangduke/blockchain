@@ -306,6 +306,10 @@ public class AssetManagementServiceImpl implements AssetManagementService {
             if (isNotBlank(address)) {
                 result = address.equals(item.getAddress());
             }
+            // 表示查所有
+            if (chain == null) {
+                return result ;
+            }
             return result && item.getChain() == chain;
         }).collect(Collectors.toList())) {
             String queryAddress = data.getAddress();
