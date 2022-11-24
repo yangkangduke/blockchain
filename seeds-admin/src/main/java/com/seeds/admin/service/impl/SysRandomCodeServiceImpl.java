@@ -79,6 +79,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
     @Override
     public IPage<SysRandomCodeResp> queryPage(SysRandomCodePageReq query) {
         LambdaQueryWrapper<SysRandomCodeEntity> queryWrap = new QueryWrapper<SysRandomCodeEntity>().lambda()
+                .like(StringUtils.isNotBlank(query.getDesc()), SysRandomCodeEntity::getDesc, query.getDesc())
                 .eq(query.getStatus() != null, SysRandomCodeEntity::getStatus, query.getStatus())
                 .eq(query.getType() != null, SysRandomCodeEntity::getType, query.getType())
                 .eq(query.getLength() != null, SysRandomCodeEntity::getLength, query.getLength())
@@ -128,6 +129,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
             list.forEach(p -> {
                 // 置为失效
                 p.setExpireTime(0L);
+                p.setStatus(RandomCodeStatusEnum.EXPIRED.getCode());
                 updateById(p);
             });
         }

@@ -1,8 +1,8 @@
 package com.seeds.account.service.impl;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -19,6 +19,8 @@ import com.seeds.account.service.IWithdrawRuleUserService;
 import com.seeds.account.tool.ListMap;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.dto.request.AllUserReq;
+import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,25 +85,17 @@ public class WithdrawRuleUserServiceImpl extends ServiceImpl<WithdrawRuleUserMap
                 .stream()
                 .map(e -> ObjectUtils.copy(e, new WithdrawRuleUserDto()))
                 .collect(Collectors.toList());
-        GenericDto<Map<Long, String>> emailMap = userCenterFeignClient.getEmailByIds(withdraw.stream().map(WithdrawRuleUserDto::getUserId).collect(Collectors.toList()));
-       // GenericDto<Map<Long, String>> publicAddressMap = userCenterFeignClient.getPublicAddressByIds(withdraw.stream().map(WithdrawRuleUserDto::getUserId).collect(Collectors.toList()));
+        GenericDto<Page<UcUserResp>> allUser = userCenterFeignClient.getAllUser((AllUserReq) withdraw.stream().collect(Collectors.toList()));
+        log.debug("WithdrawRuleUserDto  allUser = {}",allUser);
         List<WithdrawRuleUserDto> resultList = Lists.newArrayList();
-        if (null != emailMap && emailMap.getCode() == 200) {
+        if (null != allUser && allUser.getCode() == 200) {
             for (WithdrawRuleUserDto withdrawDto : withdraw) {
                 WithdrawRuleUserDto dto = new WithdrawRuleUserDto();
                 ObjectUtils.copy(withdrawDto, dto);
-                dto.setEmail(emailMap.getData().get(withdrawDto.getUserId()) == null ? "": emailMap.getData().get(withdrawDto.getUserId()));
+                dto.setEmail(allUser.getData().toString());
                 resultList.add(dto);
             }
         }
-        /*if (null != publicAddressMap && publicAddressMap.getCode() == 200){
-           for (WithdrawRuleUserDto withdrawDto : withdraw) {
-               WithdrawRuleUserDto  ruleUserDto = new WithdrawRuleUserDto();
-               ObjectUtils.copy(withdrawDto, ruleUserDto);
-               ruleUserDto.setPublicAddress(publicAddressMap.getData().get(withdrawDto.getUserId()) == null ? "": publicAddressMap.getData().get(withdrawDto.getUserId()));
-               resultList.add(ruleUserDto);
-           }
-        }*/
         return resultList;
     }
 

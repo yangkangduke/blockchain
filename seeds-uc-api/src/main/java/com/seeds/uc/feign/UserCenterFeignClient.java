@@ -35,14 +35,6 @@ public interface UserCenterFeignClient {
     @PostMapping("/uc-internal/user/get-email-by-ids")
     GenericDto<Map<Long, String>> getEmailByIds(@RequestBody List<Long> ids);
 
-    /**
-     * 根据用户ids获取钱包地址
-     * @param ids
-     * @return
-     */
-    @PostMapping("/uc-internal/user/get-public-address-by-ids")
-    GenericDto<Map<Long, String>> getPublicAddressByIds(@RequestBody List<Long> ids);
-
     @PostMapping("/uc-internal/user/all-user")
     @ApiOperation("获取所有用户信息")
     GenericDto<com.baomidou.mybatisplus.extension.plugins.pagination.Page <UcUserResp>> getAllUser(@RequestBody AllUserReq allUserReq);
