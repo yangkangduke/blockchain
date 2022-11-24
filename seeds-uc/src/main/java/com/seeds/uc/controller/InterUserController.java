@@ -60,12 +60,6 @@ public class InterUserController {
         return GenericDto.success(ucUserService.queryEmailByIds(ids));
     }
 
-    @PostMapping("/get-public-address-by-ids")
-    @Inner
-    public GenericDto<Map<Long, String>> getPublicAddressByIds(@RequestBody List<Long> ids) {
-        return GenericDto.success(ucUserService.queryPublicAddressByIds(ids));
-    }
-
     @PostMapping("/all-user")
     @ApiOperation("获取所有用户信息")
     @Inner
