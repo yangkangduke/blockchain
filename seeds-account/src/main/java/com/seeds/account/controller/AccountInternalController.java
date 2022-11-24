@@ -388,7 +388,7 @@ public class AccountInternalController {
     @GetMapping("/sys/system-wallet-address")
     @ApiOperation("获取所有系统使用的地址")
     @Inner
-    public GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(Integer chain) {
+    public GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam(value = "chain",required = false) Integer chain) {
         try {
             List<SystemWalletAddressDto> list = systemWalletAddressService.loadAll();
             if (chain != null) {
@@ -412,7 +412,7 @@ public class AccountInternalController {
     @GetMapping("/sys/system-address-balances")
     @ApiOperation("获取所有系统地址的余额")
     @Inner
-    public GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(Integer chain) {
+    public GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(@RequestParam(value = "chain",required = false) Integer chain) {
         try {
             // 查全部
             if (chain == null) {
