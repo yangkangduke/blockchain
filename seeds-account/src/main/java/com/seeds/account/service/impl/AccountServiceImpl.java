@@ -215,7 +215,7 @@ public class AccountServiceImpl implements IAccountService {
                     .userSource(TargetSource.ADMIN.name())
                     .values(ImmutableMap.of(
                             "ts", System.currentTimeMillis(),
-                            "type", AccountAction.WITHDRAW.getNotificationType()))
+                            "type", AccountAction.WITHDRAW.getCode()))
                     .build()));
             log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.WITHDRAW.getNotificationType());
         }

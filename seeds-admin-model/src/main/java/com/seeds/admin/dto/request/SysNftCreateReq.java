@@ -42,4 +42,7 @@ public class SysNftCreateReq extends SysNftAddReq {
 	@NotBlank(message = "NFT gas fees cannot be empty")
 	private String gasFees;
 
+	@ApiModelProperty("回调通知链接")
+	private String callbackUrl;
+
 }
