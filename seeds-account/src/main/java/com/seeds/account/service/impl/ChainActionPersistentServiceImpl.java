@@ -137,7 +137,7 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
                         .userSource(TargetSource.ADMIN.name())
                         .values(ImmutableMap.of(
                                 "ts", System.currentTimeMillis(),
-                                "type", AccountAction.DEPOSIT.getNotificationType()))
+                                "type", AccountAction.DEPOSIT.getCode()))
                         .build()));
                 log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.DEPOSIT.getNotificationType());
                 // 发送通知给运维人员
@@ -177,7 +177,7 @@ public class ChainActionPersistentServiceImpl implements IChainActionPersistentS
                                 .userSource(TargetSource.ADMIN.name())
                                 .values(ImmutableMap.of(
                                         "ts", System.currentTimeMillis(),
-                                        "type", AccountAction.DEPOSIT.getNotificationType()))
+                                        "type", AccountAction.DEPOSIT.getCode()))
                                 .build()));
                         log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.DEPOSIT.getNotificationType());
                         // 发送通知给运维人员

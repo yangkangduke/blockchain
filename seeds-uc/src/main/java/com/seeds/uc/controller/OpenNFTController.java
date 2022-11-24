@@ -14,7 +14,6 @@ import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.enums.UcErrorCodeEnum;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.service.IUcNftOfferService;
-import com.seeds.uc.service.IUcUserAccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +36,7 @@ import javax.validation.Valid;
 @Slf4j
 public class OpenNFTController {
 
-    @Autowired
-    private IUcUserAccountService ucUserAccountService;
+
     @Autowired
     private IUcNftOfferService ucNftOffersService;
     @Autowired
@@ -53,7 +51,7 @@ public class OpenNFTController {
         } catch (Exception e) {
             throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
         }
-        ucUserAccountService.buyNFT(buyReq, sysNftDetailResp);
+//        ucUserAccountService.buyNFT(buyReq, sysNftDetailResp);
         return GenericDto.success(null);
     }
 

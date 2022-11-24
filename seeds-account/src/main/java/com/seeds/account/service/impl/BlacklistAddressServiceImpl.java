@@ -109,7 +109,7 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
 
     @Override
     public Boolean update(BlackListAddressSaveOrUpdateReq req) {
-
+        log.info("BlacklistAddress req={}",req);
         //要修改的地址已经存在，无法修改
         LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
                 .eq(BlacklistAddress::getAddress,req.getAddress())

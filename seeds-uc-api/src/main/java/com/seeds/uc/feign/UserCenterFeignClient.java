@@ -5,12 +5,10 @@ import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
 import com.seeds.uc.dto.response.UcUserResp;
-import com.seeds.uc.model.UcUser;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
 import java.util.List;
 import java.util.Map;
 

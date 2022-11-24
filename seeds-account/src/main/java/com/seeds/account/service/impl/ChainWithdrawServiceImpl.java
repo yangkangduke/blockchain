@@ -3,10 +3,8 @@ package com.seeds.account.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.seeds.account.dto.WithdrawLimitRuleDto;
 import com.seeds.account.dto.WithdrawRuleDto;
 import com.seeds.account.enums.CommonStatus;
-import com.seeds.account.mapper.WithdrawLimitRuleMapper;
 import com.seeds.account.mapper.WithdrawRuleMapper;
 import com.seeds.account.service.IChainWithdrawService;
 import com.seeds.account.tool.ListMap;
@@ -33,11 +31,8 @@ public class ChainWithdrawServiceImpl implements IChainWithdrawService {
 
     @Autowired
     WithdrawRuleMapper withdrawRuleMapper;
-    @Autowired
-    WithdrawLimitRuleMapper withdrawLimitRuleMapper;
 
     final static String ALL = "all";
-
 
     /**
      * 提币规则（与链相关）
@@ -57,38 +52,6 @@ public class ChainWithdrawServiceImpl implements IChainWithdrawService {
         return chain + ":" + currency;
     }
 
-
-    @Override
-    public WithdrawLimitRuleDto getWithdrawLimitRule(String currency) {
-        return getWithdrawLimitRuleMap().get(currency);
-    }
-
-    @Override
-    public Map<String, WithdrawLimitRuleDto> getWithdrawLimitRuleMap() {
-        return Objects.requireNonNull(limits.get(ALL)).getMap();
-    }
-
-    @Override
-    public List<WithdrawLimitRuleDto> loadAllLimit() {
-        return withdrawLimitRuleMapper.selectList(new QueryWrapper<>())
-                .stream()
-                .map(e -> ObjectUtils.copy(e, new WithdrawLimitRuleDto()))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 提币限额(与链无关)
-     */
-    LoadingCache<String, ListMap<WithdrawLimitRuleDto>> limits = Caffeine.newBuilder()
-            .refreshAfterWrite(15, TimeUnit.SECONDS)
-            .recordStats()
-            .build(k -> {
-                List<WithdrawLimitRuleDto> list = loadAllLimit();
-                Map<String, WithdrawLimitRuleDto> map = list.stream()
-                        .collect(Collectors.toMap(WithdrawLimitRuleDto::getCurrency, e -> e));
-                return ListMap.init(list, map);
-            });
-
     @Override
     public WithdrawRuleDto getWithdrawRule(Chain chain, String currency) {
         return getWithdrawRuleMap().get(toKey(chain.getCode(), currency));
@@ -102,11 +65,6 @@ public class ChainWithdrawServiceImpl implements IChainWithdrawService {
     @Override
     public List<WithdrawRuleDto> getWithdrawRules() {
         return Objects.requireNonNull(rules.get(ALL)).getList();
-    }
-
-    @Override
-    public List<WithdrawLimitRuleDto> getWithdrawLimitRules() {
-        return Objects.requireNonNull(limits.get(ALL)).getList();
     }
 
     @Override

@@ -1,6 +1,4 @@
 package com.seeds.uc.service;
-
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.uc.dto.UserDto;
@@ -11,7 +9,6 @@ import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.model.UcUser;
-
 import java.util.Collection;
 import java.util.Map;
 

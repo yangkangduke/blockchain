@@ -3,10 +3,12 @@ package com.seeds.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-import com.seeds.account.dto.*;
+import com.seeds.account.dto.AddressCollectHisDto;
+import com.seeds.account.dto.BalanceGetStatusDto;
+import com.seeds.account.dto.ChainGasPriceDto;
+import com.seeds.account.dto.SystemWalletAddressUpdateDto;
 import com.seeds.account.enums.FundCollectOrderType;
 import com.seeds.account.feign.AccountFeignClient;
-import com.seeds.admin.annotation.MgtAuthority;
 import com.seeds.admin.dto.*;
 import com.seeds.admin.dto.request.SysCollectOrderHisReq;
 import com.seeds.admin.service.AssetManagementService;
@@ -15,7 +17,6 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import jodd.bean.BeanCopy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -181,9 +182,7 @@ public class SysCashController {
 
     @GetMapping("/account/hot-wallet")
     @ApiOperation(value = "获取所有系统钱包",notes = "type：1 热钱包; 链： 1 eth ，3 tron ")
-    public GenericDto<List<MgtHotWalletDto>> hotWallet(@RequestParam(value = "type", required = false) Integer type,
-                                                       @RequestParam(value = "chain", defaultValue = "1") Integer chain,
-                                                       @RequestParam(value = "address", required = false) String address) {
+    public GenericDto<List<MgtHotWalletDto>> hotWallet( Integer type, Integer chain, String address) {
         return assetManagementService.queryHotWallets(type, chain, address);
     }
 
@@ -238,6 +237,12 @@ public class SysCashController {
     @ApiOperation("Gas Fee划转")
     public GenericDto<Boolean> createGasFeeOrder(@RequestBody MgtAddressCollectOrderRequestDto dto) {
         return assetManagementService.createGasFeeOrder(dto);
+    }
+
+    @PostMapping("/transfer/gas-fee-and-collect")
+    @ApiOperation("Gas Fee划转并进行归集操作")
+    public GenericDto<Boolean> createGasFeeAndCollectOrder(@Valid @RequestBody MgtGasFeeAndCollectOrderRequestDto dto) {
+        return assetManagementService.createGasFeeAndCollectOrder(dto);
     }
 
 

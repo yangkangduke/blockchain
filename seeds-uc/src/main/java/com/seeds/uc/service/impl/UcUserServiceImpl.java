@@ -603,5 +603,4 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         Page<UcUserResp> respPage = baseMapper.getAllUser(page, allUserReq);
         return respPage;
     }
-
 }

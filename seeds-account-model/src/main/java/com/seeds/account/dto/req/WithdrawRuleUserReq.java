@@ -7,15 +7,15 @@ import lombok.Data;
 
 /**
  * <p>
- * 提币白名单请求req
+ * 提币用户规则请求req
  * </p>
  *
  * @author dengyang
  * @since 2022-11-12
  */
 @Data
-@ApiModel(value = "WithdrawWhitelistPageReq", description = "提币白名单请求req")
-public class WithdrawWhitelistReq {
+@ApiModel(value = "WithdrawRuleUserReq", description = "提币用户规则请求req")
+public class WithdrawRuleUserReq {
 
     /**
      * @see  com.seeds.account.enums.CommonStatus

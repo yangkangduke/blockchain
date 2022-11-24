@@ -47,7 +47,7 @@ public class AccountController {
     @Autowired
     private IChainWithdrawService chainWithdrawService;
     @Autowired
-    private IWithdrawWhitelistService withdrawWhitelistService;
+    private IWithdrawRuleUserService withdrawRuleUserService;
     @Autowired
     private IChainContractService chainContractService;
 
@@ -171,24 +171,23 @@ public class AccountController {
                 values.put("feeAmount", e.getFeeAmount());
                 values.put("amountDecimals", e.getDecimals());
 
-                WithdrawLimitRuleDto limitRuleDto = chainWithdrawService.getWithdrawLimitRule(e.getCurrency());
-                BigDecimal minAmount = limitRuleDto.getMinAmount();
-                BigDecimal maxAmount = limitRuleDto.getMaxAmount();
-                BigDecimal intradayAmount = limitRuleDto.getIntradayAmount();
-                BigDecimal autoAmount = limitRuleDto.getAutoAmount();
+                BigDecimal minAmount = e.getMinAmount();
+                BigDecimal maxAmount = e.getMaxAmount();
+                BigDecimal intradayAmount = e.getIntradayAmount();
+                BigDecimal autoAmount = e.getAutoAmount();
 
-                WithdrawWhitelistDto withdrawWhitelistDto = withdrawWhitelistService.get(userId, e.getCurrency());
-                if (withdrawWhitelistDto != null) {
-                    maxAmount = withdrawWhitelistDto.getMaxAmount();
-                    intradayAmount = withdrawWhitelistDto.getIntradayAmount();
-                    autoAmount = withdrawWhitelistDto.getAutoAmount();
+                WithdrawRuleUserDto withdrawRuleUserDto = withdrawRuleUserService.get(userId, e.getCurrency());
+                if (withdrawRuleUserDto != null) {
+                    maxAmount = withdrawRuleUserDto.getMaxAmount();
+                    intradayAmount = withdrawRuleUserDto.getIntradayAmount();
+                    autoAmount = withdrawRuleUserDto.getAutoAmount();
                 }
 
                 values.put("minAmount", minAmount);
                 values.put("maxAmount", maxAmount);
                 values.put("intradayAmount", intradayAmount);
                 values.put("autoAmount", autoAmount);
-                values.put("zeroFeeOnInternal", limitRuleDto.getZeroFeeOnInternal());
+                values.put("zeroFeeOnInternal", e.getZeroFeeOnInternal());
 
                 // 当日已使用额度
                 BigDecimal usedIntradayWithdraw = accountService.getUsedIntradayWithdraw(userId, e.getCurrency());
@@ -215,7 +214,6 @@ public class AccountController {
         Map<String, Object> rules = Maps.newLinkedHashMap();
         rules.put("depositRules", getCurrentUserDepositRules());
         rules.put("withdrawRules", getCurrentUserWithdrawRules());
-        rules.put("withdrawLimitRules", chainWithdrawService.getWithdrawLimitRules());
         return GenericDto.success(rules);
     }
 

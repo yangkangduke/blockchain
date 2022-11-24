@@ -2,8 +2,6 @@ package com.seeds.game.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.uc.dto.response.UcUserAccountAmountResp;
-import com.seeds.uc.feign.RemoteUserAccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -23,20 +21,19 @@ import java.util.List;
 @RequestMapping("/account")
 public class OpenAccountController {
 
-    @Autowired
-    private RemoteUserAccountService remoteUserAccountService;
 
-    @GetMapping("/amount-info")
-    @ApiOperation(value = "账户金额详情", notes = "账户金额详情")
-    public GenericDto<List<UcUserAccountAmountResp>> amountInfo(@RequestParam String accessKey,
-                                                                @RequestParam String signature,
-                                                                @RequestParam Long timestamp) {
-        GenericDto<List<UcUserAccountAmountResp>> result = remoteUserAccountService.amountInfo(UserContext.getCurrentUserId());
-        if (!result.isSuccess()) {
-            return GenericDto.failure(result.getMessage(),
-                    result.getCode());
-        }
-        return result;
-    }
+
+//    @GetMapping("/amount-info")
+//    @ApiOperation(value = "账户金额详情", notes = "账户金额详情")
+//    public GenericDto<List<UcUserAccountAmountResp>> amountInfo(@RequestParam String accessKey,
+//                                                                @RequestParam String signature,
+//                                                                @RequestParam Long timestamp) {
+//        GenericDto<List<UcUserAccountAmountResp>> result = remoteUserAccountService.amountInfo(UserContext.getCurrentUserId());
+//        if (!result.isSuccess()) {
+//            return GenericDto.failure(result.getMessage(),
+//                    result.getCode());
+//        }
+//        return result;
+//    }
 
 }

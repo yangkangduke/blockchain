@@ -1,7 +1,6 @@
 package com.seeds.admin.service.impl;
 
 import com.seeds.account.dto.DepositRuleDto;
-import com.seeds.account.dto.WithdrawLimitRuleDto;
 import com.seeds.account.dto.WithdrawRuleDto;
 import com.seeds.account.dto.req.*;
 import com.seeds.account.feign.AccountFeignClient;
@@ -64,24 +63,4 @@ public class SysDepositWithdrawConfigService implements ISysDepositWithdrawConfi
         return accountFeignClient.deleteWithdrawRule(req);
     }
 
-    @Override
-    public GenericDto<Boolean> addWithdrawLimitRule(WithdrawLimitSaveOrUpdateReq req) {
-        return accountFeignClient.addWithdrawLimitRule(req);
-    }
-
-    @Override
-    public GenericDto<List<WithdrawLimitRuleDto>> getWithdrawLimitRuleList() {
-        return accountFeignClient.getWithdrawLimitRuleList();
-    }
-
-    @Override
-    public GenericDto<Boolean> updateWithdrawLimitRule(WithdrawLimitSaveOrUpdateReq req) {
-        return accountFeignClient.updateWithdrawLimitRule(req);
-    }
-
-
-    @Override
-    public GenericDto<Boolean> deleteWithdrawLimitRule(ListReq req) {
-        return accountFeignClient.deleteWithdrawLimitRule(req);
-    }
 }
