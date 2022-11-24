@@ -21,6 +21,9 @@ public class SysRandomCodePageReq extends PageReq {
     @ApiModelProperty(value = "长度")
     private Integer length;
 
+    @ApiModelProperty(value = "描述")
+    private String desc;
+
     @ApiModelProperty(value = "数量")
     private Integer number;
 

@@ -405,7 +405,7 @@ public class ChainActionServiceImpl implements IChainActionService {
                         .userSource(TargetSource.ADMIN.name())
                         .values(ImmutableMap.of(
                                 "ts", System.currentTimeMillis(),
-                                "type", AccountAction.DEPOSIT.getNotificationType()))
+                                "type", AccountAction.DEPOSIT.getCode()))
                         .build()));
                 log.info("send audit notification, ts:{}, type:{}", System.currentTimeMillis(), AccountAction.DEPOSIT.getNotificationType());
             } else {
