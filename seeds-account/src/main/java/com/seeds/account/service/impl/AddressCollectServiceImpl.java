@@ -22,6 +22,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.redis.account.RedisKeys;
+import com.seeds.uc.enums.CurrencyEnum;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import com.seeds.wallet.dto.RawTransactionDto;
 import lombok.extern.slf4j.Slf4j;
@@ -233,8 +234,21 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
             collectOrder.setStatus(FundCollectOrderStatus.COMPLETED.getCode());
             log.info("checkAndUpdateOrderStatus collectOrder={}", collectOrder);
             addressCollectOrderHisMapper.updateByPrimaryKey(collectOrder);
+
+            // 划转完成后，自动发起归集
+            if (collectOrder.getType() == FundCollectOrderType.FROM_SYSTEM_TO_USER.getCode()) {
+                AddressCollectOrderRequestDto dto = this.getAddressCollectOrderRequestDto(collectOrder, collectHisList);
+                dto.setChain(collectOrder.getChain().getCode());
+                dto.setCurrency(CurrencyEnum.USDT.getCode().toUpperCase());
+                dto.setAddress(collectOrder.getAddress());
+                dto.setType(FundCollectOrderType.FROM_USER_TO_SYSTEM.getCode());
+                dto.setGasPrice(chainService.getGasPriceDto(collectOrder.getChain()).getProposeGasPrice());
+                asyncService.execute(() -> this.createFundCollectOrder(dto));
+            }
+
         });
     }
+
 
     @Override
     @SingletonLock(key = "/kine/account/chain/scan-pending-collect-balances")
@@ -641,5 +655,34 @@ public class AddressCollectServiceImpl implements IAddressCollectService {
                 }
             }
         }
+    }
+
+    private AddressCollectOrderRequestDto getAddressCollectOrderRequestDto(AddressCollectOrderHis collectOrder, List<AddressCollectHis> collectHisList) {
+
+        AddressCollectOrderRequestDto dto = new AddressCollectOrderRequestDto();
+        dto.setChain(collectOrder.getChain().getCode());
+        List<String> userAddresses = collectHisList.stream().map(AddressCollectHis::getToAddress).collect(Collectors.toList());
+        try {
+            // batch操作中间的休眠时间（毫秒）
+            long sleep = Long.parseLong(systemConfigService.getValue(AccountSystemConfig.FUND_COLLECT_REQUEST_BATCH_SLEEP, "500"));
+            List<AddressBalanceDto> balancesOnBatch = chainService.getBalancesOnBatch(collectOrder.getChain(), userAddresses, sleep);
+
+            List<AddressCollectOrderRequestDto.AddressOrderDetail> list = userAddresses.stream().map(p -> {
+                AddressCollectOrderRequestDto.AddressOrderDetail detail = new AddressCollectOrderRequestDto.AddressOrderDetail();
+                detail.setAddress(p);
+                for (AddressBalanceDto balance : balancesOnBatch) {
+                    if (balance.getAddress().equalsIgnoreCase(p)) {
+                        detail.setAmount(balance.getBalances().containsKey(CurrencyEnum.USDT.getCode().toUpperCase()) ? balance.getBalances().get(CurrencyEnum.USDT.getCode().toUpperCase()) : new BigDecimal(0));
+                    }
+                }
+                return detail;
+            }).collect(Collectors.toList());
+
+            dto.setList(list);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dto;
     }
 }
