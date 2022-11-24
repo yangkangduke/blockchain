@@ -730,7 +730,7 @@ public class AccountInternalController {
             SystemWalletAddressDto addressDto = SystemWalletAddressDto.builder()
                     .address(updateDto.getAddress())
                     .type(updateDto.getType())
-                    .chain(updateDto.getType())
+                    .chain(updateDto.getChain())
                     .tag(updateDto.getTag())
                     .comments(updateDto.getComments())
                     .status(updateDto.getStatus())

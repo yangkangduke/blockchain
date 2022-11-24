@@ -212,7 +212,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
         }
         // 链上余额大于等于预估的gasfee,则可以直接发起归集操作
         List<MgtGasFeeAndCollectOrderRequestDto.MgtGasFeeAndCollectOrderDetail> collectList = requestDto.getList().stream()
-                .filter(p -> new BigDecimal(p.getChainBalance()).compareTo(gasFeeDecimal) >= 0).collect(Collectors.toList());
+                .filter(p -> new BigDecimal(p.getChainBalance()).compareTo(gasFeeDecimal) >= 0 && new BigDecimal(p.getUsdtBalance()).compareTo(new BigDecimal(0)) > 0).collect(Collectors.toList());
 
         // 系统钱包地址
         String address = this.getSystemWalletAddress(requestDto.getChain());
