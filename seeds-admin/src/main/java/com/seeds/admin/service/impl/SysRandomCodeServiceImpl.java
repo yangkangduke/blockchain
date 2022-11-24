@@ -79,11 +79,17 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
     @Override
     public IPage<SysRandomCodeResp> queryPage(SysRandomCodePageReq query) {
         LambdaQueryWrapper<SysRandomCodeEntity> queryWrap = new QueryWrapper<SysRandomCodeEntity>().lambda()
-                .eq(query.getStatus() != null, SysRandomCodeEntity::getStatus, query.getStatus())
+                .like(StringUtils.isNotBlank(query.getDesc()), SysRandomCodeEntity::getDesc, query.getDesc())
                 .eq(query.getType() != null, SysRandomCodeEntity::getType, query.getType())
                 .eq(query.getLength() != null, SysRandomCodeEntity::getLength, query.getLength())
-                .eq(query.getNumber() != null, SysRandomCodeEntity::getNumber, query.getNumber())
-                .orderByDesc(SysRandomCodeEntity::getBatchNo);
+                .eq(query.getNumber() != null, SysRandomCodeEntity::getNumber, query.getNumber());
+        if (query.getStatus() != null) {
+            queryWrap.eq(SysRandomCodeEntity::getStatus, query.getStatus());
+            if (RandomCodeStatusEnum.NORMAL.getCode() == query.getStatus()) {
+                queryWrap.gt(SysRandomCodeEntity::getExpireTime, System.currentTimeMillis());
+            }
+        }
+        queryWrap.orderByDesc(SysRandomCodeEntity::getBatchNo);
         Page<SysRandomCodeEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
         List<SysRandomCodeEntity> records = page.getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -94,7 +100,9 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
             BeanUtils.copyProperties(p, resp);
             // 失效状态
             if (resp.getExpireTime() < System.currentTimeMillis()) {
+                p.setStatus(RandomCodeStatusEnum.EXPIRED.getCode());
                 resp.setStatus(RandomCodeStatusEnum.EXPIRED.getCode());
+                updateById(p);
             }
             return resp;
         });
@@ -128,6 +136,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
             list.forEach(p -> {
                 // 置为失效
                 p.setExpireTime(0L);
+                p.setStatus(RandomCodeStatusEnum.EXPIRED.getCode());
                 updateById(p);
             });
         }
@@ -203,6 +212,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void detailDelete(ListReq req) {
         List<SysRandomCodeDetailEntity> details = sysRandomCodeDetailService.listByIds(req.getIds());
         if (CollectionUtils.isEmpty(details)) {
@@ -213,6 +223,9 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
             throw new SeedsException("Cannot delete used random codes");
         }
         sysRandomCodeDetailService.removeByIds(req.getIds());
+        SysRandomCodeEntity randomCode = queryByBatchNo(details.get(0).getBatchNo());
+        randomCode.setNumber(randomCode.getNumber() - details.size());
+        updateById(randomCode);
     }
 
     @Override
@@ -221,7 +234,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         if (randomCode == null) {
             throw new SeedsException("Record does not exist");
         }
-        if (StringUtils.isNotBlank(randomCode.getExcelUrl())) {
+        if (StringUtils.isNotBlank(randomCode.getExcelUrl()) && Objects.equals(randomCode.getExportTime(), randomCode.getUpdatedAt())) {
             return randomCode.getExcelUrl();
         }
         // 处理数量小于阈值直接同步处理
@@ -267,11 +280,13 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         @Cleanup InputStream is = new ByteArrayInputStream(content);
         SysFileResp resp = sysFileService.upload(is, batchNo + ".xlsx", RandomCodeType.from(randomCode.getType()).getDescEn(), null);
         randomCode.setExcelUrl(resp.getUrl());
+        randomCode.setExportTime(randomCode.getUpdatedAt());
         updateById(randomCode);
         return resp.getUrl();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void useRandomCode(RandomCodeUseReq req) {
         LambdaQueryWrapper<SysRandomCodeEntity> query = new QueryWrapper<SysRandomCodeEntity>().lambda()
                 .eq(SysRandomCodeEntity::getType, req.getType())
@@ -282,6 +297,8 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
             throw new SeedsException("Invitation not exist");
         }
         SysRandomCodeEntity randomCode = list.get(0);
+        randomCode.setUpdatedAt(System.currentTimeMillis());
+        updateById(randomCode);
         SysRandomCodeDetailEntity randomCodeDetail = sysRandomCodeDetailService.queryByBatchNoAndCode(randomCode.getBatchNo(), req.getCode());
         if (randomCodeDetail == null) {
             throw new SeedsException("Invitation code not exist");

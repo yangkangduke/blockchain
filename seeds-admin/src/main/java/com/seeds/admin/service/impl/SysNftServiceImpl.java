@@ -107,7 +107,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Override
     public IPage<SysNftResp> queryPage(SysNftPageReq query) {
         LambdaQueryWrapper<SysNftEntity> queryWrap = new QueryWrapper<SysNftEntity>().lambda()
-                .likeRight(StringUtils.isNotBlank(query.getName()), SysNftEntity::getName, query.getName())
+                .like(StringUtils.isNotBlank(query.getName()), SysNftEntity::getName, query.getName())
                 .eq(query.getStatus() != null, SysNftEntity::getStatus, query.getStatus())
                 .eq(query.getNftTypeId() != null, SysNftEntity::getNftTypeId, query.getNftTypeId())
                 .eq(query.getUserId() != null, SysNftEntity::getOwnerId, query.getUserId())
