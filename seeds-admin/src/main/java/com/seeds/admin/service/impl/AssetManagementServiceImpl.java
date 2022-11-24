@@ -195,7 +195,7 @@ public class AssetManagementServiceImpl implements AssetManagementService {
     }
 
     @Override
-    public GenericDto<List<MgtHotWalletDto>> queryHotWallets(Integer type, int chain, String address) {
+    public GenericDto<List<MgtHotWalletDto>> queryHotWallets(Integer type, Integer chain, String address) {
         GenericDto<List<SystemWalletAddressDto>> dto = accountFeignClient.getAllSystemWalletAddress(chain);
         if (!dto.isSuccess()) {
             return GenericDto.failure(dto.getCode(), dto.getMessage());

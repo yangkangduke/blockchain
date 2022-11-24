@@ -388,11 +388,14 @@ public class AccountInternalController {
     @GetMapping("/sys/system-wallet-address")
     @ApiOperation("获取所有系统使用的地址")
     @Inner
-    public GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam("chain") int chain) {
+    public GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam(value = "chain") Integer chain) {
         try {
-            List<SystemWalletAddressDto> list = systemWalletAddressService.loadAll()
-                    .stream().filter(e -> /*e.getStatus() == CommonStatus.ENABLED.getCode() &&*/ e.getChain() == chain)
-                    .collect(Collectors.toList());
+            List<SystemWalletAddressDto> list = systemWalletAddressService.loadAll();
+            if (chain != null) {
+                list.stream().filter(e -> e.getChain() == chain)
+                        .collect(Collectors.toList());
+            }
+
             return GenericDto.success(list);
         } catch (Exception e) {
             log.error("getAllSystemWalletAddress", e);
@@ -409,15 +412,37 @@ public class AccountInternalController {
     @GetMapping("/sys/system-address-balances")
     @ApiOperation("获取所有系统地址的余额")
     @Inner
-    public GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(@RequestParam("chain") int chain) {
+    public GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(@RequestParam("chain") Integer chain) {
         try {
-            List<String> addresses = systemWalletAddressService.getAll()
-                    .stream()
-                    .filter(e -> e.getStatus() == CommonStatus.ENABLED.getCode() && e.getChain() == chain)
-                    .map(SystemWalletAddressDto::getAddress)
-                    .collect(Collectors.toList());
-            List<AddressBalanceDto> balances = chainService.getBalancesOnBatch(Chain.fromCode(chain), addresses, 0L);
-            return GenericDto.success(balances);
+            // 查全部
+            if (chain == null) {
+                List<String> addressesEth = systemWalletAddressService.getAll()
+                        .stream()
+                        .filter(e -> e.getChain() == 1)
+                        .map(SystemWalletAddressDto::getAddress)
+                        .collect(Collectors.toList());
+                List<String> addressesTron = systemWalletAddressService.getAll()
+                        .stream()
+                        .filter(e -> e.getChain() == 3)
+                        .map(SystemWalletAddressDto::getAddress)
+                        .collect(Collectors.toList());
+                List<AddressBalanceDto> balancesEth = chainService.getBalancesOnBatch(Chain.fromCode(1), addressesEth, 0L);
+                List<AddressBalanceDto> balancesTron = chainService.getBalancesOnBatch(Chain.fromCode(3), addressesTron, 0L);
+                balancesEth.addAll(balancesTron);
+                // 两条链的一起返回
+                return GenericDto.success(balancesEth);
+
+                // 查指定的
+            } else {
+                List<String> addresses = systemWalletAddressService.getAll()
+                        .stream()
+                        .filter(e -> e.getChain() == chain)
+                        .map(SystemWalletAddressDto::getAddress)
+                        .collect(Collectors.toList());
+                List<AddressBalanceDto> balances = chainService.getBalancesOnBatch(Chain.fromCode(chain), addresses, 0L);
+                return GenericDto.success(balances);
+            }
+
         } catch (Exception e) {
             log.error("getSystemAddressBalances", e);
             return Utils.returnFromException(e);

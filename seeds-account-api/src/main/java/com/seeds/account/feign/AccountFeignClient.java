@@ -227,7 +227,7 @@ public interface AccountFeignClient {
      * @return
      */
     @GetMapping("/sys/system-wallet-address")
-    GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam("chain") int chain);
+    GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam(value = "chain") Integer chain);
 
 
     /**
@@ -237,7 +237,7 @@ public interface AccountFeignClient {
      * @return
      */
     @GetMapping("/sys/system-address-balances")
-    GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(@RequestParam("chain") int chain);
+    GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(@RequestParam("chain") Integer chain);
 
 
     /**
