@@ -286,6 +286,7 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void useRandomCode(RandomCodeUseReq req) {
         LambdaQueryWrapper<SysRandomCodeEntity> query = new QueryWrapper<SysRandomCodeEntity>().lambda()
                 .eq(SysRandomCodeEntity::getType, req.getType())
@@ -296,6 +297,8 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
             throw new SeedsException("Invitation not exist");
         }
         SysRandomCodeEntity randomCode = list.get(0);
+        randomCode.setUpdatedAt(System.currentTimeMillis());
+        updateById(randomCode);
         SysRandomCodeDetailEntity randomCodeDetail = sysRandomCodeDetailService.queryByBatchNoAndCode(randomCode.getBatchNo(), req.getCode());
         if (randomCodeDetail == null) {
             throw new SeedsException("Invitation code not exist");
