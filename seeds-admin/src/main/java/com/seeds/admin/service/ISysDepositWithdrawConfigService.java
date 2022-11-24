@@ -1,7 +1,6 @@
 package com.seeds.admin.service;
 
 import com.seeds.account.dto.DepositRuleDto;
-import com.seeds.account.dto.WithdrawLimitRuleDto;
 import com.seeds.account.dto.WithdrawRuleDto;
 import com.seeds.account.dto.req.*;
 import com.seeds.account.model.SwitchReq;
@@ -14,6 +13,7 @@ import java.util.List;
  * @date 2022/11/8
  */
 public interface ISysDepositWithdrawConfigService {
+
     GenericDto<Boolean> addDepositRule(DepositRuleSaveOrUpdateReq req);
 
     GenericDto<List<DepositRuleDto>> getDepositRuleList(DepositRuleReq req);
@@ -30,12 +30,4 @@ public interface ISysDepositWithdrawConfigService {
 
     GenericDto<Boolean> deleteWithdrawRule(SwitchReq req);
 
-
-    GenericDto<Boolean> addWithdrawLimitRule(WithdrawLimitSaveOrUpdateReq req);
-
-    GenericDto<List<WithdrawLimitRuleDto>> getWithdrawLimitRuleList();
-
-    GenericDto<Boolean> updateWithdrawLimitRule(WithdrawLimitSaveOrUpdateReq req);
-
-    GenericDto<Boolean> deleteWithdrawLimitRule(ListReq req);
 }

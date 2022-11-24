@@ -16,6 +16,7 @@ import com.seeds.account.model.DepositRule;
 import com.seeds.account.model.SwitchReq;
 import com.seeds.account.service.IDepositRuleService;
 import com.seeds.account.util.ObjectUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -31,6 +32,7 @@ import static com.seeds.common.enums.ErrorCode.*;
  * @author yk
  * @since 2022-10-10
  */
+@Slf4j
 @Service
 public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, DepositRule> implements IDepositRuleService {
 
@@ -68,6 +70,7 @@ public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, Depos
 
     @Override
     public Boolean update(DepositRuleSaveOrUpdateReq req) {
+        log.info("DepositRule req = {}",req);
         // chain 不能修改为已经存在的充币规则
         LambdaQueryWrapper<DepositRule> queryWrap = new QueryWrapper<DepositRule>().lambda()
                 .eq(DepositRule::getChain,req.getChain());
@@ -81,6 +84,7 @@ public class DepositRuleServiceImpl extends ServiceImpl<DepositRuleMapper, Depos
         depositRule.setUpdateTime(System.currentTimeMillis());
         depositRule.setVersion(rule.getVersion() + 1);
         depositRule.setStatus(req.getStatus());
+
         return updateById(depositRule);
     }
 

@@ -38,14 +38,11 @@ import java.util.List;
 @Transactional
 public class UcInterNFTServiceImpl implements UcInterNFTService {
 
-    @Autowired
-    private IUcUserAccountActionHistoryService ucUserAccountActionHistoryService;
+
     @Autowired
     private IUcNftForwardAuctionService ucNftForwardAuctionService;
     @Autowired
     private IUcNftReverseAuctionService ucNftReverseAuctionService;
-    @Autowired
-    private IUcUserAccountService ucUserAccountService;
     @Autowired
     private IUcNftOfferService ucNftOfferService;
     @Autowired
@@ -64,45 +61,45 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
             // 如果是admin端mint的nft，在uc端不用记账该账户到uc_user_account，都是uc端的用户则需要记账，卖家为UC端用户
             if (null != buyReq.getOwnerType() && buyReq.getOwnerType() == 1) {
                 //  卖家balance增加
-                LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
-                        .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
-                        .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
-                UcUserAccount sellerAccount = ucUserAccountService.getOne(wrapper);
-                sellerAccount.setBalance(sellerAccount.getBalance().add(amount));
-                ucUserAccountService.updateById(sellerAccount);
+//                LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
+//                        .eq(UcUserAccount::getUserId, buyReq.getFromUserId())
+//                        .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
+//                UcUserAccount sellerAccount = ucUserAccountService.getOne(wrapper);
+//                sellerAccount.setBalance(sellerAccount.getBalance().add(amount));
+//                ucUserAccountService.updateById(sellerAccount);
             }
 
             // 买家freeze减少
-            LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
-                    .eq(UcUserAccount::getUserId, buyReq.getToUserId())
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
-            UcUserAccount buyerAccount = ucUserAccountService.getOne(wrapper);
-            buyerAccount.setFreeze(buyerAccount.getFreeze().subtract(amount));
-            ucUserAccountService.updateById(buyerAccount);
+//            LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
+//                    .eq(UcUserAccount::getUserId, buyReq.getToUserId())
+//                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
+//            UcUserAccount buyerAccount = ucUserAccountService.getOne(wrapper);
+//            buyerAccount.setFreeze(buyerAccount.getFreeze().subtract(amount));
+//            ucUserAccountService.updateById(buyerAccount);
         } else {
             // 失败
             // 买家解冻金额，增加余额
-            LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
-                    .eq(UcUserAccount::getUserId, buyReq.getToUserId())
-                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
-            UcUserAccount buyerAccount = ucUserAccountService.getOne(wrapper);
-            buyerAccount.setBalance(buyerAccount.getBalance().add(amount));
-            buyerAccount.setFreeze(buyerAccount.getFreeze().subtract(amount));
-            ucUserAccountService.updateById(buyerAccount);
+//            LambdaQueryWrapper<UcUserAccount> wrapper = new LambdaQueryWrapper<UcUserAccount>()
+//                    .eq(UcUserAccount::getUserId, buyReq.getToUserId())
+//                    .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT);
+//            UcUserAccount buyerAccount = ucUserAccountService.getOne(wrapper);
+//            buyerAccount.setBalance(buyerAccount.getBalance().add(amount));
+//            buyerAccount.setFreeze(buyerAccount.getFreeze().subtract(amount));
+//            ucUserAccountService.updateById(buyerAccount);
         }
 
         // 改变交易记录的状态及其他信息
-        ucUserAccountActionHistoryService.updateById(UcUserAccountActionHistory.builder()
-                .status(buyReq.getActionStatusEnum())
-                        .fromAddress(buyReq.getFromAddress())
-                        .toAddress(buyReq.getToAddress())
-                        .amount(buyReq.getAmount())
-                        .chain(buyReq.getChain())
-                        .txHash(buyReq.getTxHash())
-                        .blockNumber(buyReq.getBlockNumber())
-                        .blockHash(buyReq.getBlockHash())
-                        .id(buyReq.getActionHistoryId())
-                .build());
+//        ucUserAccountActionHistoryService.updateById(UcUserAccountActionHistory.builder()
+//                .status(buyReq.getActionStatusEnum())
+//                        .fromAddress(buyReq.getFromAddress())
+//                        .toAddress(buyReq.getToAddress())
+//                        .amount(buyReq.getAmount())
+//                        .chain(buyReq.getChain())
+//                        .txHash(buyReq.getTxHash())
+//                        .blockNumber(buyReq.getBlockNumber())
+//                        .blockHash(buyReq.getBlockHash())
+//                        .id(buyReq.getActionHistoryId())
+//                .build());
 
         // 改变offer状态
         if (buyReq.getOfferId() != null) {
@@ -130,7 +127,7 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
 
     @Override
     public void buyNFT(NFTBuyReq req, SysNftDetailResp sysNftDetailResp) {
-        ucUserAccountService.buyNFT(req, sysNftDetailResp);
+//        ucUserAccountService.buyNFT(req, sysNftDetailResp);
     }
 
     @Override
@@ -249,6 +246,6 @@ public class UcInterNFTServiceImpl implements UcInterNFTService {
 
     @Override
     public void deductGasFee(NFTDeductGasFeeReq req) {
-        ucUserAccountService.deductGasFee(req);
+//        ucUserAccountService.deductGasFee(req);
     }
 }
