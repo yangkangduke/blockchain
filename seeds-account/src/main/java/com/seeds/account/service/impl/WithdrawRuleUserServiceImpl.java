@@ -86,12 +86,13 @@ public class WithdrawRuleUserServiceImpl extends ServiceImpl<WithdrawRuleUserMap
                 .map(e -> ObjectUtils.copy(e, new WithdrawRuleUserDto()))
                 .collect(Collectors.toList());
         GenericDto<Page<UcUserResp>> allUser = userCenterFeignClient.getAllUser((AllUserReq) withdraw.stream().collect(Collectors.toList()));
+        log.debug("WithdrawRuleUserDto  allUser = {}",allUser);
         List<WithdrawRuleUserDto> resultList = Lists.newArrayList();
         if (null != allUser && allUser.getCode() == 200) {
             for (WithdrawRuleUserDto withdrawDto : withdraw) {
                 WithdrawRuleUserDto dto = new WithdrawRuleUserDto();
                 ObjectUtils.copy(withdrawDto, dto);
-                dto.setPublicAddress(allUser.toString());
+                dto.setEmail(allUser.getData().toString());
                 resultList.add(dto);
             }
         }
