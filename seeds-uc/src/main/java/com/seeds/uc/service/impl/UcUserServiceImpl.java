@@ -603,16 +603,4 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         Page<UcUserResp> respPage = baseMapper.getAllUser(page, allUserReq);
         return respPage;
     }
-
-    @Override
-    public Map<Long, String> queryPublicAddressByIds(Collection<Long> ids) {
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyMap();
-        }
-        List<UcUser> list = listByIds(ids);
-        if (CollectionUtils.isEmpty(list)) {
-            return Collections.emptyMap();
-        }
-        return list.stream().collect(Collectors.toMap(UcUser::getId, UcUser::getPublicAddress));
-    }
 }
