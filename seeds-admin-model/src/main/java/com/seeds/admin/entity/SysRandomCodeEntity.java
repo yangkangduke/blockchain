@@ -54,6 +54,12 @@ public class SysRandomCodeEntity extends BaseEntity {
 	private String excelUrl;
 
 	/**
+	 * 导出时间
+	 */
+	@TableField("export_time")
+	private Long exportTime;
+
+	/**
 	 * 描述
 	 */
 	@TableField("`desc`")
