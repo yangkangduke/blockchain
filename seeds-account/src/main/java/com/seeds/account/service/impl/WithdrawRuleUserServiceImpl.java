@@ -1,8 +1,8 @@
 package com.seeds.account.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -19,7 +19,6 @@ import com.seeds.account.service.IWithdrawRuleUserService;
 import com.seeds.account.tool.ListMap;
 import com.seeds.account.util.ObjectUtils;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import static com.seeds.common.enums.ErrorCode.*;
+
+import static com.seeds.common.enums.ErrorCode.ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG;
+import static com.seeds.common.enums.ErrorCode.USER_ID_ON_CHAIN_ALREADY_EXIST;
 
 /**
  * <p>
@@ -85,15 +86,20 @@ public class WithdrawRuleUserServiceImpl extends ServiceImpl<WithdrawRuleUserMap
                 .stream()
                 .map(e -> ObjectUtils.copy(e, new WithdrawRuleUserDto()))
                 .collect(Collectors.toList());
-        GenericDto<Page<UcUserResp>> allUser = userCenterFeignClient.getAllUser((AllUserReq) withdraw.stream().collect(Collectors.toList()));
-        log.debug("WithdrawRuleUserDto  allUser = {}",allUser);
+        // rpc 获取uc用户list
+        GenericDto<List<UcUserResp>> userListData = userCenterFeignClient.getUserList((withdraw.stream().map(WithdrawRuleUserDto::getUserId).collect(Collectors.toList())));
         List<WithdrawRuleUserDto> resultList = Lists.newArrayList();
-        if (null != allUser && allUser.getCode() == 200) {
+
+        if (null != userListData && userListData.getCode() == 200) {
             for (WithdrawRuleUserDto withdrawDto : withdraw) {
-                WithdrawRuleUserDto dto = new WithdrawRuleUserDto();
-                ObjectUtils.copy(withdrawDto, dto);
-                dto.setEmail(allUser.getData().toString());
-                resultList.add(dto);
+
+                for (UcUserResp ucUser : userListData.getData()) {
+                    if (ucUser.getId().equals(withdrawDto.getUserId())) {
+                        withdrawDto.setEmail(ucUser.getEmail());
+                        withdrawDto.setPublicAddress(ucUser.getPublicAddress());
+                    }
+                }
+                resultList.add(withdrawDto);
             }
         }
         return resultList;

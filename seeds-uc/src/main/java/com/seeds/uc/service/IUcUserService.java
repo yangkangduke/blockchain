@@ -10,6 +10,7 @@ import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.model.UcUser;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -177,5 +178,6 @@ public interface IUcUserService extends IService<UcUser> {
      */
     Page<UcUserResp> getAllUser(Page page, AllUserReq allUserReq);
 
+    List<UcUserResp> getUserList(List<Long> ids);
 }
 
