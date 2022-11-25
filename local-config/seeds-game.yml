@@ -42,8 +42,5 @@ hystrix:
           thread:
             timeoutInMilliseconds: 5000
 
-game-warblade:
-  nft-notification-api: /WarBlade/eqp/nftCreateNotice.do
-
 Seeds-uc: http://127.0.0.1:10101
 Seeds-admin: http://127.0.0.1:10102

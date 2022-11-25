@@ -45,4 +45,7 @@ public class SysNftCreateReq extends SysNftAddReq {
 	@ApiModelProperty("回调通知链接")
 	private String callbackUrl;
 
+	@ApiModelProperty("游戏方用户id")
+	private Long accId;
+
 }

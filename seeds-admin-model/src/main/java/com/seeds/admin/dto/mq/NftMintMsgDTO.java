@@ -50,7 +50,7 @@ public class NftMintMsgDTO {
     @ApiModelProperty("回调通知链接")
     private String callbackUrl;
 
-    @ApiModelProperty("拥有用户id")
-    private Long ownerId;
+    @ApiModelProperty("游戏方用户id")
+    private Long accId;
 
 }

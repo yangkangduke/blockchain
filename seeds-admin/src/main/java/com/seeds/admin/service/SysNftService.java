@@ -212,4 +212,11 @@ public interface SysNftService extends IService<SysNftEntity> {
      */
     SysNftEntity queryByNumber(String number);
 
+    /**
+     * NFT生效通知游戏方
+     *
+     * @param msgDTO NFT相关信息
+     */
+    void effectiveNotificationGame(NftMintMsgDTO msgDTO);
+
 }
