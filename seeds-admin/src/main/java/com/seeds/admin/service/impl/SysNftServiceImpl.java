@@ -669,7 +669,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             // 更新事件记录
             sysNftEventRecordService.successionByNftId(req.getNftId(), req.getId());
         }
-        String url = sysGameApiService.queryUrlByGameAndType(req.getGameId(), ApiType.NFT_NOTIFICATION.getCode());
+        String api = sysGameApiService.queryApiByGameAndType(req.getGameId(), ApiType.NFT_NOTIFICATION.getCode());
         // todo 通知游戏方NFT升级结果
 
     }
@@ -841,7 +841,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         }
         // 请求来源是游戏方，交易完成通知游戏方
         if (TargetSource.GAME == req.getSource()) {
-            String url = sysGameApiService.queryUrlByGameAndType(nft.getGameId(), ApiType.TRADE_NOTIFICATION.getCode());
+            String url = sysGameApiService.queryApiByGameAndType(nft.getGameId(), ApiType.TRADE_NOTIFICATION.getCode());
             // todo 通知游戏方交易完成
         }
     }

@@ -8,9 +8,10 @@ import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.mq.NftUpgradeMsgDTO;
 import com.seeds.admin.dto.request.SysNftHonorModifyReq;
 import com.seeds.admin.entity.SysNftEntity;
+import com.seeds.admin.service.SysGameApiService;
 import com.seeds.admin.service.SysNftService;
 import com.seeds.common.constant.mq.KafkaTopic;
-import com.seeds.game.config.warblade.GameWarbladeConfig;
+import com.seeds.common.enums.ApiType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class NFTConsumer {
     private SysNftService nftService;
 
     @Autowired
-    private GameWarbladeConfig gameWarbladeConfig;
+    private SysGameApiService sysGameApiService;
 
     /**
      * 消费NFT保存成功消息，完成NFT上链操作
@@ -47,7 +48,8 @@ public class NFTConsumer {
         Boolean result = nftService.mintNft(msgDTO);
         if (StringUtils.isNotBlank(msgDTO.getCallbackUrl()) && result) {
             // 通知游戏方NFT创建结果
-            String notificationUrl = msgDTO.getCallbackUrl() + gameWarbladeConfig.getNftNotificationApi();
+            String notificationApi = sysGameApiService.queryApiByGameAndType(msgDTO.getGameId(), ApiType.NFT_NOTIFICATION.getCode());
+            String notificationUrl = msgDTO.getCallbackUrl() + notificationApi;
             JSONObject param = new JSONObject();
             param.putOnce("nft_id", msgDTO.getId());
             param.putOnce("acc_id", msgDTO.getOwnerId());
