@@ -671,6 +671,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         }
         String url = sysGameApiService.queryUrlByGameAndType(req.getGameId(), ApiType.NFT_NOTIFICATION.getCode());
         // todo 通知游戏方NFT升级结果
+
     }
 
     @Override

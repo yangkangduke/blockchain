@@ -1,5 +1,8 @@
 package com.seeds.admin.mq.consumer;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.mq.NftUpgradeMsgDTO;
@@ -7,7 +10,10 @@ import com.seeds.admin.dto.request.SysNftHonorModifyReq;
 import com.seeds.admin.entity.SysNftEntity;
 import com.seeds.admin.service.SysNftService;
 import com.seeds.common.constant.mq.KafkaTopic;
+import com.seeds.game.config.warblade.GameWarbladeConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +32,9 @@ public class NFTConsumer {
     @Resource
     private SysNftService nftService;
 
+    @Autowired
+    private GameWarbladeConfig gameWarbladeConfig;
+
     /**
      * 消费NFT保存成功消息，完成NFT上链操作
      *
@@ -35,8 +44,22 @@ public class NFTConsumer {
     public void gameMintNft(String msg) {
         log.info("收到消息：{}", msg);
         NftMintMsgDTO msgDTO = JSONUtil.toBean(msg, NftMintMsgDTO.class);
-        nftService.mintNft(msgDTO);
-        // todo 通知游戏方NFT创建结果
+        Boolean result = nftService.mintNft(msgDTO);
+        if (StringUtils.isNotBlank(msgDTO.getCallbackUrl()) && result) {
+            // 通知游戏方NFT创建结果
+            String notificationUrl = msgDTO.getCallbackUrl() + gameWarbladeConfig.getNftNotificationApi();
+            JSONObject param = new JSONObject();
+            param.putOnce("nft_id", msgDTO.getId());
+            param.putOnce("acc_id", msgDTO.getOwnerId());
+            log.info("开始请求游戏nft生效通知， param:{}", param);
+            HttpResponse response = HttpRequest.post(notificationUrl)
+                    .header("Content-Type", "application/json;charset=UTF-8")
+                    .body(String.valueOf(param))
+                    .timeout(5 * 60 * 1000)
+                    .execute();
+            String body = response.body();
+            log.info("请求游戏nft生效通知返回，result:{}",body);
+        }
     }
 
     /**
