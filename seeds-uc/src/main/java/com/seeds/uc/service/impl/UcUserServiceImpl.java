@@ -470,6 +470,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return false;
     }
 
+
     /**
      * 验证metamask签名
      * @param verifyReq
@@ -481,7 +482,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String signature = verifyReq.getSignature();
         String message = verifyReq.getMessage();
         String[] split = message.split(":");
-        String nonce =  split[1];
+        String nonce =  split[2].replace("\n","");
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(verifyReq.getPublicAddress());
         if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !genMetamaskAuth.getNonce().equals(nonce) ) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);

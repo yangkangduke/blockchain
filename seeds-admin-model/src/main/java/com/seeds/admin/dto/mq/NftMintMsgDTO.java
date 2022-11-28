@@ -47,4 +47,10 @@ public class NftMintMsgDTO {
     @ApiModelProperty("NFT图片")
     private String imageFileHash;
 
+    @ApiModelProperty("回调通知链接")
+    private String callbackUrl;
+
+    @ApiModelProperty("游戏方用户id")
+    private Long accId;
+
 }

@@ -1,5 +1,7 @@
 package com.seeds.admin.service.impl;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -668,9 +670,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             sysNftHonorService.successionByNftId(req.getNftId(), req.getId());
             // 更新事件记录
             sysNftEventRecordService.successionByNftId(req.getNftId(), req.getId());
+            // 生效通知游戏方
+            effectiveNotificationGame(req);
         }
-        String url = sysGameApiService.queryUrlByGameAndType(req.getGameId(), ApiType.NFT_NOTIFICATION.getCode());
-        // todo 通知游戏方NFT升级结果
     }
 
     @Override
@@ -807,6 +809,22 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         return getOne(queryWrap);
     }
 
+    @Override
+    public void effectiveNotificationGame(NftMintMsgDTO msgDTO) {
+        // 通知游戏方NFT创建结果
+        String notificationApi = sysGameApiService.queryApiByGameAndType(msgDTO.getGameId(), ApiType.NFT_NOTIFICATION.getCode());
+        String notificationUrl = msgDTO.getCallbackUrl() + notificationApi;
+        String param = String.format("nft_id=%s&acc_id=%s", msgDTO.getId(), msgDTO.getAccId());
+        log.info("开始请求游戏nft生效通知， param:{}", param);
+        HttpResponse response = HttpRequest.post(notificationUrl)
+                .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+                .body(param)
+                .timeout(5 * 60 * 1000)
+                .execute();
+        String body = response.body();
+        log.info("请求游戏nft生效通知返回，result:{}",body);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void transferNft(NftOwnerChangeReq req, List<SysNftEntity> list) {
         Map<Long, SysNftEntity> map = list.stream().collect(Collectors.toMap(SysNftEntity::getId, p -> p));
@@ -840,7 +858,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         }
         // 请求来源是游戏方，交易完成通知游戏方
         if (TargetSource.GAME == req.getSource()) {
-            String url = sysGameApiService.queryUrlByGameAndType(nft.getGameId(), ApiType.TRADE_NOTIFICATION.getCode());
+            String url = sysGameApiService.queryApiByGameAndType(nft.getGameId(), ApiType.TRADE_NOTIFICATION.getCode());
             // todo 通知游戏方交易完成
         }
     }
