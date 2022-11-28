@@ -470,6 +470,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return false;
     }
 
+    public static void main(String[] args) {
+        String message = "Welcome to SEEDS!\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nWallet address:\n0x67ffd165145594eaf165d1cfdb7b39d8f09f1d02\n\nNonce:\n744975caefa2d0787577ea2f";
+        String[] split = message.split(":");
+        String nonce =  split[2];
+        System.out.println("nonce:" + nonce.replace("\n",""));
+    }
     /**
      * 验证metamask签名
      * @param verifyReq
@@ -481,7 +487,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String signature = verifyReq.getSignature();
         String message = verifyReq.getMessage();
         String[] split = message.split(":");
-        String nonce =  split[1];
+        String nonce =  split[2].replace("\n","");
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(verifyReq.getPublicAddress());
         if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !genMetamaskAuth.getNonce().equals(nonce) ) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
