@@ -78,5 +78,14 @@ public interface IWalletAccountService {
      */
     List<UserAccount> getAccounts(long userId);
 
+    /**
+     * 检查账户里面的金额是否足够支付
+     * @param userId uc用户id
+     * @param amount 金额
+     * @param currency 币种
+     * @return result
+     */
+    Boolean checkBalance(Long userId, BigDecimal amount, String currency);
+
 
 }

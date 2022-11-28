@@ -9,7 +9,6 @@ import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.*;
 import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
-import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.enums.DepositStatus;
 import com.seeds.account.enums.WithdrawStatus;
 import com.seeds.account.model.SwitchReq;

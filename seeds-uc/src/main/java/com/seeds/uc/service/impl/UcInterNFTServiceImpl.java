@@ -1,7 +1,6 @@
 package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seeds.admin.dto.request.SysNftShelvesReq;
 import com.seeds.admin.dto.request.SysNftSoldOutReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;

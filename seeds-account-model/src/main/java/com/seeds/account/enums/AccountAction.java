@@ -182,6 +182,11 @@ public enum AccountAction {
     UNLOCK(35),
 
     /**
+     * 购买NFT
+     */
+    BUY_NFT(36),
+
+    /**
      * 其它
      */
     OTHERS(100);
