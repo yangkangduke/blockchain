@@ -57,7 +57,7 @@ public class SysMetaMaskController {
         String[] split = message.split(":");
         Long currentAdminUserId = UserContext.getCurrentAdminUserId();
         SysUserEntity userEntity = sysUserService.getById(currentAdminUserId);
-        if (!userEntity.getNonce().equals(split[1]) ) {
+        if (!userEntity.getNonce().equals(split[2].replace("\n","")) ) {
             throw new InvalidArgumentsException(AdminErrorCodeEnum.ERR_17004_METAMASK_NONCE_INCORRECT);
         }
         // 地址合法性校验
