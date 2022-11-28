@@ -12,6 +12,6 @@ import com.seeds.admin.entity.SysGameApiEntity;
  */
 public interface SysGameApiService extends IService<SysGameApiEntity> {
 
-    String queryUrlByGameAndType(Long gameId, Integer type);
+    String queryApiByGameAndType(Long gameId, Integer type);
 
 }

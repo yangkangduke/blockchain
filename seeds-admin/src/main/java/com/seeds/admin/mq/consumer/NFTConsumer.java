@@ -8,6 +8,7 @@ import com.seeds.admin.entity.SysNftEntity;
 import com.seeds.admin.service.SysNftService;
 import com.seeds.common.constant.mq.KafkaTopic;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -35,8 +36,10 @@ public class NFTConsumer {
     public void gameMintNft(String msg) {
         log.info("收到消息：{}", msg);
         NftMintMsgDTO msgDTO = JSONUtil.toBean(msg, NftMintMsgDTO.class);
-        nftService.mintNft(msgDTO);
-        // todo 通知游戏方NFT创建结果
+        Boolean result = nftService.mintNft(msgDTO);
+        if (StringUtils.isNotBlank(msgDTO.getCallbackUrl()) && result) {
+            nftService.effectiveNotificationGame(msgDTO);
+        }
     }
 
     /**

@@ -19,12 +19,12 @@ import org.springframework.stereotype.Service;
 public class SysGameApiServiceImpl extends ServiceImpl<SysGameApiMapper, SysGameApiEntity> implements SysGameApiService {
 
     @Override
-    public String queryUrlByGameAndType(Long gameId, Integer type) {
+    public String queryApiByGameAndType(Long gameId, Integer type) {
         LambdaQueryWrapper<SysGameApiEntity> queryWrap = new QueryWrapper<SysGameApiEntity>().lambda()
                 .eq(SysGameApiEntity::getGameId, gameId)
                 .eq(SysGameApiEntity::getType, type);
         SysGameApiEntity gameApi = getOne(queryWrap);
-        return gameApi.getBaseUrl() + gameApi.getApi();
+        return gameApi.getApi();
     }
 }
 
