@@ -13,7 +13,7 @@ import javax.validation.Valid;
  * @author yk
  * @date 2022/8/8
  */
-@FeignClient(name = "seeds-account", url = "${service.url.account}", path = "/account-trade-internal", configuration = {AccountFeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteAccountTradeService", url = "${service.url.account}", path = "/account-trade-internal", configuration = {AccountFeignInnerRequestInterceptor.class})
 public interface RemoteAccountTradeService {
 
 	@PostMapping("/buy-nft-callback")
