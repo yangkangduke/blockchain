@@ -1,6 +1,9 @@
 package com.seeds.account.service;
 
+import com.seeds.account.dto.NftPriceHisDto;
+import com.seeds.account.dto.req.NftBuyCallbackReq;
 import com.seeds.account.dto.req.NftBuyReq;
+import com.seeds.account.dto.req.NftPriceHisReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.common.enums.TargetSource;
 
@@ -26,5 +29,18 @@ public interface AccountTradeService {
      * @param currentUserId 登录用户id
      */
     void buyNftAndRecord(SysNftDetailResp nftDetail, TargetSource source, Long currentUserId);
+
+    /**
+     * 购买NFT回调
+     * @param buyReq 入参
+     */
+    void buyNftCallback(NftBuyCallbackReq buyReq);
+
+    /**
+     * NFT历史价格
+     * @param req 入参
+     * @return result
+     */
+    NftPriceHisDto nftPriceHis(NftPriceHisReq req);
 
 }

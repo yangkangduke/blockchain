@@ -184,7 +184,7 @@ public enum AccountAction {
     /**
      * 购买NFT
      */
-    BUY_NFT(36),
+    NFT_TRADE(36),
 
     /**
      * 其它

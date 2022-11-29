@@ -29,7 +29,7 @@ public class Utils {
 
         // 把错误报告给监控系统
         Metrics.counter("error", Tags.of(
-                Tag.of("app_name", "kine-account-service"),
+                Tag.of("app_name", "seeds-account-service"),
                 Tag.of("module", "restful"))
         ).increment();
 

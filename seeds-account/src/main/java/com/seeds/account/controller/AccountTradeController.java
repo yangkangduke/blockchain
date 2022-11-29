@@ -1,17 +1,15 @@
 package com.seeds.account.controller;
 
+import com.seeds.account.dto.NftPriceHisDto;
 import com.seeds.account.dto.req.NftBuyReq;
+import com.seeds.account.dto.req.NftPriceHisReq;
 import com.seeds.account.service.AccountTradeService;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.web.inner.Inner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -30,14 +28,22 @@ public class AccountTradeController {
     private AccountTradeService accountTradeService;
 
     /**
-     *  购买NFT接口
+     *  购买NFT
      */
     @PostMapping("/buy-nft")
     @ApiOperation(value = "购买NFT", notes = "购买NFT")
-    @Inner
     public GenericDto<Object> buyNft(@Valid @RequestBody NftBuyReq buyReq) {
         accountTradeService.validateAndInitBuyNft(buyReq);
         return GenericDto.success(null);
+    }
+
+    /**
+     *  NFT历史价格
+     */
+    @PostMapping("/nft-price-his")
+    @ApiOperation(value = "NFT历史价格", notes = "NFT历史价格")
+    public GenericDto<NftPriceHisDto> nftPriceHis(@Valid @RequestBody NftPriceHisReq req) {
+        return GenericDto.success(accountTradeService.nftPriceHis(req));
     }
 
 }

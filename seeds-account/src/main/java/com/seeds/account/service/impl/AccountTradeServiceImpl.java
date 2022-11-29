@@ -1,16 +1,22 @@
 package com.seeds.account.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
 import com.seeds.account.AccountConstants;
+import com.seeds.account.dto.NftPriceHisDto;
+import com.seeds.account.dto.req.NftBuyCallbackReq;
 import com.seeds.account.dto.req.NftBuyReq;
+import com.seeds.account.dto.req.NftPriceHisReq;
 import com.seeds.account.enums.AccountAction;
 import com.seeds.account.enums.CommonActionStatus;
 import com.seeds.account.model.UserAccountActionHis;
+import com.seeds.account.mq.producer.KafkaProducer;
 import com.seeds.account.service.AccountTradeService;
 import com.seeds.account.service.IUserAccountActionHisService;
 import com.seeds.account.service.IWalletAccountService;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
+import com.seeds.admin.enums.SysOwnerTypeEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.constant.mq.KafkaTopic;
@@ -18,16 +24,16 @@ import com.seeds.common.enums.TargetSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
-import com.seeds.uc.model.UcUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 账户交易服务
@@ -47,6 +53,9 @@ public class AccountTradeServiceImpl implements AccountTradeService {
 
     @Autowired
     private RemoteNftService adminRemoteNftService;
+
+    @Autowired
+    private KafkaProducer kafkaProducer;
 
     @Override
     public void validateAndInitBuyNft(NftBuyReq req) {
@@ -100,37 +109,86 @@ public class AccountTradeServiceImpl implements AccountTradeService {
                 .version((int) AccountConstants.DEFAULT_VERSION)
                 .createTime(System.currentTimeMillis())
                 .updateTime(System.currentTimeMillis())
-                .action(AccountAction.BUY_NFT)
+                .action(AccountAction.NFT_TRADE)
                 .currency(currency)
                 .status(CommonActionStatus.PROCESSING)
-                .source("")
+                .source(nftId.toString())
                 .amount(amount)
                 .build();
         userAccountActionHisService.save(actionHistory);
         Long actionHistoryId = actionHistory.getId();
 
         // 远程调用admin端归属人变更接口
-        /*List<NftOwnerChangeReq> list = new ArrayList<>();
+        List<NftOwnerChangeReq> list = new ArrayList<>();
         NftOwnerChangeReq nftOwnerChangeReq = new NftOwnerChangeReq();
-        UcUser buyer = ucUserService.getById(currentUserId);
-        if (null != buyer) {
-            // 买家名字、地址
-            nftOwnerChangeReq.setOwnerName(buyer.getNickname());
-            nftOwnerChangeReq.setToAddress(buyer.getPublicAddress());
-        }
         nftOwnerChangeReq.setSource(source);
         nftOwnerChangeReq.setOwnerId(currentUserId);
+        nftOwnerChangeReq.setCurrency(currency);
         nftOwnerChangeReq.setId(nftId);
         nftOwnerChangeReq.setActionHistoryId(actionHistoryId);
-        nftOwnerChangeReq.setOwnerType(nftDetail.getOwnerType());
+        nftOwnerChangeReq.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
         nftOwnerChangeReq.setAmount(amount);
-        if (nftDetail.getOwnerType() == 1) {
-            // 卖家地址
-            UcUser saler = ucUserService.getById(nftDetail.getOwnerId());
-            nftOwnerChangeReq.setFromAddress(saler.getPublicAddress());
-        }
         list.add(nftOwnerChangeReq);
-        kafkaProducer.send(KafkaTopic.UC_NFT_OWNER_CHANGE, JSONUtil.toJsonStr(list));*/
+        kafkaProducer.send(KafkaTopic.UC_NFT_OWNER_CHANGE, JSONUtil.toJsonStr(list));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void buyNftCallback(NftBuyCallbackReq buyReq) {
+        BigDecimal amount = buyReq.getAmount();
+        // 成功
+        if (CommonActionStatus.SUCCESS == buyReq.getActionStatusEnum()) {
+            // 如果是admin端mint的nft，在uc端不用记账该账户到uc_user_account，都是uc端的用户则需要记账，卖家为UC端用户
+            if (null != buyReq.getOwnerType() && SysOwnerTypeEnum.UC_USER.getCode() == buyReq.getOwnerType()) {
+                //  卖家balance增加
+                walletAccountService.updateAvailable(buyReq.getFromUserId(), buyReq.getCurrency(), amount, false);
+            }
+
+            // 买家freeze减少
+            walletAccountService.unfreeze(buyReq.getToUserId(), buyReq.getCurrency(), amount);
+        } else {
+            // 失败
+            // 买家解冻金额，增加余额
+            walletAccountService.updateFreezeAndAvailable(buyReq.getToUserId(), buyReq.getCurrency(), amount, buyReq.getCurrency(), amount);
+        }
+
+        // 改变交易记录的状态
+        userAccountActionHisService.updateById(UserAccountActionHis.builder()
+                .toUserId(buyReq.getToUserId())
+                .status(buyReq.getActionStatusEnum())
+                .amount(buyReq.getAmount())
+                .id(buyReq.getActionHistoryId())
+                .build());
+    }
+
+    @Override
+    public NftPriceHisDto nftPriceHis(NftPriceHisReq req) {
+        List<UserAccountActionHis> actionHisList = userAccountActionHisService.querySuccessByActionAndSourceAndTime(AccountAction.NFT_TRADE, req.getNftId(), req.getStartTime(), req.getEndTime());
+        if (CollectionUtils.isEmpty(actionHisList)) {
+            return null;
+        }
+        Map<String, List<UserAccountActionHis>> actionHisMap = actionHisList.stream().collect(Collectors.groupingBy(p -> DateUtil.formatDate(new Date(p.getUpdateTime()))));
+        List<NftPriceHisDto.PriceHis> data = new ArrayList<>();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (String key : actionHisMap.keySet()) {
+            List<UserAccountActionHis> list = actionHisMap.get(key);
+            BigDecimal totalPrice = BigDecimal.ZERO;
+            for (UserAccountActionHis actionHis : list) {
+                totalPrice = totalPrice.add(actionHis.getAmount());
+                totalAmount = totalAmount.add(actionHis.getAmount());
+            }
+            int number = list.size();
+            data.add(NftPriceHisDto.PriceHis.builder()
+                    .number(number)
+                    .date(key)
+                    .totalPrice(totalPrice)
+                    .ovgPrice(totalPrice.divide(new BigDecimal(number), 3, RoundingMode.HALF_UP))
+                    .build());
+        }
+        return NftPriceHisDto.builder()
+                .ovgAmount(totalAmount.divide(new BigDecimal(actionHisList.size()), 3, RoundingMode.HALF_UP))
+                .list(data)
+                .build();
     }
 
 }

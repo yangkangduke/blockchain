@@ -1,7 +1,6 @@
-package com.seeds.uc.dto.request;
+package com.seeds.account.dto.req;
 
-import com.seeds.uc.enums.AccountActionStatusEnum;
-import com.seeds.uc.enums.NFTOfferStatusEnum;
+import com.seeds.account.enums.CommonActionStatus;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +19,7 @@ import java.math.BigDecimal;
  */
 @Data
 @Builder
-public class NFTBuyCallbackReq implements Serializable {
+public class NftBuyCallbackReq implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,36 +44,15 @@ public class NFTBuyCallbackReq implements Serializable {
     @ApiModelProperty("备注")
     private String comments;
 
-    @ApiModelProperty("NFT的tokenId")
-    private String tokenId;
-
-    @ApiModelProperty("admin中的NFT的id")
-    private Long nftId;
-
-    @ApiModelProperty("记录状态 1-进行中 2-成功 3-失败")
+    @ApiModelProperty("记录状态 1-成功 2-失败 3-进行中")
     @NotNull
-    private AccountActionStatusEnum actionStatusEnum;
+    private CommonActionStatus actionStatusEnum;
 
     @ApiModelProperty("记录id")
     @NotNull
     private Long actionHistoryId;
 
-    @ApiModelProperty("offer的id")
-    private Long offerId;
-
-    @ApiModelProperty("状态 0：竞价中 1：已接受 2：已拒绝 3：已过期")
-    private NFTOfferStatusEnum offerStatusEnum;
-
-    @ApiModelProperty("链")
-    private String chain;
-
-    @ApiModelProperty("哈希值")
-    private String txHash;
-
-    @ApiModelProperty("区块号")
-    private Long blockNumber;
-
-    @ApiModelProperty("区块的hash值")
-    private String blockHash;
+    @ApiModelProperty("币种")
+    private String currency;
 
 }

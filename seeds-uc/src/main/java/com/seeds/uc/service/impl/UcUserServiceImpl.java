@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
 import com.seeds.admin.dto.request.RandomCodeUseReq;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteRandomCodeService;
@@ -34,6 +35,7 @@ import com.seeds.uc.util.RandomUtil;
 import com.seeds.uc.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,10 +46,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.web3j.crypto.WalletUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -471,6 +470,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return false;
     }
 
+
     /**
      * 验证metamask签名
      * @param verifyReq
@@ -482,7 +482,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String signature = verifyReq.getSignature();
         String message = verifyReq.getMessage();
         String[] split = message.split(":");
-        String nonce =  split[1];
+        String nonce =  split[2].replace("\n","");
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(verifyReq.getPublicAddress());
         if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !genMetamaskAuth.getNonce().equals(nonce) ) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
@@ -602,5 +602,19 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     public Page<UcUserResp> getAllUser(Page page, AllUserReq allUserReq) {
         Page<UcUserResp> respPage = baseMapper.getAllUser(page, allUserReq);
         return respPage;
+    }
+
+    @Override
+    public List<UcUserResp> getUserList(List<Long> ids) {
+        List<UcUserResp> result = Lists.newArrayList();
+        List<UcUser> list = this.list(new QueryWrapper<UcUser>().lambda().in(UcUser::getId, new HashSet<>(ids)));
+        if (!CollectionUtils.isEmpty(list)) {
+            result = list.stream().map(p -> {
+                UcUserResp ucUserResp = new UcUserResp();
+                BeanUtils.copyProperties(p, ucUserResp);
+                return ucUserResp;
+            }).collect(Collectors.toList());
+        }
+        return result;
     }
 }

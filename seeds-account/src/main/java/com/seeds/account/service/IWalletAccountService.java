@@ -87,5 +87,4 @@ public interface IWalletAccountService {
      */
     Boolean checkBalance(Long userId, BigDecimal amount, String currency);
 
-
 }

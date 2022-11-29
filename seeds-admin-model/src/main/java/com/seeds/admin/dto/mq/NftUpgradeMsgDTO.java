@@ -29,9 +29,6 @@ public class NftUpgradeMsgDTO extends NftMintMsgDTO {
     @ApiModelProperty("保留战绩NFT的id")
     private Long nftId;
 
-    @ApiModelProperty("回调通知链接")
-    private String callbackUrl;
-
     /**
      * 消耗的NFT唯一标识集合
      */

@@ -21,7 +21,7 @@
                 AND id = #{query.id }
             </if>
             <if test="query.state != null">
-                AND `state` = #{state}
+                AND `state` = #{query.state}
             </if>
         </where>
     </select>
