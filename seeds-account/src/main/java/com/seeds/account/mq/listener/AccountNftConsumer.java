@@ -39,7 +39,7 @@ public class AccountNftConsumer {
      *
      * @param msg 消息
      */
-    @KafkaListener(groupId = "uc-nft-consumer-group", topics = {KafkaTopic.UC_NFT_OWNER_CHANGE})
+    @KafkaListener(groupId = "account-nft-consumer-group", topics = {KafkaTopic.AC_NFT_OWNER_CHANGE})
     public void ownerChange(String msg) {
         log.info("收到消息：{}", msg);
         List<NftOwnerChangeReq> reqList = JSONUtil.toList(JSONUtil.parseArray(msg), NftOwnerChangeReq.class);

@@ -1,8 +1,6 @@
 package com.seeds.account.controller;
 
-import com.seeds.account.dto.NftPriceHisDto;
 import com.seeds.account.dto.req.NftBuyReq;
-import com.seeds.account.dto.req.NftPriceHisReq;
 import com.seeds.account.service.AccountTradeService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -35,15 +33,6 @@ public class AccountTradeController {
     public GenericDto<Object> buyNft(@Valid @RequestBody NftBuyReq buyReq) {
         accountTradeService.validateAndInitBuyNft(buyReq);
         return GenericDto.success(null);
-    }
-
-    /**
-     *  NFT历史价格
-     */
-    @PostMapping("/nft-price-his")
-    @ApiOperation(value = "NFT历史价格", notes = "NFT历史价格")
-    public GenericDto<NftPriceHisDto> nftPriceHis(@Valid @RequestBody NftPriceHisReq req) {
-        return GenericDto.success(accountTradeService.nftPriceHis(req));
     }
 
 }

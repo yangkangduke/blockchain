@@ -29,7 +29,8 @@ public class UserAccountActionHisServiceImpl extends ServiceImpl<UserAccountActi
                 .eq(UserAccountActionHis::getSource, nftId)
                 .eq(UserAccountActionHis::getStatus, CommonActionStatus.SUCCESS)
                 .eq(UserAccountActionHis::getAction, AccountAction.NFT_TRADE)
-                .between(UserAccountActionHis::getUpdateTime, startTime, endTime);
+                .ge(startTime != null, UserAccountActionHis::getUpdateTime, startTime)
+                .le(endTime != null, UserAccountActionHis::getUpdateTime, endTime);
         return list(wrapper);
     }
 }
