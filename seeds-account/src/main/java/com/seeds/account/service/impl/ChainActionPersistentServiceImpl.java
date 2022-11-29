@@ -19,7 +19,7 @@ import com.seeds.account.model.ChainBlock;
 import com.seeds.account.model.ChainDepositAddress;
 import com.seeds.account.model.ChainDepositWithdrawHis;
 import com.seeds.account.model.UserAccount;
-import com.seeds.account.sender.KafkaProducer;
+import com.seeds.account.mq.producer.KafkaProducer;
 import com.seeds.account.service.*;
 import com.seeds.account.util.Utils;
 import com.seeds.common.constant.mq.KafkaTopic;
