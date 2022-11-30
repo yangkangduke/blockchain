@@ -1,6 +1,6 @@
 package com.seeds.game.dto.request;
 
-import com.seeds.uc.dto.request.NFTReverseAuctionReq;
+import com.seeds.account.dto.req.NftReverseAuctionReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(value = "OpenNftReverseAuctionReq", description = "系统NFT反向拍卖")
-public class OpenNftReverseAuctionReq extends NFTReverseAuctionReq {
+public class OpenNftReverseAuctionReq extends NftReverseAuctionReq {
 
     @ApiModelProperty(value = "访问键")
     @NotBlank(message = "Access key cannot be empty")

@@ -19,7 +19,7 @@ import com.seeds.admin.service.AssetManagementService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
-import com.seeds.uc.enums.CurrencyEnum;
+import com.seeds.common.enums.CurrencyEnum;
 import jodd.bean.BeanCopy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

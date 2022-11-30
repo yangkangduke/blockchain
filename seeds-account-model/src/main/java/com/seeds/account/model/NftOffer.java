@@ -1,8 +1,8 @@
-package com.seeds.uc.model;
+package com.seeds.account.model;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.seeds.uc.enums.CurrencyEnum;
-import com.seeds.uc.enums.NFTOfferStatusEnum;
+import com.seeds.common.enums.CurrencyEnum;
+import com.seeds.common.enums.NFTOfferStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -19,11 +19,11 @@ import java.math.BigDecimal;
  * @author hang.yu
  * @since 2022/09/05
  */
-@TableName("uc_nft_offer")
-@ApiModel(value = "UcNftOffer对象", description = "NFT的Offer")
+@TableName("ac_nft_offer")
+@ApiModel(value = "NftOffer对象", description = "NFT的Offer")
 @Data
 @Builder
-public class UcNftOffer implements Serializable {
+public class NftOffer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
