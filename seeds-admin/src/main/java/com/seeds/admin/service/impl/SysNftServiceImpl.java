@@ -11,6 +11,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.account.dto.req.NftBuyCallbackReq;
+import com.seeds.account.enums.CommonActionStatus;
+import com.seeds.account.feign.RemoteAccountTradeService;
 import com.seeds.admin.dto.mq.NftMintMsgDTO;
 import com.seeds.admin.dto.mq.NftUpgradeMsgDTO;
 import com.seeds.admin.dto.request.*;
@@ -27,13 +30,11 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.enums.TargetSource;
 import com.seeds.common.exception.SeedsException;
-import com.seeds.uc.dto.request.NFTBuyCallbackReq;
 import com.seeds.uc.dto.request.NFTShelvesReq;
 import com.seeds.uc.dto.request.NFTSoldOutReq;
-import com.seeds.uc.enums.AccountActionStatusEnum;
+import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.enums.CurrencyEnum;
-import com.seeds.uc.enums.NFTOfferStatusEnum;
-import com.seeds.uc.feign.RemoteNFTService;
+import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -48,7 +49,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 
@@ -68,13 +68,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     private SysGameService sysGameService;
 
     @Autowired
-    private ExecutorService executorService;
-
-    @Autowired
     private ChainNftService chainNftService;
-
-    @Autowired
-    private RemoteNFTService remoteNftService;
 
     @Autowired
     private SysGameApiService sysGameApiService;
@@ -92,10 +86,16 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     private SysSequenceNoService sysSequenceNoService;
 
     @Autowired
+    private UserCenterFeignClient userCenterFeignClient;
+
+    @Autowired
     private SysNftPropertiesService sysNftPropertiesService;
 
     @Autowired
     private SysNftEventRecordService sysNftEventRecordService;
+
+    @Autowired
+    private RemoteAccountTradeService remoteAccountTradeService;
 
     @Autowired
     private SysNftPropertiesTypeService sysNftPropertiesTypeService;
@@ -128,6 +128,15 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         Map<Long, String> gameMap = sysGameService.queryMapByIds(gameIds);
         Set<Long> nftTypeIds = records.stream().map(SysNftEntity::getNftTypeId).collect(Collectors.toSet());
         Map<Long, SysNftTypeEntity> nftTypeMap = sysNftTypeService.queryMapByIds(nftTypeIds);
+        List<Long> ownerIds = records.stream().map(SysNftEntity::getOwnerId).collect(Collectors.toList());
+        Map<Long, UcUserResp> userMap = new HashMap<>(ownerIds.size());
+        try {
+            GenericDto<List<UcUserResp>> userList = userCenterFeignClient.getUserList(ownerIds);
+            userMap = userList.getData().stream().collect(Collectors.toMap(UcUserResp::getId, p -> p));
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户信息失败");
+        }
+        Map<Long, UcUserResp> finalUserMap = userMap;
         return page.convert(p -> {
             SysNftResp resp = new SysNftResp();
             BeanUtils.copyProperties(p, resp);
@@ -139,6 +148,10 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             }
             // 图片
             resp.setPicture(smartContractConfig.getIpfsUrl() + p.getUrl());
+            if (p.getOwnerId() != null) {
+                UcUserResp ucUserResp = finalUserMap.get(p.getOwnerId());
+                resp.setOwnerName(StringUtils.isNotBlank(ucUserResp.getEmail()) ? ucUserResp.getEmail() : ucUserResp.getPublicAddress());
+            }
             return resp;
         });
     }
@@ -292,6 +305,15 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             resp.setPropertiesList(list);
             // 图片
             resp.setPicture(smartContractConfig.getIpfsUrl() + sysNft.getUrl());
+            if (sysNft.getOwnerId() != null) {
+                try {
+                    GenericDto<List<UcUserResp>> userList = userCenterFeignClient.getUserList(Collections.singletonList(sysNft.getOwnerId()));
+                    UcUserResp ucUserResp = userList.getData().get(0);
+                    resp.setOwnerName(StringUtils.isNotBlank(ucUserResp.getEmail()) ? ucUserResp.getEmail() : ucUserResp.getPublicAddress());
+                } catch (Exception e) {
+                    log.error("内部请求uc获取用户信息失败");
+                }
+            }
         }
         return resp;
     }
@@ -834,22 +856,17 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         entity.setStatus(WhetherEnum.NO.value());
         updateById(entity);
         SysNftEntity nft = map.get(req.getId()) == null ? new SysNftEntity() : map.get(req.getId());
-        NFTBuyCallbackReq callback = NFTBuyCallbackReq.builder()
+        NftBuyCallbackReq callback = NftBuyCallbackReq.builder()
                 .fromUserId(nft.getOwnerId())
-                .fromAddress(req.getFromAddress())
                 .toUserId(req.getOwnerId())
                 .amount(nft.getPrice())
-                .tokenId(nft.getTokenId())
-                .nftId(req.getId())
                 .actionHistoryId(req.getActionHistoryId())
-                .actionStatusEnum(AccountActionStatusEnum.SUCCESS)
-                .offerId(req.getOfferId())
-                .offerStatusEnum(NFTOfferStatusEnum.ACCEPTED)
-                .toAddress(req.getToAddress())
-                .ownerType(req.getOwnerType())
+                .actionStatusEnum(CommonActionStatus.SUCCESS)
+                .ownerType(nft.getOwnerType())
+                .currency(req.getCurrency())
                 .build();
         try {
-            GenericDto<Object> result = remoteNftService.buyNFTCallback(callback);
+            GenericDto<Object> result = remoteAccountTradeService.buyNftCallback(callback);
             if (!result.isSuccess()) {
                 throw new SeedsException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn());
             }

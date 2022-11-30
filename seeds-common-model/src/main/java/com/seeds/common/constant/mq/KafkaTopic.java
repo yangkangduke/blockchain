@@ -18,8 +18,8 @@ public class KafkaTopic {
     public final String NFT_DELETE_SUCCESS = "NFT-DELETE-SUCCESS";
     public final String NFT_UPGRADE_SUCCESS = "NFT-UPGRADE-SUCCESS";
 
-    // NFT UC
-    public final String UC_NFT_OWNER_CHANGE = "uc_nft_owner_change";
+    // NFT ACCOUNT
+    public final String AC_NFT_OWNER_CHANGE = "ac_nft_owner_change";
 
     // Notification
     public final String SEND_NOTIFICATION = "SEND-NOTIFICATION";

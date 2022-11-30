@@ -15,7 +15,6 @@ import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.mapper.UcNftOfferMapper;
 import com.seeds.uc.model.UcNftOffer;
-import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IUcNftOfferService;
 import com.seeds.uc.service.IUcUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -162,23 +161,12 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
         SysNftDetailResp nftDetail = validateOffer(offer);
         Long userId = offer.getUserId();
         // 远程调用admin端归属人变更接口
-        UcUser buyer = ucUserService.getById(userId);
         NftOwnerChangeReq nftOwnerChangeReq = new NftOwnerChangeReq();
-        if (null != buyer) {
-            // 买家名字、地址
-            nftOwnerChangeReq.setOwnerName(buyer.getNickname());
-            nftOwnerChangeReq.setToAddress(buyer.getPublicAddress());
-        }
         nftOwnerChangeReq.setOwnerId(userId);
         nftOwnerChangeReq.setId(offer.getNftId());
         nftOwnerChangeReq.setActionHistoryId(offer.getActionHistoryId());
         nftOwnerChangeReq.setOfferId(id);
         nftOwnerChangeReq.setOwnerType(nftDetail.getOwnerType());
-        if (nftDetail.getOwnerType() == 1) {
-            // 卖家地址
-            UcUser saleUser = ucUserService.getById(nftDetail.getOwnerId());
-            nftOwnerChangeReq.setFromAddress(saleUser.getPublicAddress());
-        }
         List<NftOwnerChangeReq> list = Collections.singletonList(nftOwnerChangeReq);
         remoteNftService.ownerChange(list);
     }

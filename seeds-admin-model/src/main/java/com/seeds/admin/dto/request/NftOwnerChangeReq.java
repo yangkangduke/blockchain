@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
@@ -30,13 +29,6 @@ public class NftOwnerChangeReq {
     @NotNull(message = "NFT owner id cannot be empty")
     private Long ownerId;
 
-    /**
-     * NFT的归属人名称
-     */
-    @ApiModelProperty("NFT的归属人名称")
-    @NotBlank(message = "NFT owner name cannot be empty")
-    private String ownerName;
-
     @ApiModelProperty("记录id")
     @NotNull(message = "NFT actionHistory id cannot be empty")
     private Long actionHistoryId;
@@ -44,19 +36,14 @@ public class NftOwnerChangeReq {
     @ApiModelProperty("offer的id")
     private Long offerId;
 
-    @ApiModelProperty("卖家地址")
-    @NotBlank(message = "NFT sellers address cannot be empty")
-    private String fromAddress;
-
-    @ApiModelProperty("买家地址")
-    @NotBlank(message = "NFT buyers address cannot be empty")
-    private String toAddress;
-
     @ApiModelProperty("请求来源")
     private TargetSource source;
 
     @ApiModelProperty("售卖金额")
-    @NotNull
+    @NotNull(message = "NFT amount cannot be empty")
     private BigDecimal amount;
+
+    @ApiModelProperty("币种")
+    private String currency;
 
 }
