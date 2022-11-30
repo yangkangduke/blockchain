@@ -1,4 +1,5 @@
 package com.seeds.admin.controller;
+
 import com.seeds.account.dto.BlacklistAddressDto;
 import com.seeds.account.dto.req.BlackListAddressSaveOrUpdateReq;
 import com.seeds.account.enums.ChainAction;
@@ -27,21 +28,21 @@ public class SysBlacklistController {
     @GetMapping("/deposit/get")
     @ApiOperation("获取充币黑名单列表")
     public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getDepositBlackList(@RequestParam(value = "reason", required = false) String reason,
-                                                                                 @RequestParam(value = "address",required = false) String address,
-                                                                                 @RequestParam(value = "chain",required = false) Integer chain) {
-        return ISysRiskService.getBlackList(ChainAction.DEPOSIT.getCode(), reason, address,chain);
+                                                                                 @RequestParam(value = "address", required = false) String address,
+                                                                                 @RequestParam(value = "chain", required = false) Integer chain) {
+        return ISysRiskService.getBlackList(ChainAction.DEPOSIT.getCode(), reason, address, chain);
     }
 
     @PostMapping("/deposit/add")
     @ApiOperation("新增充币黑名单")
-    public GenericDto<Boolean> addBlackList(@RequestBody  BlackListAddressSaveOrUpdateReq req) {
+    public GenericDto<Boolean> addBlackList(@RequestBody BlackListAddressSaveOrUpdateReq req) {
         req.setType(ChainAction.DEPOSIT.getCode());
         return ISysRiskService.addDepositBlackList(req);
     }
 
     @PostMapping("/deposit/update")
     @ApiOperation("更新充币黑名单")
-    public GenericDto<Boolean> updateBlackList(@RequestBody  BlackListAddressSaveOrUpdateReq req) {
+    public GenericDto<Boolean> updateBlackList(@RequestBody BlackListAddressSaveOrUpdateReq req) {
         req.setType(ChainAction.DEPOSIT.getCode());
         return ISysRiskService.updateDepositBlackList(req);
     }
@@ -49,9 +50,9 @@ public class SysBlacklistController {
     @GetMapping("/withdraw/get")
     @ApiOperation("获取提币黑名单列表")
     public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getWithdrawBlackList(@RequestParam(value = "reason", required = false) String reason,
-                                                                                  @RequestParam(value = "address",required = false) String address,
-                                                                                  @RequestParam(value = "chain",required = false) Integer chain) {
-        return ISysRiskService.getBlackList(ChainAction.WITHDRAW.getCode(), reason, address,chain);
+                                                                                  @RequestParam(value = "address", required = false) String address,
+                                                                                  @RequestParam(value = "chain", required = false) Integer chain) {
+        return ISysRiskService.getBlackList(ChainAction.WITHDRAW.getCode(), reason, address, chain);
     }
 
     @PostMapping("/withdraw/add")
@@ -63,7 +64,7 @@ public class SysBlacklistController {
 
     @PostMapping("/withdraw/update")
     @ApiOperation("修改提币黑名单")
-    public GenericDto<Boolean> updateWithdrawBlackList(@RequestBody  BlackListAddressSaveOrUpdateReq req) {
+    public GenericDto<Boolean> updateWithdrawBlackList(@RequestBody BlackListAddressSaveOrUpdateReq req) {
         req.setType(ChainAction.WITHDRAW.getCode());
         return ISysRiskService.updateWithdrawBlackList(req);
     }
