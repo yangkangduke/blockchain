@@ -9,7 +9,6 @@ import com.seeds.account.dto.*;
 import com.seeds.account.dto.req.*;
 import com.seeds.account.dto.req.ChainTxnPageReq;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
-import com.seeds.account.enums.CommonStatus;
 import com.seeds.account.enums.DepositStatus;
 import com.seeds.account.enums.WithdrawStatus;
 import com.seeds.account.model.SwitchReq;
@@ -270,6 +269,7 @@ public class AccountInternalController {
 
     /**
      * 创建获取用户充币地址余额的请求
+     *
      * @param chain
      * @return
      */
@@ -288,6 +288,7 @@ public class AccountInternalController {
 
     /**
      * 查询获取用户充币地址余额的请求的状态
+     *
      * @param chain
      * @return
      */
@@ -306,6 +307,7 @@ public class AccountInternalController {
 
     /**
      * 获取所有分配给用户地址的余额
+     *
      * @param chain
      * @return
      */
@@ -388,7 +390,7 @@ public class AccountInternalController {
     @GetMapping("/sys/system-wallet-address")
     @ApiOperation("获取所有系统使用的地址")
     @Inner
-    public GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam(value = "chain",required = false) Integer chain) {
+    public GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam(value = "chain", required = false) Integer chain) {
         try {
             List<SystemWalletAddressDto> list = systemWalletAddressService.loadAll();
             if (chain != null) {
@@ -412,7 +414,7 @@ public class AccountInternalController {
     @GetMapping("/sys/system-address-balances")
     @ApiOperation("获取所有系统地址的余额")
     @Inner
-    public GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(@RequestParam(value = "chain",required = false) Integer chain) {
+    public GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(@RequestParam(value = "chain", required = false) Integer chain) {
         try {
             // 查全部
             if (chain == null) {
@@ -471,6 +473,7 @@ public class AccountInternalController {
     /**
      * 获取钱包归集历史
      * (热钱包划转历史)
+     *
      * @param chain
      * @param startTime
      * @param endTime
@@ -641,10 +644,13 @@ public class AccountInternalController {
     @GetMapping("/sys/blacklist-address")
     @ApiOperation("获取所有充提币黑地址")
     @Inner
-    public GenericDto<List<BlacklistAddressDto>> getAllBlacklistAddress(@RequestParam("type") int type) {
+    public GenericDto<List<BlacklistAddressDto>> getAllBlacklistAddress(@RequestParam("type") int type,
+                                                                        @RequestParam(value = "reason", required = false) String reason,
+                                                                        @RequestParam(value = "address", required = false) String address,
+                                                                        @RequestParam(value = "chain", required = false) Integer chain) {
         try {
-            List<BlacklistAddressDto> list = blacklistAddressService.loadAll()
-                    .stream().filter(e -> e.getType() == type).collect(Collectors.toList());
+            List<BlacklistAddressDto> list = blacklistAddressService.loadAll(type, reason, address, chain)
+                    .stream().collect(Collectors.toList());
             return GenericDto.success(list);
         } catch (Exception e) {
             log.error("getAllBlacklistAddress", e);
@@ -693,11 +699,12 @@ public class AccountInternalController {
 
     /**
      * 创建热钱包地址
+     *
      * @param chain
      * @return
      */
     @PostMapping("/sys/create-system-wallet-address")
-    @ApiOperation(value = "创建热钱包地址",notes = "chain的值：1 eth， 3 tron")
+    @ApiOperation(value = "创建热钱包地址", notes = "chain的值：1 eth， 3 tron")
     @Inner
     public GenericDto<SystemWalletAddressDto> createSystemWalletAddress(@RequestParam("chain") int chain) {
         try {
@@ -768,6 +775,7 @@ public class AccountInternalController {
             return Utils.returnFromException(e);
         }
     }
+
     /**
      * 获取充币规则列表
      *

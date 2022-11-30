@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "seeds-account", url = "${service.url.account}",path = "/account-internal", configuration = {AccountFeignInnerRequestInterceptor.class})
+@FeignClient(name = "seeds-account", url = "${service.url.account}", path = "/account-internal", configuration = {AccountFeignInnerRequestInterceptor.class})
 public interface AccountFeignClient {
 
     /**
@@ -131,6 +131,7 @@ public interface AccountFeignClient {
 
     @GetMapping("/sys/pending-collect-balances")
     GenericDto<Map<Chain, Map<String, BigDecimal>>> getPendingCollectBalances() throws Exception;
+
     /**
      * 获取钱包归集历史
      *
@@ -156,12 +157,12 @@ public interface AccountFeignClient {
 
     @GetMapping("/sys/fund-collect-history")
     GenericDto<Page<AddressCollectHisDto>> getFundCollectHistory(@RequestParam("chain") int chain,
-                                                                     @RequestParam("startTime") long startTime,
-                                                                     @RequestParam("endTime") long endTime,
-                                                                     @RequestParam(value = "fromAddress", required = false) String fromAddress,
-                                                                     @RequestParam(value = "toAddress", required = false) String toAddress,
-                                                                     @RequestParam("page") int page,
-                                                                     @RequestParam("size") int size);
+                                                                 @RequestParam("startTime") long startTime,
+                                                                 @RequestParam("endTime") long endTime,
+                                                                 @RequestParam(value = "fromAddress", required = false) String fromAddress,
+                                                                 @RequestParam(value = "toAddress", required = false) String toAddress,
+                                                                 @RequestParam("page") int page,
+                                                                 @RequestParam("size") int size);
 
     /**
      * 根据归集订单Id获取钱包归集历史
@@ -227,7 +228,7 @@ public interface AccountFeignClient {
      * @return
      */
     @GetMapping("/sys/system-wallet-address")
-    GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam(value = "chain",required = false) Integer chain);
+    GenericDto<List<SystemWalletAddressDto>> getAllSystemWalletAddress(@RequestParam(value = "chain", required = false) Integer chain);
 
 
     /**
@@ -237,7 +238,7 @@ public interface AccountFeignClient {
      * @return
      */
     @GetMapping("/sys/system-address-balances")
-    GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(@RequestParam(value = "chain",required = false) Integer chain);
+    GenericDto<List<AddressBalanceDto>> getSystemAddressBalances(@RequestParam(value = "chain", required = false) Integer chain);
 
 
     /**
@@ -276,7 +277,6 @@ public interface AccountFeignClient {
 
     /**
      * 获取所有提币用户规则
-     *
      */
     @GetMapping("/sys/withdraw-rule-user-address")
     GenericDto<List<WithdrawRuleUserDto>> getAllWithdrawRuleUser();
@@ -301,6 +301,7 @@ public interface AccountFeignClient {
 
     /**
      * 启用/停用提币用户规则
+     *
      * @param req
      * @return
      */
@@ -314,9 +315,9 @@ public interface AccountFeignClient {
      * @return
      */
     @GetMapping("/sys/blacklist-address")
-    GenericDto<List<BlacklistAddressDto>> getAllBlacklistAddress(@RequestParam("type") int type);
+    GenericDto<List<BlacklistAddressDto>> getAllBlacklistAddress(@RequestParam("type") int type, @RequestParam("reason") String reason, @RequestParam("address") String address, @RequestParam("chain") Integer chain);
 
-   /**
+    /**
      * 添加新充提币黑地址
      *
      * @param req
@@ -341,7 +342,7 @@ public interface AccountFeignClient {
      * @return
      */
     @PostMapping("/sys/delete-blacklist-address")
-    GenericDto<Boolean> deleteBlacklistAddress(@RequestBody SwitchReq req );
+    GenericDto<Boolean> deleteBlacklistAddress(@RequestBody SwitchReq req);
 
     /**
      * 创建热钱包地址
@@ -381,16 +382,15 @@ public interface AccountFeignClient {
 
     /**
      * 编辑账户系统配置
+     *
      * @param req 系统配置
      */
     @PostMapping("/sys/account-system-config-modify")
     GenericDto<Object> accountSystemConfigModify(@RequestBody AccountSystemConfigDto req);
 
 
-
     /**
      * 获取充币规则列表
-     *
      */
     @PostMapping("/sys/get-deposit-rule-list")
     GenericDto<List<DepositRuleDto>> getDepositRuleList(@RequestBody DepositRuleReq req);
@@ -403,7 +403,6 @@ public interface AccountFeignClient {
 
     /**
      * 编辑充币规则
-     *
      */
     @PutMapping("/sys/update-deposit-rule")
     GenericDto<Boolean> updateDepositRule(@RequestBody DepositRuleSaveOrUpdateReq req);
@@ -464,7 +463,6 @@ public interface AccountFeignClient {
      */
     @PostMapping("/sys/update-action-control")
     GenericDto<Boolean> updateActionControl(@RequestBody ActionControlDto actionControlDto);
-
 
 
 }

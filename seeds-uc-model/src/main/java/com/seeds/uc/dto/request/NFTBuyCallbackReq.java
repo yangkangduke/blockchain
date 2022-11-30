@@ -1,7 +1,7 @@
 package com.seeds.uc.dto.request;
 
 import com.seeds.uc.enums.AccountActionStatusEnum;
-import com.seeds.uc.enums.NFTOfferStatusEnum;
+import com.seeds.common.enums.NFTOfferStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;

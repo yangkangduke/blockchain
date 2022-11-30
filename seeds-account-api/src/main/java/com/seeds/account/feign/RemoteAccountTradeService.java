@@ -1,13 +1,18 @@
 package com.seeds.account.feign;
 
-import com.seeds.account.dto.req.NftBuyCallbackReq;
+import com.seeds.account.dto.req.*;
+import com.seeds.account.dto.resp.NftAuctionResp;
+import com.seeds.account.dto.resp.NftOfferResp;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author yk
@@ -19,5 +24,37 @@ public interface RemoteAccountTradeService {
 	@PostMapping("/buy-nft-callback")
 	@ApiOperation(value = "购买NFT回调", notes = "购买NFT回调")
 	GenericDto<Object> buyNftCallback(@Valid @RequestBody NftBuyCallbackReq buyReq);
+
+	@PostMapping("/buy-nft")
+	@ApiOperation(value = "购买NFT", notes = "购买NFT")
+	GenericDto<Object> buyNft(@Valid @RequestBody NftBuyReq buyReq);
+
+	@PostMapping("/nft-forward-auction")
+	@ApiOperation(value = "正向拍卖", notes = "正向拍卖")
+	GenericDto<Object> forwardAuction(NftForwardAuctionReq req);
+
+	@PostMapping("/nft-reverse-auction")
+	@ApiOperation(value = "反向拍卖", notes = "反向拍卖")
+	GenericDto<Object> reverseAuction(NftReverseAuctionReq req);
+
+	@PostMapping("/nft-forward-bids")
+	@ApiOperation(value = "正向出价", notes = "正向出价")
+	GenericDto<Object> forwardBids(NftMakeOfferReq req);
+
+	@PostMapping("/nft-reverse-bids")
+	@ApiOperation(value = "反向出价", notes = "反向出价")
+	GenericDto<Object> reverseBids(NftBuyReq req);
+
+	@GetMapping("/nft-offer-list")
+	@ApiOperation("NFT出价列表")
+	GenericDto<List<NftOfferResp>> offerList(@RequestParam Long id);
+
+	@GetMapping("/nft-action-info")
+	@ApiOperation("NFT拍卖信息")
+	GenericDto<NftAuctionResp> actionInfo(@RequestParam Long id, @RequestParam Long userId);
+
+	@PostMapping("/nft-deduct-gas-fee")
+	@ApiOperation(value = "扣除手续费", notes = "扣除手续费")
+	GenericDto<Object> deductGasFee(@Valid @RequestBody NftDeductGasFeeReq req) ;
 
 }

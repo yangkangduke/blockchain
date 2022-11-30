@@ -1,7 +1,7 @@
-package com.seeds.uc.service;
+package com.seeds.account.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.uc.model.UcNftForwardAuction;
+import com.seeds.account.model.NftForwardAuction;
 
 
 /**
@@ -12,7 +12,7 @@ import com.seeds.uc.model.UcNftForwardAuction;
  * @author hang.yu
  * @since 2022-09-05
  */
-public interface IUcNftForwardAuctionService extends IService<UcNftForwardAuction> {
+public interface INftForwardAuctionService extends IService<NftForwardAuction> {
 
     /**
      * 根据归属人和NFT的id查询记录
@@ -20,6 +20,6 @@ public interface IUcNftForwardAuctionService extends IService<UcNftForwardAuctio
      * @param nftId NFT的id
      * @return 记录
      */
-    UcNftForwardAuction queryByUserIdAndNftId(Long userId, Long nftId);
+    NftForwardAuction queryByUserIdAndNftId(Long userId, Long nftId);
 
 }

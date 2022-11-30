@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.dto.BlacklistAddressDto;
 import com.seeds.account.dto.req.BlackListAddressSaveOrUpdateReq;
@@ -68,6 +69,20 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     }
 
     @Override
+    public List<BlacklistAddressDto> loadAll(Integer type, String reason, String address, Integer chain) {
+        QueryWrapper<BlacklistAddress> wrapper = new QueryWrapper<>();
+        wrapper.eq(!Objects.isNull(type), "type", type)
+                .eq(!StrUtil.isBlank(address), "address", address)
+                .eq(!Objects.isNull(chain), "chain", chain)
+                .like(!StrUtil.isBlank(reason), "reason", reason);
+
+        return blacklistAddressMapper.selectList(wrapper)
+                .stream()
+                .map(e -> ObjectUtils.copy(e, new BlacklistAddressDto()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public BlacklistAddressDto get(Integer type, Long userId, String address) {
         // milo 由于要兼容大小写，所以不能直接使用map
         return getAll().stream()
@@ -89,7 +104,7 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
         // 冲币或者提币，已存在的地址无法重复新增；
         LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
                 .eq(BlacklistAddress::getAddress, req.getAddress())
-                .eq(BlacklistAddress::getType,req.getType());
+                .eq(BlacklistAddress::getType, req.getType());
         BlacklistAddress one = getOne(queryWrap);
         if (one != null) {
             throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
@@ -109,13 +124,13 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
 
     @Override
     public Boolean update(BlackListAddressSaveOrUpdateReq req) {
-        log.info("BlacklistAddress req={}",req);
+        log.info("BlacklistAddress req={}", req);
         //要修改的地址已经存在，无法修改
         LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
-                .eq(BlacklistAddress::getAddress,req.getAddress())
-                .eq(BlacklistAddress::getType,req.getType());
+                .eq(BlacklistAddress::getAddress, req.getAddress())
+                .eq(BlacklistAddress::getType, req.getType());
         BlacklistAddress one = getOne(queryWrap);
-        if (null != one && !one.getId().equals(req.getId())){
+        if (null != one && !one.getId().equals(req.getId())) {
             throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
         }
 
