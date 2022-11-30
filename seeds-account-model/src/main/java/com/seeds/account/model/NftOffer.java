@@ -19,7 +19,7 @@ import java.math.BigDecimal;
  * @author hang.yu
  * @since 2022/09/05
  */
-@TableName("nft_offer")
+@TableName("ac_nft_offer")
 @ApiModel(value = "NftOffer对象", description = "NFT的Offer")
 @Data
 @Builder

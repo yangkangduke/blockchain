@@ -20,7 +20,7 @@ import java.math.BigDecimal;
  * @author hang.yu
  * @since 2022/10/11
  */
-@TableName("nft_reverse_auction")
+@TableName("ac_nft_reverse_auction")
 @ApiModel(value = "NftReverseAuction", description = "NFT的反向拍卖")
 @Data
 @Builder
