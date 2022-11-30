@@ -43,4 +43,6 @@ public interface AccountTradeService {
      */
     NftPriceHisDto nftPriceHis(NftPriceHisReq req);
 
+
+
 }

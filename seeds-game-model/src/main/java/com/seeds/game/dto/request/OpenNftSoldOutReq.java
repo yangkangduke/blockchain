@@ -1,5 +1,5 @@
 package com.seeds.game.dto.request;
-import com.seeds.uc.dto.request.NFTSoldOutReq;
+import com.seeds.admin.dto.request.SysNftSoldOutReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(value = "OpenNftSoldOutReq", description = "系统NFT下架")
-public class OpenNftSoldOutReq extends NFTSoldOutReq {
+public class OpenNftSoldOutReq extends SysNftSoldOutReq {
 
     @ApiModelProperty(value = "访问键")
     @NotBlank(message = "Access key cannot be empty")

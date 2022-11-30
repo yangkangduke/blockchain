@@ -1,10 +1,7 @@
 package com.seeds.uc.job;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.seeds.uc.enums.AccountActionStatusEnum;
-import com.seeds.uc.enums.CurrencyEnum;
-import com.seeds.uc.enums.NFTOfferStatusEnum;
-import com.seeds.uc.model.UcNftOffer;
+import com.seeds.common.enums.NFTOfferStatusEnum;
+import com.seeds.account.model.NftOffer;
 import com.seeds.uc.service.IUcNftOfferService;
 import com.seeds.uc.service.impl.CacheService;
 import io.swagger.annotations.Api;
@@ -58,7 +55,7 @@ public class UcNftTask {
             return;
         }
         // 查询过期的offer
-        List<UcNftOffer> offers = ucNftOfferService.queryExpiredOffers();
+        List<NftOffer> offers = ucNftOfferService.queryExpiredOffers();
         if (CollectionUtils.isEmpty(offers)) {
             log.info("没有过期的offer需要处理， time={}", new Date());
             return;
@@ -76,7 +73,7 @@ public class UcNftTask {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void processTask(UcNftOffer offer){
+    public void processTask(NftOffer offer){
         Long userId = offer.getUserId();
         // 解冻金额
         BigDecimal price = offer.getPrice();

@@ -1,7 +1,7 @@
 package com.seeds.uc.dto.response;
 
-import com.seeds.uc.enums.CurrencyEnum;
-import com.seeds.uc.enums.NFTOfferStatusEnum;
+import com.seeds.common.enums.CurrencyEnum;
+import com.seeds.common.enums.NFTOfferStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;

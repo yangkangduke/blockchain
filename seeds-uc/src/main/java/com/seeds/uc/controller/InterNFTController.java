@@ -39,17 +39,6 @@ public class InterNFTController {
     private RemoteNftService adminRemoteNftService;
 
     /**
-     *  购买回调接口
-     */
-    @PostMapping("/buy/callback")
-    @ApiOperation(value = "购买回调", notes = "购买回调")
-    @Inner
-    public GenericDto<Object> buyNFTCallback(@Valid @RequestBody NFTBuyCallbackReq buyReq) {
-        ucInterNFTService.buyNFTCallback(buyReq);
-        return GenericDto.success(null);
-    }
-
-    /**
      *  购买接口
      */
     @PostMapping("/buy")

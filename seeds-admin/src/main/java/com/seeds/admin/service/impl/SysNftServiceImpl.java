@@ -33,7 +33,7 @@ import com.seeds.common.exception.SeedsException;
 import com.seeds.uc.dto.request.NFTShelvesReq;
 import com.seeds.uc.dto.request.NFTSoldOutReq;
 import com.seeds.uc.dto.response.UcUserResp;
-import com.seeds.uc.enums.CurrencyEnum;
+import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

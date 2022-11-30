@@ -143,7 +143,7 @@ public class OpenNftController {
     @ApiOperation("NFT上架")
     public GenericDto<Object> shelves(@Valid @RequestBody OpenNftShelvesReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        GenericDto<Object> result = ucRemoteNftService.shelves(req);
+        GenericDto<Object> result = adminRemoteNftService.shelves(req);
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),
                     result.getCode());
@@ -155,7 +155,7 @@ public class OpenNftController {
     @ApiOperation("NFT下架")
     public GenericDto<Object> soldOut(@Valid @RequestBody OpenNftSoldOutReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        GenericDto<Object> result = ucRemoteNftService.soldOut(req);
+        GenericDto<Object> result = adminRemoteNftService.soldOut(req);
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),
                     result.getCode());

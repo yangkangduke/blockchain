@@ -1,10 +1,10 @@
-package com.seeds.uc.service;
+package com.seeds.account.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.dto.response.NFTOfferResp;
-import com.seeds.uc.model.UcNftOffer;
+import com.seeds.account.model.NftOffer;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
  * @author hang.yu
  * @since 2022-09-05
  */
-public interface IUcNftOfferService extends IService<UcNftOffer> {
+public interface INftOfferService extends IService<NftOffer> {
 
     /**
      * 出价
@@ -48,13 +48,13 @@ public interface IUcNftOfferService extends IService<UcNftOffer> {
      * 查询过期的offers
      * @return 过期的offers
      */
-    List<UcNftOffer> queryExpiredOffers();
+    List<NftOffer> queryExpiredOffers();
 
     /**
      * 通过nft的id查询竞价中的offers
      * @param nftId NFT 的id
      * @return 竞价中的offers
      */
-    List<UcNftOffer> queryBiddingByNftId(Long nftId);
+    List<NftOffer> queryBiddingByNftId(Long nftId);
 
 }

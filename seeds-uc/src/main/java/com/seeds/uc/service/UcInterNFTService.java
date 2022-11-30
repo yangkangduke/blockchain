@@ -19,12 +19,6 @@ import java.util.List;
 public interface UcInterNFTService {
 
     /**
-     * 购买回调
-     * @param buyReq
-     */
-    void buyNFTCallback(NFTBuyCallbackReq buyReq);
-
-    /**
      * 购买
      * @param req 入参
      * @param sysNftDetailResp NFT的详情

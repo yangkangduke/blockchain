@@ -11,15 +11,14 @@ import com.seeds.account.enums.AccountAction;
 import com.seeds.account.enums.CommonActionStatus;
 import com.seeds.account.model.UserAccountActionHis;
 import com.seeds.account.mq.producer.KafkaProducer;
-import com.seeds.account.service.AccountTradeService;
-import com.seeds.account.service.IUserAccountActionHisService;
-import com.seeds.account.service.IWalletAccountService;
+import com.seeds.account.service.*;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.enums.SysOwnerTypeEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.constant.mq.KafkaTopic;
+import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.common.enums.TargetSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.enums.*;
@@ -49,10 +48,18 @@ public class AccountTradeServiceImpl implements AccountTradeService {
     private IUserAccountActionHisService userAccountActionHisService;
 
     @Autowired
+    private INftForwardAuctionService nftForwardAuctionService;
+    @Autowired
+    private INftReverseAuctionService nftReverseAuctionService;
+
+    @Autowired
     private IWalletAccountService walletAccountService;
 
     @Autowired
     private RemoteNftService adminRemoteNftService;
+
+    @Autowired
+    private INftOfferService nftOfferService;
 
     @Autowired
     private KafkaProducer kafkaProducer;

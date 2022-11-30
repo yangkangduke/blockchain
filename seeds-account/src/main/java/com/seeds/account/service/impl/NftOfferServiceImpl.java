@@ -1,22 +1,22 @@
-package com.seeds.uc.service.impl;
+package com.seeds.account.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.account.mapper.NftOfferMapper;
+import com.seeds.account.service.INftOfferService;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.enums.NFTOfferStatusEnum;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.NFTMakeOfferReq;
 import com.seeds.uc.dto.response.NFTOfferResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
-import com.seeds.uc.mapper.UcNftOfferMapper;
-import com.seeds.uc.model.UcNftOffer;
-import com.seeds.uc.service.IUcNftOfferService;
-import com.seeds.uc.service.IUcUserService;
+import com.seeds.account.model.NftOffer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +39,13 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOffer> implements IUcNftOfferService {
+public class NftOfferServiceImpl extends ServiceImpl<NftOfferMapper, NftOffer> implements INftOfferService {
 
     @Autowired
     private IUcUserService ucUserService;
 
     @Autowired
     private RemoteNftService remoteNftService;
-
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -94,7 +92,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
 //                .build();
 //        ucUserAccountActionHistoryService.save(ucUserAccountActionHistory);
         // 存储offer
-        UcNftOffer nftOffer = UcNftOffer.builder().build();
+        NftOffer nftOffer = NftOffer.builder().build();
         BeanUtils.copyProperties(req, nftOffer);
         nftOffer.setUserId(currentUserId);
         nftOffer.setCreateTime(currentTimeMillis);
@@ -109,15 +107,15 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
 
     @Override
     public List<NFTOfferResp> offerList(Long nftId) {
-        LambdaQueryWrapper<UcNftOffer> query = new QueryWrapper<UcNftOffer>().lambda()
-                .eq(UcNftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
-                .eq(UcNftOffer::getNftId, nftId);
-        List<UcNftOffer> list = list(query);
+        LambdaQueryWrapper<NftOffer> query = new QueryWrapper<NftOffer>().lambda()
+                .eq(NftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
+                .eq(NftOffer::getNftId, nftId);
+        List<NftOffer> list = list(query);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();
         }
         List<NFTOfferResp> respList = new ArrayList<>();
-        Set<Long> userIds = list.stream().map(UcNftOffer::getUserId).collect(Collectors.toSet());
+        Set<Long> userIds = list.stream().map(NftOffer::getUserId).collect(Collectors.toSet());
         Map<Long, String> userMap = ucUserService.queryNameByIds(userIds);
         list.forEach(p -> {
             NFTOfferResp resp = NFTOfferResp.builder().build();
@@ -132,7 +130,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
     @Transactional(rollbackFor = Exception.class)
     public void offerReject(Long id) {
         // 验证offer
-        UcNftOffer offer = getById(id);
+        NftOffer offer = getById(id);
         validateOffer(offer);
         Long userId = offer.getUserId();
         // 解冻金额
@@ -157,7 +155,7 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
     @Override
     public void offerAccept(Long id) {
         // 验证offer
-        UcNftOffer offer = getById(id);
+        NftOffer offer = getById(id);
         SysNftDetailResp nftDetail = validateOffer(offer);
         Long userId = offer.getUserId();
         // 远程调用admin端归属人变更接口
@@ -172,22 +170,22 @@ public class UcNftOfferServiceImpl extends ServiceImpl<UcNftOfferMapper, UcNftOf
     }
 
     @Override
-    public List<UcNftOffer> queryExpiredOffers() {
-        LambdaQueryWrapper<UcNftOffer> query = new QueryWrapper<UcNftOffer>().lambda()
-                .eq(UcNftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
-                .lt(UcNftOffer::getExpireTime, System.currentTimeMillis());
+    public List<NftOffer> queryExpiredOffers() {
+        LambdaQueryWrapper<NftOffer> query = new QueryWrapper<NftOffer>().lambda()
+                .eq(NftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
+                .lt(NftOffer::getExpireTime, System.currentTimeMillis());
         return list(query);
     }
 
     @Override
-    public List<UcNftOffer> queryBiddingByNftId(Long nftId) {
-        LambdaQueryWrapper<UcNftOffer> query = new QueryWrapper<UcNftOffer>().lambda()
-                .eq(UcNftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
-                .eq(UcNftOffer::getNftId, nftId);
+    public List<NftOffer> queryBiddingByNftId(Long nftId) {
+        LambdaQueryWrapper<NftOffer> query = new QueryWrapper<NftOffer>().lambda()
+                .eq(NftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
+                .eq(NftOffer::getNftId, nftId);
         return list(query);
     }
 
-    private SysNftDetailResp validateOffer(UcNftOffer offer) {
+    private SysNftDetailResp validateOffer(NftOffer offer) {
         // 检查状态
         if (offer == null || NFTOfferStatusEnum.BIDDING != offer.getStatus() ) {
             throw new GenericException(UcErrorCodeEnum.ERR_500_SYSTEM_BUSY);

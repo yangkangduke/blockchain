@@ -1,7 +1,7 @@
-package com.seeds.uc.mapper;
+package com.seeds.account.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.seeds.uc.model.UcNftOffer;
+import com.seeds.account.model.NftOffer;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.seeds.uc.model.UcNftOffer;
  * @author hang.yu
  * @since 2022-09-05
  */
-public interface UcNftOfferMapper extends BaseMapper<UcNftOffer> {
+public interface NftOfferMapper extends BaseMapper<NftOffer> {
 
 }
