@@ -862,7 +862,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .amount(nft.getPrice())
                 .actionHistoryId(req.getActionHistoryId())
                 .actionStatusEnum(CommonActionStatus.SUCCESS)
-                .ownerType(req.getOwnerType())
+                .ownerType(nft.getOwnerType())
                 .currency(req.getCurrency())
                 .build();
         try {

@@ -129,7 +129,7 @@ public class AccountTradeServiceImpl implements AccountTradeService {
         nftOwnerChangeReq.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
         nftOwnerChangeReq.setAmount(amount);
         list.add(nftOwnerChangeReq);
-        kafkaProducer.send(KafkaTopic.UC_NFT_OWNER_CHANGE, JSONUtil.toJsonStr(list));
+        kafkaProducer.send(KafkaTopic.AC_NFT_OWNER_CHANGE, JSONUtil.toJsonStr(list));
     }
 
     @Override
@@ -181,7 +181,7 @@ public class AccountTradeServiceImpl implements AccountTradeService {
             data.add(NftPriceHisDto.PriceHis.builder()
                     .number(number)
                     .date(key)
-                    .totalPrice(totalPrice)
+                    .totalPrice(totalPrice.setScale(3, RoundingMode.HALF_UP))
                     .ovgPrice(totalPrice.divide(new BigDecimal(number), 3, RoundingMode.HALF_UP))
                     .build());
         }
