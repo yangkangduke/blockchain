@@ -130,7 +130,7 @@ public class AccountServiceImpl implements IAccountService {
         internalWithdraw = assignedDepositAddress != null && assignedDepositAddress.getUserId() > 0;
 
         // 读取提币用户规则
-        WithdrawRuleUserDto withdrawRuleUserDto = withdrawRuleUserService.get(userId, currency);
+        WithdrawRuleUserDto withdrawRuleUserDto = withdrawRuleUserService.get(userId, currency, chain.getCode());
         BigDecimal minAmount = rule.getMinAmount();
         BigDecimal maxAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getMaxAmount() : rule.getMaxAmount();
         BigDecimal intradyAmount = withdrawRuleUserDto != null ? withdrawRuleUserDto.getIntradayAmount() : rule.getIntradayAmount();
