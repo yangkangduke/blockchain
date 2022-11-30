@@ -176,7 +176,7 @@ public class AccountController {
                 BigDecimal intradayAmount = e.getIntradayAmount();
                 BigDecimal autoAmount = e.getAutoAmount();
 
-                WithdrawRuleUserDto withdrawRuleUserDto = withdrawRuleUserService.get(userId, e.getCurrency());
+                WithdrawRuleUserDto withdrawRuleUserDto = withdrawRuleUserService.get(userId, e.getCurrency(), e.getChain());
                 if (withdrawRuleUserDto != null) {
                     maxAmount = withdrawRuleUserDto.getMaxAmount();
                     intradayAmount = withdrawRuleUserDto.getIntradayAmount();

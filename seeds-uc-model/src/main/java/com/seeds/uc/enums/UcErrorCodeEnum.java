@@ -39,6 +39,8 @@ public enum UcErrorCodeEnum {
     ERR_18007_ACCOUNT_BUY_FAIL_NFT_LOCKED (18007, "购买NFT失败， NFT已锁定", "Failed to buy NFT,NFT locked"),
     ERR_18008_YOU_ALREADY_OWN_THIS_NFT (18008, "你已经拥有该NFT", "You already own this NFT"),
     ERR_18009_FAILED_TO_BID_NFT(18009, "NFT竞价失败", "Failed to bid NFT"),
+    ERR_18010_THE_NFT_GAS_FEES_IS_INCORRECTLY_CONFIGURED(18010, "NFT手续费配置有误", "The NFT gas fees is incorrectly configured"),
+    ERR_18011_THE_NFT_GAS_FEES_IS_TOO_LOW(18011, "NFT手续费太低", "The NFT gas fees is too low"),
 
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),

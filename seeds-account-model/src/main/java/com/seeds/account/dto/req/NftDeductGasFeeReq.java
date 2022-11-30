@@ -6,9 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * <p>
@@ -24,9 +22,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class NftDeductGasFeeReq implements Serializable {
 
-    @ApiModelProperty(value = "价格")
-    @NotNull
-    private BigDecimal price;
+    @ApiModelProperty(value = "手续费")
+    private String gasFees;
+
+    @ApiModelProperty(value = "币种")
+    private String currency;
 
     @ApiModelProperty("用户id")
     private Long userId;

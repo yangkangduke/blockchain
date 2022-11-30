@@ -23,9 +23,10 @@ public interface IWithdrawRuleUserService extends IService<WithdrawRuleUser> {
      * 从缓存获取单个
      * @param userId
      * @param currency
+     * @param chain
      * @return
      */
-    WithdrawRuleUserDto get(long userId, String currency);
+    WithdrawRuleUserDto get(long userId, String currency, Integer chain);
 
     /**
      * 从缓存获取
