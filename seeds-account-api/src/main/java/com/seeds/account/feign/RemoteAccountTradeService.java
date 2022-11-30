@@ -1,6 +1,7 @@
 package com.seeds.account.feign;
 
 import com.seeds.account.dto.req.NftBuyCallbackReq;
+import com.seeds.account.dto.req.NftBuyReq;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -19,5 +20,9 @@ public interface RemoteAccountTradeService {
 	@PostMapping("/buy-nft-callback")
 	@ApiOperation(value = "购买NFT回调", notes = "购买NFT回调")
 	GenericDto<Object> buyNftCallback(@Valid @RequestBody NftBuyCallbackReq buyReq);
+
+	@PostMapping("/buy-nft")
+	@ApiOperation(value = "购买NFT", notes = "购买NFT")
+	GenericDto<Object> buyNft(@Valid @RequestBody NftBuyReq buyReq);
 
 }

@@ -1,6 +1,7 @@
 package com.seeds.account.controller;
 
 import com.seeds.account.dto.req.NftBuyCallbackReq;
+import com.seeds.account.dto.req.NftBuyReq;
 import com.seeds.account.service.AccountTradeService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
@@ -37,6 +38,17 @@ public class AccountTradeInternalController {
     @Inner
     public GenericDto<Object> buyNftCallback(@Valid @RequestBody NftBuyCallbackReq buyReq) {
         accountTradeService.buyNftCallback(buyReq);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  购买NFT
+     */
+    @PostMapping("/buy-nft")
+    @ApiOperation(value = "购买NFT", notes = "购买NFT")
+    @Inner
+    public GenericDto<Object> buyNft(@Valid @RequestBody NftBuyReq buyReq) {
+        accountTradeService.validateAndInitBuyNft(buyReq);
         return GenericDto.success(null);
     }
 

@@ -1,5 +1,6 @@
 package com.seeds.game.controller;
 
+import com.seeds.account.feign.RemoteAccountTradeService;
 import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.enums.SysOwnerTypeEnum;
 import com.seeds.admin.feign.RemoteNftService;
@@ -26,6 +27,9 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/nft")
 public class OpenNftController {
+
+    @Autowired
+    private RemoteAccountTradeService remoteAccountTradeService;
 
     @Autowired
     private RemoteNftService adminRemoteNftService;
@@ -79,7 +83,7 @@ public class OpenNftController {
     public GenericDto<Object> buy(@Valid @RequestBody OpenNftBuyReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         req.setSource(TargetSource.GAME);
-        GenericDto<Object> result = ucRemoteNftService.buyNFT(req);
+        GenericDto<Object> result = remoteAccountTradeService.buyNft(req);
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),
                     result.getCode());
