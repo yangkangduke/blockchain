@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
 import com.seeds.account.AccountConstants;
-import com.seeds.account.dto.ChainCurrencyGasLimitDto;
 import com.seeds.account.dto.NftGasFeesDto;
 import com.seeds.account.dto.NftPriceHisDto;
 import com.seeds.account.dto.req.NftBuyCallbackReq;
@@ -163,7 +162,7 @@ public class AccountTradeServiceImpl implements AccountTradeService {
 
         // 改变交易记录的状态
         userAccountActionHisService.updateById(UserAccountActionHis.builder()
-                .toUserId(buyReq.getToUserId())
+                .fromUserId(buyReq.getFromUserId())
                 .status(buyReq.getActionStatusEnum())
                 .amount(buyReq.getAmount())
                 .id(buyReq.getActionHistoryId())
