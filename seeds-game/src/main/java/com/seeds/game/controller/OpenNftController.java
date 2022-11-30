@@ -1,5 +1,6 @@
 package com.seeds.game.controller;
 
+import com.seeds.account.dto.req.NftDeductGasFeeReq;
 import com.seeds.account.feign.RemoteAccountTradeService;
 import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.enums.SysOwnerTypeEnum;
@@ -36,8 +37,16 @@ public class OpenNftController {
     @PostMapping("create")
     @ApiOperation("NFT创建")
     public GenericDto<Long> create(@RequestBody OpenNftCreateReq req) {
+        GenericDto<Object> gasFeeResult = remoteAccountTradeService.deductGasFee(NftDeductGasFeeReq.builder()
+                .gasFees(req.getGasFees())
+                .userId(UserContext.getCurrentUserId())
+                .currency(req.getUnit())
+                .build());
+        if (!gasFeeResult.isSuccess()) {
+            return GenericDto.failure(gasFeeResult.getMessage(),
+                    gasFeeResult.getCode());
+        }
         req.setOwnerId(UserContext.getCurrentUserId());
-        req.setOwnerName(UserContext.getCurrentUserName());
         req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
         GenericDto<Long> result = adminRemoteNftService.create(req);
         if (!result.isSuccess()) {
@@ -50,9 +59,17 @@ public class OpenNftController {
     @PostMapping("upgrade")
     @ApiOperation("NFT升级")
     public GenericDto<Long> upgrade(@RequestBody OpenNftUpgradeReq req) {
+        GenericDto<Object> gasFeeResult = remoteAccountTradeService.deductGasFee(NftDeductGasFeeReq.builder()
+                .gasFees(req.getGasFees())
+                .userId(UserContext.getCurrentUserId())
+                .currency(req.getUnit())
+                .build());
+        if (!gasFeeResult.isSuccess()) {
+            return GenericDto.failure(gasFeeResult.getMessage(),
+                    gasFeeResult.getCode());
+        }
         req.setUserId(UserContext.getCurrentUserId());
         req.setOwnerId(UserContext.getCurrentUserId());
-        req.setOwnerName(UserContext.getCurrentUserName());
         req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
         GenericDto<Long> result = adminRemoteNftService.upgrade(req);
         if (!result.isSuccess()) {
