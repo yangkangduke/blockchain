@@ -1,11 +1,13 @@
 package com.seeds.account.service;
 
 import com.seeds.account.dto.NftPriceHisDto;
-import com.seeds.account.dto.req.NftBuyCallbackReq;
-import com.seeds.account.dto.req.NftBuyReq;
-import com.seeds.account.dto.req.NftPriceHisReq;
+import com.seeds.account.dto.req.*;
+import com.seeds.account.dto.resp.NftOfferResp;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.common.enums.TargetSource;
+import com.seeds.account.dto.resp.NftAuctionResp;
+
+import java.util.List;
 
 
 /**
@@ -36,6 +38,14 @@ public interface AccountTradeService {
      */
     void buyNftCallback(NftBuyCallbackReq buyReq);
 
+
+    /**
+     * 出价
+     * @param req NFT相关入参
+     * @param sysNftDetail NFT详情
+     */
+    void makeOffer(NftMakeOfferReq req, SysNftDetailResp sysNftDetail);
+
     /**
      * NFT历史价格
      * @param req 入参
@@ -43,6 +53,50 @@ public interface AccountTradeService {
      */
     NftPriceHisDto nftPriceHis(NftPriceHisReq req);
 
+    /**
+     * 正向拍卖
+     * @param req 入参
+     */
+    void forwardAuction(NftForwardAuctionReq req);
 
+    /**
+     * 反向拍卖
+     * @param req 入参
+     */
+    void reverseAuction(NftReverseAuctionReq req);
+
+    /**
+     * 正向出价
+     * @param req 入参
+     */
+    void forwardBids(NftMakeOfferReq req);
+
+    /**
+     * 反向出价
+     * @param req 入参
+     */
+    void reverseBids(NftBuyReq req);
+
+
+    /**
+     * 出价列表
+     * @param id 入参
+     */
+    List<NftOfferResp> offerList(Long id);
+
+    /**
+     * NFT拍卖信息
+     * @param id NFT的id
+     * @param userId 拥有该NFT的用户id
+     * @return NFT拍卖信息
+     */
+    NftAuctionResp actionInfo(Long id, Long userId);
+
+
+    /**
+     * 手续费扣除
+     * @param req 入参
+     */
+    void deductGasFee(NftDeductGasFeeReq req);
 
 }

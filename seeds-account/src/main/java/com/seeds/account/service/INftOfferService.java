@@ -1,9 +1,7 @@
 package com.seeds.account.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.admin.dto.response.SysNftDetailResp;
-import com.seeds.uc.dto.request.NFTMakeOfferReq;
-import com.seeds.uc.dto.response.NFTOfferResp;
+import com.seeds.account.dto.resp.NftOfferResp;
 import com.seeds.account.model.NftOffer;
 
 import java.util.List;
@@ -20,17 +18,10 @@ import java.util.List;
 public interface INftOfferService extends IService<NftOffer> {
 
     /**
-     * 出价
-     * @param req NFT相关入参
-     * @param sysNftDetail NFT详情
-     */
-    void makeOffer(NFTMakeOfferReq req, SysNftDetailResp sysNftDetail);
-
-    /**
      * 出价列表
      * @param nftId NFT的id
      */
-    List<NFTOfferResp> offerList(Long nftId);
+    List<NftOfferResp> offerList(Long nftId);
 
     /**
      * NFT竞价拒绝

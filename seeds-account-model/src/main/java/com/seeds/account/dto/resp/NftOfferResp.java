@@ -1,4 +1,4 @@
-package com.seeds.uc.dto.response;
+package com.seeds.account.dto.resp;
 
 import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.common.enums.NFTOfferStatusEnum;
@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  */
 @Data
 @Builder
-public class NFTOfferResp {
+public class NftOfferResp {
 
     @ApiModelProperty("offer的id")
     private Long id;

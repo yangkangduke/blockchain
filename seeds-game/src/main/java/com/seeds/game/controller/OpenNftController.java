@@ -8,7 +8,6 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.TargetSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.*;
-import com.seeds.uc.feign.RemoteNFTService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +32,6 @@ public class OpenNftController {
 
     @Autowired
     private RemoteNftService adminRemoteNftService;
-
-    @Autowired
-    private RemoteNFTService ucRemoteNftService;
 
     @PostMapping("create")
     @ApiOperation("NFT创建")
@@ -95,7 +91,7 @@ public class OpenNftController {
     @ApiOperation("NFT正向拍卖")
     public GenericDto<Object> forwardAuction(@Valid @RequestBody OpenNftForwardAuctionReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        GenericDto<Object> result = ucRemoteNftService.forwardAuction(req);
+        GenericDto<Object> result = remoteAccountTradeService.forwardAuction(req);
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),
                     result.getCode());
@@ -107,7 +103,7 @@ public class OpenNftController {
     @ApiOperation("NFT反向拍卖")
     public GenericDto<Object> reverseAuction(@Valid @RequestBody OpenNftReverseAuctionReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        GenericDto<Object> result = ucRemoteNftService.reverseAuction(req);
+        GenericDto<Object> result = remoteAccountTradeService.reverseAuction(req);
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),
                     result.getCode());
@@ -119,7 +115,7 @@ public class OpenNftController {
     @ApiOperation("NFT正向出价")
     public GenericDto<Object> forwardBids(@Valid @RequestBody OpenNftForwardBidsReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        GenericDto<Object> result = ucRemoteNftService.forwardBids(req);
+        GenericDto<Object> result = remoteAccountTradeService.forwardBids(req);
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),
                     result.getCode());
@@ -131,7 +127,7 @@ public class OpenNftController {
     @ApiOperation("NFT反向出价")
     public GenericDto<Object> reverseBids(@Valid @RequestBody OpenNftReverseBidsReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        GenericDto<Object> result = ucRemoteNftService.reverseBids(req);
+        GenericDto<Object> result = remoteAccountTradeService.reverseBids(req);
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),
                     result.getCode());

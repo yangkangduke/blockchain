@@ -1,4 +1,4 @@
-package com.seeds.uc.dto.request;
+package com.seeds.account.dto.req;
 
 import com.seeds.common.enums.CurrencyEnum;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,38 +13,34 @@ import java.math.BigDecimal;
 
 /**
  * <p>
- * NFT正向拍卖入参
+ * NFT出价入参
  * </p>
  *
  * @author hang.yu
- * @since 2022-10-11
+ * @since 2022-09-05
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NFTForwardAuctionReq implements Serializable {
+public class NftMakeOfferReq implements Serializable {
 
     @ApiModelProperty("admin中的NFT的id")
     @NotNull
     private Long nftId;
 
-    @ApiModelProperty("拍卖的初始最低价格")
+    @ApiModelProperty("价格")
     @NotNull
     private BigDecimal price;
 
-    @ApiModelProperty("一口价")
-    @NotNull
-    private BigDecimal maxPrice;
-
-    @ApiModelProperty("价格单位")
+    @ApiModelProperty("单位")
     @NotNull
     private CurrencyEnum currency;
 
-    @ApiModelProperty("结算时间")
-    private Long settlementTime;
+    @ApiModelProperty("过期时间")
+    private Long expireTime;
 
-    @ApiModelProperty("拥有NFT的用户id")
+    @ApiModelProperty("出价用户id")
     private Long userId;
 
 }

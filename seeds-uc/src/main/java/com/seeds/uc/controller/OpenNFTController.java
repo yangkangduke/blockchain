@@ -4,16 +4,10 @@ package com.seeds.uc.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.SysNftPageReq;
 import com.seeds.admin.dto.request.UcSwitchReq;
-import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.uc.dto.request.NFTBuyReq;
-import com.seeds.uc.dto.request.NFTMakeOfferReq;
-import com.seeds.uc.enums.UcErrorCodeEnum;
-import com.seeds.uc.exceptions.GenericException;
-import com.seeds.uc.service.IUcNftOfferService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -36,24 +30,8 @@ import javax.validation.Valid;
 @Slf4j
 public class OpenNFTController {
 
-
-    @Autowired
-    private IUcNftOfferService ucNftOffersService;
     @Autowired
     private RemoteNftService remoteNftService;
-
-    @PostMapping("/buy")
-    @ApiOperation(value = "购买", notes = "购买")
-    public GenericDto<Object> buyNFT(@Valid @RequestBody NFTBuyReq buyReq) {
-        SysNftDetailResp sysNftDetailResp;
-        try {
-            sysNftDetailResp = remoteNftService.ucDetail(buyReq.getNftId()).getData();
-        } catch (Exception e) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
-        }
-//        ucUserAccountService.buyNFT(buyReq, sysNftDetailResp);
-        return GenericDto.success(null);
-    }
 
     @PostMapping("/owner-page")
     @ApiOperation(value = "用户拥有分页查询", notes = "用户拥有分页查询")
@@ -67,34 +45,6 @@ public class OpenNFTController {
     public GenericDto<Object> ucUpOrDown(@Valid @RequestBody UcSwitchReq req) {
         req.setUcUserId(UserContext.getCurrentUserId());
         return remoteNftService.ucUpOrDown(req);
-    }
-
-    @PostMapping("/make-offer")
-    @ApiOperation("NFT出价")
-    public GenericDto<Object> makeOffer(@Valid @RequestBody NFTMakeOfferReq req) {
-        SysNftDetailResp sysNftDetailResp;
-        try {
-            GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = remoteNftService.ucDetail(req.getNftId());
-            sysNftDetailResp = sysNftDetailRespGenericDto.getData();
-        } catch (Exception e) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18005_ACCOUNT_BUY_FAIL);
-        }
-        ucNftOffersService.makeOffer(req, sysNftDetailResp);
-        return GenericDto.success(null);
-    }
-
-    @PostMapping("/offer-reject/{id}")
-    @ApiOperation("NFT竞价拒绝")
-    public GenericDto<Object> offerReject(@PathVariable("id") Long id) {
-        ucNftOffersService.offerReject(id);
-        return GenericDto.success(null);
-    }
-
-    @PostMapping("/offer-accept/{id}")
-    @ApiOperation("NFT竞价接受")
-    public GenericDto<Object> offerAccept(@PathVariable("id") Long id) {
-        ucNftOffersService.offerAccept(id);
-        return GenericDto.success(null);
     }
 
 }

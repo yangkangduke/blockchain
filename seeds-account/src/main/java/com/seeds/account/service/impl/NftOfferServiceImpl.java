@@ -7,16 +7,16 @@ import com.seeds.account.mapper.NftOfferMapper;
 import com.seeds.account.service.INftOfferService;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
-import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.NFTOfferStatusEnum;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.uc.dto.request.NFTMakeOfferReq;
-import com.seeds.uc.dto.response.NFTOfferResp;
+import com.seeds.account.dto.resp.NftOfferResp;
+import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.account.model.NftOffer;
+import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,71 +42,13 @@ import java.util.stream.Collectors;
 public class NftOfferServiceImpl extends ServiceImpl<NftOfferMapper, NftOffer> implements INftOfferService {
 
     @Autowired
-    private IUcUserService ucUserService;
+    private UserCenterFeignClient userCenterFeignClient;
 
     @Autowired
-    private RemoteNftService remoteNftService;
+    private RemoteNftService adminRemoteNftService;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void makeOffer(NFTMakeOfferReq req, SysNftDetailResp sysNftDetailResp) {
-        Long currentUserId = req.getUserId();
-        if (currentUserId == null) {
-            currentUserId = UserContext.getCurrentUserId();
-        }
-        BigDecimal price = sysNftDetailResp.getPrice();
-        // 是否已拥有该NFT
-        if (Objects.equals(sysNftDetailResp.getOwnerId(), currentUserId)) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18008_YOU_ALREADY_OWN_THIS_NFT);
-        }
-        // 判断NFT是否可以购买
-        if (sysNftDetailResp.getStatus() != WhetherEnum.YES.value()) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18006_ACCOUNT_BUY_FAIL_INVALID_NFT_STATUS);
-        }
-        // 判断NFT是否已锁定
-        if (WhetherEnum.YES.value() == sysNftDetailResp.getLockFlag()) {
-            throw new GenericException(UcErrorCodeEnum.ERR_18007_ACCOUNT_BUY_FAIL_NFT_LOCKED);
-        }
-        // 检查余额
-        BigDecimal reqPrice = req.getPrice();
-//        if (!ucUserAccountService.checkBalance(currentUserId, reqPrice, CurrencyEnum.USDT)) {
-//            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
-//        }
-        // 冻结金额
-//        UcUserAccountInfoResp info = ucUserAccountService.getInfo(currentUserId);
-//        ucUserAccountService.update(UcUserAccount.builder()
-//                .balance(info.getBalance().subtract(reqPrice))
-//                .freeze(info.getFreeze().add(reqPrice))
-//                .build(), new LambdaQueryWrapper<UcUserAccount>()
-//                .eq(UcUserAccount::getUserId, currentUserId)
-//                .eq(UcUserAccount::getCurrency, CurrencyEnum.USDT));
-        // 添加记录信息
-        long currentTimeMillis = System.currentTimeMillis();
-//        UcUserAccountActionHistory ucUserAccountActionHistory = UcUserAccountActionHistory.builder()
-//                .userId(currentUserId)
-//                .createTime(currentTimeMillis)
-//                .actionEnum(AccountActionEnum.BUY_NFT)
-//                .accountType(AccountTypeEnum.ACTUALS)
-//                .currency(CurrencyEnum.USDT)
-//                .status(AccountActionStatusEnum.PROCESSING)
-//                .build();
-//        ucUserAccountActionHistoryService.save(ucUserAccountActionHistory);
-        // 存储offer
-        NftOffer nftOffer = NftOffer.builder().build();
-        BeanUtils.copyProperties(req, nftOffer);
-        nftOffer.setUserId(currentUserId);
-        nftOffer.setCreateTime(currentTimeMillis);
-        nftOffer.setUpdateTime(currentTimeMillis);
-        nftOffer.setStatus(NFTOfferStatusEnum.BIDDING);
-//        nftOffer.setActionHistoryId(ucUserAccountActionHistory.getId());
-        // TODO 汇率转换
-        // 计算差异
-        nftOffer.setDifference(reqPrice.subtract(price));
-        save(nftOffer);
-    }
-
-    @Override
-    public List<NFTOfferResp> offerList(Long nftId) {
+    public List<NftOfferResp> offerList(Long nftId) {
         LambdaQueryWrapper<NftOffer> query = new QueryWrapper<NftOffer>().lambda()
                 .eq(NftOffer::getStatus, NFTOfferStatusEnum.BIDDING)
                 .eq(NftOffer::getNftId, nftId);
@@ -114,15 +56,24 @@ public class NftOfferServiceImpl extends ServiceImpl<NftOfferMapper, NftOffer> i
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();
         }
-        List<NFTOfferResp> respList = new ArrayList<>();
-        Set<Long> userIds = list.stream().map(NftOffer::getUserId).collect(Collectors.toSet());
-        Map<Long, String> userMap = ucUserService.queryNameByIds(userIds);
-        list.forEach(p -> {
-            NFTOfferResp resp = NFTOfferResp.builder().build();
-            BeanUtils.copyProperties(p, resp);
-            resp.setUserName(userMap.get(p.getUserId()));
+        List<NftOfferResp> respList = new ArrayList<>();
+        List<Long> userIds = list.stream().map(NftOffer::getUserId).collect(Collectors.toList());
+        Map<Long, UcUserResp> userMap = new HashMap<>(userIds.size());
+        try {
+            GenericDto<List<UcUserResp>> userList = userCenterFeignClient.getUserList(userIds);
+            userMap = userList.getData().stream().collect(Collectors.toMap(UcUserResp::getId, p -> p));
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户信息失败");
+        }
+        for (NftOffer nftOffer : list) {
+            NftOfferResp resp = NftOfferResp.builder().build();
+            BeanUtils.copyProperties(nftOffer, resp);
+            UcUserResp ucUser = userMap.get(nftOffer.getUserId());
+            if (ucUser != null) {
+                resp.setUserName(ucUser.getNickname());
+            }
             respList.add(resp);
-        });
+        }
         return respList;
     }
 
@@ -166,7 +117,7 @@ public class NftOfferServiceImpl extends ServiceImpl<NftOfferMapper, NftOffer> i
         nftOwnerChangeReq.setOfferId(id);
         nftOwnerChangeReq.setOwnerType(nftDetail.getOwnerType());
         List<NftOwnerChangeReq> list = Collections.singletonList(nftOwnerChangeReq);
-        remoteNftService.ownerChange(list);
+        adminRemoteNftService.ownerChange(list);
     }
 
     @Override
@@ -194,7 +145,7 @@ public class NftOfferServiceImpl extends ServiceImpl<NftOfferMapper, NftOffer> i
         SysNftDetailResp sysNftDetailResp;
         Long ownerId;
         try {
-            GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = remoteNftService.ucDetail(offer.getNftId());
+            GenericDto<SysNftDetailResp> sysNftDetailRespGenericDto = adminRemoteNftService.ucDetail(offer.getNftId());
             sysNftDetailResp = sysNftDetailRespGenericDto.getData();
             ownerId = sysNftDetailResp.getOwnerId();
         } catch (Exception e) {

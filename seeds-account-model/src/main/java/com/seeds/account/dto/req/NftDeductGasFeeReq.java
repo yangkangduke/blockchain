@@ -1,4 +1,4 @@
-package com.seeds.uc.dto.request;
+package com.seeds.account.dto.req;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NFTDeductGasFeeReq implements Serializable {
+public class NftDeductGasFeeReq implements Serializable {
 
     @ApiModelProperty(value = "价格")
     @NotNull

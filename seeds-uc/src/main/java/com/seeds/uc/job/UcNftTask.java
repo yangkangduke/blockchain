@@ -1,26 +1,19 @@
 package com.seeds.uc.job;
 
-import com.seeds.common.enums.NFTOfferStatusEnum;
 import com.seeds.account.model.NftOffer;
-import com.seeds.uc.service.IUcNftOfferService;
 import com.seeds.uc.service.impl.CacheService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 
 
 /**
@@ -41,15 +34,15 @@ public class UcNftTask {
     @Autowired
     private CacheService cacheService;
 
-    @Autowired
-    private IUcNftOfferService ucNftOfferService;
+    //@Autowired
+    //private IUcNftOfferService ucNftOfferService;
 
 
     @Scheduled(cron = "0 0 3 * * ?")
     @PostMapping("/expired-offer")
     @ApiOperation(value = "过期offer处理", notes = "过期offer处理")
     public void expiredOffer() {
-        String key = LocalDate.now().toString();
+        /*String key = LocalDate.now().toString();
         if (StringUtils.isNotBlank(cacheService.getOneDayMarking(key))) {
             log.info("有正在执行中的过期offer处理任务， key={}", key);
             return;
@@ -69,7 +62,7 @@ public class UcNftTask {
                 log.info("处理过期的offer任务失败， offer id ={}", p.getId());
             }
         });
-        cacheService.removeOneDayMarking(key);
+        cacheService.removeOneDayMarking(key);*/
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -90,8 +83,8 @@ public class UcNftTask {
 //                .build(), new LambdaQueryWrapper<UcUserAccountActionHistory>()
 //                .eq(UcUserAccountActionHistory::getId, offer.getActionHistoryId()));
         // 修改offer
-        offer.setStatus(NFTOfferStatusEnum.EXPIRED);
-        ucNftOfferService.updateById(offer);
+//        offer.setStatus(NFTOfferStatusEnum.EXPIRED);
+//        ucNftOfferService.updateById(offer);
     }
 
 }
