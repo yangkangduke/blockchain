@@ -31,7 +31,6 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.seeds.common.enums.ErrorCode.ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG;
 import static com.seeds.common.enums.ErrorCode.USER_ID_ON_CHAIN_ALREADY_EXIST;
 
 /**
@@ -61,18 +60,18 @@ public class WithdrawRuleUserServiceImpl extends ServiceImpl<WithdrawRuleUserMap
                 List<WithdrawRuleUserDto> list = loadAll();
                 Map<String, WithdrawRuleUserDto> map = list.stream()
                         .filter(e -> Objects.equals(e.getStatus(), CommonStatus.ENABLED.getCode()))
-                        .collect(Collectors.toMap(e -> toKey(e.getUserId(), e.getCurrency()), e -> e));
+                        .collect(Collectors.toMap(e -> toKey(e.getUserId(), e.getCurrency(), e.getChain()), e -> e));
                 return ListMap.init(list, map);
             });
 
 
-    private String toKey(long userId, String currency) {
-        return userId + ":" + currency;
+    private String toKey(long userId, String currency, Integer chain) {
+        return userId + ":" + currency + ":" + chain;
     }
 
     @Override
-    public WithdrawRuleUserDto get(long userId, String currency) {
-        return getAllMap().get(toKey(userId, currency));
+    public WithdrawRuleUserDto get(long userId, String currency, Integer chain) {
+        return getAllMap().get(toKey(userId, currency, chain));
     }
 
     @Override
@@ -163,7 +162,7 @@ public class WithdrawRuleUserServiceImpl extends ServiceImpl<WithdrawRuleUserMap
                 .eq(WithdrawRuleUser::getChain,chain);
         WithdrawRuleUser one = getOne(queryWrap);
         if (one != null) {
-            throw new ConfigException(ILLEGAL_WITHDRAW_WHITE_LIST_CONFIG);
+            throw new ConfigException(USER_ID_ON_CHAIN_ALREADY_EXIST);
         }
     }
 }

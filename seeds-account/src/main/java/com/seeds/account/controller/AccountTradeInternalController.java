@@ -115,4 +115,15 @@ public class AccountTradeInternalController {
         return GenericDto.success(accountTradeService.actionInfo(id, userId));
     }
 
+    /**
+     *  手续费扣除接口
+     */
+    @PostMapping("/nft-deduct-gas-fee")
+    @ApiOperation(value = "手续费扣除", notes = "手续费扣除")
+    @Inner
+    public GenericDto<Object> deductGasFee(@Valid @RequestBody NftDeductGasFeeReq req) {
+        accountTradeService.deductGasFee(req);
+        return GenericDto.success(null);
+    }
+
 }

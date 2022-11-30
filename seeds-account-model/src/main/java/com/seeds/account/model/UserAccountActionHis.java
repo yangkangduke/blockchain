@@ -49,8 +49,8 @@ public class UserAccountActionHis implements Serializable {
     @ApiModelProperty("userId")
     private Long userId;
 
-    @ApiModelProperty("toUserId")
-    private Long toUserId;
+    @ApiModelProperty("fromUserId")
+    private Long fromUserId;
 
     private String currency;
 

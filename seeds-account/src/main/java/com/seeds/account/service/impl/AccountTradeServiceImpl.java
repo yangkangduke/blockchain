@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
 import com.seeds.account.AccountConstants;
+import com.seeds.account.dto.NftGasFeesDto;
 import com.seeds.account.dto.NftPriceHisDto;
 import com.seeds.account.dto.req.NftBuyCallbackReq;
 import com.seeds.account.dto.req.NftBuyReq;
@@ -11,6 +12,7 @@ import com.seeds.account.dto.req.NftPriceHisReq;
 import com.seeds.account.dto.resp.NftAuctionResp;
 import com.seeds.account.dto.resp.NftOfferResp;
 import com.seeds.account.enums.AccountAction;
+import com.seeds.account.enums.AccountSystemConfig;
 import com.seeds.account.enums.CommonActionStatus;
 import com.seeds.account.model.NftForwardAuction;
 import com.seeds.account.model.NftOffer;
@@ -18,6 +20,7 @@ import com.seeds.account.model.NftReverseAuction;
 import com.seeds.account.model.UserAccountActionHis;
 import com.seeds.account.mq.producer.KafkaProducer;
 import com.seeds.account.service.*;
+import com.seeds.account.util.JsonUtils;
 import com.seeds.admin.dto.request.NftOwnerChangeReq;
 import com.seeds.admin.dto.request.SysNftShelvesReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
@@ -63,11 +66,15 @@ public class AccountTradeServiceImpl implements AccountTradeService {
 
     @Autowired
     private INftForwardAuctionService nftForwardAuctionService;
+
     @Autowired
     private INftReverseAuctionService nftReverseAuctionService;
 
     @Autowired
     private IWalletAccountService walletAccountService;
+
+    @Autowired
+    private ISystemConfigService systemConfigService;
 
     @Autowired
     private RemoteNftService adminRemoteNftService;
@@ -101,7 +108,7 @@ public class AccountTradeServiceImpl implements AccountTradeService {
             currentUserId = UserContext.getCurrentUserId();
         }
         String currency = CurrencyEnum.from(nftDetail.getUnit()).name();
-        // 冻结金额
+        // 冻结金额 余额减少，冻结增加
         walletAccountService.freeze(currentUserId, currency, amount);
 
         // 添加记录信息
@@ -146,16 +153,16 @@ public class AccountTradeServiceImpl implements AccountTradeService {
             }
 
             // 买家freeze减少
-            walletAccountService.unfreeze(buyReq.getToUserId(), buyReq.getCurrency(), amount);
+            walletAccountService.updateFreeze(buyReq.getToUserId(), buyReq.getCurrency(), amount.negate(), true);
         } else {
             // 失败
             // 买家解冻金额，增加余额
-            walletAccountService.updateFreezeAndAvailable(buyReq.getToUserId(), buyReq.getCurrency(), amount, buyReq.getCurrency(), amount);
+            walletAccountService.unfreeze(buyReq.getToUserId(), buyReq.getCurrency(), amount);
         }
 
         // 改变交易记录的状态
         userAccountActionHisService.updateById(UserAccountActionHis.builder()
-                .toUserId(buyReq.getToUserId())
+                .fromUserId(buyReq.getFromUserId())
                 .status(buyReq.getActionStatusEnum())
                 .amount(buyReq.getAmount())
                 .id(buyReq.getActionHistoryId())
@@ -318,8 +325,31 @@ public class AccountTradeServiceImpl implements AccountTradeService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deductGasFee(NftDeductGasFeeReq req) {
-
+        Long currentUserId = req.getUserId();
+        if (currentUserId == null) {
+            currentUserId = UserContext.getCurrentUserId();
+        }
+        BigDecimal gasFees = new BigDecimal(req.getGasFees());
+        String currency = CurrencyEnum.from(req.getCurrency()).name();
+        // 读取扣除手续费配置
+        String nftGasFees = systemConfigService.getValue(AccountSystemConfig.NFT_GAS_FEES);
+        List<NftGasFeesDto> list = JsonUtils.readValue(nftGasFees, new com.fasterxml.jackson.core.type.TypeReference<List<NftGasFeesDto>>() {});
+        NftGasFeesDto dto = list.stream().filter(e -> Objects.equals(e.getCurrency(), currency)).findFirst().orElse(null);
+        if (dto == null || dto.getGasFees() == null) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18010_THE_NFT_GAS_FEES_IS_INCORRECTLY_CONFIGURED);
+        }
+        // 验证传入手续费是否小于配置
+        if (dto.getGasFees().compareTo(gasFees) > 0) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18011_THE_NFT_GAS_FEES_IS_TOO_LOW);
+        }
+        // 检查账户里面的金额是否足够支付
+        if (!walletAccountService.checkBalance(currentUserId, gasFees, currency)) {
+            throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
+        }
+        // 扣除手续费
+        walletAccountService.updateAvailable(currentUserId, currency, gasFees.negate(), true);
     }
 
     private Long validateNft(SysNftDetailResp nftDetail, Long currentUserId) {
