@@ -1,8 +1,10 @@
 package com.seeds.account.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seeds.account.AccountConstants;
 import com.seeds.account.mapper.UserAccountMapper;
 import com.seeds.account.model.UserAccount;
+import com.seeds.account.service.IUserAccountService;
 import com.seeds.account.service.IWalletAccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
@@ -26,6 +28,8 @@ public class WalletAccountServiceImpl implements IWalletAccountService {
     RedissonClient client;
     @Autowired
     UserAccountMapper userAccountMapper;
+    @Autowired
+    IUserAccountService userAccountService;
 
     @Override
     public boolean freeze(Long userId, String currency, BigDecimal amount) {
@@ -111,6 +115,14 @@ public class WalletAccountServiceImpl implements IWalletAccountService {
     @Override
     public List<UserAccount> getAccounts(long userId) {
         return userAccountMapper.getUserAccountByUserId(userId);
+    }
+
+    @Override
+    public Boolean checkBalance(Long userId, BigDecimal amount, String currency) {
+        UserAccount one = userAccountService.getOne(new LambdaQueryWrapper<UserAccount>()
+                .eq(UserAccount::getUserId, userId)
+                .eq(UserAccount::getCurrency, currency));
+        return one != null && one.getAvailable().compareTo(new BigDecimal(0)) > 0 && one.getAvailable().compareTo(amount) > 0;
     }
 
     @Override

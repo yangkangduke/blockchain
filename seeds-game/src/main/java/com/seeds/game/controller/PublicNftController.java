@@ -1,6 +1,7 @@
 package com.seeds.game.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.account.feign.RemoteAccountTradeService;
 import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftResp;
 import com.seeds.admin.feign.RemoteNftService;
@@ -9,9 +10,8 @@ import com.seeds.game.dto.request.OpenNftHonorModifyReq;
 import com.seeds.game.dto.request.OpenNftModifyReq;
 import com.seeds.game.dto.request.OpenNftPageReq;
 import com.seeds.game.dto.request.OpenNftSettlementReq;
-import com.seeds.uc.dto.response.NFTAuctionResp;
-import com.seeds.uc.dto.response.NFTOfferResp;
-import com.seeds.uc.feign.RemoteNFTService;
+import com.seeds.account.dto.resp.NftAuctionResp;
+import com.seeds.account.dto.resp.NftOfferResp;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +34,10 @@ import java.util.List;
 public class PublicNftController {
 
     @Autowired
-    private RemoteNftService adminRemoteNftService;
+    private RemoteAccountTradeService remoteAccountTradeService;
 
     @Autowired
-    private RemoteNFTService ucRemoteNftService;
+    private RemoteNftService adminRemoteNftService;
 
     @PostMapping("modify")
     @ApiOperation("NFT修改")
@@ -96,18 +96,18 @@ public class PublicNftController {
                     resp.getCode());
         }
         SysNftDetailResp nftDetailResp = resp.getData();
-        GenericDto<NFTAuctionResp> actionInfo = ucRemoteNftService.actionInfo(id, nftDetailResp.getOwnerId());
+        GenericDto<NftAuctionResp> actionInfo = remoteAccountTradeService.actionInfo(id, nftDetailResp.getOwnerId());
         nftDetailResp.setAuctionFlag(actionInfo.getData().getAuctionFlag());
         return resp;
     }
 
     @GetMapping("/offer-list")
     @ApiOperation("NFT出价列表")
-    public GenericDto<List<NFTOfferResp>> offerList(@RequestParam Long id,
+    public GenericDto<List<NftOfferResp>> offerList(@RequestParam Long id,
                                                     @RequestParam String accessKey,
                                                     @RequestParam String signature,
                                                     @RequestParam Long timestamp) {
-        GenericDto<List<NFTOfferResp>> result = ucRemoteNftService.offerList(id);
+        GenericDto<List<NftOfferResp>> result = remoteAccountTradeService.offerList(id);
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),
                     result.getCode());

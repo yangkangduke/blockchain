@@ -22,7 +22,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.Chain;
 import com.seeds.common.enums.ErrorCode;
 import com.seeds.common.redis.account.RedisKeys;
-import com.seeds.uc.enums.CurrencyEnum;
+import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import com.seeds.wallet.dto.RawTransactionDto;
 import lombok.extern.slf4j.Slf4j;

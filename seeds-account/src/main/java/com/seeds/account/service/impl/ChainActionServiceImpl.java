@@ -19,7 +19,7 @@ import com.seeds.account.enums.*;
 import com.seeds.account.ex.AccountException;
 import com.seeds.account.mapper.*;
 import com.seeds.account.model.*;
-import com.seeds.account.sender.KafkaProducer;
+import com.seeds.account.mq.producer.KafkaProducer;
 import com.seeds.account.service.*;
 import com.seeds.account.util.JsonUtils;
 import com.seeds.account.util.ObjectUtils;
