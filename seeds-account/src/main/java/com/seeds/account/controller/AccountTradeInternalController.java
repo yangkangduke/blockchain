@@ -1,5 +1,6 @@
 package com.seeds.account.controller;
 
+import com.seeds.account.dto.NftGasFeesDto;
 import com.seeds.account.dto.req.*;
 import com.seeds.account.dto.resp.NftOfferResp;
 import com.seeds.account.service.AccountTradeService;
@@ -121,8 +122,40 @@ public class AccountTradeInternalController {
     @PostMapping("/nft-deduct-gas-fee")
     @ApiOperation(value = "手续费扣除", notes = "手续费扣除")
     @Inner
-    public GenericDto<Object> deductGasFee(@Valid @RequestBody NftDeductGasFeeReq req) {
-        accountTradeService.deductGasFee(req);
+    public GenericDto<Object> nftDeductGasFee(@Valid @RequestBody AccountOperateReq req) {
+        accountTradeService.nftDeductGasFee(req);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  NFT手续费
+     */
+    @GetMapping("/nft-gas-fees")
+    @ApiOperation(value = "NFT手续费", notes = "NFT手续费")
+    @Inner
+    public GenericDto<List<NftGasFeesDto>> nftGasFee() {
+        return GenericDto.success(accountTradeService.nftGasFee());
+    }
+
+    /**
+     *  解冻金额
+     */
+    @PostMapping("/amount-unfreeze")
+    @ApiOperation(value = "解冻金额", notes = "解冻金额")
+    @Inner
+    public GenericDto<Object> amountUnfreeze(@Valid @RequestBody AccountOperateReq req) {
+        accountTradeService.amountUnfreeze(req);
+        return GenericDto.success(null);
+    }
+
+    /**
+     *  余额变更
+     */
+    @PostMapping("/amount-change-balance")
+    @ApiOperation(value = "余额变更", notes = "余额变更")
+    @Inner
+    public GenericDto<Object> amountChangeBalance(@Valid @RequestBody AccountOperateReq req) {
+        accountTradeService.amountChangeBalance(req);
         return GenericDto.success(null);
     }
 

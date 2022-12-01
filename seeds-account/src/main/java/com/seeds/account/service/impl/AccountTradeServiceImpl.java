@@ -37,7 +37,7 @@ import com.seeds.common.web.context.UserContext;
 import com.seeds.account.dto.req.NftForwardAuctionReq;
 import com.seeds.account.dto.req.NftMakeOfferReq;
 import com.seeds.account.dto.req.NftReverseAuctionReq;
-import com.seeds.account.dto.req.NftDeductGasFeeReq;
+import com.seeds.account.dto.req.AccountOperateReq;
 import com.seeds.uc.constant.UcRedisKeysConstant;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.GenericException;
@@ -413,12 +413,12 @@ public class AccountTradeServiceImpl implements AccountTradeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deductGasFee(NftDeductGasFeeReq req) {
+    public void nftDeductGasFee(AccountOperateReq req) {
         Long currentUserId = req.getUserId();
         if (currentUserId == null) {
             currentUserId = UserContext.getCurrentUserId();
         }
-        BigDecimal gasFees = new BigDecimal(req.getGasFees());
+        BigDecimal gasFees = req.getAmount();
         String currency = CurrencyEnum.from(req.getCurrency()).name();
         // 读取扣除手续费配置
         String nftGasFees = systemConfigService.getValue(AccountSystemConfig.NFT_GAS_FEES);
@@ -436,7 +436,17 @@ public class AccountTradeServiceImpl implements AccountTradeService {
             throw new GenericException(UcErrorCodeEnum.ERR_18004_ACCOUNT_BALANCE_INSUFFICIENT);
         }
         // 扣除手续费
-        walletAccountService.updateAvailable(currentUserId, currency, gasFees.negate(), true);
+        walletAccountService.freeze(currentUserId, currency, gasFees);
+    }
+
+    @Override
+    public void amountUnfreeze(AccountOperateReq req) {
+        walletAccountService.unfreeze(req.getUserId(), req.getCurrency(), req.getAmount());
+    }
+
+    @Override
+    public void amountChangeBalance(AccountOperateReq req) {
+        walletAccountService.updateFreeze(req.getUserId(), req.getCurrency(), req.getAmount(), true);
     }
 
     @Override
@@ -463,6 +473,13 @@ public class AccountTradeServiceImpl implements AccountTradeService {
             }
         });
         bucket.delete();
+    }
+
+    @Override
+    public List<NftGasFeesDto> nftGasFee() {
+        // 读取扣除手续费配置
+        String nftGasFees = systemConfigService.getValue(AccountSystemConfig.NFT_GAS_FEES);
+        return JsonUtils.readValue(nftGasFees, new com.fasterxml.jackson.core.type.TypeReference<List<NftGasFeesDto>>() {});
     }
 
     private Long validateNft(SysNftDetailResp nftDetail, Long currentUserId) {

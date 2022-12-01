@@ -1,5 +1,6 @@
 package com.seeds.account.service;
 
+import com.seeds.account.dto.NftGasFeesDto;
 import com.seeds.account.dto.NftPriceHisDto;
 import com.seeds.account.dto.req.*;
 import com.seeds.account.dto.resp.NftOfferResp;
@@ -108,11 +109,29 @@ public interface AccountTradeService {
      * 手续费扣除
      * @param req 入参
      */
-    void deductGasFee(NftDeductGasFeeReq req);
+    void nftDeductGasFee(AccountOperateReq req);
+
+    /**
+     * 解冻金额
+     * @param req 入参
+     */
+    void amountUnfreeze(AccountOperateReq req);
+
+    /**
+     * 余额变更
+     * @param req 入参
+     */
+    void amountChangeBalance(AccountOperateReq req);
 
     /**
      * NFT的offer过期任务
      */
     void nftOfferExpired();
+
+    /**
+     * NFT的手续费
+     * @return 手续费
+     */
+    List<NftGasFeesDto> nftGasFee();
 
 }

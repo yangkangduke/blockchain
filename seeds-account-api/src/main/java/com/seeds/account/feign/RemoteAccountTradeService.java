@@ -1,5 +1,6 @@
 package com.seeds.account.feign;
 
+import com.seeds.account.dto.NftGasFeesDto;
 import com.seeds.account.dto.req.*;
 import com.seeds.account.dto.resp.NftAuctionResp;
 import com.seeds.account.dto.resp.NftOfferResp;
@@ -55,7 +56,19 @@ public interface RemoteAccountTradeService {
 
 	@PostMapping("/nft-deduct-gas-fee")
 	@ApiOperation(value = "扣除手续费", notes = "扣除手续费")
-	GenericDto<Object> deductGasFee(@Valid @RequestBody NftDeductGasFeeReq req) ;
+	GenericDto<Object> nftDeductGasFee(@Valid @RequestBody AccountOperateReq req);
+
+	@GetMapping("/nft-gas-fees")
+	@ApiOperation(value = "NFT手续费", notes = "NFT手续费")
+	GenericDto<List<NftGasFeesDto>> nftGasFee();
+
+	@PostMapping("/amount-unfreeze")
+	@ApiOperation(value = "解冻金额", notes = "解冻金额")
+	GenericDto<Object> amountUnfreeze(@Valid @RequestBody AccountOperateReq req);
+
+	@PostMapping("/amount-change-balance")
+	@ApiOperation(value = "余额变更", notes = "余额变更")
+	GenericDto<Object> amountChangeBalance(@Valid @RequestBody AccountOperateReq req);
 
 	@PostMapping("/job/nft-offer-expired")
 	@ApiOperation(value = "NFT的offer过期任务", notes = "NFT的offer过期任务")
