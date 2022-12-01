@@ -28,6 +28,7 @@ import com.seeds.chain.service.GameItemsService;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
+import com.seeds.common.enums.NftOfferStatusEnum;
 import com.seeds.common.enums.TargetSource;
 import com.seeds.common.exception.SeedsException;
 import com.seeds.uc.dto.request.NFTShelvesReq;
@@ -118,7 +119,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId())
                 .ge(query.getMinPrice() != null, SysNftEntity::getPrice, query.getMinPrice())
                 .le(query.getMaxPrice() != null, SysNftEntity::getPrice, query.getMaxPrice());
-                buildOrderBy(query, queryWrap);
+        buildOrderBy(query, queryWrap);
         Page<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
         List<SysNftEntity> records = page.getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -150,7 +151,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             resp.setPicture(smartContractConfig.getIpfsUrl() + p.getUrl());
             if (p.getOwnerId() != null) {
                 UcUserResp ucUserResp = finalUserMap.get(p.getOwnerId());
-                resp.setOwnerName(StringUtils.isNotBlank(ucUserResp.getEmail()) ? ucUserResp.getEmail() : ucUserResp.getPublicAddress());
+                if (ucUserResp != null) {
+                    resp.setOwnerName(StringUtils.isNotBlank(ucUserResp.getEmail()) ? ucUserResp.getEmail() : ucUserResp.getPublicAddress());
+                }
             }
             return resp;
         });
@@ -864,6 +867,8 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .actionStatusEnum(CommonActionStatus.SUCCESS)
                 .ownerType(nft.getOwnerType())
                 .currency(req.getCurrency())
+                .offerId(req.getOfferId())
+                .offerStatusEnum(NftOfferStatusEnum.ACCEPTED)
                 .build();
         try {
             GenericDto<Object> result = remoteAccountTradeService.buyNftCallback(callback);

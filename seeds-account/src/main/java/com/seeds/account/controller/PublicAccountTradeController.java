@@ -4,7 +4,6 @@ import com.seeds.account.dto.NftPriceHisDto;
 import com.seeds.account.dto.req.NftPriceHisReq;
 import com.seeds.account.dto.resp.NftOfferResp;
 import com.seeds.account.service.AccountTradeService;
-import com.seeds.account.service.INftOfferService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,9 +28,6 @@ public class PublicAccountTradeController {
     @Autowired
     private AccountTradeService accountTradeService;
 
-    @Autowired
-    private INftOfferService nftOfferService;
-
     /**
      *  NFT历史价格
      */
@@ -44,7 +40,7 @@ public class PublicAccountTradeController {
     @GetMapping("/nft-offer-list/{id}")
     @ApiOperation("出价列表")
     public GenericDto<List<NftOfferResp>> offerList(@PathVariable("id") Long id) {
-        return GenericDto.success(nftOfferService.offerList(id));
+        return GenericDto.success(accountTradeService.offerList(id));
     }
 
 }

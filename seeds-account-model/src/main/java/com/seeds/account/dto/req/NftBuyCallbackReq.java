@@ -1,6 +1,7 @@
 package com.seeds.account.dto.req;
 
 import com.seeds.account.enums.CommonActionStatus;
+import com.seeds.common.enums.NftOfferStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -54,5 +55,11 @@ public class NftBuyCallbackReq implements Serializable {
 
     @ApiModelProperty("币种")
     private String currency;
+
+    @ApiModelProperty("offer的id")
+    private Long offerId;
+
+    @ApiModelProperty("状态 0：竞价中 1：已接受 2：已拒绝 3：已过期")
+    private NftOfferStatusEnum offerStatusEnum;
 
 }

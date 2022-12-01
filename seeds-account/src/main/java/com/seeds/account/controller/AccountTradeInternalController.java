@@ -126,4 +126,15 @@ public class AccountTradeInternalController {
         return GenericDto.success(null);
     }
 
+    /**
+     *  NFT的offer过期任务
+     */
+    @PostMapping("/job/nft-offer-expired")
+    @ApiOperation(value = "NFT的offer过期任务", notes = "NFT的offer过期任务")
+    @Inner
+    public GenericDto<Object> nftOfferExpired() {
+        accountTradeService.nftOfferExpired();
+        return GenericDto.success(null);
+    }
+
 }

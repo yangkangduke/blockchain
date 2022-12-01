@@ -80,4 +80,25 @@ public class AccountTradeController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("/nft-make-offer")
+    @ApiOperation("NFT出价")
+    public GenericDto<Object> nftMakeOffer(@Valid @RequestBody NftMakeOfferReq req) {
+        accountTradeService.nftMakeOffer(req, null);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("/nft-offer-reject/{id}")
+    @ApiOperation("NFT竞价拒绝")
+    public GenericDto<Object> nftOfferReject(@PathVariable("id") Long id) {
+        accountTradeService.nftOfferReject(id);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("/nft-offer-accept/{id}")
+    @ApiOperation("NFT竞价接受")
+    public GenericDto<Object> nftOfferAccept(@PathVariable("id") Long id) {
+        accountTradeService.nftOfferAccept(id);
+        return GenericDto.success(null);
+    }
+
 }

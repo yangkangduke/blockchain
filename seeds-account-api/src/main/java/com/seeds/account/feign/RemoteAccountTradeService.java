@@ -57,4 +57,8 @@ public interface RemoteAccountTradeService {
 	@ApiOperation(value = "扣除手续费", notes = "扣除手续费")
 	GenericDto<Object> deductGasFee(@Valid @RequestBody NftDeductGasFeeReq req) ;
 
+	@PostMapping("/job/nft-offer-expired")
+	@ApiOperation(value = "NFT的offer过期任务", notes = "NFT的offer过期任务")
+	GenericDto<Object> nftOfferExpired();
+
 }

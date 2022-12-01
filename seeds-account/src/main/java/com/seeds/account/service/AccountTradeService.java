@@ -44,7 +44,19 @@ public interface AccountTradeService {
      * @param req NFT相关入参
      * @param sysNftDetail NFT详情
      */
-    void makeOffer(NftMakeOfferReq req, SysNftDetailResp sysNftDetail);
+    void nftMakeOffer(NftMakeOfferReq req, SysNftDetailResp sysNftDetail);
+
+    /**
+     * NFT竞价拒绝
+     * @param id NFT offer的id
+     */
+    void nftOfferReject(Long id);
+
+    /**
+     * NFT竞价接受
+     * @param id NFT offer的id
+     */
+    void nftOfferAccept(Long id);
 
     /**
      * NFT历史价格
@@ -92,11 +104,15 @@ public interface AccountTradeService {
      */
     NftAuctionResp actionInfo(Long id, Long userId);
 
-
     /**
      * 手续费扣除
      * @param req 入参
      */
     void deductGasFee(NftDeductGasFeeReq req);
+
+    /**
+     * NFT的offer过期任务
+     */
+    void nftOfferExpired();
 
 }
