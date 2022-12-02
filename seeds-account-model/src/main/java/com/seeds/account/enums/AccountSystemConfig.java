@@ -295,6 +295,11 @@ public enum AccountSystemConfig {
      * 分仓最大持仓数量
      */
     MAX_SUB_POSITION_COUNT(149, "account", "max_sub_position_count"),
+
+    /**
+     * NFT Gas Fees
+     */
+    NFT_GAS_FEES(150, "nft", "nft_gas_fees"),
     ;
 
     int code;

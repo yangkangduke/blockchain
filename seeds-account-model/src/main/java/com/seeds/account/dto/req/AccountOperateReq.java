@@ -1,4 +1,4 @@
-package com.seeds.uc.dto.request;
+package com.seeds.account.dto.req;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -6,13 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * <p>
- * NFT手续费扣除
+ * 操作账户
  * </p>
  *
  * @author hang.yu
@@ -22,11 +21,13 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NFTDeductGasFeeReq implements Serializable {
+public class AccountOperateReq implements Serializable {
 
-    @ApiModelProperty(value = "价格")
-    @NotNull
-    private BigDecimal price;
+    @ApiModelProperty(value = "金额")
+    private BigDecimal amount;
+
+    @ApiModelProperty(value = "币种")
+    private String currency;
 
     @ApiModelProperty("用户id")
     private Long userId;

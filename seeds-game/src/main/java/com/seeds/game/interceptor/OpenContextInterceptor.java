@@ -92,7 +92,6 @@ public class OpenContextInterceptor implements HandlerInterceptor {
         }
         try {
             UserContext.setCurrentUserId(user.getUserId());
-            UserContext.setCurrentUserName(user.getLoginName());
             return true;
         } catch (Exception e) {
             log.error("Got invalid user id from header: {}", user.getUserId());

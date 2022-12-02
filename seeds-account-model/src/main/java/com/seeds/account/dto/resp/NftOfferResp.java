@@ -1,7 +1,7 @@
-package com.seeds.uc.dto.response;
+package com.seeds.account.dto.resp;
 
-import com.seeds.uc.enums.CurrencyEnum;
-import com.seeds.uc.enums.NFTOfferStatusEnum;
+import com.seeds.common.enums.CurrencyEnum;
+import com.seeds.common.enums.NftOfferStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  */
 @Data
 @Builder
-public class NFTOfferResp {
+public class NftOfferResp {
 
     @ApiModelProperty("offer的id")
     private Long id;
@@ -32,7 +32,7 @@ public class NFTOfferResp {
     private CurrencyEnum currency;
 
     @ApiModelProperty("状态 0：竞价中 1：已接受 2：已拒绝 3：已过期")
-    private NFTOfferStatusEnum status;
+    private NftOfferStatusEnum status;
 
     @ApiModelProperty("过期时间")
     private Long expireTime;

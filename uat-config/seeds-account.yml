@@ -46,5 +46,7 @@ feign:
       access-key: XXXXX
       secret-key: "5bb40a4623ead547e4b2f15awallet.access.key.secret"
 
+Seeds-admin: http://35.76.116.54:10102
+
 
 

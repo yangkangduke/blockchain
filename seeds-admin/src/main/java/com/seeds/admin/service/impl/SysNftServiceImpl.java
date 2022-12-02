@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.account.dto.req.AccountOperateReq;
 import com.seeds.account.dto.req.NftBuyCallbackReq;
 import com.seeds.account.enums.CommonActionStatus;
 import com.seeds.account.feign.RemoteAccountTradeService;
@@ -28,12 +29,14 @@ import com.seeds.chain.service.GameItemsService;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
+import com.seeds.common.enums.NftOfferStatusEnum;
 import com.seeds.common.enums.TargetSource;
 import com.seeds.common.exception.SeedsException;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.request.NFTShelvesReq;
 import com.seeds.uc.dto.request.NFTSoldOutReq;
 import com.seeds.uc.dto.response.UcUserResp;
-import com.seeds.uc.enums.CurrencyEnum;
+import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -118,7 +121,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .eq(query.getGameId() != null, SysNftEntity::getGameId, query.getGameId())
                 .ge(query.getMinPrice() != null, SysNftEntity::getPrice, query.getMinPrice())
                 .le(query.getMaxPrice() != null, SysNftEntity::getPrice, query.getMaxPrice());
-                buildOrderBy(query, queryWrap);
+        buildOrderBy(query, queryWrap);
         Page<SysNftEntity> page = page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
         List<SysNftEntity> records = page.getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -150,7 +153,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             resp.setPicture(smartContractConfig.getIpfsUrl() + p.getUrl());
             if (p.getOwnerId() != null) {
                 UcUserResp ucUserResp = finalUserMap.get(p.getOwnerId());
-                resp.setOwnerName(StringUtils.isNotBlank(ucUserResp.getEmail()) ? ucUserResp.getEmail() : ucUserResp.getPublicAddress());
+                if (ucUserResp != null) {
+                    resp.setOwnerName(StringUtils.isNotBlank(ucUserResp.getEmail()) ? ucUserResp.getEmail() : ucUserResp.getPublicAddress());
+                }
             }
             return resp;
         });
@@ -673,7 +678,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     @Transactional(rollbackFor = Exception.class)
     public Long upgradeSend(SysNftUpgradeReq req) {
         // 校验NFT
-        upgradeValidate(req.getNftIdList(), req.getUserId(), req.getNftId());
+        upgradeValidate(req.getNftIdList(), req.getOwnerId(), req.getNftId());
         return createSend(req, KafkaTopic.NFT_UPGRADE_SUCCESS);
     }
 
@@ -681,7 +686,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     public void upgrade(NftUpgradeMsgDTO req) {
         // 校验NFT
         List<Long> nftIdList = req.getNftIdList();
-        upgradeValidate(nftIdList, req.getUserId(), req.getNftId());
+        upgradeValidate(nftIdList, req.getOwnerId(), req.getNftId());
         // NFT上链
         Boolean result = mintNft(req);
         // 成功
@@ -692,9 +697,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
             sysNftHonorService.successionByNftId(req.getNftId(), req.getId());
             // 更新事件记录
             sysNftEventRecordService.successionByNftId(req.getNftId(), req.getId());
-            // 生效通知游戏方
-            effectiveNotificationGame(req);
         }
+        // 生效通知游戏方
+        effectiveNotificationGame(req, result);
     }
 
     @Override
@@ -832,7 +837,21 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
     }
 
     @Override
-    public void effectiveNotificationGame(NftMintMsgDTO msgDTO) {
+    public void effectiveNotificationGame(NftMintMsgDTO msgDTO, Boolean result) {
+        // 处理手续费
+        AccountOperateReq operateReq = AccountOperateReq.builder()
+                .amount(msgDTO.getPrice())
+                .userId(msgDTO.getOwnerId())
+                .currency(CurrencyEnum.from(msgDTO.getUnit()).name())
+                .build();
+        if (result) {
+            // 成功则扣取手续费
+            operateReq.setAmount(operateReq.getAmount().negate());
+            remoteAccountTradeService.amountChangeBalance(operateReq);
+        } else {
+            // 失败返还手续费
+            remoteAccountTradeService.amountUnfreeze(operateReq);
+        }
         // 通知游戏方NFT创建结果
         String notificationApi = sysGameApiService.queryApiByGameAndType(msgDTO.getGameId(), ApiType.NFT_NOTIFICATION.getCode());
         String notificationUrl = msgDTO.getCallbackUrl() + notificationApi;
@@ -862,8 +881,10 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .amount(nft.getPrice())
                 .actionHistoryId(req.getActionHistoryId())
                 .actionStatusEnum(CommonActionStatus.SUCCESS)
-                .ownerType(req.getOwnerType())
+                .ownerType(nft.getOwnerType())
                 .currency(req.getCurrency())
+                .offerId(req.getOfferId())
+                .offerStatusEnum(NftOfferStatusEnum.ACCEPTED)
                 .build();
         try {
             GenericDto<Object> result = remoteAccountTradeService.buyNftCallback(callback);

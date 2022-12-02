@@ -1,6 +1,6 @@
-package com.seeds.uc.dto.request;
+package com.seeds.account.dto.req;
 
-import com.seeds.uc.enums.CurrencyEnum;
+import com.seeds.common.enums.CurrencyEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NFTForwardAuctionReq implements Serializable {
+public class NftForwardAuctionReq implements Serializable {
 
     @ApiModelProperty("admin中的NFT的id")
     @NotNull

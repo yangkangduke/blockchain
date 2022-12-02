@@ -16,10 +16,9 @@ import com.seeds.common.dto.GenericDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static cn.hutool.core.text.CharSequenceUtil.isNotBlank;
 
 /**
  * @author: dengyang
@@ -34,22 +33,10 @@ public class SysBlackListAddressServiceImpl implements ISysRiskService {
 
 
     @Override
-    public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getBlackList(Integer type, String reason,String address,Integer chain) {
-        GenericDto<List<BlacklistAddressDto>> dto = accountFeignClient.getAllBlacklistAddress(type);
+    public GenericDto<MgtPageDto<List<BlacklistAddressDto>>> getBlackList(Integer type, String reason, String address, Integer chain) {
+        GenericDto<List<BlacklistAddressDto>> dto = accountFeignClient.getAllBlacklistAddress(type, reason, address, chain);
         if (!dto.isSuccess()) GenericDto.failure(dto.getMessage(), dto.getCode());
-        return GenericDto.success(MgtPageDto.<List<BlacklistAddressDto>>builder().data(dto.getData().stream().filter(item -> {
-            boolean result = true;
-            if (isNotBlank(reason)) {
-                result = reason.contains(item.getReason());
-            }
-            if (isNotBlank(address)){
-                result = address.equals(item.getAddress());
-            }
-            if (null != chain){
-                result = chain.equals(item.getChain());
-            }
-            return result;
-        }).collect(Collectors.toList())).build());
+        return GenericDto.success(MgtPageDto.<List<BlacklistAddressDto>>builder().data(dto.getData().stream().collect(Collectors.toList())).build());
     }
 
     @Override
@@ -80,7 +67,7 @@ public class SysBlackListAddressServiceImpl implements ISysRiskService {
     @Override
     public GenericDto<MgtPageDto<List<ActionControlDto>>> getAllActionControl() {
         GenericDto<List<ActionControlDto>> dto = accountFeignClient.getAllActionControl();
-        if(!dto.isSuccess()) return GenericDto.failure(dto.getMessage(), dto.getCode());
+        if (!dto.isSuccess()) return GenericDto.failure(dto.getMessage(), dto.getCode());
         return GenericDto.success(MgtPageDto.<List<ActionControlDto>>builder()
                 .data(dto.getData())
                 .build());

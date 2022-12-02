@@ -1,6 +1,5 @@
 package com.seeds.game.dto.request;
-import com.seeds.uc.dto.request.NFTShelvesReq;
-import com.seeds.uc.enums.CurrencyEnum;
+import com.seeds.admin.dto.request.SysNftShelvesReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(value = "OpenNftShelvesReq", description = "系统NFT上架")
-public class OpenNftShelvesReq extends NFTShelvesReq {
+public class OpenNftShelvesReq extends SysNftShelvesReq {
 
     @ApiModelProperty(value = "访问键")
     @NotBlank(message = "Access key cannot be empty")
