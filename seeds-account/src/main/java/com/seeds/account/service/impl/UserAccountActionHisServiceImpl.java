@@ -1,5 +1,6 @@
 package com.seeds.account.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,6 +11,7 @@ import com.seeds.account.model.UserAccountActionHis;
 import com.seeds.account.service.IUserAccountActionHisService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,7 +31,8 @@ public class UserAccountActionHisServiceImpl extends ServiceImpl<UserAccountActi
                 .eq(UserAccountActionHis::getSource, nftId)
                 .eq(UserAccountActionHis::getStatus, CommonActionStatus.SUCCESS)
                 .eq(UserAccountActionHis::getAction, AccountAction.NFT_TRADE)
-                .between(UserAccountActionHis::getUpdateTime, startTime, endTime);
+                .between(UserAccountActionHis::getUpdateTime, DateUtil.beginOfDay(new Date(startTime)).getTime(), DateUtil.endOfDay(new Date(endTime)).getTime())
+                .orderByAsc(UserAccountActionHis::getUpdateTime);
         return list(wrapper);
     }
 }
