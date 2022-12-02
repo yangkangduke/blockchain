@@ -285,7 +285,7 @@ public class AccountTradeServiceImpl implements AccountTradeService {
         if (CollectionUtils.isEmpty(actionHisList)) {
             return null;
         }
-        Map<String, List<UserAccountActionHis>> actionHisMap = actionHisList.stream().collect(Collectors.groupingBy(p -> DateUtil.formatDate(new Date(p.getUpdateTime()))));
+        LinkedHashMap<String, List<UserAccountActionHis>> actionHisMap = actionHisList.stream().collect(Collectors.groupingBy(p -> DateUtil.formatDate(new Date(p.getUpdateTime())), LinkedHashMap::new, Collectors.toList()));
         List<NftPriceHisDto.PriceHis> data = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
         for (String key : actionHisMap.keySet()) {
