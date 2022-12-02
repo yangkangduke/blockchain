@@ -37,8 +37,8 @@ public class NFTConsumer {
         log.info("收到消息：{}", msg);
         NftMintMsgDTO msgDTO = JSONUtil.toBean(msg, NftMintMsgDTO.class);
         Boolean result = nftService.mintNft(msgDTO);
-        if (StringUtils.isNotBlank(msgDTO.getCallbackUrl()) && result) {
-            nftService.effectiveNotificationGame(msgDTO);
+        if (StringUtils.isNotBlank(msgDTO.getCallbackUrl())) {
+            nftService.effectiveNotificationGame(msgDTO, result);
         }
     }
 

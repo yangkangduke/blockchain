@@ -53,4 +53,9 @@ public class NftMintMsgDTO {
     @ApiModelProperty("游戏方用户id")
     private Long accId;
 
+    /**
+     * 归属人id
+     */
+    private Long ownerId;
+
 }

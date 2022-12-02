@@ -67,3 +67,11 @@ elasticjob:
       description: "获取链上最新的gasPrice"
       disabled: false
       overwrite: true
+    # NFT的offer过期任务，每天3点执行一次
+    nftOfferExpiredJob:
+      elasticJobClass: com.seeds.account.task.NftOfferExpiredTask
+      cron: "0 0 3 * * ?"
+      shardingTotalCount: 1
+      description: "NFT的offer过期任务"
+      disabled: false
+      overwrite: true

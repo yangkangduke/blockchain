@@ -1,14 +1,15 @@
 package com.seeds.game.controller;
 
-import com.seeds.account.dto.req.NftDeductGasFeeReq;
+import com.seeds.account.dto.NftGasFeesDto;
+import com.seeds.account.dto.req.AccountOperateReq;
 import com.seeds.account.feign.RemoteAccountTradeService;
-import com.seeds.admin.dto.response.SysNftGasFeesResp;
 import com.seeds.admin.enums.SysOwnerTypeEnum;
 import com.seeds.admin.feign.RemoteNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.TargetSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.*;
+import com.seeds.uc.exceptions.GenericException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 提供外部调用的NFT相关接口
@@ -37,19 +40,13 @@ public class OpenNftController {
     @PostMapping("create")
     @ApiOperation("NFT创建")
     public GenericDto<Long> create(@RequestBody OpenNftCreateReq req) {
-        GenericDto<Object> gasFeeResult = remoteAccountTradeService.deductGasFee(NftDeductGasFeeReq.builder()
-                .gasFees(req.getGasFees())
-                .userId(UserContext.getCurrentUserId())
-                .currency(req.getUnit())
-                .build());
-        if (!gasFeeResult.isSuccess()) {
-            return GenericDto.failure(gasFeeResult.getMessage(),
-                    gasFeeResult.getCode());
-        }
+        // 手续费
+        AccountOperateReq operateReq = nftDeductGasFee(new BigDecimal(req.getGasFees()), req.getUnit());
         req.setOwnerId(UserContext.getCurrentUserId());
         req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
         GenericDto<Long> result = adminRemoteNftService.create(req);
         if (!result.isSuccess()) {
+            remoteAccountTradeService.amountUnfreeze(operateReq);
             return GenericDto.failure(result.getMessage(),
                     result.getCode());
         }
@@ -59,20 +56,13 @@ public class OpenNftController {
     @PostMapping("upgrade")
     @ApiOperation("NFT升级")
     public GenericDto<Long> upgrade(@RequestBody OpenNftUpgradeReq req) {
-        GenericDto<Object> gasFeeResult = remoteAccountTradeService.deductGasFee(NftDeductGasFeeReq.builder()
-                .gasFees(req.getGasFees())
-                .userId(UserContext.getCurrentUserId())
-                .currency(req.getUnit())
-                .build());
-        if (!gasFeeResult.isSuccess()) {
-            return GenericDto.failure(gasFeeResult.getMessage(),
-                    gasFeeResult.getCode());
-        }
-        req.setUserId(UserContext.getCurrentUserId());
+        // 手续费
+        AccountOperateReq operateReq = nftDeductGasFee(new BigDecimal(req.getGasFees()), req.getUnit());
         req.setOwnerId(UserContext.getCurrentUserId());
         req.setOwnerType(SysOwnerTypeEnum.UC_USER.getCode());
         GenericDto<Long> result = adminRemoteNftService.upgrade(req);
         if (!result.isSuccess()) {
+            remoteAccountTradeService.amountUnfreeze(operateReq);
             return GenericDto.failure(result.getMessage(),
                     result.getCode());
         }
@@ -178,16 +168,28 @@ public class OpenNftController {
 
     @GetMapping("/gas-fees")
     @ApiOperation("NFT费用")
-    public GenericDto<SysNftGasFeesResp> gasFees(@RequestParam String nftNo,
-                                                 @RequestParam String accessKey,
-                                                 @RequestParam String signature,
-                                                 @RequestParam Long timestamp) {
-        GenericDto<SysNftGasFeesResp> result = adminRemoteNftService.gasFees(nftNo);
+    public GenericDto<List<NftGasFeesDto>> gasFees(@RequestParam String accessKey,
+                                                   @RequestParam String signature,
+                                                   @RequestParam Long timestamp) {
+        GenericDto<List<NftGasFeesDto>> result = remoteAccountTradeService.nftGasFee();
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),
                     result.getCode());
         }
         return result;
+    }
+
+    private AccountOperateReq nftDeductGasFee(BigDecimal amount, String currency) {
+        AccountOperateReq operateReq = AccountOperateReq.builder()
+                .amount(amount)
+                .userId(UserContext.getCurrentUserId())
+                .currency(currency)
+                .build();
+        GenericDto<Object> gasFeeResult = remoteAccountTradeService.nftDeductGasFee(operateReq);
+        if (!gasFeeResult.isSuccess()) {
+            throw new GenericException(gasFeeResult.getMessage());
+        }
+        return operateReq;
     }
 
 }

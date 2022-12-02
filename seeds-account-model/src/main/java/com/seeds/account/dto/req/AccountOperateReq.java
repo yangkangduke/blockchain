@@ -7,10 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * <p>
- * NFT手续费扣除
+ * 操作账户
  * </p>
  *
  * @author hang.yu
@@ -20,10 +21,10 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NftDeductGasFeeReq implements Serializable {
+public class AccountOperateReq implements Serializable {
 
-    @ApiModelProperty(value = "手续费")
-    private String gasFees;
+    @ApiModelProperty(value = "金额")
+    private BigDecimal amount;
 
     @ApiModelProperty(value = "币种")
     private String currency;

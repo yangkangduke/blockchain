@@ -216,7 +216,8 @@ public interface SysNftService extends IService<SysNftEntity> {
      * NFT生效通知游戏方
      *
      * @param msgDTO NFT相关信息
+     * @param result 结果
      */
-    void effectiveNotificationGame(NftMintMsgDTO msgDTO);
+    void effectiveNotificationGame(NftMintMsgDTO msgDTO, Boolean result);
 
 }
