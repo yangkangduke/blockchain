@@ -27,12 +27,14 @@ public class UserAccountActionHisServiceImpl extends ServiceImpl<UserAccountActi
 
     @Override
     public List<UserAccountActionHis> querySuccessByActionAndSourceAndTime(AccountAction action, Long nftId, Long startTime, Long endTime) {
+        Long startDate = startTime == null ? null : DateUtil.beginOfDay(new Date(startTime)).getTime();
+        Long endDate = endTime == null ? null : DateUtil.endOfDay(new Date(endTime)).getTime();
         LambdaQueryWrapper<UserAccountActionHis> wrapper = new QueryWrapper<UserAccountActionHis>().lambda()
                 .eq(UserAccountActionHis::getSource, nftId)
                 .eq(UserAccountActionHis::getStatus, CommonActionStatus.SUCCESS)
                 .eq(UserAccountActionHis::getAction, AccountAction.NFT_TRADE)
-                .ge(startTime != null, UserAccountActionHis::getUpdateTime, DateUtil.beginOfDay(new Date(startTime)).getTime())
-                .le(endTime != null, UserAccountActionHis::getUpdateTime, DateUtil.endOfDay(new Date(endTime)).getTime())
+                .ge(startDate != null, UserAccountActionHis::getUpdateTime, startDate)
+                .le(endDate != null, UserAccountActionHis::getUpdateTime, endDate)
                 .orderByAsc(UserAccountActionHis::getUpdateTime);
         return list(wrapper);
     }
