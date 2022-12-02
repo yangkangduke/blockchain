@@ -10,7 +10,7 @@ import lombok.Getter;
  * @date 2022/9/5
  */
 @Getter
-public enum NFTOfferStatusEnum {
+public enum NftOfferStatusEnum {
 
     @JsonProperty("0")
     BIDDING((short) 0, "Bidding","竞价中"),
@@ -28,7 +28,7 @@ public enum NFTOfferStatusEnum {
     private String descEn;
     private String desc;
 
-    NFTOfferStatusEnum(Short code, String descEn, String desc) {
+    NftOfferStatusEnum(Short code, String descEn, String desc) {
         this.code = code;
         this.desc = desc;
         this.descEn = descEn;

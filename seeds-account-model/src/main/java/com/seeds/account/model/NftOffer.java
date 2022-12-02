@@ -2,7 +2,7 @@ package com.seeds.account.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.seeds.common.enums.CurrencyEnum;
-import com.seeds.common.enums.NFTOfferStatusEnum;
+import com.seeds.common.enums.NftOfferStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -47,7 +47,7 @@ public class NftOffer implements Serializable {
     private CurrencyEnum currency;
 
     @ApiModelProperty("状态")
-    private NFTOfferStatusEnum status;
+    private NftOfferStatusEnum status;
 
     @ApiModelProperty("过期时间")
     private Long expireTime;

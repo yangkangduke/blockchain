@@ -24,18 +24,6 @@ public interface INftOfferService extends IService<NftOffer> {
     List<NftOfferResp> offerList(Long nftId);
 
     /**
-     * NFT竞价拒绝
-     * @param id NFT offer的id
-     */
-    void offerReject(Long id);
-
-    /**
-     * NFT竞价接受
-     * @param id NFT offer的id
-     */
-    void offerAccept(Long id);
-
-    /**
      * 查询过期的offers
      * @return 过期的offers
      */

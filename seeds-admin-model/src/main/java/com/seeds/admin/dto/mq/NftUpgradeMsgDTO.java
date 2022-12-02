@@ -19,11 +19,6 @@ import java.util.List;
 public class NftUpgradeMsgDTO extends NftMintMsgDTO {
 
     /**
-     * 操作用户id
-     */
-    private Long userId;
-
-    /**
      * 保留战绩NFT的id
      */
     @ApiModelProperty("保留战绩NFT的id")
