@@ -39,6 +39,13 @@ redisson:
   max-pool-size: 50
   min-idle-size: 25
 
+ftp:
+  hostname: 18.167.2.206
+  username: seedsftp
+  password: 1qaz@WSX
+  port: 21
+  basePath: /home/seedsftp
+
 file:
   bucketName: seeds # 上文创建的桶名称
   oss:
