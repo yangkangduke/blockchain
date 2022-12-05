@@ -101,6 +101,10 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
 
     @Override
     public Boolean add(BlackListAddressSaveOrUpdateReq req) {
+        //新增chain开启校验功能
+        Chain chain = Chain.fromCode(req.getChain());
+        Utils.check(AddressUtils.validate(chain, req.getAddress()), "invalid address");
+
         // 冲币或者提币，已存在的地址无法重复新增；
         LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
                 .eq(BlacklistAddress::getAddress, req.getAddress())
@@ -109,10 +113,6 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
         if (one != null) {
             throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
         }
-
-        //新增chain开启校验功能
-        Chain chain = Chain.fromCode(req.getChain());
-        Utils.check(AddressUtils.validate(chain, req.getAddress()), "invalid address");
 
         BlacklistAddress blacklistAddress = ObjectUtils.copy(req, BlacklistAddress.builder().build());
         blacklistAddress.setCreateTime(System.currentTimeMillis());
@@ -125,6 +125,10 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
     @Override
     public Boolean update(BlackListAddressSaveOrUpdateReq req) {
         log.info("BlacklistAddress req={}", req);
+        //编辑chain开启校验功能
+        Chain chain = Chain.fromCode(req.getChain());
+        Utils.check(AddressUtils.validate(chain, req.getAddress()), "invalid address");
+
         //要修改的地址已经存在，无法修改
         LambdaQueryWrapper<BlacklistAddress> queryWrap = new QueryWrapper<BlacklistAddress>().lambda()
                 .eq(BlacklistAddress::getAddress, req.getAddress())
@@ -133,10 +137,6 @@ public class BlacklistAddressServiceImpl extends ServiceImpl<BlacklistAddressMap
         if (null != one && !one.getId().equals(req.getId())) {
             throw new ConfigException(ILLEGAL_BLACK_LIST_CONFIG);
         }
-
-        //编辑chain开启校验功能
-        Chain chain = Chain.fromCode(req.getChain());
-        Utils.check(AddressUtils.validate(chain, req.getAddress()), "invalid address");
 
         BlacklistAddress Address = getById(req.getId());
         BlacklistAddress blacklistAddress = ObjectUtils.copy(req, BlacklistAddress.builder().build());
