@@ -132,31 +132,35 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleEntity
                         .filter(p -> StringUtils.isNotBlank(p.getParentCode()))
                         .collect(Collectors.groupingBy(SysMenuEntity::getParentCode));
                 List<List<Long>> menuIdList = new ArrayList<>();
-                menuList.forEach(p -> {
-                    if (!allIds.contains(p.getId())) {
-                        return;
+                for (SysMenuEntity sysMenu : menuList) {
+                    if (!allIds.contains(sysMenu.getId())) {
+                        continue;
                     }
                     LinkedList<Long> list = new LinkedList<>();
-                    String parentCode = p.getParentCode();
+                    String parentCode = sysMenu.getParentCode();
                     // 先把自己放进集合
-                    list.add(p.getId());
-                    allIds.remove(p.getId());
+                    list.add(sysMenu.getId());
+                    allIds.remove(sysMenu.getId());
                     // 把所有父级放进集合
                     while (StringUtils.isNotBlank(parentCode)) {
                         SysMenuEntity menu = menuMap.get(parentCode);
-                        Long parentMenuId = menu.getId();
-                        list.addFirst(parentMenuId);
-                        allIds.remove(parentMenuId);
-                        parentCode = menu.getParentCode();
+                        if (menu != null) {
+                            Long parentMenuId = menu.getId();
+                            list.addFirst(parentMenuId);
+                            allIds.remove(parentMenuId);
+                            parentCode = menu.getParentCode();
+                        } else {
+                            parentCode = null;
+                        }
                     }
                     // 把所有子级放进集合
-                    List<SysMenuEntity> childList = parentMap.get(p.getCode());
+                    List<SysMenuEntity> childList = parentMap.get(sysMenu.getCode());
                     if (!CollectionUtils.isEmpty(childList)) {
                         addChildMenu(childList, list, allIds, parentMap, menuIdList);
                     } else {
                         menuIdList.add(list);
                     }
-                });
+                }
                 resp.setMenuIdList(menuIdList);
             }
         }
