@@ -123,7 +123,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
         adminUser.setPassword(password);
         adminUser.setSalt(salt);
         adminUser.setSuperAdmin(WhetherEnum.NO.value());
-        adminUser.setStatus(SysStatusEnum.ENABLED.value());
         save(adminUser);
         return adminUser;
     }

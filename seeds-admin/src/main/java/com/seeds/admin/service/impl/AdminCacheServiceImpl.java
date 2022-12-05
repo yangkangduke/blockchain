@@ -4,6 +4,7 @@ import com.seeds.admin.constant.AdminRedisKeys;
 import com.seeds.admin.dto.redis.LoginAdminUser;
 import com.seeds.admin.service.AdminCacheService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,9 @@ public class AdminCacheServiceImpl implements AdminCacheService {
     public void removeAdminUserByUserId(Long userId) {
         String key = AdminRedisKeys.getAdminUserIdKey(userId);
         String token = redisson.<String>getBucket(key).get();
-        removeAdminUserByToken(token);
+        if (StringUtils.isNotBlank(token)) {
+            removeAdminUserByToken(token);
+        }
     }
 
     private void removeAdminUserLoginUidTokenMapping(Long uid) {
