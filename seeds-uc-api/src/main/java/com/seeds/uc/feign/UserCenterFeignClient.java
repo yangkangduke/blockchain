@@ -51,6 +51,6 @@ public interface UserCenterFeignClient {
      *
      * @return
      */
-    @GetMapping("uc-internal/user-registration")
+    @GetMapping("uc-internal/user/user-registration")
     GenericDto<UserRegistrationResp> getUserRegistration();
 }
