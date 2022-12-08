@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.account.dto.ChainDepositAddressDto;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
+import com.seeds.account.dto.ChainDepositWithdrawMonitorDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
 import com.seeds.account.model.ChainDepositWithdrawHis;
@@ -81,11 +82,14 @@ public interface ChainDepositWithdrawHisMapper extends BaseMapper<ChainDepositWi
 
     /**
      * 获取一段时间内充币的地址
+     *
      * @param chain
      * @param startTime
      * @param endTime
      * @return
      */
     List<ChainDepositAddressDto> getDepositAddress(@Param("chain") Chain chain, @Param("startTime") long startTime, @Param("endTime") long endTime);
+
+    List<ChainDepositWithdrawMonitorDto> getDailyDepositWithdraw(@Param("startTime") long startTime, @Param("endTime") long endTime);
 
 }
