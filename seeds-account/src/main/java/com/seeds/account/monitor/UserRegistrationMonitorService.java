@@ -28,9 +28,8 @@ public class UserRegistrationMonitorService {
         GenericDto<UserRegistrationResp> respGenericDto = userCenterFeignClient.getUserRegistration();
         if (null != respGenericDto.getData()) {
             UserRegistrationResp data = respGenericDto.getData();
-            MetricsGaugeUtils.gauge("user-registration", Tags.of("total"), data.getTotalRegisteredUsers());
-            MetricsGaugeUtils.gauge("user-registration", Tags.of("today"), data.getTodayRegisteredUsers());
-
+            MetricsGaugeUtils.gauge("user-registration", Tags.of("total", "totalRegisteredUsers"), data.getTotalRegisteredUsers());
+            MetricsGaugeUtils.gauge("user-registration", Tags.of("today", "todayRegisteredUsers"), data.getTodayRegisteredUsers());
         }
         log.info("UserRegistrationMonitorService end ...");
     }
