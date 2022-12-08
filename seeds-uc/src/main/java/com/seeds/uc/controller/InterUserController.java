@@ -6,16 +6,13 @@ import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.response.UcUserResp;
+import com.seeds.uc.dto.response.UserRegistrationResp;
 import com.seeds.uc.service.IUcUserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -77,4 +74,12 @@ public class InterUserController {
     public GenericDto<List<UcUserResp>> getUserList(@RequestBody List<Long> ids) {
         return GenericDto.success(ucUserService.getUserList(ids));
     }
+
+    @ApiOperation("获取用户注册情况")
+    @Inner
+    @GetMapping("user-registration")
+    GenericDto<UserRegistrationResp> getUserRegistration() {
+        return GenericDto.success(ucUserService.getUserRegistration());
+    }
+
 }

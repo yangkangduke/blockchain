@@ -9,10 +9,11 @@ import com.seeds.account.AccountConstants;
 import com.seeds.account.chain.service.IChainService;
 import com.seeds.account.dto.ChainDepositAddressDto;
 import com.seeds.account.dto.ChainDepositWithdrawHisDto;
+import com.seeds.account.dto.ChainDepositWithdrawMonitorDto;
 import com.seeds.account.dto.ChainTxnDto;
 import com.seeds.account.dto.req.AccountHistoryReq;
-import com.seeds.account.enums.ChainAction;
 import com.seeds.account.dto.req.AccountPendingTransactionsReq;
+import com.seeds.account.enums.ChainAction;
 import com.seeds.account.mapper.ChainDepositWithdrawHisMapper;
 import com.seeds.account.mapper.ChainDepositWithdrawSigHisMapper;
 import com.seeds.account.mapper.UserAccountActionHisMapper;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -124,6 +126,11 @@ public class ChainDepositWithdrawHisServiceImpl extends ServiceImpl<ChainDeposit
     @Override
     public List<ChainDepositAddressDto> getDepositAddress(Chain chain, long startTime, long endTime) {
         return chainDepositWithdrawHisMapper.getDepositAddress(chain, startTime, endTime);
+    }
+
+    @Override
+    public List<ChainDepositWithdrawMonitorDto> getDailyDepositWithdraw(long startTime, long endTime) {
+        return chainDepositWithdrawHisMapper.getDailyDepositWithdraw(startTime, endTime);
     }
 
     private BigInteger getChainGasPrice(Chain chain) {
