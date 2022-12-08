@@ -77,7 +77,7 @@ public class InterUserController {
 
     @ApiOperation("获取用户注册情况")
     @Inner
-    @GetMapping("user-registration")
+    @GetMapping("/user-registration")
     GenericDto<UserRegistrationResp> getUserRegistration() {
         return GenericDto.success(ucUserService.getUserRegistration());
     }
