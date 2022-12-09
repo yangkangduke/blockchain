@@ -26,7 +26,7 @@ public class DepositWithdrawMonitorService {
     @Autowired
     private IChainDepositWithdrawHisService chainDepositWithdrawHisService;
 
-    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 10 * 1000)
+    @Scheduled(fixedDelay = 10 * 1000, initialDelay = 10 * 1000)
     public void monitor() throws Exception {
         log.info("DepositWithdrawMonitorService start ...");
 

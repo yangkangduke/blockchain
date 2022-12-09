@@ -21,7 +21,7 @@ public class UserRegistrationMonitorService {
     @Autowired
     private UserCenterFeignClient userCenterFeignClient;
 
-    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 10 * 1000)
+    @Scheduled(fixedDelay = 10 * 1000, initialDelay = 10 * 1000)
     public void monitor() throws Exception {
         log.info("UserRegistrationMonitorService start ...");
 
