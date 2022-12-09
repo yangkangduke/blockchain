@@ -5,8 +5,10 @@ import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
 import com.seeds.uc.dto.response.UcUserResp;
+import com.seeds.uc.dto.response.UserRegistrationResp;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -43,4 +45,12 @@ public interface UserCenterFeignClient {
     @PostMapping("/uc-internal/user/user-list")
     @ApiOperation("获取用户信息列表")
     GenericDto<List<UcUserResp>> getUserList(@RequestBody List<Long> ids);
+
+    /**
+     * 获取用户注册情况 总注册用户数和今日新增注册用户数
+     *
+     * @return
+     */
+    @GetMapping("uc-internal/user/user-registration")
+    GenericDto<UserRegistrationResp> getUserRegistration();
 }

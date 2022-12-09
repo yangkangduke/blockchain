@@ -90,7 +90,10 @@ public enum AdminErrorCodeEnum {
     ERR_90001_FAIL_TO_EXECUTE_ON_CHAIN(90001,"区块链操作失败", "chain operation failed"),
 
     //dict data
-    ERR_100001_DICT_DATA_ALREADY_EXIST(100001,"字典已经存在","Dict data code already exist")
+    ERR_100001_DICT_DATA_ALREADY_EXIST(100001,"字典已经存在","Dict data code already exist"),
+
+    //org
+    ERR_110001_ORG_PARENT_ITSELF(110001, "上级组织不能为自身", "Parent org cannot be for itself"),
     ;
 
     @JsonValue

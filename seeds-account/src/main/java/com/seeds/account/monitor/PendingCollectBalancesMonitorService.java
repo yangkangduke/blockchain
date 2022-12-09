@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 /**
+ * 监控待归集的地址余额
  * @author hewei
  */
 @Service

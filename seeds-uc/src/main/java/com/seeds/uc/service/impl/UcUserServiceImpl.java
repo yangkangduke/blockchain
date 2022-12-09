@@ -1,6 +1,7 @@
 package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -18,6 +19,7 @@ import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserInfoResp;
+import com.seeds.uc.dto.response.UserRegistrationResp;
 import com.seeds.uc.enums.*;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.LoginException;
@@ -616,5 +618,16 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             }).collect(Collectors.toList());
         }
         return result;
+    }
+
+    @Override
+    public UserRegistrationResp getUserRegistration() {
+
+        UserRegistrationResp resp = new UserRegistrationResp();
+        long total = this.count();
+        long todayCount = this.count(new LambdaQueryWrapper<UcUser>().between(UcUser::getCreatedAt, DateUtil.beginOfDay(new Date()).getTime(), DateUtil.endOfDay(new Date()).getTime()));
+        resp.setTotalRegisteredUsers(total);
+        resp.setTodayRegisteredUsers(todayCount);
+        return resp;
     }
 }

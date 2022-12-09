@@ -131,4 +131,14 @@
         <if test="endTime > 0">and create_time &lt;= #{endTime,jdbcType=BIGINT}</if>
         <if test="chain != null">and chain = #{chain.code,jdbcType=TINYINT}</if>
     </select>
+
+    <select id="getDailyDepositWithdraw" resultType="com.seeds.account.dto.ChainDepositWithdrawMonitorDto">
+        select chain, action, sum(amount) as amount
+        from ac_chain_deposit_withdraw_his
+        where status = 7
+
+        <if test="startTime > 0">and create_time &gt;= #{startTime,jdbcType=BIGINT}</if>
+        <if test="endTime > 0">and create_time &lt;= #{endTime,jdbcType=BIGINT}</if>
+        group by chain,action
+    </select>
 </mapper>
