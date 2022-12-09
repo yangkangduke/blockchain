@@ -18,6 +18,9 @@ public class SysOrgAddOrModifyReq {
     @ApiModelProperty("主键id")
     private Long id;
 
+    @ApiModelProperty("组织ID")
+    private Long orgId;
+
     @ApiModelProperty("父级组织ID")
     private Long parentOrgId;
 

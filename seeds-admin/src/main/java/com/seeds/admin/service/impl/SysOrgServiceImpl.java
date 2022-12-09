@@ -39,6 +39,10 @@ public class SysOrgServiceImpl extends ServiceImpl<SysOrgMapper, SysOrgEntity> i
     public void modify(SysOrgAddOrModifyReq req) {
         SysOrgEntity sysOrgEntity = new SysOrgEntity();
         BeanUtils.copyProperties(req, sysOrgEntity);
+        if (req.getParentOrgId() == null) {
+            // 0表示没有父级组织
+            sysOrgEntity.setParentOrgId(0L);
+        }
         updateById(sysOrgEntity);
     }
 
