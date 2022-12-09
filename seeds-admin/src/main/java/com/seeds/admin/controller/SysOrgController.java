@@ -62,7 +62,7 @@ public class SysOrgController {
     @RequiredPermission("sys:org:modify")
     public GenericDto<Object> modify(@Valid @RequestBody SysOrgAddOrModifyReq req) {
         // 上级类别不能为自身
-        if (Objects.equals(req.getId(), req.getParentOrgId())) {
+        if (Objects.equals(req.getOrgId(), req.getParentOrgId())) {
             return GenericDto.failure(AdminErrorCodeEnum.ERR_110001_ORG_PARENT_ITSELF.getDescEn(), AdminErrorCodeEnum.ERR_110001_ORG_PARENT_ITSELF.getCode(), null);
         }
         orgService.modify(req);
