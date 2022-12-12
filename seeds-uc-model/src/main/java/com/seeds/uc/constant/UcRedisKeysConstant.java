@@ -70,6 +70,8 @@ public class UcRedisKeysConstant {
 
     public final String UC_ONE_DAY_MARKING_TEMPLATE = UC_KEY_PREFIX + "one:day:marking:%s";
 
+    public final String UC_GAME_WIN_RANK_TEMPLATE = UC_KEY_PREFIX + "game:win:rank:%s";
+
 
     /**
      * return uc:token:{uid} as redis key in login
@@ -164,6 +166,10 @@ public class UcRedisKeysConstant {
 
     public String getOneDayMarkingTemplate(String key) {
         return String.format(UC_ONE_DAY_MARKING_TEMPLATE, key);
+    }
+
+    public String getGameWinRankTemplate(String gameId) {
+        return String.format(UC_GAME_WIN_RANK_TEMPLATE, gameId);
     }
 
 }

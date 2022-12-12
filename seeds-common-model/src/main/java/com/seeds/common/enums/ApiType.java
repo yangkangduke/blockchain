@@ -13,6 +13,7 @@ public enum ApiType {
 
     TRADE_NOTIFICATION(1, "交易通知"),
     NFT_NOTIFICATION(2, "NFT通知"),
+    PLAYER_WIN_RANK(3, "玩家胜场排行"),
     ;
 
     @JsonValue

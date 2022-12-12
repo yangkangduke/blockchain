@@ -844,7 +844,9 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .userId(msgDTO.getOwnerId())
                 .currency(CurrencyEnum.from(msgDTO.getUnit()).name())
                 .build();
+        int success = 0;
         if (result) {
+            success = 1;
             // 成功则扣取手续费
             operateReq.setAmount(operateReq.getAmount().negate());
             remoteAccountTradeService.amountChangeBalance(operateReq);
@@ -855,7 +857,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
         // 通知游戏方NFT创建结果
         String notificationApi = sysGameApiService.queryApiByGameAndType(msgDTO.getGameId(), ApiType.NFT_NOTIFICATION.getCode());
         String notificationUrl = msgDTO.getCallbackUrl() + notificationApi;
-        String param = String.format("nft_id=%s&acc_id=%s", msgDTO.getId(), msgDTO.getAccId());
+        String param = String.format("nft_id=%s&acc_id=%s&success=%s", msgDTO.getId(), msgDTO.getAccId(), success);
         log.info("开始请求游戏nft生效通知， param:{}", param);
         HttpResponse response = HttpRequest.post(notificationUrl)
                 .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
@@ -863,7 +865,7 @@ public class SysNftServiceImpl extends ServiceImpl<SysNftMapper, SysNftEntity> i
                 .timeout(5 * 60 * 1000)
                 .execute();
         String body = response.body();
-        log.info("请求游戏nft生效通知返回，result:{}",body);
+        log.info("请求游戏nft生效通知返回，result:{}", body);
     }
 
     @Transactional(rollbackFor = Exception.class)

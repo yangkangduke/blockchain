@@ -1,6 +1,9 @@
 package com.seeds.admin.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -10,19 +13,21 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
+import com.seeds.admin.entity.SysGameApiEntity;
 import com.seeds.admin.entity.SysGameEntity;
 import com.seeds.admin.entity.SysGameTypeEntity;
 import com.seeds.admin.enums.SortTypeEnum;
 import com.seeds.admin.enums.SysStatusEnum;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysGameMapper;
-import com.seeds.admin.service.SysGameService;
-import com.seeds.admin.service.SysGameTypeService;
-import com.seeds.admin.service.SysMerchantGameService;
-import com.seeds.admin.service.SysSequenceNoService;
+import com.seeds.admin.service.*;
 import com.seeds.admin.utils.HashUtil;
+import com.seeds.common.enums.ApiType;
+import com.seeds.uc.exceptions.GenericException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +44,7 @@ import java.util.stream.Collectors;
  * @author hang.yu
  * @date 2022/7/21
  */
+@Slf4j
 @Service
 public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity> implements SysGameService {
 
@@ -50,6 +56,9 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
 
     @Autowired
     private SysGameTypeService sysGameTypeService;
+
+    @Autowired
+    private SysGameApiService sysGameApiService;
 
     @Autowired
     private SysGameMapper sysGameMapper;
@@ -215,6 +224,32 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             return null;
         }
         return game.getSecretKey();
+    }
+
+    @Override
+    public List<GameWinRankResp.GameWinRank> winRankInfo(GameWinRankReq query) {
+        // 通知游戏方NFT创建结果
+        SysGameApiEntity gameApi = sysGameApiService.queryByGameAndType(query.getGameId(), ApiType.PLAYER_WIN_RANK.getCode());
+        String rankUrl = gameApi.getBaseUrl() + gameApi.getApi();
+        String params = String.format("startRow=%s&endRow=%s", query.getStartRow(), query.getEndRow());
+        rankUrl = rankUrl + "?" + params;
+        log.info("开始请求游戏胜场排行榜数据， params:{}", params);
+        HttpResponse response = HttpRequest.get(rankUrl)
+                .timeout(5 * 60 * 1000)
+                .header("Content-Type", "application/json")
+                .execute();
+        String body = response.body();
+        log.info("请求游戏胜场排行榜数据返回，result:{}", body);
+        if (!response.isOk()) {
+            log.error("Failed to get the win list from game");
+            throw new GenericException("Failed to get the win list");
+        }
+        GameWinRankResp resp = JSONUtil.toBean(body, GameWinRankResp.class);
+        if (!resp.getRet().equalsIgnoreCase("OK")) {
+            log.error("Get the win list from game failed");
+            throw new GenericException("Get the win list from game failed");
+        }
+        return resp.getInfos();
     }
 
     private void buildOrderBy(SysGamePageReq query, LambdaQueryWrapper<SysGameEntity> queryWrap) {
