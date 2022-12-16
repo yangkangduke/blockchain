@@ -47,7 +47,7 @@ ftp:
 #    secret-key: seeds123!
 
 file:
-  bucketName: seeds # 上文创建的桶名称
+  bucketName: apeastgame # 上文创建的桶名称
   oss:
     enable: true
     endpoint: https://apeastgame.s3.ap-northeast-1.amazonaws.com
