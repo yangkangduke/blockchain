@@ -9,6 +9,7 @@ import com.seeds.common.web.oss.FileTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.InputStream;
@@ -133,6 +134,11 @@ public class LocalFileTemplate implements FileTemplate {
 			summary.setKey(file.getName());
 			return new S3ObjectSummary();
 		}).collect(Collectors.toList());
+	}
+
+	@Override
+	public void uploadMultipartFileByPart(MultipartFile file, String bucketName, String objectName) {
+
 	}
 
 }

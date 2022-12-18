@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.List;
@@ -83,4 +84,12 @@ public interface FileTemplate extends InitializingBean {
 	 */
 	List<S3ObjectSummary> getAllObjectsByPrefix(String bucketName, String prefix, boolean recursive);
 
+	/**
+	 * 分片上传文件
+	 *
+	 * @param bucketName bucket名称
+	 * @param objectName 文件名称
+	 * @throws Exception
+	 */
+	void uploadMultipartFileByPart(MultipartFile file, String bucketName, String objectName);
 }
