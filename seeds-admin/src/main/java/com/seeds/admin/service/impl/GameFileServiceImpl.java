@@ -31,8 +31,7 @@ public class GameFileServiceImpl implements GameFileService {
     @Override
     public GameFileResp upload(MultipartFile file) {
 
-        //String bucketName = properties.getBucketName();
-        String bucketName = "apeastgame2";
+        String bucketName = properties.getBucketName();
         String endpoint = properties.getOss().getEndpoint();
         String originalFilename = file.getOriginalFilename();
         String objectName = "game/" + IdUtil.simpleUUID() + StrUtil.DOT + FileUtil.extName(originalFilename);
@@ -56,7 +55,7 @@ public class GameFileServiceImpl implements GameFileService {
         // res.setFileId(sysFile.getId());
         res.setObjectName(objectName);
         res.setBucketName(properties.getBucketName());
-        res.setUrl(endpoint + objectName);
+        res.setUrl(endpoint + "/" + bucketName + "/" + objectName);
         return res;
     }
 }
