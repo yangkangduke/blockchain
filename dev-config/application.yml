@@ -48,6 +48,7 @@ ftp:
 
 file:
   bucketName: apeastgame # 上文创建的桶名称
+  dirName: game
   oss:
     enable: true
     endpoint: https://apeastgame.s3.ap-northeast-1.amazonaws.com
