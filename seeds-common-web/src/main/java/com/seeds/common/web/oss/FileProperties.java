@@ -22,6 +22,10 @@ public class FileProperties {
 	private String bucketName = "local";
 
 	/**
+	 * 文件夹名称
+	 */
+	private String dirName;
+	/**
 	 * 本地文件配置信息
 	 */
 	private LocalFileProperties local;
