@@ -87,9 +87,9 @@ public interface FileTemplate extends InitializingBean {
 	/**
 	 * 分片上传文件
 	 *
-	 * @param bucketName bucket名称
+	 * @param key bucket名称
 	 * @param objectName 文件名称
 	 * @throws Exception
 	 */
-	void uploadMultipartFileByPart(MultipartFile file, String bucketName, String objectName);
+	void uploadMultipartFileByPart(MultipartFile file, String key, String objectName);
 }

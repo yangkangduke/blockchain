@@ -32,13 +32,14 @@ public class GameFileServiceImpl implements GameFileService {
     public GameFileResp upload(MultipartFile file) {
 
         String bucketName = properties.getBucketName();
+        String key = properties.getDirName();
         String endpoint = properties.getOss().getEndpoint();
         String originalFilename = file.getOriginalFilename();
-        String objectName = "game/" + IdUtil.simpleUUID() + StrUtil.DOT + FileUtil.extName(originalFilename);
+        String objectName = IdUtil.simpleUUID() + StrUtil.DOT + FileUtil.extName(originalFilename);
         // SysFileEntity sysFile = new SysFileEntity();
 
         try {
-            template.uploadMultipartFileByPart(file, bucketName, objectName);
+            template.uploadMultipartFileByPart(file, key, objectName);
             // 记录文件信息
 //            sysFile.setFileSize(file.getSize());
 //            sysFile.setObjectName(objectName);
@@ -54,8 +55,8 @@ public class GameFileServiceImpl implements GameFileService {
         GameFileResp res = new GameFileResp();
         // res.setFileId(sysFile.getId());
         res.setObjectName(objectName);
-        res.setBucketName(properties.getBucketName());
-        res.setUrl(endpoint + "/" + bucketName + "/" + objectName);
+        res.setBucketName(bucketName);
+        res.setUrl(endpoint + "/" + key + "/" + objectName);
         return res;
     }
 }
