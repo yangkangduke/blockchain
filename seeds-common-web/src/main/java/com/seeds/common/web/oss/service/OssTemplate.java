@@ -233,16 +233,10 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	/**
 	 * 分段上传文件至S3
 	 *
-	 * @param file
-	 * @param bucketName bucket名称
-	 * @param objectName 文件名称
 	 */
 	@Override
-	public void uploadMultipartFileByPart(MultipartFile file, String bucketName, String objectName) {
+	public void uploadMultipartFileByPart(MultipartFile file, String key, String objectName) {
 
-		amazonS3.createBucket(bucketName);
-		// 设置公共读权限
-		amazonS3.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
 		//声明线程池
 		ExecutorService exec = Executors.newFixedThreadPool(8);
 		long size = file.getSize();
@@ -258,7 +252,9 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		// 创建一个列表保存所有分传的 PartETag, 在分段完成后会用到
 		List<PartETag> partETags = Collections.synchronizedList(new ArrayList<>());
 		// 第一步，初始化，声明下面将有一个 Multipart Upload
-		InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, objectName);
+		InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(key, objectName);
+		//设置公共读取权限
+		initRequest.withCannedACL(CannedAccessControlList.PublicRead);
 		InitiateMultipartUploadResult initResponse = amazonS3.initiateMultipartUpload(initRequest);
 		log.info("开始上传");
 		long begin = System.currentTimeMillis();
@@ -270,7 +266,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 				exec.execute(() -> {
 					long time1 = System.currentTimeMillis();
 					UploadPartRequest uploadRequest = new UploadPartRequest()
-							.withBucketName(bucketName)
+							.withBucketName(key)
 							.withKey(objectName)
 							.withUploadId(initResponse.getUploadId())
 							.withPartNumber(finalI + 1)
@@ -293,14 +289,14 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 			}
 
 			// 第三步，完成上传，合并分段
-			CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(bucketName, objectName,
+			CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(key, objectName,
 					initResponse.getUploadId(), partETags);
 			amazonS3.completeMultipartUpload(compRequest);
 			//删除本地缓存文件
 			toFile.delete();
 		} catch (Exception e) {
-			amazonS3.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName, objectName, initResponse.getUploadId()));
-			log.error("Failed to upload, " + e.getMessage());
+			amazonS3.abortMultipartUpload(new AbortMultipartUploadRequest(key, objectName, initResponse.getUploadId()));
+			log.error("Failed to upload {}, " + e.getMessage());
 		}
 		long end = System.currentTimeMillis();
 		log.info("总上传耗时：{}", (end - begin) + "ms");
