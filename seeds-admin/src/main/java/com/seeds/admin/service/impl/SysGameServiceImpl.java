@@ -61,6 +61,9 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     private SysGameApiService sysGameApiService;
 
     @Autowired
+    private SysFileService sysFileService;
+
+    @Autowired
     private SysGameMapper sysGameMapper;
 
     @Override
@@ -249,7 +252,11 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             log.error("Get the win list from game failed");
             throw new GenericException("Get the win list from game failed");
         }
-        return resp.getInfos();
+        List<GameWinRankResp.GameWinRank> infos = resp.getInfos();
+        infos.forEach(p -> {
+            p.setPortraitUrl(sysFileService.getFileUrl("game/" + gameApi.getDesc() + p.getPortraitId() + ".jpg"));
+        });
+        return infos;
     }
 
     private void buildOrderBy(SysGamePageReq query, LambdaQueryWrapper<SysGameEntity> queryWrap) {
