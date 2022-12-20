@@ -57,6 +57,7 @@ public class GameFileServiceImpl implements GameFileService {
         res.setObjectName(objectName);
         res.setBucketName(bucketName);
         res.setUrl(endpoint + "/" + key + "/" + objectName);
+        log.info("文件url，{}", endpoint + "/" + key + "/" + objectName);
         return res;
     }
 }
