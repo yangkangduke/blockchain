@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -252,6 +253,9 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		// 创建一个列表保存所有分传的 PartETag, 在分段完成后会用到
 		List<PartETag> partETags = Collections.synchronizedList(new ArrayList<>());
 		// 第一步，初始化，声明下面将有一个 Multipart Upload
+//		ObjectMetadata objectMetadata = new ObjectMetadata();
+//		objectMetadata.setContentType("video/mp4");
+//		InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(key, objectName, objectMetadata);
 		InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(key, objectName);
 		//设置公共读取权限
 		initRequest.withCannedACL(CannedAccessControlList.PublicRead);
