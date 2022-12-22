@@ -38,6 +38,7 @@ public class ChainContractServiceImpl implements IChainContractService {
             .recordStats()
             .build(k -> {
                 List<ChainContractDto> list = loadAll();
+                log.info("---List<ChainContractDto>{}---", list);
                 Map<String, ChainContractDto> map = list.stream().collect(Collectors.toMap(e -> toKey(e.getChain(), e.getCurrency()), e -> e));
                 return ListMap.init(list, map);
             });
