@@ -50,6 +50,10 @@ email:
 login:
   twofa: true
 
+zookeeper:
+  address: 10.18.14.26:2181
+
 service:
   url:
     uc: http://seeds-uc.app.prd.devseeds.link
+    admin: http://seeds-admin.app.prd.devseeds.link

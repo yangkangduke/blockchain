@@ -26,5 +26,13 @@ public class SysGameApiServiceImpl extends ServiceImpl<SysGameApiMapper, SysGame
         SysGameApiEntity gameApi = getOne(queryWrap);
         return gameApi.getApi();
     }
+
+    @Override
+    public SysGameApiEntity queryByGameAndType(Long gameId, Integer type) {
+        LambdaQueryWrapper<SysGameApiEntity> queryWrap = new QueryWrapper<SysGameApiEntity>().lambda()
+                .eq(SysGameApiEntity::getGameId, gameId)
+                .eq(SysGameApiEntity::getType, type);
+        return getOne(queryWrap);
+    }
 }
 

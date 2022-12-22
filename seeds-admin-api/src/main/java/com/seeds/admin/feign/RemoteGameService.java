@@ -1,7 +1,9 @@
 package com.seeds.admin.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.request.SysGamePageReq;
+import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.dto.response.SysGameTypeResp;
@@ -76,5 +78,14 @@ public interface RemoteGameService {
 	@GetMapping("/internal-game/secret-key")
 	@ApiOperation("查询游戏秘钥")
 	GenericDto<String> querySecretKey(@RequestParam String accessKey);
+
+	/**
+	 * 获取游戏胜场排行榜
+	 * @param query 查询条件
+	 * @return 游戏胜场排行榜
+	 */
+	@PostMapping("/internal-game/win-rank-info")
+	@ApiOperation("获取游戏胜场排行榜")
+	GenericDto<List<GameWinRankResp.GameWinRank>> winRankInfo(@RequestBody GameWinRankReq query);
 
 }

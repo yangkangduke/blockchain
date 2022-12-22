@@ -50,4 +50,11 @@ public interface SysFileService extends IService<SysFileEntity> {
      */
     void delete(Long fileId);
 
+    /**
+     * 获取文件url
+     * @param objectName 对象名称
+     * @return 文件url
+     */
+    String getFileUrl(String objectName);
+
 }

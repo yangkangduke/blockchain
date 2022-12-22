@@ -1,7 +1,9 @@
 package com.seeds.admin.feign.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.request.SysGamePageReq;
+import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.dto.response.SysGameTypeResp;
@@ -46,5 +48,10 @@ public class RemoteGameServiceImpl implements RemoteGameService {
 	@Override
 	public GenericDto<String> querySecretKey(String accessKey) {
 		return GenericDto.failure("Internal Error:game querySecretKey failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<List<GameWinRankResp.GameWinRank>> winRankInfo(GameWinRankReq query) {
+		return GenericDto.failure("Internal Error:game rankWinInfo failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 }

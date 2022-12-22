@@ -14,4 +14,6 @@ public interface SysGameApiService extends IService<SysGameApiEntity> {
 
     String queryApiByGameAndType(Long gameId, Integer type);
 
+    SysGameApiEntity queryByGameAndType(Long gameId, Integer type);
+
 }

@@ -1,7 +1,9 @@
 package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.request.SysGamePageReq;
+import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.enums.WhetherEnum;
@@ -66,6 +68,13 @@ public class InterGameController {
     @Inner
     public GenericDto<String> querySecretKey(@RequestParam String accessKey) {
         return GenericDto.success(sysGameService.querySecretKey(accessKey));
+    }
+
+    @PostMapping("win-rank-info")
+    @ApiOperation("获取游戏胜场排行榜")
+    @Inner
+    public GenericDto<List<GameWinRankResp.GameWinRank>> winRankInfo(@RequestBody GameWinRankReq query) {
+        return GenericDto.success(sysGameService.winRankInfo(query));
     }
 
 }

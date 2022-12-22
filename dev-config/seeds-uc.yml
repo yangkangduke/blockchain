@@ -25,5 +25,4 @@ springfox:
       enabled: true
 
 
-Seeds-admin: http://127.0.0.1:10102
 Use-invite-code-flag: true
