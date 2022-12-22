@@ -3,10 +3,7 @@ package com.seeds.admin.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.request.SysGamePageReq;
-import com.seeds.admin.dto.response.GameWinRankResp;
-import com.seeds.admin.dto.response.SysGameBriefResp;
-import com.seeds.admin.dto.response.SysGameResp;
-import com.seeds.admin.dto.response.SysGameTypeResp;
+import com.seeds.admin.dto.response.*;
 import com.seeds.admin.feign.impl.RemoteGameServiceImpl;
 import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import com.seeds.common.dto.GenericDto;
@@ -87,5 +84,14 @@ public interface RemoteGameService {
 	@PostMapping("/internal-game/win-rank-info")
 	@ApiOperation("获取游戏胜场排行榜")
 	GenericDto<List<GameWinRankResp.GameWinRank>> winRankInfo(@RequestBody GameWinRankReq query);
+
+	/**
+	 * 获取个人游戏概括信息
+	 * @param email 用户邮箱
+	 * @return 个人游戏概括信息
+	 */
+	@GetMapping("/internal-game/profile-info")
+	@ApiOperation("获取个人游戏概括信息")
+    GenericDto<ProfileInfoResp> profileInfo(@RequestParam Long gameId, @RequestParam String email);
 
 }

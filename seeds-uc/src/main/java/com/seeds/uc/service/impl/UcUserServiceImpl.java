@@ -2,6 +2,7 @@ package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -9,10 +10,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.seeds.admin.dto.request.RandomCodeUseReq;
+import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.admin.feign.RemoteRandomCodeService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RandomCodeType;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.*;
 import com.seeds.uc.dto.request.*;
@@ -21,6 +25,7 @@ import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.dto.response.UserRegistrationResp;
 import com.seeds.uc.enums.*;
+import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.LoginException;
 import com.seeds.uc.mapper.UcSecurityStrategyMapper;
@@ -37,6 +42,7 @@ import com.seeds.uc.util.RandomUtil;
 import com.seeds.uc.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RBucket;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +55,7 @@ import org.web3j.crypto.WalletUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -77,6 +84,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     private SendCodeService sendCodeService;
     @Autowired
     private IUsUserLoginLogService userLoginLogService;
+    @Autowired
+    private RemoteGameService adminRemoteGameService;
     @Autowired
     private RemoteRandomCodeService remoteRandomCodeService;
 
@@ -629,5 +638,30 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         resp.setTotalRegisteredUsers(total);
         resp.setTodayRegisteredUsers(todayCount);
         return resp;
+    }
+
+    @Override
+    public ProfileInfoResp profileInfo(Long userId, Long gameId) {
+        if (userId == null) {
+            userId = UserContext.getCurrentUserId();
+        }
+        UcUser user = getById(userId);
+        if (user == null || StringUtils.isEmpty(user.getEmail())) {
+            throw new GenericException("Game account not exits!");
+        }
+        // 先从redis缓存中拿个人概括数据
+        String data = cacheService.getProfileInfo(userId.toString(), gameId.toString());
+        if (StringUtils.isNotBlank(data)) {
+            return JSONUtil.toBean(data, ProfileInfoResp.class);
+        }
+        // 请求游戏方获取个人游戏概括数据
+        GenericDto<ProfileInfoResp> result = adminRemoteGameService.profileInfo(gameId, user.getEmail());
+        if (!result.isSuccess()) {
+            throw new GenericException("Failed to get the profile info, please wait and try again!");
+        }
+        // 设置redis个人游戏概括数据
+        ProfileInfoResp newData = result.getData();
+        cacheService.putProfileInfo(userId.toString(), gameId.toString(), newData);
+        return newData;
     }
 }

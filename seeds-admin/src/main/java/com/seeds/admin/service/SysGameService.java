@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.GameWinRankResp;
+import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.entity.SysGameEntity;
@@ -112,5 +113,13 @@ public interface SysGameService extends IService<SysGameEntity> {
      * @return 游戏胜场排行榜
      */
     List<GameWinRankResp.GameWinRank> winRankInfo(GameWinRankReq query);
+
+    /**
+     * 获取个人游戏概括信息
+     * @param gameId 游戏id
+     * @param email 邮箱
+     * @return 个人游戏概括信息
+     */
+    ProfileInfoResp profileInfo(Long gameId, String email);
 
 }
