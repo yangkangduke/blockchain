@@ -1,6 +1,5 @@
 package com.seeds.account.chain.service.impl.eth;
 
-import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.seeds.account.AccountConstants;
@@ -1017,15 +1016,14 @@ public class ETHChainServiceProvider extends ChainBasicService implements IChain
         if (latestChainBlock == null) {
             return BigInteger.ZERO;
         }
-        BigInteger safeBlockNumber = new BigInteger(
-                String.valueOf(latestChainBlock.getBlockNumber() - (long) (getConfirmBlocks(chain)))
-        );
-        EthGetTransactionCount count = web3.readCli().ethGetTransactionCount(
+        return web3.readCli().ethGetTransactionCount(
                 address,
-                DefaultBlockParameter.valueOf(safeBlockNumber)
-        ).send();
-        log.info("EthGetTransactionCount = {}", JSONUtil.toJsonStr(count));
-        return count.getTransactionCount().subtract(BigInteger.ONE);
+                DefaultBlockParameter.valueOf(
+                        new BigInteger(
+                                String.valueOf(latestChainBlock.getBlockNumber() - (long) (getConfirmBlocks(chain)))
+                        )
+                )
+        ).send().getTransactionCount().subtract(BigInteger.ONE);
     }
 
     @Override

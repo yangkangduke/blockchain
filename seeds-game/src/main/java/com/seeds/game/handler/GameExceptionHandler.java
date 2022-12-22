@@ -1,4 +1,3 @@
-/*
 package com.seeds.game.handler;
 
 import cn.hutool.json.JSONUtil;
@@ -20,12 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 
-*/
 /**
 * @author yk
  * @date 2020/8/29
- *//*
-
+ */
 @Slf4j
 @ControllerAdvice
 public class GameExceptionHandler {
@@ -94,19 +91,17 @@ public class GameExceptionHandler {
                 HttpStatus.BAD_REQUEST);
     }
 
-    */
-/**
+    /**
      * System exception
      *
      * @param request
      * @param e
      * @return
-     *//*
-
+     */
     @ResponseBody
     @ExceptionHandler(PermissionException.class)
     ResponseEntity<GenericDto> handle(HttpServletRequest request, PermissionException e) {
         return new ResponseEntity<>(GenericDto.failure("permission error: " + e.getMessage(), 403), HttpStatus.OK);
     }
 
-}*/
+}
