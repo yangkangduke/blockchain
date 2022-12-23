@@ -30,7 +30,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @Api(tags = "游戏相关资源")
-@RequestMapping("/public/game-resource")
+@RequestMapping("/game-resource")
 public class GameSourceController {
 
     @Autowired
@@ -82,9 +82,9 @@ public class GameSourceController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("get-patch-from-s3")
-    @ApiOperation("获取各个源S3上所有的补丁文件，不对接")
-    public GenericDto<List<GameFileResp>> getAllPatch() {
-        return GenericDto.success(gameFileService.getAllPatch());
-    }
+//    @PostMapping("get-patch-from-s3")
+//    @ApiOperation("获取各个源S3上所有的补丁文件，不对接")
+//    public GenericDto<List<GameFileResp>> getAllPatch() {
+//        return GenericDto.success(gameFileService.getAllPatch());
+//    }
 }

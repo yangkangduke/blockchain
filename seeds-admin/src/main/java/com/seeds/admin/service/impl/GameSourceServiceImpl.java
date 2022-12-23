@@ -26,6 +26,7 @@ import com.seeds.admin.service.GameSourceService;
 import com.seeds.admin.service.SysUserService;
 import com.seeds.admin.utils.IPUtil;
 import com.seeds.common.exception.SeedsException;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.common.web.oss.FileProperties;
 import com.seeds.common.web.oss.FileTemplate;
 import lombok.extern.slf4j.Slf4j;
@@ -99,8 +100,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                 gameSrc.setRemark(req.getRemark());
                 gameSrc.setCreatedAt(System.currentTimeMillis());
                 gameSrc.setUpdatedAt(System.currentTimeMillis());
-//                gameSrc.setCreatedBy(UserContext.getCurrentAdminUserId());
-                gameSrc.setCreatedBy(10L);
+                gameSrc.setCreatedBy(UserContext.getCurrentAdminUserId());
                 gameSrc.setStatus(WhetherEnum.NO.value());
                 save(gameSrc);
                 log.info("文件url，{}", "https://" + properties.getGame().getOss1().getCdn() + "/" + objectName);
