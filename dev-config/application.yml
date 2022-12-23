@@ -50,9 +50,22 @@ file:
   bucketName: apeastgame # 上文创建的桶名称
   oss:
     enable: true
+    info: true
     endpoint: https://apeastgame.s3.ap-northeast-1.amazonaws.com
     access-key: AKIAQMKUPROLJREE5AGN
     secret-key: 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
+  game:
+    bucketName: apeastgame
+    oss1:
+      region: ap-northeast-1 #日本
+      cdn: d3ox6c0xknt324.cloudfront.net
+    oss2:
+      region: eu-west-2 #欧洲
+      cdn: dttqy0ok22fnz.cloudfront.net
+    oss3:
+      region: us-west-1 #美国
+      cdn: derpo1ywdu54.cloudfront.net
+
 
 email:
   enable: false

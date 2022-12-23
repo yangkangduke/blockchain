@@ -58,6 +58,7 @@ public interface FileTemplate extends InitializingBean {
 
 	/**
 	 * 获取文件
+	 *
 	 * @param bucketName bucket名称
 	 * @param objectName 文件名称
 	 * @return 二进制流 API Documentation</a>
@@ -65,6 +66,8 @@ public interface FileTemplate extends InitializingBean {
 	S3Object getObject(String bucketName, String objectName);
 
 	void removeObject(String bucketName, String objectName) throws Exception;
+
+	void removeObject(String objectName) throws Exception;
 
 	/**
 	 * @throws Exception
@@ -84,12 +87,21 @@ public interface FileTemplate extends InitializingBean {
 	 */
 	List<S3ObjectSummary> getAllObjectsByPrefix(String bucketName, String prefix, boolean recursive);
 
+	List<S3ObjectSummary> getAllObjectsByPrefix(String bucketName, String prefix);
+
 	/**
 	 * 分片上传文件
 	 *
-	 * @param key bucket名称
+	 * @param key        bucket名称
 	 * @param objectName 文件名称
 	 * @throws Exception
 	 */
 	void uploadMultipartFileByPart(MultipartFile file, String key, String objectName);
+
+	/**
+	 * 获取三个区域下的所有文件
+	 *
+	 * @return S3ObjectSummary 列表
+	 */
+	List<S3ObjectSummary> getAllObjects();
 }

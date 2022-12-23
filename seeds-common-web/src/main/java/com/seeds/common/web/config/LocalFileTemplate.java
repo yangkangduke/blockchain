@@ -104,6 +104,11 @@ public class LocalFileTemplate implements FileTemplate {
 		FileUtil.del(dir + FileUtil.FILE_SEPARATOR + objectName);
 	}
 
+	@Override
+	public void removeObject(String objectName) throws Exception {
+
+	}
+
 	/**
 	 * 上传文件
 	 * @param bucketName bucket名称
@@ -137,8 +142,18 @@ public class LocalFileTemplate implements FileTemplate {
 	}
 
 	@Override
+	public List<S3ObjectSummary> getAllObjectsByPrefix(String bucketName, String prefix) {
+		return null;
+	}
+
+	@Override
 	public void uploadMultipartFileByPart(MultipartFile file, String bucketName, String objectName) {
 
 	}
+
+    @Override
+    public List<S3ObjectSummary> getAllObjects() {
+        return null;
+    }
 
 }

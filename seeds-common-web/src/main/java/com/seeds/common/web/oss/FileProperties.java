@@ -22,10 +22,6 @@ public class FileProperties {
 	private String bucketName = "local";
 
 	/**
-	 * 文件夹名称
-	 */
-	private String dirName;
-	/**
 	 * 本地文件配置信息
 	 */
 	private LocalFileProperties local;
@@ -35,4 +31,8 @@ public class FileProperties {
 	 */
 	private OssProperties oss;
 
+	/**
+	 * S3 配置（用于game安装包，游戏视频等）
+	 */
+	private GameOssProperties game;
 }
