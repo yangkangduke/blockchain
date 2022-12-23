@@ -25,7 +25,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@Api(tags = "游戏相关资源")
+@Api(tags = "游戏相关资源内部调用")
 @RequestMapping("/internal-game-resource")
 public class InterGameSourceController {
 

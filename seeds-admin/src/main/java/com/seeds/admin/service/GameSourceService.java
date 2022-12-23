@@ -23,7 +23,7 @@ public interface GameSourceService extends IService<SysGameSourceEntity> {
 
     List<GameFileResp> getAll();
 
-    void delete(String fileName);
+    Boolean delete(String fileName);
 
     List<GameSrcLinkResp> getLinks(String ip, Integer type);
 

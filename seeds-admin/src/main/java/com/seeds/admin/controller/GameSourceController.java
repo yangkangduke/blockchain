@@ -78,8 +78,7 @@ public class GameSourceController {
             @ApiImplicitParam(name = "fileName", value = "参数值传列表中对应列的key的值", dataType = "String")
     })
     public GenericDto<Boolean> delete(@RequestParam(value = "fileName") String fileName) {
-        gameFileService.delete(fileName);
-        return GenericDto.success(null);
+        return GenericDto.success(gameFileService.delete(fileName));
     }
 
 //    @PostMapping("get-patch-from-s3")

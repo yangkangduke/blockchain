@@ -15,7 +15,7 @@ public class GameSrcLinkResp {
     @ApiModelProperty("资源名称")
     private String srcName;
 
-    @ApiModelProperty("适用系统 1 Windows 2 mac")
+    @ApiModelProperty("适用系统 0 不限 1 Windows 2 mac")
     private Integer os;
 
     @ApiModelProperty("资源地址")
