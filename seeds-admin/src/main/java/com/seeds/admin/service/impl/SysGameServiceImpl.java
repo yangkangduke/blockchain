@@ -291,7 +291,7 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         List<ProfileInfoResp.GameHeroRecord> heroRecord = resp.getHeroRecord();
         if (!CollectionUtils.isEmpty(heroRecord)) {
             heroRecord.forEach(p -> {
-                p.setWinRate(new BigDecimal(p.getTw() / p.getNum()).setScale(2, RoundingMode.HALF_UP) + "%");
+                p.setWinRate(new BigDecimal(p.getTw() / p.getNum()).setScale(2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)) + "%");
             });
         }
         return resp;
