@@ -31,4 +31,8 @@ public class FileProperties {
 	 */
 	private OssProperties oss;
 
+	/**
+	 * S3 配置（用于game安装包，游戏视频等）
+	 */
+	private GameOssProperties game;
 }

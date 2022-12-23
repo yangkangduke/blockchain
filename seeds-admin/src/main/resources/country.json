@@ -1,0 +1,1247 @@
+[
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "斯瓦尔巴群岛和扬马延岛"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "荷兰加勒比区"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "蒙塞拉特岛"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "西撒哈拉"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "不丹"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "东帝汶"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "中国"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "乌兹别克斯坦"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "也门"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "亚美尼亚"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "以色列"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "伊拉克"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "伊朗"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "卡塔尔"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "印尼"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "印度"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "叙利亚"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "台湾"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "吉尔吉斯斯坦"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "哈萨克斯坦"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "土库曼斯坦"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "土耳其"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "圣诞岛"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "塔吉克斯坦"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "塞浦路斯"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "孟加拉"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "尼泊尔"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "巴勒斯坦"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "巴基斯坦"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "巴林"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "文莱"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "斯里兰卡"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "新加坡"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "日本"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "朝鲜"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "柬埔寨"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "格鲁吉亚"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "沙特阿拉伯"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "泰国"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "澳门"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "科威特"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "科科斯群岛"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "约旦"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "缅甸"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "老挝"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "菲律宾"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "蒙古国"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "越南"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "阿塞拜疆"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "阿富汗"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "阿曼"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "阿根廷"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "阿联酋"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "韩国"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "香港"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "马尔代夫"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "马来西亚"
+  },
+  {
+    "continent_cname": "亚洲",
+    "continent_name": "AS",
+    "country_cname": "黎巴嫩"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "伯利兹"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "加拿大"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "危地马拉"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "古巴"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "哥斯达黎加"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "圣卢西亚"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "圣基茨和尼维斯"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "圣巴泰勒米岛"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "圣文森特和格林纳丁斯"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "圣皮埃尔和密克隆"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "墨西哥"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "多米尼克"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "多米尼加"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "安圭拉"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "安提瓜和巴布达"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "尼加拉瓜"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "巴哈马"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "巴巴多斯"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "巴拿马"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "库拉索"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "开曼群岛"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "格林纳达"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "格陵兰"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "法属圣马丁"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "波多黎各"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "洪都拉斯"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "海地"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "牙买加"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "特克斯和凯科斯群岛"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "特立尼达和多巴哥"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "瓜德罗普"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "百慕大"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "美国"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "美国本土外小岛屿"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "美属维尔京群岛"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "英属维尔京群岛"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "荷属圣马丁"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "萨尔瓦多"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "阿鲁巴"
+  },
+  {
+    "continent_cname": "北美洲",
+    "continent_name": "NA",
+    "country_cname": "马提尼克"
+  },
+  {
+    "continent_cname": "南极洲",
+    "continent_name": "AN",
+    "country_cname": "南乔治亚岛和南桑威奇群岛"
+  },
+  {
+    "continent_cname": "南极洲",
+    "continent_name": "AN",
+    "country_cname": "南极洲"
+  },
+  {
+    "continent_cname": "南极洲",
+    "continent_name": "AN",
+    "country_cname": "布韦岛"
+  },
+  {
+    "continent_cname": "南极洲",
+    "continent_name": "AN",
+    "country_cname": "法属南部领地"
+  },
+  {
+    "continent_cname": "南极洲",
+    "continent_name": "AN",
+    "country_cname": "赫德岛和麦克唐纳群岛"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "乌拉圭"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "厄瓜多尔"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "哥伦比亚"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "圭亚那"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "委内瑞拉"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "巴拉圭"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "巴西"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "智利"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "法属圭亚那"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "玻利维亚"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "秘鲁"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "苏里南"
+  },
+  {
+    "continent_cname": "南美洲",
+    "continent_name": "SA",
+    "country_cname": "马尔维纳斯群岛(福克兰)"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "关岛"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "北马里亚纳群岛"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "图瓦卢"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "基里巴斯"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "密克罗尼西亚联邦"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "巴布亚新几内亚"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "帕劳"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "库克群岛"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "所罗门群岛"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "托克劳"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "斐济群岛"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "新喀里多尼亚"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "新西兰"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "汤加"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "法属波利尼西亚"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "澳大利亚"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "瑙鲁"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "瓦利斯和富图纳"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "瓦努阿图"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "皮特凯恩群岛"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "纽埃"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "美属萨摩亚"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "萨摩亚"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "诺福克岛"
+  },
+  {
+    "continent_cname": "大洋洲",
+    "continent_name": "OA",
+    "country_cname": "马绍尔群岛"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "丹麦"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "乌克兰"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "俄罗斯"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "保加利亚"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "克罗地亚"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "冰岛"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "列支敦士登"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "匈牙利"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "卢森堡"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "圣马力诺"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "塞尔维亚"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "奥兰群岛"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "奥地利"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "安道尔"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "希腊"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "德国"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "意大利"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "拉脱维亚"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "挪威"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "捷克"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "摩尔多瓦"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "摩纳哥"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "斯洛伐克"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "斯洛文尼亚"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "根西岛"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "梵蒂冈"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "比利时"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "法国"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "法罗群岛"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "波兰"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "波黑"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "泽西岛"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "爱尔兰"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "爱沙尼亚"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "瑞典"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "瑞士"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "白俄罗斯"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "直布罗陀"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "立陶宛"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "罗马尼亚"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "芬兰"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "英国"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "荷兰"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "葡萄牙"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "西班牙"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "阿尔巴尼亚"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "马其顿"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "马恩岛"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "马耳他"
+  },
+  {
+    "continent_cname": "欧洲",
+    "continent_name": "EU",
+    "country_cname": "黑山"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "中非"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "乌干达"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "乍得"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "佛得角"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "冈比亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "几内亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "几内亚比绍"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "刚果(布)"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "刚果(金)"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "利比亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "利比里亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "加纳"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "加蓬"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "南苏丹"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "南非"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "博茨瓦纳"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "卢旺达"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "厄立特里亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "吉布提"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "喀麦隆"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "圣多美和普林西比"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "圣赫勒拿"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "坦桑尼亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "埃及"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "埃塞俄比亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "塞内加尔"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "塞拉利昂"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "塞舌尔"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "多哥"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "安哥拉"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "尼日利亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "尼日尔"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "布基纳法索"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "布隆迪"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "摩洛哥"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "斯威士兰"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "毛里塔尼亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "毛里求斯"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "津巴布韦"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "留尼汪"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "科摩罗"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "科特迪瓦"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "突尼斯"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "索马里"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "纳米比亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "肯尼亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "苏丹"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "英属印度洋领地"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "莫桑比克"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "莱索托"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "贝宁"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "赞比亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "赤道几内亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "阿尔及利亚"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "马拉维"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "马约特"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "马达加斯加"
+  },
+  {
+    "continent_cname": "非洲",
+    "continent_name": "AF",
+    "country_cname": "马里"
+  }
+]
