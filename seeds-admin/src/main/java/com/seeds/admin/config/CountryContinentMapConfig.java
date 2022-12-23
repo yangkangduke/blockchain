@@ -1,8 +1,10 @@
 package com.seeds.admin.config;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.json.JSONUtil;
 import com.seeds.admin.dto.CountryContinent;
 import com.seeds.admin.dto.CountryContinentService;
+import com.seeds.admin.utils.IPUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +13,7 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,8 +32,8 @@ public class CountryContinentMapConfig {
     public CountryContinentService initCountryContinentMap() throws IOException {
         CountryContinentService countryContinentMap = new CountryContinentService();
         Map<String, String> map;
-        File file = ResourceUtils.getFile("classpath:country.json");
-        String json = FileUtils.readFileToString(file, "UTF-8");
+        InputStream inputStream = CountryContinentMapConfig.class.getClassLoader().getResourceAsStream("country.json");
+        String json = IoUtil.read(inputStream,"UTF-8");
         List<CountryContinent> countryContinents = JSONUtil.parseArray(json).toList(CountryContinent.class);
         map = countryContinents.stream().collect(Collectors.toMap(CountryContinent::getCountryCname, CountryContinent::getContinentName));
         countryContinentMap.setCountryContinentMap(map);
