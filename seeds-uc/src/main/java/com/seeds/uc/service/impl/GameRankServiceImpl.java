@@ -1,5 +1,6 @@
 package com.seeds.uc.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.admin.feign.RemoteGameService;
@@ -8,6 +9,7 @@ import com.seeds.uc.constant.UcRedisKeysConstant;
 import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.service.GameRankService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +41,10 @@ public class GameRankServiceImpl implements GameRankService {
     @Override
     public List<GameWinRankResp.GameWinRank> winInfo(GameWinRankReq query) {
         // 先从redis缓存中拿排行榜数据
-        RBucket<List<GameWinRankResp.GameWinRank>> bucket = redissonClient.getBucket(UcRedisKeysConstant.getGameWinRankTemplate(query.getGameId().toString()));
-        List<GameWinRankResp.GameWinRank> data = bucket.get();
-        if (data != null) {
-            return data;
+        RBucket<String> bucket = redissonClient.getBucket(UcRedisKeysConstant.getGameWinRankTemplate(query.getGameId().toString()));
+        String data = bucket.get();
+        if (StringUtils.isNotBlank(data)) {
+            return JSONUtil.toList(data, GameWinRankResp.GameWinRank.class);
         }
         // 请求游戏方获取排行榜数据
         GenericDto<List<GameWinRankResp.GameWinRank>> result = adminRemoteGameService.winRankInfo(query);
@@ -51,7 +53,7 @@ public class GameRankServiceImpl implements GameRankService {
         }
         // 设置redis排行榜缓存
         List<GameWinRankResp.GameWinRank> newData = result.getData();
-        bucket.set(newData, winRankExpireAfter, TimeUnit.MINUTES);
+        bucket.set(JSONUtil.toJsonStr(result.getData()), winRankExpireAfter, TimeUnit.MINUTES);
         return newData;
     }
 }

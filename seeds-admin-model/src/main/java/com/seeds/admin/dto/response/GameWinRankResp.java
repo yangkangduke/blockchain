@@ -45,6 +45,9 @@ public class GameWinRankResp {
 		@ApiModelProperty(value = "头像id")
 		private Long portraitId;
 
+		@ApiModelProperty(value = "头像url")
+		private String portraitUrl;
+
 		@ApiModelProperty(value = "总积分")
 		private Long score;
 
