@@ -27,6 +27,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+            <version>1.7.2</version>
+        </dependency>
         <!--kafka依赖-->
         <dependency>
             <groupId>org.springframework.kafka</groupId>

@@ -9,6 +9,7 @@ import com.seeds.common.web.oss.FileTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.InputStream;
@@ -103,6 +104,11 @@ public class LocalFileTemplate implements FileTemplate {
 		FileUtil.del(dir + FileUtil.FILE_SEPARATOR + objectName);
 	}
 
+	@Override
+	public void removeObject(String objectName) throws Exception {
+
+	}
+
 	/**
 	 * 上传文件
 	 * @param bucketName bucket名称
@@ -134,5 +140,20 @@ public class LocalFileTemplate implements FileTemplate {
 			return new S3ObjectSummary();
 		}).collect(Collectors.toList());
 	}
+
+	@Override
+	public List<S3ObjectSummary> getAllObjectsByPrefix(String bucketName, String prefix) {
+		return null;
+	}
+
+	@Override
+	public void uploadMultipartFileByPart(MultipartFile file, String bucketName, String objectName) {
+
+	}
+
+    @Override
+    public List<S3ObjectSummary> getAllObjects() {
+        return null;
+    }
 
 }
