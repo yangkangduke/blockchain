@@ -211,7 +211,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         LambdaQueryWrapper<SysGameSourceEntity> queryWrap = new LambdaQueryWrapper<>();
 
         queryWrap.eq(!ObjectUtil.isEmpty(req.getSrcType()), SysGameSourceEntity::getSrcType, req.getSrcType())
-                .like(!ObjectUtil.isEmpty(req.getFileName()), SysGameSourceEntity::getSrcType, req.getFileName())
+                .like(!ObjectUtil.isEmpty(req.getFileName()), SysGameSourceEntity::getFileName, req.getFileName())
                 .eq(!ObjectUtil.isEmpty(req.getStatus()), SysGameSourceEntity::getStatus, req.getStatus())
                 .orderByDesc(SysGameSourceEntity::getCreatedAt);
 
