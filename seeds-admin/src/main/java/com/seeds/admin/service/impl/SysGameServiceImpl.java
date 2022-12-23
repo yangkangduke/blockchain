@@ -35,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -254,9 +256,11 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             throw new GenericException("Get the win list from game failed");
         }
         List<GameWinRankResp.GameWinRank> infos = resp.getInfos();
-        infos.forEach(p -> {
-            p.setPortraitUrl(sysFileService.getFileUrl("game/" + gameApi.getDesc() + p.getPortraitId() + ".jpg"));
-        });
+        if (!CollectionUtils.isEmpty(infos)) {
+            infos.forEach(p -> {
+                p.setPortraitUrl(sysFileService.getFileUrl("game/" + gameApi.getDesc() + p.getPortraitId() + ".jpg"));
+            });
+        }
         return infos;
     }
 
@@ -265,7 +269,7 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         // 通知游戏方NFT创建结果
         SysGameApiEntity gameApi = sysGameApiService.queryByGameAndType(gameId, ApiType.PROFILE_INFO.getCode());
         String rankUrl = gameApi.getBaseUrl() + gameApi.getApi();
-        String params = String.format("email=%s", email);
+        String params = String.format("accName=%s", email);
         rankUrl = rankUrl + "?" + params;
         log.info("开始请求个人游戏概括信息数据，params:{}", params);
         HttpResponse response = HttpRequest.get(rankUrl)
@@ -283,7 +287,13 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             log.error("Get the profile info from game failed");
             throw new GenericException("Get the profile info from game failed");
         }
-        // todo 计算游戏英雄胜率
+        // 计算游戏英雄胜率
+        List<ProfileInfoResp.GameHeroRecord> heroRecord = resp.getHeroRecord();
+        if (!CollectionUtils.isEmpty(heroRecord)) {
+            heroRecord.forEach(p -> {
+                p.setWinRate(new BigDecimal(p.getTw() / p.getNum()).setScale(2, RoundingMode.HALF_UP) + "%");
+            });
+        }
         return resp;
     }
 

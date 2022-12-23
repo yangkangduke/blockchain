@@ -3,10 +3,7 @@ package com.seeds.admin.feign.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.request.SysGamePageReq;
-import com.seeds.admin.dto.response.GameWinRankResp;
-import com.seeds.admin.dto.response.SysGameBriefResp;
-import com.seeds.admin.dto.response.SysGameResp;
-import com.seeds.admin.dto.response.SysGameTypeResp;
+import com.seeds.admin.dto.response.*;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.http.HttpStatus;
@@ -53,5 +50,10 @@ public class RemoteGameServiceImpl implements RemoteGameService {
 	@Override
 	public GenericDto<List<GameWinRankResp.GameWinRank>> winRankInfo(GameWinRankReq query) {
 		return GenericDto.failure("Internal Error:game rankWinInfo failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
+	@Override
+	public GenericDto<ProfileInfoResp> profileInfo(Long gameId, String email) {
+		return GenericDto.failure("Internal Error:game profileInfo failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 }
