@@ -237,22 +237,25 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 				properties.getOss().getEndpoint(), properties.getOss().getRegion());
 		AWSCredentials awsCredentials = new BasicAWSCredentials(properties.getOss().getAccessKey(),
 				properties.getOss().getSecretKey());
+		AWSCredentials gameCredentails = new BasicAWSCredentials(properties.getGame().getAccessKey(),
+				properties.getGame().getSecretKey());
 		AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
+		AWSCredentialsProvider awsGameCredentialsProvider = new AWSStaticCredentialsProvider(gameCredentails);
 		this.amazonS3 = AmazonS3Client.builder().withEndpointConfiguration(endpointConfiguration)
 				.withClientConfiguration(clientConfiguration).withCredentials(awsCredentialsProvider)
 				.disableChunkedEncoding().withPathStyleAccessEnabled(properties.getOss().getPathStyleAccess()).build();
 
 
 		this.gameoss1 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
-				.withCredentials(awsCredentialsProvider).withRegion(properties.getGame().getOss1().getRegion())
+				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss1().getRegion())
 				.enablePathStyleAccess()
 				.build();
 		this.gameoss2 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
-				.withCredentials(awsCredentialsProvider).withRegion(properties.getGame().getOss2().getRegion())
+				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss2().getRegion())
 				.enablePathStyleAccess()
 				.build();
 		this.gameoss3 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
-				.withCredentials(awsCredentialsProvider).withRegion(properties.getGame().getOss3().getRegion())
+				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss3().getRegion())
 				.enablePathStyleAccess()
 				.build();
 	}
