@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.GameWinRankResp;
+import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.entity.SysGameApiEntity;
@@ -34,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -253,10 +256,45 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             throw new GenericException("Get the win list from game failed");
         }
         List<GameWinRankResp.GameWinRank> infos = resp.getInfos();
-        infos.forEach(p -> {
-            p.setPortraitUrl(sysFileService.getFileUrl("game/" + gameApi.getDesc() + p.getPortraitId() + ".jpg"));
-        });
+        if (!CollectionUtils.isEmpty(infos)) {
+            infos.forEach(p -> {
+                p.setPortraitUrl(sysFileService.getFileUrl("game/" + gameApi.getDesc() + p.getPortraitId() + ".jpg"));
+            });
+        }
         return infos;
+    }
+
+    @Override
+    public ProfileInfoResp profileInfo(Long gameId, String email) {
+        // 通知游戏方NFT创建结果
+        SysGameApiEntity gameApi = sysGameApiService.queryByGameAndType(gameId, ApiType.PROFILE_INFO.getCode());
+        String rankUrl = gameApi.getBaseUrl() + gameApi.getApi();
+        String params = String.format("accName=%s", email);
+        rankUrl = rankUrl + "?" + params;
+        log.info("开始请求个人游戏概括信息数据，params:{}", params);
+        HttpResponse response = HttpRequest.get(rankUrl)
+                .timeout(5 * 60 * 1000)
+                .header("Content-Type", "application/json")
+                .execute();
+        String body = response.body();
+        log.info("请求个人游戏概括信息数据返回，result:{}", body);
+        if (!response.isOk()) {
+            log.error("Failed to get the profile info from game");
+            throw new GenericException("Failed to get the profile info");
+        }
+        ProfileInfoResp resp = JSONUtil.toBean(body, ProfileInfoResp.class);
+        if (!resp.getRet().equalsIgnoreCase("OK")) {
+            log.error("Get the profile info from game failed");
+            throw new GenericException("Get the profile info from game failed");
+        }
+        // 计算游戏英雄胜率
+        List<ProfileInfoResp.GameHeroRecord> heroRecord = resp.getHeroRecord();
+        if (!CollectionUtils.isEmpty(heroRecord)) {
+            heroRecord.forEach(p -> {
+                p.setWinRate(new BigDecimal(p.getTw() / p.getNum()).setScale(2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)) + "%");
+            });
+        }
+        return resp;
     }
 
     private void buildOrderBy(SysGamePageReq query, LambdaQueryWrapper<SysGameEntity> queryWrap) {

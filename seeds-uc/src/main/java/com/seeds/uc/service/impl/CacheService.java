@@ -1,6 +1,8 @@
 package com.seeds.uc.service.impl;
 
 
+import cn.hutool.json.JSONUtil;
+import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.uc.constant.UcRedisKeysConstant;
 import com.seeds.uc.dto.redis.*;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
@@ -54,6 +56,9 @@ public class CacheService {
     // nonce生成，绑定 的过期时间
     @Value("${uc.metamask.expire:300}")
     private Integer metamaskAuthExpireAfter;
+
+    @Value("${uc.profile.info.expire:10}")
+    private Integer profileInfoExpireAfter;
 
     @Autowired
     private RedissonClient redisson;
@@ -313,5 +318,17 @@ public class CacheService {
         String key = UcRedisKeysConstant.getUcSecurityAuthTokenKeyTemplate(token);
         RBucket<SecurityAuth> securityAuthRBucket = redisson.getBucket(key);
         return securityAuthRBucket.get();
+    }
+
+    public String getProfileInfo(String userId, String gameId) {
+        String key = UcRedisKeysConstant.getProfileInfoTemplate(userId, gameId);
+        RBucket<String> bucket = redisson.getBucket(key);
+        return bucket.get();
+    }
+
+    public void putProfileInfo(String userId, String gameId, ProfileInfoResp data) {
+        String key = UcRedisKeysConstant.getProfileInfoTemplate(userId, gameId);
+        RBucket<String> bucket = redisson.getBucket(key);
+        bucket.set(JSONUtil.toJsonStr(data), profileInfoExpireAfter, TimeUnit.MINUTES);
     }
 }

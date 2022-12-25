@@ -1,7 +1,9 @@
 package com.seeds.uc.controller;
 
 
+import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.ChangePasswordReq;
 import com.seeds.uc.dto.request.NickNameReq;
@@ -107,5 +109,10 @@ public class OpenUserController {
         return GenericDto.success(ucUserService.updatePassword(user.getId(), password));
     }
 
+    @GetMapping("/profile-info/{gameId}")
+    @ApiOperation(value = "个人游戏概况信息", notes = "个人游戏概况信息")
+    public GenericDto<ProfileInfoResp> profileInfo(@PathVariable("gameId") Long gameId) {
+        return GenericDto.success(ucUserService.profileInfo(UserContext.getCurrentUserId(), gameId));
+    }
 
 }

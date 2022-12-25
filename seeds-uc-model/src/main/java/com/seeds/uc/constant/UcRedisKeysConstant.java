@@ -72,6 +72,8 @@ public class UcRedisKeysConstant {
 
     public final String UC_GAME_WIN_RANK_TEMPLATE = UC_KEY_PREFIX + "game:win:rank:%s";
 
+    public final String UC_PROFILE_INFO_TEMPLATE = UC_KEY_PREFIX + "profile:info:%s:%s";
+
 
     /**
      * return uc:token:{uid} as redis key in login
@@ -170,6 +172,10 @@ public class UcRedisKeysConstant {
 
     public String getGameWinRankTemplate(String gameId) {
         return String.format(UC_GAME_WIN_RANK_TEMPLATE, gameId);
+    }
+
+    public String getProfileInfoTemplate(String userId, String gameId) {
+        return String.format(UC_PROFILE_INFO_TEMPLATE, userId, gameId);
     }
 
 }
