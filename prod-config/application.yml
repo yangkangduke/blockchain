@@ -72,8 +72,8 @@ service:
   url:
     uc: http://seeds-uc.app.prd.devseeds.link
     admin: http://seeds-admin.app.prd.devseeds.link
-    account: http://seeds-admin.app.prd.devseeds.link
-    wallet: http://seeds-admin.app.prd.devseeds.link
-    notification: http://seeds-admin.app.prd.devseeds.link
-    game: http://seeds-admin.app.prd.devseeds.link
-    gateway: http://seeds-admin.app.prd.devseeds.link
+    account: http://seeds-account.app.prd.devseeds.link
+    wallet: http://seeds-wallet.app.prd.devseeds.link
+    notification: http://seeds-notification.app.prd.devseeds.link
+    game: http://seeds-game.app.prd.devseeds.link
+    gateway: https://seeds-gateway.app.prd.devseeds.link
