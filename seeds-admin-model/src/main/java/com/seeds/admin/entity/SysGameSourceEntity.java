@@ -79,6 +79,8 @@ public class SysGameSourceEntity implements Serializable {
      */
     private Long updatedAt;
 
+    private Long updatedBy;
+
     /**
      * 删除标记  1：启动   0：禁用
      */
