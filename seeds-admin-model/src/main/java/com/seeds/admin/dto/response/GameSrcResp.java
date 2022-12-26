@@ -61,6 +61,10 @@ public class GameSrcResp {
     private Long updatedAt;
 
 
+    @ApiModelProperty("更新人")
+    private String updatedBy;
+
+
     @ApiModelProperty("删除标记  1：启动   0：禁用")
     private Integer status;
 }
