@@ -61,13 +61,6 @@ file:
       region: us-west-1 #美国
       cdn: derpo1ywdu54.cloudfront.net
 
-#file:
-#  bucketName: seeds # 上文创建的桶名称
-#  oss:
-#    enable: true
-#    endpoint: http://3.114.69.251:9000
-#    access-key: seeds123!
-#    secret-key: seeds123!
 
 email:
   enable: false
