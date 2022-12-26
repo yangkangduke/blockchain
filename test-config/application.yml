@@ -83,6 +83,7 @@ service:
     wallet: http://127.0.0.1:10104
     notification: http://127.0.0.1:10105
     game: http://127.0.0.1:10106
+    gateway: http://3.114.69.251:9999
 
 # Springboot Actuator
 management:

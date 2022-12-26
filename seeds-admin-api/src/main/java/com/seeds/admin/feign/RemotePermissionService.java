@@ -15,7 +15,7 @@ import java.util.Set;
  * @author hang.yu
  * @date 2022/11/10
  */
-@FeignClient(name = "remotePermissionService", url = "${Seeds-admin}", fallback = RemotePermissionServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
+@FeignClient(name = "remotePermissionService", url = "${service.url.admin}", fallback = RemotePermissionServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
 public interface RemotePermissionService {
 
 	/**
