@@ -9,10 +9,6 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
-management:
-  endpoints:
-    web:
-      base-path: /
 
 mybatis:
   type-aliases-package*: com.seeds.uc.model
@@ -30,4 +26,3 @@ springfox:
 
 
 Use-invite-code-flag: true
-Seeds-admin: http://127.0.0.1:10102

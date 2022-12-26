@@ -16,7 +16,7 @@ import javax.validation.Valid;
  * @author hang.yu
  * @date 2022/8/19
  */
-@FeignClient(name = "remoteRandomCodeService", url = "${Seeds-admin}", fallback = RemoteRandomCodeServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteRandomCodeService", url = "${service.url.admin}", fallback = RemoteRandomCodeServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
 public interface RemoteRandomCodeService {
 
 	/**
