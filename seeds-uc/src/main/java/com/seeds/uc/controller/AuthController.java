@@ -90,43 +90,45 @@ public class AuthController {
         //获取用户真实ip地址
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String clientIp = WebUtil.getIpAddr(request);
+        // 不需要进行2FA
         if (userLoginLogService.checkNeed2FA(loginReq.getEmail(), clientIp)) {
             // 校验账号、密码
             UserDto userDto = ucUserService.verifyLogin(loginReq);
             LoginResp login = ucUserService.buildLoginResponse(userDto.getUid(), userDto.getEmail());
+            // 生产登陆成功消息
+            try {
+                Map loginMap = new HashMap<>();
+                loginMap.put("email",loginReq.getEmail());
+                loginMap.put("userIp",loginReq.getUserIp());
+                loginMap.put("serviceRegion",loginReq.getServiceRegion());
+                ListenableFuture<SendResult> listenableFuture = kafkaTemplate.send("login_topic", loginMap.toString());
+                // 提供回调方法，可以监控消息的成功或失败的后续处理
+                listenableFuture.addCallback(new ListenableFutureCallback<SendResult>() {
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        log.info("发送消息失败，" + throwable.getMessage());
+                    }
+                    @Override
+                    public void onSuccess(SendResult sendResult) {
+                        // 消息发送到的topic
+                        String topic = sendResult.getRecordMetadata().topic();
+                        // 消息发送到的分区
+                        int partition = sendResult.getRecordMetadata().partition();
+                        // 消息在分区内的offset
+                        long offset = sendResult.getRecordMetadata().offset();
+                        log.info(String.format("发送消息成功，topc：%s, partition: %s, offset：%s ", topic, partition, offset));
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return GenericDto.success(login);
         }
 
         LoginResp login = ucUserService.login(loginReq);
         if (login.getUcToken() == null) {
             return GenericDto.failure(UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getDescEn(), UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getCode(), login);
-        }
-        // 生产登陆成功消息
-        try {
-            Map loginMap = new HashMap<>();
-            loginMap.put("userIp",loginReq.getUserIp());
-            loginMap.put("serviceRegion",loginReq.getServiceRegion());
-            ListenableFuture<SendResult> listenableFuture = kafkaTemplate.send("login_topic", loginMap);
-            // 提供回调方法，可以监控消息的成功或失败的后续处理
-            listenableFuture.addCallback(new ListenableFutureCallback<SendResult>() {
-                @Override
-                public void onFailure(Throwable throwable) {
-                    log.info("发送消息失败，" + throwable.getMessage());
-                }
-                @Override
-                public void onSuccess(SendResult sendResult) {
-                    // 消息发送到的topic
-                    String topic = sendResult.getRecordMetadata().topic();
-                    // 消息发送到的分区
-                    int partition = sendResult.getRecordMetadata().partition();
-                    // 消息在分区内的offset
-                    long offset = sendResult.getRecordMetadata().offset();
-                    log.info(String.format("发送消息成功，topc：%s, partition: %s, offset：%s ", topic, partition, offset));
-                }
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return GenericDto.success(login);
     }
