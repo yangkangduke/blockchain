@@ -269,6 +269,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 
 		//声明线程池
 		ExecutorService exec = Executors.newFixedThreadPool(8);
+		File toFile = multipartFileToFile(file);
 		long size = file.getSize();
 		int minPartSize = 25 * 1024 * 1024;
 		// 得到总共的段数，和 分段后，每个段的开始上传的字节位置
@@ -291,8 +292,6 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		log.info("开始上传");
 		long begin = System.currentTimeMillis();
 		try {
-			// MultipartFile 转 File
-			File toFile = multipartFileToFile(file);
 			for (int i = 0; i < positions.size(); i++) {
 				int finalI = i;
 				exec.execute(() -> {
@@ -357,25 +356,30 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	/**
 	 * MultipartFile 转 File
 	 */
-	public static File multipartFileToFile(MultipartFile file) throws Exception {
+	public static File multipartFileToFile(MultipartFile file) {
 		File toFile = null;
 		if (file.equals("") || file.getSize() <= 0) {
 			file = null;
 		} else {
-			InputStream ins = null;
-			ins = file.getInputStream();
-			String name = file.getOriginalFilename();
-			String substring = name.substring(name.lastIndexOf("/") + 1);
-			toFile = new File(substring);
-			//获取流文件
-			OutputStream os = new FileOutputStream(toFile);
-			int bytesRead = 0;
-			byte[] buffer = new byte[8192];
-			while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
-				os.write(buffer, 0, bytesRead);
+
+			try {
+				InputStream ins = null;
+				ins = file.getInputStream();
+				String name = file.getOriginalFilename();
+				String substring = name.substring(name.lastIndexOf("/") + 1);
+				toFile = new File(substring);
+				//获取流文件
+				OutputStream os = new FileOutputStream(toFile);
+				int bytesRead = 0;
+				byte[] buffer = new byte[8192];
+				while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
+					os.write(buffer, 0, bytesRead);
+				}
+				os.close();
+				ins.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			os.close();
-			ins.close();
 		}
 		return toFile;
 	}
