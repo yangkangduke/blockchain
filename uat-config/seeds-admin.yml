@@ -4,7 +4,7 @@ spring:
       matching-strategy: ant_path_matcher
 
   datasource:
-    url: jdbc:mysql://192.168.1.101:3306/seeds_admin?useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://35.76.116.54:3306/seeds_admin?useUnicode=true&characterEncoding=utf-8
     username: root
     password: Seeds123!
     driver-class-name: com.mysql.cj.jdbc.Driver
