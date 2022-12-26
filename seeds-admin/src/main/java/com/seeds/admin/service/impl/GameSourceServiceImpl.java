@@ -102,7 +102,11 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                     gameSrc.setCreatedAt(System.currentTimeMillis());
                     gameSrc.setUpdatedAt(System.currentTimeMillis());
                     gameSrc.setCreatedBy(UserContext.getCurrentAdminUserId());
-                    gameSrc.setStatus(WhetherEnum.NO.value());
+                    if (req.getSrcType().equals(GameSrcTypeEnum.PATCH_PK.getCode())) {
+                        gameSrc.setStatus(WhetherEnum.YES.value());
+                    } else {
+                        gameSrc.setStatus(WhetherEnum.NO.value());
+                    }
                     save(gameSrc);
                 } else {
                     //更新
