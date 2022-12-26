@@ -333,6 +333,7 @@ public class CacheService {
     public void putProfileInfo(String userId, String gameId, ProfileInfoResp data) {
         String key = UcRedisKeysConstant.getProfileInfoTemplate(userId, gameId);
         RBucket<String> bucket = redisson.getBucket(key);
-        bucket.set(JSONUtil.toJsonStr(data), profileInfoExpireAfter, TimeUnit.MINUTES);
+        data.setExpireTime(System.currentTimeMillis() + profileInfoExpireAfter * 60 * 1000);
+        bucket.set(JSONUtil.toJsonStr(data), profileInfoExpireAfter, TimeUnit.DAYS);
     }
 }

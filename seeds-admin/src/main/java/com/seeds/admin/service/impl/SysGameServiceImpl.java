@@ -236,65 +236,157 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
     public List<GameWinRankResp.GameWinRank> winRankInfo(GameWinRankReq query) {
         // 通知游戏方NFT创建结果
         SysGameApiEntity gameApi = sysGameApiService.queryByGameAndType(query.getGameId(), ApiType.PLAYER_WIN_RANK.getCode());
-        String rankUrl = gameApi.getBaseUrl() + gameApi.getApi();
-        String params = String.format("startRow=%s&endRow=%s", query.getStartRow(), query.getEndRow());
-        rankUrl = rankUrl + "?" + params;
-        log.info("开始请求游戏胜场排行榜数据， params:{}", params);
-        HttpResponse response = HttpRequest.get(rankUrl)
-                .timeout(5 * 60 * 1000)
-                .header("Content-Type", "application/json")
-                .execute();
-        String body = response.body();
-        log.info("请求游戏胜场排行榜数据返回，result:{}", body);
-        if (!response.isOk()) {
-            log.error("Failed to get the win list from game");
-            throw new GenericException("Failed to get the win list");
+        List<String> rankUrls = new ArrayList<>();
+        if (gameApi.getBaseUrl().contains("|")) {
+            rankUrls = Arrays.stream(gameApi.getBaseUrl().split("\\|")).map(p -> p + gameApi.getApi()).collect(Collectors.toList());
+        } else {
+            rankUrls.add(gameApi.getBaseUrl() + gameApi.getApi());
         }
-        GameWinRankResp resp = JSONUtil.toBean(body, GameWinRankResp.class);
-        if (!resp.getRet().equalsIgnoreCase("OK")) {
-            log.error("Get the win list from game failed");
-            throw new GenericException("Get the win list from game failed");
+        List<GameWinRankResp.GameWinRank> rankList = new ArrayList<>();
+        for (String rankUrl : rankUrls) {
+            String params = String.format("startRow=%s&endRow=%s", query.getStartRow(), query.getEndRow() * 2);
+            rankUrl = rankUrl + "?" + params;
+            log.info("开始请求游戏胜场排行榜数据， params:{}", params);
+            HttpResponse response = HttpRequest.get(rankUrl)
+                    .timeout(5 * 60 * 1000)
+                    .header("Content-Type", "application/json")
+                    .execute();
+            String body = response.body();
+            log.info("请求游戏胜场排行榜数据返回，result:{}", body);
+            if (!response.isOk()) {
+                log.error("Failed to get the win list from game");
+                throw new GenericException("Failed to get the win list");
+            }
+            GameWinRankResp resp = JSONUtil.toBean(body, GameWinRankResp.class);
+            if (!resp.getRet().equalsIgnoreCase("OK")) {
+                log.error("Get the win list from game failed");
+                throw new GenericException("Get the win list from game failed");
+            }
+            rankList.addAll(resp.getInfos());
         }
-        List<GameWinRankResp.GameWinRank> infos = resp.getInfos();
-        if (!CollectionUtils.isEmpty(infos)) {
-            infos.forEach(p -> {
-                p.setPortraitUrl(sysFileService.getFileUrl("game/" + gameApi.getDesc() + p.getPortraitId() + ".jpg"));
-            });
+        if (CollectionUtils.isEmpty(rankList)) {
+            return Collections.emptyList();
         }
-        return infos;
+        Map<Long, GameWinRankResp.GameWinRank> rankMap = new HashMap<>(rankList.size());
+        for (GameWinRankResp.GameWinRank rank : rankList) {
+            Long key = rank.getAccID();
+            GameWinRankResp.GameWinRank mapRank = rankMap.get(key);
+            if (mapRank == null) {
+                rankMap.put(key, rank);
+            } else {
+                // 总场数
+                mapRank.setFightNum(mapRank.getFightNum() + rank.getFightNum());
+                // 最高连胜场数
+                mapRank.setMaxSeqWin(mapRank.getMaxSeqWin() > rank.getMaxSeqWin() ? mapRank.getMaxSeqWin() : rank.getMaxSeqWin());
+                // 总积分
+                mapRank.setScore(mapRank.getScore() + rank.getScore());
+                // 总胜利场数
+                mapRank.setWinNum(mapRank.getWinNum() + rank.getWinNum());
+                // 头像url
+                mapRank.setPortraitUrl(sysFileService.getFileUrl("game/" + gameApi.getDesc() + mapRank.getPortraitId() + ".jpg"));
+                rankMap.put(key, mapRank);
+            }
+        }
+        return rankMap.values().stream()
+                .sorted(Comparator.comparing(GameWinRankResp.GameWinRank::getScore).reversed())
+                .limit(query.getEndRow()).collect(Collectors.toList());
     }
 
     @Override
     public ProfileInfoResp profileInfo(Long gameId, String email) {
         // 通知游戏方NFT创建结果
-        SysGameApiEntity gameApi = sysGameApiService.queryByGameAndType(gameId, ApiType.PROFILE_INFO.getCode());
-        String rankUrl = gameApi.getBaseUrl() + gameApi.getApi();
-        String params = String.format("accName=%s", email);
-        rankUrl = rankUrl + "?" + params;
-        log.info("开始请求个人游戏概括信息数据，params:{}", params);
-        HttpResponse response = HttpRequest.get(rankUrl)
-                .timeout(5 * 60 * 1000)
-                .header("Content-Type", "application/json")
-                .execute();
-        String body = response.body();
-        log.info("请求个人游戏概括信息数据返回，result:{}", body);
-        if (!response.isOk()) {
-            log.error("Failed to get the profile info from game");
-            throw new GenericException("Failed to get the profile info");
+        List<String> rankUrls = sysGameApiService.queryUrlByGameAndType(gameId, ApiType.PROFILE_INFO.getCode());
+        ProfileInfoResp profileInfo = null;
+        List<ProfileInfoResp.GameHeroRecord> heroRecords = new ArrayList<>();
+        for (String rankUrl : rankUrls) {
+            String params = String.format("accName=%s", email);
+            rankUrl = rankUrl + "?" + params;
+            log.info("开始请求个人游戏概括信息数据，params:{}", params);
+            HttpResponse response = HttpRequest.get(rankUrl)
+                    .timeout(5 * 60 * 1000)
+                    .header("Content-Type", "application/json")
+                    .execute();
+            String body = response.body();
+            log.info("请求个人游戏概括信息数据返回，result:{}", body);
+            if (!response.isOk()) {
+                log.error("Failed to get the profile info from game");
+                throw new GenericException("Failed to get the profile info");
+            }
+            ProfileInfoResp resp = JSONUtil.toBean(body, ProfileInfoResp.class);
+            if (!resp.getRet().equalsIgnoreCase("OK")) {
+                log.error("Get the profile info from game failed");
+                throw new GenericException("Get the profile info from game failed");
+            }
+            if (profileInfo == null) {
+                profileInfo = resp;
+            } else {
+                // 胜利总场次
+                profileInfo.setWinNum(profileInfo.getWinNum() + resp.getWinNum());
+                // 最大连胜场次
+                profileInfo.setMaxSeqWin(profileInfo.getMaxSeqWin() > resp.getMaxSeqWin() ? profileInfo.getMaxSeqWin() : resp.getMaxSeqWin());
+                // 战斗总场次
+                profileInfo.setFightNum(profileInfo.getFightNum() + resp.getFightNum());
+                // 总积分
+                profileInfo.setScore(profileInfo.getScore() + resp.getScore());
+            }
+            heroRecords.addAll(resp.getHeroRecord());
         }
-        ProfileInfoResp resp = JSONUtil.toBean(body, ProfileInfoResp.class);
-        if (!resp.getRet().equalsIgnoreCase("OK")) {
-            log.error("Get the profile info from game failed");
-            throw new GenericException("Get the profile info from game failed");
+        // 多个服都没有数据
+        if (profileInfo == null) {
+            return null;
         }
-        // 计算游戏英雄胜率
-        List<ProfileInfoResp.GameHeroRecord> heroRecord = resp.getHeroRecord();
-        if (!CollectionUtils.isEmpty(heroRecord)) {
-            heroRecord.forEach(p -> {
-                p.setWinRate(new BigDecimal(p.getTw() / p.getNum()).setScale(2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)) + "%");
-            });
+        Map<Long, ProfileInfoResp.GameHeroRecord> recordMap = new HashMap<>(heroRecords.size());
+        if (!CollectionUtils.isEmpty(heroRecords)) {
+            for (ProfileInfoResp.GameHeroRecord record : heroRecords) {
+                Long key = record.getId();
+                ProfileInfoResp.GameHeroRecord mapRecord = recordMap.get(key);
+                if (mapRecord == null) {
+                    recordMap.put(key, record);
+                } else {
+                    // 胜利总数
+                    mapRecord.setTw(mapRecord.getTw() + record.getTw());
+                    // 最大连杀数
+                    mapRecord.setMsk(mapRecord.getMsk() > record.getMsk() ? mapRecord.getMsk() : record.getMsk());
+                    // 最多救援
+                    mapRecord.setMs(mapRecord.getMs() > record.getMs() ? mapRecord.getMs() : record.getMs());
+                    // 英雄使用次数
+                    mapRecord.setNum(mapRecord.getNum() + record.getNum());
+                    // 3S次数
+                    mapRecord.setTsss(mapRecord.getTsss() + record.getTsss());
+                    // 最大得分
+                    mapRecord.setMts(mapRecord.getMts() > record.getMts() ? mapRecord.getMts() : record.getMts());
+                    // 总收集
+                    mapRecord.setTc(mapRecord.getTc() + record.getTc());
+                    // 前几名总次数
+                    mapRecord.setTtn(mapRecord.getTtn() + record.getTtn());
+                    // 最长存活时间
+                    mapRecord.setMst(mapRecord.getMst() > record.getMst() ? mapRecord.getMst() : record.getMst());
+                    // 死亡总数
+                    mapRecord.setTd(mapRecord.getTd() + record.getTd());
+                    // 总存活时间
+                    mapRecord.setTst(mapRecord.getTst() + record.getTst());
+                    // 最多清兵数
+                    mapRecord.setMks(mapRecord.getMks() > record.getMks() ? mapRecord.getMks() : record.getMks());
+                    // 最大收集
+                    mapRecord.setMc(mapRecord.getMc() > record.getMc() ? mapRecord.getMc() : record.getMc());
+                    // 击杀总数
+                    mapRecord.setTk(mapRecord.getTk() + record.getTk());
+                    // 总清兵数
+                    mapRecord.setTks(mapRecord.getTks() + record.getTks());
+                    // 总救援
+                    mapRecord.setTs(mapRecord.getTs() + record.getTs());
+                    // 英雄最大连胜次数
+                    mapRecord.setMsw(mapRecord.getMsw() > record.getMsw() ? mapRecord.getMsw() : record.getMsw());
+                    // 英雄连胜次数
+                    mapRecord.setSw(mapRecord.getSw() > record.getSw() ? mapRecord.getSw() : record.getSw());
+                    // 英雄胜率（胜场数/总场数）
+                    mapRecord.setWinRate(new BigDecimal(mapRecord.getTw() / mapRecord.getNum()).setScale(2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)) + "%");
+                    recordMap.put(key, mapRecord);
+                }
+            }
         }
-        return resp;
+        profileInfo.setHeroRecord(new ArrayList<>(recordMap.values()));
+        return profileInfo;
     }
 
     private void buildOrderBy(SysGamePageReq query, LambdaQueryWrapper<SysGameEntity> queryWrap) {

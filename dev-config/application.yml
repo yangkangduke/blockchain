@@ -61,15 +61,6 @@ file:
       region: us-west-1 #美国
       cdn: derpo1ywdu54.cloudfront.net
 
-#file:
-  #bucketName: apeastgame # 上文创建的桶名称
-  #dirName: game
-    #oss:
-    #enable: true
-    #endpoint: https://apeastgame.s3.ap-northeast-1.amazonaws.com
-    #access-key: AKIAQMKUPROLJREE5AGN
-    #secret-key: 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
-
 email:
   enable: false
   host: email-smtp.ap-northeast-1.amazonaws.com
@@ -91,6 +82,7 @@ service:
     wallet: http://127.0.0.1:10104
     notification: http://127.0.0.1:10105
     game: http://127.0.0.1:10106
+    gateway: http://192.168.1.100:9999
 
 # Springboot Actuator
 management:

@@ -11,7 +11,10 @@ spring:
       buffer-memory: 33554432
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-
+      properties:
+        sasl.mechanism: PLAIN
+        security.protocol: SASL_PLAINTEXT
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
     consumer:
       group-id: tomge-consumer-group  # 默认消费者group id
       auto-offset-reset: latest
@@ -19,7 +22,10 @@ spring:
       auto-commit-interval: 100
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-
+      properties:
+        sasl.mechanism: PLAIN
+        security.protocol: SASL_PLAINTEXT
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
 
 redis:
   host: 35.76.116.54
@@ -44,14 +50,29 @@ file:
   bucketName: seeds # 上文创建的桶名称
   oss:
     enable: true
-    endpoint: http://127.0.0.1:9000
-    access-key: Seeds123!
-    secret-key: Seeds123!
+    endpoint: http://35.76.116.54:9000
+    access-key: seeds123!
+    secret-key: seeds123!
+  game:
+    access-key: AKIAQMKUPROLJREE5AGN
+    secret-key: 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
+    oss1:
+      bucketName: apeastgame
+      region: ap-northeast-1 #日本
+      cdn: d3ox6c0xknt324.cloudfront.net
+    oss2:
+      bucketName: euwestgame
+      region: eu-west-2 #欧洲
+      cdn: dttqy0ok22fnz.cloudfront.net
+    oss3:
+      bucketName: uswestgame
+      region: us-west-1 #美国
+      cdn: derpo1ywdu54.cloudfront.net
 
 email:
   enable: false
   host: email-smtp.ap-northeast-1.amazonaws.com
-  from: seeds<no-reply-dev@theseeds.io>
+  from: seeds<no-reply-uat@theseeds.io>
   user: AKIAQMKUPROLIXMNEIJK
   pass: BBTyucDgyIg8qIDU1ki5XT1x3JEZZSA3cK1FC96TO0r4
 
@@ -69,3 +90,4 @@ service:
     wallet: http://127.0.0.1:10104
     notification: http://127.0.0.1:10105
     game: http://127.0.0.1:10106
+    gateway: http://35.76.116.54:9999
