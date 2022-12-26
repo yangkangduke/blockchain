@@ -76,3 +76,4 @@ service:
     wallet: http://seeds-admin.app.prd.devseeds.link
     notification: http://seeds-admin.app.prd.devseeds.link
     game: http://seeds-admin.app.prd.devseeds.link
+    gateway: http://seeds-admin.app.prd.devseeds.link
