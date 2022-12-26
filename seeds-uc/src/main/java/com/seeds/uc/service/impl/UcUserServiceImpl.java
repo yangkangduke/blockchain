@@ -42,20 +42,22 @@ import com.seeds.uc.util.RandomUtil;
 import com.seeds.uc.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.redisson.api.RBucket;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.web3j.crypto.WalletUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -88,6 +90,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     private RemoteGameService adminRemoteGameService;
     @Autowired
     private RemoteRandomCodeService remoteRandomCodeService;
+    @Autowired
+    private KafkaTemplate kafkaTemplate;
 
     /**
      * 注册邮箱账号
@@ -156,6 +160,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     token,
                     userDto.getUid(),
                     userDto.getEmail(),
+                    loginReq.getUserIp(),
+                    loginReq.getServiceRegion(),
                     ClientAuthTypeEnum.GA);
             return LoginResp.builder()
                     .token(token)
@@ -170,6 +176,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     token,
                     userDto.getUid(),
                     userDto.getEmail(),
+                    loginReq.getUserIp(),
+                    loginReq.getServiceRegion(),
                     ClientAuthTypeEnum.EMAIL);
 
             return LoginResp.builder()
@@ -352,8 +360,40 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         } else {
             throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
         }
-
+        this.sendLoginMsg(twoFactorAuth.getAuthAccountName(), twoFactorAuth.getUserIp(), twoFactorAuth.getServiceRegion());
         return buildLoginResponse(user.getId(), twoFactorAuth.getAuthAccountName());
+    }
+
+    @Override
+    public void sendLoginMsg(String email, String userIp, String serviceRegion){
+        // 生产登陆成功消息
+        try {
+            Map loginMap = new HashMap<>();
+            loginMap.put("email", email);
+            loginMap.put("userIp", userIp);
+            loginMap.put("serviceRegion", serviceRegion);
+            ListenableFuture<SendResult> listenableFuture = kafkaTemplate.send("login_topic", loginMap.toString());
+            // 提供回调方法，可以监控消息的成功或失败的后续处理
+            listenableFuture.addCallback(new ListenableFutureCallback<SendResult>() {
+                @Override
+                public void onFailure(Throwable throwable) {
+                    log.info("发送消息失败，" + throwable.getMessage());
+                }
+                @Override
+                public void onSuccess(SendResult sendResult) {
+                    // 消息发送到的topic
+                    String topic = sendResult.getRecordMetadata().topic();
+                    // 消息发送到的分区
+                    int partition = sendResult.getRecordMetadata().partition();
+                    // 消息在分区内的offset
+                    long offset = sendResult.getRecordMetadata().offset();
+                    log.info(String.format("发送消息成功，topc：%s, partition: %s, offset：%s ", topic, partition, offset));
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -192,5 +192,12 @@ public interface IUcUserService extends IService<UcUser> {
      */
     ProfileInfoResp profileInfo(Long userId, Long gameId);
 
+    /**
+     * 发送登陆消息
+     * @param email
+     * @param userIp
+     * @param serviceRegion
+     */
+    void sendLoginMsg(String email, String userIp, String serviceRegion);
 }
 

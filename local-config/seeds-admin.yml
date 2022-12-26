@@ -9,11 +9,6 @@ spring:
     password: Seeds123!
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-management:
-  endpoints:
-    web:
-      base-path: /
-
 mybatis:
   type-aliases-package*: com.seeds.admin.entity
 
@@ -60,6 +55,3 @@ hystrix:
           thread:
             timeoutInMilliseconds: 5000
 
-Seeds-uc: http://127.0.0.1:10101
-Seeds-notification: http://127.0.0.1:10105
-Seeds-gateway: http://192.168.1.100:9999

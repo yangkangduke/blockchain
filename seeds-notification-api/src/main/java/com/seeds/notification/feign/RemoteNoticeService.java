@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * @author hewei
  * @date 2022/9/20
  */
-@FeignClient(name = "RemoteNoticeService", url = "${Seeds-notification}", path = "/internal-notice", configuration = {FeignInnerRequestInterceptor.class})
+@FeignClient(name = "RemoteNoticeService", url = "${service.url.notification}", path = "/internal-notice", configuration = {FeignInnerRequestInterceptor.class})
 public interface RemoteNoticeService {
 
     @PostMapping("/getNoticeList")

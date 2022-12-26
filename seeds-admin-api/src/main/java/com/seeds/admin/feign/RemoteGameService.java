@@ -21,7 +21,7 @@ import java.util.List;
  * @author hang.yu
  * @date 2022/8/22
  */
-@FeignClient(name = "remoteGameService", url = "${Seeds-admin}", fallback = RemoteGameServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteGameService", url = "${service.url.admin}", fallback = RemoteGameServiceImpl.class, configuration = {AdminFeignInnerRequestInterceptor.class})
 public interface RemoteGameService {
 
 	/**

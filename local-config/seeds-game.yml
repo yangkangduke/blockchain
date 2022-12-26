@@ -13,11 +13,6 @@ spring:
       filter:
         enabled: true
 
-management:
-  endpoints:
-    web:
-      base-path: /
-
 mybatis:
   type-aliases-package*: com.seeds.game.entity
 
@@ -42,5 +37,3 @@ hystrix:
           thread:
             timeoutInMilliseconds: 5000
 
-Seeds-uc: http://127.0.0.1:10101
-Seeds-admin: http://127.0.0.1:10102

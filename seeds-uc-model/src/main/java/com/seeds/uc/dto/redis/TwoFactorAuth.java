@@ -13,5 +13,7 @@ public class TwoFactorAuth implements Serializable {
     private Long expireAt;
     // the account name to 2FA check
     private String authAccountName;
+    private String userIp;
+    private String serviceRegion;
     private ClientAuthTypeEnum authType;
 }
