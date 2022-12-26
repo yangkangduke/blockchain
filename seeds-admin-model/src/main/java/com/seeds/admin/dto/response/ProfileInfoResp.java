@@ -20,14 +20,23 @@ public class ProfileInfoResp {
 	@ApiModelProperty(value = "请求状态")
 	private String ret;
 
+	@ApiModelProperty(value = "过期时间")
+	private Long expireTime;
+
 	@ApiModelProperty(value = "胜利总场次")
-	private Long winNum;
+	private Long winNum = 0L;
 
 	@ApiModelProperty(value = "最大连胜场次")
-	private Long maxSeqWin;
+	private Long maxSeqWin = 0L;
 
 	@ApiModelProperty(value = "战斗总场次")
-	private Long fightNum;
+	private Long fightNum = 0L;
+
+	@ApiModelProperty(value = "总积分")
+	private Long score = 0L;
+
+	@ApiModelProperty(value = "排名，-1表示未上榜")
+	private Long rank;
 
 	@ApiModelProperty(value = "英雄记录信息")
 	private List<GameHeroRecord> heroRecord;
@@ -37,55 +46,67 @@ public class ProfileInfoResp {
 	public static class GameHeroRecord {
 
 		@ApiModelProperty(value = "胜利总数")
-		private Long tw;
+		private Long tw = 0L;
 
 		@ApiModelProperty(value = "最大连杀数")
-		private Long msk;
+		private Long msk = 0L;
 
 		@ApiModelProperty(value = "最多救援")
-		private Long ms;
+		private Long ms = 0L;
 
 		@ApiModelProperty(value = "英雄使用次数")
-		private Long num;
+		private Long num = 0L;
 
 		@ApiModelProperty(value = "3S次数")
-		private Long tsss;
+		private Long tsss = 0L;
 
 		@ApiModelProperty(value = "最大得分")
-		private Long mts;
+		private Long mts = 0L;
 
 		@ApiModelProperty(value = "总收集")
-		private Long tc;
+		private Long tc = 0L;
 
 		@ApiModelProperty(value = "前几名总次数")
-		private Long ttn;
+		private Long ttn = 0L;
 
 		@ApiModelProperty(value = "最长存活时间")
-		private Long mst;
+		private Long mst = 0L;
 
 		@ApiModelProperty(value = "死亡总数")
-		private Long td;
+		private Long td = 0L;
 
 		@ApiModelProperty(value = "总存活时间")
-		private Long tst;
+		private Long tst = 0L;
 
 		@ApiModelProperty(value = "最多清兵数")
-		private Long mks;
+		private Long mks = 0L;
 
 		@ApiModelProperty(value = "最大收集")
-		private Long mc;
+		private Long mc = 0L;
 
 		@ApiModelProperty(value = "击杀总数")
-		private Long tk;
+		private Long tk = 0L;
 
 		@ApiModelProperty(value = "英雄id")
 		private Long id;
 
 		@ApiModelProperty(value = "总清兵数")
-		private Long tks;
+		private Long tks = 0L;
 
 		@ApiModelProperty(value = "总救援")
-		private Long ts;
+		private Long ts = 0L;
+
+		@ApiModelProperty(value = "英雄名字")
+		private String nm;
+
+		@ApiModelProperty(value = "英雄类型")
+		private Long ty;
+
+		@ApiModelProperty(value = "英雄最大连胜次数")
+		private Long msw = 0L;
+
+		@ApiModelProperty(value = "英雄连胜次数")
+		private Long sw = 0L;
 
 		@ApiModelProperty(value = "比赛胜率（胜场数/总场数）")
 		private String winRate;

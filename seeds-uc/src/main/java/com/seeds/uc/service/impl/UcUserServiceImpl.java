@@ -651,13 +651,21 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         // 先从redis缓存中拿个人概括数据
         String data = cacheService.getProfileInfo(userId.toString(), gameId.toString());
+        ProfileInfoResp resp = null;
         if (StringUtils.isNotBlank(data)) {
-            return JSONUtil.toBean(data, ProfileInfoResp.class);
+            resp = JSONUtil.toBean(data, ProfileInfoResp.class);
+            // 判断是否过期
+            if (resp.getExpireTime() > System.currentTimeMillis()) {
+                return resp;
+            }
         }
         // 请求游戏方获取个人游戏概括数据
         GenericDto<ProfileInfoResp> result = adminRemoteGameService.profileInfo(gameId, user.getEmail());
         if (!result.isSuccess()) {
-            throw new GenericException("Failed to get the profile info, please wait and try again!");
+            if (resp == null) {
+                throw new GenericException("Failed to get the profile info, please wait and try again!");
+            }
+            return resp;
         }
         // 设置redis个人游戏概括数据
         ProfileInfoResp newData = result.getData();
