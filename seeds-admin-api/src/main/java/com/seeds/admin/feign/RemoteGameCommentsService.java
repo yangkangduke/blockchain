@@ -25,7 +25,7 @@ import java.util.List;
  * @author hewei
  * @date 2022/8/26
  */
-@FeignClient(name = "remoteGamCommentsService", url = "${Seeds-admin}", path = "/internal-game-comments", configuration = {AdminFeignInnerRequestInterceptor.class})
+@FeignClient(name = "remoteGamCommentsService", url = "${service.url.admin}", path = "/internal-game-comments", configuration = {AdminFeignInnerRequestInterceptor.class})
 public interface RemoteGameCommentsService {
 
 	@PostMapping("page")

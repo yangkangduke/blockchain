@@ -1,8 +1,8 @@
 spring:
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 1024MB
+      max-file-size: 5GB
+      max-request-size: 5GB
   kafka:
     bootstrap-servers: 192.168.1.101:9092
     producer:
@@ -11,6 +11,7 @@ spring:
       buffer-memory: 33554432
       key-serializer: org.apache.kafka.common.serialization.StringSerializer # 生产者消息key和消息value的序列化处理类
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
     consumer:
       group-id: tomge-consumer-group  # 默认消费者group id
       auto-offset-reset: latest
@@ -18,7 +19,6 @@ spring:
       auto-commit-interval: 100
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-
 redis:
   host: 192.168.1.101
   port: 6379
@@ -45,6 +45,21 @@ file:
     endpoint: http://192.168.1.101:9000
     access-key: seeds123!
     secret-key: seeds123!
+  game:
+    access-key: AKIAQMKUPROLJREE5AGN
+    secret-key: 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
+    oss1:
+      bucketName: apeastgame
+      region: ap-northeast-1 #日本
+      cdn: d3ox6c0xknt324.cloudfront.net
+    oss2:
+      bucketName: euwestgame
+      region: eu-west-2 #欧洲
+      cdn: dttqy0ok22fnz.cloudfront.net
+    oss3:
+      bucketName: uswestgame
+      region: us-west-1 #美国
+      cdn: derpo1ywdu54.cloudfront.net
 
 email:
   enable: false
@@ -68,6 +83,23 @@ service:
     notification: http://127.0.0.1:10105
     game: http://127.0.0.1:10106
 
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+# Springboot Actuator
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: caches,health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+    httptrace:
+      enabled: true
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}

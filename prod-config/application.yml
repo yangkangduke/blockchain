@@ -36,9 +36,24 @@ file:
   bucketName: seeds # 上文创建的桶名称
   oss:
     enable: true
-    endpoint: https://theseeds.s3.ap-east-1.amazonaws.com
+    endpoint: http://3.114.69.251:9000
+    access-key: seeds123!
+    secret-key: seeds123!
+  game:
     access-key: AKIAQMKUPROLJREE5AGN
     secret-key: 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
+    oss1:
+      bucketName: apeastgame
+      region: ap-northeast-1 #日本
+      cdn: d3ox6c0xknt324.cloudfront.net
+    oss2:
+      bucketName: euwestgame
+      region: eu-west-2 #欧洲
+      cdn: dttqy0ok22fnz.cloudfront.net
+    oss3:
+      bucketName: uswestgame
+      region: us-west-1 #美国
+      cdn: derpo1ywdu54.cloudfront.net
 
 email:
   enable: true
@@ -57,3 +72,7 @@ service:
   url:
     uc: http://seeds-uc.app.prd.devseeds.link
     admin: http://seeds-admin.app.prd.devseeds.link
+    account: http://seeds-admin.app.prd.devseeds.link
+    wallet: http://seeds-admin.app.prd.devseeds.link
+    notification: http://seeds-admin.app.prd.devseeds.link
+    game: http://seeds-admin.app.prd.devseeds.link
