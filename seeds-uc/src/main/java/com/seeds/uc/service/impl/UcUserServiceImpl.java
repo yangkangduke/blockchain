@@ -2,6 +2,7 @@ package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -9,10 +10,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.seeds.admin.dto.request.RandomCodeUseReq;
+import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.admin.feign.RemoteRandomCodeService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.RandomCodeType;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.*;
 import com.seeds.uc.dto.request.*;
@@ -21,6 +25,7 @@ import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.dto.response.UserRegistrationResp;
 import com.seeds.uc.enums.*;
+import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.LoginException;
 import com.seeds.uc.mapper.UcSecurityStrategyMapper;
@@ -40,9 +45,13 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.web3j.crypto.WalletUtils;
@@ -78,7 +87,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Autowired
     private IUsUserLoginLogService userLoginLogService;
     @Autowired
+    private RemoteGameService adminRemoteGameService;
+    @Autowired
     private RemoteRandomCodeService remoteRandomCodeService;
+    @Autowired
+    private KafkaTemplate kafkaTemplate;
 
     /**
      * 注册邮箱账号
@@ -147,6 +160,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     token,
                     userDto.getUid(),
                     userDto.getEmail(),
+                    loginReq.getUserIp(),
+                    loginReq.getServiceRegion(),
                     ClientAuthTypeEnum.GA);
             return LoginResp.builder()
                     .token(token)
@@ -161,6 +176,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     token,
                     userDto.getUid(),
                     userDto.getEmail(),
+                    loginReq.getUserIp(),
+                    loginReq.getServiceRegion(),
                     ClientAuthTypeEnum.EMAIL);
 
             return LoginResp.builder()
@@ -343,8 +360,40 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         } else {
             throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
         }
-
+        this.sendLoginMsg(twoFactorAuth.getAuthAccountName(), twoFactorAuth.getUserIp(), twoFactorAuth.getServiceRegion());
         return buildLoginResponse(user.getId(), twoFactorAuth.getAuthAccountName());
+    }
+
+    @Override
+    public void sendLoginMsg(String email, String userIp, String serviceRegion){
+        // 生产登陆成功消息
+        try {
+            Map loginMap = new HashMap<>();
+            loginMap.put("email", email);
+            loginMap.put("userIp", userIp);
+            loginMap.put("serviceRegion", serviceRegion);
+            ListenableFuture<SendResult> listenableFuture = kafkaTemplate.send("login_topic", loginMap.toString());
+            // 提供回调方法，可以监控消息的成功或失败的后续处理
+            listenableFuture.addCallback(new ListenableFutureCallback<SendResult>() {
+                @Override
+                public void onFailure(Throwable throwable) {
+                    log.info("发送消息失败，" + throwable.getMessage());
+                }
+                @Override
+                public void onSuccess(SendResult sendResult) {
+                    // 消息发送到的topic
+                    String topic = sendResult.getRecordMetadata().topic();
+                    // 消息发送到的分区
+                    int partition = sendResult.getRecordMetadata().partition();
+                    // 消息在分区内的offset
+                    long offset = sendResult.getRecordMetadata().offset();
+                    log.info(String.format("发送消息成功，topc：%s, partition: %s, offset：%s ", topic, partition, offset));
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -629,5 +678,30 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         resp.setTotalRegisteredUsers(total);
         resp.setTodayRegisteredUsers(todayCount);
         return resp;
+    }
+
+    @Override
+    public ProfileInfoResp profileInfo(Long userId, Long gameId) {
+        if (userId == null) {
+            userId = UserContext.getCurrentUserId();
+        }
+        UcUser user = getById(userId);
+        if (user == null || StringUtils.isEmpty(user.getEmail())) {
+            throw new GenericException("Game account not exits!");
+        }
+        // 先从redis缓存中拿个人概括数据
+        String data = cacheService.getProfileInfo(userId.toString(), gameId.toString());
+        if (StringUtils.isNotBlank(data)) {
+            return JSONUtil.toBean(data, ProfileInfoResp.class);
+        }
+        // 请求游戏方获取个人游戏概括数据
+        GenericDto<ProfileInfoResp> result = adminRemoteGameService.profileInfo(gameId, user.getEmail());
+        if (!result.isSuccess()) {
+            throw new GenericException("Failed to get the profile info, please wait and try again!");
+        }
+        // 设置redis个人游戏概括数据
+        ProfileInfoResp newData = result.getData();
+        cacheService.putProfileInfo(userId.toString(), gameId.toString(), newData);
+        return newData;
     }
 }

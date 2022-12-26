@@ -15,15 +15,19 @@ import com.seeds.common.web.oss.FileTemplate;
 import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * aws-s3 通用存储操作 支持所有兼容s3协议的云存储: {阿里云OSS，腾讯云COS，七牛云，京东云，minio 等}
@@ -34,18 +38,23 @@ import java.util.*;
 @RequiredArgsConstructor
 @Component
 @Primary
+@Slf4j
 public class OssTemplate implements InitializingBean, FileTemplate {
 
 	private final FileProperties properties;
 
 	private AmazonS3 amazonS3;
+	private AmazonS3 gameoss1;
+	private AmazonS3 gameoss2;
+	private AmazonS3 gameoss3;
 
 	/**
 	 * 创建bucket
+	 *
 	 * @param bucketName bucket名称
 	 */
 	@Override
-    @SneakyThrows
+	@SneakyThrows
 	public void createBucket(String bucketName) {
 		if (!amazonS3.doesBucketExistV2(bucketName)) {
 			amazonS3.createBucket((bucketName));
@@ -212,6 +221,14 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	}
 
 	@Override
+	public void removeObject(String objectName) throws Exception {
+		gameoss1.deleteObject(properties.getGame().getOss1().getBucketName(), objectName);
+		gameoss2.deleteObject(properties.getGame().getOss2().getBucketName(), objectName);
+		gameoss3.deleteObject(properties.getGame().getOss3().getBucketName(), objectName);
+
+	}
+
+	@Override
 	public void afterPropertiesSet() {
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
 		clientConfiguration.setMaxConnections(properties.getOss().getMaxConnections());
@@ -220,10 +237,150 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 				properties.getOss().getEndpoint(), properties.getOss().getRegion());
 		AWSCredentials awsCredentials = new BasicAWSCredentials(properties.getOss().getAccessKey(),
 				properties.getOss().getSecretKey());
+		AWSCredentials gameCredentails = new BasicAWSCredentials(properties.getGame().getAccessKey(),
+				properties.getGame().getSecretKey());
 		AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
+		AWSCredentialsProvider awsGameCredentialsProvider = new AWSStaticCredentialsProvider(gameCredentails);
 		this.amazonS3 = AmazonS3Client.builder().withEndpointConfiguration(endpointConfiguration)
 				.withClientConfiguration(clientConfiguration).withCredentials(awsCredentialsProvider)
 				.disableChunkedEncoding().withPathStyleAccessEnabled(properties.getOss().getPathStyleAccess()).build();
+
+
+		this.gameoss1 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
+				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss1().getRegion())
+				.enablePathStyleAccess()
+				.build();
+		this.gameoss2 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
+				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss2().getRegion())
+				.enablePathStyleAccess()
+				.build();
+		this.gameoss3 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
+				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss3().getRegion())
+				.enablePathStyleAccess()
+				.build();
 	}
 
+	/**
+	 * 分段上传文件至S3
+	 */
+	@Override
+	@Async
+	public void uploadMultipartFileByPart(MultipartFile file, String bucketName, String objectName) {
+
+		//声明线程池
+		ExecutorService exec = Executors.newFixedThreadPool(8);
+		File toFile = multipartFileToFile(file);
+		long size = file.getSize();
+		int minPartSize = 25 * 1024 * 1024;
+		// 得到总共的段数，和 分段后，每个段的开始上传的字节位置
+		List<Long> positions = Collections.synchronizedList(new ArrayList<>());
+		long filePosition = 0;
+		while (filePosition < size) {
+			positions.add(filePosition);
+			filePosition += Math.min(minPartSize, (size - filePosition));
+		}
+		log.info("总大小：{}，分为{}段", size, positions.size());
+		// 创建一个列表保存所有分传的 PartETag, 在分段完成后会用到
+		List<PartETag> partETags = Collections.synchronizedList(new ArrayList<>());
+		//第一步，初始化，声明下面将有一个 Multipart Upload
+		ObjectMetadata objectMetadata = new ObjectMetadata();
+		objectMetadata.setContentType(file.getContentType());
+		InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, objectName, objectMetadata);
+		//设置公共读取权限
+		initRequest.withCannedACL(CannedAccessControlList.PublicRead);
+		InitiateMultipartUploadResult initResponse = gameoss1.initiateMultipartUpload(initRequest);
+		log.info("开始上传");
+		long begin = System.currentTimeMillis();
+		try {
+			for (int i = 0; i < positions.size(); i++) {
+				int finalI = i;
+				exec.execute(() -> {
+					long time1 = System.currentTimeMillis();
+					UploadPartRequest uploadRequest = new UploadPartRequest()
+							.withBucketName(bucketName)
+							.withKey(objectName)
+							.withUploadId(initResponse.getUploadId())
+							.withPartNumber(finalI + 1)
+							.withFileOffset(positions.get(finalI))
+							.withFile(toFile)
+							.withPartSize(Math.min(minPartSize, (size - positions.get(finalI))));
+					// 第二步，上传分段，并把当前段的 PartETag 放到列表中
+					partETags.add(gameoss1.uploadPart(uploadRequest).getPartETag());
+					long time2 = System.currentTimeMillis();
+					log.info("第{}段上传耗时：{}", finalI + 1, (time2 - time1) + "ms");
+				});
+			}
+			//任务结束关闭线程池
+			exec.shutdown();
+			//判断线程池是否结束，不加会直接结束方法
+			while (true) {
+				if (exec.isTerminated()) {
+					break;
+				}
+			}
+
+			// 第三步，完成上传，合并分段
+			CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(bucketName, objectName,
+					initResponse.getUploadId(), partETags);
+			gameoss1.completeMultipartUpload(compRequest);
+			//删除本地缓存文件
+			toFile.delete();
+		} catch (Exception e) {
+			gameoss1.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName, objectName, initResponse.getUploadId()));
+			log.error("Failed to upload {}, " + e.getMessage());
+		}
+		long end = System.currentTimeMillis();
+		log.info("总上传耗时：{}", (end - begin) + "ms");
+	}
+
+	@Override
+	public List<S3ObjectSummary> getAllObjects() {
+
+
+		ObjectListing japanList = gameoss1.listObjects(properties.getGame().getOss1().getBucketName());
+		//ObjectListing euList = gameoss2.listObjects(properties.getGame().getOss2().getBucketName());
+		//ObjectListing usList = gameoss3.listObjects(properties.getGame().getOss3().getBucketName());
+		return new ArrayList<>(japanList.getObjectSummaries());
+	}
+
+
+	@Override
+	@SneakyThrows
+	public List<S3ObjectSummary> getAllObjectsByPrefix(String bucketName, String prefix) {
+
+		ListObjectsV2Request request = new ListObjectsV2Request().withBucketName(bucketName).withPrefix(prefix);
+		ListObjectsV2Result listObjectsV2Result = gameoss1.listObjectsV2(request);
+		return new ArrayList<>(listObjectsV2Result.getObjectSummaries());
+	}
+
+	/**
+	 * MultipartFile 转 File
+	 */
+	public static File multipartFileToFile(MultipartFile file) {
+		File toFile = null;
+		if (file.equals("") || file.getSize() <= 0) {
+			file = null;
+		} else {
+
+			try {
+				InputStream ins = null;
+				ins = file.getInputStream();
+				String name = file.getOriginalFilename();
+				String substring = name.substring(name.lastIndexOf("/") + 1);
+				toFile = new File(substring);
+				//获取流文件
+				OutputStream os = new FileOutputStream(toFile);
+				int bytesRead = 0;
+				byte[] buffer = new byte[8192];
+				while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
+					os.write(buffer, 0, bytesRead);
+				}
+				os.close();
+				ins.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return toFile;
+	}
 }

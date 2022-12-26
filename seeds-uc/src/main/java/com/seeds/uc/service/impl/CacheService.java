@@ -1,6 +1,8 @@
 package com.seeds.uc.service.impl;
 
 
+import cn.hutool.json.JSONUtil;
+import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.uc.constant.UcRedisKeysConstant;
 import com.seeds.uc.dto.redis.*;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
@@ -55,6 +57,9 @@ public class CacheService {
     @Value("${uc.metamask.expire:300}")
     private Integer metamaskAuthExpireAfter;
 
+    @Value("${uc.profile.info.expire:10}")
+    private Integer profileInfoExpireAfter;
+
     @Autowired
     private RedissonClient redisson;
 
@@ -64,6 +69,8 @@ public class CacheService {
     public void put2FAInfoWithTokenAndUserAndAuthType(String token,
                                                       Long userId,
                                                       String name,
+                                                      String userIp,
+                                                      String serviceRegion,
                                                       ClientAuthTypeEnum authTypeEnum) {
         Long expireAt = System.currentTimeMillis() + twoFaCodeExpireAfter * 1000;
         String key = UcRedisKeysConstant.getUcTwoFactorTokenKey(token);
@@ -72,6 +79,8 @@ public class CacheService {
                 TwoFactorAuth.builder()
                         .userId(userId)
                         .authAccountName(name)
+                        .userIp(userIp)
+                        .serviceRegion(serviceRegion)
                         .authType(authTypeEnum)
                         .expireAt(expireAt)
                         .build();
@@ -313,5 +322,17 @@ public class CacheService {
         String key = UcRedisKeysConstant.getUcSecurityAuthTokenKeyTemplate(token);
         RBucket<SecurityAuth> securityAuthRBucket = redisson.getBucket(key);
         return securityAuthRBucket.get();
+    }
+
+    public String getProfileInfo(String userId, String gameId) {
+        String key = UcRedisKeysConstant.getProfileInfoTemplate(userId, gameId);
+        RBucket<String> bucket = redisson.getBucket(key);
+        return bucket.get();
+    }
+
+    public void putProfileInfo(String userId, String gameId, ProfileInfoResp data) {
+        String key = UcRedisKeysConstant.getProfileInfoTemplate(userId, gameId);
+        RBucket<String> bucket = redisson.getBucket(key);
+        bucket.set(JSONUtil.toJsonStr(data), profileInfoExpireAfter, TimeUnit.MINUTES);
     }
 }

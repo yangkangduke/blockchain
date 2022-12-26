@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.request.SysGamePageReq;
 import com.seeds.admin.dto.response.GameWinRankResp;
+import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.enums.WhetherEnum;
@@ -75,6 +76,13 @@ public class InterGameController {
     @Inner
     public GenericDto<List<GameWinRankResp.GameWinRank>> winRankInfo(@RequestBody GameWinRankReq query) {
         return GenericDto.success(sysGameService.winRankInfo(query));
+    }
+
+    @GetMapping("profile-info")
+    @ApiOperation("获取个人游戏概括信息")
+    @Inner
+    public GenericDto<ProfileInfoResp> profileInfo(@RequestParam Long gameId, @RequestParam String email) {
+        return GenericDto.success(sysGameService.profileInfo(gameId, email));
     }
 
 }

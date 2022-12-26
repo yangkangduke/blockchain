@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -50,6 +51,8 @@ public class AuthController {
     private CacheService cacheService;
     @Autowired
     private IUsUserLoginLogService userLoginLogService;
+    @Autowired
+    private KafkaTemplate kafkaTemplate;
 
 
     @PostMapping("/register/email")
@@ -78,14 +81,17 @@ public class AuthController {
     @ApiOperation(value = "账号登陆", notes = "1.调用/auth/login接口，返回token和authType " +
             "2.调用/auth/2fa/login，参数authCode填的值根据上一个接口返回的authType来决定，如果是2就填email的验证码，如果是3就填ga的验证码， 返回的ucToken就是登陆成功的凭证 ")
     public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
+        String email = loginReq.getEmail();
         // 校验是否需要2FA认证
         //获取用户真实ip地址
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String clientIp = WebUtil.getIpAddr(request);
-        if (userLoginLogService.checkNeed2FA(loginReq.getEmail(), clientIp)) {
+        // 不需要进行2FA
+        if (userLoginLogService.checkNeed2FA(email, clientIp)) {
             // 校验账号、密码
             UserDto userDto = ucUserService.verifyLogin(loginReq);
             LoginResp login = ucUserService.buildLoginResponse(userDto.getUid(), userDto.getEmail());
+            ucUserService.sendLoginMsg(email, loginReq.getUserIp(), loginReq.getServiceRegion());
             return GenericDto.success(login);
         }
 

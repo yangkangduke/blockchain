@@ -1,6 +1,7 @@
 package com.seeds.uc.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthTokenDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
@@ -182,5 +183,21 @@ public interface IUcUserService extends IService<UcUser> {
     List<UcUserResp> getUserList(List<Long> ids);
 
     UserRegistrationResp getUserRegistration();
+
+    /**
+     * 获取个人游戏概括信息
+     * @param userId 用户id
+     * @param gameId 游戏id
+     * @return 概括信息
+     */
+    ProfileInfoResp profileInfo(Long userId, Long gameId);
+
+    /**
+     * 发送登陆消息
+     * @param email
+     * @param userIp
+     * @param serviceRegion
+     */
+    void sendLoginMsg(String email, String userIp, String serviceRegion);
 }
 

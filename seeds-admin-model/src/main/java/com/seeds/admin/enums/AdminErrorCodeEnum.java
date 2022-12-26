@@ -87,13 +87,18 @@ public enum AdminErrorCodeEnum {
 
     // block chain
 
-    ERR_90001_FAIL_TO_EXECUTE_ON_CHAIN(90001,"区块链操作失败", "chain operation failed"),
+    ERR_90001_FAIL_TO_EXECUTE_ON_CHAIN(90001, "区块链操作失败", "chain operation failed"),
 
     //dict data
-    ERR_100001_DICT_DATA_ALREADY_EXIST(100001,"字典已经存在","Dict data code already exist"),
+    ERR_100001_DICT_DATA_ALREADY_EXIST(100001, "字典已经存在", "Dict data code already exist"),
 
     //org
     ERR_110001_ORG_PARENT_ITSELF(110001, "上级组织不能为自身", "Parent org cannot be for itself"),
+
+    //游戏资源相关
+    ERR_120001_CANNOT_DELETE_RESOURCE_IN_ENABLE_STATE(120001, "不能删除启用状态的资源", "Cannot delete resource in enable state"),
+
+    ERR_120002_THERE_MUST_BE_AT_LEAST_ONE_ENABLED_DATA(120002, "至少得启用一条记录", "There must be at least one enabled data"),
     ;
 
     @JsonValue
