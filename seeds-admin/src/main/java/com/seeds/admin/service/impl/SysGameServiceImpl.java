@@ -246,9 +246,9 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         for (String rankUrl : rankUrls) {
             String params = String.format("startRow=%s&endRow=%s", query.getStartRow(), query.getEndRow() * 2);
             rankUrl = rankUrl + "?" + params;
-            log.info("开始请求游戏胜场排行榜数据， params:{}", params);
+            log.info("开始请求游戏胜场排行榜数据， url:{}， params:{}", rankUrl, params);
             HttpResponse response = HttpRequest.get(rankUrl)
-                    .timeout(5 * 60 * 1000)
+                    .timeout(10 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
             String body = response.body();
@@ -301,9 +301,9 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         for (String rankUrl : rankUrls) {
             String params = String.format("accName=%s", email);
             rankUrl = rankUrl + "?" + params;
-            log.info("开始请求个人游戏概括信息数据，params:{}", params);
+            log.info("开始请求个人游戏概括信息数据， url:{}， params:{}", rankUrl, params);
             HttpResponse response = HttpRequest.get(rankUrl)
-                    .timeout(5 * 60 * 1000)
+                    .timeout(10 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
             String body = response.body();
