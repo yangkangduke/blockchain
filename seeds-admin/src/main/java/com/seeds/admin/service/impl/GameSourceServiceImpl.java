@@ -231,7 +231,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         List<SysGameSourceEntity> entityList = list(queryWrap);
 
         List<String> paths = entityList.stream().map(SysGameSourceEntity::getFileName).collect(Collectors.toList());
-        List<GameSrcResp> filePathTree = getFilePathTree(paths);
+        List<GameSrcResp> filePathTree = getFilePathTree(paths, entityList);
 
         filePathTree = filePathTree.stream().map(p -> {
             GameSrcResp gameSrcResp = new GameSrcResp();
@@ -348,7 +348,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
     }
 
 
-    public static List<GameSrcResp> getFilePathTree(List<String> paths) {
+    private List<GameSrcResp> getFilePathTree(List<String> paths, List<SysGameSourceEntity> entityList) {
         Map<String, Integer> map = new LinkedHashMap<>();
         Integer id = 1;
         for (int i = 0; i < paths.size(); i++) {
@@ -362,32 +362,43 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
             }
         }
 
-        List<GameSrcResp> menus = new ArrayList<>();
+        List<GameSrcResp> srcResps = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : map.entrySet()) {
-            GameSrcResp menu = new GameSrcResp();
+            GameSrcResp srcResp = new GameSrcResp();
             Integer values = entry.getValue();
             String[] keys = entry.getKey().split("/");
-            menu.setVId(values);
+            srcResp.setVId(values);
             if (keys.length == 1) {
-                menu.setVParentId(0);
-                menu.setFileName(keys[0]);
-                menu.setFilePath(keys[0]);
+                srcResp.setVParentId(0);
+                srcResp.setFileName(keys[0]);
+                srcResp.setFilePath(keys[0]);
             } else {
                 String path = "";
                 for (int i = 0; i < keys.length - 1; i++) {
                     path += keys[i] + "/";
                 }
-                menu.setFileName(keys[keys.length - 1]);
-                menu.setFilePath(String.join("/", keys));
+                srcResp.setFileName(keys[keys.length - 1]);
+                srcResp.setFilePath(String.join("/", keys));
                 path = path.substring(0, path.length() - 1);
-                menu.setVParentId(map.get(path));
+                srcResp.setVParentId(map.get(path));
             }
-            menus.add(menu);
+            for (SysGameSourceEntity entity : entityList) {
+                if (entity.getFileName().equals(srcResp.getFilePath())) {
+                    BeanUtils.copyProperties(entity, srcResp);
+                    srcResp.setOsName(OsTypeEnum.getNameByCode(entity.getOs()));
+                    srcResp.setSrcTypeName(GameSrcTypeEnum.getNameByCode(entity.getSrcType()));
+                    srcResp.setUploader(sysUserService.detail(entity.getCreatedBy()).getRealName());
+                    srcResp.setUpdatedBy(sysUserService.detail(entity.getUpdatedBy()).getRealName());
+                }
+            }
+
+
+            srcResps.add(srcResp);
         }
         //获取父节点
-        List<GameSrcResp> collect = menus.stream().filter(m -> m.getVParentId() == 0).map(
+        List<GameSrcResp> collect = srcResps.stream().filter(m -> m.getVParentId() == 0).map(
                 (m) -> {
-                    m.setChildList(getChildrens(m, menus));
+                    m.setChildList(getChildrens(m, srcResps));
                     return m;
                 }
         ).collect(Collectors.toList());
@@ -402,7 +413,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
      * @param all  所有节点
      * @return 根节点信息
      */
-    private static List<GameSrcResp> getChildrens(GameSrcResp root, List<GameSrcResp> all) {
+    private List<GameSrcResp> getChildrens(GameSrcResp root, List<GameSrcResp> all) {
         List<GameSrcResp> children = all.stream().filter(m -> {
             return Objects.equals(m.getVParentId(), root.getVId());
         }).map((m) -> {
