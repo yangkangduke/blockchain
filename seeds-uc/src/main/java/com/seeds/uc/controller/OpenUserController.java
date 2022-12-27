@@ -40,6 +40,7 @@ import javax.validation.Valid;
  */
 @RestController
 @Api(tags = "用户")
+@Slf4j
 public class OpenUserController {
 
     @Autowired
