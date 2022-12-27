@@ -20,6 +20,9 @@ public class GameWinRankResp {
 	@ApiModelProperty(value = "请求状态")
 	private String ret;
 
+	@ApiModelProperty(value = "过期时间")
+	private Long expireTime;
+
 	@ApiModelProperty(value = "排行榜数据")
 	private List<GameWinRank> infos;
 
@@ -31,10 +34,10 @@ public class GameWinRankResp {
 		private Long accID;
 
 		@ApiModelProperty(value = "总场数")
-		private Long fightNum;
+		private Long fightNum = 0L;
 
 		@ApiModelProperty(value = "最高连胜场数")
-		private Long maxSeqWin;
+		private Long maxSeqWin = 0L;
 
 		@ApiModelProperty(value = "玩家昵称")
 		private String nickName;
@@ -49,10 +52,10 @@ public class GameWinRankResp {
 		private String portraitUrl;
 
 		@ApiModelProperty(value = "总积分")
-		private Long score;
+		private Long score = 0L;
 
 		@ApiModelProperty(value = "总胜利场数")
-		private Long winNum;
+		private Long winNum = 0L;
 
 	}
 

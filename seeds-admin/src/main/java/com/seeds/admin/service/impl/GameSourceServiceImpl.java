@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -83,22 +84,36 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                 // 上传S3
                 template.uploadMultipartFileByPart(file, gameBucketName, objectName);
 
-                // 记录资源信息
-                SysGameSourceEntity gameSrc = new SysGameSourceEntity();
-                gameSrc.setSrcType(req.getSrcType());
-                gameSrc.setFileName(originalFilename);
-                gameSrc.setOs(req.getOs());
-                gameSrc.setSrcSize(getPrintSize(file.getSize()));
-                gameSrc.setS3Path(objectName);
-                gameSrc.setJapanUrl(getFileUrl(properties.getGame().getOss1().getCdn(), objectName));
-                gameSrc.setEuUrl(getFileUrl(properties.getGame().getOss2().getCdn(), objectName));
-                gameSrc.setUsUrl(getFileUrl(properties.getGame().getOss3().getCdn(), objectName));
-                gameSrc.setRemark(req.getRemark());
-                gameSrc.setCreatedAt(System.currentTimeMillis());
-                gameSrc.setUpdatedAt(System.currentTimeMillis());
-                gameSrc.setCreatedBy(UserContext.getCurrentAdminUserId());
-                gameSrc.setStatus(WhetherEnum.NO.value());
-                save(gameSrc);
+                LambdaQueryWrapper<SysGameSourceEntity> wrapper = new LambdaQueryWrapper<SysGameSourceEntity>().eq(SysGameSourceEntity::getFileName, originalFilename);
+                SysGameSourceEntity one = this.getOne(wrapper);
+
+                if (Objects.isNull(one)) {
+                    // 记录资源信息
+                    SysGameSourceEntity gameSrc = new SysGameSourceEntity();
+                    gameSrc.setSrcType(req.getSrcType());
+                    gameSrc.setFileName(originalFilename);
+                    gameSrc.setOs(req.getOs());
+                    gameSrc.setSrcSize(getPrintSize(file.getSize()));
+                    gameSrc.setS3Path(objectName);
+                    gameSrc.setJapanUrl(getFileUrl(properties.getGame().getOss1().getCdn(), objectName));
+                    gameSrc.setEuUrl(getFileUrl(properties.getGame().getOss2().getCdn(), objectName));
+                    gameSrc.setUsUrl(getFileUrl(properties.getGame().getOss3().getCdn(), objectName));
+                    gameSrc.setRemark(req.getRemark());
+                    gameSrc.setCreatedAt(System.currentTimeMillis());
+                    gameSrc.setUpdatedAt(System.currentTimeMillis());
+                    gameSrc.setCreatedBy(UserContext.getCurrentAdminUserId());
+                    if (req.getSrcType().equals(GameSrcTypeEnum.PATCH_PK.getCode())) {
+                        gameSrc.setStatus(WhetherEnum.YES.value());
+                    } else {
+                        gameSrc.setStatus(WhetherEnum.NO.value());
+                    }
+                    save(gameSrc);
+                } else {
+                    //更新
+                    one.setUpdatedAt(System.currentTimeMillis());
+                    one.setUpdatedBy(UserContext.getCurrentAdminUserId());
+                    this.updateById(one);
+                }
                 log.info("文件url，{}", "https://" + properties.getGame().getOss1().getCdn() + "/" + objectName);
             } catch (Exception e) {
                 log.error("文件上传失败，fileName={},e={}", originalFilename, e.getMessage());
@@ -229,6 +244,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
             resp.setOsName(OsTypeEnum.getNameByCode(p.getOs()));
             resp.setSrcTypeName(GameSrcTypeEnum.getNameByCode(p.getSrcType()));
             resp.setUploader(sysUserService.detail(p.getCreatedBy()).getRealName());
+            resp.setUpdatedBy(sysUserService.detail(p.getUpdatedBy()).getRealName());
             return resp;
         });
     }
@@ -243,7 +259,9 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         if (req.getStatus().equals(WhetherEnum.NO.value())) {
 
             long count = this.count(new QueryWrapper<SysGameSourceEntity>().lambda().eq(SysGameSourceEntity::getStatus, WhetherEnum.YES.value())
+                    .eq(SysGameSourceEntity::getSrcType, src.getSrcType())
                     .eq(SysGameSourceEntity::getOs, src.getOs()));
+
             if ((count == 1 && src.getStatus().equals(WhetherEnum.YES.value())) && (src.getSrcType().equals(GameSrcTypeEnum.MAIN_VIDEO.getCode()) || src.getSrcType().equals(GameSrcTypeEnum.INSTALL_PK.getCode()))) {
                 throw new GenericException(AdminErrorCodeEnum.ERR_120002_THERE_MUST_BE_AT_LEAST_ONE_ENABLED_DATA);
             }

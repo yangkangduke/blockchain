@@ -8,6 +8,11 @@ import com.seeds.admin.mapper.SysGameApiMapper;
 import com.seeds.admin.service.SysGameApiService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 /**
  * 游戏api
@@ -33,6 +38,19 @@ public class SysGameApiServiceImpl extends ServiceImpl<SysGameApiMapper, SysGame
                 .eq(SysGameApiEntity::getGameId, gameId)
                 .eq(SysGameApiEntity::getType, type);
         return getOne(queryWrap);
+    }
+
+    @Override
+    public List<String> queryUrlByGameAndType(Long gameId, Integer type) {
+        SysGameApiEntity gameApi = queryByGameAndType(gameId, type);
+        String baseUrl = gameApi.getBaseUrl();
+        List<String> urls = new ArrayList<>();
+        if (baseUrl.contains("|")) {
+            urls = Arrays.stream(baseUrl.split("\\|")).map(p -> p + gameApi.getApi()).collect(Collectors.toList());
+        } else {
+            urls.add(baseUrl + gameApi.getApi());
+        }
+        return urls;
     }
 }
 

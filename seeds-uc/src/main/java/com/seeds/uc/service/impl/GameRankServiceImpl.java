@@ -15,7 +15,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +24,6 @@ import java.util.concurrent.TimeUnit;
  * @date 2020/8/2
  */
 @Slf4j
-@Transactional
 @Service
 public class GameRankServiceImpl implements GameRankService {
 
@@ -43,17 +41,28 @@ public class GameRankServiceImpl implements GameRankService {
         // 先从redis缓存中拿排行榜数据
         RBucket<String> bucket = redissonClient.getBucket(UcRedisKeysConstant.getGameWinRankTemplate(query.getGameId().toString()));
         String data = bucket.get();
+        GameWinRankResp resp = null;
         if (StringUtils.isNotBlank(data)) {
-            return JSONUtil.toList(data, GameWinRankResp.GameWinRank.class);
+            resp = JSONUtil.toBean(data, GameWinRankResp.class);
+            // 判断是否过期
+            if (resp.getExpireTime() > System.currentTimeMillis()) {
+                return resp.getInfos();
+            }
         }
         // 请求游戏方获取排行榜数据
         GenericDto<List<GameWinRankResp.GameWinRank>> result = adminRemoteGameService.winRankInfo(query);
         if (!result.isSuccess()) {
-            throw new GenericException("Failed to get the win list, please wait and try again!");
+            if (resp == null) {
+                throw new GenericException("Failed to get the win list, please wait and try again!");
+            }
+            return resp.getInfos();
         }
         // 设置redis排行榜缓存
         List<GameWinRankResp.GameWinRank> newData = result.getData();
-        bucket.set(JSONUtil.toJsonStr(result.getData()), winRankExpireAfter, TimeUnit.MINUTES);
+        resp = new GameWinRankResp();
+        resp.setInfos(newData);
+        resp.setExpireTime(System.currentTimeMillis() + winRankExpireAfter * 60 * 1000);
+        bucket.set(JSONUtil.toJsonStr(resp), winRankExpireAfter, TimeUnit.DAYS);
         return newData;
     }
 }
