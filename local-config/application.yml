@@ -42,12 +42,9 @@ file:
   bucketName: seeds # 上文创建的桶名称
   oss:
     enable: true
-    #endpoint: http://192.168.1.101:9000
-    #access-key: seeds123!
-    #secret-key: seeds123!
-    endpoint: https://theseeds.s3.ap-east-1.amazonaws.com
-    access-key: AKIAQMKUPROLJREE5AGN
-    secret-key: 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
+    endpoint: http://192.168.1.101:9000
+    access-key: seeds123!
+    secret-key: seeds123!
   game:
     access-key: AKIAQMKUPROLJREE5AGN
     secret-key: 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
