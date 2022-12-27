@@ -91,7 +91,7 @@ public class AuthController {
             // 校验账号、密码
             UserDto userDto = ucUserService.verifyLogin(loginReq);
             LoginResp login = ucUserService.buildLoginResponse(userDto.getUid(), userDto.getEmail());
-            ucUserService.sendLoginMsg(email, loginReq.getUserIp(), loginReq.getServiceRegion());
+//            ucUserService.sendLoginMsg(email, loginReq.getUserIp(), loginReq.getServiceRegion());
             return GenericDto.success(login);
         }
 

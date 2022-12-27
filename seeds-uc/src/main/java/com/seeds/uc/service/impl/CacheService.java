@@ -69,8 +69,6 @@ public class CacheService {
     public void put2FAInfoWithTokenAndUserAndAuthType(String token,
                                                       Long userId,
                                                       String name,
-                                                      String userIp,
-                                                      String serviceRegion,
                                                       ClientAuthTypeEnum authTypeEnum) {
         Long expireAt = System.currentTimeMillis() + twoFaCodeExpireAfter * 1000;
         String key = UcRedisKeysConstant.getUcTwoFactorTokenKey(token);
@@ -79,8 +77,6 @@ public class CacheService {
                 TwoFactorAuth.builder()
                         .userId(userId)
                         .authAccountName(name)
-                        .userIp(userIp)
-                        .serviceRegion(serviceRegion)
                         .authType(authTypeEnum)
                         .expireAt(expireAt)
                         .build();

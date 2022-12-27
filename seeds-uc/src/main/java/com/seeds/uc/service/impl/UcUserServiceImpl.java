@@ -160,8 +160,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     token,
                     userDto.getUid(),
                     userDto.getEmail(),
-                    loginReq.getUserIp(),
-                    loginReq.getServiceRegion(),
                     ClientAuthTypeEnum.GA);
             return LoginResp.builder()
                     .token(token)
@@ -176,8 +174,6 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     token,
                     userDto.getUid(),
                     userDto.getEmail(),
-                    loginReq.getUserIp(),
-                    loginReq.getServiceRegion(),
                     ClientAuthTypeEnum.EMAIL);
 
             return LoginResp.builder()
@@ -360,7 +356,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         } else {
             throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
         }
-        this.sendLoginMsg(twoFactorAuth.getAuthAccountName(), twoFactorAuth.getUserIp(), twoFactorAuth.getServiceRegion());
+//        this.sendLoginMsg(twoFactorAuth.getAuthAccountName(), twoFactorAuth.getUserIp(), twoFactorAuth.getServiceRegion());
         return buildLoginResponse(user.getId(), twoFactorAuth.getAuthAccountName());
     }
 

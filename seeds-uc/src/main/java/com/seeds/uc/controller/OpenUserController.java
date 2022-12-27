@@ -23,6 +23,7 @@ import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +52,7 @@ public class OpenUserController {
     private SendCodeService sendCodeService;
 
 
-    @GetMapping("/info")
+    @GetMapping("/getInfo")
     @ApiOperation(value = "获取用户信息", notes = "获取用户信息")
     public GenericDto<UserInfoResp> getInfo(HttpServletRequest request) {
         // 获取当前登陆人信息
