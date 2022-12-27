@@ -47,7 +47,7 @@ file:
     #secret-key: seeds123!
     endpoint: https://theseeds.s3.ap-east-1.amazonaws.com
     access-key: AKIAQMKUPROLJREE5AGN
-    secret-key: OGsncX4nqcbn/NTMTExbzoaz+skv+2m5t0
+    secret-key: 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
   game:
     access-key: AKIAQMKUPROLJREE5AGN
     secret-key: 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
