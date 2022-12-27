@@ -15,6 +15,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -59,10 +60,12 @@ public class GameRankServiceImpl implements GameRankService {
         }
         // 设置redis排行榜缓存
         List<GameWinRankResp.GameWinRank> newData = result.getData();
-        resp = new GameWinRankResp();
-        resp.setInfos(newData);
-        resp.setExpireTime(System.currentTimeMillis() + winRankExpireAfter * 60 * 1000);
-        bucket.set(JSONUtil.toJsonStr(resp), winRankExpireAfter, TimeUnit.DAYS);
+        if (!CollectionUtils.isEmpty(newData)) {
+            resp = new GameWinRankResp();
+            resp.setInfos(newData);
+            resp.setExpireTime(System.currentTimeMillis() + winRankExpireAfter * 60 * 1000);
+            bucket.set(JSONUtil.toJsonStr(resp), winRankExpireAfter, TimeUnit.DAYS);
+        }
         return newData;
     }
 }
