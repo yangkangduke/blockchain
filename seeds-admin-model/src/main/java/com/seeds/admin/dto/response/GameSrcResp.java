@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author: hewei
  * @date 2022/12/17
@@ -23,6 +25,9 @@ public class GameSrcResp {
 
     @ApiModelProperty("文件名")
     private String fileName;
+
+    @ApiModelProperty("path")
+    private String filePath;
 
     @ApiModelProperty("操作系统 1 Windows; 2 mac")
     private Integer os;
@@ -52,7 +57,6 @@ public class GameSrcResp {
     private Long createdAt;
 
 
-
     @ApiModelProperty("上传人")
     private String uploader;
 
@@ -67,4 +71,12 @@ public class GameSrcResp {
 
     @ApiModelProperty("删除标记  1：启动   0：禁用")
     private Integer status;
+
+    @ApiModelProperty(value = "为了便于构造树形结构虚拟的id,不是数据库记录的id")
+    private Integer vId;
+
+    @ApiModelProperty(value = "为了便于构造树形结构虚拟的id")
+    private Integer vParentId;
+
+    private List<GameSrcResp> childList;
 }
