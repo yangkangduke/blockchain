@@ -709,7 +709,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         // 设置redis个人游戏概括数据
         ProfileInfoResp newData = result.getData();
-        cacheService.putProfileInfo(userId.toString(), gameId.toString(), newData);
+        if (newData != null) {
+            cacheService.putProfileInfo(userId.toString(), gameId.toString(), newData);
+        }
         return newData;
     }
 }
