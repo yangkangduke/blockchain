@@ -77,7 +77,7 @@ public class GameSourceController {
     @ApiImplicitParams(value = {
             @ApiImplicitParam(name = "fileName", value = "参数值传列表中对应列的key的值", dataType = "String")
     })
-    public GenericDto<Boolean> delete(@RequestParam(value = "fileName") String fileName) {
+    public GenericDto<Boolean> delete(@RequestParam(value = "fileName") String fileName) throws Exception {
         return GenericDto.success(gameFileService.delete(fileName));
     }
 

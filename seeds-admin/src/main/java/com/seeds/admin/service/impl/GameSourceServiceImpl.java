@@ -141,8 +141,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
     }
 
     @Override
-    public Boolean delete(String fileName) {
-        try {
+    public Boolean delete(String fileName) throws Exception {
             LambdaQueryWrapper<SysGameSourceEntity> wrapper = new QueryWrapper<SysGameSourceEntity>().lambda()
                     .eq(SysGameSourceEntity::getS3Path, fileName)
                     .eq(SysGameSourceEntity::getStatus, WhetherEnum.YES.value());
@@ -151,9 +150,6 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                 throw new GenericException(AdminErrorCodeEnum.ERR_120001_CANNOT_DELETE_RESOURCE_IN_ENABLE_STATE);
             }
             template.removeObject(fileName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return true;
     }
 

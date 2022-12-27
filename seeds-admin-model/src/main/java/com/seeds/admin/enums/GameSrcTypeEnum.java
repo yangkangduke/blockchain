@@ -13,7 +13,7 @@ public enum GameSrcTypeEnum {
 
     MAIN_VIDEO(1, "首页视频"),
     INSTALL_PK(2, "安装包"),
-    PATCH_PK(3, "补丁包");
+    PATCH_PK(3, "补丁");
 
     private Integer code;
     private String name;
