@@ -19,10 +19,6 @@ spring:
       auto-commit-interval: 100
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-#      properties:
-#        sasl.mechanism: PLAIN
-#        security.protocol: SASL_PLAINTEXT
-#        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="seeds123";
 
 redis:
   host: 35.76.116.54

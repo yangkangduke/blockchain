@@ -37,9 +37,9 @@ public class GameSourceController {
     private GameSourceService gameFileService;
 
 
-    @PostMapping("page")
-    @ApiOperation("游戏资源分页列表")
-    public GenericDto<IPage<GameSrcResp>> queryPage(@RequestBody SysGameSrcPageReq req) {
+    @PostMapping("list")
+    @ApiOperation("游戏资源列表")
+    public GenericDto<List<GameSrcResp>> queryPage(@RequestBody SysGameSrcPageReq req) {
         return GenericDto.success(gameFileService.queryPage(req));
     }
 

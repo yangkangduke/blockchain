@@ -27,7 +27,7 @@ public interface GameSourceService extends IService<SysGameSourceEntity> {
 
     List<GameSrcLinkResp> getLinks(String ip, Integer type);
 
-    IPage<GameSrcResp> queryPage(SysGameSrcPageReq req);
+    List<GameSrcResp> queryPage(SysGameSrcPageReq req);
 
 
     Boolean switchStatus(SwitchReq req);
