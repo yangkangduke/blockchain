@@ -272,6 +272,8 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             Long key = rank.getAccID();
             GameWinRankResp.GameWinRank mapRank = rankMap.get(key);
             if (mapRank == null) {
+                // 头像url
+                rank.setPortraitUrl(sysFileService.getFileUrl("game/" + gameApi.getDesc() + rank.getPortraitId() + ".jpg"));
                 rankMap.put(key, rank);
             } else {
                 // 总场数
@@ -336,11 +338,14 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             return null;
         }
         Map<Long, ProfileInfoResp.GameHeroRecord> recordMap = new HashMap<>(heroRecords.size());
+        List<ProfileInfoResp.GameHeroRecord> list = new ArrayList<>();
         if (!CollectionUtils.isEmpty(heroRecords)) {
             for (ProfileInfoResp.GameHeroRecord record : heroRecords) {
                 Long key = record.getId();
                 ProfileInfoResp.GameHeroRecord mapRecord = recordMap.get(key);
                 if (mapRecord == null) {
+                    // 英雄胜率（胜场数/总场数）
+                    record.setWinRate(new BigDecimal(record.getTw()).divide(new BigDecimal(record.getNum()), 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)) + "%");
                     recordMap.put(key, record);
                 } else {
                     // 胜利总数
@@ -380,12 +385,14 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
                     // 英雄连胜次数
                     mapRecord.setSw(mapRecord.getSw() > record.getSw() ? mapRecord.getSw() : record.getSw());
                     // 英雄胜率（胜场数/总场数）
-                    mapRecord.setWinRate(new BigDecimal(mapRecord.getTw() / mapRecord.getNum()).setScale(2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)) + "%");
+                    mapRecord.setWinRate(new BigDecimal(mapRecord.getTw()).divide(new BigDecimal(mapRecord.getNum()), 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)) + "%");
                     recordMap.put(key, mapRecord);
                 }
             }
+            // 根据英雄游玩次数倒叙
+            list = recordMap.values().stream().sorted(Comparator.comparing(ProfileInfoResp.GameHeroRecord::getNum).reversed()).collect(Collectors.toList());
         }
-        profileInfo.setHeroRecord(new ArrayList<>(recordMap.values()));
+        profileInfo.setHeroRecord(list);
         return profileInfo;
     }
 

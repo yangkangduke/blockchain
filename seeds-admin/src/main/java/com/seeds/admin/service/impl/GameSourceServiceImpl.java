@@ -259,7 +259,9 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         if (req.getStatus().equals(WhetherEnum.NO.value())) {
 
             long count = this.count(new QueryWrapper<SysGameSourceEntity>().lambda().eq(SysGameSourceEntity::getStatus, WhetherEnum.YES.value())
+                    .eq(SysGameSourceEntity::getSrcType, src.getSrcType())
                     .eq(SysGameSourceEntity::getOs, src.getOs()));
+
             if ((count == 1 && src.getStatus().equals(WhetherEnum.YES.value())) && (src.getSrcType().equals(GameSrcTypeEnum.MAIN_VIDEO.getCode()) || src.getSrcType().equals(GameSrcTypeEnum.INSTALL_PK.getCode()))) {
                 throw new GenericException(AdminErrorCodeEnum.ERR_120002_THERE_MUST_BE_AT_LEAST_ONE_ENABLED_DATA);
             }
