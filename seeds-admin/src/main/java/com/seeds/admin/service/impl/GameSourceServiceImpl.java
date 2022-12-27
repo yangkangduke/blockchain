@@ -5,8 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.account.model.SwitchReq;
 import com.seeds.admin.dto.CountryContinentService;
@@ -32,10 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -223,7 +218,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
     }
 
     @Override
-    public IPage<GameSrcResp> queryPage(SysGameSrcPageReq req) {
+    public List<GameSrcResp> queryPage(SysGameSrcPageReq req) {
 
         LambdaQueryWrapper<SysGameSourceEntity> queryWrap = new LambdaQueryWrapper<>();
 
@@ -233,20 +228,26 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                 .orderByDesc(SysGameSourceEntity::getStatus)
                 .orderByDesc(SysGameSourceEntity::getCreatedAt);
 
-        Page<SysGameSourceEntity> page = new Page<>(req.getCurrent(), req.getSize());
-        List<SysGameSourceEntity> records = page(page, queryWrap).getRecords();
-        if (CollectionUtils.isEmpty(records)) {
-            return page.convert(p -> null);
-        }
-        return page.convert(p -> {
-            GameSrcResp resp = new GameSrcResp();
-            BeanUtils.copyProperties(p, resp);
-            resp.setOsName(OsTypeEnum.getNameByCode(p.getOs()));
-            resp.setSrcTypeName(GameSrcTypeEnum.getNameByCode(p.getSrcType()));
-            resp.setUploader(sysUserService.detail(p.getCreatedBy()).getRealName());
-            resp.setUpdatedBy(sysUserService.detail(p.getUpdatedBy()).getRealName());
-            return resp;
-        });
+        List<SysGameSourceEntity> entityList = list(queryWrap);
+
+        List<String> paths = entityList.stream().map(SysGameSourceEntity::getFileName).collect(Collectors.toList());
+        List<GameSrcResp> filePathTree = getFilePathTree(paths);
+
+        filePathTree = filePathTree.stream().map(p -> {
+            GameSrcResp gameSrcResp = new GameSrcResp();
+            BeanUtils.copyProperties(p, gameSrcResp);
+            for (SysGameSourceEntity entity : entityList) {
+                if (entity.getFileName().equals(p.getFilePath())) {
+                    BeanUtils.copyProperties(entity, gameSrcResp);
+                    gameSrcResp.setOsName(OsTypeEnum.getNameByCode(entity.getOs()));
+                    gameSrcResp.setSrcTypeName(GameSrcTypeEnum.getNameByCode(entity.getSrcType()));
+                    gameSrcResp.setUploader(sysUserService.detail(entity.getCreatedBy()).getRealName());
+                    gameSrcResp.setUpdatedBy(sysUserService.detail(entity.getUpdatedBy()).getRealName());
+                }
+            }
+            return gameSrcResp;
+        }).collect(Collectors.toList());
+        return filePathTree;
     }
 
     @Override
@@ -345,4 +346,72 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                     + String.valueOf((size % 100)) + "GB";
         }
     }
+
+
+    public static List<GameSrcResp> getFilePathTree(List<String> paths) {
+        Map<String, Integer> map = new LinkedHashMap<>();
+        Integer id = 1;
+        for (int i = 0; i < paths.size(); i++) {
+            String[] path = paths.get(i).split("/");
+            String p = "";
+            for (int j = 0; j < path.length; j++) {
+                p += path[j] + "/";
+                if (!map.containsKey(p.substring(0, p.length() - 1))) {
+                    map.put(p.substring(0, p.length() - 1), id++);
+                }
+            }
+        }
+
+        List<GameSrcResp> menus = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            GameSrcResp menu = new GameSrcResp();
+            Integer values = entry.getValue();
+            String[] keys = entry.getKey().split("/");
+            menu.setVId(values);
+            if (keys.length == 1) {
+                menu.setVParentId(0);
+                menu.setFileName(keys[0]);
+                menu.setFilePath(keys[0]);
+            } else {
+                String path = "";
+                for (int i = 0; i < keys.length - 1; i++) {
+                    path += keys[i] + "/";
+                }
+                menu.setFileName(keys[keys.length - 1]);
+                menu.setFilePath(String.join("/", keys));
+                path = path.substring(0, path.length() - 1);
+                menu.setVParentId(map.get(path));
+            }
+            menus.add(menu);
+        }
+        //获取父节点
+        List<GameSrcResp> collect = menus.stream().filter(m -> m.getVParentId() == 0).map(
+                (m) -> {
+                    m.setChildList(getChildrens(m, menus));
+                    return m;
+                }
+        ).collect(Collectors.toList());
+
+        return collect;
+    }
+
+    /**
+     * 递归查询子节点
+     *
+     * @param root 根节点
+     * @param all  所有节点
+     * @return 根节点信息
+     */
+    private static List<GameSrcResp> getChildrens(GameSrcResp root, List<GameSrcResp> all) {
+        List<GameSrcResp> children = all.stream().filter(m -> {
+            return Objects.equals(m.getVParentId(), root.getVId());
+        }).map((m) -> {
+                    m.setChildList(getChildrens(m, all));
+                    return m;
+                }
+        ).collect(Collectors.toList());
+        return children;
+    }
+
+
 }
