@@ -2,7 +2,6 @@ package com.seeds.gateway.config;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.support.NameUtils;
@@ -24,7 +23,6 @@ import java.util.List;
 @Component
 @Primary
 @AllArgsConstructor
-@ConditionalOnProperty(prefix = "swagger", value = {"enable"}, havingValue = "false")
 public class SwaggerResourceConfig implements SwaggerResourcesProvider {
 
     private static final String API_URI = "v2/api-docs";
