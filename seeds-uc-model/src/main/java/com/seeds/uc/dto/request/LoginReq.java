@@ -21,10 +21,7 @@ public class LoginReq {
     @ApiModelProperty(value = "密码", required = true)
     @NotBlank
     private String password;
-    @ApiModelProperty(value = "游戏登陆用户的ip")
-    private String userIp;
-    @ApiModelProperty(value = "游戏服务地区")
-    private String serviceRegion;
+
 
 
 }
