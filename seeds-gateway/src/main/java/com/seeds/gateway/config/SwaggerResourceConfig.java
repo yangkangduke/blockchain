@@ -6,6 +6,7 @@ import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.support.NameUtils;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import springfox.documentation.swagger.web.SwaggerResource;
 import springfox.documentation.swagger.web.SwaggerResourcesProvider;
@@ -23,6 +24,7 @@ import java.util.List;
 @Component
 @Primary
 @AllArgsConstructor
+@Profile("!main")
 public class SwaggerResourceConfig implements SwaggerResourcesProvider {
 
     private static final String API_URI = "v2/api-docs";
