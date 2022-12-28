@@ -72,3 +72,6 @@ spring:
             redis-rate-limiter.replenishRate: 5
             redis-rate-limiter.burstCapacity: 10
 
+swagger:
+  enable: true
+
