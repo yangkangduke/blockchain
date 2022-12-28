@@ -14,6 +14,7 @@ import com.seeds.admin.dto.response.GameFileResp;
 import com.seeds.admin.dto.response.GameSrcLinkResp;
 import com.seeds.admin.dto.response.GameSrcResp;
 import com.seeds.admin.entity.SysGameSourceEntity;
+import com.seeds.admin.entity.SysUserEntity;
 import com.seeds.admin.enums.*;
 import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.mapper.SysGameSourceMapper;
@@ -238,8 +239,10 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                     BeanUtils.copyProperties(entity, gameSrcResp);
                     gameSrcResp.setOsName(OsTypeEnum.getNameByCode(entity.getOs()));
                     gameSrcResp.setSrcTypeName(GameSrcTypeEnum.getNameByCode(entity.getSrcType()));
-                    gameSrcResp.setUploader(sysUserService.detail(entity.getCreatedBy()).getRealName());
-                    gameSrcResp.setUpdatedBy(sysUserService.detail(entity.getUpdatedBy()).getRealName());
+                    SysUserEntity creator = sysUserService.getById(entity.getCreatedBy());
+                    gameSrcResp.setUploader(Objects.isNull(creator) ? "" : creator.getRealName());
+                    SysUserEntity updater = sysUserService.getById(entity.getUpdatedBy());
+                    gameSrcResp.setUpdatedBy(Objects.isNull(updater) ? "" : updater.getRealName());
                 }
             }
             return gameSrcResp;
