@@ -78,7 +78,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
             try {
 
                 // 上传S3
-                template.uploadMultipartFileByPart(file, gameBucketName, objectName);
+                template.uploadMultipartFileByPart(file.getInputStream(), file.getContentType(), file.getOriginalFilename(), gameBucketName, objectName,file.getSize());
 
                 LambdaQueryWrapper<SysGameSourceEntity> wrapper = new LambdaQueryWrapper<SysGameSourceEntity>().eq(SysGameSourceEntity::getFileName, originalFilename);
                 SysGameSourceEntity one = this.getOne(wrapper);

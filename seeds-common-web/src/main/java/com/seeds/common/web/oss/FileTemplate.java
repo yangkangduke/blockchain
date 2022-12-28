@@ -4,7 +4,6 @@ import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.List;
@@ -92,11 +91,14 @@ public interface FileTemplate extends InitializingBean {
 	/**
 	 * 分片上传文件
 	 *
-	 * @param key        bucket名称
-	 * @param objectName 文件名称
+	 * @param contentType
+	 * @param originalFilename
+	 * @param key              bucket名称
+	 * @param objectName       文件名称
+	 * @param size
 	 * @throws Exception
 	 */
-	void uploadMultipartFileByPart(MultipartFile file, String key, String objectName);
+	void uploadMultipartFileByPart(InputStream in, String contentType, String originalFilename, String key, String objectName, long size);
 
 	/**
 	 * 获取三个区域下的所有文件

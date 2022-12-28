@@ -21,7 +21,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.URL;
@@ -265,12 +264,11 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	 */
 	@Override
 	@Async
-	public void uploadMultipartFileByPart(MultipartFile file, String bucketName, String objectName) {
+	public void uploadMultipartFileByPart(InputStream in, String contentType, String originalFilename, String bucketName, String objectName, long size) {
 
 		//声明线程池
 		ExecutorService exec = Executors.newFixedThreadPool(8);
-		File toFile = multipartFileToFile(file);
-		long size = file.getSize();
+		File toFile = multipartFileToFile(in, originalFilename);
 		int minPartSize = 25 * 1024 * 1024;
 		// 得到总共的段数，和 分段后，每个段的开始上传的字节位置
 		List<Long> positions = Collections.synchronizedList(new ArrayList<>());
@@ -284,7 +282,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		List<PartETag> partETags = Collections.synchronizedList(new ArrayList<>());
 		//第一步，初始化，声明下面将有一个 Multipart Upload
 		ObjectMetadata objectMetadata = new ObjectMetadata();
-		objectMetadata.setContentType(file.getContentType());
+		objectMetadata.setContentType(contentType);
 		InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, objectName, objectMetadata);
 		//设置公共读取权限
 		initRequest.withCannedACL(CannedAccessControlList.PublicRead);
@@ -356,27 +354,21 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	/**
 	 * MultipartFile 转 File
 	 */
-	public static File multipartFileToFile(MultipartFile file) {
+	public static File multipartFileToFile(InputStream in, String name) {
 		File toFile = null;
-		if (file.equals("") || file.getSize() <= 0) {
-			file = null;
-		} else {
-
+		if (in != null) {
 			try {
-				InputStream ins = null;
-				ins = file.getInputStream();
-				String name = file.getOriginalFilename();
 				String substring = name.substring(name.lastIndexOf("/") + 1);
 				toFile = new File(substring);
 				//获取流文件
 				OutputStream os = new FileOutputStream(toFile);
 				int bytesRead = 0;
 				byte[] buffer = new byte[8192];
-				while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
+				while ((bytesRead = in.read(buffer, 0, 8192)) != -1) {
 					os.write(buffer, 0, bytesRead);
 				}
 				os.close();
-				ins.close();
+				in.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
