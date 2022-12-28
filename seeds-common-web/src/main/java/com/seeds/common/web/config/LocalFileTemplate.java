@@ -8,8 +8,6 @@ import com.seeds.common.web.oss.FileProperties;
 import com.seeds.common.web.oss.FileTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.InputStream;
@@ -147,7 +145,7 @@ public class LocalFileTemplate implements FileTemplate {
 	}
 
 	@Override
-	public void uploadMultipartFileByPart(MultipartFile file, String bucketName, String objectName) {
+	public void uploadMultipartFileByPart(InputStream file, String contentType, String originalFilename, String bucketName, String objectName, long size) {
 
 	}
 
