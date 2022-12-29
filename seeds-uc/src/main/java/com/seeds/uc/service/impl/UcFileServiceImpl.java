@@ -94,7 +94,7 @@ public class UcFileServiceImpl extends ServiceImpl<UcFileMapper, UcFile> impleme
         UcFileResp ucFileResp = UcFileResp.builder()
                 .bucketName(properties.getBucketName())
                 .objectName(objectName)
-                .url(String.format("/uc/file/%s/%s", properties.getBucketName(), objectName))
+                .url(String.format("/uc/public/file/%s/%s", properties.getBucketName(), objectName))
                 .build();
 
         try (InputStream inputStream = file.getInputStream()) {
