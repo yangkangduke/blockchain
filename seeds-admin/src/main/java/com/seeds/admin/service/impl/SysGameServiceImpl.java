@@ -267,9 +267,9 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         if (CollectionUtils.isEmpty(rankList)) {
             return Collections.emptyList();
         }
-        Map<Long, GameWinRankResp.GameWinRank> rankMap = new HashMap<>(rankList.size());
+        Map<String, GameWinRankResp.GameWinRank> rankMap = new HashMap<>(rankList.size());
         for (GameWinRankResp.GameWinRank rank : rankList) {
-            Long key = rank.getAccID();
+            String key = rank.getAccName();
             GameWinRankResp.GameWinRank mapRank = rankMap.get(key);
             // 头像url
             rank.setPortraitUrl(sysFileService.getFileUrl("game/" + rank.getPortraitId() + gameApi.getDesc()));
