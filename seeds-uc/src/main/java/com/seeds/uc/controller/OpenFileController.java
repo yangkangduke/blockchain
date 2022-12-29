@@ -57,10 +57,16 @@ public class OpenFileController {
         ucFileService.getFile(bucket, objectName, response);
     }
 
-    @DeleteMapping("delete/{id}")
-    @ApiOperation(value = "删除文件", notes = "删除文件")
-    public GenericDto<Boolean> delete(@PathVariable Long id) throws Exception {
-        return GenericDto.success(ucFileService.deleteFile(id));
+    @DeleteMapping("delete-by-id/{id}")
+    @ApiOperation(value = "通过id删除文件", notes = "通过id删除文件")
+    public GenericDto<Boolean> deleteFileById(@PathVariable Long id) throws Exception {
+        return GenericDto.success(ucFileService.deleteFileById(id));
+    }
+
+    @DeleteMapping("delete-by-name/{objectName}")
+    @ApiOperation(value = "通过名字删除文件", notes = "通过名字删除文件")
+    public GenericDto<Boolean> deleteFileByName(@PathVariable String objectName) throws Exception {
+        return GenericDto.success(ucFileService.deleteFileByName(objectName));
     }
 
 

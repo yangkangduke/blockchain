@@ -33,6 +33,9 @@ public class GameWinRankResp {
 		@ApiModelProperty(value = "玩家游戏id")
 		private Long accID;
 
+		@ApiModelProperty(value = "玩家账号")
+		private String accName;
+
 		@ApiModelProperty(value = "总场数")
 		private Long fightNum = 0L;
 
