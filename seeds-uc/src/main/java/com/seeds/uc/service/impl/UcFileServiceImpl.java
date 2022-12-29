@@ -5,6 +5,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.amazonaws.services.s3.model.S3Object;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.oss.FileProperties;
@@ -65,10 +66,21 @@ public class UcFileServiceImpl extends ServiceImpl<UcFileMapper, UcFile> impleme
      * @throws Exception
      */
     @Override
-    public Boolean deleteFile(Long id) throws Exception {
+    public Boolean deleteFileById(Long id) throws Exception {
         UcFile file = this.getById(id);
         fileTemplate.removeObject(properties.getBucketName(), file.getObjectName());
         return this.removeById(id);
+    }
+
+    /**
+     * 根据名字删除文件信息
+     */
+    @Override
+    public Boolean deleteFileByName(String objectName) throws Exception {
+        UcFile file = this.getOne(new QueryWrapper<UcFile>().lambda()
+                .eq(UcFile::getObjectName, objectName));
+        fileTemplate.removeObject(properties.getBucketName(), file.getObjectName());
+        return this.removeById(file.getId());
     }
 
     /**
