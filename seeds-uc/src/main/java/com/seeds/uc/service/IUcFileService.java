@@ -21,7 +21,12 @@ public interface IUcFileService extends IService<UcFile> {
     /**
      * 根据id删除文件信息
      */
-    Boolean deleteFile(Long id) throws Exception;
+    Boolean deleteFileById(Long id) throws Exception;
+
+    /**
+     * 根据名字删除文件信息
+     */
+    Boolean deleteFileByName(String objectName) throws Exception;
 
     /**
      * 上传

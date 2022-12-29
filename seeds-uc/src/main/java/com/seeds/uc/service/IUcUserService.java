@@ -95,6 +95,13 @@ public interface IUcUserService extends IService<UcUser> {
     Boolean updateNickname(String nickname, LoginUserDTO loginUser);
 
     /**
+     * 修改头像
+     * @param avatar
+     * @param loginUser
+     */
+    Boolean updateAvatar(String avatar, LoginUserDTO loginUser) throws Exception;
+
+    /**
      * 修改密码
      * @param userId
      * @param password
