@@ -72,6 +72,8 @@ public class UcUser implements Serializable {
     private String publicAddress;
     @ApiModelProperty("随机数，metamask登陆时使用")
     private String nonce;
+    @ApiModelProperty("头像")
+    private String avatar;
 
 
 }

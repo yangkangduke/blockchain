@@ -5,6 +5,7 @@ import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.redis.LoginUserDTO;
+import com.seeds.uc.dto.request.AvatarReq;
 import com.seeds.uc.dto.request.ChangePasswordReq;
 import com.seeds.uc.dto.request.NickNameReq;
 import com.seeds.uc.dto.response.UserInfoResp;
@@ -78,6 +79,15 @@ public class OpenUserController {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         return GenericDto.success(ucUserService.updateNickname(nickNameReq.getNickname(), loginUser));
+    }
+
+    @PutMapping("/change/avatar")
+    @ApiOperation(value = "修改头像", notes = "修改头像")
+    public GenericDto<Object> updateAvatar(@Valid @RequestBody AvatarReq avatarReq, HttpServletRequest request) throws Exception {
+        // 获取当前登陆人信息
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+        return GenericDto.success(ucUserService.updateAvatar(avatarReq.getAvatar(), loginUser));
     }
 
 

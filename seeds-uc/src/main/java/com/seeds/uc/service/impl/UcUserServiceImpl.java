@@ -30,12 +30,10 @@ import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.LoginException;
 import com.seeds.uc.mapper.UcSecurityStrategyMapper;
 import com.seeds.uc.mapper.UcUserMapper;
+import com.seeds.uc.model.UcFile;
 import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
-import com.seeds.uc.service.IGoogleAuthService;
-import com.seeds.uc.service.IUcUserService;
-import com.seeds.uc.service.IUsUserLoginLogService;
-import com.seeds.uc.service.SendCodeService;
+import com.seeds.uc.service.*;
 import com.seeds.uc.util.CryptoUtils;
 import com.seeds.uc.util.PasswordUtil;
 import com.seeds.uc.util.RandomUtil;
@@ -92,6 +90,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     private RemoteRandomCodeService remoteRandomCodeService;
     @Autowired
     private KafkaTemplate kafkaTemplate;
+    @Autowired
+    private IUcFileService ucFileService;
 
     /**
      * 注册邮箱账号
@@ -430,6 +430,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         Long userId = loginUser.getUserId();
         BeanUtil.copyProperties(this.getById(userId), userInfoResp);
         userInfoResp.setSecurityStrategyList(ucSecurityStrategyMapper.getByUserId(userId));
+        if (StringUtils.isNotBlank(userInfoResp.getAvatar())){
+            UcFile file = ucFileService.getOne(new QueryWrapper<UcFile>().lambda().eq(UcFile::getObjectName, userInfoResp.getAvatar()));
+            userInfoResp.setAvatarUrl(String.format("/uc/file/%s/%s", file.getBucketName(), userInfoResp.getAvatar()));
+        }
+
         return userInfoResp;
     }
 
@@ -444,6 +449,30 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return this.updateById(UcUser.builder()
                 .id(loginUser.getUserId())
                 .nickname(nickname)
+                .updatedAt(currentTime)
+                .build());
+    }
+
+    /**
+     * 修改头像
+     * @param avatar
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public Boolean updateAvatar(String avatar, LoginUserDTO loginUser) throws Exception {
+        // 查询原来的头像，如果有就先删除然后在添加
+        Long userId = loginUser.getUserId();
+        UcUser user = this.getById(userId);
+        String oldAvatar = user.getAvatar();
+        if (StringUtils.isNotBlank(oldAvatar)) {
+            ucFileService.deleteFileByName(oldAvatar);
+        }
+
+        long currentTime = System.currentTimeMillis();
+        return this.updateById(UcUser.builder()
+                .id(userId)
+                .avatar(avatar)
                 .updatedAt(currentTime)
                 .build());
     }
