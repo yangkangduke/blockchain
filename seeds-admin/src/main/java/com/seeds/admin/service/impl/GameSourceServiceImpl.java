@@ -110,6 +110,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                     one.setUpdatedAt(System.currentTimeMillis());
                     one.setUpdatedBy(UserContext.getCurrentAdminUserId());
                     one.setSrcSize(getPrintSize(file.getSize()));
+                    one.setRemark(req.getRemark());
                     this.updateById(one);
                 }
                 log.info("文件url，{}", "https://" + properties.getGame().getOss1().getCdn() + "/" + objectName);
