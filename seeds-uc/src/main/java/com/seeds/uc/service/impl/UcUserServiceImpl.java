@@ -432,7 +432,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         userInfoResp.setSecurityStrategyList(ucSecurityStrategyMapper.getByUserId(userId));
         if (StringUtils.isNotBlank(userInfoResp.getAvatar())){
             UcFile file = ucFileService.getOne(new QueryWrapper<UcFile>().lambda().eq(UcFile::getObjectName, userInfoResp.getAvatar()));
-            userInfoResp.setAvatarUrl(String.format("/uc/file/%s/%s", file.getBucketName(), userInfoResp.getAvatar()));
+            userInfoResp.setAvatarUrl(String.format("/uc/public/file/%s/%s", file.getBucketName(), userInfoResp.getAvatar()));
         }
 
         return userInfoResp;
