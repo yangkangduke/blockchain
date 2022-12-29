@@ -30,6 +30,7 @@ import com.seeds.uc.exceptions.InvalidArgumentsException;
 import com.seeds.uc.exceptions.LoginException;
 import com.seeds.uc.mapper.UcSecurityStrategyMapper;
 import com.seeds.uc.mapper.UcUserMapper;
+import com.seeds.uc.model.UcFile;
 import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.*;
@@ -429,6 +430,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         Long userId = loginUser.getUserId();
         BeanUtil.copyProperties(this.getById(userId), userInfoResp);
         userInfoResp.setSecurityStrategyList(ucSecurityStrategyMapper.getByUserId(userId));
+        if (StringUtils.isNotBlank(userInfoResp.getAvatar())){
+            UcFile file = ucFileService.getOne(new QueryWrapper<UcFile>().lambda().eq(UcFile::getObjectName, userInfoResp.getAvatar()));
+            userInfoResp.setAvatarUrl(String.format("/uc/file/%s/%s", file.getBucketName(), userInfoResp.getAvatar()));
+        }
+
         return userInfoResp;
     }
 

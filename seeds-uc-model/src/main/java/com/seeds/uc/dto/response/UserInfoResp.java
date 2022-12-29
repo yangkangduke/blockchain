@@ -25,6 +25,8 @@ public class UserInfoResp {
     private String nickname;
     @ApiModelProperty(value = "头像")
     private String avatar;
+    @ApiModelProperty(value = "头像url")
+    private String avatarUrl;
     @ApiModelProperty(value = "matemask地址")
     private String publicAddress;
     @ApiModelProperty(value = "创建时间（时间戳）")
