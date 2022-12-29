@@ -46,20 +46,20 @@ file:
     access-key: seeds123!
     secret-key: seeds123!
   game:
-    access-key: AKIAQMKUPROLJREE5AGN
-    secret-key: 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
+    access-key: AKIARE5ABL7ROKGNEWG4
+    secret-key: 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
     oss1:
-      bucketName: apeastgame
-      region: ap-northeast-1 #日本
-      cdn: d3ox6c0xknt324.cloudfront.net
+      bucketName: game1
+      region: cn-northwest-1 #宁夏
+      cdn: game1.s3.cn-northwest-1.amazonaws.com.cn
     oss2:
-      bucketName: euwestgame
-      region: eu-west-2 #欧洲
-      cdn: dttqy0ok22fnz.cloudfront.net
+      bucketName: game2
+      region: cn-north-1 #北京
+      cdn: game2.s3.cn-north-1.amazonaws.com.cn
     oss3:
-      bucketName: uswestgame
-      region: us-west-1 #美国
-      cdn: derpo1ywdu54.cloudfront.net
+      bucketName: game3
+      region: cn-north-1 #北京
+      cdn: game3.s3.cn-north-1.amazonaws.com.cn
 
 email:
   enable: false
