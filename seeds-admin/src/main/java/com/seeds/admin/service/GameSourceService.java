@@ -2,10 +2,7 @@ package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.account.model.SwitchReq;
-import com.seeds.admin.dto.request.FilePartReq;
-import com.seeds.admin.dto.request.SysGameSrcAddReq;
-import com.seeds.admin.dto.request.SysGameSrcPageReq;
-import com.seeds.admin.dto.request.UploadFileInfo;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.GameFileResp;
 import com.seeds.admin.dto.response.GameSrcLinkResp;
 import com.seeds.admin.dto.response.GameSrcResp;
@@ -42,5 +39,5 @@ public interface GameSourceService extends IService<SysGameSourceEntity> {
 
     String getPartUrl(FilePartReq req);
 
-    String completeMultipartUpload(FilePartReq req);
+    String completeMultipartUpload(CompleteUploadReq req);
 }

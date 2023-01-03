@@ -110,7 +110,7 @@ public interface FileTemplate extends InitializingBean {
 
 	String getPresignedUrl(String fileName, String bucketName);
 
-	String getPresignedUrl(String fileName, String bucketName, String uploadId, Integer partNumber, Long length);
+	String getPresignedUrl(String fileName, String bucketName, String uploadId, Integer partNumber);
 
 	InitiateMultipartUploadResult initiateMultipartUpload(String bucketName, String objectName, String contentType);
 

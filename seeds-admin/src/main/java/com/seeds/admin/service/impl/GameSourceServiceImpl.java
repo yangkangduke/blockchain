@@ -9,10 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.account.model.SwitchReq;
 import com.seeds.admin.dto.CountryContinentService;
-import com.seeds.admin.dto.request.FilePartReq;
-import com.seeds.admin.dto.request.SysGameSrcAddReq;
-import com.seeds.admin.dto.request.SysGameSrcPageReq;
-import com.seeds.admin.dto.request.UploadFileInfo;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.GameFileResp;
 import com.seeds.admin.dto.response.GameSrcLinkResp;
 import com.seeds.admin.dto.response.GameSrcResp;
@@ -328,11 +325,11 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
     @Override
     public String getPartUrl(FilePartReq req) {
         String gameBucketName = properties.getGame().getOss1().getBucketName();
-        return template.getPresignedUrl(req.getKey(), gameBucketName, req.getUploadId(), req.getPartNumber(), req.getContentLength());
+        return template.getPresignedUrl(req.getKey(), gameBucketName, req.getUploadId(), req.getPartNumber());
     }
 
     @Override
-    public String completeMultipartUpload(FilePartReq req) {
+    public String completeMultipartUpload(CompleteUploadReq req) {
         String gameBucketName = properties.getGame().getOss1().getBucketName();
         template.completeMultipartUpload(gameBucketName, req.getKey(), req.getUploadId());
         String fileUrl = getFileUrl(properties.getGame().getOss1().getCdn(), req.getKey());

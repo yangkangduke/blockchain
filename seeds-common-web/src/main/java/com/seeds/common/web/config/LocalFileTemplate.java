@@ -161,7 +161,7 @@ public class LocalFileTemplate implements FileTemplate {
 	}
 
 	@Override
-	public String getPresignedUrl(String fileName, String bucketName, String uploadId, Integer partNumber, Long length) {
+	public String getPresignedUrl(String fileName, String bucketName, String uploadId, Integer partNumber) {
 		return null;
 	}
 

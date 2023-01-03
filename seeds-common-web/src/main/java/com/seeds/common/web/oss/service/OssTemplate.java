@@ -354,7 +354,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	}
 
 	@Override
-	public String getPresignedUrl(String fileName, String bucketName, String uploadId, Integer partNumber, Long length) {
+	public String getPresignedUrl(String fileName, String bucketName, String uploadId, Integer partNumber) {
 		DateTime expiration = DateUtil.offsetHour(new Date(), 1);
 
 		HashMap<String, Object> params = new HashMap<>();

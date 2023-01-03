@@ -1,10 +1,7 @@
 package com.seeds.admin.controller;
 
 import com.seeds.account.model.SwitchReq;
-import com.seeds.admin.dto.request.FilePartReq;
-import com.seeds.admin.dto.request.SysGameSrcAddReq;
-import com.seeds.admin.dto.request.SysGameSrcPageReq;
-import com.seeds.admin.dto.request.UploadFileInfo;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.GameFileResp;
 import com.seeds.admin.dto.response.GameSrcResp;
 import com.seeds.admin.dto.response.PreUploadResp;
@@ -104,7 +101,7 @@ public class GameSourceController {
 
     @ApiOperation("完成分段上传")
     @PostMapping("/complete-upload")
-    public GenericDto<String> completeMultipartUpload(@RequestBody FilePartReq req) {
+    public GenericDto<String> completeMultipartUpload(@RequestBody CompleteUploadReq req) {
         return GenericDto.success(gameFileService.completeMultipartUpload(req));
     }
 }

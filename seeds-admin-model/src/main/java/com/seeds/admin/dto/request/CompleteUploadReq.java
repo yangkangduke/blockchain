@@ -7,8 +7,7 @@ import lombok.Data;
  * @date 2023/1/3
  */
 @Data
-public class FilePartReq {
+public class CompleteUploadReq {
     private String key;
     private String uploadId;
-    private Integer partNumber;
 }
