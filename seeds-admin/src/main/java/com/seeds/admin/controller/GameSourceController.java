@@ -83,8 +83,8 @@ public class GameSourceController {
 
     @PostMapping("/pre-upload")
     @ApiOperation("使用预签名URL上传，不分段")
-    public GenericDto<PreUploadResp> preUpload(@RequestParam("fileName") @NotEmpty String fileName) {
-        return GenericDto.success(gameFileService.preUpload(fileName));
+    public GenericDto<PreUploadResp> preUpload(@RequestBody UploadFileInfo req) {
+        return GenericDto.success(gameFileService.preUpload(req));
     }
 
 

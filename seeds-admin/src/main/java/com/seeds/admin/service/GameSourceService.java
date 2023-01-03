@@ -33,7 +33,7 @@ public interface GameSourceService extends IService<SysGameSourceEntity> {
 
     List<GameFileResp> getAllPatch();
 
-    PreUploadResp preUpload(String fileName);
+    PreUploadResp preUpload(UploadFileInfo req);
 
     PreUploadResp createUpload(UploadFileInfo req);
 

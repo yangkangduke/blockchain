@@ -1,6 +1,7 @@
 package com.seeds.admin.dto.response;
 
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -13,9 +14,15 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class PreUploadResp {
 
+    @ApiModelProperty(value = "文件的全路径名称", example = "game/video/test.mp4")
     private String key;
 
-    private String url;
+    @ApiModelProperty(value = "预签名URL")
+    private String preSignedUrl;
 
+    @ApiModelProperty(value = "上传id")
     private String uploadId;
+
+    @ApiModelProperty(value = "文件访问地址")
+    private String cndUrl;
 }

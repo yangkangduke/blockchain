@@ -303,12 +303,14 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
     }
 
     @Override
-    public PreUploadResp preUpload(String fileName) {
-
+    public PreUploadResp preUpload(UploadFileInfo req) {
         PreUploadResp resp = new PreUploadResp();
+        String objectName = handleObjectNamePrefix(req.getType());
+        String key = objectName + req.getFileName();
         String bucketName = properties.getGame().getOss1().getBucketName();
-        String presignedUrl = template.getPresignedUrl(fileName, bucketName);
-        resp.setKey(fileName).setUrl(presignedUrl);
+        String presignedUrl = template.getPresignedUrl(key, bucketName);
+        String fileUrl = getFileUrl(properties.getGame().getOss1().getCdn(), key);
+        resp.setKey(key).setPreSignedUrl(presignedUrl).setCndUrl(fileUrl);
         return resp;
     }
 
