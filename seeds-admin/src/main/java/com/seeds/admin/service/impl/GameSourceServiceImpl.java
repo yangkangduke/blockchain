@@ -2,17 +2,21 @@ package com.seeds.admin.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.account.model.SwitchReq;
 import com.seeds.admin.dto.CountryContinentService;
+import com.seeds.admin.dto.request.FilePartReq;
 import com.seeds.admin.dto.request.SysGameSrcAddReq;
 import com.seeds.admin.dto.request.SysGameSrcPageReq;
+import com.seeds.admin.dto.request.UploadFileInfo;
 import com.seeds.admin.dto.response.GameFileResp;
 import com.seeds.admin.dto.response.GameSrcLinkResp;
 import com.seeds.admin.dto.response.GameSrcResp;
+import com.seeds.admin.dto.response.PreUploadResp;
 import com.seeds.admin.entity.SysGameSourceEntity;
 import com.seeds.admin.entity.SysUserEntity;
 import com.seeds.admin.enums.*;
@@ -62,16 +66,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         String gameBucketName = properties.getGame().getOss1().getBucketName();
 
         for (MultipartFile file : files) {
-            String objectName = "game/";
-            if (req.getSrcType().equals(GameSrcTypeEnum.INSTALL_PK.getCode())) {
-                objectName += "packages/";
-            }
-            if (req.getSrcType().equals(GameSrcTypeEnum.MAIN_VIDEO.getCode())) {
-                objectName += "video/";
-            }
-            if (req.getSrcType().equals(GameSrcTypeEnum.PATCH_PK.getCode())) {
-                objectName += "patches/";
-            }
+            String objectName = handleObjectNamePrefix(req.getSrcType());
             String originalFilename = file.getOriginalFilename();
             objectName += originalFilename;
 
@@ -310,6 +305,40 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         return list;
     }
 
+    @Override
+    public PreUploadResp preUpload(String fileName) {
+
+        PreUploadResp resp = new PreUploadResp();
+        String bucketName = properties.getGame().getOss1().getBucketName();
+        String presignedUrl = template.getPresignedUrl(fileName, bucketName);
+        resp.setKey(fileName).setUrl(presignedUrl);
+        return resp;
+    }
+
+    @Override
+    public PreUploadResp createUpload(UploadFileInfo req) {
+        PreUploadResp resp = new PreUploadResp();
+        String gameBucketName = properties.getGame().getOss1().getBucketName();
+        String objectName = handleObjectNamePrefix(req.getType());
+        InitiateMultipartUploadResult initiateMultipartUpload = template.initiateMultipartUpload(gameBucketName, objectName + req.getFileName(), req.getContentType());
+        resp.setUploadId(initiateMultipartUpload.getUploadId()).setKey(initiateMultipartUpload.getKey());
+        return resp;
+    }
+
+    @Override
+    public String getPartUrl(FilePartReq req) {
+        String gameBucketName = properties.getGame().getOss1().getBucketName();
+        return template.getPresignedUrl(req.getKey(), gameBucketName, req.getUploadId(), req.getPartNumber(), req.getContentLength());
+    }
+
+    @Override
+    public String completeMultipartUpload(FilePartReq req) {
+        String gameBucketName = properties.getGame().getOss1().getBucketName();
+        template.completeMultipartUpload(gameBucketName, req.getKey(), req.getUploadId());
+        String fileUrl = getFileUrl(properties.getGame().getOss1().getCdn(), req.getKey());
+        return fileUrl;
+    }
+
     private String getFileUrl(String cdn, String objectName) {
         return String.format("https://%s/%s", cdn, objectName);
     }
@@ -426,5 +455,18 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         return children;
     }
 
+    private String handleObjectNamePrefix(Integer srcType) {
+        String objectName = "game/";
+        if (srcType.equals(GameSrcTypeEnum.INSTALL_PK.getCode())) {
+            objectName += "packages/";
+        }
+        if (srcType.equals(GameSrcTypeEnum.MAIN_VIDEO.getCode())) {
+            objectName += "video/";
+        }
+        if (srcType.equals(GameSrcTypeEnum.PATCH_PK.getCode())) {
+            objectName += "patches/";
+        }
+        return objectName;
+    }
 
 }

@@ -2,6 +2,7 @@ package com.seeds.common.web.config;
 
 import cn.hutool.core.io.FileUtil;
 import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.seeds.common.web.oss.FileProperties;
@@ -149,9 +150,29 @@ public class LocalFileTemplate implements FileTemplate {
 
 	}
 
-    @Override
-    public List<S3ObjectSummary> getAllObjects() {
+	@Override
+	public List<S3ObjectSummary> getAllObjects() {
+		return null;
+	}
+
+	@Override
+	public String getPresignedUrl(String fileName, String bucketName) {
+		return null;
+	}
+
+	@Override
+	public String getPresignedUrl(String fileName, String bucketName, String uploadId, Integer partNumber, Long length) {
+		return null;
+	}
+
+	@Override
+    public InitiateMultipartUploadResult initiateMultipartUpload(String bucketName, String objectName, String contentType) {
         return null;
+    }
+
+    @Override
+    public void completeMultipartUpload(String gameBucketName, String key, String uploadId) {
+
     }
 
 }

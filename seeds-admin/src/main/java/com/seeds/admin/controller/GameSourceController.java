@@ -1,11 +1,13 @@
 package com.seeds.admin.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.account.model.SwitchReq;
+import com.seeds.admin.dto.request.FilePartReq;
 import com.seeds.admin.dto.request.SysGameSrcAddReq;
 import com.seeds.admin.dto.request.SysGameSrcPageReq;
+import com.seeds.admin.dto.request.UploadFileInfo;
 import com.seeds.admin.dto.response.GameFileResp;
 import com.seeds.admin.dto.response.GameSrcResp;
+import com.seeds.admin.dto.response.PreUploadResp;
 import com.seeds.admin.service.GameSourceService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -81,9 +84,27 @@ public class GameSourceController {
         return GenericDto.success(gameFileService.delete(fileName));
     }
 
-//    @PostMapping("get-patch-from-s3")
-//    @ApiOperation("获取各个源S3上所有的补丁文件，不对接")
-//    public GenericDto<List<GameFileResp>> getAllPatch() {
-//        return GenericDto.success(gameFileService.getAllPatch());
-//    }
+    @PostMapping("/pre-upload")
+    public GenericDto<PreUploadResp> preUpload(@RequestParam("fileName") @NotEmpty String fileName) {
+        return GenericDto.success(gameFileService.preUpload(fileName));
+    }
+
+
+    @ApiOperation("创建分段上传")
+    @PostMapping("/create-upload")
+    public GenericDto<PreUploadResp> createUpload(@RequestBody UploadFileInfo req) {
+        return GenericDto.success(gameFileService.createUpload(req));
+    }
+
+    @ApiOperation("为某个分段生成预签名的URL")
+    @PostMapping("/get-part-url")
+    public GenericDto<String> getPartUrl(@RequestBody FilePartReq req) {
+        return GenericDto.success(gameFileService.getPartUrl(req));
+    }
+
+    @ApiOperation("完成分段上传")
+    @PostMapping("/complete-upload")
+    public GenericDto<String> completeMultipartUpload(@RequestBody FilePartReq req) {
+        return GenericDto.success(gameFileService.completeMultipartUpload(req));
+    }
 }

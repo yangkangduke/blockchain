@@ -1,6 +1,7 @@
 package com.seeds.common.web.oss;
 
 import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import org.springframework.beans.factory.InitializingBean;
@@ -106,4 +107,12 @@ public interface FileTemplate extends InitializingBean {
 	 * @return S3ObjectSummary 列表
 	 */
 	List<S3ObjectSummary> getAllObjects();
+
+	String getPresignedUrl(String fileName, String bucketName);
+
+	String getPresignedUrl(String fileName, String bucketName, String uploadId, Integer partNumber, Long length);
+
+	InitiateMultipartUploadResult initiateMultipartUpload(String bucketName, String objectName, String contentType);
+
+	void completeMultipartUpload(String gameBucketName, String key, String uploadId);
 }

@@ -1,7 +1,10 @@
 
 package com.seeds.common.web.oss.service;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -27,6 +30,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * aws-s3 通用存储操作 支持所有兼容s3协议的云存储: {阿里云OSS，腾讯云COS，七牛云，京东云，minio 等}
@@ -339,6 +343,61 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		//ObjectListing euList = gameoss2.listObjects(properties.getGame().getOss2().getBucketName());
 		//ObjectListing usList = gameoss3.listObjects(properties.getGame().getOss3().getBucketName());
 		return new ArrayList<>(japanList.getObjectSummaries());
+	}
+
+	@Override
+	public String getPresignedUrl(String fileName, String bucketName) {
+		// token设置1小时后过期
+		DateTime expiration = DateUtil.offsetHour(new Date(), 1);
+		URL url = gameoss1.generatePresignedUrl(new GeneratePresignedUrlRequest(bucketName, fileName).withExpiration(expiration).withMethod(HttpMethod.PUT));
+		return url.toString();
+	}
+
+	@Override
+	public String getPresignedUrl(String fileName, String bucketName, String uploadId, Integer partNumber, Long length) {
+		DateTime expiration = DateUtil.offsetHour(new Date(), 1);
+
+		HashMap<String, Object> params = new HashMap<>();
+		params.put("partNumber", partNumber);
+		params.put("uploadId", uploadId);
+		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, fileName)
+				.withExpiration(expiration)
+				.withMethod(HttpMethod.PUT);
+		generatePresignedUrlRequest.addRequestParameter("partNumber", String.valueOf(partNumber));
+		generatePresignedUrlRequest.addRequestParameter("uploadId", uploadId);
+		URL url = gameoss1.generatePresignedUrl(generatePresignedUrlRequest);
+		return url.toString();
+	}
+
+	@Override
+	public InitiateMultipartUploadResult initiateMultipartUpload(String bucketName, String objectName, String contentType) {
+
+		ObjectMetadata objectMetadata = new ObjectMetadata();
+		objectMetadata.setContentType(contentType);
+		InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, objectName, objectMetadata);
+		InitiateMultipartUploadResult initResponse = gameoss1.initiateMultipartUpload(initRequest);
+		return initResponse;
+	}
+
+	@Override
+	public void completeMultipartUpload(String gameBucketName, String key, String uploadId) {
+
+		// 获取已完成的 List<PartETag>
+		ListPartsRequest listPartsRequest = new ListPartsRequest(gameBucketName, key, uploadId);
+		PartListing partListing = gameoss1.listParts(listPartsRequest);
+		List<PartETag> partETags = partListing.getParts().stream().map(p -> {
+			PartETag partETag = new PartETag(p.getPartNumber(), p.getETag());
+			return partETag;
+		}).collect(Collectors.toList());
+
+
+		// 完成上传，合并分段
+		CompleteMultipartUploadRequest requset = new CompleteMultipartUploadRequest();
+		requset.setBucketName(gameBucketName);
+		requset.setKey(key);
+		requset.setUploadId(uploadId);
+		requset.setPartETags(partETags);
+		gameoss1.completeMultipartUpload(requset);
 	}
 
 
