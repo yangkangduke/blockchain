@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -104,5 +103,18 @@ public class GameSourceController {
     @PostMapping("/complete-upload")
     public GenericDto<String> completeMultipartUpload(@RequestBody CompleteUploadReq req) {
         return GenericDto.success(gameFileService.completeMultipartUpload(req));
+    }
+
+    @ApiOperation("中断上传")
+    @PostMapping("/abort-upload")
+    public GenericDto<Boolean> abortUpload(@RequestBody CompleteUploadReq req) {
+        return GenericDto.success(gameFileService.abortUpload(req));
+    }
+
+    @PostMapping("add-new")
+    @ApiOperation(value = "新增", notes = "前端直接上传，不再走后台上传逻辑")
+    public GenericDto<Boolean> add(List<SysGameSrcAddReq> reqs) {
+        gameFileService.add(reqs);
+        return GenericDto.success(null);
     }
 }

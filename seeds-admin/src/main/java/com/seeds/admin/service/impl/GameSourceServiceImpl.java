@@ -76,27 +76,8 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                 SysGameSourceEntity one = this.getOne(wrapper);
 
                 if (Objects.isNull(one)) {
-                    // 记录资源信息
-                    SysGameSourceEntity gameSrc = new SysGameSourceEntity();
-                    gameSrc.setSrcType(req.getSrcType());
-                    gameSrc.setFileName(originalFilename);
-                    gameSrc.setOs(req.getOs());
-                    gameSrc.setSrcSize(getPrintSize(file.getSize()));
-                    gameSrc.setS3Path(objectName);
-                    gameSrc.setJapanUrl(getFileUrl(properties.getGame().getOss1().getCdn(), objectName));
-                    gameSrc.setEuUrl(getFileUrl(properties.getGame().getOss2().getCdn(), objectName));
-                    gameSrc.setUsUrl(getFileUrl(properties.getGame().getOss3().getCdn(), objectName));
-                    gameSrc.setRemark(req.getRemark());
-                    gameSrc.setCreatedAt(System.currentTimeMillis());
-                    gameSrc.setUpdatedAt(System.currentTimeMillis());
-                    gameSrc.setCreatedBy(UserContext.getCurrentAdminUserId());
-                    gameSrc.setUpdatedBy(UserContext.getCurrentAdminUserId());
-                    if (req.getSrcType().equals(GameSrcTypeEnum.PATCH_PK.getCode())) {
-                        gameSrc.setStatus(WhetherEnum.YES.value());
-                    } else {
-                        gameSrc.setStatus(WhetherEnum.NO.value());
-                    }
-                    save(gameSrc);
+                    SysGameSourceEntity entity = this.handleEntity(req, objectName);
+                    save(entity);
                 } else {
                     //更新
                     one.setUpdatedAt(System.currentTimeMillis());
@@ -275,7 +256,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                     .eq(SysGameSourceEntity::getSrcType, src.getSrcType())
                     .eq(SysGameSourceEntity::getOs, src.getOs());
             List<SysGameSourceEntity> list = list(wrapper);
-            list.stream().forEach(p -> p.setStatus(WhetherEnum.NO.value()));
+            list.forEach(p -> p.setStatus(WhetherEnum.NO.value()));
             this.updateBatchById(list);
         }
         return true;
@@ -319,23 +300,58 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         PreUploadResp resp = new PreUploadResp();
         String gameBucketName = properties.getGame().getOss1().getBucketName();
         String objectName = handleObjectNamePrefix(req.getType());
-        InitiateMultipartUploadResult initiateMultipartUpload = template.initiateMultipartUpload(gameBucketName, objectName + req.getFileName(), req.getContentType());
+        InitiateMultipartUploadResult initiateMultipartUpload = null;
+        try {
+            initiateMultipartUpload = template.initiateMultipartUpload(gameBucketName, objectName + req.getFileName(), req.getContentType());
+        } catch (Exception e) {
+            log.info("创建分段上传失败，{}", e.getMessage());
+        }
         resp.setUploadId(initiateMultipartUpload.getUploadId()).setKey(initiateMultipartUpload.getKey());
         return resp;
     }
 
     @Override
     public String getPartUrl(FilePartReq req) {
+        String preSignedUrl = "";
         String gameBucketName = properties.getGame().getOss1().getBucketName();
-        return template.getPresignedUrl(req.getKey(), gameBucketName, req.getUploadId(), req.getPartNumber());
+        try {
+            preSignedUrl = template.getPresignedUrl(req.getKey(), gameBucketName, req.getUploadId(), req.getPartNumber());
+        } catch (Exception e) {
+            log.info("获取第{}段的预签名失败，{}", req.getPartNumber(), e.getMessage());
+        }
+        return preSignedUrl;
     }
 
     @Override
     public String completeMultipartUpload(CompleteUploadReq req) {
         String gameBucketName = properties.getGame().getOss1().getBucketName();
-        template.completeMultipartUpload(gameBucketName, req.getKey(), req.getUploadId());
-        String fileUrl = getFileUrl(properties.getGame().getOss1().getCdn(), req.getKey());
-        return fileUrl;
+        try {
+            template.completeMultipartUpload(gameBucketName, req.getKey(), req.getUploadId());
+        } catch (Exception e) {
+            log.info("完成上传合并分段失败，{}", e.getMessage());
+            template.abortUpload(gameBucketName, req.getKey(), req.getUploadId());
+        }
+        return getFileUrl(properties.getGame().getOss1().getCdn(), req.getKey());
+    }
+
+    @Override
+    public void add(List<SysGameSrcAddReq> reqs) {
+
+        List<SysGameSourceEntity> entityList = reqs.stream().map(p -> {
+            String objectName = handleObjectNamePrefix(p.getSrcType());
+            String originalFilename = p.getFileName();
+            objectName += originalFilename;
+            return this.handleEntity(p, objectName);
+        }).collect(Collectors.toList());
+
+        this.saveBatch(entityList);
+    }
+
+    @Override
+    public Boolean abortUpload(CompleteUploadReq req) {
+        String gameBucketName = properties.getGame().getOss1().getBucketName();
+        template.abortUpload(gameBucketName, req.getKey(), req.getUploadId());
+        return true;
     }
 
     private String getFileUrl(String cdn, String objectName) {
@@ -344,14 +360,11 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
 
     /**
      * 字节转kb/mb/gb
-     *
-     * @param size
-     * @return
      */
     public String getPrintSize(long size) {
         //如果字节数少于1024，则直接以B为单位，否则先除于1024，后3位因太少无意义
         if (size < 1024) {
-            return String.valueOf(size) + "B";
+            return size + "B";
         } else {
             size = size / 1024;
         }
@@ -359,7 +372,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         //因为还没有到达要使用另一个单位的时候
         //接下去以此类推
         if (size < 1024) {
-            return String.valueOf(size) + "KB";
+            return size + "KB";
         } else {
             size = size / 1024;
         }
@@ -367,25 +380,25 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
             //因为如果以MB为单位的话，要保留最后1位小数，
             //因此，把此数乘以100之后再取余
             size = size * 100;
-            return String.valueOf((size / 100)) + "."
-                    + String.valueOf((size % 100)) + "MB";
+            return size / 100 + "."
+                    + size % 100 + "MB";
         } else {
             //否则如果要以GB为单位的，先除于1024再作同样的处理
             size = size * 100 / 1024;
-            return String.valueOf((size / 100)) + "."
-                    + String.valueOf((size % 100)) + "GB";
+            return size / 100 + "."
+                    + size % 100 + "GB";
         }
     }
 
 
     private List<GameSrcResp> getFilePathTree(List<String> paths, List<SysGameSourceEntity> entityList) {
         Map<String, Integer> map = new LinkedHashMap<>();
-        Integer id = 1;
-        for (int i = 0; i < paths.size(); i++) {
-            String[] path = paths.get(i).split("/");
-            String p = "";
-            for (int j = 0; j < path.length; j++) {
-                p += path[j] + "/";
+        int id = 1;
+        for (String s : paths) {
+            String[] path = s.split("/");
+            StringBuilder p = new StringBuilder();
+            for (String value : path) {
+                p.append(value).append("/");
                 if (!map.containsKey(p.substring(0, p.length() - 1))) {
                     map.put(p.substring(0, p.length() - 1), id++);
                 }
@@ -403,14 +416,14 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                 srcResp.setFileName(keys[0]);
                 srcResp.setFilePath(keys[0]);
             } else {
-                String path = "";
+                StringBuilder path = new StringBuilder();
                 for (int i = 0; i < keys.length - 1; i++) {
-                    path += keys[i] + "/";
+                    path.append(keys[i]).append("/");
                 }
                 srcResp.setFileName(keys[keys.length - 1]);
                 srcResp.setFilePath(String.join("/", keys));
-                path = path.substring(0, path.length() - 1);
-                srcResp.setVParentId(map.get(path));
+                path = new StringBuilder(path.substring(0, path.length() - 1));
+                srcResp.setVParentId(map.get(path.toString()));
             }
             for (SysGameSourceEntity entity : entityList) {
                 if (entity.getFileName().equals(srcResp.getFilePath())) {
@@ -426,14 +439,10 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
             srcResps.add(srcResp);
         }
         //获取父节点
-        List<GameSrcResp> collect = srcResps.stream().filter(m -> m.getVParentId() == 0).map(
-                (m) -> {
-                    m.setChildList(getChildrens(m, srcResps));
-                    return m;
-                }
-        ).collect(Collectors.toList());
 
-        return collect;
+        return srcResps.stream().filter(m -> m.getVParentId() == 0).peek(
+                (m) -> m.setChildList(getChildrens(m, srcResps))
+        ).collect(Collectors.toList());
     }
 
     /**
@@ -444,14 +453,8 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
      * @return 根节点信息
      */
     private List<GameSrcResp> getChildrens(GameSrcResp root, List<GameSrcResp> all) {
-        List<GameSrcResp> children = all.stream().filter(m -> {
-            return Objects.equals(m.getVParentId(), root.getVId());
-        }).map((m) -> {
-                    m.setChildList(getChildrens(m, all));
-                    return m;
-                }
+        return all.stream().filter(m -> Objects.equals(m.getVParentId(), root.getVId())).peek((m) -> m.setChildList(getChildrens(m, all))
         ).collect(Collectors.toList());
-        return children;
     }
 
     private String handleObjectNamePrefix(Integer srcType) {
@@ -468,4 +471,27 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         return objectName;
     }
 
+    private SysGameSourceEntity handleEntity(SysGameSrcAddReq req, String objectName) {
+        // 记录资源信息
+        SysGameSourceEntity gameSrc = new SysGameSourceEntity();
+        gameSrc.setSrcType(req.getSrcType());
+        gameSrc.setFileName(req.getFileName());
+        gameSrc.setOs(req.getOs());
+        gameSrc.setSrcSize(getPrintSize(req.getSize()));
+        gameSrc.setS3Path(objectName);
+        gameSrc.setJapanUrl(getFileUrl(properties.getGame().getOss1().getCdn(), objectName));
+        gameSrc.setEuUrl(getFileUrl(properties.getGame().getOss2().getCdn(), objectName));
+        gameSrc.setUsUrl(getFileUrl(properties.getGame().getOss3().getCdn(), objectName));
+        gameSrc.setRemark(req.getRemark());
+        gameSrc.setCreatedAt(System.currentTimeMillis());
+        gameSrc.setUpdatedAt(System.currentTimeMillis());
+        gameSrc.setCreatedBy(UserContext.getCurrentAdminUserId());
+        gameSrc.setUpdatedBy(UserContext.getCurrentAdminUserId());
+        if (req.getSrcType().equals(GameSrcTypeEnum.PATCH_PK.getCode())) {
+            gameSrc.setStatus(WhetherEnum.YES.value());
+        } else {
+            gameSrc.setStatus(WhetherEnum.NO.value());
+        }
+        return gameSrc;
+    }
 }

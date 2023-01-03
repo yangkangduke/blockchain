@@ -175,4 +175,9 @@ public class LocalFileTemplate implements FileTemplate {
 
     }
 
+    @Override
+    public void abortUpload(String gameBucketName, String key, String uploadId) {
+
+    }
+
 }

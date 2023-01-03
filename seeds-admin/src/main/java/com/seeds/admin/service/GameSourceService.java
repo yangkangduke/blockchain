@@ -40,4 +40,8 @@ public interface GameSourceService extends IService<SysGameSourceEntity> {
     String getPartUrl(FilePartReq req);
 
     String completeMultipartUpload(CompleteUploadReq req);
+
+    void add(List<SysGameSrcAddReq> reqs);
+
+    Boolean abortUpload(CompleteUploadReq req);
 }

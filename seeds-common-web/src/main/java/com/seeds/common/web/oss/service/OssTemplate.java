@@ -400,6 +400,12 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		gameoss1.completeMultipartUpload(requset);
 	}
 
+	@Override
+	public void abortUpload(String gameBucketName, String key, String uploadId) {
+		AbortMultipartUploadRequest request = new AbortMultipartUploadRequest(gameBucketName, key, uploadId);
+		gameoss1.abortMultipartUpload(request);
+	}
+
 
 	@Override
 	@SneakyThrows

@@ -115,4 +115,6 @@ public interface FileTemplate extends InitializingBean {
 	InitiateMultipartUploadResult initiateMultipartUpload(String bucketName, String objectName, String contentType);
 
 	void completeMultipartUpload(String gameBucketName, String key, String uploadId);
+
+	void abortUpload(String gameBucketName, String key, String uploadId);
 }
