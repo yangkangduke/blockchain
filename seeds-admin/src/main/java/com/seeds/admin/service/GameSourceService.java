@@ -1,13 +1,12 @@
 package com.seeds.admin.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.account.model.SwitchReq;
-import com.seeds.admin.dto.request.SysGameSrcAddReq;
-import com.seeds.admin.dto.request.SysGameSrcPageReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.GameFileResp;
 import com.seeds.admin.dto.response.GameSrcLinkResp;
 import com.seeds.admin.dto.response.GameSrcResp;
+import com.seeds.admin.dto.response.PreUploadResp;
 import com.seeds.admin.entity.SysGameSourceEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,4 +32,16 @@ public interface GameSourceService extends IService<SysGameSourceEntity> {
     Boolean switchStatus(SwitchReq req);
 
     List<GameFileResp> getAllPatch();
+
+    PreUploadResp preUpload(UploadFileInfo req);
+
+    PreUploadResp createUpload(UploadFileInfo req);
+
+    String getPartUrl(FilePartReq req);
+
+    String completeMultipartUpload(CompleteUploadReq req);
+
+    void add(List<SysGameSrcAddReq> reqs);
+
+    Boolean abortUpload(CompleteUploadReq req);
 }
