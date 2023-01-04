@@ -35,8 +35,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -292,6 +294,11 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
         // 通知游戏方NFT创建结果
         List<String> rankUrls = sysGameApiService.queryUrlByGameAndType(gameId, ApiType.PROFILE_INFO.getCode());
         ProfileInfoResp profileInfo = null;
+        try {
+            email = URLEncoder.encode(email , "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("Failed to encode param:{}, message:{}", email, e.getMessage());
+        }
         for (String rankUrl : rankUrls) {
             String params = String.format("accName=%s", email);
             rankUrl = rankUrl + "?" + params;
