@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -120,7 +119,7 @@ public class GameSourceController {
 
     @PostMapping("add-new")
     @ApiOperation(value = "新增", notes = "前端直接上传，不再走后台上传逻辑")
-    public GenericDto<Boolean> add(List<SysGameSrcAddReq> reqs) {
+    public GenericDto<Boolean> add(@RequestParam(value = "reqs") List<SysGameSrcAddReq> reqs) {
         gameFileService.add(reqs);
         return GenericDto.success(null);
     }
