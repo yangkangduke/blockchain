@@ -45,7 +45,7 @@ public class GameSourceController {
 
 
     @PostMapping("add")
-    @ApiOperation(value = "新增", notes = "前端需要支持可以上传文件夹")
+    @ApiOperation(value = "新增", notes = "前端需要支持可以选择文件夹")
     public GenericDto<Boolean> upload(@RequestPart(value = "files") MultipartFile[] files, @Valid SysGameSrcAddReq req) {
         gameFileService.upload(files, req);
         return GenericDto.success(null);
@@ -58,7 +58,7 @@ public class GameSourceController {
         return GenericDto.success(gameFileService.switchStatus(req));
     }
 
-    @PostMapping("delete/{id}")
+    @PostMapping("batch-delete")
     @ApiOperation("删除记录，并且删除S3上的资源")
     public GenericDto<Boolean> delete(@Valid @RequestBody ListReq req) throws Exception {
         return GenericDto.success(gameFileService.batchDelete(req));
