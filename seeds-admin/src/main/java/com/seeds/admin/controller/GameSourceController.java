@@ -60,8 +60,8 @@ public class GameSourceController {
 
     @PostMapping("delete/{id}")
     @ApiOperation("删除记录，并且删除S3上的资源")
-    public GenericDto<Boolean> delete(@PathVariable(value = "id") @NotNull Long id) throws Exception {
-        return GenericDto.success(gameFileService.deleteSrc(id));
+    public GenericDto<Boolean> delete(@Valid @RequestBody ListReq req) throws Exception {
+        return GenericDto.success(gameFileService.batchDelete(req));
     }
 
 //    @GetMapping("get-links")

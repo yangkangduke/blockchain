@@ -355,14 +355,19 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
     }
 
     @Override
-    public Boolean deleteSrc(Long id) throws Exception {
-        SysGameSourceEntity entity = this.getById(id);
-        if (!Objects.isNull(entity)) {
-            // 删除S3上的资源
-            template.removeObject(entity.getS3Path());
+    public Boolean batchDelete(ListReq req) throws Exception {
+        Set<Long> ids = req.getIds();
+
+        for (Long id : ids) {
+            SysGameSourceEntity entity = this.getById(id);
+            if (!Objects.isNull(entity)) {
+                // 删除S3上的资源
+                template.removeObject(entity.getS3Path());
+            }
         }
+
         // 删除数据库记录
-        return this.removeById(id);
+        return removeBatchByIds(ids);
     }
 
     private String getFileUrl(String cdn, String objectName) {

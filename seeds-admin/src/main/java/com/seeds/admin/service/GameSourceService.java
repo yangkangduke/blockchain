@@ -45,5 +45,5 @@ public interface GameSourceService extends IService<SysGameSourceEntity> {
 
     Boolean abortUpload(CompleteUploadReq req);
 
-    Boolean deleteSrc(Long id) throws Exception;
+    Boolean batchDelete(ListReq req) throws Exception;
 }
