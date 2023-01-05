@@ -725,10 +725,18 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             }
         }
         // 请求游戏方获取个人游戏概括数据
-        GenericDto<ProfileInfoResp> result = adminRemoteGameService.profileInfo(gameId, user.getEmail());
+        GenericDto<ProfileInfoResp> result;
+        try {
+            result = adminRemoteGameService.profileInfo(gameId, user.getEmail());
+        } catch (Exception e) {
+            if (resp == null) {
+                throw e;
+            }
+            return resp;
+        }
         if (!result.isSuccess()) {
             if (resp == null) {
-                throw new GenericException("Failed to get the profile info, please wait and try again!");
+                throw new GenericException(result.getMessage());
             }
             return resp;
         }
