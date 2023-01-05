@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -57,6 +58,12 @@ public class GameSourceController {
         return GenericDto.success(gameFileService.switchStatus(req));
     }
 
+    @PostMapping("delete/{id}")
+    @ApiOperation("删除记录，并且删除S3上的资源")
+    public GenericDto<Boolean> delete(@PathVariable(value = "id") @NotNull Long id) throws Exception {
+        return GenericDto.success(gameFileService.deleteSrc(id));
+    }
+
 //    @GetMapping("get-links")
 //    @ApiOperation("获取需要请求的链接地址")
 //    public GenericDto<List<GameSrcLinkResp>> getLinks(HttpServletRequest request,
@@ -76,7 +83,7 @@ public class GameSourceController {
     @ApiImplicitParams(value = {
             @ApiImplicitParam(name = "fileName", value = "参数值传列表中对应列的key的值", dataType = "String")
     })
-    public GenericDto<Boolean> delete(@RequestParam(value = "fileName") String fileName) throws Exception {
+    public GenericDto<Boolean> deleteS3(@RequestParam(value = "fileName") String fileName) throws Exception {
         return GenericDto.success(gameFileService.delete(fileName));
     }
 

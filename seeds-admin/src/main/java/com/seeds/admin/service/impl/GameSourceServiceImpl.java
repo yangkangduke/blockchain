@@ -303,10 +303,10 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         InitiateMultipartUploadResult initiateMultipartUpload = null;
         try {
             initiateMultipartUpload = template.initiateMultipartUpload(gameBucketName, objectName + req.getFileName(), req.getContentType());
+            resp.setUploadId(initiateMultipartUpload.getUploadId()).setKey(initiateMultipartUpload.getKey());
         } catch (Exception e) {
             log.info("创建分段上传失败，{}", e.getMessage());
         }
-        resp.setUploadId(initiateMultipartUpload.getUploadId()).setKey(initiateMultipartUpload.getKey());
         return resp;
     }
 
@@ -352,6 +352,17 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         String gameBucketName = properties.getGame().getOss1().getBucketName();
         template.abortUpload(gameBucketName, req.getKey(), req.getUploadId());
         return true;
+    }
+
+    @Override
+    public Boolean deleteSrc(Long id) throws Exception {
+        SysGameSourceEntity entity = this.getById(id);
+        if (!Objects.isNull(entity)) {
+            // 删除S3上的资源
+            template.removeObject(entity.getS3Path());
+        }
+        // 删除数据库记录
+        return this.removeById(id);
     }
 
     private String getFileUrl(String cdn, String objectName) {
