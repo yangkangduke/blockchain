@@ -300,7 +300,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         PreUploadResp resp = new PreUploadResp();
         String gameBucketName = properties.getGame().getOss1().getBucketName();
         String objectName = handleObjectNamePrefix(req.getType());
-        InitiateMultipartUploadResult initiateMultipartUpload = null;
+        InitiateMultipartUploadResult initiateMultipartUpload;
         try {
             initiateMultipartUpload = template.initiateMultipartUpload(gameBucketName, objectName + req.getFileName(), req.getContentType());
             resp.setUploadId(initiateMultipartUpload.getUploadId()).setKey(initiateMultipartUpload.getKey());
