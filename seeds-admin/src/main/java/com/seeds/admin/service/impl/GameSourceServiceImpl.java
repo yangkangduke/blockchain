@@ -337,14 +337,25 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
     @Override
     public void add(List<SysGameSrcAddReq> reqs) {
 
-        List<SysGameSourceEntity> entityList = reqs.stream().map(p -> {
-            String objectName = handleObjectNamePrefix(p.getSrcType());
-            String originalFilename = p.getFileName();
-            objectName += originalFilename;
-            return this.handleEntity(p, objectName);
-        }).collect(Collectors.toList());
+        for (SysGameSrcAddReq req : reqs) {
+            LambdaQueryWrapper<SysGameSourceEntity> wrapper = new LambdaQueryWrapper<SysGameSourceEntity>().eq(SysGameSourceEntity::getFileName, req.getFileName());
+            SysGameSourceEntity one = this.getOne(wrapper);
 
-        this.saveBatch(entityList);
+            if (Objects.isNull(one)) {
+                String objectName = handleObjectNamePrefix(req.getSrcType());
+                String originalFilename = req.getFileName();
+                objectName += originalFilename;
+                SysGameSourceEntity entity = this.handleEntity(req, objectName);
+                this.save(entity);
+            } else {
+                //更新
+                one.setUpdatedAt(System.currentTimeMillis());
+                one.setUpdatedBy(UserContext.getCurrentAdminUserId());
+                one.setSrcSize(getPrintSize(req.getSize()));
+                one.setRemark(req.getRemark());
+                this.updateById(one);
+            }
+        }
     }
 
     @Override
