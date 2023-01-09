@@ -36,7 +36,7 @@ file:
   bucketName: seeds # 上文创建的桶名称
   oss:
     enable: true
-    endpoint: http://3.114.69.251:9000
+    endpoint: http://192.168.1.100:9000
     access-key: seeds123!
     secret-key: seeds123!
   game:

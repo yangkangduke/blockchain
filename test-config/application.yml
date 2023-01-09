@@ -4,7 +4,7 @@ spring:
       max-file-size: 5GB
       max-request-size: 5GB
   kafka:
-    bootstrap-servers: 3.114.69.251:9092
+    bootstrap-servers: 192.168.1.100:9092
     producer:
       retries: 3  # 生产者发送失败时，重试次数
       batch-size: 16384
@@ -20,7 +20,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 redis:
-  host: 3.114.69.251
+  host: 192.168.1.100
   port: 6379
   password: Seeds123!
 
@@ -42,7 +42,7 @@ file:
   bucketName: seeds # 上文创建的桶名称
   oss:
     enable: true
-    endpoint: http://3.114.69.251:9000
+    endpoint: http://192.168.1.100:9000
     access-key: seeds123!
     secret-key: seeds123!
   game:
@@ -73,7 +73,7 @@ login:
   twofa: true
 
 zookeeper:
-  address: 3.114.69.251:2181
+  address: 192.168.1.100:2181
 
 service:
   url:
@@ -83,7 +83,7 @@ service:
     wallet: http://127.0.0.1:10104
     notification: http://127.0.0.1:10105
     game: http://127.0.0.1:10106
-    gateway: http://3.114.69.251:9999
+    gateway: http://192.168.1.100:9999
 
 # Springboot Actuator
 management:
