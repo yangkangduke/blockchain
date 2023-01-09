@@ -51,10 +51,18 @@ public class GameRankServiceImpl implements GameRankService {
             }
         }
         // 请求游戏方获取排行榜数据
-        GenericDto<List<GameWinRankResp.GameWinRank>> result = adminRemoteGameService.winRankInfo(query);
+        GenericDto<List<GameWinRankResp.GameWinRank>> result;
+        try {
+            result = adminRemoteGameService.winRankInfo(query);
+        } catch (Exception e) {
+            if (resp == null) {
+                throw e;
+            }
+            return resp.getInfos();
+        }
         if (!result.isSuccess()) {
             if (resp == null) {
-                throw new GenericException("Failed to get the win list, please wait and try again!");
+                throw new GenericException(result.getMessage());
             }
             return resp.getInfos();
         }
