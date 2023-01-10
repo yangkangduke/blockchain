@@ -18,6 +18,7 @@ public class UploadFileInfo {
     /**
      * @see com.seeds.admin.enums.GameSrcTypeEnum
      */
+    @ApiModelProperty(value = " 1, 首页视频; 2, 安装包 3, 补丁")
     private Integer type; // 资源类型
 
     @ApiModelProperty(value = "文件类型")
