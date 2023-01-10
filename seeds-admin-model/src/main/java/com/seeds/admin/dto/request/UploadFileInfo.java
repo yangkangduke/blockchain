@@ -12,7 +12,7 @@ import lombok.Data;
 @ApiModel(value = "UploadFileInfo", description = "文件信息")
 public class UploadFileInfo {
 
-    @ApiModelProperty(value = "文件名")
+    @ApiModelProperty(value = "文件名,有目录的需要带上目录名")
     private String fileName;
 
     /**
