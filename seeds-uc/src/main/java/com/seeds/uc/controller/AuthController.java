@@ -3,6 +3,7 @@ package com.seeds.uc.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.uc.annotation.UcOpLog;
 import com.seeds.uc.dto.UserDto;
 import com.seeds.uc.dto.redis.AuthCodeDTO;
 import com.seeds.uc.dto.redis.LoginUserDTO;
@@ -77,6 +78,7 @@ public class AuthController {
     }
 
 
+    @UcOpLog(value = "账号登陆")
     @PostMapping("/login")
     @ApiOperation(value = "账号登陆", notes = "1.调用/auth/login接口，返回token和authType " +
             "2.调用/auth/2fa/login，参数authCode填的值根据上一个接口返回的authType来决定，如果是2就填email的验证码，如果是3就填ga的验证码， 返回的ucToken就是登陆成功的凭证 ")
