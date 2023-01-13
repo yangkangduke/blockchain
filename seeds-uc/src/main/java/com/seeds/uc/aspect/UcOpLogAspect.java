@@ -62,9 +62,9 @@ public class UcOpLogAspect {
         String serverNo = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getHeader(HttpHeaders.SERVER_NO);
         Object result = joinPoint.proceed();
         // 请求头没有serverNo，则请求来自游戏方，直接返回
-        if (Objects.isNull(serverNo)) {
-            return GenericDto.success(result);
-        }
+//        if (Objects.isNull(serverNo)) {
+//            return GenericDto.success(result);
+//        }
         //保存日志
         UcOperationLog operationLog = new UcOperationLog();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
