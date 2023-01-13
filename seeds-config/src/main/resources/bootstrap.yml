@@ -13,9 +13,12 @@ spring:
     config:
       server:
         git:
-          uri: https://gitee.com/Jiutong123/git-config
-          username: 15928559050
-          password: cd530d0aaf83a68e54a523e0c011af4b
+          uri: https://github.com/AllenAi007/seeds-java
+          username: 819628513@qq.com
+          password: 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
+#          uri: https://gitee.com/Jiutong123/git-config
+#          username: 15928559050
+#          password: cd530d0aaf83a68e54a523e0c011af4b
           search-paths: dev-config
           default-label: dev
           force-pull: true
