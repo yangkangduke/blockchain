@@ -34,5 +34,9 @@ public class HttpHeaders {
      * 外部调用身份标识
      */
     public static final String OPEN_AUTH = "openAuth";
+    /**
+     * 游戏方请求需携带
+     */
+    public static final String SERVER_NO = "server-no";
 
 }

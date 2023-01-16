@@ -6,15 +6,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
-* @author yk
+ * @author yk
  * @date 2020/8/27
  */
 @Slf4j
 public class WebUtil {
+    private static final String LOCALHOST_IP = "0:0:0:0:0:0:0:1";
+    private static final String LOCALHOST_IP1 = "127.0.0.1";
+
     private WebUtil() {
     }
 
@@ -46,19 +47,8 @@ public class WebUtil {
             }
         } else if (!StringUtils.isEmpty(xRealIP)) {
             clientIp = xRealIP;
-        } else {
-            log.warn("Cannot not find any valid IP address from request, using remote address.");
-            clientIp = request.getRemoteAddr();
-            if (clientIp.equals("127.0.0.1")) {
-                try {
-                    InetAddress inet = InetAddress.getLocalHost();
-                    clientIp = inet.getHostAddress();
-                } catch (UnknownHostException e) {
-                    log.error("get ip has error, due to", e);
-                }
-            }
         }
-        log.debug("client ip is {}", clientIp);
+        clientIp = clientIp.equals(LOCALHOST_IP) ? LOCALHOST_IP1 : clientIp;
         return checkIpAddress(clientIp.trim());
     }
 
