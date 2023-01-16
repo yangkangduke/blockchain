@@ -61,7 +61,7 @@ public class UcOpLogAspect {
 
         String serverNo = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getHeader(HttpHeaders.SERVER_NO);
         Object result = joinPoint.proceed();
-        // 请求头没有serverNo，则请求来自游戏方，直接返回
+        // 请求头没有serverNo，则请求来自web端，直接返回
 //        if (Objects.isNull(serverNo)) {
 //            return GenericDto.success(result);
 //        }
