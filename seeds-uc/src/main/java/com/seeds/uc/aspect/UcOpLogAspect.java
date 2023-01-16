@@ -102,7 +102,7 @@ public class UcOpLogAspect {
         operationLog.setSpendTime(System.currentTimeMillis() - opTime);
         operationLog.setCreatedAt(System.currentTimeMillis());
         logService.save(operationLog);
-        return GenericDto.success(result);
+        return result;
     }
 
     private int readValue(String jsonStr, String key) {
