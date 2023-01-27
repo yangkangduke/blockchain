@@ -193,6 +193,17 @@ public class SysRandomCodeServiceImpl extends ServiceImpl<SysRandomCodeMapper, S
         }
         randomCode.setDesc(req.getDesc());
         randomCode.setExpireTime(req.getExpireTime());
+        // 延期
+        if (RandomCodeStatusEnum.EXPIRED.getCode() == randomCode.getStatus() && randomCode.getExpireTime() > System.currentTimeMillis()) {
+            // 最新批次的邀请码才能延期
+            LambdaQueryWrapper<SysRandomCodeEntity> query = new QueryWrapper<SysRandomCodeEntity>().lambda()
+                    .eq(SysRandomCodeEntity::getType, randomCode.getType())
+                    .gt(SysRandomCodeEntity::getBatchNo, randomCode.getBatchNo());
+            List<SysRandomCodeEntity> list = list(query);
+            if (CollectionUtils.isEmpty(list)) {
+                randomCode.setStatus(RandomCodeStatusEnum.NORMAL.getCode());
+            }
+        }
         updateById(randomCode);
     }
 
