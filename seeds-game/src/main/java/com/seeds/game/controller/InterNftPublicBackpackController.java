@@ -10,25 +10,24 @@ import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
 import com.seeds.game.dto.response.NftPublicBackpackResp;
 import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
 import com.seeds.game.service.INftPublicBackpackService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 /**
  * <p>
- * NFT公共背包
+ * NFT公共背包  web端调用
  * </p>
  *
  * @author hewei
  * @since 2023-01-31
  */
-@Controller
+
+@Api(tags = "NFT公共背包接口，内部调用")
+@RestController
 @RequestMapping("/internal-nft-backpack")
 public class InterNftPublicBackpackController {
 

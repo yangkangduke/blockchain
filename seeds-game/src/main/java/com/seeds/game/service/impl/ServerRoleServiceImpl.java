@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.game.dto.request.OpenServerRoleCreateUpdateReq;
-import com.seeds.game.dto.request.OpenServerRolePageReq;
+import com.seeds.game.dto.request.internal.ServerRoleCreateUpdateReq;
+import com.seeds.game.dto.request.internal.ServerRolePageReq;
 import com.seeds.game.dto.response.ServerRoleResp;
 import com.seeds.game.entity.ServerRoleEntity;
 import com.seeds.game.mapper.ServerRoleMapper;
@@ -28,7 +28,7 @@ import java.util.List;
 public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerRoleEntity> implements IServerRoleService {
 
     @Override
-    public IPage<ServerRoleResp> queryPage(OpenServerRolePageReq req) {
+    public IPage<ServerRoleResp> queryPage(ServerRolePageReq req) {
 
         LambdaQueryWrapper<ServerRoleEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.orderByDesc(ServerRoleEntity::getLevel);
@@ -45,14 +45,14 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
     }
 
     @Override
-    public void createRole(OpenServerRoleCreateUpdateReq req) {
+    public void createRole(ServerRoleCreateUpdateReq req) {
         ServerRoleEntity entity = new ServerRoleEntity();
         BeanUtils.copyProperties(req, entity);
         this.save(entity);
     }
 
     @Override
-    public void updateRole(OpenServerRoleCreateUpdateReq req) {
+    public void updateRole(ServerRoleCreateUpdateReq req) {
         ServerRoleEntity entity = new ServerRoleEntity();
         BeanUtils.copyProperties(req, entity);
         this.updateById(entity);

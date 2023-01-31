@@ -1,6 +1,7 @@
 package com.seeds.game.dto.request;
 
 import com.seeds.common.dto.PageReq;
+import com.seeds.game.dto.request.internal.ServerRolePageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,7 +22,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(value = "OpenServerRolePageReq")
 @Data
-public class OpenServerRolePageReq extends PageReq implements Serializable {
+public class OpenServerRolePageReq extends ServerRolePageReq implements Serializable {
 
     @ApiModelProperty(value = "访问键", required = true)
     @NotBlank(message = "Access key cannot be empty")

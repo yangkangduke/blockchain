@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.game.dto.request.OpenServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.OpenServerRolePageReq;
+import com.seeds.game.dto.request.internal.ServerRoleCreateUpdateReq;
+import com.seeds.game.dto.request.internal.ServerRolePageReq;
 import com.seeds.game.dto.response.ServerRoleResp;
 import com.seeds.game.entity.ServerRoleEntity;
 
@@ -17,11 +19,11 @@ import com.seeds.game.entity.ServerRoleEntity;
  */
 public interface IServerRoleService extends IService<ServerRoleEntity> {
 
-    IPage<ServerRoleResp> queryPage(OpenServerRolePageReq req);
+    IPage<ServerRoleResp> queryPage(ServerRolePageReq req);
 
-    void createRole(OpenServerRoleCreateUpdateReq req);
+    void createRole(ServerRoleCreateUpdateReq req);
 
-    void updateRole(OpenServerRoleCreateUpdateReq req);
+    void updateRole(ServerRoleCreateUpdateReq req);
 
     void delete(Long id);
 }
