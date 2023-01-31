@@ -85,10 +85,20 @@ public class GameExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<GenericDto<String>> handle(ConstraintViolationException e){
+    public ResponseEntity<GenericDto<String>> handle(ConstraintViolationException e) {
         return new ResponseEntity<>(
                 GenericDto.failure(e.getCause().getMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ResponseBody
+    @ExceptionHandler(com.seeds.game.exception.GenericException.class)
+    ResponseEntity<GenericDto<String>> handle(com.seeds.game.exception.GenericException e) {
+        log.error("General Exception:", e);
+        return new ResponseEntity<>(
+                GenericDto.failure(e.getMessage(), e.getErrorCode().getCode()),
+                HttpStatus.OK);
     }
 
     /**
