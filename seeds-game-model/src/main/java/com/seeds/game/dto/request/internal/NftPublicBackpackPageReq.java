@@ -6,8 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -25,6 +23,6 @@ public class NftPublicBackpackPageReq extends PageReq implements Serializable {
     @ApiModelProperty(value = "用户id")
     private Long userId;
 
-    @ApiModelProperty("是否分配。0未分配 1已分配")
+    @ApiModelProperty(value = "是否分配。0未分配 1已分配", example = "0")
     private Integer isConfiguration;
 }

@@ -10,6 +10,7 @@ import com.seeds.game.dto.request.OpenNftPublicBackpackTakeBackReq;
 import com.seeds.game.dto.response.NftPublicBackpackResp;
 import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
 import com.seeds.game.service.INftPublicBackpackService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,9 @@ import javax.validation.Valid;
  * @author hewei
  * @since 2023-01-31
  */
+
+
+@Api(tags = "NFT公共背包接口，游戏方调用")
 @Controller
 @RequestMapping("/nft-backpack")
 public class OpenNftPublicBackpackController {
@@ -36,7 +40,7 @@ public class OpenNftPublicBackpackController {
     private INftPublicBackpackService nftPublicBackpackService;
 
     @PostMapping("page")
-    @ApiOperation("获取背包分页信息")
+    @ApiOperation("获取分页信息")
     public GenericDto<IPage<NftPublicBackpackResp>> create(@Valid @RequestBody OpenNftPublicBackpackPageReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(nftPublicBackpackService.queryPage(req));
@@ -52,14 +56,14 @@ public class OpenNftPublicBackpackController {
     }
 
     @PostMapping("create")
-    @ApiOperation("新增背包信息")
+    @ApiOperation("新增")
     public GenericDto<Object> create(@RequestBody @Valid OpenNftPublicBackpackCreateUpdateReq req) {
         nftPublicBackpackService.create(req);
         return GenericDto.success(null);
     }
 
     @PostMapping("update")
-    @ApiOperation("修改背包信息")
+    @ApiOperation("修改")
     public GenericDto<Object> update(@RequestBody @Valid OpenNftPublicBackpackCreateUpdateReq req) {
         nftPublicBackpackService.update(req);
         return GenericDto.success(null);
@@ -75,6 +79,7 @@ public class OpenNftPublicBackpackController {
     @PostMapping("take-back")
     @ApiOperation("收回")
     public GenericDto<Object> takeBack(@RequestBody @Valid OpenNftPublicBackpackTakeBackReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         nftPublicBackpackService.takeBack(req);
         return GenericDto.success(null);
     }
@@ -82,6 +87,7 @@ public class OpenNftPublicBackpackController {
     @PostMapping("transfer")
     @ApiOperation("转移")
     public GenericDto<Object> transfer(@RequestBody @Valid OpenNftPublicBackpackDisReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         nftPublicBackpackService.transfer(req);
         return GenericDto.success(null);
     }

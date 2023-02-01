@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -64,6 +65,10 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     public void create(NftPublicBackpackReq req) {
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
         BeanUtils.copyProperties(req, entity);
+        entity.setCreatedAt(System.currentTimeMillis());
+        entity.setCreatedBy(UserContext.getCurrentUserId());
+        entity.setUpdatedAt(System.currentTimeMillis());
+        entity.setUpdatedBy(UserContext.getCurrentUserId());
         this.save(entity);
     }
 
@@ -71,6 +76,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     public void update(NftPublicBackpackReq req) {
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
         BeanUtils.copyProperties(req, entity);
+        entity.setUpdatedAt(System.currentTimeMillis());
+        entity.setUpdatedBy(UserContext.getCurrentUserId());
         this.updateById(entity);
     }
 
@@ -98,16 +105,21 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         // 2.校验当前NFT物品是否是未分配转态
         if (nftItem.getIsConfiguration().equals(NftConfigurationEnum.ASSIGNED.getCode())) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10002_NFT_ITEM_HAVE_BEEN_ASSIGNED);
+            throw new GenericException(GameErrorCodeEnum.ERR_10003_NFT_ITEM_HAVE_BEEN_ASSIGNED);
         }
         // 3.校验分配的角色等级是否满10级
         ServerRoleEntity roleEntity = serverRoleService.getById(req.getServerRoleId());
+        if (Objects.isNull(roleEntity)) {
+            throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_NOT_EXIST);
+        }
         if (roleEntity.getLevel() < 10) {
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
         }
 
         // 4.执行分配
         nftItem.setServerRoleId(req.getServerRoleId());
+        nftItem.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
+        nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
 
         // 组装返回值
@@ -136,6 +148,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         // 收回
         nftItem.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
         nftItem.setServerRoleId(null);
+        nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
     }
 
@@ -146,6 +159,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (Objects.isNull(nftItem)) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
         }
+
+        // 当前NFT已经属于想要转移的角色，不需要再转移
+        if (nftItem.getServerRoleId().equals(req.getServerRoleId())) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10005_NFT_ITEM_ALREADY_BELONGS_TO_THE_ROLE);
+        }
         // 校验当前NFT物品是否属于当前用户
         Long userId = nftItem.getUserId();
         if (!userId.equals(req.getUserId())) {
@@ -153,15 +171,19 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         // 校验当前NFT物品是否是分配转态
         if (nftItem.getIsConfiguration().equals(NftConfigurationEnum.UNASSIGNED.getCode())) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10002_NFT_ITEM_CANNOT_TRANSFER);
+            throw new GenericException(GameErrorCodeEnum.ERR_10004_NFT_ITEM_CANNOT_TRANSFER);
         }
         // 校验分配的角色等级是否满10级
         ServerRoleEntity roleEntity = serverRoleService.getById(req.getServerRoleId());
+        if (Objects.isNull(roleEntity)) {
+            throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_NOT_EXIST);
+        }
         if (roleEntity.getLevel() < 10) {
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
         }
         // 转移
         nftItem.setServerRoleId(req.getServerRoleId());
+        nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
 
         // 组装返回值

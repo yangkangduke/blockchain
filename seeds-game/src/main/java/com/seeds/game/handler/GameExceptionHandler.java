@@ -38,10 +38,11 @@ public class GameExceptionHandler {
     @ResponseBody
     @ExceptionHandler(FeignException.class)
     ResponseEntity<GenericDto<String>> handle(FeignException e) {
-        String message = e.getMessage().substring(e.getMessage().lastIndexOf('{'), e.getMessage().length() - 1);
-        return new ResponseEntity<>(
-                GenericDto.failure(JSONUtil.toBean(message, GenericDto.class).getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+//        String message = e.getMessage().substring(e.getMessage().lastIndexOf('{'), e.getMessage().length() - 1);
+//        return new ResponseEntity<>(
+//                GenericDto.failure(JSONUtil.toBean(message, GenericDto.class).getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+//                HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(GenericDto.failure(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ResponseBody

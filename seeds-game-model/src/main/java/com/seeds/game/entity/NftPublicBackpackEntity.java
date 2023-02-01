@@ -1,6 +1,7 @@
 package com.seeds.game.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
@@ -32,6 +33,7 @@ public class NftPublicBackpackEntity implements Serializable {
     private String name;
 
     @ApiModelProperty("描述")
+    @TableField("`desc`")
     private String desc;
 
     @ApiModelProperty("icon")
@@ -41,7 +43,7 @@ public class NftPublicBackpackEntity implements Serializable {
     private String image;
 
     @ApiModelProperty("类型：1装备 2道具 3英雄")
-    private Boolean type;
+    private Integer type;
 
     @ApiModelProperty("对应游戏那边的conf_id，找静态表中的数据")
     private Long itemId;

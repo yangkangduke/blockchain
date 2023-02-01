@@ -37,19 +37,4 @@ public class ServerRoleCreateUpdateReq implements Serializable {
 
     @ApiModelProperty("等级")
     private Integer level;
-
-    @ApiModelProperty("version")
-    private Long version;
-
-    @ApiModelProperty("创建人")
-    private Long createdBy;
-
-    @ApiModelProperty("修改人")
-    private Long updatedBy;
-
-    @ApiModelProperty("创建时间")
-    private Long createdAt;
-
-    @ApiModelProperty("修改时间")
-    private Long updatedAt;
 }

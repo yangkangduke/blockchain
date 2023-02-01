@@ -3,8 +3,8 @@ package com.seeds.game.interceptor;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.seeds.admin.feign.RemoteGameService;
-import com.seeds.common.dto.GenericDto;
 import com.seeds.common.constant.redis.RedisKeys;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.common.web.util.HttpHelper;
@@ -60,10 +60,34 @@ public class OpenContextInterceptor implements HandlerInterceptor {
     private static final GenericDto<String> INVALID_TOKEN_RESPONSE = GenericDto.failure("Invalid token", 401);
     private static final GenericDto<String> INVALID_SIGNATURE_RESPONSE = GenericDto.failure("Invalid signature", 401);
     private static final String NO_LOGIN_REQUIRED_PATH = "/public/";
+    private static final String FROM_WEB = "/web/";
     private static final String GET_METHOD = "GET";
     private static final String POST_METHOD = "POST";
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        // 来自web端的请求不再校验签名
+        if (request.getRequestURI().contains(FROM_WEB)) {
+            // 需要进行登录校验
+            String token = request.getHeader(HttpHeaders.USER_TOKEN);
+            if (StringUtils.isEmpty(token)) {
+                writeFailureResponse(response, INVALID_TOKEN_RESPONSE);
+                return false;
+            }
+            LoginUserDTO user = redissonClient.<LoginUserDTO>getBucket(RedisKeys.getUcTokenKey(token)).get();
+            if (user == null || user.getUserId() == null) {
+                writeFailureResponse(response, INVALID_TOKEN_RESPONSE);
+                return false;
+            }
+            try {
+                UserContext.setCurrentUserId(user.getUserId());
+                return true;
+            } catch (Exception e) {
+                log.error("Got invalid user id from header: {}", user.getUserId());
+                writeFailureResponse(response, INVALID_TOKEN_RESPONSE);
+                return false;
+            }
+        }
         // 网关调用校验
         String openAuth = request.getHeader(HttpHeaders.OPEN_AUTH);
         if (!HttpHeaders.OPEN_AUTH.equals(openAuth)) {

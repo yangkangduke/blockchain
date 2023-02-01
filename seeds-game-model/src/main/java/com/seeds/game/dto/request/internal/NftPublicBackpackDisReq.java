@@ -14,14 +14,14 @@ import javax.validation.constraints.NotNull;
 @Data
 public class NftPublicBackpackDisReq {
 
-    @ApiModelProperty("nft物品")
+    @ApiModelProperty(value = "nft物品", required = true)
     @NotNull(message = "物品Id不能为空")
     private Long id;
 
     @ApiModelProperty("userId")
     private Long userId;
 
-    @ApiModelProperty("游戏服务角色id")
+    @ApiModelProperty(value = "游戏服务角色id", required = true)
     @NotNull(message = "游戏服角色ID不能为空")
     private Long serverRoleId;
 }

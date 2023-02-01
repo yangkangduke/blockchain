@@ -21,7 +21,7 @@ import javax.validation.Valid;
  * @since 2023-01-31
  */
 @Slf4j
-@Api(tags = "游戏服角色相关接口")
+@Api(tags = "游戏服角色相关接口，游戏方调用")
 @RestController
 @RequestMapping("/server-role")
 public class OpenServerRoleController {

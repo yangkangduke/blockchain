@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.internal.ServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.internal.ServerRolePageReq;
 import com.seeds.game.dto.response.ServerRoleResp;
@@ -48,6 +49,10 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
     public void createRole(ServerRoleCreateUpdateReq req) {
         ServerRoleEntity entity = new ServerRoleEntity();
         BeanUtils.copyProperties(req, entity);
+        entity.setCreatedAt(System.currentTimeMillis());
+        entity.setCreatedBy(UserContext.getCurrentUserId());
+        entity.setUpdatedAt(System.currentTimeMillis());
+        entity.setUpdatedBy(UserContext.getCurrentUserId());
         this.save(entity);
     }
 
@@ -55,6 +60,8 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
     public void updateRole(ServerRoleCreateUpdateReq req) {
         ServerRoleEntity entity = new ServerRoleEntity();
         BeanUtils.copyProperties(req, entity);
+        entity.setUpdatedAt(System.currentTimeMillis());
+        entity.setUpdatedBy(UserContext.getCurrentUserId());
         this.updateById(entity);
     }
 

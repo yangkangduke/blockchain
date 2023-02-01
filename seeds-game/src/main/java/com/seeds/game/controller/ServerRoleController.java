@@ -22,7 +22,7 @@ import javax.validation.Valid;
  */
 @Api(tags = "游戏服角色相关接口，web调用")
 @RestController
-@RequestMapping("/server-role")
+@RequestMapping("/web/server-role")
 public class ServerRoleController {
 
     @Autowired
