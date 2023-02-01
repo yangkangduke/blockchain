@@ -3,6 +3,7 @@ package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.common.web.inner.Inner;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -26,16 +27,17 @@ import javax.validation.Valid;
  * @since 2023-01-31
  */
 
-@Api(tags = "NFT公共背包接口，内部调用")
+@Api(tags = "NFT公共背包接口，web调用")
 @RestController
-@RequestMapping("/internal-nft-backpack")
-public class InterNftPublicBackpackController {
+@RequestMapping("/nft-backpack")
+public class NftPublicBackpackController {
 
     @Autowired
     private INftPublicBackpackService nftPublicBackpackService;
 
     @PostMapping("page")
     @ApiOperation("获取背包分页信息")
+    @Inner
     public GenericDto<IPage<NftPublicBackpackResp>> create(@Valid @RequestBody NftPublicBackpackPageReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(nftPublicBackpackService.queryPage(req));
@@ -43,6 +45,7 @@ public class InterNftPublicBackpackController {
 
     @PostMapping("detail")
     @ApiOperation("详细信息")
+    @Inner
     public GenericDto<NftPublicBackpackResp> detail(@RequestParam Long id,
                                                     @RequestParam String accessKey,
                                                     @RequestParam String signature,
@@ -50,6 +53,7 @@ public class InterNftPublicBackpackController {
         return GenericDto.success(nftPublicBackpackService.detail(id));
     }
 
+    @Inner
     @PostMapping("create")
     @ApiOperation("新增背包信息")
     public GenericDto<Object> create(@RequestBody @Valid NftPublicBackpackReq req) {
@@ -57,6 +61,7 @@ public class InterNftPublicBackpackController {
         return GenericDto.success(null);
     }
 
+    @Inner
     @PostMapping("update")
     @ApiOperation("修改背包信息")
     public GenericDto<Object> update(@RequestBody @Valid NftPublicBackpackReq req) {
@@ -64,6 +69,7 @@ public class InterNftPublicBackpackController {
         return GenericDto.success(null);
     }
 
+    @Inner
     @PostMapping("distribute")
     @ApiOperation("分配")
     public GenericDto<OpenNftPublicBackpackDisResp> distribute(@RequestBody @Valid NftPublicBackpackDisReq req) {
@@ -71,6 +77,7 @@ public class InterNftPublicBackpackController {
         return GenericDto.success(nftPublicBackpackService.distribute(req));
     }
 
+    @Inner
     @PostMapping("take-back")
     @ApiOperation("收回")
     public GenericDto<Object> takeBack(@RequestBody @Valid NftPublicBackpackTakeBackReq req) {
@@ -78,6 +85,7 @@ public class InterNftPublicBackpackController {
         return GenericDto.success(null);
     }
 
+    @Inner
     @PostMapping("transfer")
     @ApiOperation("转移")
     public GenericDto<OpenNftPublicBackpackDisResp> transfer(@RequestBody @Valid NftPublicBackpackDisReq req) {
