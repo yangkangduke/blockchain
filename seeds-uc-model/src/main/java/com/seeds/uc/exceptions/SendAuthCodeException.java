@@ -7,11 +7,16 @@ import com.seeds.uc.enums.UcErrorCodeEnum;
  * @date 2020/8/23
  */
 public class SendAuthCodeException extends GenericException {
+
     public SendAuthCodeException(UcErrorCodeEnum errorCode) {
         super(errorCode);
     }
 
     public SendAuthCodeException(String message) {
         super(message);
+    }
+
+    public SendAuthCodeException(UcErrorCodeEnum errorCode, String message) {
+        super(errorCode, message);
     }
 }

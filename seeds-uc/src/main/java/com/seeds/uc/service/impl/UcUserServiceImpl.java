@@ -43,6 +43,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -92,6 +94,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     private KafkaTemplate kafkaTemplate;
     @Autowired
     private IUcFileService ucFileService;
+    @Autowired
+    MessageSource messageSource;
 
     /**
      * 注册邮箱账号
@@ -107,7 +111,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         // 校验账号重复
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, email));
         if (one != null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED, messageSource.getMessage("ERR_10061_EMAIL_ALREADY_BEEN_USED", null, LocaleContextHolder.getLocale()));
         }
         String salt = RandomUtil.getRandomSalt();
         String password = PasswordUtil.getPassword(registerReq.getPassword(), salt);
@@ -278,12 +282,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     public void forgotPasswordVerify(String code, String email) {
         AuthCodeDTO authCode = cacheService.getAuthCode(email, AuthCodeUseTypeEnum.RESET_PASSWORD, ClientAuthTypeEnum.EMAIL);
         if (authCode == null || !code.equals(authCode.getCode())) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED, messageSource.getMessage("ERR_17000_EMAIL_VERIFICATION_FAILED", null, LocaleContextHolder.getLocale()));
         }
         // 查看email是否存在
         UcUser one = this.getOne(new LambdaQueryWrapper<UcUser>().eq(UcUser::getEmail, email));
         if (one == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED, messageSource.getMessage("ERR_10001_ACCOUNT_YET_NOT_REGISTERED", null, LocaleContextHolder.getLocale()));
         }
 
     }
@@ -325,14 +329,14 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         log.info("verifyTwoFactorLogin: {}", loginReq);
         TwoFactorAuth twoFactorAuth = cacheService.get2FAInfoWithToken(loginReq.getToken());
         if (twoFactorAuth == null) {
-            throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
+            throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED, messageSource.getMessage("ERR_10023_TOKEN_EXPIRED", null, LocaleContextHolder.getLocale()));
         }
         UcUser user = this.getById(twoFactorAuth.getUserId());
         if (twoFactorAuth != null && twoFactorAuth.getAuthAccountName() != null) {
             // GA验证
             if (ClientAuthTypeEnum.GA.equals(twoFactorAuth.getAuthType())) {
                 if (!googleAuthService.verify(loginReq.getAuthCode(), user.getGaSecret())) {
-                    throw new LoginException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+                    throw new LoginException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE, messageSource.getMessage("ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE", null, LocaleContextHolder.getLocale()));
                 }
             } else if (ClientAuthTypeEnum.EMAIL.equals(twoFactorAuth.getAuthType())) {
                 // 邮箱验证
@@ -343,18 +347,18 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
                 log.info("verifyTwoFactorLogin - in redis twoFactorAuth:{} and authCode: {}", twoFactorAuth, authCode);
                 if (authCode == null) {
-                    throw new LoginException(UcErrorCodeEnum.ERR_10036_AUTH_CODE_EXPIRED);
+                    throw new LoginException(UcErrorCodeEnum.ERR_10036_AUTH_CODE_EXPIRED, messageSource.getMessage("ERR_10036_AUTH_CODE_EXPIRED", null, LocaleContextHolder.getLocale()));
                 }
                 if (!authCode.getCode().equals(loginReq.getAuthCode())) {
-                    throw new LoginException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+                    throw new LoginException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE, messageSource.getMessage("ERR_10033_WRONG_EMAIL_CODE", null, LocaleContextHolder.getLocale()));
                 }
 
             } else {
-                throw new LoginException(UcErrorCodeEnum.ERR_504_MISSING_ARGUMENTS);
+                throw new LoginException(UcErrorCodeEnum.ERR_504_MISSING_ARGUMENTS, messageSource.getMessage("ERR_504_MISSING_ARGUMENTS", null, LocaleContextHolder.getLocale()));
             }
 
         } else {
-            throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
+            throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED, messageSource.getMessage("ERR_10023_TOKEN_EXPIRED", null, LocaleContextHolder.getLocale()));
         }
 //        this.sendLoginMsg(twoFactorAuth.getAuthAccountName(), twoFactorAuth.getUserIp(), twoFactorAuth.getServiceRegion());
         return buildLoginResponse(user.getId(), twoFactorAuth.getAuthAccountName());
@@ -406,11 +410,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .eq(UcUser::getEmail, account));
 
         if (ucUser == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED, messageSource.getMessage("ERR_10001_ACCOUNT_YET_NOT_REGISTERED", null, LocaleContextHolder.getLocale()));
         }
         String loginPassword = PasswordUtil.getPassword(password, ucUser.getSalt());
         if (!loginPassword.equals(ucUser.getPassword())) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT, messageSource.getMessage("ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT", null, LocaleContextHolder.getLocale()));
         }
         UserDto userDto = new UserDto();
         BeanUtil.copyProperties(ucUser, userDto);
@@ -561,20 +565,20 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String nonce =  split[2].replace("\n","");
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(verifyReq.getPublicAddress());
         if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !genMetamaskAuth.getNonce().equals(nonce) ) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED, messageSource.getMessage("ERR_16003_METAMASK_NONCE_EXPIRED", null, LocaleContextHolder.getLocale()));
         }
         // 地址合法性校验
         if (!WalletUtils.isValidAddress(publicAddress)) {
             // 不合法直接返回错误
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16001_METAMASK_ADDRESS, messageSource.getMessage("ERR_16001_METAMASK_ADDRESS", null, LocaleContextHolder.getLocale()));
         }
         // 校验签名信息
         try{
             if (!CryptoUtils.validate(signature, message, publicAddress)) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE, messageSource.getMessage("ERR_16002_METAMASK_SIGNATURE", null, LocaleContextHolder.getLocale()));
             }
         } catch (Exception e) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE, messageSource.getMessage("ERR_16002_METAMASK_SIGNATURE", null, LocaleContextHolder.getLocale()));
         }
         return true;
     }
@@ -645,7 +649,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             return;
         }
         if (StringUtils.isEmpty(inviteCode)) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_11501_INVITATION_CODE_NOT_EXIST.getDescEn());
+            throw new InvalidArgumentsException(messageSource.getMessage("ERR_11501_INVITATION_CODE_NOT_EXIST", null, LocaleContextHolder.getLocale()));
         }
         RandomCodeUseReq req = new RandomCodeUseReq();
         req.setUseFlag(useFlag);
@@ -654,7 +658,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         req.setCode(inviteCode);
         GenericDto<Object> result = remoteRandomCodeService.useRandomCode(req);
         if (!result.isSuccess()) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_11501_INVITATION_CODE_NOT_EXIST.getDescEn());
+            throw new InvalidArgumentsException(messageSource.getMessage("ERR_11501_INVITATION_CODE_NOT_EXIST", null, LocaleContextHolder.getLocale()));
         }
     }
 

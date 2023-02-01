@@ -16,4 +16,8 @@ public class InvalidArgumentsException extends GenericException {
     public InvalidArgumentsException(UcErrorCodeEnum errorCode) {
         super(errorCode);
     }
+
+    public InvalidArgumentsException(UcErrorCodeEnum errorCode, String message) {
+        super(errorCode, message);
+    }
 }
