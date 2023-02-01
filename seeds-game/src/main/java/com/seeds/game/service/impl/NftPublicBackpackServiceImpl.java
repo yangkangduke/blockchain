@@ -4,10 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.game.dto.request.OpenNftPublicBackpackCreateUpdateReq;
-import com.seeds.game.dto.request.OpenNftPublicBackpackDisReq;
-import com.seeds.game.dto.request.OpenNftPublicBackpackPageReq;
-import com.seeds.game.dto.request.OpenNftPublicBackpackTakeBackReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -67,12 +63,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public void create(NftPublicBackpackReq req) {
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
+        BeanUtils.copyProperties(req, entity);
         this.save(entity);
     }
 
     @Override
     public void update(NftPublicBackpackReq req) {
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
+        BeanUtils.copyProperties(req, entity);
         this.updateById(entity);
     }
 
