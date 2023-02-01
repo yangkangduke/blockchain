@@ -113,8 +113,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         // 组装返回值
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
         resp.setGameServer(roleEntity.getGameServer());
-        // todo 根据物品的基础数据获取名字
-        resp.setItemName("");
+        resp.setItemName(nftItem.getName());
         resp.setRegion(roleEntity.getRegion());
         resp.setRoleName(roleEntity.getName());
         resp.setLevel(roleEntity.getLevel());
@@ -168,8 +167,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         // 组装返回值
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
         resp.setGameServer(roleEntity.getGameServer());
-        // todo 根据物品的基础数据获取名字
-        resp.setItemName("");
+        resp.setItemName(nftItem.getName());
         resp.setRegion(roleEntity.getRegion());
         resp.setRoleName(roleEntity.getName());
         resp.setLevel(roleEntity.getLevel());
