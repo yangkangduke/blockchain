@@ -13,11 +13,7 @@ import com.seeds.game.service.INftPublicBackpackService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -32,7 +28,7 @@ import javax.validation.Valid;
 
 
 @Api(tags = "NFT公共背包接口，游戏方调用")
-@Controller
+@RestController
 @RequestMapping("/nft-backpack")
 public class OpenNftPublicBackpackController {
 
@@ -44,6 +40,15 @@ public class OpenNftPublicBackpackController {
     public GenericDto<IPage<NftPublicBackpackResp>> create(@Valid @RequestBody OpenNftPublicBackpackPageReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(nftPublicBackpackService.queryPage(req));
+    }
+
+    @PostMapping("/nft-backpack/detail")
+    @ApiOperation("详细信息")
+    public GenericDto<NftPublicBackpackResp> detail1(@RequestParam Long id,
+                                                     @RequestParam String accessKey,
+                                                     @RequestParam String signature,
+                                                     @RequestParam Long timestamp) {
+        return GenericDto.success(nftPublicBackpackService.detail(id));
     }
 
     @PostMapping("detail")
