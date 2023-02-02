@@ -38,10 +38,11 @@ public class GameExceptionHandler {
     @ResponseBody
     @ExceptionHandler(FeignException.class)
     ResponseEntity<GenericDto<String>> handle(FeignException e) {
-        String message = e.getMessage().substring(e.getMessage().lastIndexOf('{'), e.getMessage().length() - 1);
-        return new ResponseEntity<>(
-                GenericDto.failure(JSONUtil.toBean(message, GenericDto.class).getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+//        String message = e.getMessage().substring(e.getMessage().lastIndexOf('{'), e.getMessage().length() - 1);
+//        return new ResponseEntity<>(
+//                GenericDto.failure(JSONUtil.toBean(message, GenericDto.class).getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+//                HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(GenericDto.failure(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ResponseBody
@@ -85,10 +86,20 @@ public class GameExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<GenericDto<String>> handle(ConstraintViolationException e){
+    public ResponseEntity<GenericDto<String>> handle(ConstraintViolationException e) {
         return new ResponseEntity<>(
                 GenericDto.failure(e.getCause().getMessage(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ResponseBody
+    @ExceptionHandler(com.seeds.game.exception.GenericException.class)
+    ResponseEntity<GenericDto<String>> handle(com.seeds.game.exception.GenericException e) {
+        log.error("General Exception:", e);
+        return new ResponseEntity<>(
+                GenericDto.failure(e.getMessage(), e.getErrorCode().getCode()),
+                HttpStatus.OK);
     }
 
     /**

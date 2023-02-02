@@ -23,7 +23,7 @@ public class GeneratorCodeController {
                             .outputDir("/Users/yk/generatorcode"); // 指定输出目录
                 })
                 .packageConfig(builder -> {
-                    builder.parent("com.baomidou.mybatisplus.samples.generator") // 设置父包名
+                    builder.parent("com.seeds") // 设置父包名
                             .moduleName("system") // 设置父包模块名
                             .pathInfo(Collections.singletonMap(OutputFile.xml, "/Users/yk/generatorcode")); // 设置mapperXml生成路径
                 })
