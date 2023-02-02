@@ -86,10 +86,9 @@ public class OpenNftPublicBackpackController {
 
     @PostMapping("transfer")
     @ApiOperation("转移")
-    public GenericDto<Object> transfer(@RequestBody @Valid OpenNftPublicBackpackDisReq req) {
+    public GenericDto<OpenNftPublicBackpackDisResp> transfer(@RequestBody @Valid OpenNftPublicBackpackDisReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        nftPublicBackpackService.transfer(req);
-        return GenericDto.success(null);
+        return GenericDto.success(nftPublicBackpackService.transfer(req));
     }
 
 }
