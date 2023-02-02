@@ -42,15 +42,6 @@ public class OpenNftPublicBackpackController {
         return GenericDto.success(nftPublicBackpackService.queryPage(req));
     }
 
-    @PostMapping("/nft-backpack/detail")
-    @ApiOperation("详细信息")
-    public GenericDto<NftPublicBackpackResp> detail1(@RequestParam Long id,
-                                                     @RequestParam String accessKey,
-                                                     @RequestParam String signature,
-                                                     @RequestParam Long timestamp) {
-        return GenericDto.success(nftPublicBackpackService.detail(id));
-    }
-
     @PostMapping("detail")
     @ApiOperation("详细信息")
     public GenericDto<NftPublicBackpackResp> detail(@RequestParam Long id,
