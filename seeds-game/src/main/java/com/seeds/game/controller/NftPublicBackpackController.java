@@ -3,7 +3,6 @@ package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.common.web.inner.Inner;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -42,9 +41,9 @@ public class NftPublicBackpackController {
         return GenericDto.success(nftPublicBackpackService.queryPage(req));
     }
 
-    @PostMapping("detail")
+    @GetMapping("detail/{id}")
     @ApiOperation("详细信息")
-    public GenericDto<NftPublicBackpackResp> detail(@RequestParam Long id) {
+    public GenericDto<NftPublicBackpackResp> detail(@PathVariable Long id) {
         return GenericDto.success(nftPublicBackpackService.detail(id));
     }
 
