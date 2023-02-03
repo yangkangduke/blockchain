@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 
 /**
  * 游戏服角色 web端调用
@@ -28,14 +29,14 @@ public class ServerRoleController {
     @Autowired
     private IServerRoleService serverRoleService;
 
-    @Inner
+
     @PostMapping("page")
     @ApiOperation("获取角色分页信息")
     public GenericDto<IPage<ServerRoleResp>> create(@Valid @RequestBody ServerRolePageReq req) {
         return GenericDto.success(serverRoleService.queryPage(req));
     }
 
-    @Inner
+
     @PostMapping("create")
     @ApiOperation("新增角色信息")
     public GenericDto<Object> createRole(@RequestBody @Valid ServerRoleCreateUpdateReq req) {
@@ -43,7 +44,7 @@ public class ServerRoleController {
         return GenericDto.success(null);
     }
 
-    @Inner
+
     @PostMapping("update")
     @ApiOperation("修改角色信息")
     public GenericDto<Object> updateRole(@RequestBody @Valid ServerRoleCreateUpdateReq req) {
@@ -51,7 +52,6 @@ public class ServerRoleController {
         return GenericDto.success(null);
     }
 
-    @Inner
     @PostMapping("delete/{id}")
     public GenericDto<Object> delete(@PathVariable Long id) {
         serverRoleService.delete(id);

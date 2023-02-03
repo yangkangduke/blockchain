@@ -46,6 +46,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         LambdaQueryWrapper<NftPublicBackpackEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(!Objects.isNull(req.getIsConfiguration()), NftPublicBackpackEntity::getIsConfiguration, req.getIsConfiguration())
+                .like(!Objects.isNull(req.getName()), NftPublicBackpackEntity::getName, req.getName())
                 .eq(NftPublicBackpackEntity::getUserId, req.getUserId());
 
         Page<NftPublicBackpackEntity> page = new Page<>(req.getCurrent(), req.getSize());

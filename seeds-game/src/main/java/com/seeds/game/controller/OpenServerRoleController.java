@@ -49,8 +49,11 @@ public class OpenServerRoleController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("delete/{id}")
-    public GenericDto<Object> delete(@PathVariable Long id) {
+    @PostMapping("delete")
+    public GenericDto<Object> delete(@RequestParam Long id,
+                                     @RequestParam String accessKey,
+                                     @RequestParam String signature,
+                                     @RequestParam Long timestamp) {
         serverRoleService.delete(id);
         return GenericDto.success(null);
     }
