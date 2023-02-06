@@ -99,12 +99,14 @@ public class NftBackpackListener {
     @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.NFT_BACKPACK_TAKE_BACK})
     public void takeBack(String msg) {
 
-        log.info("收到【分发NFT】消息：{}", msg);
+        log.info("收到【收回NFT】消息：{}", msg);
         NftPublicBackpackTakeBackReq takeBackReq = JSONUtil.toBean(msg, NftPublicBackpackTakeBackReq.class);
         try {
+            Long userId = this.checkUcToken(takeBackReq.getUcToken());
+            takeBackReq.setUserId(userId);
             nftPublicBackpackService.takeBack(takeBackReq);
         } catch (Exception e) {
-            log.error("消费【分发NFT】消息，错误：{}", e.getMessage());
+            log.error("消费【收回NFT】消息，错误：{}", e.getMessage());
             throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
         }
     }
@@ -120,6 +122,8 @@ public class NftBackpackListener {
         log.info("收到【转移NFT】消息：{}", msg);
         NftPublicBackpackDisReq disReq = JSONUtil.toBean(msg, NftPublicBackpackDisReq.class);
         try {
+            Long userId = this.checkUcToken(disReq.getUcToken());
+            disReq.setUserId(userId);
             nftPublicBackpackService.distribute(disReq);
         } catch (Exception e) {
             log.error("消费【转移NFT】消息，错误：{}", e.getMessage());

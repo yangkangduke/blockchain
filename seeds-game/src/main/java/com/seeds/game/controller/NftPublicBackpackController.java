@@ -50,6 +50,7 @@ public class NftPublicBackpackController {
     @PostMapping("create")
     @ApiOperation("新增")
     public GenericDto<Object> create(@RequestBody @Valid NftPublicBackpackReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         nftPublicBackpackService.create(req);
         return GenericDto.success(null);
     }
@@ -57,6 +58,7 @@ public class NftPublicBackpackController {
     @PostMapping("update")
     @ApiOperation("修改")
     public GenericDto<Object> update(@RequestBody @Valid NftPublicBackpackReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         nftPublicBackpackService.update(req);
         return GenericDto.success(null);
     }

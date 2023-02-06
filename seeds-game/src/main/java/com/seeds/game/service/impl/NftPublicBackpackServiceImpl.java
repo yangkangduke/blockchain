@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -67,9 +66,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
         BeanUtils.copyProperties(req, entity);
         entity.setCreatedAt(System.currentTimeMillis());
-        entity.setCreatedBy(UserContext.getCurrentUserId());
+        entity.setCreatedBy(req.getUserId());
         entity.setUpdatedAt(System.currentTimeMillis());
-        entity.setUpdatedBy(UserContext.getCurrentUserId());
+        entity.setUpdatedBy(req.getUserId());
         this.save(entity);
     }
 
@@ -78,7 +77,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
         BeanUtils.copyProperties(req, entity);
         entity.setUpdatedAt(System.currentTimeMillis());
-        entity.setUpdatedBy(UserContext.getCurrentUserId());
+        entity.setUpdatedBy(req.getUserId());
         this.updateById(entity);
     }
 
@@ -148,7 +147,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         // 收回
         nftItem.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
-        nftItem.setServerRoleId(null);
+        nftItem.setServerRoleId(0L);
         nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
     }
