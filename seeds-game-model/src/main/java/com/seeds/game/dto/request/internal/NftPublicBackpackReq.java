@@ -77,4 +77,7 @@ public class NftPublicBackpackReq implements Serializable {
 
     @ApiModelProperty(value = "动态属性，存json", example = "{\"attr\":\"动态属性\"}")
     private String attributes;
+
+    @ApiModelProperty("nft元数据，存json")
+    private String metadata;
 }

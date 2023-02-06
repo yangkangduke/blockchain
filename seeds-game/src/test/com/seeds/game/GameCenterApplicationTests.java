@@ -4,10 +4,7 @@ package com.seeds.game;
 import cn.hutool.json.JSONUtil;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.game.dto.request.OpenNftPublicBackpackCreateUpdateReq;
-import com.seeds.game.dto.request.internal.DeleteReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
-import com.seeds.game.dto.request.internal.ServerRoleCreateUpdateReq;
+import com.seeds.game.dto.request.internal.*;
 import com.seeds.game.mq.producer.KafkaProducer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +60,7 @@ class GameCenterApplicationTests {
     // 新增公共背包数据
     @Test
     void insertBackpack() {
-        OpenNftPublicBackpackCreateUpdateReq req = new OpenNftPublicBackpackCreateUpdateReq();
+        NftPublicBackpackReq req = new NftPublicBackpackReq();
         req.setUcToken("68fe8281f4bd6c49e58ffb76343f56633eff0888");
         req.setName("测试皮肤");
         req.setDesc("testDesc");
@@ -80,12 +77,13 @@ class GameCenterApplicationTests {
         req.setIsConfiguration(0);
         req.setState(0);
         req.setAttributes("{\"attr\": \"动态属性\"}");
+        req.setMetadata("{\"metadata\": \"metadata\"}");
         kafkaProducer.sendAsync(KafkaTopic.NFT_BACKPACK_INSERT, JSONUtil.toJsonStr(req));
     }
 
     @Test
     void updateBackpack() {
-        OpenNftPublicBackpackCreateUpdateReq req = new OpenNftPublicBackpackCreateUpdateReq();
+        NftPublicBackpackReq req = new NftPublicBackpackReq();
         req.setUcToken("68fe8281f4bd6c49e58ffb76343f56633eff0888");
         req.setId(51L);
         req.setName("测试皮肤1");
@@ -103,6 +101,7 @@ class GameCenterApplicationTests {
         req.setIsConfiguration(0);
         req.setState(0);
         req.setAttributes("{\"attr\": \"动态属性1\"}");
+        req.setMetadata("{\"metadata\": \"metadata\"}");
         kafkaProducer.sendAsync(KafkaTopic.NFT_BACKPACK_UPDATE, JSONUtil.toJsonStr(req));
     }
 
