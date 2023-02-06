@@ -124,7 +124,7 @@ public class NftBackpackListener {
         try {
             Long userId = this.checkUcToken(disReq.getUcToken());
             disReq.setUserId(userId);
-            nftPublicBackpackService.distribute(disReq);
+            nftPublicBackpackService.transfer(disReq);
         } catch (Exception e) {
             log.error("消费【转移NFT】消息，错误：{}", e.getMessage());
             throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
