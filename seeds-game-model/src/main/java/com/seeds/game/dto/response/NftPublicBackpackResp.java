@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import jnr.ffi.annotations.In;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -35,7 +36,7 @@ public class NftPublicBackpackResp implements Serializable {
     private String image;
 
     @ApiModelProperty("类型：1装备 2道具 3英雄")
-    private Boolean type;
+    private Integer type;
 
     @ApiModelProperty("对应游戏那边的conf_id，找静态表中的数据")
     private Long itemId;
@@ -84,4 +85,7 @@ public class NftPublicBackpackResp implements Serializable {
 
     @ApiModelProperty("动态属性，存json")
     private String attributes;
+
+    @ApiModelProperty("nft元数据，存json")
+    private String metadata;
 }

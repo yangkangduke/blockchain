@@ -19,7 +19,7 @@ import java.io.Serializable;
  * @since 2023-01-31
  */
 @EqualsAndHashCode(callSuper = true)
-@ApiModel(value = "OpenServerRolePageReq")
+@ApiModel(value = "ServerRolePageReq")
 @Data
 public class ServerRolePageReq extends PageReq implements Serializable {
 

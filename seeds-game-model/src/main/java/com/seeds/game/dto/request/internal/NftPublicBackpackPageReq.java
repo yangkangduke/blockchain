@@ -23,6 +23,9 @@ public class NftPublicBackpackPageReq extends PageReq implements Serializable {
     @ApiModelProperty(value = "用户id")
     private Long userId;
 
+    @ApiModelProperty(value = "nft物品名字")
+    private String name;
+
     @ApiModelProperty(value = "是否分配。0未分配 1已分配", example = "0")
     private Integer isConfiguration;
 }

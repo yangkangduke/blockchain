@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.internal.DeleteReq;
 import com.seeds.game.dto.request.internal.ServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.internal.ServerRolePageReq;
 import com.seeds.game.dto.response.ServerRoleResp;
@@ -50,9 +50,9 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
         ServerRoleEntity entity = new ServerRoleEntity();
         BeanUtils.copyProperties(req, entity);
         entity.setCreatedAt(System.currentTimeMillis());
-        entity.setCreatedBy(UserContext.getCurrentUserId());
+        entity.setCreatedBy(req.getUserId());
         entity.setUpdatedAt(System.currentTimeMillis());
-        entity.setUpdatedBy(UserContext.getCurrentUserId());
+        entity.setUpdatedBy(req.getUserId());
         this.save(entity);
     }
 
@@ -61,12 +61,16 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
         ServerRoleEntity entity = new ServerRoleEntity();
         BeanUtils.copyProperties(req, entity);
         entity.setUpdatedAt(System.currentTimeMillis());
-        entity.setUpdatedBy(UserContext.getCurrentUserId());
+        entity.setUpdatedBy(req.getUserId());
         this.updateById(entity);
     }
 
     @Override
-    public void delete(Long id) {
-        this.removeById(id);
+    public void delete(DeleteReq req) {
+        ServerRoleEntity entity = getById(req.getId());
+
+        if (entity.getUserId().equals(req.getUserId())) {
+            this.removeById(req.getId());
+        }
     }
 }

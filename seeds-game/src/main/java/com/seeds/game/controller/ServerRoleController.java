@@ -2,7 +2,8 @@ package com.seeds.game.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.web.inner.Inner;
+import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.internal.DeleteReq;
 import com.seeds.game.dto.request.internal.ServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.internal.ServerRolePageReq;
 import com.seeds.game.dto.response.ServerRoleResp;
@@ -28,33 +29,35 @@ public class ServerRoleController {
     @Autowired
     private IServerRoleService serverRoleService;
 
-    @Inner
+
     @PostMapping("page")
     @ApiOperation("获取角色分页信息")
     public GenericDto<IPage<ServerRoleResp>> create(@Valid @RequestBody ServerRolePageReq req) {
         return GenericDto.success(serverRoleService.queryPage(req));
     }
 
-    @Inner
-    @PostMapping("create")
-    @ApiOperation("新增角色信息")
-    public GenericDto<Object> createRole(@RequestBody @Valid ServerRoleCreateUpdateReq req) {
-        serverRoleService.createRole(req);
-        return GenericDto.success(null);
-    }
 
-    @Inner
-    @PostMapping("update")
-    @ApiOperation("修改角色信息")
-    public GenericDto<Object> updateRole(@RequestBody @Valid ServerRoleCreateUpdateReq req) {
-        serverRoleService.updateRole(req);
-        return GenericDto.success(null);
-    }
-
-    @Inner
-    @PostMapping("delete/{id}")
-    public GenericDto<Object> delete(@PathVariable Long id) {
-        serverRoleService.delete(id);
-        return GenericDto.success(null);
-    }
+//    @PostMapping("create")
+//    @ApiOperation("新增角色信息")
+//    public GenericDto<Object> createRole(@RequestBody @Valid ServerRoleCreateUpdateReq req) {
+//        serverRoleService.createRole(req);
+//        return GenericDto.success(null);
+//    }
+//
+//
+//    @PostMapping("update")
+//    @ApiOperation("修改角色信息")
+//    public GenericDto<Object> updateRole(@RequestBody @Valid ServerRoleCreateUpdateReq req) {
+//        serverRoleService.updateRole(req);
+//        return GenericDto.success(null);
+//    }
+//
+//    @PostMapping("delete/{id}")
+//    public GenericDto<Object> delete(@PathVariable Long id) {
+//        DeleteReq deleteReq = new DeleteReq();
+//        deleteReq.setUserId(UserContext.getCurrentUserId());
+//        deleteReq.setId(id);
+//        serverRoleService.delete(deleteReq);
+//        return GenericDto.success(null);
+//    }
 }

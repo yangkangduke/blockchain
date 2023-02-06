@@ -2,8 +2,10 @@ package com.seeds.game.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.OpenServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.OpenServerRolePageReq;
+import com.seeds.game.dto.request.internal.DeleteReq;
 import com.seeds.game.dto.response.ServerRoleResp;
 import com.seeds.game.service.IServerRoleService;
 import io.swagger.annotations.Api;
@@ -35,23 +37,29 @@ public class OpenServerRoleController {
         return GenericDto.success(serverRoleService.queryPage(req));
     }
 
-    @PostMapping("create")
-    @ApiOperation("新增角色信息")
-    public GenericDto<Object> createRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
-        serverRoleService.createRole(req);
-        return GenericDto.success(null);
-    }
-
-    @PostMapping("update")
-    @ApiOperation("修改角色信息")
-    public GenericDto<Object> updateRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
-        serverRoleService.updateRole(req);
-        return GenericDto.success(null);
-    }
-
-    @PostMapping("delete/{id}")
-    public GenericDto<Object> delete(@PathVariable Long id) {
-        serverRoleService.delete(id);
-        return GenericDto.success(null);
-    }
+//    @PostMapping("create")
+//    @ApiOperation("新增角色信息")
+//    public GenericDto<Object> createRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
+//        serverRoleService.createRole(req);
+//        return GenericDto.success(null);
+//    }
+//
+//    @PostMapping("update")
+//    @ApiOperation("修改角色信息")
+//    public GenericDto<Object> updateRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
+//        serverRoleService.updateRole(req);
+//        return GenericDto.success(null);
+//    }
+//
+//    @PostMapping("delete")
+//    public GenericDto<Object> delete(@RequestParam Long id,
+//                                     @RequestParam String accessKey,
+//                                     @RequestParam String signature,
+//                                     @RequestParam Long timestamp) {
+//        DeleteReq deleteReq = new DeleteReq();
+//        deleteReq.setUserId(UserContext.getCurrentUserId());
+//        deleteReq.setId(id);
+//        serverRoleService.delete(deleteReq);
+//        return GenericDto.success(null);
+//    }
 }

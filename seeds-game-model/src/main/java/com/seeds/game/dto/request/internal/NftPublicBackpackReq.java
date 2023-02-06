@@ -22,6 +22,10 @@ public class NftPublicBackpackReq implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+
+    @ApiModelProperty(value = "登陆用户的token", example = "5df3072916f6c67886917600d65d29651db5c24e")
+    private String ucToken;
+
     @ApiModelProperty("id")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
@@ -73,4 +77,7 @@ public class NftPublicBackpackReq implements Serializable {
 
     @ApiModelProperty(value = "动态属性，存json", example = "{\"attr\":\"动态属性\"}")
     private String attributes;
+
+    @ApiModelProperty("nft元数据，存json")
+    private String metadata;
 }
