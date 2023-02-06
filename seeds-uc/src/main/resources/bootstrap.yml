@@ -9,6 +9,11 @@ info:
     version: ${BUILD_NUMBER:NOT_SET}
 
 spring:
+  messages:
+    # 国际化资源文件路径 eg:"messages,config.i18n.messages"
+    basename: i18n/messages
+    encoding: UTF-8
+
   application:
     name: ${APP_NAME:seeds-uc}
   profiles:

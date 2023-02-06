@@ -27,6 +27,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -35,6 +37,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Locale;
 
 @Slf4j
 @RestController
@@ -54,6 +57,8 @@ public class AuthController {
     private IUsUserLoginLogService userLoginLogService;
     @Autowired
     private KafkaTemplate kafkaTemplate;
+    @Autowired
+    MessageSource messageSource;
 
 
     @PostMapping("/register/email")
@@ -86,7 +91,7 @@ public class AuthController {
     public GenericDto<LoginResp> login(@Valid @RequestBody LoginReq loginReq) {
         String email = loginReq.getEmail();
         // 校验是否需要2FA认证
-        //获取用户真实ip地址
+        // 获取用户真实ip地址
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String clientIp = WebUtil.getIpAddr(request);
         // 不需要进行2FA
@@ -100,7 +105,7 @@ public class AuthController {
 
         LoginResp login = ucUserService.login(loginReq);
         if (login.getUcToken() == null) {
-            return GenericDto.failure(UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getDescEn(), UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getCode(), login);
+            return GenericDto.failure(messageSource.getMessage("ERR_10070_PLEASE_ENTER_2FA", null, LocaleContextHolder.getLocale()), UcErrorCodeEnum.ERR_10070_PLEASE_ENTER_2FA.getCode(), login);
         }
         return GenericDto.success(login);
     }
@@ -161,12 +166,12 @@ public class AuthController {
         // 验证邮箱和验证码是否正确
         AuthCodeDTO authCode = cacheService.getAuthCode(email, AuthCodeUseTypeEnum.RESET_GA, ClientAuthTypeEnum.EMAIL);
         if (authCode == null || !code.equals(authCode.getCode())) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED, messageSource.getMessage("ERR_17000_EMAIL_VERIFICATION_FAILED", null, LocaleContextHolder.getLocale()));
         }
         // 查看email是否存在
         UcUser one = ucUserService.getOne(new LambdaQueryWrapper<UcUser>().eq(UcUser::getEmail, email));
         if (one == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED, messageSource.getMessage("ERR_10001_ACCOUNT_YET_NOT_REGISTERED", null, LocaleContextHolder.getLocale()));
         }
         // 删除已经绑定的ga
         ucUserService.deleteGa(one);
@@ -188,7 +193,7 @@ public class AuthController {
             String loginToken = WebUtil.getTokenFromRequest(request);
             LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
             if (StringUtils.isBlank(loginToken) || loginUser == null) {
-                throw new SendAuthCodeException(UcErrorCodeEnum.ERR_401_NOT_LOGGED_IN);
+                throw new SendAuthCodeException(UcErrorCodeEnum.ERR_401_NOT_LOGGED_IN, messageSource.getMessage("ERR_401_NOT_LOGGED_IN", null, LocaleContextHolder.getLocale()));
             }
             UcUser user = ucUserService.getById(loginUser.getUserId());
             // 绑定邮箱、修改邮箱

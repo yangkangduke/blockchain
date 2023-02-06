@@ -32,4 +32,21 @@ public class KafkaTopic {
     public final String RANDOM_CODE_GENERATE = "RANDOM_CODE_GENERATE";
     public final String RANDOM_CODE_EXPORT = "RANDOM_CODE_EXPORT";
 
+    // NFT backpack
+    public final String NFT_BACKPACK_INSERT = "NFT_BACKPACK_INSERT";
+    public final String NFT_BACKPACK_UPDATE = "NFT_BACKPACK_UPDATE";
+
+    // 分发 将nft物品从公共背包分发到A服A角色的玩家背包
+    public final String NFT_BACKPACK_DISTRIBUTE = "NFT_BACKPACK_DISTRIBUTE";
+
+    // 收回 撤销分发，收回后的NFT物品在玩家背包内消除
+    public final String NFT_BACKPACK_TAKE_BACK = "NFT_BACKPACK_TAKE_BACK";
+
+    // 转移 将已经分发给A区A服下角色的NFT物品转移至B区B服下的角色
+    public final String NFT_BACKPACK_TRANSFER = "NFT_BACKPACK_TRANSFER";
+
+    // server role
+    public final String SERVER_ROLE_INSERT = "SERVER_ROLE_INSERT";
+    public final String SERVER_ROLE_UPDATE = "SERVER_ROLE_UPDATE";
+    public final String SERVER_ROLE_DELETE = "SERVER_ROLE_DELETE";
 }
