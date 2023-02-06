@@ -37,27 +37,29 @@ public class ServerRoleController {
     }
 
 
-//    @PostMapping("create")
-//    @ApiOperation("新增角色信息")
-//    public GenericDto<Object> createRole(@RequestBody @Valid ServerRoleCreateUpdateReq req) {
-//        serverRoleService.createRole(req);
-//        return GenericDto.success(null);
-//    }
-//
-//
-//    @PostMapping("update")
-//    @ApiOperation("修改角色信息")
-//    public GenericDto<Object> updateRole(@RequestBody @Valid ServerRoleCreateUpdateReq req) {
-//        serverRoleService.updateRole(req);
-//        return GenericDto.success(null);
-//    }
-//
-//    @PostMapping("delete/{id}")
-//    public GenericDto<Object> delete(@PathVariable Long id) {
-//        DeleteReq deleteReq = new DeleteReq();
-//        deleteReq.setUserId(UserContext.getCurrentUserId());
-//        deleteReq.setId(id);
-//        serverRoleService.delete(deleteReq);
-//        return GenericDto.success(null);
-//    }
+    @PostMapping("create")
+    @ApiOperation("新增角色信息")
+    public GenericDto<Object> createRole(@RequestBody @Valid ServerRoleCreateUpdateReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        serverRoleService.createRole(req);
+        return GenericDto.success(null);
+    }
+
+
+    @PostMapping("update")
+    @ApiOperation("修改角色信息")
+    public GenericDto<Object> updateRole(@RequestBody @Valid ServerRoleCreateUpdateReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        serverRoleService.updateRole(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("delete/{id}")
+    public GenericDto<Object> delete(@PathVariable Long id) {
+        DeleteReq deleteReq = new DeleteReq();
+        deleteReq.setUserId(UserContext.getCurrentUserId());
+        deleteReq.setId(id);
+        serverRoleService.delete(deleteReq);
+        return GenericDto.success(null);
+    }
 }
