@@ -33,6 +33,7 @@ public class ServerRoleController {
     @PostMapping("page")
     @ApiOperation("获取角色分页信息")
     public GenericDto<IPage<ServerRoleResp>> create(@Valid @RequestBody ServerRolePageReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(serverRoleService.queryPage(req));
     }
 
@@ -54,12 +55,12 @@ public class ServerRoleController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("delete/{id}")
-    public GenericDto<Object> delete(@PathVariable Long id) {
-        DeleteReq deleteReq = new DeleteReq();
-        deleteReq.setUserId(UserContext.getCurrentUserId());
-        deleteReq.setId(id);
-        serverRoleService.delete(deleteReq);
-        return GenericDto.success(null);
-    }
+//    @PostMapping("delete/{id}")
+//    public GenericDto<Object> delete(@PathVariable Long id) {
+//        DeleteReq deleteReq = new DeleteReq();
+//        deleteReq.setUserId(UserContext.getCurrentUserId());
+//        deleteReq.setId(id);
+//        serverRoleService.delete(deleteReq);
+//        return GenericDto.success(null);
+//    }
 }

@@ -11,6 +11,8 @@ import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * NFT公共背包 服务类
@@ -34,4 +36,6 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     void takeBack(NftPublicBackpackTakeBackReq req);
 
     OpenNftPublicBackpackDisResp transfer(NftPublicBackpackDisReq req);
+
+    List<NftPublicBackpackResp> queryList(OpenNftPublicBackpackPageReq req);
 }
