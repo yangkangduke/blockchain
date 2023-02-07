@@ -49,6 +49,7 @@ public class OpenServerRoleController {
     @PostMapping("create")
     @ApiOperation("新增角色信息")
     public GenericDto<Object> createRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         serverRoleService.createRole(req);
         return GenericDto.success(null);
     }
@@ -56,6 +57,7 @@ public class OpenServerRoleController {
     @PostMapping("update")
     @ApiOperation("修改角色信息")
     public GenericDto<Object> updateRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         serverRoleService.updateRole(req);
         return GenericDto.success(null);
     }
