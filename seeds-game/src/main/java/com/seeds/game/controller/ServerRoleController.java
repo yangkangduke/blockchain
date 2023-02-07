@@ -55,12 +55,12 @@ public class ServerRoleController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("delete/{id}")
-    public GenericDto<Object> delete(@PathVariable Long id) {
-        DeleteReq deleteReq = new DeleteReq();
-        deleteReq.setUserId(UserContext.getCurrentUserId());
-        deleteReq.setId(id);
-        serverRoleService.delete(deleteReq);
-        return GenericDto.success(null);
-    }
+//    @PostMapping("delete/{id}")
+//    public GenericDto<Object> delete(@PathVariable Long id) {
+//        DeleteReq deleteReq = new DeleteReq();
+//        deleteReq.setUserId(UserContext.getCurrentUserId());
+//        deleteReq.setId(id);
+//        serverRoleService.delete(deleteReq);
+//        return GenericDto.success(null);
+//    }
 }

@@ -3,17 +3,16 @@ package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.OpenServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.OpenServerRolePageReq;
+import com.seeds.game.dto.request.internal.DeleteReq;
 import com.seeds.game.dto.response.ServerRoleResp;
 import com.seeds.game.service.IServerRoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -47,21 +46,22 @@ public class OpenServerRoleController {
         return GenericDto.success(serverRoleService.queryList(req));
     }
 
-//    @PostMapping("create")
-//    @ApiOperation("新增角色信息")
-//    public GenericDto<Object> createRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
-//        serverRoleService.createRole(req);
-//        return GenericDto.success(null);
-//    }
-//
-//    @PostMapping("update")
-//    @ApiOperation("修改角色信息")
-//    public GenericDto<Object> updateRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
-//        serverRoleService.updateRole(req);
-//        return GenericDto.success(null);
-//    }
-//
+    @PostMapping("create")
+    @ApiOperation("新增角色信息")
+    public GenericDto<Object> createRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
+        serverRoleService.createRole(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("update")
+    @ApiOperation("修改角色信息")
+    public GenericDto<Object> updateRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
+        serverRoleService.updateRole(req);
+        return GenericDto.success(null);
+    }
+
 //    @PostMapping("delete")
+//    @ApiOperation("删除角色信息")
 //    public GenericDto<Object> delete(@RequestParam Long id,
 //                                     @RequestParam String accessKey,
 //                                     @RequestParam String signature,

@@ -60,20 +60,20 @@ public class OpenNftPublicBackpackController {
         return GenericDto.success(nftPublicBackpackService.detail(id));
     }
 
-//    @PostMapping("create")
-//    @ApiOperation("新增")
-//    public GenericDto<Object> create(@RequestBody @Valid OpenNftPublicBackpackCreateUpdateReq req) {
-//        nftPublicBackpackService.create(req);
-//        return GenericDto.success(null);
-//    }
-//
-//    @PostMapping("update")
-//    @ApiOperation("修改")
-//    public GenericDto<Object> update(@RequestBody @Valid OpenNftPublicBackpackCreateUpdateReq req) {
-//        nftPublicBackpackService.update(req);
-//        return GenericDto.success(null);
-//    }
-//
+    @PostMapping("create")
+    @ApiOperation("新增")
+    public GenericDto<Object> create(@RequestBody @Valid OpenNftPublicBackpackCreateUpdateReq req) {
+        nftPublicBackpackService.create(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("update")
+    @ApiOperation("修改")
+    public GenericDto<Object> update(@RequestBody @Valid OpenNftPublicBackpackCreateUpdateReq req) {
+        nftPublicBackpackService.update(req);
+        return GenericDto.success(null);
+    }
+
     @PostMapping("distribute")
     @ApiOperation("分配")
     public GenericDto<OpenNftPublicBackpackDisResp> distribute(@RequestBody @Valid OpenNftPublicBackpackDisReq req) {

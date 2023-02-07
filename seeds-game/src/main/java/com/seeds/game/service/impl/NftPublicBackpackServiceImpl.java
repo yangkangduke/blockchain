@@ -1,11 +1,9 @@
 package com.seeds.game.service.impl;
 
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.game.dto.request.OpenNftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
@@ -125,7 +123,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
         }
 
-        // 4.执行分配
+        // 调用游戏方接口，执行分配  TODO
+
+        // 更新公共背包数据
         nftItem.setServerRoleId(req.getServerRoleId());
         nftItem.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
         nftItem.setUpdatedAt(System.currentTimeMillis());
@@ -140,9 +140,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         resp.setRoleName(roleEntity.getName());
         resp.setLevel(roleEntity.getLevel());
 
-        //  nft分发成功消息，通知游戏方
-        //  todo 发送的字段需要再确定
-        kafkaProducer.sendAsync(KafkaTopic.NFT_BACKPACK_DISTRIBUTE_FORM_WEB, JSONUtil.toJsonStr(resp));
         return resp;
     }
 
@@ -159,14 +156,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (!userId.equals(req.getUserId())) {
             throw new GenericException(GameErrorCodeEnum.ERR_10002_NFT_ITEM_DOES_NOT_BELONG_TO_CURRENT_USER);
         }
-        // 收回
+
+        // 调用游戏方接口，执行收回  TODO
+
+        // 更新公共背包数据
         nftItem.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
         nftItem.setServerRoleId(0L);
         nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
-        //  nft收回成功消息，通知游戏方
-        //  todo 发送的字段需要再确定
-        kafkaProducer.sendAsync(KafkaTopic.NFT_BACKPACK_TAKE_BACK_FROM_WEB, JSONUtil.toJsonStr(req));
     }
 
     @Override
@@ -198,7 +195,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (roleEntity.getLevel() < 10) {
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
         }
-        // 转移
+
+
+        // 调用游戏方接口，执行收回,再分发  TODO
+
+        // 更新公共背包数据
         nftItem.setServerRoleId(req.getServerRoleId());
         nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
@@ -210,9 +211,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         resp.setRegion(roleEntity.getRegion());
         resp.setRoleName(roleEntity.getName());
         resp.setLevel(roleEntity.getLevel());
-        //  nft转移成功消息，通知游戏方
-        //  todo 发送的字段需要再确定
-        kafkaProducer.sendAsync(KafkaTopic.NFT_BACKPACK_TRANSFER_FROM_WEB, JSONUtil.toJsonStr(resp));
         return resp;
     }
 
