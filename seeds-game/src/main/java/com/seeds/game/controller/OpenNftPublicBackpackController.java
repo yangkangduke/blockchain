@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -37,9 +38,17 @@ public class OpenNftPublicBackpackController {
 
     @PostMapping("page")
     @ApiOperation("获取分页信息")
-    public GenericDto<IPage<NftPublicBackpackResp>> create(@Valid @RequestBody OpenNftPublicBackpackPageReq req) {
+    public GenericDto<IPage<NftPublicBackpackResp>> queryPage(@Valid @RequestBody OpenNftPublicBackpackPageReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(nftPublicBackpackService.queryPage(req));
+    }
+
+
+    @PostMapping("list")
+    @ApiOperation("获取列表信息，不分页")
+    public GenericDto<List<NftPublicBackpackResp>> queryList(@Valid @RequestBody OpenNftPublicBackpackPageReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return GenericDto.success(nftPublicBackpackService.queryList(req));
     }
 
     @GetMapping("detail")
@@ -51,40 +60,40 @@ public class OpenNftPublicBackpackController {
         return GenericDto.success(nftPublicBackpackService.detail(id));
     }
 
-//    @PostMapping("create")
-//    @ApiOperation("新增")
-//    public GenericDto<Object> create(@RequestBody @Valid OpenNftPublicBackpackCreateUpdateReq req) {
-//        nftPublicBackpackService.create(req);
-//        return GenericDto.success(null);
-//    }
-//
-//    @PostMapping("update")
-//    @ApiOperation("修改")
-//    public GenericDto<Object> update(@RequestBody @Valid OpenNftPublicBackpackCreateUpdateReq req) {
-//        nftPublicBackpackService.update(req);
-//        return GenericDto.success(null);
-//    }
-//
-//    @PostMapping("distribute")
-//    @ApiOperation("分配")
-//    public GenericDto<OpenNftPublicBackpackDisResp> distribute(@RequestBody @Valid OpenNftPublicBackpackDisReq req) {
-//        req.setUserId(UserContext.getCurrentUserId());
-//        return GenericDto.success(nftPublicBackpackService.distribute(req));
-//    }
-//
-//    @PostMapping("take-back")
-//    @ApiOperation("收回")
-//    public GenericDto<Object> takeBack(@RequestBody @Valid OpenNftPublicBackpackTakeBackReq req) {
-//        req.setUserId(UserContext.getCurrentUserId());
-//        nftPublicBackpackService.takeBack(req);
-//        return GenericDto.success(null);
-//    }
-//
-//    @PostMapping("transfer")
-//    @ApiOperation("转移")
-//    public GenericDto<OpenNftPublicBackpackDisResp> transfer(@RequestBody @Valid OpenNftPublicBackpackDisReq req) {
-//        req.setUserId(UserContext.getCurrentUserId());
-//        return GenericDto.success(nftPublicBackpackService.transfer(req));
-//    }
+    @PostMapping("create")
+    @ApiOperation("新增")
+    public GenericDto<Object> create(@RequestBody @Valid OpenNftPublicBackpackCreateUpdateReq req) {
+        nftPublicBackpackService.create(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("update")
+    @ApiOperation("修改")
+    public GenericDto<Object> update(@RequestBody @Valid OpenNftPublicBackpackCreateUpdateReq req) {
+        nftPublicBackpackService.update(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("distribute")
+    @ApiOperation("分配")
+    public GenericDto<OpenNftPublicBackpackDisResp> distribute(@RequestBody @Valid OpenNftPublicBackpackDisReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return GenericDto.success(nftPublicBackpackService.distribute(req));
+    }
+
+    @PostMapping("take-back")
+    @ApiOperation("收回")
+    public GenericDto<Object> takeBack(@RequestBody @Valid OpenNftPublicBackpackTakeBackReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        nftPublicBackpackService.takeBack(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("transfer")
+    @ApiOperation("转移")
+    public GenericDto<OpenNftPublicBackpackDisResp> transfer(@RequestBody @Valid OpenNftPublicBackpackDisReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return GenericDto.success(nftPublicBackpackService.transfer(req));
+    }
 
 }

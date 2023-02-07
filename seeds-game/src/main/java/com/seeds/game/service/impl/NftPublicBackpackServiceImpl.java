@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.game.dto.request.OpenNftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -16,6 +17,7 @@ import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NftConfigurationEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftPublicBackpackMapper;
+import com.seeds.game.mq.producer.KafkaProducer;
 import com.seeds.game.service.INftPublicBackpackService;
 import com.seeds.game.service.IServerRoleService;
 import org.springframework.beans.BeanUtils;
@@ -23,8 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -39,6 +43,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Autowired
     private IServerRoleService serverRoleService;
+
+    @Autowired
+    private KafkaProducer kafkaProducer;
 
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
@@ -116,7 +123,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
         }
 
-        // 4.执行分配
+        // 调用游戏方接口，执行分配  TODO
+
+        // 更新公共背包数据
         nftItem.setServerRoleId(req.getServerRoleId());
         nftItem.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
         nftItem.setUpdatedAt(System.currentTimeMillis());
@@ -124,11 +133,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         // 组装返回值
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
+        resp.setId(req.getId());
         resp.setGameServer(roleEntity.getGameServer());
         resp.setItemName(nftItem.getName());
         resp.setRegion(roleEntity.getRegion());
         resp.setRoleName(roleEntity.getName());
         resp.setLevel(roleEntity.getLevel());
+
         return resp;
     }
 
@@ -145,7 +156,10 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (!userId.equals(req.getUserId())) {
             throw new GenericException(GameErrorCodeEnum.ERR_10002_NFT_ITEM_DOES_NOT_BELONG_TO_CURRENT_USER);
         }
-        // 收回
+
+        // 调用游戏方接口，执行收回  TODO
+
+        // 更新公共背包数据
         nftItem.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
         nftItem.setServerRoleId(0L);
         nftItem.setUpdatedAt(System.currentTimeMillis());
@@ -181,7 +195,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (roleEntity.getLevel() < 10) {
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
         }
-        // 转移
+
+
+        // 调用游戏方接口，执行收回,再分发  TODO
+
+        // 更新公共背包数据
         nftItem.setServerRoleId(req.getServerRoleId());
         nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
@@ -194,5 +212,25 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         resp.setRoleName(roleEntity.getName());
         resp.setLevel(roleEntity.getLevel());
         return resp;
+    }
+
+    @Override
+    public List<NftPublicBackpackResp> queryList(OpenNftPublicBackpackPageReq req) {
+        List<NftPublicBackpackResp> respList = new ArrayList<>();
+
+        LambdaQueryWrapper<NftPublicBackpackEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(!Objects.isNull(req.getIsConfiguration()), NftPublicBackpackEntity::getIsConfiguration, req.getIsConfiguration())
+                .like(!Objects.isNull(req.getName()), NftPublicBackpackEntity::getName, req.getName())
+                .eq(NftPublicBackpackEntity::getUserId, req.getUserId());
+        List<NftPublicBackpackEntity> list = this.list(wrapper);
+
+        if (!CollectionUtils.isEmpty(list)) {
+            respList = list.stream().map(p -> {
+                NftPublicBackpackResp resp = new NftPublicBackpackResp();
+                BeanUtils.copyProperties(p, resp);
+                return resp;
+            }).collect(Collectors.toList());
+        }
+        return respList;
     }
 }

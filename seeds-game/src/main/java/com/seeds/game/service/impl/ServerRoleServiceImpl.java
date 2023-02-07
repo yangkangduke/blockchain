@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.game.dto.request.OpenServerRolePageReq;
 import com.seeds.game.dto.request.internal.DeleteReq;
 import com.seeds.game.dto.request.internal.ServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.internal.ServerRolePageReq;
@@ -15,7 +16,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -32,7 +35,9 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
     public IPage<ServerRoleResp> queryPage(ServerRolePageReq req) {
 
         LambdaQueryWrapper<ServerRoleEntity> wrapper = new LambdaQueryWrapper<>();
-        wrapper.orderByDesc(ServerRoleEntity::getLevel);
+        wrapper.eq(ServerRoleEntity::getUserId, req.getUserId())
+                .orderByDesc(ServerRoleEntity::getLevel);
+
         Page<ServerRoleEntity> page = new Page<>(req.getCurrent(), req.getSize());
         List<ServerRoleEntity> records = page(page, wrapper).getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -72,5 +77,24 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
         if (entity.getUserId().equals(req.getUserId())) {
             this.removeById(req.getId());
         }
+    }
+
+    @Override
+    public List<ServerRoleResp> queryList(OpenServerRolePageReq req) {
+
+        List<ServerRoleResp> respList = new ArrayList<>();
+        LambdaQueryWrapper<ServerRoleEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ServerRoleEntity::getUserId, req.getUserId())
+                .orderByDesc(ServerRoleEntity::getLevel);
+        List<ServerRoleEntity> list = this.list(wrapper);
+        if (!CollectionUtils.isEmpty(list)) {
+            respList = list.stream().map(p -> {
+                ServerRoleResp resp = new ServerRoleResp();
+                BeanUtils.copyProperties(p, resp);
+                return resp;
+            }).collect(Collectors.toList());
+
+        }
+        return respList;
     }
 }

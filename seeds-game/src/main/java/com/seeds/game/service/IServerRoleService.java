@@ -10,6 +10,8 @@ import com.seeds.game.dto.request.internal.ServerRolePageReq;
 import com.seeds.game.dto.response.ServerRoleResp;
 import com.seeds.game.entity.ServerRoleEntity;
 
+import java.util.List;
+
 /**
  * <p>
  * 游戏服角色 服务类
@@ -27,4 +29,6 @@ public interface IServerRoleService extends IService<ServerRoleEntity> {
     void updateRole(ServerRoleCreateUpdateReq req);
 
     void delete(DeleteReq req);
+
+    List<ServerRoleResp> queryList(OpenServerRolePageReq req);
 }

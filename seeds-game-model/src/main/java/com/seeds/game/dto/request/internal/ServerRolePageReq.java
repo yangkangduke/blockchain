@@ -6,8 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -23,4 +21,6 @@ import java.io.Serializable;
 @Data
 public class ServerRolePageReq extends PageReq implements Serializable {
 
+    @ApiModelProperty(value = "userId")
+    private Long userId;
 }

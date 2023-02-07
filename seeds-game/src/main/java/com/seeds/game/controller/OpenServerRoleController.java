@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 游戏服角色 游戏方调用，需要带上 accessKey、signature、timestamp
@@ -33,25 +34,34 @@ public class OpenServerRoleController {
 
     @PostMapping("page")
     @ApiOperation("获取角色分页信息")
-    public GenericDto<IPage<ServerRoleResp>> create(@Valid @RequestBody OpenServerRolePageReq req) {
+    public GenericDto<IPage<ServerRoleResp>> queryPage(@Valid @RequestBody OpenServerRolePageReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(serverRoleService.queryPage(req));
     }
 
-//    @PostMapping("create")
-//    @ApiOperation("新增角色信息")
-//    public GenericDto<Object> createRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
-//        serverRoleService.createRole(req);
-//        return GenericDto.success(null);
-//    }
-//
-//    @PostMapping("update")
-//    @ApiOperation("修改角色信息")
-//    public GenericDto<Object> updateRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
-//        serverRoleService.updateRole(req);
-//        return GenericDto.success(null);
-//    }
-//
+    @PostMapping("list")
+    @ApiOperation("获取角色列表，不分页")
+    public GenericDto<List<ServerRoleResp>> queryList(@Valid @RequestBody OpenServerRolePageReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return GenericDto.success(serverRoleService.queryList(req));
+    }
+
+    @PostMapping("create")
+    @ApiOperation("新增角色信息")
+    public GenericDto<Object> createRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
+        serverRoleService.createRole(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("update")
+    @ApiOperation("修改角色信息")
+    public GenericDto<Object> updateRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
+        serverRoleService.updateRole(req);
+        return GenericDto.success(null);
+    }
+
 //    @PostMapping("delete")
+//    @ApiOperation("删除角色信息")
 //    public GenericDto<Object> delete(@RequestParam Long id,
 //                                     @RequestParam String accessKey,
 //                                     @RequestParam String signature,
