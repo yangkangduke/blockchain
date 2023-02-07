@@ -66,13 +66,13 @@ public class OpenSecurityController {
                 securityStrategyList
                         .stream()
                         .collect(Collectors.toMap(UcSecurityStrategy::getAuthType, v -> v));
-        Optional<UcSecurityStrategy> metamaskStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.METAMASK));
+        Optional<UcSecurityStrategy> phantomStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.PHANTOM));
         Optional<UcSecurityStrategy> emailStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.EMAIL));
         Optional<UcSecurityStrategy> gaStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.GA));
         return GenericDto.success(
                 SecurityDetailDto.builder()
-                        .metamask(ucUser.getPublicAddress())
-                        .metamaskState(metamaskStrategy.isPresent())
+                        .phantom(ucUser.getPublicAddress())
+                        .phantomState(phantomStrategy.isPresent())
                         .email(ucUser.getEmail())
                         .emailState(emailStrategy.isPresent())
                         .gaState(gaStrategy.isPresent())
@@ -89,12 +89,12 @@ public class OpenSecurityController {
                 securityStrategyList
                         .stream()
                         .collect(Collectors.toMap(UcSecurityStrategy::getAuthType, v -> v));
-        Optional<UcSecurityStrategy> metamaskStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.METAMASK));
+        Optional<UcSecurityStrategy> phantomStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.PHANTOM));
         Optional<UcSecurityStrategy> emailStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.EMAIL));
         Optional<UcSecurityStrategy> gaStrategy = Optional.ofNullable(strategyEnumMap.get(ClientAuthTypeEnum.GA));
         return GenericDto.success(
                 SecurityStrategyDto.builder()
-                        .verifyMetamask(metamaskStrategy.isPresent() && metamaskStrategy.get().getNeedAuth())
+                        .verifyPhantom(phantomStrategy.isPresent() && phantomStrategy.get().getNeedAuth())
                         .verifyEmail(emailStrategy.isPresent() && emailStrategy.get().getNeedAuth())
                         .verifyGA(gaStrategy.isPresent() && gaStrategy.get().getNeedAuth())
                         .build());

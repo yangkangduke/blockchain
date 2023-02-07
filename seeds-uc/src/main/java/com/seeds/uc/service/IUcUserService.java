@@ -47,10 +47,21 @@ public interface IUcUserService extends IService<UcUser> {
     LoginResp metamaskLogin(MetamaskVerifyReq metamaskVerifyReq);
 
     /**
+     * phantom登陆
+     */
+    LoginResp phantomLogin(PhantomVerifyReq phantomVerifyReq);
+
+    /**
      * 绑定metamask
      * @param uId
      */
     void bindMetamask(AuthTokenDTO authTokenDTO, Long uId);
+
+    /**
+     * 绑定phantom
+     * @param uId
+     */
+    void bindPhantom(AuthTokenDTO authTokenDTO, Long uId);
 
 
     /**
@@ -136,6 +147,13 @@ public interface IUcUserService extends IService<UcUser> {
      * @return
      */
     Boolean verifyMetamask(MetamaskVerifyReq verifyReq);
+
+    /**
+     * 验证phantom签名
+     * @param verifyReq
+     * @return
+     */
+    Boolean verifyPhantom(PhantomVerifyReq verifyReq);
 
     /**
      * 通过id查询用户昵称

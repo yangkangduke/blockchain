@@ -6,6 +6,7 @@ import com.seeds.uc.dto.redis.GenGoogleAuth;
 import com.seeds.uc.dto.request.AuthCodeVerifyReq;
 import com.seeds.uc.dto.request.GoogleAuthVerifyReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
+import com.seeds.uc.dto.request.PhantomVerifyReq;
 import com.seeds.uc.dto.response.TokenResp;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
@@ -92,6 +93,20 @@ public class OpenCodeController {
 
         String authToken = RandomUtil.genRandomToken(UserContext.getCurrentUserId().toString());
         cacheService.putAuthToken(authToken, verifyReq.getMessage(), verifyReq.getPublicAddress(), ClientAuthTypeEnum.METAMASK);
+        return GenericDto.success(
+                TokenResp.builder()
+                        .token(authToken)
+                        .build());
+    }
+
+    @ApiOperation(value = "phantom验证", notes = "phantom验证")
+    @PostMapping("/phantom/verify")
+    public GenericDto<TokenResp> verifyPhantom(@RequestBody PhantomVerifyReq verifyReq) {
+        log.info("OpenCodeController - verifyPhantom got request: {}", verifyReq);
+        userService.verifyPhantom(verifyReq);
+
+        String authToken = RandomUtil.genRandomToken(UserContext.getCurrentUserId().toString());
+        cacheService.putAuthToken(authToken, verifyReq.getMessage(), verifyReq.getPublicAddress(), ClientAuthTypeEnum.PHANTOM);
         return GenericDto.success(
                 TokenResp.builder()
                         .token(authToken)

@@ -29,6 +29,8 @@ public enum ClientAuthTypeEnum {
     GA((short) 3, "ga"),
     @JsonProperty("4")
     PHONE((short) 4, "phone"),
+    @JsonProperty("5")
+    PHANTOM((short) 5, "phantom"),
     ;
 
     public static Set<ClientAuthTypeEnum> NEED_SEND_CODE = EnumSet.of(GA, EMAIL);
@@ -50,6 +52,8 @@ public enum ClientAuthTypeEnum {
                 return EMAIL;
             case 3:
                 return GA;
+            case 5:
+                return PHANTOM;
             default:
                 throw new SeedsException("ClientAuthTypeEnum - no such enum for code: " + code);
         }

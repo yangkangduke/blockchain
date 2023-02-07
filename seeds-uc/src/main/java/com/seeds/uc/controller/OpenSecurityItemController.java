@@ -11,6 +11,7 @@ import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.redis.SecurityAuth;
 import com.seeds.uc.dto.request.GaReq;
 import com.seeds.uc.dto.request.MetamaskBindReq;
+import com.seeds.uc.dto.request.PhantomBindReq;
 import com.seeds.uc.dto.request.UpdateEmailReq;
 import com.seeds.uc.dto.request.security.item.EmailSecurityItemReq;
 import com.seeds.uc.dto.request.security.item.GaSecurityItemReq;
@@ -138,6 +139,38 @@ public class OpenSecurityItemController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("/bind/phantom")
+    @ApiOperation(value = "绑定phantom",
+            notes = "1.调用/auth/phantom/generate-nonce生成nonce " +
+                    "2.前端根据nonce生成签名信息 " +
+                    "3.调用/code/phantom/verify 验证签名信息，返回authToken " +
+                    "4.调用/auth/email/send 参数authType=BIND_PHANTOM 获取邮箱验证码 " +
+                    "5.调用/security/item/bind/phantom绑定 ")
+    public GenericDto<Object> phantomBind(@Valid @RequestBody PhantomBindReq bindReq) {
+        String authToken = bindReq.getAuthToken();
+        String emailCode = bindReq.getEmailCode();
+        Long currentUserId = UserContext.getCurrentUserId();
+        // 验证authToken
+        AuthTokenDTO authTokenDTO = cacheService.getAuthTokenDetailWithToken(authToken, ClientAuthTypeEnum.PHANTOM);
+        if (authTokenDTO == null) {
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_17004_PHANTOM_VERIFY_EXPIRED);
+        }
+        UcUser ucUser = ucUserService.getById(currentUserId);
+        // 验证emailCode
+        AuthCodeDTO authCode = cacheService.getAuthCode(ucUser.getEmail(), AuthCodeUseTypeEnum.BIND_PHANTOM, ClientAuthTypeEnum.EMAIL);
+        if (authCode == null || !emailCode.equals(authCode.getCode())) {
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
+        }
+        // 校验是否已经绑定过了
+        if (null != ucUserService.getOne(new LambdaQueryWrapper<UcUser>()
+                .eq(UcUser::getPublicAddress, authTokenDTO.getAccountName()))) {
+
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10029_METAMASK_EXIST);
+        }
+        // 绑定
+        ucUserService.bindPhantom(authTokenDTO, currentUserId);
+        return GenericDto.success(null);
+    }
 
     @PostMapping("/bind/metamask")
     @ApiOperation(value = "绑定metamask",
@@ -176,8 +209,8 @@ public class OpenSecurityItemController {
     @ApiOperation(value = "绑定邮箱",
             notes = "1.调用/auth/email/send, 参数use_type=BIND_EMAIL, 发送邮箱验证码 " +
                     "2.调用/code/email/verify, 参数use_type=BIND_EMAIL, 进行邮箱的验证, 获取到emailToken " +
-                    "3.调用/auth/metamask/generate-nonce 获取随机数 " +
-                    "4.调用/code/metamask/verify 验证签名，返回authToken " +
+                    "3.调用/auth/phantom/generate-nonce 获取随机数 " +
+                    "4.调用/code/phantom/verify 验证签名，返回authToken " +
                     "5.调用/security/item/email/bind 绑定邮箱 ")
     public GenericDto<Object> bindEmail(@RequestBody EmailSecurityItemReq securityItemReq) {
         String authToken = securityItemReq.getAuthToken();
@@ -189,9 +222,9 @@ public class OpenSecurityItemController {
         }
 
         // 验证authToken
-        AuthTokenDTO authTokenDTO = cacheService.getAuthTokenDetailWithToken(authToken, ClientAuthTypeEnum.METAMASK);
+        AuthTokenDTO authTokenDTO = cacheService.getAuthTokenDetailWithToken(authToken, ClientAuthTypeEnum.PHANTOM);
         if (authTokenDTO == null) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_16004_METAMASK_VERIFY_EXPIRED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_17004_PHANTOM_VERIFY_EXPIRED);
         }
 
         String accountName = emailAuthToken.getAccountName();

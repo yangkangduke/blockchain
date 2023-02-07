@@ -28,6 +28,12 @@ public enum UcErrorCodeEnum {
     ERR_16003_METAMASK_NONCE_EXPIRED(16003, "nonce已经过期", "nonce has expired"),
     ERR_16004_METAMASK_VERIFY_EXPIRED(16004, "metamask签名验证过期", "metamask signature verification expired"),
 
+    //phantom
+    ERR_17001_PHANTOM_ADDRESS(17001, "非法地址格式", "Illegal address format"),
+    ERR_17002_PHANTOM_SIGNATURE(17002, "签名验证失败", "Signature verification failed"),
+    ERR_17003_PHANTOM_NONCE_EXPIRED(17003, "nonce已经过期", "nonce has expired"),
+    ERR_17004_PHANTOM_VERIFY_EXPIRED(17004, "phantom签名验证过期", "phantom signature verification expired"),
+
     // 账户
     ERR_18001_ACCOUNT_BALANCE_INSUFFICIENT(18001, "账户余额不足", "Insufficient account balance"),
     ERR_18002_ACCOUNT_NOT(18002, "账户不存在，请先生成账户", "The account does not exist, please create an account first"),

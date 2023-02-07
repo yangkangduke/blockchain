@@ -13,6 +13,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SecurityStrategyDto {
     private Boolean verifyMetamask;
+    private Boolean verifyPhantom;
     private Boolean verifyEmail;
     private Boolean verifyGA;
 }
