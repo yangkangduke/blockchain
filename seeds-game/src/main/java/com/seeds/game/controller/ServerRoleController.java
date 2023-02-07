@@ -33,6 +33,7 @@ public class ServerRoleController {
     @PostMapping("page")
     @ApiOperation("获取角色分页信息")
     public GenericDto<IPage<ServerRoleResp>> create(@Valid @RequestBody ServerRolePageReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(serverRoleService.queryPage(req));
     }
 

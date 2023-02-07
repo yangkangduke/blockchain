@@ -38,12 +38,18 @@ public class KafkaTopic {
 
     // 分发 将nft物品从公共背包分发到A服A角色的玩家背包
     public final String NFT_BACKPACK_DISTRIBUTE = "NFT_BACKPACK_DISTRIBUTE";
+    // WEB端分发成功后，通知游戏方
+    public final String NFT_BACKPACK_DISTRIBUTE_FORM_WEB = "NFT_BACKPACK_DISTRIBUTE_FROM_WEB";
 
     // 收回 撤销分发，收回后的NFT物品在玩家背包内消除
     public final String NFT_BACKPACK_TAKE_BACK = "NFT_BACKPACK_TAKE_BACK";
+    // WEB端收回成功后，通知游戏方
+    public final String NFT_BACKPACK_TAKE_BACK_FROM_WEB = "NFT_BACKPACK_TAKE_BACK_FROM_WEB";
 
     // 转移 将已经分发给A区A服下角色的NFT物品转移至B区B服下的角色
     public final String NFT_BACKPACK_TRANSFER = "NFT_BACKPACK_TRANSFER";
+    // WEB端转移成功后，通知游戏方
+    public final String NFT_BACKPACK_TRANSFER_FROM_WEB = "NFT_BACKPACK_TRANSFER_FROM_WEB";
 
     // server role
     public final String SERVER_ROLE_INSERT = "SERVER_ROLE_INSERT";

@@ -3,18 +3,20 @@ package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.game.dto.request.OpenServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.OpenServerRolePageReq;
-import com.seeds.game.dto.request.internal.DeleteReq;
 import com.seeds.game.dto.response.ServerRoleResp;
 import com.seeds.game.service.IServerRoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 游戏服角色 游戏方调用，需要带上 accessKey、signature、timestamp
@@ -33,8 +35,16 @@ public class OpenServerRoleController {
 
     @PostMapping("page")
     @ApiOperation("获取角色分页信息")
-    public GenericDto<IPage<ServerRoleResp>> create(@Valid @RequestBody OpenServerRolePageReq req) {
+    public GenericDto<IPage<ServerRoleResp>> queryPage(@Valid @RequestBody OpenServerRolePageReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(serverRoleService.queryPage(req));
+    }
+
+    @PostMapping("list")
+    @ApiOperation("获取角色列表，不分页")
+    public GenericDto<List<ServerRoleResp>> queryList(@Valid @RequestBody OpenServerRolePageReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return GenericDto.success(serverRoleService.queryList(req));
     }
 
 //    @PostMapping("create")

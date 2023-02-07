@@ -1,9 +1,12 @@
 package com.seeds.game.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.common.constant.mq.KafkaTopic;
+import com.seeds.game.dto.request.OpenNftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -16,6 +19,7 @@ import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NftConfigurationEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftPublicBackpackMapper;
+import com.seeds.game.mq.producer.KafkaProducer;
 import com.seeds.game.service.INftPublicBackpackService;
 import com.seeds.game.service.IServerRoleService;
 import org.springframework.beans.BeanUtils;
@@ -23,8 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -39,6 +45,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Autowired
     private IServerRoleService serverRoleService;
+
+    @Autowired
+    private KafkaProducer kafkaProducer;
 
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
@@ -124,11 +133,16 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         // 组装返回值
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
+        resp.setId(req.getId());
         resp.setGameServer(roleEntity.getGameServer());
         resp.setItemName(nftItem.getName());
         resp.setRegion(roleEntity.getRegion());
         resp.setRoleName(roleEntity.getName());
         resp.setLevel(roleEntity.getLevel());
+
+        //  nft分发成功消息，通知游戏方
+        //  todo 发送的字段需要再确定
+        kafkaProducer.sendAsync(KafkaTopic.NFT_BACKPACK_DISTRIBUTE_FORM_WEB, JSONUtil.toJsonStr(resp));
         return resp;
     }
 
@@ -150,6 +164,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         nftItem.setServerRoleId(0L);
         nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
+        //  nft收回成功消息，通知游戏方
+        //  todo 发送的字段需要再确定
+        kafkaProducer.sendAsync(KafkaTopic.NFT_BACKPACK_TAKE_BACK_FROM_WEB, JSONUtil.toJsonStr(req));
     }
 
     @Override
@@ -193,6 +210,29 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         resp.setRegion(roleEntity.getRegion());
         resp.setRoleName(roleEntity.getName());
         resp.setLevel(roleEntity.getLevel());
+        //  nft转移成功消息，通知游戏方
+        //  todo 发送的字段需要再确定
+        kafkaProducer.sendAsync(KafkaTopic.NFT_BACKPACK_TRANSFER_FROM_WEB, JSONUtil.toJsonStr(resp));
         return resp;
+    }
+
+    @Override
+    public List<NftPublicBackpackResp> queryList(OpenNftPublicBackpackPageReq req) {
+        List<NftPublicBackpackResp> respList = new ArrayList<>();
+
+        LambdaQueryWrapper<NftPublicBackpackEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(!Objects.isNull(req.getIsConfiguration()), NftPublicBackpackEntity::getIsConfiguration, req.getIsConfiguration())
+                .like(!Objects.isNull(req.getName()), NftPublicBackpackEntity::getName, req.getName())
+                .eq(NftPublicBackpackEntity::getUserId, req.getUserId());
+        List<NftPublicBackpackEntity> list = this.list(wrapper);
+
+        if (!CollectionUtils.isEmpty(list)) {
+            respList = list.stream().map(p -> {
+                NftPublicBackpackResp resp = new NftPublicBackpackResp();
+                BeanUtils.copyProperties(p, resp);
+                return resp;
+            }).collect(Collectors.toList());
+        }
+        return respList;
     }
 }

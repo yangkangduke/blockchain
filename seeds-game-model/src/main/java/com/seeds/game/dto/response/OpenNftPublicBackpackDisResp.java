@@ -12,6 +12,9 @@ import lombok.Data;
 @Data
 public class OpenNftPublicBackpackDisResp {
 
+    @ApiModelProperty("nft物品Id")
+    private Long id;
+
     @ApiModelProperty("nft物品名称")
     private String itemName;
 

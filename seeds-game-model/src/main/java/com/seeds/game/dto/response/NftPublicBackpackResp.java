@@ -62,21 +62,6 @@ public class NftPublicBackpackResp implements Serializable {
     @ApiModelProperty("协议标准")
     private String tokenStandard;
 
-    @ApiModelProperty("version")
-    private Long version;
-
-    @ApiModelProperty("创建人")
-    private Long createdBy;
-
-    @ApiModelProperty("修改人")
-    private Long updatedBy;
-
-    @ApiModelProperty("上传时间")
-    private Long createdAt;
-
-    @ApiModelProperty("更新时间")
-    private Long updatedAt;
-
     @ApiModelProperty("是否分配。0未分配 1已分配")
     private Integer isConfiguration;
 
