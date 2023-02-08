@@ -165,7 +165,7 @@ public class OpenSecurityItemController {
         if (null != ucUserService.getOne(new LambdaQueryWrapper<UcUser>()
                 .eq(UcUser::getPublicAddress, authTokenDTO.getAccountName()))) {
 
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_10029_METAMASK_EXIST);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10029_PHANTOM_EXIST);
         }
         // 绑定
         ucUserService.bindPhantom(authTokenDTO, currentUserId);

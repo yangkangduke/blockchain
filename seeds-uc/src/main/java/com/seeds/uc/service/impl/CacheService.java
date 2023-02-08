@@ -53,9 +53,13 @@ public class CacheService {
     @Value("${uc.ga.expire:300}")
     private Integer googleAuthExpireAfter;
 
-    // nonce生成，绑定 的过期时间
+    // metamask的nonce生成，绑定 的过期时间
     @Value("${uc.metamask.expire:300}")
     private Integer metamaskAuthExpireAfter;
+
+    // phantom的nonce生成，绑定 的过期时间
+    @Value("${uc.phantom.expire:300}")
+    private Integer phantomkAuthExpireAfter;
 
     @Value("${uc.profile.info.expire:10}")
     private Integer profileInfoExpireAfter;
@@ -270,6 +274,20 @@ public class CacheService {
         log.info("CacheService - putGenerateMetamaskAuth - put key: {}, value: {}", key, genMetamaskAuth);
     }
 
+    public void putGeneratePhantomAuth(String publicAddress,
+                                        String nonce) {
+        Long expireAt = System.currentTimeMillis() + phantomkAuthExpireAfter * 1000;
+        String key = UcRedisKeysConstant.getUcGeneratePhantomAuthKeyTemplate(publicAddress);
+        RBucket<GenPhantomAuth> genPhantomAuthRBucket = redisson.getBucket(key);
+        GenPhantomAuth genPhantomAuth =
+                GenPhantomAuth.builder()
+                        .nonce(nonce)
+                        .expireAt(expireAt)
+                        .build();
+        genPhantomAuthRBucket.set(genPhantomAuth, phantomkAuthExpireAfter, TimeUnit.SECONDS);
+        log.info("CacheService - putGeneratePhantomAuth - put key: {}, value: {}", key, genPhantomAuth);
+    }
+
     public void putOneDayMarking(String key) {
         key = UcRedisKeysConstant.getOneDayMarkingTemplate(key);
         RBucket<String> bucket = redisson.getBucket(key);
@@ -293,6 +311,12 @@ public class CacheService {
         String key = UcRedisKeysConstant.getUcGenerateMetamaskAuthKeyTemplate(token);
         RBucket<GenMetamaskAuth> genMetamaskAuthRBucket = redisson.getBucket(key);
         return genMetamaskAuthRBucket.get();
+    }
+
+    public GenPhantomAuth getGeneratePhantomAuth(String token) {
+        String key = UcRedisKeysConstant.getUcGeneratePhantomAuthKeyTemplate(token);
+        RBucket<GenPhantomAuth> genPhantomAuthRBucket = redisson.getBucket(key);
+        return genPhantomAuthRBucket.get();
     }
 
     /**

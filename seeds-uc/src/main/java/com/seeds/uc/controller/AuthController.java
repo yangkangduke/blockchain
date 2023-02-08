@@ -136,7 +136,7 @@ public class AuthController {
     @PostMapping("/phantom/generate-nonce")
     public GenericDto<PhantomAuthResp> generateNonce(@Valid @RequestBody PhantomVerifyReq phantomVerifyReq) {
         String nonce = RandomUtil.getRandomSalt();
-        cacheService.putGenerateMetamaskAuth(phantomVerifyReq.getPublicAddress(), nonce);
+        cacheService.putGeneratePhantomAuth(phantomVerifyReq.getPublicAddress(), nonce);
         return GenericDto.success(
                 PhantomAuthResp.builder()
                         .nonce(nonce)
@@ -221,7 +221,7 @@ public class AuthController {
             // 绑定邮箱、修改邮箱
             if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_REQUEST_SET.contains(sendReq.getUseType())) {
                 sendCodeService.sendEmailWithUseType(sendReq.getEmail(), sendReq.getUseType());
-                // 绑定ga、修改密码、绑定metamask
+                // 绑定ga、修改密码、绑定metamask、绑定phantom
             } else if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_DB_SET.contains(sendReq.getUseType())) {
                 sendCodeService.sendEmailWithUseType(user.getEmail(), sendReq.getUseType());
             } else {
