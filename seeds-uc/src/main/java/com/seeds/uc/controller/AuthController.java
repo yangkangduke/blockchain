@@ -10,6 +10,7 @@ import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
 import com.seeds.uc.dto.response.LoginResp;
 import com.seeds.uc.dto.response.MetamaskAuthResp;
+import com.seeds.uc.dto.response.PhantomAuthResp;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
 import com.seeds.uc.enums.UcErrorCodeEnum;
@@ -131,6 +132,18 @@ public class AuthController {
                         .build());
     }
 
+    @ApiOperation(value = "生成phantom的nonce", notes = "生成phantom的nonce")
+    @PostMapping("/phantom/generate-nonce")
+    public GenericDto<PhantomAuthResp> generateNonce(@Valid @RequestBody PhantomVerifyReq phantomVerifyReq) {
+        String nonce = RandomUtil.getRandomSalt();
+        cacheService.putGenerateMetamaskAuth(phantomVerifyReq.getPublicAddress(), nonce);
+        return GenericDto.success(
+                PhantomAuthResp.builder()
+                        .nonce(nonce)
+                        .publicAddress(phantomVerifyReq.getPublicAddress())
+                        .build());
+    }
+
     @PostMapping("/metamask/login")
     @ApiOperation(value = "metamask登陆",
             notes = "1.调用/auth/metamask/generateNonce生成nonce " +
@@ -138,6 +151,15 @@ public class AuthController {
                     "3.调用/auth/metamask/login登陆验证签名信息，验证成功返回ucToken ")
     public GenericDto<LoginResp> metamaskLogin(@Valid @RequestBody MetamaskVerifyReq metamaskVerifyReq) {
         return GenericDto.success(ucUserService.metamaskLogin(metamaskVerifyReq));
+    }
+
+    @PostMapping("/phantom/login")
+    @ApiOperation(value = "phantom登陆",
+            notes = "1.调用/auth/phantom/generateNonce生成nonce " +
+                    "2.前端根据nonce生成签名信息 " +
+                    "3.调用/auth/phantom/login登陆验证签名信息，验证成功返回ucToken ")
+    public GenericDto<LoginResp> phantomLogin(@Valid @RequestBody PhantomVerifyReq phantomVerifyReq) {
+        return GenericDto.success(ucUserService.phantomLogin(phantomVerifyReq));
     }
 
     @GetMapping("/invite-flag")

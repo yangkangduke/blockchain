@@ -38,6 +38,8 @@ public enum AuthCodeUseTypeEnum {
     BIND_EMAIL("BIND_EMAIL", "bind email", "绑定邮箱", "bind.email"),
     @JsonProperty("BIND_METAMASK")
     BIND_METAMASK("BIND_METAMASK", "bind metamask", "绑定小狐狸钱包", "bind.metamask"),
+    @JsonProperty("BIND_PHANTOM")
+    BIND_PHANTOM("BIND_PHANTOM", "bind phantom", "绑定phantom钱包", "bind.phantom"),
     @JsonProperty("RESET_PHONE")
     RESET_PHONE("RESET_PHONE", "reset phone", "重置手机", "rst.phone"),
     @JsonProperty("VERIFY_SETTING_POLICY")
@@ -177,6 +179,7 @@ public enum AuthCodeUseTypeEnum {
                     VERIFY_SETTING_POLICY_REBIND_PHONE,
                     VERIFY_SETTING_POLICY_WITHDRAW,
                     BIND_METAMASK,
+                    BIND_PHANTOM,
                     VERIFY_SETTING_POLICY_WITHDRAW_ADD_ADDRESS
             );
     // security setting 时Phone相关的use type

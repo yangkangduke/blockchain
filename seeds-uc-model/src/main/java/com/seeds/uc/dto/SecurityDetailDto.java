@@ -15,4 +15,6 @@ public class SecurityDetailDto {
     private String email;
     private Boolean emailState;
     private Boolean gaState;
+    private String phantom;
+    private Boolean phantomState;
 }

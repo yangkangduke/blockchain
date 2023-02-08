@@ -58,6 +58,7 @@ public class UcRedisKeysConstant {
      */
     public final String UC_PHONE_AUTH_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "phone:token:%s";
     public final String UC_METAMASK_AUTH_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "metamask:token:%s";
+    public final String UC_PHANTOM_AUTH_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "phantom:token:%s";
     public final String UC_EMAIL_AUTH_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "email:token:%s";
     public final String UC_GOOGLE_AUTH_TOKEN_KEY_TEMPLATE = UC_KEY_PREFIX + "ga:token:%s";
 
@@ -138,6 +139,8 @@ public class UcRedisKeysConstant {
     public String getUcAuthTokenKeyTemplate(String token, ClientAuthTypeEnum authTypeEnum) {
         if (ClientAuthTypeEnum.METAMASK.equals(authTypeEnum)) {
             return String.format(UC_METAMASK_AUTH_TOKEN_KEY_TEMPLATE, token);
+        } else if (ClientAuthTypeEnum.PHANTOM.equals(authTypeEnum)) {
+            return String.format(UC_PHANTOM_AUTH_TOKEN_KEY_TEMPLATE, token);
         } else if (ClientAuthTypeEnum.EMAIL.equals(authTypeEnum)) {
             return String.format(UC_EMAIL_AUTH_TOKEN_KEY_TEMPLATE, token);
         } else if (ClientAuthTypeEnum.GA.equals(authTypeEnum)) {

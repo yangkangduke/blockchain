@@ -13,9 +13,6 @@ public class DeleteReq {
     @ApiModelProperty(value = "记录ID", required = true)
     private Long id;
 
-    @ApiModelProperty(value = "登陆用户token", required = true)
-    private String ucToken;
-
     @ApiModelProperty(value = "用户id")
     private Long userId;
 }

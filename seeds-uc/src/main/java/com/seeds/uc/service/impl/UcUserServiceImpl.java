@@ -1,6 +1,7 @@
 package com.seeds.uc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.codec.Base58;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.portto.solana.web3.util.TweetNaclFast;
 import com.seeds.admin.dto.request.RandomCodeUseReq;
 import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.admin.enums.WhetherEnum;
@@ -57,6 +59,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.web3j.crypto.WalletUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -247,11 +250,93 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     }
 
     /**
+     * phantom登陆
+     *
+     * @return
+     */
+    @Override
+    public LoginResp phantomLogin(PhantomVerifyReq phantomVerifyReq) {
+        String publicAddress = phantomVerifyReq.getPublicAddress();
+        this.verifyPhantom(phantomVerifyReq);
+        long currentTime = System.currentTimeMillis();
+
+        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(publicAddress);
+        UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
+                .eq(UcUser::getPublicAddress, publicAddress));
+        Long userId;
+        if (one == null) {
+            // 新增
+            UcUser ucUser = UcUser.builder()
+                    .nickname(publicAddress)
+                    .publicAddress(publicAddress)
+                    .nonce(genMetamaskAuth.getNonce())
+                    .state(ClientStateEnum.NORMAL)
+                    .type(ClientTypeEnum.NORMAL)
+                    .createdAt(currentTime)
+                    .updatedAt(currentTime)
+                    .build();
+            this.save(ucUser);
+            userId = ucUser.getId();
+            // 消耗邀请码
+            registerWriteOffsInviteCode(phantomVerifyReq.getInviteCode(), userId.toString(), WhetherEnum.YES.value());
+        } else {
+            userId = one.getId();
+            this.updateById(UcUser.builder()
+                    .id(userId)
+                    .nonce(genMetamaskAuth.getNonce())
+                    .updatedAt(currentTime)
+                    .build());
+        }
+
+        UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyMapper.selectOne(new QueryWrapper<UcSecurityStrategy>().lambda()
+                .eq(UcSecurityStrategy::getUid, userId)
+                .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.METAMASK));
+        if (ucSecurityStrategy == null) {
+            // 新增
+            ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
+                    .needAuth(true)
+                    .uid(userId)
+                    .authType(ClientAuthTypeEnum.METAMASK)
+                    .createdAt(currentTime)
+                    .updatedAt(currentTime)
+                    .build());
+        }
+
+        return buildLoginResponse(userId, publicAddress);
+    }
+
+    /**
      * 绑定metamask
      * @param uId
      */
     @Override
     public void bindMetamask(AuthTokenDTO authTokenDTO, Long uId) {
+        long currentTime = System.currentTimeMillis();
+        // 修改
+        UcUser ucUser = UcUser.builder()
+                .id(uId)
+                .publicAddress(authTokenDTO.getAccountName())
+                .nonce(authTokenDTO.getSecret())
+                .updatedAt(currentTime)
+                .build();
+        this.updateById(ucUser);
+
+        ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
+                .needAuth(true)
+                .uid(ucUser.getId())
+                .authType(ClientAuthTypeEnum.METAMASK)
+                .createdAt(currentTime)
+                .updatedAt(currentTime)
+                .build());
+
+    }
+
+    /**
+     * 绑定phantom
+     * @param uId
+     */
+    @Override
+    public void bindPhantom(AuthTokenDTO authTokenDTO, Long uId) {
         long currentTime = System.currentTimeMillis();
         // 修改
         UcUser ucUser = UcUser.builder()
@@ -550,6 +635,34 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return false;
     }
 
+
+    /**
+     * 验证Phantom签名
+     * @param verifyReq
+     * @return
+     */
+    @Override
+    public Boolean verifyPhantom(PhantomVerifyReq verifyReq) {
+        String publicAddress = verifyReq.getPublicAddress();
+        String signature = verifyReq.getSignature();
+        String message = verifyReq.getMessage();
+        String[] split = message.split(":");
+        String nonce =  split[2].replace("\n","");
+        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(verifyReq.getPublicAddress());
+        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !genMetamaskAuth.getNonce().equals(nonce) ) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED, messageSource.getMessage("ERR_16003_METAMASK_NONCE_EXPIRED", null, LocaleContextHolder.getLocale()));
+        }
+        // 校验签名信息
+        try{
+            if (!new TweetNaclFast.Signature(Base58.decode(publicAddress), null).detached_verify(message.getBytes(StandardCharsets.UTF_8), Base58.decode(signature))) {
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE, messageSource.getMessage("ERR_16002_METAMASK_SIGNATURE", null, LocaleContextHolder.getLocale()));
+            }
+
+        } catch (Exception e) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE, messageSource.getMessage("ERR_16002_METAMASK_SIGNATURE", null, LocaleContextHolder.getLocale()));
+        }
+        return true;
+    }
 
     /**
      * 验证metamask签名
