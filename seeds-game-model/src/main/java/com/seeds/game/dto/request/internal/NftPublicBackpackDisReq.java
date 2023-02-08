@@ -18,9 +18,6 @@ public class NftPublicBackpackDisReq {
     @NotNull(message = "物品Id不能为空")
     private Long id;
 
-    @ApiModelProperty(value = "登陆用户的token", example = "5df3072916f6c67886917600d65d29651db5c24e")
-    private String ucToken;
-
     @ApiModelProperty("userId")
     private Long userId;
 

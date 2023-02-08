@@ -26,9 +26,6 @@ public class ServerRoleCreateUpdateReq implements Serializable {
     @ApiModelProperty("角色名称")
     private String name;
 
-    @ApiModelProperty("登陆用户token")
-    private String ucToken;
-
     @ApiModelProperty("UC服务中的用户id")
     private Long userId;
 
