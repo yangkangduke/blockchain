@@ -133,7 +133,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         // 组装返回值
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
-        resp.setId(req.getId());
         resp.setGameServer(roleEntity.getGameServer());
         resp.setItemName(nftItem.getName());
         resp.setRegion(roleEntity.getRegion());
