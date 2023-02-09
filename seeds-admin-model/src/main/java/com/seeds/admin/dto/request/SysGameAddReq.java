@@ -118,11 +118,17 @@ public class SysGameAddReq {
 	private Integer commentsAllowed;
 
 	/**
-	 * 游戏状态  0：下架   1：正常   2：维护中
+	 * 游戏状态  0：下架   1：正常
 	 */
-	@ApiModelProperty("游戏状态  0：下架   1：正常   2：维护中")
+	@ApiModelProperty("游戏状态  0：下架   1：正常 ")
 	@NotNull(message = "Game status cannot be empty")
 	private Integer status;
+
+	/**
+	 * 游戏是否维护中  0：维护中  1：正常
+	 */
+	@ApiModelProperty("游戏是否维护中  0：维护中   1：正常 ")
+	private Integer upkeep;
 
 	/**
 	 * 介绍

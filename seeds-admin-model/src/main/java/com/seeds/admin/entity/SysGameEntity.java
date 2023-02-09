@@ -135,10 +135,16 @@ public class SysGameEntity extends BaseEntity {
 	private String secretKey;
 
 	/**
-	 * 游戏状态  0：下架   1：正常  2：维护中
+	 * 游戏状态  0：下架   1：正常
 	 */
 	@TableField("status")
 	private Integer status;
+
+	/**
+	 * 游戏是否维护：0：维护中  1：正常
+	 */
+	@TableField("upkeep")
+	private Integer upkeep;
 
 	/**
 	 * 删除标记  0：未删除
