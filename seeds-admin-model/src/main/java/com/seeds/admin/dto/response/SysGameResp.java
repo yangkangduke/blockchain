@@ -71,7 +71,7 @@ public class SysGameResp {
 	@ApiModelProperty("是否允许评论  0：不允许   1：允许")
 	private Integer commentsAllowed;
 
-	@ApiModelProperty("游戏状态  0：下架   1：正常")
+	@ApiModelProperty("游戏状态  0：下架   1：正常  2：维护中")
 	private Integer status;
 
 	@ApiModelProperty("介绍")
