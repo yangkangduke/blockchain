@@ -141,6 +141,12 @@ public class SysGameEntity extends BaseEntity {
 	private Integer status;
 
 	/**
+	 * 游戏是否维护：0：维护中  1：正常
+	 */
+	@TableField("upkeep")
+	private Integer upkeep;
+
+	/**
 	 * 删除标记  0：未删除
 	 */
 	@TableLogic(value = "0", delval = "NULL")

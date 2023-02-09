@@ -26,6 +26,9 @@ public enum GameErrorCodeEnum {
     // role
     ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN(20001, "角色等级不满十级", "The role level is less than ten"),
     ERR_20001_ROLE_NOT_EXIST(20002, "角色不存在", "The role does not exist"),
+
+    // game
+    ERR_30001_GAME_IS_UNDER_MAINTENANCE(30001,"游戏正在维护中,Web端请稍后再操作","The game is under maintenance. Please try again later")
     ;
 
     @JsonValue
