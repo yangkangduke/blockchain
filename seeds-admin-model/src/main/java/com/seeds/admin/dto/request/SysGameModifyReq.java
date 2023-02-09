@@ -127,7 +127,7 @@ public class SysGameModifyReq {
 	/**
 	 * 游戏状态  0：下架   1：正常
 	 */
-	@ApiModelProperty("游戏状态  0：下架   1：正常  2:维护中")
+	@ApiModelProperty("游戏状态  0：下架   1：正常")
 	@NotNull(message = "Game status cannot be empty")
 	private Integer status;
 
