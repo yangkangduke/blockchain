@@ -11,13 +11,15 @@ import lombok.Getter;
 @Getter
 public enum GameConditionEnum {
 
-    UNDER_MAINTENANCE(0),  // 正在维护中
-    NORMAL(1);             // 正常
+    UNDER_MAINTENANCE(0,"游戏正在维护中"),
+    NORMAL(1,"游戏正常");
 
     private int value;
+    private  String condition;
 
-    GameConditionEnum(int value) {
+    GameConditionEnum(int value,String condition) {
         this.value = value;
+        this.condition = condition;
     }
 
     public int value() {
