@@ -3,6 +3,7 @@ package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.OpenNftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -40,6 +42,14 @@ public class NftPublicBackpackController {
         req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(nftPublicBackpackService.queryPage(req));
     }
+
+    @PostMapping("list")
+    @ApiOperation("获取列表信息，不分页")
+    public GenericDto<List<NftPublicBackpackResp>> queryList(@Valid @RequestBody OpenNftPublicBackpackPageReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return GenericDto.success(nftPublicBackpackService.queryList(req));
+    }
+
 
     @GetMapping("detail/{id}")
     @ApiOperation("详细信息")

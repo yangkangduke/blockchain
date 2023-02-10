@@ -3,6 +3,7 @@ package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.OpenServerRolePageReq;
 import com.seeds.game.dto.request.internal.DeleteReq;
 import com.seeds.game.dto.request.internal.ServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.internal.ServerRolePageReq;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 游戏服角色 web端调用
@@ -37,6 +39,12 @@ public class ServerRoleController {
         return GenericDto.success(serverRoleService.queryPage(req));
     }
 
+    @PostMapping("list")
+    @ApiOperation("获取角色列表，不分页")
+    public GenericDto<List<ServerRoleResp>> queryList(@Valid @RequestBody OpenServerRolePageReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return GenericDto.success(serverRoleService.queryList(req));
+    }
 
     @PostMapping("create")
     @ApiOperation("新增角色信息")
