@@ -23,7 +23,7 @@ public interface IServerRoleService extends IService<ServerRoleEntity> {
 
     IPage<ServerRoleResp> queryPage(ServerRolePageReq req);
 
-    void createRole(ServerRoleCreateUpdateReq req);
+    void createOrUpdate(ServerRoleCreateUpdateReq req);
 
     void updateRole(ServerRoleCreateUpdateReq req);
 

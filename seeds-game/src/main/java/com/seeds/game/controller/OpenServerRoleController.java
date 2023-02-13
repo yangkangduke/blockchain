@@ -46,21 +46,21 @@ public class OpenServerRoleController {
         return GenericDto.success(serverRoleService.queryList(req));
     }
 
-    @PostMapping("create")
-    @ApiOperation("新增角色信息")
-    public GenericDto<Object> createRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
+    @PostMapping("createOrUpdate")
+    @ApiOperation("新增/编辑角色信息")
+    public GenericDto<Object> createOrUpdate(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        serverRoleService.createRole(req);
+        serverRoleService.createOrUpdate(req);
         return GenericDto.success(null);
     }
 
-    @PostMapping("update")
-    @ApiOperation("修改角色信息")
-    public GenericDto<Object> updateRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
-        req.setUserId(UserContext.getCurrentUserId());
-        serverRoleService.updateRole(req);
-        return GenericDto.success(null);
-    }
+//    @PostMapping("update")
+//    @ApiOperation("修改角色信息")
+//    public GenericDto<Object> updateRole(@RequestBody @Valid OpenServerRoleCreateUpdateReq req) {
+//        req.setUserId(UserContext.getCurrentUserId());
+//        serverRoleService.updateRole(req);
+//        return GenericDto.success(null);
+//    }
 
 //    @PostMapping("delete")
 //    @ApiOperation("删除角色信息")
