@@ -4,6 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.dto.response.SysGameResp;
+import com.seeds.admin.enums.GameConditionEnum;
+import com.seeds.admin.enums.GameEnum;
+import com.seeds.admin.feign.RemoteGameService;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.OpenNftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
@@ -46,6 +51,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Autowired
     private KafkaProducer kafkaProducer;
+
+    @Autowired
+    private RemoteGameService remoteGameService;
 
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
@@ -101,6 +109,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public OpenNftPublicBackpackDisResp distribute(NftPublicBackpackDisReq req) {
         NftPublicBackpackEntity nftItem = this.getById(req.getId());
+        GenericDto<SysGameResp> gameDetail = remoteGameService.ucDetail(GameEnum.BLADERITE.getCode());
+
+        // 游戏正在维护中，web端无法操作
+        if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())){
+            throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
+        }
 
         if (Objects.isNull(nftItem)) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
@@ -122,6 +136,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (roleEntity.getLevel() < 10) {
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
         }
+
 
         // 调用游戏方接口，执行分配  TODO
 
@@ -146,6 +161,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     public void takeBack(NftPublicBackpackTakeBackReq req) {
 
         NftPublicBackpackEntity nftItem = this.getById(req.getId());
+        GenericDto<SysGameResp> gameDetail = remoteGameService.ucDetail(GameEnum.BLADERITE.getCode());
+
+        if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())){
+            throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
+        }
 
         if (Objects.isNull(nftItem)) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
@@ -155,6 +175,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (!userId.equals(req.getUserId())) {
             throw new GenericException(GameErrorCodeEnum.ERR_10002_NFT_ITEM_DOES_NOT_BELONG_TO_CURRENT_USER);
         }
+
+
 
         // 调用游戏方接口，执行收回  TODO
 
@@ -168,6 +190,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public OpenNftPublicBackpackDisResp transfer(NftPublicBackpackDisReq req) {
         NftPublicBackpackEntity nftItem = this.getById(req.getId());
+        GenericDto<SysGameResp> gameDetail = remoteGameService.ucDetail(GameEnum.BLADERITE.getCode());
+
+        // 游戏正在维护中，web端无法操作
+        if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())){
+            throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
+        }
 
         if (Objects.isNull(nftItem)) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
@@ -194,7 +222,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (roleEntity.getLevel() < 10) {
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
         }
-
 
         // 调用游戏方接口，执行收回,再分发  TODO
 

@@ -69,6 +69,8 @@ public class UcRedisKeysConstant {
 
     public final String UC_GENERATE_METAMASK_AUTH_KEY_TEMPLATE = UC_KEY_PREFIX + "metamask:user.token:%s";
 
+    public final String UC_GENERATE_PHANTOM_AUTH_KEY_TEMPLATE = UC_KEY_PREFIX + "phantom:user.token:%s";
+
     public final String UC_ONE_DAY_MARKING_TEMPLATE = UC_KEY_PREFIX + "one:day:marking:%s";
 
     public final String UC_GAME_WIN_RANK_TEMPLATE = UC_KEY_PREFIX + "game:win:rank:%s";
@@ -163,6 +165,10 @@ public class UcRedisKeysConstant {
 
     public String getUcGenerateMetamaskAuthKeyTemplate(String token) {
         return String.format(UC_GENERATE_METAMASK_AUTH_KEY_TEMPLATE, token);
+    }
+
+    public String getUcGeneratePhantomAuthKeyTemplate(String token) {
+        return String.format(UC_GENERATE_PHANTOM_AUTH_KEY_TEMPLATE, token);
     }
 
     public static String getUcKeyForgotPassword(String account) {

@@ -26,7 +26,7 @@
         <include refid="mainColumns"/>
         from sys_game_type
         where 1 = 1
-        <if test="id != null and id != ''">
+        <if test="id != null">
             and id = #{id}
         </if>
     </select>

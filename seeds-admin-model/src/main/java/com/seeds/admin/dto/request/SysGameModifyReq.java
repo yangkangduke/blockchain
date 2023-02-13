@@ -132,6 +132,12 @@ public class SysGameModifyReq {
 	private Integer status;
 
 	/**
+	 * 游戏是否维护中  0：维护中  1：正常
+	 */
+	@ApiModelProperty("游戏是否维护中  0：维护中   1：正常 ")
+	private Integer upkeep;
+
+	/**
 	 * 介绍
 	 */
 	@ApiModelProperty("介绍")

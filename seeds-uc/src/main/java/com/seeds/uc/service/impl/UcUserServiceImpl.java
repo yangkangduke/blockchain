@@ -260,7 +260,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         this.verifyPhantom(phantomVerifyReq);
         long currentTime = System.currentTimeMillis();
 
-        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(publicAddress);
+        GenPhantomAuth genPhantomAuth = cacheService.getGeneratePhantomAuth(publicAddress);
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getPublicAddress, publicAddress));
         Long userId;
@@ -269,7 +269,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             UcUser ucUser = UcUser.builder()
                     .nickname(publicAddress)
                     .publicAddress(publicAddress)
-                    .nonce(genMetamaskAuth.getNonce())
+                    .nonce(genPhantomAuth.getNonce())
                     .state(ClientStateEnum.NORMAL)
                     .type(ClientTypeEnum.NORMAL)
                     .createdAt(currentTime)
@@ -283,20 +283,20 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             userId = one.getId();
             this.updateById(UcUser.builder()
                     .id(userId)
-                    .nonce(genMetamaskAuth.getNonce())
+                    .nonce(genPhantomAuth.getNonce())
                     .updatedAt(currentTime)
                     .build());
         }
 
         UcSecurityStrategy ucSecurityStrategy = ucSecurityStrategyMapper.selectOne(new QueryWrapper<UcSecurityStrategy>().lambda()
                 .eq(UcSecurityStrategy::getUid, userId)
-                .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.METAMASK));
+                .eq(UcSecurityStrategy::getAuthType, ClientAuthTypeEnum.PHANTOM));
         if (ucSecurityStrategy == null) {
             // 新增
             ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
                     .needAuth(true)
                     .uid(userId)
-                    .authType(ClientAuthTypeEnum.METAMASK)
+                    .authType(ClientAuthTypeEnum.PHANTOM)
                     .createdAt(currentTime)
                     .updatedAt(currentTime)
                     .build());
@@ -350,7 +350,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
                 .needAuth(true)
                 .uid(ucUser.getId())
-                .authType(ClientAuthTypeEnum.METAMASK)
+                .authType(ClientAuthTypeEnum.PHANTOM)
                 .createdAt(currentTime)
                 .updatedAt(currentTime)
                 .build());
@@ -648,18 +648,18 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String message = verifyReq.getMessage();
         String[] split = message.split(":");
         String nonce =  split[2].replace("\n","");
-        GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(verifyReq.getPublicAddress());
-        if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !genMetamaskAuth.getNonce().equals(nonce) ) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED, messageSource.getMessage("ERR_16003_METAMASK_NONCE_EXPIRED", null, LocaleContextHolder.getLocale()));
+        GenPhantomAuth genPhantomAuth = cacheService.getGeneratePhantomAuth(verifyReq.getPublicAddress());
+        if (genPhantomAuth == null || StringUtils.isBlank(genPhantomAuth.getNonce()) || !genPhantomAuth.getNonce().equals(nonce) ) {
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17003_PHANTOM_NONCE_EXPIRED, messageSource.getMessage("ERR_17003_PHANTOM_NONCE_EXPIRED", null, LocaleContextHolder.getLocale()));
         }
         // 校验签名信息
         try{
             if (!new TweetNaclFast.Signature(Base58.decode(publicAddress), null).detached_verify(message.getBytes(StandardCharsets.UTF_8), Base58.decode(signature))) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE, messageSource.getMessage("ERR_16002_METAMASK_SIGNATURE", null, LocaleContextHolder.getLocale()));
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17002_PHANTOM_SIGNATURE, messageSource.getMessage("ERR_17002_PHANTOM_SIGNATURE", null, LocaleContextHolder.getLocale()));
             }
 
         } catch (Exception e) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16002_METAMASK_SIGNATURE, messageSource.getMessage("ERR_16002_METAMASK_SIGNATURE", null, LocaleContextHolder.getLocale()));
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17002_PHANTOM_SIGNATURE, messageSource.getMessage("ERR_17002_PHANTOM_SIGNATURE", null, LocaleContextHolder.getLocale()));
         }
         return true;
     }

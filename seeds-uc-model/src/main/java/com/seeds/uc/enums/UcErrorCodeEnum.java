@@ -65,6 +65,7 @@ public enum UcErrorCodeEnum {
     ERR_10027_CHOOSE_PHONE_OR_EMAIL(10027, "请选择手机或者邮箱注册", "please choose phone or email to register"),
     ERR_10028_FAILED_DUE_TO_SECURITY_REASONS(10028, "注册由于安全原因失败，请重试", "registration failed due to security reasons"),
     ERR_10029_METAMASK_EXIST(10029, "钱包已经注册过了，请不要重复操作", "The wallet has already been registered, please do not repeat the operation"),
+    ERR_10029_PHANTOM_EXIST(10029, "钱包已经注册过了，请不要重复操作", "The wallet has already been registered, please do not repeat the operation"),
     ERR_10032_WRONG_SMS_CODE(10032, "短信验证码不正确，请重新输入", "wrong sms code"),
     ERR_10033_WRONG_EMAIL_CODE(10033, "邮箱验证码不正确，请重新输入", "wrong email code"),
     ERR_10034_SMS_CODE_EXPIRED(10034, "短信验证码已过期，请重新获取", "sms code expired"),

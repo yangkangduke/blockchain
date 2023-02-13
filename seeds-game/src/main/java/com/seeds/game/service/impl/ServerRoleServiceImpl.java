@@ -1,6 +1,7 @@
 package com.seeds.game.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -51,14 +53,24 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
     }
 
     @Override
-    public void createRole(ServerRoleCreateUpdateReq req) {
-        ServerRoleEntity entity = new ServerRoleEntity();
-        BeanUtils.copyProperties(req, entity);
-        entity.setCreatedAt(System.currentTimeMillis());
-        entity.setCreatedBy(req.getUserId());
-        entity.setUpdatedAt(System.currentTimeMillis());
-        entity.setUpdatedBy(req.getUserId());
-        this.save(entity);
+    public void createOrUpdate(ServerRoleCreateUpdateReq req) {
+        ServerRoleEntity serverRole = this.getById(req.getId());
+        if (Objects.isNull(serverRole)) {
+            ServerRoleEntity entity = new ServerRoleEntity();
+            BeanUtils.copyProperties(req, entity);
+            entity.setCreatedAt(System.currentTimeMillis());
+            entity.setCreatedBy(req.getUserId());
+            entity.setUpdatedAt(System.currentTimeMillis());
+            entity.setUpdatedBy(req.getUserId());
+            this.save(entity);
+        } else {
+            ServerRoleEntity entity = new ServerRoleEntity();
+            BeanUtils.copyProperties(req, entity);
+            entity.setUpdatedAt(System.currentTimeMillis());
+            entity.setUpdatedBy(req.getUserId());
+            this.updateById(entity);
+        }
+
     }
 
     @Override
@@ -96,5 +108,14 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
 
         }
         return respList;
+    }
+
+    @Override
+    public ServerRoleEntity queryByUserIdAndRegionAndServer(Long userId, Integer region, Integer server) {
+        LambdaQueryWrapper<ServerRoleEntity> wrapper = new QueryWrapper<ServerRoleEntity>().lambda()
+                .eq(ServerRoleEntity::getUserId, userId)
+                .eq(ServerRoleEntity::getRegion, region)
+                .eq(ServerRoleEntity::getGameServer, server);
+        return getOne(wrapper);
     }
 }
