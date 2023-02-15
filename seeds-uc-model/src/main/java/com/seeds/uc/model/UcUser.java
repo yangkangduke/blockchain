@@ -68,12 +68,28 @@ public class UcUser implements Serializable {
 
     @ApiModelProperty("昵称")
     private String nickname;
-    @ApiModelProperty("钱包地址，metamask")
+
+    @ApiModelProperty("钱包地址")
     private String publicAddress;
+
     @ApiModelProperty("随机数，metamask登陆时使用")
     private String nonce;
+
     @ApiModelProperty("头像")
     private String avatar;
+
+    @ApiModelProperty("个人简介")
+    private String introduction;
+
+    @ApiModelProperty("facebook地址")
+    private String facebook;
+
+    @ApiModelProperty("twitter地址")
+    private String twitter;
+
+    @ApiModelProperty("instagram地址")
+    private String instagram;
+
 
 
 }

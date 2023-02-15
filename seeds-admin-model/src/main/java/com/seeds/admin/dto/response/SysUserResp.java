@@ -104,7 +104,7 @@ public class SysUserResp {
 	@ApiModelProperty("删除标记  1：已删除   0：未删除")
 	private Integer deleteFlag;
 	/**
-	 * 钱包地址，metamask
+	 * 钱包地址
 	 */
 	@TableField("public_address")
 	private String publicAddress;
