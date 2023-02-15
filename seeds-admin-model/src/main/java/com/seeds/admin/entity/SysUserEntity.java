@@ -97,7 +97,7 @@ public class SysUserEntity extends BaseEntity {
 	private Integer deleteFlag;
 
 	/**
-	 * 钱包地址，metamask
+	 * 钱包地址
 	 */
 	@TableField("public_address")
 	private String publicAddress;

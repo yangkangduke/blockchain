@@ -122,4 +122,9 @@ public interface SysGameService extends IService<SysGameEntity> {
      */
     ProfileInfoResp profileInfo(Long gameId, String email);
 
+    /**
+     * 游戏维护中/正常
+     * @param req
+     */
+    void upkeepOrNormal(SysGameUpkeepReq req);
 }
