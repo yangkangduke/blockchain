@@ -20,9 +20,7 @@ import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.entity.SysGameApiEntity;
 import com.seeds.admin.entity.SysGameEntity;
 import com.seeds.admin.entity.SysGameTypeEntity;
-import com.seeds.admin.enums.SortTypeEnum;
-import com.seeds.admin.enums.SysStatusEnum;
-import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.admin.enums.*;
 import com.seeds.admin.mapper.SysGameMapper;
 import com.seeds.admin.service.*;
 import com.seeds.admin.utils.HashUtil;
@@ -368,6 +366,13 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             default:
                 return SysGameEntity::getCreatedAt;
         }
+    }
+
+    @Override
+    public void upkeepOrNormal(SysGameUpkeepReq req) {
+        SysGameEntity sysGame = getById(req.getId());
+        BeanUtils.copyProperties(req,sysGame);
+        updateById(sysGame);
     }
 }
 

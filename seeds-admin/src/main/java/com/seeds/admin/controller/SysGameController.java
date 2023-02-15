@@ -102,4 +102,14 @@ public class SysGameController {
         sysGameService.enableOrDisable(req);
         return GenericDto.success(null);
     }
+
+    @PostMapping("upkeep")
+    @ApiOperation("游戏维护中/游戏正常")
+    @RequiredPermission("sys:game:upkeep")
+    public GenericDto<Object> upkeepOrNormal(@Valid @RequestBody SysGameUpkeepReq req) {
+        sysGameService.upkeepOrNormal(req);
+        return GenericDto.success(null);
+    }
+
+
 }
