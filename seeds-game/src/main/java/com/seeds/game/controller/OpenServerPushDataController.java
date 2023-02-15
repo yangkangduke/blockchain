@@ -1,7 +1,7 @@
 package com.seeds.game.controller;
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.game.dto.request.OpenProduceDrawingRecordReq;
+import com.seeds.game.dto.request.OpenHeroRecordReq;
 import com.seeds.game.dto.request.OpenMatchRecordReq;
 import com.seeds.game.service.ServerPushDataService;
 import io.swagger.annotations.Api;
@@ -29,14 +29,14 @@ public class OpenServerPushDataController {
     @PostMapping("match-record")
     @ApiOperation("对局记录")
     public GenericDto<Object> matchRecord(@Valid @RequestBody OpenMatchRecordReq matchRecord) {
-
+        serverPushDataService.matchRecord(matchRecord);
         return GenericDto.success(null);
     }
 
-    @GetMapping("produce-drawing-record")
-    @ApiOperation("对局图纸记录")
-    public GenericDto<Object> produceDrawingRecord(@Valid @RequestBody OpenProduceDrawingRecordReq produceDrawingRecord) {
-
+    @GetMapping("hero-record")
+    @ApiOperation("英雄记录")
+    public GenericDto<Object> heroRecord(@Valid @RequestBody OpenHeroRecordReq heroRecordReq) {
+        serverPushDataService.heroRecord(heroRecordReq);
         return GenericDto.success(null);
     }
 

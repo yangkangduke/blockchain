@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.math.BigDecimal;
 
 
 /**
@@ -21,21 +21,67 @@ import java.util.List;
 @ApiModel(value = "OpenMatchRecordReq", description = "对局记录")
 public class OpenMatchRecordReq extends OpenSignReq {
 
-	@ApiModelProperty("战斗模式：317 Free，402 Loot")
-	@NotNull(message = "mModeId cannot be empty")
-	private Integer mModeId;
+	@ApiModelProperty("击杀总数")
+	@NotNull(message = "totalKillNum cannot be empty")
+	private Long totalKillNum;
 
-	@ApiModelProperty("玩家单局中击杀其他玩家的数量")
-	@NotNull(message = "mKillNum cannot be empty")
-	private Integer mKillNum;
+	@ApiModelProperty("最大击杀数")
+	private Integer maxKillNum;
 
-	@ApiModelProperty("每局结束时玩家的生存时间")
-	@NotNull(message = "mSurvivalTime cannot be empty")
-	private Long mSurvivalTime;
+	@ApiModelProperty("血腥积分")
+	@NotNull(message = "killScore cannot be empty")
+	private Integer killScore;
 
-	@ApiModelProperty("统计玩家当前的竞技场积分")
-	@NotNull(message = "mTotalScore cannot be empty")
-	private Long mTotalScore;
+	@ApiModelProperty("总生存时间")
+	@NotNull(message = "totalSurvivalTime cannot be empty")
+	private Long totalSurvivalTime;
+
+	@ApiModelProperty("最大生存时间")
+	private Long maxSurvivalTime;
+
+	@ApiModelProperty("生存积分")
+	@NotNull(message = "survivalScore cannot be empty")
+	private Integer survivalScore;
+
+	@ApiModelProperty("生产积分")
+	private Integer drawingScore;
+
+	@ApiModelProperty("lootMode次数")
+	private Long lootFightNum;
+
+	@ApiModelProperty("lootMode获取图纸数量")
+	private Long lootDrawNum;
+
+	@ApiModelProperty("掠夺积分")
+	@NotNull(message = "lootScore cannot be empty")
+	private Integer lootScore;
+
+	@ApiModelProperty("天梯积分")
+	private Integer ladderScore;
+
+	@ApiModelProperty("竞技场积分")
+	@NotNull(message = "rankScore cannot be empty")
+	private Integer rankScore;
+
+	@ApiModelProperty("获胜场次")
+	@NotNull(message = "winNum cannot be empty")
+	private Long winNum;
+
+	@ApiModelProperty("总场次")
+	@NotNull(message = "fightNum cannot be empty")
+	private Long fightNum;
+
+	@ApiModelProperty("胜率")
+	@NotNull(message = "winRate cannot be empty")
+	private BigDecimal winRate;
+
+	@ApiModelProperty("最大连胜")
+	@NotNull(message = "seqWinNum cannot be empty")
+	private Integer seqWinNum;
+
+	@ApiModelProperty("综合积分")
+	@NotNull(message = "comprehensiveScore cannot be empty")
+	private Integer comprehensiveScore;
 
 	@ApiModelProperty("玩家账号id")
 	@NotBlank(message = "accId cannot be empty")
@@ -44,20 +90,5 @@ public class OpenMatchRecordReq extends OpenSignReq {
 	@ApiModelProperty("游戏服id")
 	@NotBlank(message = "gameServerId cannot be empty")
 	private String gameServerId;
-
-	@ApiModelProperty("LootMode中获取图纸（仅Loot模式下有该参数）")
-	private List<MatchDrawing> mDrawings;
-
-	@Data
-	@ApiModel(value = "MatchDrawing", description = "对局图纸")
-	public static class MatchDrawing {
-
-		@ApiModelProperty(value = "图纸id")
-		private Long drawingId;
-
-		@ApiModelProperty(value = "nft全局id")
-		private Long autoId;
-
-	}
 
 }

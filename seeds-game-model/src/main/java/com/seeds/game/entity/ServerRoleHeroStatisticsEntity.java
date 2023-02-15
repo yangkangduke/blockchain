@@ -35,38 +35,20 @@ public class ServerRoleHeroStatisticsEntity implements Serializable {
     @ApiModelProperty("游戏英雄id")
     private Long heroId;
 
-    @ApiModelProperty("击杀次数")
-    private Long killing;
-
-    @ApiModelProperty("击杀评分")
-    private BigDecimal killingRate;
-
-    @ApiModelProperty("伤害值")
-    private Long damage;
-
-    @ApiModelProperty("伤害评分")
-    private BigDecimal damageRate;
-
-    @ApiModelProperty("存活次数")
-    private Long survival;
-
-    @ApiModelProperty("存活评分")
-    private BigDecimal survivalRate;
-
-    @ApiModelProperty("采集次数")
-    private Long framing;
-
-    @ApiModelProperty("采集评分")
-    private BigDecimal framingRate;
-
-    @ApiModelProperty("移动次数")
-    private Long movement;
-
-    @ApiModelProperty("移动得分")
-    private BigDecimal movementRate;
-
     @ApiModelProperty("胜率")
-    private BigDecimal winningRate;
+    private BigDecimal winRate;
+
+    @ApiModelProperty("熟练度")
+    private Long proficiencyLvl;
+
+    @ApiModelProperty("天赋等级")
+    private Integer heroLvl;
+
+    @ApiModelProperty("击杀其他玩家次数")
+    private Long killNum;
+
+    @ApiModelProperty(value = "英雄总分（排名时使用）")
+    private Long score;
 
     @ApiModelProperty("创建人")
     private Long createdBy;

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,7 @@ public class ServerStatisticsServiceImpl implements ServerStatisticsService {
             return resp;
         }
         BeanUtils.copyProperties(roleStatistics, resp);
+        resp.setWinRate(roleStatistics.getWinRate().scaleByPowerOfTen(2).setScale(0, RoundingMode.HALF_UP) + "%");
         return resp;
     }
 
@@ -67,6 +69,7 @@ public class ServerStatisticsServiceImpl implements ServerStatisticsService {
         roleHeroStatistics.forEach(p -> {
             ServerRoleHeroStatisticsResp resp = new ServerRoleHeroStatisticsResp();
             BeanUtils.copyProperties(p, resp);
+            resp.setWinRate(p.getWinRate().scaleByPowerOfTen(2).setScale(0, RoundingMode.HALF_UP) + "%");
             respList.add(resp);
         });
         return respList;

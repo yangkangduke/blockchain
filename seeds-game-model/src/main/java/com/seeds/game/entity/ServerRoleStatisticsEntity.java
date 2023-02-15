@@ -32,35 +32,35 @@ public class ServerRoleStatisticsEntity implements Serializable {
     @ApiModelProperty("游戏角色id")
     private Long roleId;
 
-    @ApiModelProperty("击杀评分")
-    private BigDecimal killingRate;
+    @ApiModelProperty("血腥积分")
+    private Integer killScore;
 
-    @ApiModelProperty("存活评分")
-    private BigDecimal survivalRate;
+    @ApiModelProperty("生存积分")
+    private Integer survivalScore;
 
-    @ApiModelProperty("生产评分")
-    private BigDecimal productionRate;
+    @ApiModelProperty("生产积分")
+    private Integer drawingScore;
 
-    @ApiModelProperty("排行评分")
-    private BigDecimal rankingRate;
+    @ApiModelProperty("天梯积分")
+    private Integer ladderScore;
 
-    @ApiModelProperty("掠夺评分")
-    private BigDecimal lootRate;
+    @ApiModelProperty("竞技场积分")
+    private Integer rankScore;
 
-    @ApiModelProperty("得分评分")
-    private BigDecimal scoreRate;
+    @ApiModelProperty("专业积分")
+    private Integer professionalScore;
 
     @ApiModelProperty("胜率")
-    private BigDecimal winningRate;
+    private BigDecimal winRate;
 
-    @ApiModelProperty("最高连胜")
-    private Integer highWinStreak;
+    @ApiModelProperty("最大连胜")
+    private Integer seqWinNum;
 
-    @ApiModelProperty("总游戏次数")
-    private Long totalGames;
+    @ApiModelProperty("总场次")
+    private Long fightNum;
 
     @ApiModelProperty("总游戏时间")
-    private Long totalGameTime;
+    private Long totalSurvivalTime;
 
     @ApiModelProperty("综合评价")
     private String overallScore;

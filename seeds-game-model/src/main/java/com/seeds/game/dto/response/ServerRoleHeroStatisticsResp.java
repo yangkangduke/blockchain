@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.math.BigDecimal;
 
 /**
  * 游戏角色的英雄统计
@@ -19,37 +18,19 @@ public class ServerRoleHeroStatisticsResp {
     @ApiModelProperty("id")
     private Long id;
 
-    @ApiModelProperty("击杀评分")
-    private BigDecimal killingRate;
-
-    @ApiModelProperty("存活评分")
-    private BigDecimal survivalRate;
-
-    @ApiModelProperty("生产评分")
-    private BigDecimal productionRate;
-
-    @ApiModelProperty("排行评分")
-    private BigDecimal rankingRate;
-
-    @ApiModelProperty("掠夺评分")
-    private BigDecimal lootRate;
-
-    @ApiModelProperty("得分评分")
-    private BigDecimal scoreRate;
-
     @ApiModelProperty("胜率")
-    private BigDecimal winningRate;
+    private String winRate;
 
-    @ApiModelProperty("最高连胜")
-    private Integer highWinStreak;
+    @ApiModelProperty("熟练度")
+    private Long proficiencyLvl;
 
-    @ApiModelProperty("总游戏次数")
-    private Long totalGames;
+    @ApiModelProperty("成长度")
+    private Integer heroLvl;
 
-    @ApiModelProperty("总游戏时间")
-    private Long totalGameTime;
+    @ApiModelProperty("血腥度")
+    private Long killNum;
 
-    @ApiModelProperty("综合评价")
-    private String overallScore;
+    @ApiModelProperty(value = "英雄总分（排名时使用）")
+    private Long score;
 
 }

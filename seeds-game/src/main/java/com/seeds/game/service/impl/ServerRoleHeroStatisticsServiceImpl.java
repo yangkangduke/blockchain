@@ -27,4 +27,12 @@ public class ServerRoleHeroStatisticsServiceImpl extends ServiceImpl<ServerRoleH
                 .eq(ServerRoleHeroStatisticsEntity::getRoleId, roleId);
         return list(wrapper);
     }
+
+    @Override
+    public ServerRoleHeroStatisticsEntity queryByRoleIdAndHeroId(Long roleId, Long heroId) {
+        LambdaQueryWrapper<ServerRoleHeroStatisticsEntity> wrapper = new QueryWrapper<ServerRoleHeroStatisticsEntity>().lambda()
+                .eq(ServerRoleHeroStatisticsEntity::getRoleId, roleId)
+                .eq(ServerRoleHeroStatisticsEntity::getHeroId, heroId);
+        return getOne(wrapper);
+    }
 }
