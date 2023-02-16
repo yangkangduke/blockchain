@@ -18,6 +18,9 @@ public class ServerRoleHeroStatisticsResp {
     @ApiModelProperty("id")
     private Long id;
 
+    @ApiModelProperty("游戏英雄id")
+    private Long heroId;
+
     @ApiModelProperty("胜率")
     private String winRate;
 
@@ -30,7 +33,7 @@ public class ServerRoleHeroStatisticsResp {
     @ApiModelProperty("血腥度")
     private Long killNum;
 
-    @ApiModelProperty(value = "英雄总分（排名时使用）")
-    private Long totalScore;
+    @ApiModelProperty(value = "英雄排名")
+    private String rank;
 
 }

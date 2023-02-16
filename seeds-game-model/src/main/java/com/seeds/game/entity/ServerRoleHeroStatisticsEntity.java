@@ -22,13 +22,14 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 public class ServerRoleHeroStatisticsEntity extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
-
     @ApiModelProperty("游戏角色id")
     private Long roleId;
 
     @ApiModelProperty("游戏英雄id")
     private Long heroId;
+
+    @ApiModelProperty("游戏服id")
+    private String gameServerId;
 
     @ApiModelProperty("胜率")
     private BigDecimal winRate;

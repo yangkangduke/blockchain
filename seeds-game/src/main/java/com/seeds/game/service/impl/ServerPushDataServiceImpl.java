@@ -4,6 +4,7 @@ import com.seeds.game.dto.request.OpenHeroRecordReq;
 import com.seeds.game.dto.request.OpenMatchRecordReq;
 import com.seeds.game.entity.ServerRoleHeroStatisticsEntity;
 import com.seeds.game.entity.ServerRoleStatisticsEntity;
+import com.seeds.game.service.GameCacheService;
 import com.seeds.game.service.IServerRoleHeroStatisticsService;
 import com.seeds.game.service.IServerRoleStatisticsService;
 import com.seeds.game.service.ServerPushDataService;
@@ -24,6 +25,9 @@ import java.math.RoundingMode;
  */
 @Service
 public class ServerPushDataServiceImpl implements ServerPushDataService {
+
+    @Autowired
+    private GameCacheService gameCacheService;
 
     @Autowired
     private IServerRoleStatisticsService serverRoleStatisticsService;
@@ -53,6 +57,8 @@ public class ServerPushDataServiceImpl implements ServerPushDataService {
     @Override
     public void heroRecord(OpenHeroRecordReq heroRecordReq) {
         Long accId = Long.valueOf(heroRecordReq.getAccID());
+        // 缓存英雄排行到redis
+        gameCacheService.putGameHeroRankCache(heroRecordReq.getGameServerId(), heroRecordReq.getHeroId(), heroRecordReq.getTotalScore(), accId);
         // common hero
         ServerRoleHeroStatisticsEntity roleHeroStatistics = serverRoleHeroStatisticsService.queryByRoleIdAndHeroId(accId, heroRecordReq.getHeroId());
         BigDecimal winRate = new BigDecimal(heroRecordReq.getWinNum()).divide(new BigDecimal(heroRecordReq.getFightNum()), 4, RoundingMode.HALF_UP);

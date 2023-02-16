@@ -5,10 +5,7 @@ import com.seeds.game.dto.response.ServerRoleStatisticsResp;
 import com.seeds.game.entity.ServerRoleEntity;
 import com.seeds.game.entity.ServerRoleHeroStatisticsEntity;
 import com.seeds.game.entity.ServerRoleStatisticsEntity;
-import com.seeds.game.service.IServerRoleHeroStatisticsService;
-import com.seeds.game.service.IServerRoleService;
-import com.seeds.game.service.IServerRoleStatisticsService;
-import com.seeds.game.service.ServerStatisticsService;
+import com.seeds.game.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +29,9 @@ public class ServerStatisticsServiceImpl implements ServerStatisticsService {
 
     @Autowired
     private IServerRoleService serverRoleService;
+
+    @Autowired
+    private GameCacheService gameCacheService;
 
     @Autowired
     private IServerRoleStatisticsService serverRoleStatisticsService;
@@ -70,6 +70,7 @@ public class ServerStatisticsServiceImpl implements ServerStatisticsService {
             ServerRoleHeroStatisticsResp resp = new ServerRoleHeroStatisticsResp();
             BeanUtils.copyProperties(p, resp);
             resp.setWinRate(p.getWinRate().scaleByPowerOfTen(2).setScale(0, RoundingMode.HALF_UP) + "%");
+            resp.setRank(gameCacheService.getHeroRankCache(p.getGameServerId(), p.getHeroId(), p.getRoleId()));
             respList.add(resp);
         });
         return respList;

@@ -23,7 +23,7 @@ public interface IServerRoleHeroStatisticsService extends IService<ServerRoleHer
      */
     List<ServerRoleHeroStatisticsEntity> queryByRoleId(Long roleId);
 
-                                                                /**
+    /**
      * 获取游戏角色的英雄统计
      * @param roleId 游戏角色id
      * @param heroId 游戏英雄id

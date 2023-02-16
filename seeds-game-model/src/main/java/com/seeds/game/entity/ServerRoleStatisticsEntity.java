@@ -22,8 +22,6 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 public class ServerRoleStatisticsEntity extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
-
     @ApiModelProperty("游戏角色id")
     private Long roleId;
 
