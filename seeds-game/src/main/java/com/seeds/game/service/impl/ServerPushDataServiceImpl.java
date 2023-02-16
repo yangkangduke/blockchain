@@ -33,7 +33,7 @@ public class ServerPushDataServiceImpl implements ServerPushDataService {
 
     @Override
     public void matchRecord(OpenMatchRecordReq matchRecord) {
-        Long accId = Long.valueOf(matchRecord.getAccId());
+        Long accId = Long.valueOf(matchRecord.getAccID());
         // data statistics
         ServerRoleStatisticsEntity roleStatistics = serverRoleStatisticsService.queryByRoleId(accId);
         if (roleStatistics == null) {
@@ -52,7 +52,7 @@ public class ServerPushDataServiceImpl implements ServerPushDataService {
 
     @Override
     public void heroRecord(OpenHeroRecordReq heroRecordReq) {
-        Long accId = Long.valueOf(heroRecordReq.getAccId());
+        Long accId = Long.valueOf(heroRecordReq.getAccID());
         // common hero
         ServerRoleHeroStatisticsEntity roleHeroStatistics = serverRoleHeroStatisticsService.queryByRoleIdAndHeroId(accId, heroRecordReq.getHeroId());
         BigDecimal winRate = new BigDecimal(heroRecordReq.getWinNum()).divide(new BigDecimal(heroRecordReq.getFightNum()), 4, RoundingMode.HALF_UP);

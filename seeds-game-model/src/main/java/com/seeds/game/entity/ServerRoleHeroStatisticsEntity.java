@@ -1,13 +1,11 @@
 package com.seeds.game.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -21,13 +19,10 @@ import java.math.BigDecimal;
 @TableName("ga_server_role_hero_statistics")
 @ApiModel(value = "ServerRoleHeroStatistics对象", description = "游戏服角色的英雄统计")
 @Data
-public class ServerRoleHeroStatisticsEntity implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class ServerRoleHeroStatisticsEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty("id")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
 
     @ApiModelProperty("游戏角色id")
     private Long roleId;
@@ -49,17 +44,5 @@ public class ServerRoleHeroStatisticsEntity implements Serializable {
 
     @ApiModelProperty(value = "英雄总分（排名时使用）")
     private Long score;
-
-    @ApiModelProperty("创建人")
-    private Long createdBy;
-
-    @ApiModelProperty("修改人")
-    private Long updatedBy;
-
-    @ApiModelProperty("上传时间")
-    private Long createdAt;
-
-    @ApiModelProperty("更新时间")
-    private Long updatedAt;
 
 }

@@ -33,7 +33,7 @@ public class OpenServerPushDataController {
         return GenericDto.success(null);
     }
 
-    @GetMapping("hero-record")
+    @PostMapping("hero-record")
     @ApiOperation("英雄记录")
     public GenericDto<Object> heroRecord(@Valid @RequestBody OpenHeroRecordReq heroRecordReq) {
         serverPushDataService.heroRecord(heroRecordReq);
