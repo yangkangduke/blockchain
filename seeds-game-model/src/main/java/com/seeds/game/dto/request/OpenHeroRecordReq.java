@@ -41,8 +41,8 @@ public class OpenHeroRecordReq extends OpenSignReq {
 	private Long killNum;
 
 	@ApiModelProperty(value = "英雄总分（排名时使用）")
-	@NotNull(message = "score cannot be empty")
-	private Long score;
+	@NotNull(message = "totalScore cannot be empty")
+	private Long totalScore;
 
 	@ApiModelProperty("玩家账号id")
 	@NotBlank(message = "accID cannot be empty")
