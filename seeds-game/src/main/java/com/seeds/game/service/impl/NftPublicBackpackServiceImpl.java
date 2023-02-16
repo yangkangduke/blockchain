@@ -222,6 +222,10 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (roleEntity.getLevel() < 10) {
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
         }
+        // 不属于当前用户下的角色
+        if (!roleEntity.getUserId().equals(req.getUserId())){
+            throw new GenericException(GameErrorCodeEnum.ERR_20003_ROLE_NOT_BELONGS_TO_CURRENT_USER);
+        }
 
         // 调用游戏方接口，执行收回,再分发  TODO
 
