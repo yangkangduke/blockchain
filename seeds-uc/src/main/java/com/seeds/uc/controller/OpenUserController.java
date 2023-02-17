@@ -6,6 +6,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.*;
+import com.seeds.uc.dto.request.security.item.ShareLinkReq;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
@@ -93,44 +94,18 @@ public class OpenUserController {
                 .build()));
     }
 
-    @PutMapping("/change/facebook")
-    @ApiOperation(value = "修改facebook", notes = "修改facebook")
-    public GenericDto<Object> updateFacebook(@Valid @RequestBody FacebookReq facebookReq, HttpServletRequest request) {
+    @PutMapping("/change/ShareLink")
+    @ApiOperation(value = "修改社交链接", notes = "修改社交链接")
+    public GenericDto<Object> updateShareLink(@Valid @RequestBody ShareLinkReq shareLinkReq, HttpServletRequest request) {
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         long currentTime = System.currentTimeMillis();
         return GenericDto.success(ucUserService.updateById(UcUser.builder()
                 .id(loginUser.getUserId())
-                .facebook(facebookReq.getFacebook())
-                .updatedAt(currentTime)
-                .build()));
-    }
-
-    @PutMapping("/change/twitter")
-    @ApiOperation(value = "修改twitter", notes = "修改twitter")
-    public GenericDto<Object> updateTwitter(@Valid @RequestBody TwitterReq twitterReq, HttpServletRequest request) {
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        long currentTime = System.currentTimeMillis();
-        return GenericDto.success(ucUserService.updateById(UcUser.builder()
-                .id(loginUser.getUserId())
-                .twitter(twitterReq.getTwitter())
-                .updatedAt(currentTime)
-                .build()));
-    }
-
-    @PutMapping("/change/instagram")
-    @ApiOperation(value = "修改instagram", notes = "修改instagram")
-    public GenericDto<Object> updateInstagram(@Valid @RequestBody InstagramReq instagramReq, HttpServletRequest request) {
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        long currentTime = System.currentTimeMillis();
-        return GenericDto.success(ucUserService.updateById(UcUser.builder()
-                .id(loginUser.getUserId())
-                .instagram(instagramReq.getInstagram())
+                .facebook(shareLinkReq.getFacebook())
+                .twitter(shareLinkReq.getTwitter())
+                .instagram(shareLinkReq.getInstagram())
                 .updatedAt(currentTime)
                 .build()));
     }
