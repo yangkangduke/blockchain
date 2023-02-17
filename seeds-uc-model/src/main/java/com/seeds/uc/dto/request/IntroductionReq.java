@@ -14,6 +14,5 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class IntroductionReq {
     @ApiModelProperty(value = "简介")
-    @NotBlank
     private String introduction;
 }

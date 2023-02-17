@@ -84,6 +84,7 @@ public class OpenUserController {
     @ApiOperation(value = "修改简介", notes = "修改简介")
     public GenericDto<Object> updateIntroduction(@Valid @RequestBody IntroductionReq introductionReq, HttpServletRequest request) {
         // 获取当前登陆人信息
+        log.info("updateIntroduction--> {}",introductionReq);
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         long currentTime = System.currentTimeMillis();
