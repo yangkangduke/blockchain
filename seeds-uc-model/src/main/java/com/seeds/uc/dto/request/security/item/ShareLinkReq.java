@@ -14,15 +14,12 @@ import javax.validation.constraints.NotBlank;
 public class ShareLinkReq {
 
     @ApiModelProperty(value = "twitter地址")
-    @NotBlank
     private String twitter;
 
     @ApiModelProperty(value = "instagram地址")
-    @NotBlank
     private String instagram;
 
     @ApiModelProperty(value = "facebook地址")
-    @NotBlank
     private String facebook;
 
 }
