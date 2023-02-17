@@ -96,7 +96,7 @@ public class OpenUserController {
     }
 
 
-    @PutMapping("/change/ShareLink")
+    @PutMapping("/change/shareLink")
     @ApiOperation(value = "修改社交链接", notes = "修改社交链接")
     public GenericDto<Object> updateShareLink(@Valid @RequestBody ShareLinkReq shareLinkReq, HttpServletRequest request) {
         log.info("updateShareLink--> {}",shareLinkReq);
