@@ -98,6 +98,7 @@ public class OpenUserController {
     @PutMapping("/change/ShareLink")
     @ApiOperation(value = "修改社交链接", notes = "修改社交链接")
     public GenericDto<Object> updateShareLink(@Valid @RequestBody ShareLinkReq shareLinkReq, HttpServletRequest request) {
+        log.info("updateShareLink--> {}",shareLinkReq);
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
