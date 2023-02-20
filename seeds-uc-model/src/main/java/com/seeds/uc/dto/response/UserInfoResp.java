@@ -33,5 +33,13 @@ public class UserInfoResp {
     private String createdAt;
     @ApiModelProperty(value = "策略")
     private List<UcSecurityStrategyResp> securityStrategyList;
+    @ApiModelProperty(value = "个人简介")
+    private String introduction;
+    @ApiModelProperty(value = "facebook地址")
+    private String facebook;
+    @ApiModelProperty(value = "twitter地址")
+    private String twitter;
+    @ApiModelProperty(value = "instagram地址")
+    private String instagram;
 
 }

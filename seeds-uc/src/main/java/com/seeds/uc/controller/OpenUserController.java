@@ -5,9 +5,8 @@ import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.uc.dto.redis.LoginUserDTO;
-import com.seeds.uc.dto.request.AvatarReq;
-import com.seeds.uc.dto.request.ChangePasswordReq;
-import com.seeds.uc.dto.request.NickNameReq;
+import com.seeds.uc.dto.request.*;
+import com.seeds.uc.dto.request.security.item.ShareLinkReq;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.enums.AuthCodeUseTypeEnum;
 import com.seeds.uc.enums.ClientAuthTypeEnum;
@@ -79,6 +78,39 @@ public class OpenUserController {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         return GenericDto.success(ucUserService.updateNickname(nickNameReq.getNickname(), loginUser));
+    }
+
+    @PutMapping("/change/introduction")
+    @ApiOperation(value = "修改简介", notes = "修改简介")
+    public GenericDto<Object> updateIntroduction(@Valid @RequestBody IntroductionReq introductionReq, HttpServletRequest request) {
+        // 获取当前登陆人信息
+        log.info("updateIntroduction--> {}",introductionReq);
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+        long currentTime = System.currentTimeMillis();
+        return GenericDto.success(ucUserService.updateById(UcUser.builder()
+                .id(loginUser.getUserId())
+                .introduction(introductionReq.getIntroduction())
+                .updatedAt(currentTime)
+                .build()));
+    }
+
+
+    @PutMapping("/change/shareLink")
+    @ApiOperation(value = "修改社交链接", notes = "修改社交链接")
+    public GenericDto<Object> updateShareLink(@Valid @RequestBody ShareLinkReq shareLinkReq, HttpServletRequest request) {
+        log.info("updateShareLink--> {}",shareLinkReq);
+        // 获取当前登陆人信息
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+        long currentTime = System.currentTimeMillis();
+        return GenericDto.success(ucUserService.updateById(UcUser.builder()
+                .id(loginUser.getUserId())
+                .facebook(shareLinkReq.getFacebook())
+                .twitter(shareLinkReq.getTwitter())
+                .instagram(shareLinkReq.getInstagram())
+                .updatedAt(currentTime)
+                .build()));
     }
 
     @PutMapping("/change/avatar")

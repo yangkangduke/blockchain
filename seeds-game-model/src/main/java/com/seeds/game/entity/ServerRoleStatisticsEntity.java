@@ -1,13 +1,11 @@
 package com.seeds.game.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -21,60 +19,43 @@ import java.math.BigDecimal;
 @TableName("ga_server_role_statistics")
 @ApiModel(value = "ServerRoleStatistics对象", description = "游戏服角色统计")
 @Data
-public class ServerRoleStatisticsEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty("id")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+@EqualsAndHashCode(callSuper = true)
+public class ServerRoleStatisticsEntity extends BaseEntity {
 
     @ApiModelProperty("游戏角色id")
     private Long roleId;
 
-    @ApiModelProperty("击杀评分")
-    private BigDecimal killingRate;
+    @ApiModelProperty("血腥积分")
+    private Integer killScore;
 
-    @ApiModelProperty("存活评分")
-    private BigDecimal survivalRate;
+    @ApiModelProperty("生存积分")
+    private Integer survivalScore;
 
-    @ApiModelProperty("生产评分")
-    private BigDecimal productionRate;
+    @ApiModelProperty("生产积分")
+    private Integer drawingScore;
 
-    @ApiModelProperty("排行评分")
-    private BigDecimal rankingRate;
+    @ApiModelProperty("天梯积分")
+    private Integer ladderScore;
 
-    @ApiModelProperty("掠夺评分")
-    private BigDecimal lootRate;
+    @ApiModelProperty("竞技场积分")
+    private Integer rankScore;
 
-    @ApiModelProperty("得分评分")
-    private BigDecimal scoreRate;
+    @ApiModelProperty("专业积分")
+    private Integer professionalScore;
 
     @ApiModelProperty("胜率")
-    private BigDecimal winningRate;
+    private BigDecimal winRate;
 
-    @ApiModelProperty("最高连胜")
-    private Integer highWinStreak;
+    @ApiModelProperty("最大连胜")
+    private Integer seqWinNum;
 
-    @ApiModelProperty("总游戏次数")
-    private Long totalGames;
+    @ApiModelProperty("总场次")
+    private Long fightNum;
 
     @ApiModelProperty("总游戏时间")
-    private Long totalGameTime;
+    private Long totalSurvivalTime;
 
     @ApiModelProperty("综合评价")
     private String overallScore;
-
-    @ApiModelProperty("创建人")
-    private Long createdBy;
-
-    @ApiModelProperty("修改人")
-    private Long updatedBy;
-
-    @ApiModelProperty("上传时间")
-    private Long createdAt;
-
-    @ApiModelProperty("更新时间")
-    private Long updatedAt;
 
 }
