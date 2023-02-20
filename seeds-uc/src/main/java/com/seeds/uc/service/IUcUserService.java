@@ -11,6 +11,8 @@ import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.dto.response.UserRegistrationResp;
 import com.seeds.uc.model.UcUser;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -146,14 +148,14 @@ public interface IUcUserService extends IService<UcUser> {
      * @param verifyReq
      * @return
      */
-    Boolean verifyMetamask(MetamaskVerifyReq verifyReq);
+    Boolean verifyMetamask(MetamaskVerifyReq verifyReq, HttpServletRequest request);
 
     /**
      * 验证phantom签名
      * @param verifyReq
      * @return
      */
-    Boolean verifyPhantom(PhantomVerifyReq verifyReq);
+    Boolean verifyPhantom(PhantomVerifyReq verifyReq, HttpServletRequest request);
 
     /**
      * 通过id查询用户昵称

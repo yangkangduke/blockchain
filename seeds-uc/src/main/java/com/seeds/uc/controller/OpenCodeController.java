@@ -87,9 +87,9 @@ public class OpenCodeController {
 
     @ApiOperation(value = "metamask验证", notes = "metamask验证")
     @PostMapping("/metamask/verify")
-    public GenericDto<TokenResp> verifyMetamask(@RequestBody MetamaskVerifyReq verifyReq) {
+    public GenericDto<TokenResp> verifyMetamask(@RequestBody MetamaskVerifyReq verifyReq, HttpServletRequest request) {
         log.info("OpenCodeController - verifyMetamask got request: {}", verifyReq);
-        userService.verifyMetamask(verifyReq);
+        userService.verifyMetamask(verifyReq, request);
 
         String authToken = RandomUtil.genRandomToken(UserContext.getCurrentUserId().toString());
         cacheService.putAuthToken(authToken, verifyReq.getMessage(), verifyReq.getPublicAddress(), ClientAuthTypeEnum.METAMASK);
@@ -101,9 +101,9 @@ public class OpenCodeController {
 
     @ApiOperation(value = "phantom验证", notes = "phantom验证")
     @PostMapping("/phantom/verify")
-    public GenericDto<TokenResp> verifyPhantom(@RequestBody PhantomVerifyReq verifyReq) {
+    public GenericDto<TokenResp> verifyPhantom(@RequestBody PhantomVerifyReq verifyReq, HttpServletRequest request) {
         log.info("OpenCodeController - verifyPhantom got request: {}", verifyReq);
-        userService.verifyPhantom(verifyReq);
+        userService.verifyPhantom(verifyReq, request);
 
         String authToken = RandomUtil.genRandomToken(UserContext.getCurrentUserId().toString());
         cacheService.putAuthToken(authToken, verifyReq.getMessage(), verifyReq.getPublicAddress(), ClientAuthTypeEnum.PHANTOM);

@@ -17,7 +17,6 @@ public class PhantomVerifyReq {
     private String signature;
     @ApiModelProperty(value = "签名原文")
     private String message;
-    private Long userId;
 
     @ApiModelProperty(value = "邀请码")
     private String inviteCode;
