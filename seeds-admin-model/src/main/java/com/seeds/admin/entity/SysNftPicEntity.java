@@ -87,7 +87,7 @@ public class SysNftPicEntity extends BaseEntity {
     /**
      * NFT链上的地址
      */
-    @TableField("tokenAddress")
+    @TableField("token_address")
     private String tokenAddress;
 
 
