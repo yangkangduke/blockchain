@@ -1,12 +1,18 @@
 package com.seeds.admin.controller;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.dto.request.PageReq;
+import com.seeds.admin.dto.response.SysNftPicUpHisResp;
 import com.seeds.admin.service.SysNftPicUpHisService;
+import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * NFT上传文件记录
@@ -22,4 +28,9 @@ public class SysNftPicUpHisController {
     @Autowired
     private SysNftPicUpHisService sysNftPicUpHisService;
 
+    @PostMapping("page")
+    @ApiOperation("获取分页信息")
+    public GenericDto<IPage<SysNftPicUpHisResp>>queryPage(@Valid @RequestBody PageReq req){
+        return GenericDto.success(sysNftPicUpHisService.queryPage(req));
+    }
 }
