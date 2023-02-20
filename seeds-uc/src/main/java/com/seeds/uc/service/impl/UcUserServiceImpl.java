@@ -201,7 +201,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp metamaskLogin(MetamaskVerifyReq metamaskVerifyReq) {
         String publicAddress = metamaskVerifyReq.getPublicAddress();
-        this.verifyMetamask(metamaskVerifyReq);
+        this.verifyMetamask(metamaskVerifyReq, null);
         long currentTime = System.currentTimeMillis();
 
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(publicAddress);
@@ -257,7 +257,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     @Override
     public LoginResp phantomLogin(PhantomVerifyReq phantomVerifyReq) {
         String publicAddress = phantomVerifyReq.getPublicAddress();
-        this.verifyPhantom(phantomVerifyReq);
+        this.verifyPhantom(phantomVerifyReq, null);
         long currentTime = System.currentTimeMillis();
 
         GenPhantomAuth genPhantomAuth = cacheService.getGeneratePhantomAuth(publicAddress);
@@ -642,12 +642,22 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public Boolean verifyPhantom(PhantomVerifyReq verifyReq) {
+    public Boolean verifyPhantom(PhantomVerifyReq verifyReq, HttpServletRequest request) {
         String publicAddress = verifyReq.getPublicAddress();
         String signature = verifyReq.getSignature();
         String message = verifyReq.getMessage();
         String[] split = message.split(":");
         String nonce =  split[2].replace("\n","");
+
+        // 判断地址跟数据库地址是否一致
+        if (request != null) {
+            LoginUserDTO loginUser = cacheService.getUserByToken(WebUtil.getTokenFromRequest(request));
+            UcUser ucUser = this.getById(loginUser.getUserId());
+            if (!publicAddress.equals(ucUser.getPublicAddress())) {
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17005_PHANTOM_ADDRESS_NOT_EXIST, messageSource.getMessage("ERR_17005_PHANTOM_ADDRESS_NOT_EXIST", null, LocaleContextHolder.getLocale()));
+            }
+        }
+
         GenPhantomAuth genPhantomAuth = cacheService.getGeneratePhantomAuth(verifyReq.getPublicAddress());
         if (genPhantomAuth == null || StringUtils.isBlank(genPhantomAuth.getNonce()) || !genPhantomAuth.getNonce().equals(nonce) ) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17003_PHANTOM_NONCE_EXPIRED, messageSource.getMessage("ERR_17003_PHANTOM_NONCE_EXPIRED", null, LocaleContextHolder.getLocale()));
@@ -670,12 +680,22 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
      * @return
      */
     @Override
-    public Boolean verifyMetamask(MetamaskVerifyReq verifyReq) {
+    public Boolean verifyMetamask(MetamaskVerifyReq verifyReq, HttpServletRequest request) {
         String publicAddress = verifyReq.getPublicAddress();
         String signature = verifyReq.getSignature();
         String message = verifyReq.getMessage();
         String[] split = message.split(":");
         String nonce =  split[2].replace("\n","");
+
+        // 判断地址跟数据库地址是否一致
+        if (request != null) {
+            LoginUserDTO loginUser = cacheService.getUserByToken(WebUtil.getTokenFromRequest(request));
+            UcUser ucUser = this.getById(loginUser.getUserId());
+            if (!publicAddress.equals(ucUser.getPublicAddress())) {
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16005_METAMASK_ADDRESS_NOT_EXIST, messageSource.getMessage("ERR_16005_METAMASK_ADDRESS_NOT_EXIST", null, LocaleContextHolder.getLocale()));
+            }
+        }
+
         GenMetamaskAuth genMetamaskAuth = cacheService.getGenerateMetamaskAuth(verifyReq.getPublicAddress());
         if (genMetamaskAuth == null || StringUtils.isBlank(genMetamaskAuth.getNonce()) || !genMetamaskAuth.getNonce().equals(nonce) ) {
             throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16003_METAMASK_NONCE_EXPIRED, messageSource.getMessage("ERR_16003_METAMASK_NONCE_EXPIRED", null, LocaleContextHolder.getLocale()));
