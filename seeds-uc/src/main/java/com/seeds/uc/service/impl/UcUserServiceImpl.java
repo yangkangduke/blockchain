@@ -647,7 +647,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String signature = verifyReq.getSignature();
         String message = verifyReq.getMessage();
         String[] split = message.split(":");
-        String nonce =  split[2].replace("\n","");
+        String nonce =  split[6].replace("\\nIssued At","");
 
         // 判断地址跟数据库地址是否一致
         if (request != null) {
