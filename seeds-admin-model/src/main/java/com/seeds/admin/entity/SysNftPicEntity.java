@@ -81,6 +81,12 @@ public class SysNftPicEntity extends BaseEntity {
     @TableField("conf_id")
     private Long confId;
 
+    /**
+     * mint 后的nft名字
+     */
+    @TableField("name")
+    private String name;
+
     @TableField("symbol")
     private String symbol;
 
