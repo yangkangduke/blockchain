@@ -5,10 +5,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @TableName("sys_nft_pic")
 public class SysNftPicEntity extends BaseEntity {
 
+    /**
+     * 图片名字
+     */
+    private String picName;
     /**
      * 图片地址
      */
@@ -57,6 +61,8 @@ public class SysNftPicEntity extends BaseEntity {
     @TableField("hero")
     private String hero;
 
+    @TableField("other")
+    private String other;
     /**
      * 对应皮肤名字
      */

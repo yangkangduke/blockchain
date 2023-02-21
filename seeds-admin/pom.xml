@@ -27,6 +27,12 @@
     </properties>
 
     <dependencies>
+        <!-- csv文件解析依赖 -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.4</version>
+        </dependency>
         <dependency>
             <groupId>org.lionsoul</groupId>
             <artifactId>ip2region</artifactId>

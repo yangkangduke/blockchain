@@ -1,4 +1,5 @@
 package com.seeds.admin.controller;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.dto.request.SysNftPicPageReq;
 import com.seeds.admin.dto.response.SysNftPicResp;
@@ -8,12 +9,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 
 @Slf4j
@@ -27,7 +27,14 @@ public class SysNftPicController {
 
     @PostMapping("page")
     @ApiOperation("获取分页信息")
-    public GenericDto<IPage<SysNftPicResp>> queryPage(@Valid @RequestBody SysNftPicPageReq req){
+    public GenericDto<IPage<SysNftPicResp>> queryPage(@Valid @RequestBody SysNftPicPageReq req) {
         return GenericDto.success(sysNftPicService.queryPage(req));
+    }
+
+    @PostMapping("uploadCSV")
+    @ApiOperation(value = "上传属性文件", notes = "type: 1 属性csv; 2 autoId")
+    public GenericDto<Boolean> upload(@RequestPart(value = "file") MultipartFile file, @RequestParam(value = "type  1 属性csv; 2 autoId") @NotNull Integer type) {
+        sysNftPicService.upload(file, type);
+        return GenericDto.success(null);
     }
 }
