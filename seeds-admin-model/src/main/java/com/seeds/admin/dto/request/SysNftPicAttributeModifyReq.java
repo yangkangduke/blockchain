@@ -16,7 +16,7 @@ public class SysNftPicAttributeModifyReq {
     @ApiModelProperty("id")
     private Long id;
 
-    @ApiModelProperty("属性：稀有度分别为：normal,rare,epic")
+    @ApiModelProperty("属性：稀有度为下拉选框分别为：normal,rare,epic")
     private String rarity;
 
     @ApiModelProperty("属性:图片特征-主题")

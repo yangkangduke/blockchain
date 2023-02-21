@@ -17,6 +17,8 @@ public class KafkaTopic {
     public final String GAME_NFT_HONOR_MODIFY = "GAME-NFT-HONOR-MODIFY";
     public final String NFT_DELETE_SUCCESS = "NFT-DELETE-SUCCESS";
     public final String NFT_UPGRADE_SUCCESS = "NFT-UPGRADE-SUCCESS";
+    // NFT PIC
+    public final String NFT_PIC_ATTR_UPDATE_SUCCESS = "NFT_PIC_ATTR_UPDATE_SUCCESS";
 
     // NFT ACCOUNT
     public final String AC_NFT_OWNER_CHANGE = "ac_nft_owner_change";
