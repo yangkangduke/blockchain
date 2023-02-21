@@ -106,7 +106,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
     public void download(HttpServletResponse response, String bucketName, String objectName) {
         try (S3Object s3Object = template.getObject(bucketName, objectName)) {
             response.setContentType("application/octet-stream; charset=UTF-8");
-            response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(objectName, "UTF-8"));
+            response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(objectName.substring(objectName.lastIndexOf("/") + 1), "UTF-8"));
             IoUtil.copy(s3Object.getObjectContent(), response.getOutputStream());
         }
         catch (Exception e) {
