@@ -39,7 +39,8 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                 .eq(!Objects.isNull(req.getSkin()), SysNftPicEntity::getSkin, req.getSkin())
                 .eq(!Objects.isNull(req.getAutoId()), SysNftPicEntity::getAutoId, req.getAutoId())
                 .eq(!Objects.isNull(req.getConfId()), SysNftPicEntity::getConfId, req.getConfId())
-                .eq(!Objects.isNull(req.getTokenAddress()), SysNftPicEntity::getTokenAddress, req.getTokenAddress());
+                .eq(!Objects.isNull(req.getTokenAddress()), SysNftPicEntity::getTokenAddress, req.getTokenAddress())
+                .orderByDesc(SysNftPicEntity::getCreatedAt);
 
         Page<SysNftPicEntity> page = new Page<>(req.getCurrent(), req.getSize());
         List<SysNftPicEntity> records = this.page(page, queryWrapper).getRecords();
