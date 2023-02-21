@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.SysNFTAttrDto;
 import com.seeds.admin.dto.SysNFTAutoIdDto;
+import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
 import com.seeds.admin.dto.request.SysNftPicPageReq;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.entity.SysNftPicEntity;
@@ -79,5 +80,12 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         }
         // 批量更新属性
         this.updateBatchById(batchUpdate);
+    }
+
+    @Override
+    public void updateAttribute(SysNftPicAttributeModifyReq req) {
+        SysNftPicEntity sysNftPicEntity = new SysNftPicEntity();
+        BeanUtils.copyProperties(req,sysNftPicEntity);
+        this.updateById(sysNftPicEntity);
     }
 }
