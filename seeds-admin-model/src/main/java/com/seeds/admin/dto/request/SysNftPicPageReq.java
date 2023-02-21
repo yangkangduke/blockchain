@@ -11,8 +11,29 @@ public class SysNftPicPageReq {
     @ApiModelProperty("上传时间")
     private Long createdAt;
 
-    @ApiModelProperty("属性")
-    private String symbol;
+    @ApiModelProperty("属性：稀有度分别为：normal,rare,epic")
+    private String rarity;
+
+    @ApiModelProperty("属性:图片特征-主题")
+    private String feature;
+
+    @ApiModelProperty("图片特征-主要配饰")
+    private String accessories;
+
+    @ApiModelProperty("图片特征-肤色")
+    private String color;
+
+    @ApiModelProperty("图片特征-装饰物")
+    private String decorate;
+
+    @ApiModelProperty("图片特征-其他")
+    private String other;
+
+    @ApiModelProperty("对应英雄的名字")
+    private String hero;
+
+    @ApiModelProperty("对应皮肤的名字")
+    private String skin;
 
     @ApiModelProperty("游戏内物品的唯一id")
     private Long autoId;
