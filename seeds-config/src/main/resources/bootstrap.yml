@@ -19,6 +19,6 @@ spring:
           uri: https://gitee.com/Jiutong123/git-config
           username: 15928559050
           password: cd530d0aaf83a68e54a523e0c011af4b
-          search-paths: test-config
-          default-label: test
+          search-paths: dev-config
+          default-label: dev
           force-pull: true

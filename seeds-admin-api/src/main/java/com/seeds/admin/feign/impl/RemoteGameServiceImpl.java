@@ -7,6 +7,7 @@ import com.seeds.admin.dto.response.*;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class RemoteGameServiceImpl implements RemoteGameService {
 		return GenericDto.failure("Internal Error:game querySecretKey failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
+	@PostMapping("/internal-game/win-rank-info")
 	@Override
 	public GenericDto<List<GameWinRankResp.GameWinRank>> winRankInfo(GameWinRankReq query) {
 		return GenericDto.failure("Internal Error:game rankWinInfo failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
