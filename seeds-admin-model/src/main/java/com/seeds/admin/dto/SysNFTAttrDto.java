@@ -42,4 +42,9 @@ public class SysNFTAttrDto {
     private String skin;
 
     private String other;
+
+    // nft name
+    private String name;
+    private String symbol;
+    private String desc;
 }
