@@ -1,6 +1,7 @@
 package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
 import com.seeds.admin.dto.request.SysNftPicPageReq;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.service.SysNftPicService;
@@ -35,6 +36,13 @@ public class SysNftPicController {
     @ApiOperation(value = "上传属性文件", notes = "type: 1 属性csv; 2 autoId")
     public GenericDto<Boolean> upload(@RequestPart(value = "file") MultipartFile file, @RequestParam(value = "type  1 属性csv; 2 autoId") @NotNull Integer type) {
         sysNftPicService.upload(file, type);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("update")
+    @ApiOperation("修改内置属性")
+    public GenericDto<Object> updateAttribute(@RequestBody @Valid SysNftPicAttributeModifyReq req){
+        sysNftPicService.updateAttribute(req);
         return GenericDto.success(null);
     }
 }

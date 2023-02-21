@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.SysNFTAttrDto;
 import com.seeds.admin.dto.SysNFTAutoIdDto;
+import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
 import com.seeds.admin.dto.request.SysNftPicPageReq;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.entity.SysNftPicEntity;
@@ -28,10 +29,18 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     public IPage<SysNftPicResp> queryPage(SysNftPicPageReq req) {
         LambdaQueryWrapper<SysNftPicEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(!Objects.isNull(req.getCreatedAt()), SysNftPicEntity::getCreatedAt, req.getCreatedAt())
-                .eq(!Objects.isNull(req.getSymbol()), SysNftPicEntity::getSymbol, req.getSymbol())
+                .eq(!Objects.isNull(req.getRarity()), SysNftPicEntity::getRarity, req.getRarity())
+                .eq(!Objects.isNull(req.getFeature()), SysNftPicEntity::getFeature, req.getFeature())
+                .eq(!Objects.isNull(req.getColor()), SysNftPicEntity::getColor, req.getColor())
+                .eq(!Objects.isNull(req.getAccessories()), SysNftPicEntity::getAccessories, req.getAccessories())
+                .eq(!Objects.isNull(req.getDecorate()), SysNftPicEntity::getDecorate, req.getDecorate())
+                .eq(!Objects.isNull(req.getOther()), SysNftPicEntity::getOther, req.getOther())
+                .eq(!Objects.isNull(req.getHero()), SysNftPicEntity::getHero, req.getHero())
+                .eq(!Objects.isNull(req.getSkin()), SysNftPicEntity::getSkin, req.getSkin())
                 .eq(!Objects.isNull(req.getAutoId()), SysNftPicEntity::getAutoId, req.getAutoId())
                 .eq(!Objects.isNull(req.getConfId()), SysNftPicEntity::getConfId, req.getConfId())
-                .eq(!Objects.isNull(req.getTokenAddress()), SysNftPicEntity::getTokenAddress, req.getTokenAddress());
+                .eq(!Objects.isNull(req.getTokenAddress()), SysNftPicEntity::getTokenAddress, req.getTokenAddress())
+                .orderByDesc(SysNftPicEntity::getCreatedAt);
 
         Page<SysNftPicEntity> page = new Page<>(req.getCurrent(), req.getSize());
         List<SysNftPicEntity> records = this.page(page, queryWrapper).getRecords();
@@ -72,5 +81,12 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         }
         // 批量更新属性
         this.updateBatchById(batchUpdate);
+    }
+
+    @Override
+    public void updateAttribute(SysNftPicAttributeModifyReq req) {
+        SysNftPicEntity sysNftPicEntity = new SysNftPicEntity();
+        BeanUtils.copyProperties(req,sysNftPicEntity);
+        this.updateById(sysNftPicEntity);
     }
 }
