@@ -1,6 +1,7 @@
 package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
 import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.SysNftPicPageReq;
 import com.seeds.admin.dto.response.SysNftDetailResp;
@@ -45,5 +46,12 @@ public class SysNftPicController {
     @ApiOperation("获取属性JSON文件")
     public GenericDto<String> getAttr(@PathVariable("id") Long id) {
         return GenericDto.success(sysNftPicService.getAttr(id));
+    }
+
+    @PostMapping("update")
+    @ApiOperation("修改内置属性")
+    public GenericDto<Object> updateAttribute(@RequestBody @Valid SysNftPicAttributeModifyReq req){
+        sysNftPicService.updateAttribute(req);
+        return GenericDto.success(null);
     }
 }
