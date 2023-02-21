@@ -649,10 +649,19 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String[] split = message.split(":");
         String nonce =  split[6].replace("\nIssued At","");
 
-        // 判断地址跟数据库地址是否一致
+        // 认证、绑定钱包的时候用到；登陆和注册不进入此方法
         if (request != null) {
             LoginUserDTO loginUser = cacheService.getUserByToken(WebUtil.getTokenFromRequest(request));
             UcUser ucUser = this.getById(loginUser.getUserId());
+            UcUser otherUser = this.getOne(new QueryWrapper<UcUser>().lambda()
+                    .eq(UcUser::getPublicAddress, verifyReq.getPublicAddress())
+                    .ne(UcUser::getId, loginUser.getUserId()));
+
+            // 判断地址是否已经被绑定过了
+            if (otherUser != null) {
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17006_PHANTOM_ADDRESS_BINDED, messageSource.getMessage("ERR_17006_PHANTOM_ADDRESS_BINDED", null, LocaleContextHolder.getLocale()));
+            }
+            // 判断地址跟数据库地址是否一致
             if (!publicAddress.equals(ucUser.getPublicAddress())) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17005_PHANTOM_ADDRESS_NOT_EXIST, messageSource.getMessage("ERR_17005_PHANTOM_ADDRESS_NOT_EXIST", null, LocaleContextHolder.getLocale()));
             }
@@ -687,10 +696,18 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         String[] split = message.split(":");
         String nonce =  split[2].replace("\n","");
 
-        // 判断地址跟数据库地址是否一致
+        // 认证、绑定钱包的时候用到；登陆和注册不进入此方法
         if (request != null) {
             LoginUserDTO loginUser = cacheService.getUserByToken(WebUtil.getTokenFromRequest(request));
             UcUser ucUser = this.getById(loginUser.getUserId());
+            UcUser otherUser = this.getOne(new QueryWrapper<UcUser>().lambda()
+                    .eq(UcUser::getPublicAddress, verifyReq.getPublicAddress())
+                    .ne(UcUser::getId, loginUser.getUserId()));
+            // 判断地址是否已经被绑定过了
+            if (otherUser != null) {
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16006_METAMASK_ADDRESS_BINDED, messageSource.getMessage("ERR_16006_METAMASK_ADDRESS_BINDED", null, LocaleContextHolder.getLocale()));
+            }
+            // 判断地址跟数据库地址是否一致
             if (!publicAddress.equals(ucUser.getPublicAddress())) {
                 throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16005_METAMASK_ADDRESS_NOT_EXIST, messageSource.getMessage("ERR_16005_METAMASK_ADDRESS_NOT_EXIST", null, LocaleContextHolder.getLocale()));
             }

@@ -28,7 +28,7 @@ public enum UcErrorCodeEnum {
     ERR_16003_METAMASK_NONCE_EXPIRED(16003, "nonce已经过期", "nonce has expired"),
     ERR_16004_METAMASK_VERIFY_EXPIRED(16004, "metamask签名验证过期", "metamask signature verification expired"),
     ERR_16005_METAMASK_ADDRESS_NOT_EXIST(16005, "地址不匹配", "address does not match"),
-
+    ERR_16006_METAMASK_ADDRESS_BINDED(16006, "地址已被绑定过了", "address is already binded"),
 
     //phantom
     ERR_17001_PHANTOM_ADDRESS(17001, "非法地址格式", "Illegal address format"),
@@ -36,6 +36,7 @@ public enum UcErrorCodeEnum {
     ERR_17003_PHANTOM_NONCE_EXPIRED(17003, "nonce已经过期", "nonce has expired"),
     ERR_17004_PHANTOM_VERIFY_EXPIRED(17004, "phantom签名验证过期", "phantom signature verification expired"),
     ERR_17005_PHANTOM_ADDRESS_NOT_EXIST(17005, "地址不匹配", "address does not match"),
+    ERR_17006_PHANTOM_ADDRESS_BINDED(17006, "地址已被绑定过了", "address is already binded"),
 
     // 账户
     ERR_18001_ACCOUNT_BALANCE_INSUFFICIENT(18001, "账户余额不足", "Insufficient account balance"),
