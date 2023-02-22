@@ -711,7 +711,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             }
             // 判断地址跟数据库地址是否一致
             if (!publicAddress.equals(ucUser.getPublicAddress())) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16005_METAMASK_ADDRESS_NOT_EXIST, messageSource.getMessage("ERR_16005_METAMASK_ADDRESS_NOT_EXIST", null, LocaleContextHolder.getLocale()));
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16005_METAMASK_ADDRESS_NOT_MATCH, messageSource.getMessage("ERR_16005_METAMASK_ADDRESS_NOT_MATCH", null, LocaleContextHolder.getLocale()));
             }
         }
 
