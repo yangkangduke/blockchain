@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -27,7 +28,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -41,7 +41,10 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public IPage<SysNftPicResp> queryPage(SysNftPicPageReq req) {
         LambdaQueryWrapper<SysNftPicEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.between(!Objects.isNull(req.getCreatedAt()),SysNftPicEntity::getCreatedAt, DateUtil.beginOfDay(new Date()).getTime(), DateUtil.endOfDay(new Date()).getTime())
+        DateTime dateTime = DateUtil.parseDate(req.getQueryTime());
+        long start = DateUtil.beginOfDay(dateTime).getTime();
+        long end = DateUtil.endOfDay(dateTime).getTime();
+        queryWrapper.between(!Objects.isNull(req.getQueryTime()),SysNftPicEntity::getCreatedAt, start,end)
                 .eq(!Objects.isNull(req.getRarity()), SysNftPicEntity::getRarity, req.getRarity())
                 .eq(!Objects.isNull(req.getFeature()), SysNftPicEntity::getFeature, req.getFeature())
                 .eq(!Objects.isNull(req.getColor()), SysNftPicEntity::getColor, req.getColor())
