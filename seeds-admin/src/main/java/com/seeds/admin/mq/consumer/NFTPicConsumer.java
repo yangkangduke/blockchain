@@ -64,6 +64,7 @@ public class NFTPicConsumer {
 
                     String jsonUrl = sysFileService.getFileUrl(objectName);
                     entity.setJsonUrl(jsonUrl);
+                    entity.setUpdatedAt(System.currentTimeMillis());
                     nftPicService.updateById(entity);
 
                     // 先关闭流，否则 删除文件不成功

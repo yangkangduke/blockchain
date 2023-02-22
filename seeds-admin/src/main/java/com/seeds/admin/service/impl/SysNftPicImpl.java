@@ -1,5 +1,7 @@
 package com.seeds.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -27,7 +29,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -41,7 +42,14 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public IPage<SysNftPicResp> queryPage(SysNftPicPageReq req) {
         LambdaQueryWrapper<SysNftPicEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.between(!Objects.isNull(req.getCreatedAt()),SysNftPicEntity::getCreatedAt, DateUtil.beginOfDay(new Date()).getTime(), DateUtil.endOfDay(new Date()).getTime())
+        Long start = 0L;
+        Long end = 0L;
+        if (!Objects.isNull(req.getQueryTime())) {
+            DateTime dateTime = DateUtil.parseDate(req.getQueryTime());
+            start = DateUtil.beginOfDay(dateTime).getTime();
+            end = DateUtil.endOfDay(dateTime).getTime();
+        }
+        queryWrapper.between(!Objects.isNull(req.getQueryTime()), SysNftPicEntity::getCreatedAt, start, end)
                 .eq(!Objects.isNull(req.getRarity()), SysNftPicEntity::getRarity, req.getRarity())
                 .eq(!Objects.isNull(req.getFeature()), SysNftPicEntity::getFeature, req.getFeature())
                 .eq(!Objects.isNull(req.getColor()), SysNftPicEntity::getColor, req.getColor())
@@ -78,9 +86,12 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             if (!CollectionUtils.isEmpty(sysNFTAttrDtos)) {
                 sysNFTAttrDtos.forEach(p -> {
                     SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
-                    BeanUtils.copyProperties(p, one);
-                    one.setDescription(p.getDesc());
-                    batchUpdate.add(one);
+                    if (one.getPicName().equals(p.getPictureName())) {
+                        BeanUtils.copyProperties(p, one);
+                        one.setDescription(p.getDesc());
+                        one.setUpdatedAt(System.currentTimeMillis());
+                        batchUpdate.add(one);
+                    }
                 });
             }
         } else {
@@ -88,8 +99,11 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             if (!CollectionUtils.isEmpty(autoIdDtos)) {
                 autoIdDtos.forEach(p -> {
                     SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
-                    BeanUtils.copyProperties(p, one);
-                    batchUpdate.add(one);
+                    if (one.getPicName().equals(p.getPictureName())) {
+                        BeanUtils.copyProperties(p, one);
+                        one.setUpdatedAt(System.currentTimeMillis());
+                        batchUpdate.add(one);
+                    }
                 });
             }
         }
@@ -179,7 +193,10 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public void updateAttribute(SysNftPicAttributeModifyReq req) {
         SysNftPicEntity sysNftPicEntity = new SysNftPicEntity();
-        BeanUtils.copyProperties(req,sysNftPicEntity);
+        BeanUtils.copyProperties(req, sysNftPicEntity);
         this.updateById(sysNftPicEntity);
+
+        // 屬性更新成功消息
+        kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(CollectionUtil.newArrayList(req.getId())));
     }
 }
