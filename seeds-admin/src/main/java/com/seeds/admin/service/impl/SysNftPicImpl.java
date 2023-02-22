@@ -85,10 +85,12 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             if (!CollectionUtils.isEmpty(sysNFTAttrDtos)) {
                 sysNFTAttrDtos.forEach(p -> {
                     SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
-                    BeanUtils.copyProperties(p, one);
-                    one.setDescription(p.getDesc());
-                    one.setUpdatedAt(System.currentTimeMillis());
-                    batchUpdate.add(one);
+                    if (one.getPicName().equals(p.getPictureName())) {
+                        BeanUtils.copyProperties(p, one);
+                        one.setDescription(p.getDesc());
+                        one.setUpdatedAt(System.currentTimeMillis());
+                        batchUpdate.add(one);
+                    }
                 });
             }
         } else {
@@ -96,9 +98,11 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             if (!CollectionUtils.isEmpty(autoIdDtos)) {
                 autoIdDtos.forEach(p -> {
                     SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
-                    BeanUtils.copyProperties(p, one);
-                    one.setUpdatedAt(System.currentTimeMillis());
-                    batchUpdate.add(one);
+                    if (one.getPicName().equals(p.getPictureName())) {
+                        BeanUtils.copyProperties(p, one);
+                        one.setUpdatedAt(System.currentTimeMillis());
+                        batchUpdate.add(one);
+                    }
                 });
             }
         }
