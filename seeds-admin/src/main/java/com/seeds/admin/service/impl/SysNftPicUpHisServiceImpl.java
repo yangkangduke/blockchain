@@ -86,7 +86,6 @@ public class SysNftPicUpHisServiceImpl extends ServiceImpl<SysNftPicUpHisMapper,
         List<SysNftPicEntity> picInsert = new ArrayList<>();
         List<SysNftPicEntity> picUpdate = new ArrayList<>();
         for (MultipartFile file : files) {
-            // 上传文件到oss
             String bucketName = properties.getBucketName();
             String originalFilename = file.getOriginalFilename();
             String objectName = "NFT_PIC/" + originalFilename;
