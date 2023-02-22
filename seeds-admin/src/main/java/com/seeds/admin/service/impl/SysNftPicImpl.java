@@ -87,6 +87,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                     SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
                     BeanUtils.copyProperties(p, one);
                     one.setDescription(p.getDesc());
+                    one.setUpdatedAt(System.currentTimeMillis());
                     batchUpdate.add(one);
                 });
             }
@@ -96,6 +97,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                 autoIdDtos.forEach(p -> {
                     SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
                     BeanUtils.copyProperties(p, one);
+                    one.setUpdatedAt(System.currentTimeMillis());
                     batchUpdate.add(one);
                 });
             }
