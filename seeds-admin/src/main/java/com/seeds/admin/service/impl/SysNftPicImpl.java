@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
@@ -192,7 +193,10 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public void updateAttribute(SysNftPicAttributeModifyReq req) {
         SysNftPicEntity sysNftPicEntity = new SysNftPicEntity();
-        BeanUtils.copyProperties(req,sysNftPicEntity);
+        BeanUtils.copyProperties(req, sysNftPicEntity);
         this.updateById(sysNftPicEntity);
+
+        // 屬性更新成功消息
+        kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(CollectionUtil.newArrayList(req.getId())));
     }
 }
