@@ -30,7 +30,7 @@ public class SysNftPicController {
 
     @PostMapping("page")
     @ApiOperation("获取分页信息")
-    public GenericDto<IPage<SysNftPicResp>> queryPage(@Valid @RequestBody SysNftPicPageReq req) {
+    public GenericDto<IPage<SysNftPicResp>> queryPage(@RequestBody SysNftPicPageReq req) {
         return GenericDto.success(sysNftPicService.queryPage(req));
     }
 

@@ -41,10 +41,14 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public IPage<SysNftPicResp> queryPage(SysNftPicPageReq req) {
         LambdaQueryWrapper<SysNftPicEntity> queryWrapper = new LambdaQueryWrapper<>();
-        DateTime dateTime = DateUtil.parseDate(req.getQueryTime());
-        long start = DateUtil.beginOfDay(dateTime).getTime();
-        long end = DateUtil.endOfDay(dateTime).getTime();
-        queryWrapper.between(!Objects.isNull(req.getQueryTime()),SysNftPicEntity::getCreatedAt, start,end)
+        Long start = 0L;
+        Long end = 0L;
+        if (!Objects.isNull(req.getQueryTime())) {
+            DateTime dateTime = DateUtil.parseDate(req.getQueryTime());
+            start = DateUtil.beginOfDay(dateTime).getTime();
+            end = DateUtil.endOfDay(dateTime).getTime();
+        }
+        queryWrapper.between(!Objects.isNull(req.getQueryTime()), SysNftPicEntity::getCreatedAt, start, end)
                 .eq(!Objects.isNull(req.getRarity()), SysNftPicEntity::getRarity, req.getRarity())
                 .eq(!Objects.isNull(req.getFeature()), SysNftPicEntity::getFeature, req.getFeature())
                 .eq(!Objects.isNull(req.getColor()), SysNftPicEntity::getColor, req.getColor())
