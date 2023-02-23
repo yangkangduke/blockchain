@@ -30,7 +30,7 @@ public class OpenMatchRecordReq extends OpenSignReq {
 
 	@ApiModelProperty("血腥积分")
 	@NotNull(message = "killScore cannot be empty")
-	private Integer killScore;
+	private BigDecimal killScore;
 
 	@ApiModelProperty("总生存时间")
 	@NotNull(message = "totalSurvivalTime cannot be empty")
@@ -41,10 +41,10 @@ public class OpenMatchRecordReq extends OpenSignReq {
 
 	@ApiModelProperty("生存积分")
 	@NotNull(message = "survivalScore cannot be empty")
-	private Integer survivalScore;
+	private BigDecimal survivalScore;
 
 	@ApiModelProperty("生产积分")
-	private Integer drawingScore;
+	private BigDecimal drawingScore;
 
 	@ApiModelProperty("lootMode次数")
 	private Long lootFightNum;
@@ -54,14 +54,14 @@ public class OpenMatchRecordReq extends OpenSignReq {
 
 	@ApiModelProperty("掠夺积分")
 	@NotNull(message = "lootScore cannot be empty")
-	private Integer lootScore;
+	private BigDecimal lootScore;
 
 	@ApiModelProperty("天梯积分")
-	private Integer ladderScore;
+	private BigDecimal ladderScore;
 
 	@ApiModelProperty("竞技场积分")
 	@NotNull(message = "rankScore cannot be empty")
-	private Integer rankScore;
+	private BigDecimal rankScore;
 
 	@ApiModelProperty("获胜场次")
 	@NotNull(message = "winNum cannot be empty")
@@ -81,7 +81,7 @@ public class OpenMatchRecordReq extends OpenSignReq {
 
 	@ApiModelProperty("综合积分")
 	@NotNull(message = "comprehensiveScore cannot be empty")
-	private Integer comprehensiveScore;
+	private BigDecimal comprehensiveScore;
 
 	@ApiModelProperty("玩家账号id")
 	@NotBlank(message = "accID cannot be empty")
