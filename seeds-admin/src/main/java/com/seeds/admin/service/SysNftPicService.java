@@ -13,7 +13,7 @@ public interface SysNftPicService extends IService<SysNftPicEntity> {
 
     IPage<SysNftPicResp> queryPage(SysNftPicPageReq req);
 
-    void upload(MultipartFile file, Integer type);
+    Integer upload(MultipartFile file);
 
     String getAttr(Long id);
 
