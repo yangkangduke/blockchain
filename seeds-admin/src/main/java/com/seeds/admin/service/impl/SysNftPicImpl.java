@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.SysNFTAttrDto;
 import com.seeds.admin.dto.SysNFTAttrJSONDto;
-import com.seeds.admin.dto.SysNFTAutoIdDto;
 import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
 import com.seeds.admin.dto.request.SysNftPicPageReq;
 import com.seeds.admin.dto.response.SysNftPicResp;
@@ -77,41 +76,30 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     }
 
     @Override
-    public void upload(MultipartFile file, Integer type) {
+    public Integer upload(MultipartFile file) {
         List<SysNftPicEntity> batchUpdate = new ArrayList<>();
 
         // 解析CSV文件
-        if (type == 1) {
-            List<SysNFTAttrDto> sysNFTAttrDtos = CsvUtils.getCsvData(file, SysNFTAttrDto.class);
-            if (!CollectionUtils.isEmpty(sysNFTAttrDtos)) {
-                sysNFTAttrDtos.forEach(p -> {
-                    SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
-                    if (one.getPicName().equals(p.getPictureName())) {
-                        BeanUtils.copyProperties(p, one);
-                        one.setDescription(p.getDesc());
-                        one.setUpdatedAt(System.currentTimeMillis());
-                        batchUpdate.add(one);
-                    }
-                });
-            }
-        } else {
-            List<SysNFTAutoIdDto> autoIdDtos = CsvUtils.getCsvData(file, SysNFTAutoIdDto.class);
-            if (!CollectionUtils.isEmpty(autoIdDtos)) {
-                autoIdDtos.forEach(p -> {
-                    SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
-                    if (one.getPicName().equals(p.getPictureName())) {
-                        BeanUtils.copyProperties(p, one);
-                        one.setUpdatedAt(System.currentTimeMillis());
-                        batchUpdate.add(one);
-                    }
-                });
-            }
+        List<SysNFTAttrDto> sysNFTAttrDtos = CsvUtils.getCsvData(file, SysNFTAttrDto.class);
+        if (!CollectionUtils.isEmpty(sysNFTAttrDtos)) {
+            sysNFTAttrDtos.forEach(p -> {
+                SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
+                if (!Objects.isNull(one) && one.getPicName().equals(p.getPictureName())) {
+                    BeanUtils.copyProperties(p, one);
+                    one.setDescription(p.getDesc());
+                    one.setUpdatedAt(System.currentTimeMillis());
+                    batchUpdate.add(one);
+                }
+            });
         }
-        // 批量更新属性
-        this.updateBatchById(batchUpdate);
 
-        // 屬性更新成功消息
-        kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(batchUpdate.stream().map(p -> p.getId()).collect(Collectors.toList())));
+        if (!CollectionUtils.isEmpty(batchUpdate)) {
+            // 批量更新属性
+            this.updateBatchById(batchUpdate);
+            // 屬性更新成功消息
+            kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(batchUpdate.stream().map(p -> p.getId()).collect(Collectors.toList())));
+        }
+        return batchUpdate.size();
     }
 
     @Override

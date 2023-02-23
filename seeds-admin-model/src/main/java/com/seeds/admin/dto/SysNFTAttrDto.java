@@ -47,4 +47,9 @@ public class SysNFTAttrDto {
     private String name;
     private String symbol;
     private String desc;
+
+
+    private Long autoId;
+
+    private Long confId;
 }

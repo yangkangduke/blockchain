@@ -35,10 +35,9 @@ public class SysNftPicController {
     }
 
     @PostMapping("uploadCSV")
-    @ApiOperation(value = "上传属性文件", notes = "type: 1 属性csv; 2 autoId")
-    public GenericDto<Boolean> upload(@RequestPart(value = "file") MultipartFile file, @RequestParam(value = "type") @NotNull Integer type) {
-        sysNftPicService.upload(file, type);
-        return GenericDto.success(null);
+    @ApiOperation(value = "上传属性文件")
+    public GenericDto<Object> upload(@RequestPart(value = "file") MultipartFile file) {
+        return GenericDto.success(sysNftPicService.upload(file));
     }
 
 
