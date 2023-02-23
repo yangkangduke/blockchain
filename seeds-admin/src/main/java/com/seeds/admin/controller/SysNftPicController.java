@@ -59,7 +59,7 @@ public class SysNftPicController {
      * @param
      * @return
      */
-    @ApiOperation(value = "打包下载")
+    @ApiOperation(value = "打包下载JSON文件")
     @PostMapping("/getPackageDownload")
     public void getPackageDownload(HttpServletResponse response, @Valid @RequestBody ListReq req) {
         sysNftPicService.getPackageDownload(response, req);
