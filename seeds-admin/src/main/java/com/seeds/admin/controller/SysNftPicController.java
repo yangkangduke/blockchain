@@ -1,10 +1,9 @@
 package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
-import com.seeds.admin.annotation.RequiredPermission;
 import com.seeds.admin.dto.request.SysNftPicPageReq;
-import com.seeds.admin.dto.response.SysNftDetailResp;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.service.SysNftPicService;
 import com.seeds.common.dto.GenericDto;
@@ -15,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 
 @Slf4j
@@ -49,8 +48,20 @@ public class SysNftPicController {
 
     @PostMapping("update")
     @ApiOperation("修改内置属性")
-    public GenericDto<Object> updateAttribute(@RequestBody @Valid SysNftPicAttributeModifyReq req){
+    public GenericDto<Object> updateAttribute(@RequestBody @Valid SysNftPicAttributeModifyReq req) {
         sysNftPicService.updateAttribute(req);
         return GenericDto.success(null);
+    }
+
+    /**
+     * 打包下载
+     *
+     * @param
+     * @return
+     */
+    @ApiOperation(value = "打包下载JSON文件")
+    @PostMapping("/getPackageDownload")
+    public void getPackageDownload(HttpServletResponse response, @Valid @RequestBody ListReq req) {
+        sysNftPicService.getPackageDownload(response, req);
     }
 }
