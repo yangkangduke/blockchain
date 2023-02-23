@@ -1,5 +1,7 @@
 package com.seeds.game.service;
 
+import java.math.BigDecimal;
+
 /**
  * redis缓存
  *
@@ -15,7 +17,7 @@ public interface GameCacheService {
      * @param score  英雄积分
      * @param accId  角色id
      */
-    void putGameHeroRankCache(String gameServerId, Long heroId, Long score, Long accId);
+    void putGameHeroRankCache(String gameServerId, Long heroId, BigDecimal score, Long accId);
 
     /**
      * 获取英雄排行
