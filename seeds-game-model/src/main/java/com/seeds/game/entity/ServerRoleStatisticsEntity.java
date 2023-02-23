@@ -26,22 +26,25 @@ public class ServerRoleStatisticsEntity extends BaseEntity {
     private Long roleId;
 
     @ApiModelProperty("血腥积分")
-    private Integer killScore;
+    private BigDecimal killScore;
 
     @ApiModelProperty("生存积分")
-    private Integer survivalScore;
+    private BigDecimal survivalScore;
 
     @ApiModelProperty("生产积分")
-    private Integer drawingScore;
+    private BigDecimal drawingScore;
+
+    @ApiModelProperty("掠夺积分")
+    private BigDecimal lootScore;
 
     @ApiModelProperty("天梯积分")
-    private Integer ladderScore;
+    private BigDecimal ladderScore;
 
     @ApiModelProperty("竞技场积分")
-    private Integer rankScore;
+    private BigDecimal rankScore;
 
     @ApiModelProperty("专业积分")
-    private Integer professionalScore;
+    private BigDecimal professionalScore;
 
     @ApiModelProperty("胜率")
     private BigDecimal winRate;
