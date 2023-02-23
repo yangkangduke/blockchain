@@ -217,17 +217,15 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
 
                 zipOut = new ZipOutputStream(new FileOutputStream(zipFilePath + packageName));
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                log.error("创建压缩输出流错误，{}", e.getMessage());
             }
             // 循环调用压缩文件方法,将一个一个需要下载的文件打入压缩文件包
             for (String path : fileUrlList) {
                 try {
                     //调用工具类方法,传递路径和压缩流，压缩包文件的名字
                     fileToZip(path, zipOut);
-                } catch (IOException e) {
-                    e.printStackTrace();
                 } catch (Exception e) {
-                    continue;
+                    log.error("打包文件错误，{}", e.getMessage());
                 }
             }
 
@@ -235,7 +233,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                 // 压缩完成后,关闭压缩流
                 zipOut.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("关闭压缩流错误，{}", e.getMessage());
             }
 
             //设置内容内容型应用下载，设置字符集
@@ -260,7 +258,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                     inputStream.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("关闭输入流错误，{}", e.getMessage());
             }
 
             //下载完成，删掉zip包
