@@ -26,6 +26,7 @@ import java.util.List;
 @Slf4j
 public class NFTPicConsumer {
 
+    private String filePath = "fileStorage/json/";
     @Autowired
     private FileTemplate template;
 
@@ -51,7 +52,7 @@ public class NFTPicConsumer {
             SysNftPicEntity entity = nftPicService.getById(id);
             String attr = nftPicService.getAttr(entity.getId());
             String fileName = entity.getPicName().substring(0, entity.getPicName().indexOf(".")) + ".json";
-            boolean flag = createJsonFile(attr, "fileStorage/json/", fileName);
+            boolean flag = createJsonFile(attr, filePath, fileName);
             // 上传文件
             if (flag) {
                 InputStream inputStream = null;
