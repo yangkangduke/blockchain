@@ -50,8 +50,8 @@ public class ServerRoleStatisticsResp {
     @ApiModelProperty("总场次")
     private Long fightNum;
 
-    @ApiModelProperty("总游戏时间")
-    private Long totalSurvivalTime;
+    @ApiModelProperty("总游戏时间，单位：h")
+    private String totalSurvivalTime;
 
     @ApiModelProperty("综合评价")
     private String overallScore;
