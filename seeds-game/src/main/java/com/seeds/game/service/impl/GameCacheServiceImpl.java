@@ -44,6 +44,8 @@ public class GameCacheServiceImpl implements GameCacheService {
         Integer rank = sortedSet.revRank(accId);
         if (rank == null) {
             return heroRankMax + "+";
+        } else {
+            rank = rank + 1;
         }
         return rank.toString();
     }

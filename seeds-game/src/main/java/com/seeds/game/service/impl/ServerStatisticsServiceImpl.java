@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,7 @@ public class ServerStatisticsServiceImpl implements ServerStatisticsService {
             return resp;
         }
         BeanUtils.copyProperties(roleStatistics, resp);
+        resp.setTotalSurvivalTime(new BigDecimal(roleStatistics.getTotalSurvivalTime()).divide(new BigDecimal(3600), 1, RoundingMode.HALF_UP) + "h");
         resp.setWinRate(roleStatistics.getWinRate().scaleByPowerOfTen(2).setScale(0, RoundingMode.HALF_UP) + "%");
         return resp;
     }
