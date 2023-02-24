@@ -74,6 +74,7 @@ public class OpenUserController {
     @PutMapping("/change/nickname")
     @ApiOperation(value = "修改昵称", notes = "修改昵称")
     public GenericDto<Object> updateNickname(@Valid @RequestBody NickNameReq nickNameReq, HttpServletRequest request) {
+        log.info("nickNameReq---->{}",nickNameReq);
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
