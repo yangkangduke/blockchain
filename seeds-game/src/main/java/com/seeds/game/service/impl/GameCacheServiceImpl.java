@@ -32,9 +32,11 @@ public class GameCacheServiceImpl implements GameCacheService {
     public void putGameHeroRankCache(String gameServerId, Long heroId, BigDecimal score, Long accId) {
         // 保存到redis排行榜
         RScoredSortedSet<Object> sortedSet = redissonClient.getScoredSortedSet(GameRedisKeys.getGameHeroRankKey(gameServerId, heroId));
-        int rank = sortedSet.addAndGetRevRank(score.doubleValue(), accId) + 1;
-        if (rank > heroRankMax) {
-            sortedSet.remove(accId);
+        // 添加到排行榜
+        sortedSet.add(score.doubleValue(), accId);
+        // 超过最大排名heroRankMax的排除
+        if (sortedSet.size() > heroRankMax) {
+            sortedSet.removeRangeByRank(0, sortedSet.size() - 1 - heroRankMax);
         }
     }
 
