@@ -145,6 +145,7 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
             String ipPossession = IPUtil.getIpPossession(ip);
             String continent = countryContinentService.getCountryContinentMap().get(ipPossession);
 
+            log.info("ip :{},IP Possession {},continent {}", ip, ipPossession, continent);
             if (continent == null) {
                 return list.stream().map(p -> {
                     GameSrcLinkResp rsp = new GameSrcLinkResp();
