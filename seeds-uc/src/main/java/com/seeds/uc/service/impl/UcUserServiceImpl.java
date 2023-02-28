@@ -345,8 +345,8 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .nonce(authTokenDTO.getSecret())
                 .updatedAt(currentTime)
                 .build();
-        System.out.println(ucUser);
-        System.out.println("nonce=========>"+ucUser.getNonce());
+        log.info(ucUser.toString());
+        log.info("nonce=========>"+ucUser.getNonce());
         this.updateById(ucUser);
 
         ucSecurityStrategyMapper.insert(UcSecurityStrategy.builder()
