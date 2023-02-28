@@ -9,7 +9,7 @@ import lombok.Data;
 public class SysNftPicPageReq {
 
     @ApiModelProperty("上传时间")
-    private Long createdAt;
+    private String queryTime;
 
     @ApiModelProperty("属性：稀有度分别为：normal,rare,epic")
     private String rarity;

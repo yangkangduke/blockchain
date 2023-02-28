@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 
 /**
  * redis缓存
@@ -27,12 +29,14 @@ public class GameCacheServiceImpl implements GameCacheService {
     private RedissonClient redissonClient;
 
     @Override
-    public void putGameHeroRankCache(String gameServerId, Long heroId, Long score, Long accId) {
+    public void putGameHeroRankCache(String gameServerId, Long heroId, BigDecimal score, Long accId) {
         // 保存到redis排行榜
         RScoredSortedSet<Object> sortedSet = redissonClient.getScoredSortedSet(GameRedisKeys.getGameHeroRankKey(gameServerId, heroId));
-        int rank = sortedSet.addAndGetRevRank(score, accId) + 1;
-        if (rank > heroRankMax) {
-            sortedSet.remove(accId);
+        // 添加到排行榜
+        sortedSet.add(score.doubleValue(), accId);
+        // 超过最大排名heroRankMax的排除
+        if (sortedSet.size() > heroRankMax) {
+            sortedSet.removeRangeByRank(0, sortedSet.size() - 1 - heroRankMax);
         }
     }
 
@@ -42,6 +46,8 @@ public class GameCacheServiceImpl implements GameCacheService {
         Integer rank = sortedSet.revRank(accId);
         if (rank == null) {
             return heroRankMax + "+";
+        } else {
+            rank = rank + 1;
         }
         return rank.toString();
     }

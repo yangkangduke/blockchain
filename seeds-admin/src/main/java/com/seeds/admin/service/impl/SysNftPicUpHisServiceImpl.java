@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * NFT内容上传记录服务实现类
@@ -82,9 +83,9 @@ public class SysNftPicUpHisServiceImpl extends ServiceImpl<SysNftPicUpHisMapper,
         hisEntity.setUpdatedAt(System.currentTimeMillis());
         this.save(hisEntity);
 
-        List<SysNftPicEntity> picEntities = new ArrayList<>();
+        List<SysNftPicEntity> picInsert = new ArrayList<>();
+        List<SysNftPicEntity> picUpdate = new ArrayList<>();
         for (MultipartFile file : files) {
-            // 上传文件到oss
             String bucketName = properties.getBucketName();
             String originalFilename = file.getOriginalFilename();
             String objectName = "NFT_PIC/" + originalFilename;
@@ -102,14 +103,23 @@ public class SysNftPicUpHisServiceImpl extends ServiceImpl<SysNftPicUpHisMapper,
                 sysNftPicEntity.setCreatedAt(System.currentTimeMillis());
                 sysNftPicEntity.setUpdatedBy(UserContext.getCurrentAdminUserId());
                 sysNftPicEntity.setUpdatedAt(System.currentTimeMillis());
-                picEntities.add(sysNftPicEntity);
+
+                SysNftPicEntity one = sysNftPicService.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, originalFilename));
+                if (Objects.isNull(one)) {
+                    picInsert.add(sysNftPicEntity);
+                } else {
+                    sysNftPicEntity.setId(one.getId());
+                    picUpdate.add(sysNftPicEntity);
+                }
+
 
             } catch (Exception e) {
                 log.error("文件上传失败，fileName={}", originalFilename);
                 throw new GenericException("File upload failed");
             }
         }
-        sysNftPicService.saveBatch(picEntities);
+        sysNftPicService.saveBatch(picInsert);
+        sysNftPicService.updateBatchById(picUpdate);
     }
 
 }

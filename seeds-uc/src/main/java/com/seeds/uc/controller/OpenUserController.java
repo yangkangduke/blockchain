@@ -74,6 +74,7 @@ public class OpenUserController {
     @PutMapping("/change/nickname")
     @ApiOperation(value = "修改昵称", notes = "修改昵称")
     public GenericDto<Object> updateNickname(@Valid @RequestBody NickNameReq nickNameReq, HttpServletRequest request) {
+        log.info("nickNameReq---->{}",nickNameReq);
         // 获取当前登陆人信息
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
@@ -88,13 +89,21 @@ public class OpenUserController {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         long currentTime = System.currentTimeMillis();
+
+        // 传入null 数据库清空个人简介信息
+        if (null == introductionReq.getIntroduction()){
+            ucUserService.updateById(UcUser.builder()
+                    .id(loginUser.getUserId())
+                    .introduction("")
+                    .updatedAt(currentTime)
+                    .build());
+        }
         return GenericDto.success(ucUserService.updateById(UcUser.builder()
                 .id(loginUser.getUserId())
                 .introduction(introductionReq.getIntroduction())
                 .updatedAt(currentTime)
                 .build()));
     }
-
 
     @PutMapping("/change/shareLink")
     @ApiOperation(value = "修改社交链接", notes = "修改社交链接")
@@ -104,13 +113,36 @@ public class OpenUserController {
         String loginToken = WebUtil.getTokenFromRequest(request);
         LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
         long currentTime = System.currentTimeMillis();
-        return GenericDto.success(ucUserService.updateById(UcUser.builder()
-                .id(loginUser.getUserId())
-                .facebook(shareLinkReq.getFacebook())
-                .twitter(shareLinkReq.getTwitter())
-                .instagram(shareLinkReq.getInstagram())
-                .updatedAt(currentTime)
-                .build()));
+
+        // 前端传入的参数为null时，数据库随之清空
+        if (null == shareLinkReq.getFacebook()){
+            ucUserService.updateById(UcUser.builder()
+                    .id(loginUser.getUserId())
+                    .facebook("")
+                    .updatedAt(currentTime)
+                    .build());
+        }
+        if (null == shareLinkReq.getTwitter()){
+            ucUserService.updateById(UcUser.builder()
+                    .id(loginUser.getUserId())
+                    .twitter("")
+                    .updatedAt(currentTime)
+                    .build());
+        }
+        if (null == shareLinkReq.getInstagram()){
+            ucUserService.updateById(UcUser.builder()
+                    .id(loginUser.getUserId())
+                    .instagram("")
+                    .updatedAt(currentTime)
+                    .build());
+        }
+            return GenericDto.success(ucUserService.updateById(UcUser.builder()
+                    .id(loginUser.getUserId())
+                    .facebook(shareLinkReq.getFacebook())
+                    .twitter(shareLinkReq.getTwitter())
+                    .instagram(shareLinkReq.getInstagram())
+                    .updatedAt(currentTime)
+                    .build()));
     }
 
     @PutMapping("/change/avatar")

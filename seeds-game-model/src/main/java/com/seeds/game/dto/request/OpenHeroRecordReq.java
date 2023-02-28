@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 
 /**
@@ -42,7 +43,7 @@ public class OpenHeroRecordReq extends OpenSignReq {
 
 	@ApiModelProperty(value = "英雄总分（排名时使用）")
 	@NotNull(message = "totalScore cannot be empty")
-	private Long totalScore;
+	private BigDecimal totalScore;
 
 	@ApiModelProperty("玩家账号id")
 	@NotBlank(message = "accID cannot be empty")

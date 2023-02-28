@@ -655,17 +655,19 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         if (request != null) {
             LoginUserDTO loginUser = cacheService.getUserByToken(WebUtil.getTokenFromRequest(request));
             UcUser ucUser = this.getById(loginUser.getUserId());
-            UcUser otherUser = this.getOne(new QueryWrapper<UcUser>().lambda()
-                    .eq(UcUser::getPublicAddress, verifyReq.getPublicAddress())
-                    .ne(UcUser::getId, loginUser.getUserId()));
-
-            // 判断地址是否已经被绑定过了
-            if (otherUser != null) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17006_PHANTOM_ADDRESS_BINDED, messageSource.getMessage("ERR_17006_PHANTOM_ADDRESS_BINDED", null, LocaleContextHolder.getLocale()));
-            }
-            // 判断地址跟数据库地址是否一致
-            if (!publicAddress.equals(ucUser.getPublicAddress())) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17005_PHANTOM_ADDRESS_NOT_EXIST, messageSource.getMessage("ERR_17005_PHANTOM_ADDRESS_NOT_EXIST", null, LocaleContextHolder.getLocale()));
+            // 无钱包地址，非认证操作，判断地址是否已使用
+            if (ucUser.getPublicAddress() == null) {
+                UcUser otherUser = this.getOne(new QueryWrapper<UcUser>().lambda()
+                        .eq(UcUser::getPublicAddress, verifyReq.getPublicAddress()));
+                // 判断地址是否已经被绑定过了
+                if (otherUser != null) {
+                    throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17006_PHANTOM_ADDRESS_BINDED, messageSource.getMessage("ERR_17006_PHANTOM_ADDRESS_BINDED", null, LocaleContextHolder.getLocale()));
+                }
+            } else {
+                // 存在钱包地址，无换绑钱包功能，为认证操作，判断地址是否一致
+                if (!publicAddress.equals(ucUser.getPublicAddress())) {
+                    throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_17005_PHANTOM_ADDRESS_NOT_MATCH, messageSource.getMessage("ERR_17005_PHANTOM_ADDRESS_NOT_MATCH", null, LocaleContextHolder.getLocale()));
+                }
             }
         }
 
@@ -711,7 +713,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             }
             // 判断地址跟数据库地址是否一致
             if (!publicAddress.equals(ucUser.getPublicAddress())) {
-                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16005_METAMASK_ADDRESS_NOT_EXIST, messageSource.getMessage("ERR_16005_METAMASK_ADDRESS_NOT_EXIST", null, LocaleContextHolder.getLocale()));
+                throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_16005_METAMASK_ADDRESS_NOT_MATCH, messageSource.getMessage("ERR_16005_METAMASK_ADDRESS_NOT_MATCH", null, LocaleContextHolder.getLocale()));
             }
         }
 

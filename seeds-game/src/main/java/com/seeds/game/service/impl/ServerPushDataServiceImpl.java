@@ -78,18 +78,18 @@ public class ServerPushDataServiceImpl implements ServerPushDataService {
         }
     }
 
-    private String convertScoreToRating(Integer score) {
-        if (score <= 20) {
+    private String convertScoreToRating(BigDecimal score) {
+        if (score.compareTo(new BigDecimal(20)) < 1) {
             return "D";
-        } else if (score <= 40) {
+        } else if (score.compareTo(new BigDecimal(40)) < 1) {
             return "C";
-        } else if (score <= 60) {
+        } else if (score.compareTo(new BigDecimal(60)) < 1) {
             return "B";
-        } else if (score <= 80) {
+        } else if (score.compareTo(new BigDecimal(80)) < 1) {
             return "A";
-        } else if (score <= 90) {
+        } else if (score.compareTo(new BigDecimal(90)) < 1) {
             return "S";
-        } else if (score <= 95) {
+        } else if (score.compareTo(new BigDecimal(95)) < 1) {
             return "SS";
         } else {
             return "SSS";

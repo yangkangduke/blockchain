@@ -27,7 +27,7 @@ public enum UcErrorCodeEnum {
     ERR_16002_METAMASK_SIGNATURE(16002, "签名验证失败", "Signature verification failed"),
     ERR_16003_METAMASK_NONCE_EXPIRED(16003, "nonce已经过期", "nonce has expired"),
     ERR_16004_METAMASK_VERIFY_EXPIRED(16004, "metamask签名验证过期", "metamask signature verification expired"),
-    ERR_16005_METAMASK_ADDRESS_NOT_EXIST(16005, "地址不匹配", "address does not match"),
+    ERR_16005_METAMASK_ADDRESS_NOT_MATCH(16005, "地址不匹配", "address does not match"),
     ERR_16006_METAMASK_ADDRESS_BINDED(16006, "地址已被绑定过了", "address is already binded"),
 
     //phantom
@@ -35,7 +35,7 @@ public enum UcErrorCodeEnum {
     ERR_17002_PHANTOM_SIGNATURE(17002, "签名验证失败", "Signature verification failed"),
     ERR_17003_PHANTOM_NONCE_EXPIRED(17003, "nonce已经过期", "nonce has expired"),
     ERR_17004_PHANTOM_VERIFY_EXPIRED(17004, "phantom签名验证过期", "phantom signature verification expired"),
-    ERR_17005_PHANTOM_ADDRESS_NOT_EXIST(17005, "地址不匹配", "address does not match"),
+    ERR_17005_PHANTOM_ADDRESS_NOT_MATCH(17005, "地址不匹配", "address does not match"),
     ERR_17006_PHANTOM_ADDRESS_BINDED(17006, "地址已被绑定过了", "address is already binded"),
 
     // 账户

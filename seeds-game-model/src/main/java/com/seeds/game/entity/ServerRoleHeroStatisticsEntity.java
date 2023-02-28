@@ -44,6 +44,6 @@ public class ServerRoleHeroStatisticsEntity extends BaseEntity {
     private Long killNum;
 
     @ApiModelProperty(value = "英雄总分（排名时使用）")
-    private Long totalScore;
+    private BigDecimal totalScore;
 
 }
