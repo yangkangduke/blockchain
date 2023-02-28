@@ -313,10 +313,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     public void bindMetamask(AuthTokenDTO authTokenDTO, Long uId) {
         long currentTime = System.currentTimeMillis();
         // 修改
+        String[] split = authTokenDTO.getSecret().split(":");
+        String nonce =  split[2].replace("\n","");
         UcUser ucUser = UcUser.builder()
                 .id(uId)
                 .publicAddress(authTokenDTO.getAccountName())
-                .nonce(authTokenDTO.getSecret())
+                .nonce(nonce)
                 .updatedAt(currentTime)
                 .build();
         this.updateById(ucUser);
@@ -339,10 +341,12 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     public void bindPhantom(AuthTokenDTO authTokenDTO, Long uId) {
         long currentTime = System.currentTimeMillis();
         // 修改
+        String[] split = authTokenDTO.getSecret().split(":");
+        String nonce =  split[6].replace("\nIssued At","");
         UcUser ucUser = UcUser.builder()
                 .id(uId)
                 .publicAddress(authTokenDTO.getAccountName())
-                .nonce(authTokenDTO.getSecret())
+                .nonce(nonce)
                 .updatedAt(currentTime)
                 .build();
         this.updateById(ucUser);
