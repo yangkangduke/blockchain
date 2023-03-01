@@ -33,8 +33,14 @@ public class ServerRoleEntity implements Serializable {
     @ApiModelProperty("大区")
     private Integer region;
 
+    @ApiModelProperty("大区名字")
+    private String regionName;
+
     @ApiModelProperty("游戏服")
     private Integer gameServer;
+
+    @ApiModelProperty("游戏服名字")
+    private String gameServerName;
 
     @ApiModelProperty("等级")
     private Integer level;
