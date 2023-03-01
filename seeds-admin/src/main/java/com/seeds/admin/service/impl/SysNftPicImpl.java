@@ -182,7 +182,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         }
         jsonDto.setAttributes(attributesList);
         SysNFTAttrJSONDto.Properties.Files files = new SysNFTAttrJSONDto.Properties.Files();
-        files.setType("image/png");
+        files.setType("image/" + entity.getPicName().substring(entity.getPicName().lastIndexOf(".") + 1));
         files.setUri(entity.getPicName());
         ArrayList<SysNFTAttrJSONDto.Properties.Files> fileList = new ArrayList<>();
         fileList.add(files);
