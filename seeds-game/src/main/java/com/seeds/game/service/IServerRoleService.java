@@ -29,7 +29,7 @@ public interface IServerRoleService extends IService<ServerRoleEntity> {
 
     void delete(DeleteReq req);
 
-    List<ServerRoleResp> queryList(OpenServerRolePageReq req);
+    List<ServerRoleResp> queryList(ServerRolePageReq req);
 
     ServerRoleEntity queryByUserIdAndRegionAndServer(Long userId, Integer region, Integer server);
 

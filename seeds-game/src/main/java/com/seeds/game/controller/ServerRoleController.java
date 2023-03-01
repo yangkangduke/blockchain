@@ -41,7 +41,7 @@ public class ServerRoleController {
 
     @PostMapping("list")
     @ApiOperation("获取角色列表，不分页")
-    public GenericDto<List<ServerRoleResp>> queryList(@Valid @RequestBody OpenServerRolePageReq req) {
+    public GenericDto<List<ServerRoleResp>> queryList(@Valid @RequestBody ServerRolePageReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(serverRoleService.queryList(req));
     }
