@@ -1,39 +1,35 @@
-package com.seeds.game.entity;
+package com.seeds.game.dto.request;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
 
 /**
  * <p>
  * 游戏区服
  * </p>
  *
- * @author hang.yu
- * @since 2023-02-16
+ * @author hewei
+ * @since 2023-01-31
  */
-@TableName("ga_server_region")
-@ApiModel(value = "ServerRegionEntity对象", description = "游戏区服")
-@Data
 @EqualsAndHashCode(callSuper = true)
-public class ServerRegionEntity extends BaseEntity  {
+@ApiModel(value = "OpenServerRegionCreateUpdateReq")
+@Data
+public class OpenServerRegionCreateUpdateReq extends OpenSignReq {
 
     @ApiModelProperty("大区")
-    private Integer region;
+    private Integer regionId;
 
     @ApiModelProperty("大区名称")
     private String regionName;
 
     @ApiModelProperty("游戏服")
-    private Integer gameServer;
+    private Integer serverId;
 
     @ApiModelProperty("游戏服名称")
-    private String gameServerName;
+    private String serverName;
 
     @ApiModelProperty("ip地址")
     private String innerHost;
-
 }

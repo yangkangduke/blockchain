@@ -5,15 +5,17 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seeds.game.dto.request.OpenServerRolePageReq;
 import com.seeds.game.dto.request.internal.DeleteReq;
 import com.seeds.game.dto.request.internal.ServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.internal.ServerRolePageReq;
 import com.seeds.game.dto.response.ServerRoleResp;
+import com.seeds.game.entity.ServerRegionEntity;
 import com.seeds.game.entity.ServerRoleEntity;
 import com.seeds.game.mapper.ServerRoleMapper;
+import com.seeds.game.service.IServerRegionService;
 import com.seeds.game.service.IServerRoleService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -32,6 +34,10 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerRoleEntity> implements IServerRoleService {
+
+
+    @Autowired
+    private IServerRegionService serverRegionService;
 
     @Override
     public IPage<ServerRoleResp> queryPage(ServerRolePageReq req) {
@@ -103,6 +109,14 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
             respList = list.stream().map(p -> {
                 ServerRoleResp resp = new ServerRoleResp();
                 BeanUtils.copyProperties(p, resp);
+
+                ServerRegionEntity one = serverRegionService.getOne(new LambdaQueryWrapper<ServerRegionEntity>()
+                        .eq(ServerRegionEntity::getRegion, p.getRegion())
+                        .eq(ServerRegionEntity::getGameServer, p.getGameServer()));
+                if (Objects.nonNull(one)) {
+                    resp.setRegionName(one.getRegionName());
+                    resp.setGameServerName(one.getGameServerName());
+                }
                 return resp;
             }).collect(Collectors.toList());
 

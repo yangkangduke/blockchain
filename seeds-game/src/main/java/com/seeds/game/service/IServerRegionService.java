@@ -1,6 +1,7 @@
 package com.seeds.game.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.game.dto.request.OpenServerRegionCreateUpdateReq;
 import com.seeds.game.dto.response.ServerRegionResp;
 import com.seeds.game.entity.ServerRegionEntity;
 
@@ -22,4 +23,5 @@ public interface IServerRegionService extends IService<ServerRegionEntity> {
      */
     List<ServerRegionResp> queryList();
 
+    void createOrUpdate(OpenServerRegionCreateUpdateReq req);
 }
