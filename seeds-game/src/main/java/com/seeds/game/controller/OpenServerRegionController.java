@@ -22,14 +22,14 @@ import javax.validation.Valid;
  */
 @Api(tags = "游戏区服相关接口，游戏端调用")
 @RestController
-@RequestMapping("/web/server-region")
+@RequestMapping("/public/server-region")
 public class OpenServerRegionController {
 
     @Autowired
     private IServerRegionService serverRegionService;
 
     @PostMapping("createOrUpdate")
-    @ApiOperation("新增/编辑角色信息")
+    @ApiOperation("新增/编辑区服信息")
     public GenericDto<Object> createOrUpdate(@RequestBody @Valid OpenServerRegionCreateUpdateReq req) {
         serverRegionService.createOrUpdate(req);
         return GenericDto.success(null);
