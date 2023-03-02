@@ -48,7 +48,6 @@ public class RemoteGameServiceImpl implements RemoteGameService {
 		return GenericDto.failure("Internal Error:game querySecretKey failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
-	@PostMapping("/internal-game/win-rank-info")
 	@Override
 	public GenericDto<List<GameWinRankResp.GameWinRank>> winRankInfo(GameWinRankReq query) {
 		return GenericDto.failure("Internal Error:game rankWinInfo failed", HttpStatus.INTERNAL_SERVER_ERROR.value());

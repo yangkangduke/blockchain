@@ -92,7 +92,7 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
     }
 
     @Override
-    public List<ServerRoleResp> queryList(OpenServerRolePageReq req) {
+    public List<ServerRoleResp> queryList(ServerRolePageReq req) {
 
         List<ServerRoleResp> respList = new ArrayList<>();
         LambdaQueryWrapper<ServerRoleEntity> wrapper = new LambdaQueryWrapper<>();
