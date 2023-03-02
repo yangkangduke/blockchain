@@ -1,6 +1,9 @@
 package com.seeds.game.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.OpenServerRegionCreateUpdateReq;
 import com.seeds.game.dto.response.ServerRegionResp;
 import com.seeds.game.entity.ServerRegionEntity;
 import com.seeds.game.mapper.ServerRegionMapper;
@@ -8,10 +11,7 @@ import com.seeds.game.service.IServerRegionService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,5 +49,31 @@ public class ServerRegionServiceImpl extends ServiceImpl<ServerRegionMapper, Ser
             respList.add(resp);
         }
         return respList;
+    }
+
+    @Override
+    public void createOrUpdate(OpenServerRegionCreateUpdateReq req) {
+
+        ServerRegionEntity one = this.getOne(new LambdaQueryWrapper<ServerRegionEntity>()
+                .eq(ServerRegionEntity::getRegion, req.getRegionId())
+                .eq(ServerRegionEntity::getGameServer, req.getServerId()));
+
+        ServerRegionEntity entity = new ServerRegionEntity();
+        entity.setRegion(req.getRegionId());
+        entity.setRegionName(req.getRegionName());
+        entity.setGameServer(req.getServerId());
+        entity.setGameServerName(req.getServerName());
+        entity.setInnerHost(req.getInnerHost());
+        entity.setUpdatedAt(System.currentTimeMillis());
+        entity.setUpdatedBy(UserContext.getCurrentUserId());
+
+        if (Objects.isNull(one)) {
+            entity.setCreatedAt(System.currentTimeMillis());
+            entity.setCreatedBy(UserContext.getCurrentUserId());
+            this.save(entity);
+        } else {
+            entity.setId(one.getId());
+            this.updateById(entity);
+        }
     }
 }
