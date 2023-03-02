@@ -15,12 +15,12 @@ import javax.validation.Valid;
 
 
 /**
- * 游戏区服 web端调用
+ * 游戏区服 游戏端调用
  *
- * @author hang.yu
- * @since 2023-02-16
+ * @author hewei
+ * @since 2023-03-02
  */
-@Api(tags = "游戏区服相关接口，web调用")
+@Api(tags = "游戏区服相关接口，游戏端调用")
 @RestController
 @RequestMapping("/server-region")
 public class OpenServerRegionController {
