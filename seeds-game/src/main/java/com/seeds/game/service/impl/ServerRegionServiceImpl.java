@@ -65,11 +65,11 @@ public class ServerRegionServiceImpl extends ServiceImpl<ServerRegionMapper, Ser
         entity.setGameServerName(req.getServerName());
         entity.setInnerHost(req.getInnerHost());
         entity.setUpdatedAt(System.currentTimeMillis());
-        entity.setUpdatedBy(UserContext.getCurrentUserId());
+        entity.setUpdatedBy(1L);
 
         if (Objects.isNull(one)) {
             entity.setCreatedAt(System.currentTimeMillis());
-            entity.setCreatedBy(UserContext.getCurrentUserId());
+            entity.setCreatedBy(1L);
             this.save(entity);
         } else {
             entity.setId(one.getId());
