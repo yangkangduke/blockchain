@@ -22,7 +22,7 @@ import javax.validation.Valid;
  */
 @Api(tags = "游戏区服相关接口，游戏端调用")
 @RestController
-@RequestMapping("/server-region")
+@RequestMapping("/web/server-region")
 public class OpenServerRegionController {
 
     @Autowired
