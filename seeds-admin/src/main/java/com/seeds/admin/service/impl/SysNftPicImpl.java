@@ -194,6 +194,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
 
     @Override
     public void updateAttribute(SysNftPicAttributeModifyReq req) {
+        log.info("NftAttributeModifyReq == {}",req);
         SysNftPicEntity sysNftPicEntity = new SysNftPicEntity();
         BeanUtils.copyProperties(req, sysNftPicEntity);
         this.updateById(sysNftPicEntity);
