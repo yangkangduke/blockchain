@@ -48,5 +48,5 @@ public class SysNftPicPageReq {
     private Integer current = 1;
 
     @ApiModelProperty(value = "数据条数")
-    private Integer size = 50;
+    private Integer size = 100;
 }
