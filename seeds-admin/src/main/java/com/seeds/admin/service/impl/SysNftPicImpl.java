@@ -85,6 +85,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         return page.convert(p -> {
             SysNftPicResp resp = new SysNftPicResp();
             BeanUtils.copyProperties(p, resp);
+            resp.setDesc(p.getDescription());
             return resp;
         });
     }
