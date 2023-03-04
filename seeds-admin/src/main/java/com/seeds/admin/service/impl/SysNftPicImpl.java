@@ -101,7 +101,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         if (!CollectionUtils.isEmpty(sysNFTAttrDtos)) {
             sysNFTAttrDtos.forEach(p -> {
                 if (p.getSymbol().length() > 10) {
-                    throw new GenericException(AdminErrorCodeEnum.ERR_40022_SYMBOL_TOO_LONG.getDescEn());
+                    throw new GenericException(" 图片 ["+p.getPictureName()+"]，属性更新失败：" + AdminErrorCodeEnum.ERR_40022_SYMBOL_TOO_LONG.getDescEn());
                 }
                 SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
                 if (!Objects.isNull(one) && one.getPicName().equals(p.getPictureName())) {
