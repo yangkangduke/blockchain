@@ -64,4 +64,13 @@ public class SysNftPicResp {
 
     @ApiModelProperty("上传时间")
     private Long createdAt;
+
+    @ApiModelProperty("mint 后的nft名字")
+    private String name;
+
+    @ApiModelProperty("symbol")
+    private String symbol;
+
+    @ApiModelProperty("desc")
+    private String desc;
 }
