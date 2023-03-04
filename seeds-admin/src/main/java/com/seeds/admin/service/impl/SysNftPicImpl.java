@@ -17,6 +17,7 @@ import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
 import com.seeds.admin.dto.request.SysNftPicPageReq;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.entity.SysNftPicEntity;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.enums.NftAttrEnum;
 import com.seeds.admin.mapper.SysNftPicMapper;
 import com.seeds.admin.mq.producer.KafkaProducer;
@@ -24,6 +25,7 @@ import com.seeds.admin.service.SysNftPicService;
 import com.seeds.admin.utils.CsvUtils;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.web.oss.FileTemplate;
+import com.seeds.uc.exceptions.GenericException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +100,9 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         List<SysNFTAttrDto> sysNFTAttrDtos = CsvUtils.getCsvData(file, SysNFTAttrDto.class);
         if (!CollectionUtils.isEmpty(sysNFTAttrDtos)) {
             sysNFTAttrDtos.forEach(p -> {
+                if (p.getSymbol().length() > 10) {
+                    throw new GenericException(AdminErrorCodeEnum.ERR_40022_SYMBOL_TOO_LONG.getDescEn());
+                }
                 SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
                 if (!Objects.isNull(one) && one.getPicName().equals(p.getPictureName())) {
                     BeanUtils.copyProperties(p, one);
