@@ -134,49 +134,49 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         ArrayList<SysNFTAttrJSONDto.Attributes> attributesList = new ArrayList<>();
         if (!StrUtil.isEmpty(entity.getRarity())) {
             SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTraitType(NftAttrEnum.RARITY.getName());
+            attributes.setTrait_type(NftAttrEnum.RARITY.getName());
             attributes.setValue(entity.getRarity());
             attributesList.add(attributes);
         }
         if (!StrUtil.isEmpty(entity.getFeature())) {
             SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTraitType(NftAttrEnum.FEATURE.getName());
+            attributes.setTrait_type(NftAttrEnum.FEATURE.getName());
             attributes.setValue(entity.getFeature());
             attributesList.add(attributes);
         }
         if (!StrUtil.isEmpty(entity.getColor())) {
             SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTraitType(NftAttrEnum.COLOR.getName());
+            attributes.setTrait_type(NftAttrEnum.COLOR.getName());
             attributes.setValue(entity.getColor());
             attributesList.add(attributes);
         }
         if (!StrUtil.isEmpty(entity.getAccessories())) {
             SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTraitType(NftAttrEnum.ACCESSORIES.getName());
+            attributes.setTrait_type(NftAttrEnum.ACCESSORIES.getName());
             attributes.setValue(entity.getAccessories());
             attributesList.add(attributes);
         }
         if (!StrUtil.isEmpty(entity.getDecorate())) {
             SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTraitType(NftAttrEnum.DECORATE.getName());
+            attributes.setTrait_type(NftAttrEnum.DECORATE.getName());
             attributes.setValue(entity.getDecorate());
             attributesList.add(attributes);
         }
         if (!StrUtil.isEmpty(entity.getOther())) {
             SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTraitType(NftAttrEnum.OTHER.getName());
+            attributes.setTrait_type(NftAttrEnum.OTHER.getName());
             attributes.setValue(entity.getOther());
             attributesList.add(attributes);
         }
         if (!StrUtil.isEmpty(entity.getHero())) {
             SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTraitType(NftAttrEnum.HERO.getName());
+            attributes.setTrait_type(NftAttrEnum.HERO.getName());
             attributes.setValue(entity.getHero());
             attributesList.add(attributes);
         }
         if (!StrUtil.isEmpty(entity.getSkin())) {
             SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTraitType(NftAttrEnum.SKIN.getName());
+            attributes.setTrait_type(NftAttrEnum.SKIN.getName());
             attributes.setValue(entity.getSkin());
             attributesList.add(attributes);
         }
@@ -197,6 +197,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         log.info("NftAttributeModifyReq == {}",req);
         SysNftPicEntity sysNftPicEntity = new SysNftPicEntity();
         BeanUtils.copyProperties(req, sysNftPicEntity);
+        sysNftPicEntity.setDescription(req.getDesc());
         this.updateById(sysNftPicEntity);
 
         // 屬性更新成功消息

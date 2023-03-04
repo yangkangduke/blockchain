@@ -32,7 +32,7 @@ public class SysNFTAttrJSONDto {
 
     @Data
     public static class Attributes {
-        private String traitType;
+        private String trait_type;
         private String value;
     }
 }
