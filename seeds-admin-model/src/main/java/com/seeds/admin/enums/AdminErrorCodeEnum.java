@@ -62,6 +62,7 @@ public enum AdminErrorCodeEnum {
     ERR_40019_NFT_METADATA_MISMATCH(40019, "NFT元数据不匹配", "NFT metadata mismatch"),
     ERR_40020_BUILT_IN_PROPERTIES_CANNOT_BE_MANIPULATED(40020, "内置属性不能进行操作", "Built-in properties cannot be manipulated"),
     ERR_40021_MISSING_ESSENTIAL_ATTRIBUTES(40021, "必要属性缺失", "Missing essential attributes"),
+    ERR_40022_SYMBOL_TOO_LONG(40022, "symbol 长度需小于10", "Symbol exceeds 10 chars"),
 
     // merchant
     ERR_50001_MERCHANT_ALREADY_EXIST(50001, "商家已存在", "Merchant already exist"),
