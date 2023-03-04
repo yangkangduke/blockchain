@@ -39,4 +39,14 @@ public class SysNftPicAttributeModifyReq {
 
     @ApiModelProperty("对应皮肤的名字")
     private String skin;
+
+    @ApiModelProperty("mint 后的nft名字")
+    private String name;
+
+    @ApiModelProperty("symbol")
+    private String symbol;
+
+    @ApiModelProperty("description")
+    private String desc;
+
 }
