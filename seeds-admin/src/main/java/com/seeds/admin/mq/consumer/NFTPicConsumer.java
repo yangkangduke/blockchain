@@ -51,7 +51,7 @@ public class NFTPicConsumer {
         for (Long id : ids) {
             SysNftPicEntity entity = nftPicService.getById(id);
             String attr = nftPicService.getAttr(entity.getId());
-            String fileName = entity.getPicName().substring(0, entity.getPicName().indexOf(".")) + ".json";
+            String fileName = entity.getPicName().substring(0, entity.getPicName().lastIndexOf(".")) + ".json";
             boolean flag = createJsonFile(attr, filePath, fileName);
             // 上传文件
             if (flag) {
