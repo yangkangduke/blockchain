@@ -46,7 +46,7 @@ public class SysNftPicAttributeModifyReq {
     @ApiModelProperty("symbol")
     private String symbol;
 
-    @ApiModelProperty("description")
+    @ApiModelProperty("desc")
     private String desc;
 
 }
