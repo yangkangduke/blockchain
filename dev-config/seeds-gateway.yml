@@ -24,6 +24,11 @@ spring:
             - Path=/admin/**
           filters:
             - AdminAuth
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@defaultResolver}'
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 300
         - id: seeds-account-service
           uri: ${service.url.account}
           predicates:
@@ -69,6 +74,6 @@ spring:
         - name: RequestRateLimiter
           args:
             key-resolver: '#{@defaultResolver}'
-            redis-rate-limiter.replenishRate: 20
-            redis-rate-limiter.burstCapacity: 100
+            redis-rate-limiter.replenishRate: 5
+            redis-rate-limiter.burstCapacity: 10
 
