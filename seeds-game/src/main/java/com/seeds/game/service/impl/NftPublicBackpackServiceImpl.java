@@ -3,6 +3,7 @@ package com.seeds.game.service.impl;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -152,11 +153,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
         // 调用游戏方接口，执行分配
-        HttpResponse httpResponse = callGameDistribute(serverRegion, nftItem);
-        if (!httpResponse.isOk()) {
-            log.error("Failed to distribute nft");
-            throw new com.seeds.uc.exceptions.GenericException("Failed to distribute nft");
-        }
+        this.callGameDistribute(serverRegion, nftItem);
+
 
         // 更新公共背包数据
         nftItem.setServerRoleId(req.getServerRoleId());
@@ -198,11 +196,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
 
         // 调用游戏方接口，执行收回
-        HttpResponse response = this.callGameTakeback(nftItem);
-        if (!response.isOk()) {
-            log.error("Failed to takeback nft");
-            throw new com.seeds.uc.exceptions.GenericException("Failed to takeback nft");
-        }
+        this.callGameTakeback(nftItem);
 
         // 更新公共背包数据
         nftItem.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
@@ -254,18 +248,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         // 调用游戏方接口，执行收回,再分发
         // 执行收回
-        HttpResponse response = this.callGameTakeback(nftItem);
-        if (!response.isOk()) {
-            log.error("Failed to takeback nft");
-            throw new com.seeds.uc.exceptions.GenericException("Failed to takeback nft");
-        }
+        this.callGameTakeback(nftItem);
+
         // 分发
         ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
-        HttpResponse httpResponse = this.callGameDistribute(serverRegion, nftItem);
-        if (!httpResponse.isOk()) {
-            log.error("Failed to distribute nft");
-            throw new com.seeds.uc.exceptions.GenericException("Failed to distribute nft");
-        }
+        this.callGameDistribute(serverRegion, nftItem);
 
 
         // 更新公共背包数据
@@ -305,7 +292,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         return respList;
     }
 
-    private HttpResponse callGameDistribute(ServerRegionEntity serverRegion, NftPublicBackpackEntity nftItem) {
+    private void callGameDistribute(ServerRegionEntity serverRegion, NftPublicBackpackEntity nftItem) {
 
         GenericDto<String> dto = null;
         try {
@@ -334,10 +321,19 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 .execute();
         String body = response.body();
         log.info("请求游戏nft 分发接口数据返回，result:{}", body);
-        return response;
+        if (!response.isOk()) {
+            log.error("Failed to call game-api to distribute nft");
+            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to distribute nft");
+        }
+        JSONObject jsonObject = JSONObject.parseObject(response.body());
+        String ret = jsonObject.getString("ret");
+        if (!"ok".equalsIgnoreCase(ret)) {
+            log.error("Failed to distribute nft");
+            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to distribute nft");
+        }
     }
 
-    private HttpResponse callGameTakeback(NftPublicBackpackEntity nftItem) {
+    private void callGameTakeback(NftPublicBackpackEntity nftItem) {
         ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
 
         GenericDto<String> dto = null;
@@ -363,7 +359,15 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 .execute();
         String body = response.body();
         log.info("请求游戏nft 收回接口数据返回，result:{}", body);
-        return response;
+        if (!response.isOk()) {
+            log.error("Failed to call game-api to  takeback nft");
+            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to takeback nft");
+        }
+        JSONObject jsonObject = JSONObject.parseObject(response.body());
+        String ret = jsonObject.getString("ret");
+        if (!"ok".equalsIgnoreCase(ret)) {
+            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to takeback nft");
+        }
     }
 
     private ServerRegionEntity getServerRegionEntity(Long id) {
