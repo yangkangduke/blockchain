@@ -24,4 +24,9 @@ public class GatewayConfig {
             return Mono.just(GatewayUtils.getClientIp(exchange));
         };
     }
+
+    @Bean("pathResolver")
+    public KeyResolver apiKeyResolver() {
+        return exchange -> Mono.just(exchange.getRequest().getPath().value());
+    }
 }

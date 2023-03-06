@@ -26,7 +26,7 @@ spring:
             - AdminAuth
             - name: RequestRateLimiter
               args:
-                key-resolver: '#{@defaultResolver}'
+                key-resolver: '#{@pathResolver}'
                 redis-rate-limiter.replenishRate: 100
                 redis-rate-limiter.burstCapacity: 300
         - id: seeds-account-service
