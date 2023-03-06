@@ -15,7 +15,8 @@ public class GatewayConfig {
         return exchange -> {
             String userId = exchange.getRequest().getHeaders().getFirst(HttpHeaders.INTERNAL_USER_ID);
             if (StringUtils.hasText(userId)) {
-                return Mono.just(userId);
+                final String path = exchange.getRequest().getURI().getPath();
+                return Mono.just(path);
             }
             userId = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ADMIN_USER_ID);
             if (StringUtils.hasText(userId)) {
