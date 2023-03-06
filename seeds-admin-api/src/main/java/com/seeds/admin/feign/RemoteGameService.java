@@ -76,6 +76,11 @@ public interface RemoteGameService {
 	@ApiOperation("查询游戏秘钥")
 	GenericDto<String> querySecretKey(@RequestParam String accessKey);
 
+
+	@GetMapping("/internal-game/game-api")
+	@ApiOperation("获取游戏请求接口")
+	GenericDto<String> queryGameApi(@RequestParam Long id, @RequestParam Integer type);
+
 	/**
 	 * 获取游戏胜场排行榜
 	 * @param query 查询条件

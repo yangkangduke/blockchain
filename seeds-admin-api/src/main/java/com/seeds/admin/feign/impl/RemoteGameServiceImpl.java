@@ -49,6 +49,12 @@ public class RemoteGameServiceImpl implements RemoteGameService {
 	}
 
 	@Override
+	public GenericDto<String> queryGameApi(Long id, Integer type) {
+		return GenericDto.failure("Internal Error:game api failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+	}
+
+	@Override
 	public GenericDto<List<GameWinRankResp.GameWinRank>> winRankInfo(GameWinRankReq query) {
 		return GenericDto.failure("Internal Error:game rankWinInfo failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}

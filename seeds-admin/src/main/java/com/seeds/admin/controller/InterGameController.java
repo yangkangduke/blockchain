@@ -8,6 +8,7 @@ import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.admin.service.SysGameApiService;
 import com.seeds.admin.service.SysGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
@@ -33,6 +34,8 @@ public class InterGameController {
 
     @Autowired
     private SysGameService sysGameService;
+    @Autowired
+    private SysGameApiService gameApiService;
 
     @PostMapping("uc-page")
     @ApiOperation("分页")
@@ -69,6 +72,13 @@ public class InterGameController {
     @Inner
     public GenericDto<String> querySecretKey(@RequestParam String accessKey) {
         return GenericDto.success(sysGameService.querySecretKey(accessKey));
+    }
+
+    @GetMapping("game-api")
+    @ApiOperation("获取游戏请求接口")
+    @Inner
+    public GenericDto<String> queryGameApi(@RequestParam Long id, @RequestParam Integer type) {
+        return GenericDto.success(gameApiService.queryApiByGameAndType(id, type));
     }
 
     @PostMapping("win-rank-info")
