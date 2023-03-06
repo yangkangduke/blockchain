@@ -17,12 +17,14 @@ public class GatewayConfig {
         return exchange -> {
             String userId = exchange.getRequest().getHeaders().getFirst(HttpHeaders.INTERNAL_USER_ID);
             if (StringUtils.hasText(userId)) {
-
                 return Mono.just(userId);
             }
             userId = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ADMIN_USER_ID);
             if (StringUtils.hasText(userId)) {
-                final String path = exchange.getRequest().getURI().getPath();
+                return Mono.just(userId);
+            }
+            final String path = exchange.getRequest().getURI().getPath();
+            if ( path.contains("/admin/public/file/download")){
                 log.info("path--->" + path);
                 return Mono.just(path);
             }
