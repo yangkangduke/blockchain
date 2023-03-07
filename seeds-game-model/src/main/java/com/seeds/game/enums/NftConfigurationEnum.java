@@ -9,7 +9,8 @@ import lombok.Getter;
 @Getter
 public enum NftConfigurationEnum {
     UNASSIGNED(0, "未分配"),
-    ASSIGNED(1, "已分配");
+    ASSIGNED(1, "已分配"),
+    PROCESSING(3,"操作中");
 
     private final int code;
     private final String desc;
