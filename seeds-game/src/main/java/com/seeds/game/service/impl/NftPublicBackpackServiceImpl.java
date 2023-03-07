@@ -352,7 +352,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         GenericDto<String> dto = null;
         try {
-            dto = remoteGameService.queryGameApi(1L, ApiType.NFT_PACKAGE_DISTRIBUTE.getCode());
+            dto = remoteGameService.queryGameApi(1L, ApiType.NFT_PACKAGE_TAKEBACK.getCode());
         } catch (Exception e) {
             log.info("rpc all seeds-admin ,queryGameApi error {}", e.getMessage());
         }
