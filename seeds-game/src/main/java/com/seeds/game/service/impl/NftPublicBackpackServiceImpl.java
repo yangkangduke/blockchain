@@ -130,9 +130,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
         }
 
-        // 校验是否在操作中，操作中直接返回，减少不必要的请求
-        this.checkState(nftItem);
-
         // 1.校验当前NFT物品是否属于当前用户
         Long userId = nftItem.getUserId();
         if (!userId.equals(req.getUserId())) {
@@ -151,10 +148,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
         }
 
-
-        ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
         // 调用游戏方接口，执行分配
-        this.callGameDistribute(serverRegion, nftItem);
+        this.callGameDistribute(nftItem, req.getServerRoleId());
 
         // 更新公共背包数据
         nftItem.setServerRoleId(req.getServerRoleId());
@@ -163,6 +158,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         this.updateById(nftItem);
 
         // 组装返回值
+        ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
         resp.setGameServer(roleEntity.getGameServer());
         resp.setGameServerName(serverRegion.getGameServerName());
@@ -192,15 +188,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (Objects.isNull(nftItem)) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
         }
-        // 校验是否在操作中，操作中直接返回，减少不必要的请求
-        this.checkState(nftItem);
 
         // 校验当前NFT物品是否属于当前用户
         Long userId = nftItem.getUserId();
         if (!userId.equals(req.getUserId())) {
             throw new GenericException(GameErrorCodeEnum.ERR_10002_NFT_ITEM_DOES_NOT_BELONG_TO_CURRENT_USER);
         }
-
 
         // 调用游戏方接口，执行收回
         this.callGameTakeback(nftItem);
@@ -220,9 +213,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (Objects.isNull(nftItem)) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
         }
-        // 校验是否在操作中，操作中直接返回，减少不必要的请求
-        this.checkState(nftItem);
-
         // 当前NFT已经属于想要转移的角色，不需要再转移
         if (nftItem.getServerRoleId().equals(req.getServerRoleId())) {
             throw new GenericException(GameErrorCodeEnum.ERR_10005_NFT_ITEM_ALREADY_BELONGS_TO_THE_ROLE);
@@ -248,14 +238,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (!roleEntity.getUserId().equals(req.getUserId())) {
             throw new GenericException(GameErrorCodeEnum.ERR_20003_ROLE_NOT_BELONGS_TO_CURRENT_USER);
         }
-
         // 调用游戏方接口，执行收回,再分发
         // 执行收回
         this.callGameTakeback(nftItem);
-
         // 分发
-        ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
-        this.callGameDistribute(serverRegion, nftItem);
+        this.callGameDistribute(nftItem, req.getServerRoleId());
 
 
         // 更新公共背包数据
@@ -265,6 +252,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         this.updateById(nftItem);
 
         // 组装返回值
+        ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
         resp.setGameServer(roleEntity.getGameServer());
         resp.setGameServerName(serverRegion.getGameServerName());
@@ -296,8 +284,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         return respList;
     }
 
-    private void callGameDistribute(ServerRegionEntity serverRegion, NftPublicBackpackEntity nftItem) {
+    private void callGameDistribute(NftPublicBackpackEntity nftItem, Long serverRoleId) {
 
+        ServerRegionEntity serverRegion = this.getServerRegionEntity(serverRoleId);
+        // 校验是否在操作中，操作中直接返回，减少不必要的请求
+        this.checkState(nftItem);
         GenericDto<String> dto = null;
         try {
             dto = remoteGameService.queryGameApi(1L, ApiType.NFT_PACKAGE_DISTRIBUTE.getCode());
@@ -309,7 +300,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         NftDistributeReq distributeReq = new NftDistributeReq();
         distributeReq.setAutoId(nftItem.getAutoId());
-        distributeReq.setAccId(nftItem.getServerRoleId());
+        distributeReq.setAccId(serverRoleId);
+        distributeReq.setType(nftItem.getType());
         distributeReq.setConfigId(nftItem.getItemId().intValue());
         distributeReq.setTokenId(nftItem.getTokenId());
         distributeReq.setServerName(serverRegion.getGameServerName());
@@ -328,11 +320,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String ret = jsonObject.getString("ret");
+            log.info("请求游戏 nft 分发接口返回，  result:{}", response.body());
             if (!response.isOk() || !"ok".equalsIgnoreCase(ret)) {
                 updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
                 // 记录调用错误日志
                 errorLog(distributeUrl, params, ret);
-                throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to distribute nft");
             }
         } catch (Exception e) {
             updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
@@ -351,6 +343,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     private void callGameTakeback(NftPublicBackpackEntity nftItem) {
+
+
+        // 校验是否在操作中，操作中直接返回，减少不必要的请求
+        this.checkState(nftItem);
+
         ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
 
         GenericDto<String> dto = null;
@@ -361,6 +358,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         String takebackUrl = "http://" + serverRegion.getInnerHost() + dto.getData();
         NftTakebackReq takeback = new NftTakebackReq();
+        takeback.setType(nftItem.getType());
         takeback.setAutoId(nftItem.getAutoId());
         takeback.setAccId(nftItem.getServerRoleId());
         takeback.setConfigId(nftItem.getItemId().intValue());
@@ -379,11 +377,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String ret = jsonObject.getString("ret");
+            log.info("请求游戏 nft 收回接口返回，  result:{}", response.body());
             if (!"ok".equalsIgnoreCase(ret)) {
                 updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
                 // 记录调用错误日志
                 errorLog(takebackUrl, params, ret);
-                throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to takeback nft");
             }
         } catch (Exception e) {
             updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
