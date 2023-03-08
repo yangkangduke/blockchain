@@ -1,4 +1,4 @@
-package com.seeds.admin.dto.request.game;
+package com.seeds.game.dto.request;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import lombok.Data;
  * @date 2023/3/6
  */
 @Data
-public class NftDistributeReq {
+public class NftTakebackReq {
 
     /**
      * nft全局id
@@ -29,14 +29,5 @@ public class NftDistributeReq {
      * nft token
      */
     private String tokenId;
-    /**
-     * 大区名称
-     */
-    private String regionName;
-    /**
-     * 游戏服名称
-     */
-    private String serverName;
-
 
 }
