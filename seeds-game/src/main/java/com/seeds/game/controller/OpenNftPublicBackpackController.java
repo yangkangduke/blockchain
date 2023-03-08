@@ -53,11 +53,11 @@ public class OpenNftPublicBackpackController {
 
     @GetMapping("detail")
     @ApiOperation("详细信息")
-    public GenericDto<NftPublicBackpackResp> detail(@RequestParam Long id,
+    public GenericDto<NftPublicBackpackResp> detail(@RequestParam Integer autoId,
                                                     @RequestParam String accessKey,
                                                     @RequestParam String signature,
                                                     @RequestParam Long timestamp) {
-        return GenericDto.success(nftPublicBackpackService.detail(id));
+        return GenericDto.success(nftPublicBackpackService.detail(autoId));
     }
 
     @PostMapping("create")

@@ -29,7 +29,7 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     void update(NftPublicBackpackReq req);
 
-    NftPublicBackpackResp detail(Long id);
+    NftPublicBackpackResp detail(Integer autoId);
 
     OpenNftPublicBackpackDisResp distribute(NftPublicBackpackDisReq req);
 

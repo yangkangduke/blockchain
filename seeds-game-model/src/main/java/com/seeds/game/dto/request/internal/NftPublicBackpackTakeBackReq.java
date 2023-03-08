@@ -14,9 +14,9 @@ import javax.validation.constraints.NotNull;
 @Data
 public class NftPublicBackpackTakeBackReq {
 
-    @ApiModelProperty("nft物品")
-    @NotNull(message = "物品Id不能为空")
-    private Long id;
+    @ApiModelProperty(value = "nft物品", required = true)
+    @NotNull(message = "autoId can not null")
+    private Integer autoId;
 
     @ApiModelProperty("userId")
     private Long userId;
