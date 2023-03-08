@@ -62,8 +62,8 @@ public class NftPublicBackpackController {
 
     @GetMapping("detail/{id}")
     @ApiOperation("详细信息")
-    public GenericDto<NftPublicBackpackResp> detail(@PathVariable Long id) {
-        return GenericDto.success(nftPublicBackpackService.detail(id));
+    public GenericDto<NftPublicBackpackResp> detail(@PathVariable Integer autoId) {
+        return GenericDto.success(nftPublicBackpackService.detail(autoId));
     }
 
     @PostMapping("create")
