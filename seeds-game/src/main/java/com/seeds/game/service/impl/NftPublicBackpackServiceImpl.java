@@ -266,7 +266,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
-    public List<NftPublicBackpackResp> queryList(OpenNftPublicBackpackPageReq req) {
+    public List<NftPublicBackpackResp> queryList(NftPublicBackpackPageReq req) {
         List<NftPublicBackpackResp> respList = new ArrayList<>();
 
         LambdaQueryWrapper<NftPublicBackpackEntity> wrapper = new LambdaQueryWrapper<>();
