@@ -21,12 +21,12 @@ public enum GameErrorCodeEnum {
     ERR_10001_NFT_ITEM_NOT_EXIST(10001, "NFT物品不存在", "NFT item does not exist"),
     ERR_10002_NFT_ITEM_DOES_NOT_BELONG_TO_CURRENT_USER(10002, "NFT物品不属于当前用户", "NFT item does not belong to current user"),
     ERR_10003_NFT_ITEM_HAVE_BEEN_ASSIGNED(10003, "NFT物品已经被分配", "NFT item have been assigned"),
-    ERR_10004_NFT_ITEM_CANNOT_TRANSFER(10004, "NFT物品未分配，无法转移", "NFT item not assigned and cannot transfer"),
+    ERR_10004_NFT_ITEM_NOT_ASSIGNED(10004, "NFT物品未分配", "NFT item not assigned"),
     ERR_10005_NFT_ITEM_ALREADY_BELONGS_TO_THE_ROLE(10005, "NFT物品已经属于该角色", "NFT item already belongs to the role"),
     ERR_10006_NFT_PROCESSING(10006, "操作中...请稍后再试", "In operation... Please try again later"),
     // role
     ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN(20001, "角色等级不满十级", "The role level is less than ten"),
-    ERR_20001_ROLE_NOT_EXIST(20002, "角色不存在", "The role does not exist"),
+    ERR_20002_ROLE_NOT_EXIST(20002, "角色不存在", "The role does not exist"),
     ERR_20003_ROLE_NOT_BELONGS_TO_CURRENT_USER(20003, "角色不属于当前用户，无法分配", "The role does not belongs to current user and Unable to allocate"),
     ERR_20004_SERVER_REGION_NOT_EXIST(20004, "区服不存在", "The sever region not exist"),
 

@@ -143,7 +143,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         // 3.校验分配的角色等级是否满10级
         ServerRoleEntity roleEntity = serverRoleService.getById(req.getServerRoleId());
         if (Objects.isNull(roleEntity)) {
-            throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_NOT_EXIST);
+            throw new GenericException(GameErrorCodeEnum.ERR_20002_ROLE_NOT_EXIST);
         }
         if (roleEntity.getLevel() < 10) {
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
@@ -195,6 +195,10 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (!userId.equals(req.getUserId())) {
             throw new GenericException(GameErrorCodeEnum.ERR_10002_NFT_ITEM_DOES_NOT_BELONG_TO_CURRENT_USER);
         }
+        // 校验当前NFT物品是否是分配转态
+        if (!nftItem.getIsConfiguration().equals(NftConfigurationEnum.ASSIGNED.getCode())) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10004_NFT_ITEM_NOT_ASSIGNED);
+        }
 
         // 调用游戏方接口，执行收回
         this.callGameTakeback(nftItem);
@@ -225,12 +229,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         // 校验当前NFT物品是否是分配转态
         if (!nftItem.getIsConfiguration().equals(NftConfigurationEnum.ASSIGNED.getCode())) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10004_NFT_ITEM_CANNOT_TRANSFER);
+            throw new GenericException(GameErrorCodeEnum.ERR_10004_NFT_ITEM_NOT_ASSIGNED);
         }
         // 校验分配的角色等级是否满10级
         ServerRoleEntity roleEntity = serverRoleService.getById(req.getServerRoleId());
         if (Objects.isNull(roleEntity)) {
-            throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_NOT_EXIST);
+            throw new GenericException(GameErrorCodeEnum.ERR_20002_ROLE_NOT_EXIST);
         }
         if (roleEntity.getLevel() < 10) {
             throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN);
@@ -290,6 +294,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         ServerRegionEntity serverRegion = this.getServerRegionEntity(serverRoleId);
         // 校验是否在操作中，操作中直接返回，减少不必要的请求
         this.checkState(nftItem);
+
         GenericDto<String> dto = null;
         try {
             dto = remoteGameService.queryGameApi(1L, ApiType.NFT_PACKAGE_DISTRIBUTE.getCode());
@@ -346,11 +351,10 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     private void callGameTakeback(NftPublicBackpackEntity nftItem) {
 
+        ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
 
         // 校验是否在操作中，操作中直接返回，减少不必要的请求
         this.checkState(nftItem);
-
-        ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
 
         GenericDto<String> dto = null;
         try {
@@ -407,7 +411,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     private ServerRegionEntity getServerRegionEntity(Long id) {
         ServerRoleEntity role = serverRoleService.getById(id);
         if (Objects.isNull(role)) {
-            throw new GenericException(GameErrorCodeEnum.ERR_20001_ROLE_NOT_EXIST);
+            throw new GenericException(GameErrorCodeEnum.ERR_20002_ROLE_NOT_EXIST);
         }
         ServerRegionEntity serverRegion = serverRegionService.getOne(new LambdaQueryWrapper<ServerRegionEntity>()
                 .eq(ServerRegionEntity::getRegion, role.getRegion())
