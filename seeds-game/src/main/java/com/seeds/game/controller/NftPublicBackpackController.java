@@ -54,7 +54,7 @@ public class NftPublicBackpackController {
 
     @PostMapping("list")
     @ApiOperation("获取列表信息，不分页")
-    public GenericDto<List<NftPublicBackpackResp>> queryList(@Valid @RequestBody OpenNftPublicBackpackPageReq req) {
+    public GenericDto<List<NftPublicBackpackResp>> queryList(@Valid @RequestBody NftPublicBackpackPageReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(nftPublicBackpackService.queryList(req));
     }
