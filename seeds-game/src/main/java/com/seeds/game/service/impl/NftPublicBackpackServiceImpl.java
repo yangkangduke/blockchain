@@ -316,13 +316,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         String params = JSONUtil.toJsonStr(distributeReq);
 
         log.info("开始请求游戏 nft 分发接口， url:{}， params:{}", distributeUrl, params);
-        HttpResponse response = HttpRequest.post(distributeUrl)
-                .timeout(10 * 1000)
-                .header("Content-Type", "application/json")
-                .body(params)
-                .execute();
-
-        if (Objects.isNull(response)) {
+        HttpResponse response = null;
+        try {
+            response = HttpRequest.post(distributeUrl)
+                    .timeout(10 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(params)
+                    .execute();
+        } catch (Exception e) {
             updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(distributeUrl, params, "connect timed out");
@@ -373,19 +374,20 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         String params = JSONUtil.toJsonStr(takeback);
 
         log.info("开始请求游戏 nft 收回接口， url:{}， params:{}", takebackUrl, params);
-        HttpResponse response = HttpRequest.post(takebackUrl)
-                .timeout(10 * 1000)
-                .header("Content-Type", "application/json")
-                .body(params)
-                .execute();
-
-
-        if (Objects.isNull(response)) {
+        HttpResponse response = null;
+        try {
+            response = HttpRequest.post(takebackUrl)
+                    .timeout(10 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(params)
+                    .execute();
+        } catch (Exception e) {
             updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(takebackUrl, params, "connect timed out");
             throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to takeback nft,connect timed out");
         }
+
         JSONObject jsonObject = JSONObject.parseObject(response.body());
         String ret = jsonObject.getString("ret");
         log.info("请求游戏 nft 收回接口返回，  result:{}", response.body());
