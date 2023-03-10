@@ -60,7 +60,7 @@ public class NftPublicBackpackController {
     }
 
 
-    @GetMapping("detail/{id}")
+    @GetMapping("detail/{autoId}")
     @ApiOperation("详细信息")
     public GenericDto<NftPublicBackpackResp> detail(@PathVariable Integer autoId) {
         return GenericDto.success(nftPublicBackpackService.detail(autoId));
