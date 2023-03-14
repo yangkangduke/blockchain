@@ -13,7 +13,7 @@ spring:
     config:
       server:
         git:
-#          uri: https://github.com/AllenAi007/seeds-java
+#          uri: https://github.com/yangkangduke/seeds-java
 #          username: yangkang.duke@gmail.com
 #          password: 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
           uri: https://gitee.com/Jiutong123/git-config
