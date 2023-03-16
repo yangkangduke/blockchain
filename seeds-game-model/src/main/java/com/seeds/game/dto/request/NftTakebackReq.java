@@ -12,7 +12,7 @@ public class NftTakebackReq {
     /**
      * nft全局id
      */
-    private Integer autoId;
+    private Long autoId;
     /**
      * 游戏服务角色id（serverRoleId）
      */
