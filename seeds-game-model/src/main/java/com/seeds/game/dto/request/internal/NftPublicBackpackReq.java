@@ -45,7 +45,7 @@ public class NftPublicBackpackReq implements Serializable {
     private Long itemId;
 
     @ApiModelProperty(value = "游戏那边传的。大区+game+流水", example = "10101201")
-    private Integer autoId;
+    private Long autoId;
 
     @ApiModelProperty(value = "用户id", example = "10")
     private Long userId;
