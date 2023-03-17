@@ -38,5 +38,10 @@ public class NftDistributeReq {
      */
     private String serverName;
 
+    /**
+     * 如果是皮肤的话  需要多一个皮肤的图片地址
+     */
+    private String imgUrl = "";
+
 
 }

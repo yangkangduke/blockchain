@@ -14,7 +14,6 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.game.dto.request.NftDistributeReq;
 import com.seeds.game.dto.request.NftTakebackReq;
-import com.seeds.game.dto.request.OpenNftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -308,6 +307,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         distributeReq.setAutoId(nftItem.getAutoId());
         distributeReq.setAccId(serverRoleId);
         distributeReq.setType(nftItem.getType());
+        if (nftItem.getType().equals(3)) {
+            distributeReq.setImgUrl(nftItem.getImage());
+        }
         distributeReq.setConfigId(nftItem.getItemId().intValue());
         distributeReq.setTokenId(nftItem.getTokenId());
         distributeReq.setServerName(serverRegion.getGameServerName());
