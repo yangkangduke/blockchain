@@ -16,7 +16,7 @@ public class NftPublicBackpackTakeBackReq {
 
     @ApiModelProperty(value = "nft物品", required = true)
     @NotNull(message = "autoId can not null")
-    private Integer autoId;
+    private Long autoId;
 
     @ApiModelProperty("userId")
     private Long userId;
