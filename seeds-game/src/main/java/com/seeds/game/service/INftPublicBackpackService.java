@@ -38,4 +38,6 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     OpenNftPublicBackpackDisResp transfer(NftPublicBackpackDisReq req);
 
     List<NftPublicBackpackResp> queryList(NftPublicBackpackPageReq req);
+
+    NftPublicBackpackEntity detailForTokenId(String tokenId);
 }

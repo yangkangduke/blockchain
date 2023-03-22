@@ -288,6 +288,16 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         return respList;
     }
 
+    @Override
+    public NftPublicBackpackEntity detailForTokenId(String tokenId) {
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        NftPublicBackpackEntity entity = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenId, tokenId));
+        if (null != entity) {
+            BeanUtils.copyProperties(entity, backpackEntity);
+        }
+        return backpackEntity;
+    }
+
     private void callGameDistribute(NftPublicBackpackEntity nftItem, Long serverRoleId) {
 
         ServerRegionEntity serverRegion = this.getServerRegionEntity(serverRoleId);

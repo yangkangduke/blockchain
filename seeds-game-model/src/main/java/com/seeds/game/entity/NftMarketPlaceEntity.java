@@ -1,5 +1,4 @@
 package com.seeds.game.entity;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -29,8 +28,11 @@ public class NftMarketPlaceEntity extends BaseEntity {
     @ApiModelProperty("NFT编号")
     private Integer identifier;
 
+    @ApiModelProperty("NFT图片")
+    private String image;
+
     @ApiModelProperty("NFT名称")
-    private Integer name;
+    private String name;
 
     @ApiModelProperty("NFT价格")
     private BigDecimal price;
@@ -40,6 +42,9 @@ public class NftMarketPlaceEntity extends BaseEntity {
 
     @ApiModelProperty("NFT是否上架：0：未上架  1：已上架")
     private Integer isShelf;
+
+    @ApiModelProperty("NFT类型：1，皮肤  2，装备")
+    private Integer type;
 
     @ApiModelProperty("NFT等级")
     private Integer grade;
@@ -60,10 +65,10 @@ public class NftMarketPlaceEntity extends BaseEntity {
     private Integer views;
 
     @ApiModelProperty("胜率")
-    private Integer winRate;
+    private BigDecimal winRate;
 
-    @ApiModelProperty("NFT等级")
-    private Integer level;
+    @ApiModelProperty("token id")
+    private String tokenId;
 
     @ApiModelProperty("健康属性值")
     private Integer health;
@@ -79,4 +84,27 @@ public class NftMarketPlaceEntity extends BaseEntity {
 
     @ApiModelProperty("blade属性综合介绍")
     private String bladeBuff;
+
+    @ApiModelProperty("获胜次数")
+    private Integer wins;
+
+    @ApiModelProperty("失败次数")
+    private Integer failures;
+
+    private Integer ties;
+
+    @ApiModelProperty("连胜次数")
+    private Integer winningStreak;
+
+    private Integer consecutiveLosses;
+
+    private Integer playerKills;
+
+    private Integer maximumKills;
+
+    private Integer npcKills;
+
+    private Integer killedByAnother;
+
+    private Integer killedByNpc;
 }
