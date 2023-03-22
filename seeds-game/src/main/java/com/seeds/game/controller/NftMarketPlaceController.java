@@ -1,5 +1,4 @@
 package com.seeds.game.controller;
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp;
@@ -22,13 +21,13 @@ public class NftMarketPlaceController {
 
     @PostMapping("page-skin")
     @ApiOperation("获取皮肤分页信息")
-    public GenericDto<IPage<NftMarketPlaceSkinResp>>skinQueryList(){
+    public GenericDto<IPage<NftMarketPlaceSkinResp>>skinQueryPage(){
         return null;
     }
 
-    @PostMapping("page-skin")
+    @PostMapping("page-equip")
     @ApiOperation("获取装备分页信息")
-    public GenericDto<IPage<NftMarketPlaceEqiupmentResp>>equipQueryList(){
+    public GenericDto<IPage<NftMarketPlaceEqiupmentResp>>equipQueryPage(){
         return null;
     }
 }
