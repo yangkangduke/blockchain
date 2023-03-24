@@ -174,12 +174,9 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
         });
     }
 
-    @Override
-    public NftMarketPlaceDetailViewResp view(NftMarketPlaceDetailViewReq req) {
-        return null;
-    }
 
-   /* @Override
+
+    @Override
     public NftMarketPlaceDetailViewResp view(NftMarketPlaceDetailViewReq req) {
         NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.detailForTokenId(req.getTokenId());
         Long userId = backpackEntity.getUserId();
@@ -196,11 +193,11 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
             LambdaUpdateWrapper<NftAttributeEntity> updateWrap = new UpdateWrapper<NftAttributeEntity>().lambda()
                     .setSql("`views`=`views`+1")
                     .eq(NftAttributeEntity::getTokenId,req.getTokenId());
-            nftAttributeService.update(updateWrap);
+            this.update(updateWrap);
         }
         NftAttributeEntity attributeEntity = new NftAttributeEntity();
         NftMarketPlaceDetailViewResp resp = new NftMarketPlaceDetailViewResp();
         resp.setViews(attributeEntity.getViews());
         return resp;
-    }*/
+    }
 }

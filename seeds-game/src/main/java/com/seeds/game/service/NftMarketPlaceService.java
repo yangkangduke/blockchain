@@ -1,5 +1,6 @@
 package com.seeds.game.service;
 
+import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.common.dto.PageReq;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.NftActivityResp;
