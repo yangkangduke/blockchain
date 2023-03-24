@@ -54,18 +54,18 @@ public class NftMarketPlaceController {
     @PostMapping("page-skin")
     @ApiOperation("获取皮肤分页信息")
     public GenericDto<IPage<NftMarketPlaceSkinResp>>skinQueryPage(@RequestBody NftMarketPlaceSkinPageReq skinQuery){
-        return GenericDto.success(nftAttributeService.skinQueryPage(skinQuery));
+        return GenericDto.success(nftMarketPlaceService.skinQueryPage(skinQuery));
     }
 
     @PostMapping("page-equip")
     @ApiOperation("获取装备分页信息")
     public GenericDto<IPage<NftMarketPlaceEqiupmentResp>>equipQueryPage(@RequestBody NftMarketPlaceEquipPageReq equipQuery){
-        return GenericDto.success(nftAttributeService.equipQueryPage(equipQuery));
+        return GenericDto.success(nftMarketPlaceService.equipQueryPage(equipQuery));
     }
 
     @PostMapping("view")
     @ApiOperation("浏览量")
     public GenericDto<NftMarketPlaceDetailViewResp>view(@RequestBody NftMarketPlaceDetailViewReq req){
-        return GenericDto.success(nftAttributeService.view(req));
+        return GenericDto.success(nftMarketPlaceService.view(req));
     }
 }

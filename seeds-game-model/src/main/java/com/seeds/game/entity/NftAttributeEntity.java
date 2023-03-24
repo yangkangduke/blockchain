@@ -96,4 +96,7 @@ public class NftAttributeEntity extends BaseEntity {
 
     @ApiModelProperty("总场数")
     private Integer totalNums;
+
+    @ApiModelProperty("胜率")
+    private BigDecimal winRate;
 }
