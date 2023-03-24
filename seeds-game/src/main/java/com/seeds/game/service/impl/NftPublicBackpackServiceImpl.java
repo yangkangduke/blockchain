@@ -20,24 +20,20 @@ import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
 import com.seeds.game.dto.response.NftPublicBackpackResp;
 import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
-import com.seeds.game.entity.CallGameApiErrorLogEntity;
-import com.seeds.game.entity.NftPublicBackpackEntity;
-import com.seeds.game.entity.ServerRegionEntity;
-import com.seeds.game.entity.ServerRoleEntity;
+import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
+import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftPublicBackpackMapper;
 import com.seeds.game.mq.producer.KafkaProducer;
-import com.seeds.game.service.CallGameApiLogService;
-import com.seeds.game.service.INftPublicBackpackService;
-import com.seeds.game.service.IServerRegionService;
-import com.seeds.game.service.IServerRoleService;
+import com.seeds.game.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -71,6 +67,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Autowired
     private CallGameApiLogService callGameApiLogService;
+
+    @Autowired
+    private INftEventService nftEventService;
+
+    @Autowired
+    private INftEventEquipmentService nftEventEquipmentService;
 
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
@@ -123,6 +125,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
+    @Transactional
     public OpenNftPublicBackpackDisResp distribute(NftPublicBackpackDisReq req) {
         NftPublicBackpackEntity nftItem = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
 
@@ -156,9 +159,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         nftItem.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
         nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
+        ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
+
+        // 记录分配事件
+        recoredNftEvent(nftItem, userId, NFTEnumConstant.NFTTransEnum.BACKPACK.getDesc(), serverRegion.getGameServerName());
+
 
         // 组装返回值
-        ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
         resp.setGameServer(roleEntity.getGameServer());
         resp.setGameServerName(serverRegion.getGameServerName());
@@ -201,6 +208,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         // 调用游戏方接口，执行收回
         this.callGameTakeback(nftItem);
+
+        ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
+        // 记录转移事件
+        recoredNftEvent(nftItem, userId, serverRegion.getGameServerName(), NFTEnumConstant.NFTTransEnum.BACKPACK.getDesc());
+
 
         // 更新公共背包数据
         nftItem.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
@@ -248,6 +260,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         // 分发
         this.callGameDistribute(nftItem, req.getServerRoleId());
 
+        String from = this.getServerRegionEntity(nftItem.getServerRoleId()).getGameServerName();
 
         // 更新公共背包数据
         nftItem.setServerRoleId(req.getServerRoleId());
@@ -255,8 +268,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
 
-        // 组装返回值
+
         ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
+        // 记录转移事件
+        recoredNftEvent(nftItem, userId, from, serverRegion.getGameServerName());
+
+        // 组装返回值
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
         resp.setGameServer(roleEntity.getGameServer());
         resp.setGameServerName(serverRegion.getGameServerName());
@@ -266,6 +283,31 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         resp.setRoleName(roleEntity.getName());
         resp.setLevel(roleEntity.getLevel());
         return resp;
+    }
+
+    private void recoredNftEvent(NftPublicBackpackEntity nftItem, Long userId, String from, String to) {
+        //插入nft_event表
+        NftEvent nftEvent = new NftEvent();
+        nftEvent.setType(NFTEnumConstant.NFTEventType.OTHER.getCode());
+        nftEvent.setName(nftItem.getName());
+        nftEvent.setTransferFrom(from);
+        nftEvent.setTransferTo(to);
+        nftEvent.setUserId(userId);
+        nftEvent.setUpdatedBy(userId);
+        nftEvent.setCreatedBy(userId);
+        nftEvent.setUpdatedAt(System.currentTimeMillis());
+        nftEvent.setCreatedAt(System.currentTimeMillis());
+        nftEventService.save(nftEvent);
+        //插入nft_event_equipment表
+        NftEventEquipment one = nftEventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getAutoId, nftItem.getAutoId()));
+        if (Objects.isNull(one)) {
+            NftEventEquipment equipment = new NftEventEquipment();
+            equipment.setEventId(nftEvent.getId());
+            equipment.setImageUrl(nftItem.getImage());
+            equipment.setAutoId(nftItem.getAutoId());
+            equipment.setAttributes(nftItem.getAttributes());
+            nftEventEquipmentService.save(equipment);
+        }
     }
 
     @Override
