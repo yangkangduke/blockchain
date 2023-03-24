@@ -1,7 +1,14 @@
 package com.seeds.game.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.game.dto.request.NftBuySuccessReq;
+import com.seeds.game.dto.request.NftMarketPlaceDetailViewReq;
+import com.seeds.game.dto.request.NftMarketPlaceEquipPageReq;
+import com.seeds.game.dto.request.NftMarketPlaceSkinPageReq;
 import com.seeds.game.dto.response.NftMarketPlaceDetailResp;
+import com.seeds.game.dto.response.NftMarketPlaceDetailViewResp;
+import com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp;
+import com.seeds.game.dto.response.NftMarketPlaceSkinResp;
 
 
 public interface NftMarketPlaceService {
