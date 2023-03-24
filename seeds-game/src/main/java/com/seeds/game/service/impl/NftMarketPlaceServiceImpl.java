@@ -11,6 +11,9 @@ import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.dto.request.NftMarketPlaceDetailViewReq;
 import com.seeds.game.dto.request.NftMarketPlaceEquipPageReq;
 import com.seeds.game.dto.request.NftMarketPlaceSkinPageReq;
+import com.seeds.common.dto.PageReq;
+import com.seeds.game.dto.request.*;
+import com.seeds.game.dto.response.NftActivityResp;
 import com.seeds.game.dto.response.NftMarketPlaceDetailResp;
 import com.seeds.game.dto.response.NftMarketPlaceDetailViewResp;
 import com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp;
@@ -24,6 +27,7 @@ import com.seeds.game.enums.NftTypeEnum;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.INftMarketOrderService;
 import com.seeds.game.service.INftPublicBackpackService;
+import com.seeds.game.dto.response.NftOfferResp;
 import com.seeds.game.service.NftMarketPlaceService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -50,6 +54,26 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     @Override
     public NftMarketPlaceDetailResp detail(Long id) {
         return null;
+    }
+
+    @Override
+    public void fixedPriceShelf(NftFixedPriceShelfReq req) {
+
+    }
+
+    @Override
+    public void britishAuctionShelf(NftBritishAuctionShelfReq req) {
+
+    }
+
+    @Override
+    public void shelved(NftShelvedReq req) {
+
+    }
+
+    @Override
+    public void makeOffer(NftMakeOfferReq req) {
+
     }
 
     @Override
@@ -219,4 +243,25 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         resp.setViews(attributeEntity.getViews());
         return resp;
     }
+
+    @Override
+    public NftOfferResp offerPage(PageReq req) {
+        return null;
+    }
+
+    @Override
+    public NftActivityResp activityPage(PageReq req) {
+        return null;
+    }
+
+    @Override
+    public void acceptOffer(NftAcceptOfferReq req) {
+
+    }
+
+    @Override
+    public void cancelOffer(NftCancelOfferReq req) {
+
+    }
+
 }

@@ -20,6 +20,8 @@ mybatis:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:/com.seeds.game.mapper/*Mapper.xml
+
 
 springfox:
   documentation:
