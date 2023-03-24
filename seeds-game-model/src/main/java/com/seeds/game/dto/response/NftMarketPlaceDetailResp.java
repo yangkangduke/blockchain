@@ -51,6 +51,9 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("NFT当前价格")
     private BigDecimal currentPrice;
 
+    @ApiModelProperty("与美元汇率")
+    private BigDecimal usdRates;
+
     @ApiModelProperty("NFT价格差异")
     private String priceDifference;
 
@@ -68,6 +71,9 @@ public class NftMarketPlaceDetailResp {
 
     @ApiModelProperty("Token Id")
     private String tokenId;
+
+    @ApiModelProperty("nft地址")
+    private String mintAddress;
 
     @ApiModelProperty("Token Standard")
     private String tokenStandard;
