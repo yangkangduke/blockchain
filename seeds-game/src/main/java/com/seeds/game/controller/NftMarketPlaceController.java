@@ -1,15 +1,18 @@
 package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.dto.response.NftMarketPlaceDetailResp;
 import com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp;
 import com.seeds.game.dto.response.NftMarketPlaceSkinResp;
-import com.seeds.game.service.INftMarketPlaceService;
+import com.seeds.game.service.NftMarketPlaceService;
 import com.seeds.game.service.INftPublicBackpackService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Api(tags = "NFT市场")
 @RestController
@@ -17,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class NftMarketPlaceController {
 
     @Autowired
-    private INftMarketPlaceService nftMarketPlaceService;
+    private NftMarketPlaceService nftMarketPlaceService;
 
     @Autowired
     private INftPublicBackpackService nftPublicBackpackService;
@@ -34,10 +37,11 @@ public class NftMarketPlaceController {
         return null;
     }
 
-    @PostMapping("buy-now")
-    @ApiOperation("一口价购买")
-    public GenericDto<Object> buyNow() {
-        return null;
+    @PostMapping("buy-success")
+    @ApiOperation("购买成功")
+    public GenericDto<Object> buySuccess(@Valid @RequestBody NftBuySuccessReq req) {
+        nftMarketPlaceService.buySuccess(req);
+        return GenericDto.success(null);
     }
 
     @PostMapping("page-skin")
