@@ -1,5 +1,4 @@
 package com.seeds.game.dto.request;
-
 import com.seeds.common.dto.PageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,7 +20,7 @@ public class NftMarketPlaceEquipPageReq extends PageReq {
     private String tokenId;
 
     @ApiModelProperty("NFT状态：0：Buy Now  1：On Auction")
-    private Integer status;
+    private Integer transactionType;
 
     @ApiModelProperty("NFT等级")
     private Integer grade;
@@ -43,9 +42,6 @@ public class NftMarketPlaceEquipPageReq extends PageReq {
 
     @ApiModelProperty("最大价格")
     private BigDecimal MaxPrice;
-
-    @ApiModelProperty("点赞数量")
-    private Integer favorite;
 
     @ApiModelProperty("英雄类型5种：1，DESTIN  2，AILITH  3，AILSA  4，NELA  5，CATHAL")
     private Integer heroType;

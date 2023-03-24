@@ -1,6 +1,4 @@
 package com.seeds.game.entity;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,44 +8,25 @@ import java.math.BigDecimal;
 
 /**
  * <p>
- * NFT市场
+ * NFT属性
  * </p>
  *
  * @author dengyang
  * @since 2023-03-22
  */
-@TableName("ga_nft_marketplace")
-@ApiModel(value = "NftMarketPlaceEntity对象", description = "NFT市场")
+@TableName("ga_nft_attribute")
+@ApiModel(value = "NftAttributeEntity对象", description = "NFT属性")
 @Data
-public class NftMarketPlaceEntity extends BaseEntity {
-
-    @ApiModelProperty("id")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
-
-    @ApiModelProperty("NFT编号")
-    private Integer identifier;
-
-    @ApiModelProperty("NFT图片")
-    private String image;
-
-    @ApiModelProperty("NFT名称")
-    private String name;
-
-    @ApiModelProperty("NFT价格")
-    private BigDecimal price;
-
-    @ApiModelProperty("NFT状态：0：Buy Now  1：On Auction")
-    private Integer status;
-
-    @ApiModelProperty("NFT是否上架：0：未上架  1：已上架")
-    private Integer isShelf;
+public class NftAttributeEntity extends BaseEntity {
 
     @ApiModelProperty("NFT类型：1，皮肤  2，装备")
     private Integer type;
 
     @ApiModelProperty("NFT等级")
     private Integer grade;
+
+    @ApiModelProperty("NFT价格")
+    private BigDecimal price;
 
     @ApiModelProperty("耐久度")
     private Integer durability;
@@ -64,11 +43,11 @@ public class NftMarketPlaceEntity extends BaseEntity {
     @ApiModelProperty("浏览量")
     private Integer views;
 
-    @ApiModelProperty("胜率")
-    private BigDecimal winRate;
-
     @ApiModelProperty("token id")
     private String tokenId;
+
+    @ApiModelProperty("tokenAddress")
+    private String tokenAddress;
 
     @ApiModelProperty("健康属性值")
     private Integer health;
@@ -91,20 +70,30 @@ public class NftMarketPlaceEntity extends BaseEntity {
     @ApiModelProperty("失败次数")
     private Integer failures;
 
+    @ApiModelProperty("平局")
     private Integer ties;
 
     @ApiModelProperty("连胜次数")
     private Integer winningStreak;
 
+    @ApiModelProperty("连败次数")
     private Integer consecutiveLosses;
 
+    @ApiModelProperty("玩家击杀次数")
     private Integer playerKills;
 
+    @ApiModelProperty("最大击杀次数")
     private Integer maximumKills;
 
+    @ApiModelProperty("NPC击杀数量")
     private Integer npcKills;
 
+    @ApiModelProperty("被其他玩家击杀次数")
     private Integer killedByAnother;
 
+    @ApiModelProperty("被NPC击杀次数")
     private Integer killedByNpc;
+
+    @ApiModelProperty("总场数")
+    private Integer totalNums;
 }
