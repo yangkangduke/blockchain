@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * @author hang.yu
@@ -58,14 +57,29 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("NFT拍卖剩余时间")
     private String timeLeft;
 
-    @ApiModelProperty("NFT游戏内部属性")
-    private NftGameAttrResp gameAttr;
+    @ApiModelProperty("NFT动态属性")
+    private String attributes;
 
-    @ApiModelProperty("NFT链相关信息")
-    private NftChainDetailResp chainDetail;
+    @ApiModelProperty("NFT元数据")
+    private String metadata;
 
-    @ApiModelProperty("NFT出价列表")
-    private List<NftOfferResp> offers;
+    @ApiModelProperty("合约地址")
+    private String contractAddress;
+
+    @ApiModelProperty("Token Id")
+    private String tokenId;
+
+    @ApiModelProperty("Token Standard")
+    private String tokenStandard;
+
+    @ApiModelProperty("Chain")
+    private String chain;
+
+    @ApiModelProperty("最后更改时间")
+    private String lastUpdated;
+
+    @ApiModelProperty("创造者收益")
+    private String creatorEarnings;
 
 }
 
