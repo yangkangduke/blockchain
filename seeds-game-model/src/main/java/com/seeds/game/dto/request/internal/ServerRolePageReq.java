@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 
 /**
  * <p>
@@ -19,7 +18,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(value = "ServerRolePageReq")
 @Data
-public class ServerRolePageReq extends PageReq implements Serializable {
+public class ServerRolePageReq extends PageReq {
 
     @ApiModelProperty(value = "userId")
     private Long userId;

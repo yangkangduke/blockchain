@@ -1,5 +1,6 @@
 package com.seeds.game.dto.response;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,19 +17,40 @@ import java.math.BigDecimal;
 @ApiModel(value = "NftOfferResp")
 public class NftOfferResp {
 
-    @ApiModelProperty("出价价格")
-    private BigDecimal price;
+    @ApiModelProperty(value = "最高出价")
+    private BigDecimal highestOffer;
 
-    @ApiModelProperty("美元价格")
-    private String usdPrice;
+    @ApiModelProperty("nft地址")
+    private String mintAddress;
 
-    @ApiModelProperty("价格差异")
-    private String floorDifference;
+    @ApiModelProperty(value = "拍卖出价列表")
+    private IPage<NftOffer> nftOffers;
 
-    @ApiModelProperty("到期时间")
-    private String expiration;
+    @Data
+    @ApiModel(value = "NftOffer", description = "拍卖出价")
+    public static class NftOffer {
 
-    @ApiModelProperty("出价人")
-    private String from;
+        @ApiModelProperty("出价价格")
+        private BigDecimal price;
+
+        @ApiModelProperty("美元价格")
+        private String usdPrice;
+
+        @ApiModelProperty("价格差异")
+        private String floorDifference;
+
+        @ApiModelProperty("离出价时间")
+        private String expiration;
+
+        @ApiModelProperty("出价人")
+        private String from;
+
+        @ApiModelProperty("状态")
+        private String status;
+
+        @ApiModelProperty("是否是出价人，0 否 1 是")
+        private Integer isBidder;
+
+    }
 
 }
