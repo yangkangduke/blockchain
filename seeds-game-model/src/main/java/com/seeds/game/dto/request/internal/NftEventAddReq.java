@@ -1,5 +1,6 @@
 package com.seeds.game.dto.request.internal;
 
+import com.seeds.game.dto.request.OpenSignReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -15,24 +16,24 @@ import java.util.List;
  */
 @Data
 @ApiModel(value = "toNFT请求req")
-public class NftEventAddReq /*extends OpenSignReq*/ {
+public class NftEventAddReq extends OpenSignReq {
 
     @ApiModelProperty("userId")
     private Long userId;
 
     @ApiModelProperty("事件类型 1.mint 2.compound")
-    @NotNull
+    @NotNull(message = "type can not be null")
     private Integer type;
 
     @ApiModelProperty("name")
-    @NotBlank
+    @NotBlank(message = "name can not be null")
     private String name;
 
     @ApiModelProperty("1.Normal 2.Rare 3.Epic")
-    @NotNull
+    @NotNull(message = "detail can not be null")
     private Integer detail;
 
     @ApiModelProperty("涉及的装备")
-    @NotEmpty
-    private List<NftEventEquipmentReq> eventEquipments;
+    @NotEmpty(message = "equipments can not be null")
+    private List<NftEventEquipmentReq> equipments;
 }

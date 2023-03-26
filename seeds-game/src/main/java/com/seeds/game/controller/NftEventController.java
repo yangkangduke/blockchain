@@ -62,4 +62,10 @@ public class NftEventController {
         return GenericDto.success(nftEventService.cancel(id));
     }
 
+    @PostMapping("opt-success")
+    @ApiOperation("mint/compound 操作成功")
+    GenericDto<Boolean> mintSucess(@PathVariable("id") Long id) {
+        return GenericDto.success(nftEventService.cancel(id));
+    }
+
 }

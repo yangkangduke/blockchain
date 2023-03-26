@@ -40,4 +40,6 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     List<NftPublicBackpackResp> queryList(NftPublicBackpackPageReq req);
 
     NftPublicBackpackEntity detailForTokenId(String tokenId);
+
+    void ownerTransfer(OpenNftOwnershipTransferReq req);
 }

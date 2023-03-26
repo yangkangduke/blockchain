@@ -1,9 +1,7 @@
 package com.seeds.game.controller;
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.common.web.context.UserContext;
-import com.seeds.game.dto.request.internal.NftEventAddReq;
-import com.seeds.game.service.INftEventService;
+import com.seeds.game.dto.request.OpenNftOwnershipTransferReq;
 import com.seeds.game.service.INftPublicBackpackService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,19 +22,18 @@ import javax.validation.Valid;
  * @since 2023-03-23
  */
 
-@Api(tags = "game调用,to-nft")
+@Api(tags = "game调用,nftw物品转移")
 @RestController
-@RequestMapping("/game/nft-event")
-public class OpenNftEventController {
+@RequestMapping("/public/game/nft-event")
+public class PublicNftEventController {
 
     @Autowired
-    private INftEventService nftEventService;
+    private INftPublicBackpackService nftPublicBackpackService;
 
-    @PostMapping("/to-nft")
-    @ApiOperation("toNFT")
-    public GenericDto<Object> toNft(@Valid @RequestBody NftEventAddReq req) {
-        req.setUserId(UserContext.getCurrentUserId());
-        nftEventService.toNft(req);
+    @PostMapping("/ownership-transfer")
+    @ApiOperation("物品所有权转移")
+    public GenericDto<Object> ownerTransfer(@RequestBody @Valid OpenNftOwnershipTransferReq req) {
+        nftPublicBackpackService.ownerTransfer(req);
         return GenericDto.success(null);
     }
 }

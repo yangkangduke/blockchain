@@ -14,6 +14,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.game.dto.request.NftDistributeReq;
 import com.seeds.game.dto.request.NftTakebackReq;
+import com.seeds.game.dto.request.OpenNftOwnershipTransferReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -111,7 +112,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         BeanUtils.copyProperties(req, entity);
         entity.setUpdatedAt(System.currentTimeMillis());
         entity.setUpdatedBy(req.getUserId());
-        this.update(new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
+        this.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
     }
 
     @Override
@@ -338,6 +339,15 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             BeanUtils.copyProperties(entity, backpackEntity);
         }
         return backpackEntity;
+    }
+
+    // lootmode 结算 nft物品所有权转移，中心化操作
+    @Override
+    public void ownerTransfer(OpenNftOwnershipTransferReq req) {
+        NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
+        BeanUtils.copyProperties(req, entity);
+        entity.setUserId(req.getToUserId());
+        this.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
     }
 
     private void callGameDistribute(NftPublicBackpackEntity nftItem, Long serverRoleId) {

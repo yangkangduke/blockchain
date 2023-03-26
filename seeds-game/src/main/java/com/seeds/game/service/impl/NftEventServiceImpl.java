@@ -97,7 +97,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         nftEvent.setUpdatedAt(System.currentTimeMillis());
         nftEvent.setUpdatedBy(req.getUserId());
         this.save(nftEvent);
-        List<NftEventEquipment> equipments = CglibUtil.copyList(req.getEventEquipments(), NftEventEquipment::new);
+        List<NftEventEquipment> equipments = CglibUtil.copyList(req.getEquipments(), NftEventEquipment::new);
 
         equipments.forEach(p -> {
             p.setEventId(nftEvent.getId());
