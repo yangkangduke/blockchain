@@ -81,7 +81,7 @@ public interface NftMarketPlaceService {
     /**
      * 获取nft 装备列表
      * @param equipQuery
-     * @return 商场nft皮肤列表
+     * @return 商场nft装备列表
      */
     IPage<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery);
 

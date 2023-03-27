@@ -19,8 +19,8 @@ public class NftMarketPlaceEquipPageReq extends PageReq {
     @ApiModelProperty("token id")
     private String tokenId;
 
-    @ApiModelProperty("NFT状态：0：Buy Now  1：On Auction")
-    private Integer transactionType;
+    @ApiModelProperty("NFT交易模式：0：Buy Now  1：On Auction")
+    private Integer model;
 
     @ApiModelProperty("NFT等级")
     private Integer grade;
@@ -34,9 +34,6 @@ public class NftMarketPlaceEquipPageReq extends PageReq {
     @ApiModelProperty("NFT类型：1，皮肤  2，装备")
     private Integer type;
 
-    @ApiModelProperty("NFT是否上架：0：未上架  1：已上架")
-    private Integer isShelf;
-
     @ApiModelProperty("最小价格")
     private BigDecimal MinPrice;
 
@@ -45,11 +42,5 @@ public class NftMarketPlaceEquipPageReq extends PageReq {
 
     @ApiModelProperty("英雄类型5种：1，DESTIN  2，AILITH  3，AILSA  4，NELA  5，CATHAL")
     private Integer heroType;
-
-    @ApiModelProperty("胜率")
-    private Integer winRate;
-
-    @ApiModelProperty("上架时间：24小时内  7天内  30天内")
-    private String ListedTime;
 
 }

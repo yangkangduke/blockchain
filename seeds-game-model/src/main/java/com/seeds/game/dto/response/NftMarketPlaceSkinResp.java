@@ -16,10 +16,10 @@ public class NftMarketPlaceSkinResp implements Serializable {
      private static final long serialVersionUID = 1L;
 
      @ApiModelProperty("主键")
-     private String id;
+     private Long id;
 
      @ApiModelProperty("NFT编号")
-     private String identifier;
+     private String number;
 
      @ApiModelProperty("NFT图片")
      private String image;
@@ -37,25 +37,26 @@ public class NftMarketPlaceSkinResp implements Serializable {
      private Integer durability;
 
      @ApiModelProperty("获胜次数")
-     private Integer wins;
+     private Integer victory;
 
      @ApiModelProperty("失败次数")
-     private Integer failures;
+     private Integer lose;
 
-     private Integer ties;
+     @ApiModelProperty("最大连胜场数")
+     private Integer maxStreak;
 
-     @ApiModelProperty("连胜次数")
-     private Integer winningStreak;
+     @ApiModelProperty("击杀玩家数")
+     private Integer capture;
 
-     private Integer consecutiveLosses;
+     @ApiModelProperty("最大连杀数")
+     private Integer killingSpree;
 
-     private Integer playerKills;
+     @ApiModelProperty("击杀NPC数")
+     private Integer goblinKill;
 
-     private Integer maximumKills;
+     @ApiModelProperty("被玩家击杀数")
+     private Integer slaying;
 
-     private Integer npcKills;
-
-     private Integer killedByAnother;
-
-     private Integer killedByNpc;
+     @ApiModelProperty("被NPC击杀数")
+     private Integer goblin;
 }
