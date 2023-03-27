@@ -33,8 +33,14 @@ public class NftEventResp {
 
     private String transferTo;
 
-    @ApiModelProperty("创建时间")
+    @ApiModelProperty("创建人")
     private Long createdBy;
+
+    @ApiModelProperty("创建时间")
+    private Long createdAt;
+
+    @ApiModelProperty("修改人")
+    private Long updatedBy;
 
     @ApiModelProperty("修改时间")
     private Long updatedAt;
