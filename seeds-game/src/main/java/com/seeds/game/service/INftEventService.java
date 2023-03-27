@@ -31,4 +31,6 @@ public interface INftEventService extends IService<NftEvent> {
     Boolean cancel(Long id);
 
     List<TypeNum> getTypeNum(Long userId);
+
+    void OptSuccess(Long eventId, String tokenId, Integer autoDeposite);
 }

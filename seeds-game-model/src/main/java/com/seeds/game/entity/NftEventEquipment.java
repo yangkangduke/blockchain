@@ -3,10 +3,11 @@ package com.seeds.game.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -41,6 +42,9 @@ public class NftEventEquipment implements Serializable {
 
     @ApiModelProperty("是否nft")
     private Integer isNft;
+
+    @ApiModelProperty("tokenId")
+    private String tokenId;
 
     @ApiModelProperty("是否被消耗")
     private Integer isConsume;

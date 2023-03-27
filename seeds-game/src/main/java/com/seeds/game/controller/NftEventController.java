@@ -63,9 +63,10 @@ public class NftEventController {
     }
 
     @PostMapping("opt-success")
-    @ApiOperation("mint/compound 操作成功")
-    GenericDto<Boolean> mintSucess(@PathVariable("id") Long id) {
-        return GenericDto.success(nftEventService.cancel(id));
+    @ApiOperation("mint/compound 操作成功, 1 自动托管，0 不自动托管")
+    GenericDto<Object> OptSuccess(@RequestParam("eventId") Long eventId, @RequestParam("tokenId") String tokenId, @RequestParam("autoDeposite") Integer autoDeposite) {
+        nftEventService.OptSuccess(eventId, tokenId, autoDeposite);
+        return GenericDto.success(null);
     }
 
 }

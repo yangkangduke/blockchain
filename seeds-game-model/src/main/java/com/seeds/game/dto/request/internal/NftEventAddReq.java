@@ -21,6 +21,10 @@ public class NftEventAddReq extends OpenSignReq {
     @ApiModelProperty("userId")
     private Long userId;
 
+    @ApiModelProperty(value = "游戏服务角色id", required = true)
+    @NotNull(message = "游戏服角色ID不能为空")
+    private Long serverRoleId;
+
     @ApiModelProperty("事件类型 1.mint 2.compound")
     @NotNull(message = "type can not be null")
     private Integer type;

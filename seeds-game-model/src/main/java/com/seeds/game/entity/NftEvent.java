@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * <p>
  * nft通知
@@ -48,6 +50,9 @@ public class NftEvent implements Serializable {
     private String transferFrom;
 
     private String transferTo;
+
+    @ApiModelProperty(value = "游戏服务角色id", required = true)
+    private Long serverRoleId;
 
     @ApiModelProperty("创建人")
     private Long createdAt;
