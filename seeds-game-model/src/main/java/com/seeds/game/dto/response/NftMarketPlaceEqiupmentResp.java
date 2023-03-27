@@ -22,7 +22,7 @@ public class NftMarketPlaceEqiupmentResp implements Serializable {
     private String id;
 
     @ApiModelProperty("NFT编号")
-    private String identifier;
+    private String number;
 
     @ApiModelProperty("NFT图片")
     private String image;

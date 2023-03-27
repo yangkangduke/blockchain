@@ -1,6 +1,4 @@
 package com.seeds.game.service.impl;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -19,7 +17,6 @@ import com.seeds.game.dto.response.NftMarketPlaceDetailViewResp;
 import com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp;
 import com.seeds.game.dto.response.NftMarketPlaceSkinResp;
 import com.seeds.game.entity.NftAttributeEntity;
-import com.seeds.game.entity.NftMarketOrderEntity;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 import com.seeds.game.enums.NftHeroTypeEnum;
 import com.seeds.game.enums.NftRarityEnum;
@@ -34,10 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
@@ -84,26 +78,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     @Override
     public IPage<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery) {
 
-        Long start = 0L;
-        Long end = 0L;
-        if (!Objects.isNull(skinQuery.getListedTime())) {
-            DateTime dateTime = DateUtil.parseDate(skinQuery.getListedTime());
-            start = DateUtil.beginOfDay(dateTime).getTime();
-            end = DateUtil.endOfDay(dateTime).getTime();
-        }
-        // 从Order表中获取price
-        NftMarketOrderEntity orderEntity = nftMarketOrderService.detailForTokenId(Long.valueOf(skinQuery.getTokenId()));
-        BigDecimal price = orderEntity.getPrice();
-
-        // 从背包表获取NFT
         NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.detailForTokenId(skinQuery.getTokenId());
-
-        // NFT 名称
-        String name = backpackEntity.getName();
+        String NftImage = backpackEntity.getImage();
 
         LambdaQueryWrapper<NftAttributeEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.between(!Objects.isNull(skinQuery.getListedTime()), NftAttributeEntity::getCreatedAt, start, end)
-                // .like(skinQuery.getName() != null, name, skinQuery.getName())
+        queryWrapper.like(skinQuery.getName() != null, NftAttributeEntity::getName, skinQuery.getName())
                 .or().eq(!StringUtils.isEmpty(skinQuery.getTokenId()), NftAttributeEntity::getTokenId,skinQuery.getTokenId())
                 .eq(skinQuery.getGrade() != null, NftAttributeEntity::getGrade,skinQuery.getGrade())
                 .eq(skinQuery.getDurability() != null, NftAttributeEntity::getDurability,skinQuery.getDurability())
@@ -126,10 +105,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 .or().orderByAsc(NftAttributeEntity::getDurability)
                 .or().orderByDesc(NftAttributeEntity::getRarity)
                 .or().orderByAsc(NftAttributeEntity::getRarity)
-                .or().orderByDesc(NftAttributeEntity::getFavorite)
-                .or().orderByAsc(NftAttributeEntity::getFavorite)
-                .or().orderByDesc(NftAttributeEntity::getWinRate)
-                .or().orderByAsc(NftAttributeEntity::getWinRate)
                 .orderByDesc(NftAttributeEntity::getCreatedAt);
 
         Page<NftAttributeEntity> page = new Page<>(skinQuery.getCurrent(), skinQuery.getSize());
@@ -143,37 +118,20 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         return page.convert(p -> {
             NftMarketPlaceSkinResp resp = new NftMarketPlaceSkinResp();
             BeanUtils.copyProperties(p, resp);
-            resp.setIdentifier(NftNumber);
-            resp.setName(name);
-            resp.setImage(backpackEntity.getImage());
-            resp.setPrice(price);
+            resp.setNumber(NftNumber);
+            resp.setImage(NftImage);
             return resp;
         });
     }
 
     @Override
     public IPage<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery) {
-        Long start = 0L;
-        Long end = 0L;
-        if (!Objects.isNull(equipQuery.getListedTime())) {
-            DateTime dateTime = DateUtil.parseDate(equipQuery.getListedTime());
-            start = DateUtil.beginOfDay(dateTime).getTime();
-            end = DateUtil.endOfDay(dateTime).getTime();
-        }
 
-        // 获取price
-        NftMarketOrderEntity orderEntity = nftMarketOrderService.detailForTokenId(Long.valueOf(equipQuery.getTokenId()));
-        BigDecimal price = orderEntity.getPrice();
-
-        // 从背包表获取NFT
         NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.detailForTokenId(equipQuery.getTokenId());
-
-        // NFT 名称
-        String nftName = backpackEntity.getName();
+        String NftImage = backpackEntity.getImage();
 
         LambdaQueryWrapper<NftAttributeEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.between(!Objects.isNull(equipQuery.getListedTime()), NftAttributeEntity::getCreatedAt, start, end)
-                // .like(!StringUtils.isEmpty(equipQuery.getName()), ,equipQuery.getName())
+        queryWrapper.like(!StringUtils.isEmpty(equipQuery.getName()),NftAttributeEntity::getName ,equipQuery.getName())
                 .or().eq(!StringUtils.isEmpty(equipQuery.getTokenId()), NftAttributeEntity::getTokenId,equipQuery.getTokenId())
                 .eq(equipQuery.getGrade() != null, NftAttributeEntity::getGrade,equipQuery.getGrade())
                 .eq(equipQuery.getDurability() != null, NftAttributeEntity::getDurability,equipQuery.getDurability())
@@ -188,16 +146,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 .eq(equipQuery.getHeroType() != null, NftAttributeEntity::getHeroType, NftHeroTypeEnum.NELA.getCode())
                 .eq(equipQuery.getHeroType() != null, NftAttributeEntity::getHeroType, NftHeroTypeEnum.CATHAL.getCode())
                 .eq(equipQuery.getType() != null, NftAttributeEntity::getType, NftTypeEnum.equip.getCode())
+                .orderByDesc(NftAttributeEntity::getPrice)
+                .or().orderByAsc(NftAttributeEntity::getPrice)
                 .or().orderByDesc(NftAttributeEntity::getGrade)
                 .or().orderByAsc(NftAttributeEntity::getGrade)
                 .or().orderByDesc(NftAttributeEntity::getDurability)
                 .or().orderByAsc(NftAttributeEntity::getDurability)
                 .or().orderByDesc(NftAttributeEntity::getRarity)
                 .or().orderByAsc(NftAttributeEntity::getRarity)
-                .or().orderByDesc(NftAttributeEntity::getFavorite)
-                .or().orderByAsc(NftAttributeEntity::getFavorite)
-                .or().orderByDesc(NftAttributeEntity::getWinRate)
-                .or().orderByAsc(NftAttributeEntity::getWinRate)
                 .orderByDesc(NftAttributeEntity::getCreatedAt);
 
         Page<NftAttributeEntity> page = new Page<>(equipQuery.getCurrent(), equipQuery.getSize());
@@ -211,10 +167,8 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         return page.convert(p -> {
             NftMarketPlaceEqiupmentResp resp = new NftMarketPlaceEqiupmentResp();
             BeanUtils.copyProperties(p, resp);
-            resp.setIdentifier(NftNumber);
-            resp.setName(nftName);
-            resp.setImage(backpackEntity.getImage());
-            resp.setPrice(price);
+            resp.setNumber(NftNumber);
+            resp.setImage(NftImage);
             return resp;
         });
     }
