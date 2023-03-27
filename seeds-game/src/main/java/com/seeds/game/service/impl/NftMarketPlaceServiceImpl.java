@@ -82,7 +82,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String NftImage = backpackEntity.getImage();
 
         LambdaQueryWrapper<NftAttributeEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(skinQuery.getName() != null, NftAttributeEntity::getName, skinQuery.getName())
+        queryWrapper.like(!StringUtils.isEmpty(skinQuery.getName()), NftAttributeEntity::getName, skinQuery.getName())
                 .or().eq(!StringUtils.isEmpty(skinQuery.getTokenId()), NftAttributeEntity::getTokenId,skinQuery.getTokenId())
                 .eq(skinQuery.getGrade() != null, NftAttributeEntity::getGrade,skinQuery.getGrade())
                 .eq(skinQuery.getDurability() != null, NftAttributeEntity::getDurability,skinQuery.getDurability())
@@ -100,9 +100,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 .orderByAsc(NftAttributeEntity::getPrice)
                 .or().orderByDesc(NftAttributeEntity::getPrice)
                 .or().orderByDesc(NftAttributeEntity::getDurability)
-                .or().orderByAsc(NftAttributeEntity::getDurability)
                 .or().orderByDesc(NftAttributeEntity::getRarity)
-                .or().orderByAsc(NftAttributeEntity::getRarity)
                 .orderByDesc(NftAttributeEntity::getCreatedAt);
 
         Page<NftAttributeEntity> page = new Page<>(skinQuery.getCurrent(), skinQuery.getSize());
@@ -147,9 +145,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 .orderByDesc(NftAttributeEntity::getPrice)
                 .or().orderByAsc(NftAttributeEntity::getPrice)
                 .or().orderByDesc(NftAttributeEntity::getGrade)
-                .or().orderByAsc(NftAttributeEntity::getGrade)
                 .or().orderByDesc(NftAttributeEntity::getDurability)
-                .or().orderByAsc(NftAttributeEntity::getDurability)
                 .orderByDesc(NftAttributeEntity::getCreatedAt);
 
         Page<NftAttributeEntity> page = new Page<>(equipQuery.getCurrent(), equipQuery.getSize());
