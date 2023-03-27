@@ -199,7 +199,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         } catch (Exception e) {
             // 记录调用错误日志
             errorLog(notifyUrl, params, "connect timed out");
-            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to notify,connect timed out");
+            throw new GenericException("Failed to call game-api to notify,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());
@@ -208,7 +208,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         if (!"ok".equalsIgnoreCase(ret)) {
             // 记录调用错误日志
             errorLog(notifyUrl, params, ret);
-            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to notify, " + ret);
+            throw new GenericException("Failed to call game-api to notify, " + ret);
         }
 
     }
