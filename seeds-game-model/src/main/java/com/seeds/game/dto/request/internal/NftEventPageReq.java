@@ -8,7 +8,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author: hewei
@@ -49,6 +48,6 @@ public class NftEventPageReq extends PageReq {
                 }
             }
         }
-        return Objects.nonNull(statement) ? " order by " + statement.toString().substring(0, statement.toString().length() - 1) : "";
+        return StringUtils.isNotBlank(statement.toString()) ? " order by " + statement.toString().substring(0, statement.toString().length() - 1) : "";
     }
 }

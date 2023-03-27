@@ -29,13 +29,6 @@ public class NftEventAddReq extends OpenSignReq {
     @NotNull(message = "type can not be null")
     private Integer type;
 
-    @ApiModelProperty("name")
-    @NotBlank(message = "name can not be null")
-    private String name;
-
-    @ApiModelProperty("1.Normal 2.Rare 3.Epic")
-    @NotNull(message = "detail can not be null")
-    private Integer detail;
 
     @ApiModelProperty("涉及的装备")
     @NotEmpty(message = "equipments can not be null")

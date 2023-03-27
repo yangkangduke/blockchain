@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -57,4 +59,32 @@ public class NftEventEquipment implements Serializable {
 
     @ApiModelProperty("nft元数据")
     private String metadata;
+
+    @ApiModelProperty("名字名字")
+    @NotBlank
+    private String name;
+
+    @ApiModelProperty("等级")
+    @NotNull
+    private Integer lvl;
+
+    @ApiModelProperty("稀有属性描述")
+    @NotBlank
+    private String rarityAttrDesc;
+
+    @ApiModelProperty("稀有属性值")
+    @NotBlank
+    private String rarityAttrValue;
+
+    @ApiModelProperty("基础属性描述")
+    @NotBlank
+    private String baseAttrDesc;
+
+    @ApiModelProperty("基础属性值")
+    @NotBlank
+    private String baseAttrValue;
+
+    @ApiModelProperty("耐久度")
+    @NotNull
+    private Integer durability;
 }
