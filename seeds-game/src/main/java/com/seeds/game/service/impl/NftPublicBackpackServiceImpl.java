@@ -12,9 +12,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
-import com.seeds.game.dto.request.NftDistributeReq;
-import com.seeds.game.dto.request.NftTakebackReq;
-import com.seeds.game.dto.request.OpenNftOwnershipTransferReq;
+import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
@@ -348,6 +346,16 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         BeanUtils.copyProperties(req, entity);
         entity.setUserId(req.getToUserId());
         this.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
+    }
+
+    @Override
+    public void deposited(NftDepositedReq req) {
+
+    }
+
+    @Override
+    public void unDeposited(NftUnDepositedReq req) {
+
     }
 
     private void callGameDistribute(NftPublicBackpackEntity nftItem, Long serverRoleId) {
