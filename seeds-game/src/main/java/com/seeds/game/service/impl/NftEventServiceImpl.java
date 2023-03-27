@@ -65,6 +65,9 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Autowired
     private CallGameApiLogService callGameApiLogService;
 
+    @Autowired
+    private INftPublicBackpackService nftPublicBackpackService;
+
     @Override
     @Transactional
     public IPage<NftEventResp> getPage(NftEventPageReq req) {
@@ -72,7 +75,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
         LambdaQueryWrapper<NftEvent> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Objects.nonNull(req.getType()), NftEvent::getType, req.getType())
-                .eq(NftEvent::getUserId, req.getUserId());
+                .eq(NftEvent::getUserId, req.getUserId())
+                .in(!CollectionUtils.isEmpty(req.getStatus()), NftEvent::getStatus, req.getStatus());
 
         wrapper.last(!CollectionUtils.isEmpty(req.getSorts()), NftEventPageReq.getOrderByStatement(req.getSorts()));
         Page<NftEvent> page = new Page<>(req.getCurrent(), req.getSize());
@@ -146,6 +150,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         NftEvent event = this.getById(id);
         NftEventEquipment equipment = eventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
         this.callGameNotify(event.getServerRoleId(), 2, "", equipment.getAutoId(), equipment.getConfigId(), event.getUserId());
+        // 更新本地数据库
         return this.updateById(nftEvent);
     }
 
@@ -158,7 +163,10 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Override
     public void OptSuccess(Long eventId, String tokenId, Integer autoDeposite) {
+        NftEvent nftEvent = this.getById(eventId);
         // todo  插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
+
+        // todo 调用凤龙接口
 
     }
 

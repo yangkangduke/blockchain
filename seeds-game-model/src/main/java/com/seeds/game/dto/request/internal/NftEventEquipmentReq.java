@@ -40,6 +40,10 @@ public class NftEventEquipmentReq implements Serializable {
     @NotNull
     private Integer isConsume;
 
+    @ApiModelProperty("属性 存json")
+    @NotBlank
+    private String attributes;
+
     @ApiModelProperty("名字名字")
     @NotBlank
     private String name;
@@ -63,9 +67,5 @@ public class NftEventEquipmentReq implements Serializable {
     @ApiModelProperty("基础属性值")
     @NotBlank
     private String baseAttrValue;
-
-    @ApiModelProperty("耐久度")
-    @NotNull
-    private Integer durability;
 
 }

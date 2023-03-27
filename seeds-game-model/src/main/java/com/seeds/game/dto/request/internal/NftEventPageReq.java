@@ -23,6 +23,9 @@ public class NftEventPageReq extends PageReq {
     @ApiModelProperty("通知类型 1.mint  2. compound 3.other")
     private Integer type;
 
+    @ApiModelProperty("1.Pending 2.Cancelled 3.Minted")
+    private List<Integer> status;
+
     @ApiModelProperty("排序条件列表")
     private List<Sort> sorts;
 
