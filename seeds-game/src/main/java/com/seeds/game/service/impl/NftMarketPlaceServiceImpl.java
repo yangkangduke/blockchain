@@ -82,7 +82,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String NftImage = backpackEntity.getImage();
 
         LambdaQueryWrapper<NftAttributeEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(skinQuery.getName() != null, NftAttributeEntity::getName, skinQuery.getName())
+        queryWrapper.like(!StringUtils.isEmpty(skinQuery.getName()), NftAttributeEntity::getName, skinQuery.getName())
                 .or().eq(!StringUtils.isEmpty(skinQuery.getTokenId()), NftAttributeEntity::getTokenId,skinQuery.getTokenId())
                 .eq(skinQuery.getGrade() != null, NftAttributeEntity::getGrade,skinQuery.getGrade())
                 .eq(skinQuery.getDurability() != null, NftAttributeEntity::getDurability,skinQuery.getDurability())
