@@ -192,9 +192,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .eq(NftAttributeEntity::getTokenId,req.getTokenId());
             nftAttributeService.update(updateWrap);
         }
-        NftAttributeEntity attributeEntity = new NftAttributeEntity();
+        NftAttributeEntity nftAttributeEntity = nftAttributeService.detailForTokenId(req.getTokenId());
         NftMarketPlaceDetailViewResp resp = new NftMarketPlaceDetailViewResp();
-        resp.setViews(attributeEntity.getViews());
+        resp.setViews(nftAttributeEntity.getViews());
         return resp;
     }
 

@@ -7,6 +7,7 @@ import com.seeds.game.dto.request.NftMarketPlaceSkinPageReq;
 import com.seeds.game.dto.response.NftMarketPlaceDetailViewResp;
 import com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp;
 import com.seeds.game.dto.response.NftMarketPlaceSkinResp;
+import com.seeds.game.enums.NftTypeEnum;
 import com.seeds.game.service.NftMarketPlaceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,12 +35,14 @@ public class PublicNftMarketPlaceController {
     @PostMapping("page-skin")
     @ApiOperation("获取皮肤分页信息")
     public GenericDto<IPage<NftMarketPlaceSkinResp>> skinQueryPage(@RequestBody NftMarketPlaceSkinPageReq skinQuery){
+        skinQuery.setType(NftTypeEnum.skin.getCode());
         return GenericDto.success(nftMarketPlaceService.skinQueryPage(skinQuery));
     }
 
     @PostMapping("page-equip")
     @ApiOperation("获取装备分页信息")
     public GenericDto<IPage<NftMarketPlaceEqiupmentResp>>equipQueryPage(@RequestBody NftMarketPlaceEquipPageReq equipQuery){
+        equipQuery.setType(NftTypeEnum.equip.getCode());
         return GenericDto.success(nftMarketPlaceService.equipQueryPage(equipQuery));
     }
 
