@@ -97,10 +97,8 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 .eq(skinQuery.getHeroType() != null, NftAttributeEntity::getHeroType, NftHeroTypeEnum.NELA.getCode())
                 .eq(skinQuery.getHeroType() != null, NftAttributeEntity::getHeroType, NftHeroTypeEnum.CATHAL.getCode())
                 .eq(skinQuery.getType() != null, NftAttributeEntity::getType, NftTypeEnum.skin.getCode())
-                .orderByDesc(NftAttributeEntity::getPrice)
-                .or().orderByAsc(NftAttributeEntity::getPrice)
-                .or().orderByDesc(NftAttributeEntity::getGrade)
-                .or().orderByAsc(NftAttributeEntity::getGrade)
+                .orderByAsc(NftAttributeEntity::getPrice)
+                .or().orderByDesc(NftAttributeEntity::getPrice)
                 .or().orderByDesc(NftAttributeEntity::getDurability)
                 .or().orderByAsc(NftAttributeEntity::getDurability)
                 .or().orderByDesc(NftAttributeEntity::getRarity)
@@ -152,8 +150,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 .or().orderByAsc(NftAttributeEntity::getGrade)
                 .or().orderByDesc(NftAttributeEntity::getDurability)
                 .or().orderByAsc(NftAttributeEntity::getDurability)
-                .or().orderByDesc(NftAttributeEntity::getRarity)
-                .or().orderByAsc(NftAttributeEntity::getRarity)
                 .orderByDesc(NftAttributeEntity::getCreatedAt);
 
         Page<NftAttributeEntity> page = new Page<>(equipQuery.getCurrent(), equipQuery.getSize());
