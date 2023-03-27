@@ -399,7 +399,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(distributeUrl, params, "connect timed out");
-            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to distribute nft,connect timed out");
+            throw new GenericException("Failed to call game-api to distribute nft,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());
@@ -409,7 +409,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(distributeUrl, params, ret);
-            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to distribute nft, ret" + ret);
+            throw new GenericException("Failed to call game-api to distribute nft, ret" + ret);
         }
 
 
@@ -457,7 +457,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(takebackUrl, params, "connect timed out");
-            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to takeback nft,connect timed out");
+            throw new GenericException("Failed to call game-api to takeback nft,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());
@@ -467,7 +467,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(takebackUrl, params, ret);
-            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to takeback nft, ret" + ret);
+            throw new GenericException("Failed to call game-api to takeback nft, ret" + ret);
         }
 
     }
