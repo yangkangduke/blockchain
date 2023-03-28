@@ -52,6 +52,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public void fixedPriceShelf(NftFixedPriceShelfReq req) {
+        // 未托管才能上架
 
     }
 

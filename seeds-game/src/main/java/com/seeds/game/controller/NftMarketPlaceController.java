@@ -3,7 +3,6 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.dto.request.NftBuySuccessReq;
-import com.seeds.game.dto.response.NftMarketPlaceDetailResp;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.NftMarketPlaceService;
 import com.seeds.game.service.INftPublicBackpackService;
@@ -26,12 +25,6 @@ public class NftMarketPlaceController {
 
     @Autowired
     private INftAttributeService nftAttributeService;
-
-    @GetMapping("detail/{id}")
-    @ApiOperation("详细信息")
-    public GenericDto<NftMarketPlaceDetailResp> detail(@PathVariable("id") Long id) {
-        return GenericDto.success(nftMarketPlaceService.detail(id));
-    }
 
     @PostMapping("fixed-price-shelf")
     @ApiOperation("固定价格上架")

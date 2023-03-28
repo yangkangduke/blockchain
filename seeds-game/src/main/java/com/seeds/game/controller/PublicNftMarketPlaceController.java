@@ -4,6 +4,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.NftMarketPlaceDetailViewReq;
 import com.seeds.game.dto.request.NftMarketPlaceEquipPageReq;
 import com.seeds.game.dto.request.NftMarketPlaceSkinPageReq;
+import com.seeds.game.dto.response.NftMarketPlaceDetailResp;
 import com.seeds.game.dto.response.NftMarketPlaceDetailViewResp;
 import com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp;
 import com.seeds.game.dto.response.NftMarketPlaceSkinResp;
@@ -13,10 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * NFT市场外部调用
@@ -31,6 +29,12 @@ public class PublicNftMarketPlaceController {
 
     @Autowired
     private NftMarketPlaceService nftMarketPlaceService;
+
+    @GetMapping("detail/{id}")
+    @ApiOperation("详细信息")
+    public GenericDto<NftMarketPlaceDetailResp> detail(@PathVariable("id") Long id) {
+        return GenericDto.success(nftMarketPlaceService.detail(id));
+    }
 
     @PostMapping("page-skin")
     @ApiOperation("获取皮肤分页信息")
