@@ -22,4 +22,6 @@ public class NftEventNotifyReq {
     private String regionName;
     // 游戏服名字（mint成功时传）
     private String serverName;
+    // 1 装备2道具3英雄
+    private Integer type;
 }

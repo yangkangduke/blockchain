@@ -160,7 +160,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         // 通知游戏方事件取消
         NftEvent event = this.getById(id);
         NftEventEquipment equipment = eventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-        this.callGameNotify(event.getServerRoleId(), 2, "", equipment.getAutoId(), equipment.getConfigId(), event.getUserId());
+        this.callGameNotify(event.getServerRoleId(), 2, "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getUserId());
         // 更新本地数据库
         return this.updateById(nftEvent);
     }
@@ -240,13 +240,13 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
 
         // 通知游戏mint或者合成成功
-        this.callGameNotify(nftEvent.getServerRoleId(), 1, tokenAddress, equipment.getAutoId(), equipment.getConfigId(), nftEvent.getUserId());
+        this.callGameNotify(nftEvent.getServerRoleId(), 1, tokenAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getUserId());
 
     }
 
 
     // nft 操作通知  // optType 1 mint成功,2取消
-    private void callGameNotify(Long serverRoleId, Integer optType, String tokenId, Long autoId, Long configId, Long accId) {
+    private void callGameNotify(Long serverRoleId, Integer optType, String tokenId, Integer itemType, Long autoId, Long configId, Long accId) {
 
         ServerRegionEntity serverRegion = this.getServerRegionEntity(serverRoleId);
 
@@ -262,6 +262,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         notifyReq.setAutoId(autoId);
         notifyReq.setConfigId(configId);
         notifyReq.setAccId(accId);
+        notifyReq.setType(itemType);
         // 1 mint成功,2取消
         if (optType.equals(1)) {
             notifyReq.setRegionName(serverRegion.getRegionName());
