@@ -48,6 +48,9 @@ public class NftPublicBackpackEntity implements Serializable {
     @ApiModelProperty("对应游戏那边的conf_id，找静态表中的数据")
     private Long itemId;
 
+    @ApiModelProperty("对应游戏那边的item_id")
+    private Long itemTypeId;
+
     @ApiModelProperty("游戏那边传的。大区+game+流水")
     private Long autoId;
 

@@ -11,9 +11,10 @@ import com.seeds.game.dto.request.NftDepositedReq;
 import com.seeds.game.dto.request.NftUnDepositedReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
 import com.seeds.game.dto.response.NftPublicBackpackResp;
+import com.seeds.game.dto.response.NftType;
+import com.seeds.game.dto.response.NftTypeNum;
 import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.exception.GenericException;
@@ -46,6 +47,19 @@ public class NftPublicBackpackController {
     @Autowired
     private RemoteGameService remoteGameService;
 
+
+    @GetMapping("type-num")
+    @ApiOperation("统计各个类型的数量")
+    public GenericDto<List<NftTypeNum>> typeNum() {
+        return GenericDto.success(nftPublicBackpackService.typeNum());
+    }
+
+    @GetMapping("type-list")
+    @ApiOperation("获取分类列表")
+    public GenericDto<List<NftType>> getNftTypeList() {
+        return GenericDto.success(nftPublicBackpackService.getNftTypeList());
+    }
+
     @PostMapping("page")
     @ApiOperation("获取分页信息")
     public GenericDto<IPage<NftPublicBackpackResp>> create(@Valid @RequestBody NftPublicBackpackPageReq req) {
@@ -53,35 +67,35 @@ public class NftPublicBackpackController {
         return GenericDto.success(nftPublicBackpackService.queryPage(req));
     }
 
-    @PostMapping("list")
-    @ApiOperation("获取列表信息，不分页")
-    public GenericDto<List<NftPublicBackpackResp>> queryList(@Valid @RequestBody NftPublicBackpackPageReq req) {
-        req.setUserId(UserContext.getCurrentUserId());
-        return GenericDto.success(nftPublicBackpackService.queryList(req));
-    }
+//    @PostMapping("list")
+//    @ApiOperation("获取列表信息，不分页")
+//    public GenericDto<List<NftPublicBackpackResp>> queryList(@Valid @RequestBody NftPublicBackpackPageReq req) {
+//        req.setUserId(UserContext.getCurrentUserId());
+//        return GenericDto.success(nftPublicBackpackService.queryList(req));
+//    }
 
 
-    @GetMapping("detail/{autoId}")
-    @ApiOperation("详细信息")
-    public GenericDto<NftPublicBackpackResp> detail(@PathVariable Integer autoId) {
-        return GenericDto.success(nftPublicBackpackService.detail(autoId));
-    }
+//    @GetMapping("detail/{autoId}")
+//    @ApiOperation("详细信息")
+//    public GenericDto<NftPublicBackpackResp> detail(@PathVariable Integer autoId) {
+//        return GenericDto.success(nftPublicBackpackService.detail(autoId));
+//    }
 
-    @PostMapping("create")
-    @ApiOperation("新增")
-    public GenericDto<Object> create(@RequestBody @Valid NftPublicBackpackReq req) {
-        req.setUserId(UserContext.getCurrentUserId());
-        nftPublicBackpackService.create(req);
-        return GenericDto.success(null);
-    }
-
-    @PostMapping("update")
-    @ApiOperation("修改")
-    public GenericDto<Object> update(@RequestBody @Valid NftPublicBackpackReq req) {
-        req.setUserId(UserContext.getCurrentUserId());
-        nftPublicBackpackService.update(req);
-        return GenericDto.success(null);
-    }
+//    @PostMapping("create")
+//    @ApiOperation("新增")
+//    public GenericDto<Object> create(@RequestBody @Valid NftPublicBackpackReq req) {
+//        req.setUserId(UserContext.getCurrentUserId());
+//        nftPublicBackpackService.create(req);
+//        return GenericDto.success(null);
+//    }
+//
+//    @PostMapping("update")
+//    @ApiOperation("修改")
+//    public GenericDto<Object> update(@RequestBody @Valid NftPublicBackpackReq req) {
+//        req.setUserId(UserContext.getCurrentUserId());
+//        nftPublicBackpackService.update(req);
+//        return GenericDto.success(null);
+//    }
 
     @PostMapping("distribute")
     @ApiOperation("分配")

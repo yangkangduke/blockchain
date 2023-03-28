@@ -1,7 +1,7 @@
 package com.seeds.game.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.seeds.game.dto.response.TypeNum;
+import com.seeds.game.dto.response.EventTypeNum;
 import com.seeds.game.entity.NftEvent;
 import org.apache.ibatis.annotations.Param;
 
@@ -17,7 +17,7 @@ import java.util.List;
  */
 public interface NftEventMapper extends BaseMapper<NftEvent> {
 
-    List<TypeNum> getTypeCount(@Param("userId") Long userId);
+    List<EventTypeNum> getTypeCount(@Param("userId") Long userId);
 
     void updateClick(@Param("type") Integer type, @Param("userId") Long userId);
 }

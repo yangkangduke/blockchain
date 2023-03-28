@@ -9,7 +9,7 @@
           and user_id = #{userId}
 
     </update>
-    <select id="getTypeCount" resultType="com.seeds.game.dto.response.TypeNum">
+    <select id="getTypeCount" resultType="com.seeds.game.dto.response.EventTypeNum">
 
         select distinct t1.type, ifnull(t2.num, 0) num
         from (select `type` from ga_nft_event) t1

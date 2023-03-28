@@ -18,6 +18,8 @@ import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
 import com.seeds.game.dto.response.NftPublicBackpackResp;
+import com.seeds.game.dto.response.NftType;
+import com.seeds.game.dto.response.NftTypeNum;
 import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
@@ -356,6 +358,16 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public void unDeposited(NftUnDepositedReq req) {
 
+    }
+
+    @Override
+    public List<NftTypeNum> typeNum() {
+        return null;
+    }
+
+    @Override
+    public List<NftType> getNftTypeList() {
+        return null;
     }
 
     private void callGameDistribute(NftPublicBackpackEntity nftItem, Long serverRoleId) {

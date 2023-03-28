@@ -17,9 +17,9 @@ import com.seeds.game.dto.request.internal.NftEventAddReq;
 import com.seeds.game.dto.request.internal.NftEventEquipmentReq;
 import com.seeds.game.dto.request.internal.NftEventNotifyReq;
 import com.seeds.game.dto.request.internal.NftEventPageReq;
+import com.seeds.game.dto.response.EventTypeNum;
 import com.seeds.game.dto.response.NftEventEquipmentResp;
 import com.seeds.game.dto.response.NftEventResp;
-import com.seeds.game.dto.response.TypeNum;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
@@ -166,9 +166,9 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     }
 
     @Override
-    public List<TypeNum> getTypeNum(Long userId) {
+    public List<EventTypeNum> getTypeNum(Long userId) {
         // 获取各个类型的数量
-        List<TypeNum> typeCount = baseMapper.getTypeCount(userId);
+        List<EventTypeNum> typeCount = baseMapper.getTypeCount(userId);
         return typeCount;
     }
 
@@ -200,7 +200,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         //backpackEntity.setDesc();
         backpackEntity.setImage(equipment.getImageUrl());
         backpackEntity.setType(equipment.getItemType());
-        backpackEntity.setItemId(equipment.getItemId());
+        backpackEntity.setItemId(equipment.getConfigId());
+        backpackEntity.setItemTypeId(equipment.getItemId());
         backpackEntity.setAutoId(equipment.getAutoId());
         backpackEntity.setItemId(equipment.getConfigId());
         HashMap<String, Object> attr = new HashMap<>();
@@ -239,7 +240,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
 
         // 通知游戏mint或者合成成功
-        // this.callGameNotify(nftEvent.getServerRoleId(), 1, tokenId, equipment.getAutoId(), equipment.getConfigId(), nftEvent.getUserId());
+        this.callGameNotify(nftEvent.getServerRoleId(), 1, tokenAddress, equipment.getAutoId(), equipment.getConfigId(), nftEvent.getUserId());
 
     }
 

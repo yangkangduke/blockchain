@@ -5,7 +5,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.internal.NftEventPageReq;
 import com.seeds.game.dto.response.NftEventResp;
-import com.seeds.game.dto.response.TypeNum;
+import com.seeds.game.dto.response.EventTypeNum;
 import com.seeds.game.service.INftEventService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +38,7 @@ public class NftEventController {
     }
     @GetMapping("/type-num")
     @ApiOperation("各类型数量")
-    GenericDto<List<TypeNum>> getTypeNum() {
+    GenericDto<List<EventTypeNum>> getTypeNum() {
         Long userId = UserContext.getCurrentUserId();
         return GenericDto.success(nftEventService.getTypeNum(userId));
     }

@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.game.dto.request.internal.NftEventAddReq;
 import com.seeds.game.dto.request.internal.NftEventPageReq;
 import com.seeds.game.dto.response.NftEventResp;
-import com.seeds.game.dto.response.TypeNum;
+import com.seeds.game.dto.response.EventTypeNum;
 import com.seeds.game.entity.NftEvent;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public interface INftEventService extends IService<NftEvent> {
 
     Boolean cancel(Long id);
 
-    List<TypeNum> getTypeNum(Long userId);
+    List<EventTypeNum> getTypeNum(Long userId);
 
     void OptSuccess(Long eventId, String tokenAddress, Integer autoDeposite);
 }

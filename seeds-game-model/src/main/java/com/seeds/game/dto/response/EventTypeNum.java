@@ -6,7 +6,7 @@ import lombok.Data;
 
 @ApiModel(value = "nftEventTypeNum")
 @Data
-public class TypeNum {
+public class EventTypeNum {
 
     @ApiModelProperty("事件类型 1.mint 2.compound 3.other")
     private Integer type;
