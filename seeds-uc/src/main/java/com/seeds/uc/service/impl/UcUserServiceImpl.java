@@ -485,6 +485,15 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
     }
 
+    @Override
+    public String getPublicAddress(Long id) {
+        UcUser user = getById(id);
+        if (user == null) {
+            return null;
+        }
+        return user.getPublicAddress();
+    }
+
     /**
      * 校验登陆
      * @param loginReq

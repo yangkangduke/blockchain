@@ -1,5 +1,6 @@
 package com.seeds.game.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.game.entity.NftEquipment;
 import com.seeds.game.mapper.NftEquipmentMapper;
@@ -17,4 +18,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class NftEquipmentServiceImpl extends ServiceImpl<NftEquipmentMapper, NftEquipment> implements INftEquipmentService {
 
+    @Override
+    public NftEquipment queryByMintAddress(String mintAddress) {
+        return getOne(new LambdaQueryWrapper<NftEquipment>()
+                .eq(NftEquipment::getMintAddress, mintAddress));
+    }
 }

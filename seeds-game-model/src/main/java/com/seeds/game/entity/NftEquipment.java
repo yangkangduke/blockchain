@@ -2,6 +2,7 @@ package com.seeds.game.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -59,6 +60,7 @@ public class NftEquipment implements Serializable {
     private String orderId;
 
     @ApiModelProperty("是否删除  0：未删除  1：已删除")
+    @TableLogic(value = "0", delval = "1")
     private Integer isDelete;
 
     @ApiModelProperty("删除时间")
