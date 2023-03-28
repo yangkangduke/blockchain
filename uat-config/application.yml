@@ -67,8 +67,8 @@ email:
   enable: false
   host: email-smtp.ap-northeast-1.amazonaws.com
   from: seeds<no-reply-uat@theseeds.io>
-  user: AKIAQMKUPROLIXMNEIJK
-  pass: BBTyucDgyIg8qIDU1ki5XT1x3JEZZSA3cK1FC96TO0r4
+  user: AKIAVHK56GXNBIIULDGW
+  pass: BLz0TmjXCpgIrNSvgAIH4IZJWznP1yoEiJV5NTCeSVY2
 
 zookeeper:
   address: 35.76.116.54:2181

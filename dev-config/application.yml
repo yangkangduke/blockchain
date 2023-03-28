@@ -65,8 +65,8 @@ email:
   enable: false
   host: email-smtp.ap-northeast-1.amazonaws.com
   from: seeds<no-reply-dev@theseeds.io>
-  user: AKIAVHK56GXNJOPLTALC
-  pass: QcRUGNnTad5tPzyCtaz0xL9YjsRCyHbcvNT26T/s
+  user: AKIAVHK56GXNBIIULDGW
+  pass: BLz0TmjXCpgIrNSvgAIH4IZJWznP1yoEiJV5NTCeSVY2
 
 login:
   twofa: true

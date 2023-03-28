@@ -62,11 +62,11 @@ file:
       cdn: game3.s3.cn-north-1.amazonaws.com.cn
 
 email:
-  enable: true
+  enable: false
   host: email-smtp.ap-northeast-1.amazonaws.com
-  from: seeds<no-reply-devtest@theseeds.io>
-  user: AKIAVHK56GXNKEOKN72H
-  pass: 4bjSF9lgpYxA+pLh4nwx7XZ9jS6/Kz1Q7DtaRAzH
+  from: seeds<no-reply-dev@theseeds.io>
+  user: AKIAVHK56GXNBIIULDGW
+  pass: BLz0TmjXCpgIrNSvgAIH4IZJWznP1yoEiJV5NTCeSVY2
 
 login:
   twofa: true
