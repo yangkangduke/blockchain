@@ -42,11 +42,14 @@ public class NftEventEquipment implements Serializable {
     @ApiModelProperty("游戏方confId")
     private Long configId;
 
+    @ApiModelProperty("类别ID")
+    private Long itemId;
+
+    @ApiModelProperty("1 装备 2 道具")
+    private Integer itemType;
+
     @ApiModelProperty("是否nft")
     private Integer isNft;
-
-    @ApiModelProperty("tokenId")
-    private String tokenId;
 
     @ApiModelProperty("是否被消耗")
     private Integer isConsume;
@@ -60,31 +63,29 @@ public class NftEventEquipment implements Serializable {
     @ApiModelProperty("nft元数据")
     private String metadata;
 
-    @ApiModelProperty("名字名字")
+    @ApiModelProperty("装备名字")
     @NotBlank
     private String name;
 
-    @ApiModelProperty("等级")
+    @ApiModelProperty("装备等级")
     @NotNull
     private Integer lvl;
 
-    @ApiModelProperty("稀有属性描述")
-    @NotBlank
-    private String rarityAttrDesc;
+//    @ApiModelProperty("稀有属性描述")
+//    @NotBlank
+//    private String rarityAttrDesc;
 
     @ApiModelProperty("稀有属性值")
     @NotBlank
     private String rarityAttrValue;
 
-    @ApiModelProperty("基础属性描述")
-    @NotBlank
-    private String baseAttrDesc;
+//    @ApiModelProperty("基础属性描述")
+//    @NotBlank
+//    private String baseAttrDesc;
 
     @ApiModelProperty("基础属性值")
     @NotBlank
     private String baseAttrValue;
 
-    @ApiModelProperty("耐久度")
-    @NotNull
-    private Integer durability;
+
 }

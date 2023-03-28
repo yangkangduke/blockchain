@@ -4,7 +4,6 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.internal.NftEventAddReq;
 import com.seeds.game.service.INftEventService;
-import com.seeds.game.service.INftPublicBackpackService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ import javax.validation.Valid;
 
 @Api(tags = "game调用,to-nft")
 @RestController
-@RequestMapping("/game/nft-event")
+@RequestMapping("/nft-event")
 public class OpenNftEventController {
 
     @Autowired

@@ -22,7 +22,7 @@ import javax.validation.Valid;
  * @since 2023-03-23
  */
 
-@Api(tags = "game调用,nftw物品转移")
+@Api(tags = "game调用,nft物品转移")
 @RestController
 @RequestMapping("/public/game/nft-event")
 public class PublicNftEventController {

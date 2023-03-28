@@ -41,9 +41,6 @@ public class NftEvent implements Serializable {
     @ApiModelProperty("1.Pending 2.Cancelled 3.Minted")
     private Integer status;
 
-    @ApiModelProperty("1.Normal 2.Rare 3.Epic")
-    private Integer detail;
-
     @ApiModelProperty("用户是否点击过对应的tab,点过就不再显示数字 0 未点击 1 已点击")
     private Integer click;
 

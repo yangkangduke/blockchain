@@ -14,6 +14,7 @@ import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.game.dto.request.internal.NftEventAddReq;
+import com.seeds.game.dto.request.internal.NftEventEquipmentReq;
 import com.seeds.game.dto.request.internal.NftEventNotifyReq;
 import com.seeds.game.dto.request.internal.NftEventPageReq;
 import com.seeds.game.dto.response.NftEventEquipmentResp;
@@ -22,6 +23,7 @@ import com.seeds.game.dto.response.TypeNum;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
+import com.seeds.game.enums.NftConfigurationEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftEventMapper;
 import com.seeds.game.service.*;
@@ -34,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,6 +69,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Autowired
     private CallGameApiLogService callGameApiLogService;
 
+    @Autowired
+    private INftAttributeService attributeService;
     @Autowired
     @Lazy
     private INftPublicBackpackService nftPublicBackpackService;
@@ -120,6 +125,10 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         // 记录toNFT请求
         NftEvent nftEvent = new NftEvent();
         BeanUtils.copyProperties(req, nftEvent);
+        List<NftEventEquipmentReq> eventEquipmentReqs = req.getEquipments().stream().filter(p -> p.getIsConsume().equals(WhetherEnum.NO.value())).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(eventEquipmentReqs)) {
+            nftEvent.setName(eventEquipmentReqs.get(0).getName());
+        }
         nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.PENDING.getCode());
         nftEvent.setCreatedAt(System.currentTimeMillis());
         nftEvent.setCreatedBy(req.getUserId());
@@ -164,11 +173,73 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     }
 
     @Override
-    public void OptSuccess(Long eventId, String tokenId, Integer autoDeposite) {
+    @Transactional
+    public void OptSuccess(Long eventId, String tokenAddress, Integer autoDeposite) {
         NftEvent nftEvent = this.getById(eventId);
-        // todo  插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
+        NftEventEquipment equipment = eventEquipmentService
+                .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
 
-        // todo 调用凤龙接口
+        // todo 调用凤龙接口,如果是自动托管还需要调用托管的接口
+
+        //   插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setName(nftEvent.getName());
+        backpackEntity.setUserId(nftEvent.getUserId());
+        backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
+        backpackEntity.setTokenId(tokenAddress);
+        backpackEntity.setCreatedBy(nftEvent.getUserId());
+        backpackEntity.setUpdatedBy(nftEvent.getUserId());
+        backpackEntity.setCreatedAt(System.currentTimeMillis());
+        backpackEntity.setUpdatedAt(System.currentTimeMillis());
+        backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
+        if (autoDeposite.equals(1)) {
+            backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
+        } else {
+            backpackEntity.setState(NFTEnumConstant.NFTStateEnum.MINTED.getCode());
+        }
+        //backpackEntity.setDesc();
+        backpackEntity.setImage(equipment.getImageUrl());
+        backpackEntity.setType(equipment.getItemType());
+        backpackEntity.setItemId(equipment.getItemId());
+        backpackEntity.setAutoId(equipment.getAutoId());
+        backpackEntity.setItemId(equipment.getConfigId());
+        HashMap<String, Object> attr = new HashMap<>();
+
+        attr.put("level", equipment.getLvl());
+        JSONObject jsonObject = JSONObject.parseObject(equipment.getAttributes());
+        Integer durability = Integer.valueOf(jsonObject.getString("durability"));
+        attr.put("durability", durability);
+        String jsonStr = JSONUtil.toJsonStr(attr);
+        backpackEntity.setAttributes(jsonStr);
+
+        nftPublicBackpackService.save(backpackEntity);
+
+        // 如果是合成，作为合成材料的nft标记为临时锁定的状态
+        if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
+            NftEventEquipment consumeNft = eventEquipmentService
+                    .getOne(new LambdaQueryWrapper<NftEventEquipment>()
+                            .eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.YES.value())
+                            .eq(NftEventEquipment::getIsNft, WhetherEnum.YES.value()));
+            NftPublicBackpackEntity nftbackpack = nftPublicBackpackService.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, consumeNft.getAutoId()));
+            nftbackpack.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
+            nftPublicBackpackService.updateById(nftbackpack);
+        }
+
+        //  插入属性表
+        NftAttributeEntity attributeEntity = new NftAttributeEntity();
+        attributeEntity.setTokenAddress(tokenAddress);
+        attributeEntity.setGrade(equipment.getLvl());
+        attributeEntity.setDurability(durability);
+        attributeService.save(attributeEntity);
+
+
+        // 更新event事件状态
+        nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTED.getCode());
+        this.updateById(nftEvent);
+
+
+        // 通知游戏mint或者合成成功
+        // this.callGameNotify(nftEvent.getServerRoleId(), 1, tokenId, equipment.getAutoId(), equipment.getConfigId(), nftEvent.getUserId());
 
     }
 

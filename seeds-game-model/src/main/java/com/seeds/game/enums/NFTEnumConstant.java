@@ -64,4 +64,25 @@ public class NFTEnumConstant {
         }
     }
 
+    /**
+     * nft 状态 地枚举
+     */
+    @Getter
+    public enum NFTStateEnum {
+
+        MINTED(1, "MINTED"), // mint成功
+        LOCK(2, "LOCK"),   // 作为合成材料被临时锁定
+        DEPOSITED(3, "DEPOSITED"), // 托管给平台
+        UNDEPOSITED(4, "UNDEPOSITED"); // 解除托管
+
+        private final int code;
+        private final String desc;
+
+        NFTStateEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+    }
+
 }

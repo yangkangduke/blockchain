@@ -64,8 +64,8 @@ public class NftEventController {
 
     @PostMapping("opt-success")
     @ApiOperation("mint/compound 操作成功, 1 自动托管，0 不自动托管")
-    GenericDto<Object> OptSuccess(@RequestParam("eventId") Long eventId, @RequestParam("tokenId") String tokenId, @RequestParam("autoDeposite") Integer autoDeposite) {
-        nftEventService.OptSuccess(eventId, tokenId, autoDeposite);
+    GenericDto<Object> OptSuccess(@RequestParam("eventId") Long eventId, @RequestParam("tokenAddress") String tokenAddress, @RequestParam("autoDeposite") Integer autoDeposite) {
+        nftEventService.OptSuccess(eventId, tokenAddress, autoDeposite);
         return GenericDto.success(null);
     }
 

@@ -26,9 +26,6 @@ public class NftEventResp {
     @ApiModelProperty("1.Pending 2.Cancelled 3.Minted")
     private Integer status;
 
-    @ApiModelProperty("1.Normal 2.Rare 3.Epic")
-    private Integer detail;
-
     private String transferFrom;
 
     private String transferTo;
