@@ -5,14 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.game.dto.request.NftDepositedReq;
 import com.seeds.game.dto.request.NftUnDepositedReq;
 import com.seeds.game.dto.request.OpenNftOwnershipTransferReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
-import com.seeds.game.dto.response.NftPublicBackpackResp;
-import com.seeds.game.dto.response.NftType;
-import com.seeds.game.dto.response.NftTypeNum;
-import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
+import com.seeds.game.dto.request.internal.*;
+import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 
 import java.util.List;
@@ -73,4 +67,6 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
      * @return
      */
     List<NftType> getNftTypeList();
+
+    List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req);
 }

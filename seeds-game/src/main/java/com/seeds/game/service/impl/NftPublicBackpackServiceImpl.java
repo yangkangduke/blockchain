@@ -13,14 +13,8 @@ import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.game.dto.request.*;
-import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
-import com.seeds.game.dto.response.NftPublicBackpackResp;
-import com.seeds.game.dto.response.NftType;
-import com.seeds.game.dto.response.NftTypeNum;
-import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
+import com.seeds.game.dto.request.internal.*;
+import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
@@ -367,6 +361,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Override
     public List<NftType> getNftTypeList() {
+        return null;
+    }
+
+    @Override
+    public List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req) {
         return null;
     }
 

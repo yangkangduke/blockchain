@@ -1,6 +1,5 @@
 package com.seeds.game.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.enums.GameConditionEnum;
 import com.seeds.admin.enums.GameEnum;
@@ -9,13 +8,10 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.NftDepositedReq;
 import com.seeds.game.dto.request.NftUnDepositedReq;
+import com.seeds.game.dto.request.internal.NftBackpackWebPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
-import com.seeds.game.dto.response.NftPublicBackpackResp;
-import com.seeds.game.dto.response.NftType;
-import com.seeds.game.dto.response.NftTypeNum;
-import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
+import com.seeds.game.dto.response.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.service.INftPublicBackpackService;
@@ -62,9 +58,9 @@ public class NftPublicBackpackController {
 
     @PostMapping("page")
     @ApiOperation("获取分页信息")
-    public GenericDto<IPage<NftPublicBackpackResp>> create(@Valid @RequestBody NftPublicBackpackPageReq req) {
+    public GenericDto<List<NftPublicBackpackWebResp>> getPage(@Valid @RequestBody NftBackpackWebPageReq req) {
         req.setUserId(UserContext.getCurrentUserId());
-        return GenericDto.success(nftPublicBackpackService.queryPage(req));
+        return GenericDto.success(nftPublicBackpackService.getPageForWeb(req));
     }
 
 //    @PostMapping("list")

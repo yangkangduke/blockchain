@@ -160,7 +160,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         // 通知游戏方事件取消
         NftEvent event = this.getById(id);
         NftEventEquipment equipment = eventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-        this.callGameNotify(event.getServerRoleId(), 2, "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getUserId());
+        this.callGameNotify(event.getServerRoleId(), 2, "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId());
         // 更新本地数据库
         return this.updateById(nftEvent);
     }
@@ -240,7 +240,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
 
         // 通知游戏mint或者合成成功
-        this.callGameNotify(nftEvent.getServerRoleId(), 1, tokenAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getUserId());
+        this.callGameNotify(nftEvent.getServerRoleId(), 1, tokenAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
 
     }
 
