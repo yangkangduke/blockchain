@@ -82,4 +82,11 @@ public class InterUserController {
         return GenericDto.success(ucUserService.getUserRegistration());
     }
 
+    @ApiOperation("根据用户id获取用户地址")
+    @Inner
+    @GetMapping("/get-public-address")
+    GenericDto<String> getPublicAddress(@RequestParam Long id) {
+        return GenericDto.success(ucUserService.getPublicAddress(id));
+    }
+
 }

@@ -226,5 +226,14 @@ public interface IUcUserService extends IService<UcUser> {
      * @param serviceRegion
      */
     void sendLoginMsg(String email, String userIp, String serviceRegion);
+
+    /**
+     * 根据用户id获取用户地址
+     *
+     * @param id 用户编号
+     * @return 用户地址
+     */
+    String getPublicAddress(Long id);
+
 }
 
