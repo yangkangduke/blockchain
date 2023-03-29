@@ -12,45 +12,45 @@ import java.util.Date;
 public class NftMarketOrderEntity {
 
     @ApiModelProperty("id")
-    private String id;
+    private Long id;
 
-    @ApiModelProperty("seller_id")
+    @ApiModelProperty("售卖人id")
     private Long sellerId;
 
-    @ApiModelProperty("seller_address")
+    @ApiModelProperty("售卖人Solana地址")
     private String sellerAddress;
 
-    @ApiModelProperty("buyer_id")
+    @ApiModelProperty("买家id")
     private Long buyerId;
 
-    @ApiModelProperty("buyer_address")
+    @ApiModelProperty("买家地址")
     private String buyerAddress;
 
-    @ApiModelProperty("token_address")
-    private String tokenAddress;
+    @ApiModelProperty("Nft地址")
+    private String mintAddress;
 
-    @ApiModelProperty("token_id")
+    @ApiModelProperty("nft编号")
     private Long tokenId;
 
-    @ApiModelProperty("price")
+    @ApiModelProperty("价格")
     private BigDecimal price;
 
-    @ApiModelProperty("is_deposit")
+    @ApiModelProperty("是否托管 0：否  1：是")
     private Integer isDeposit;
 
-    @ApiModelProperty("status")
+    @ApiModelProperty("状态：1，挂单中， 2，已成交  3，已取消")
     private Integer status;
 
     @ApiModelProperty("挂单收据")
     private String listReceipt;
 
-    @ApiModelProperty("place_tx")
+    @ApiModelProperty("挂单签名")
     private String placeTx;
 
-    @ApiModelProperty("fulfill_tx")
+    @ApiModelProperty("执行交易签名")
     private String fulfillTx;
 
-    @ApiModelProperty("cancel_tx")
+    @ApiModelProperty("取消交易签名")
     private String cancelTx;
 
     @ApiModelProperty("create_time")

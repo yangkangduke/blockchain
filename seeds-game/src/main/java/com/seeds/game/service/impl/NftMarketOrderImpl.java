@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NftMarketOrderImpl extends ServiceImpl<NftMarketOrderMapper, NftMarketOrderEntity>implements INftMarketOrderService {
+
     @Override
-    public NftMarketOrderEntity detailForTokenId(Long tokenId) {
+    public NftMarketOrderEntity detailForTokenAddress(String mintAddress) {
         NftMarketOrderEntity entityDetail = new NftMarketOrderEntity();
-        NftMarketOrderEntity one = this.getOne(new LambdaQueryWrapper<NftMarketOrderEntity>().eq(NftMarketOrderEntity::getTokenId, tokenId));
+        NftMarketOrderEntity one = this.getOne(new LambdaQueryWrapper<NftMarketOrderEntity>().eq(NftMarketOrderEntity::getMintAddress, mintAddress));
         if (null != one) {
             BeanUtils.copyProperties(one, entityDetail);
         }

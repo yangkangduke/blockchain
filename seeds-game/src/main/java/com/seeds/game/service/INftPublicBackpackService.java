@@ -10,6 +10,8 @@ import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -36,6 +38,8 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     OpenNftPublicBackpackDisResp transfer(NftPublicBackpackDisReq req);
 
     List<NftPublicBackpackResp> queryList(NftPublicBackpackPageReq req);
+
+    NftPublicBackpackEntity detailForMintAddress(String mintAddress);
 
     NftPublicBackpackEntity detailForTokenId(String tokenId);
 
@@ -69,4 +73,5 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     List<NftType> getNftTypeList();
 
     List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req);
+
 }

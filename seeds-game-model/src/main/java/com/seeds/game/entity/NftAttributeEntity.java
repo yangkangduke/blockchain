@@ -4,8 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 /**
  * <p>
  * NFT属性
@@ -19,20 +17,8 @@ import java.math.BigDecimal;
 @Data
 public class NftAttributeEntity extends BaseEntity {
 
-    @ApiModelProperty("NFT类型：1，皮肤  2，装备")
-    private Integer type;
-
-    @ApiModelProperty("NFT名称")
-    private String name;
-
     @ApiModelProperty("NFT等级")
     private Integer grade;
-
-    @ApiModelProperty("NFT交易模式：0：Buy Now  1：On Auction")
-    private Integer model;
-
-    @ApiModelProperty("NFT价格")
-    private BigDecimal price;
 
     @ApiModelProperty("耐久度")
     private Integer durability;
@@ -43,14 +29,11 @@ public class NftAttributeEntity extends BaseEntity {
     @ApiModelProperty("英雄类型5种：1，DESTIN  2，AILITH  3，AILSA  4，NELA  5，CATHAL")
     private Integer heroType;
 
-    @ApiModelProperty("浏览量")
-    private Integer views;
-
     @ApiModelProperty("token id")
     private String tokenId;
 
-    @ApiModelProperty("tokenAddress")
-    private String tokenAddress;
+    @ApiModelProperty("mintAddress")
+    private String mintAddress;
 
     @ApiModelProperty("健康属性值")
     private Integer health;

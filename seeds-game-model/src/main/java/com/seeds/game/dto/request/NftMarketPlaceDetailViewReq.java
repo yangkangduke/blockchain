@@ -11,7 +11,7 @@ import lombok.Data;
 @ApiModel(value = "NftMarketPlaceDetailViewReq", description = "NFT的浏览")
 public class NftMarketPlaceDetailViewReq {
 
-    @ApiModelProperty("NFT的 token id")
-    private String tokenId;
+    @ApiModelProperty("mintAddress")
+    private String mintAddress;
 
 }
