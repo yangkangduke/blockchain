@@ -42,6 +42,9 @@
         left join ga_nft_attribute t2 on t1.token_id = t2.token_id and t1.token_address = t2.mint_address
         where user_id = #{userId}
         and item_type_id = #{itemTypeId}
+        <if test="sort != null and sort =='state'">
+            order by t1.state ${sortType}
+        </if>
         <if test="sort != null and sort =='price'">
             order by t1.price ${sortType}
         </if>
