@@ -30,29 +30,17 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("NFT拥有用户名称")
     private String ownerName;
 
-    @ApiModelProperty("点赞数量")
-    private Integer favorite;
-
     @ApiModelProperty("浏览量")
     private Integer views;
 
-    @ApiModelProperty("NFT交易模式：0：Buy Now  1：On Auction")
-    private Integer model;
-
-    @ApiModelProperty("NFT状态：0：UnDeposited  1：Deposited")
+    @ApiModelProperty("NFT状态：0：UnDeposited  1：Deposited 2:On shelf 3:On auction 4:In settlement 5: Burned")
     private Integer state;
 
-    @ApiModelProperty("NFT一口价价格")
-    private BigDecimal maxPrice;
-
-    @ApiModelProperty("NFT地板价格")
-    private BigDecimal floorPrice;
-
-    @ApiModelProperty("NFT当前价格")
+    @ApiModelProperty("当前价格")
     private BigDecimal currentPrice;
 
-    @ApiModelProperty("与美元汇率")
-    private BigDecimal usdRates;
+    @ApiModelProperty("参考价格")
+    private BigDecimal referencePrice;
 
     @ApiModelProperty("NFT价格差异")
     private String priceDifference;

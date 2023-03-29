@@ -16,17 +16,20 @@ import java.math.BigDecimal;
 @ApiModel(value = "NftOfferResp")
 public class NftActivityResp {
 
+    @ApiModelProperty(value = "id")
+    private Long id;
+
     @ApiModelProperty(value = "事件")
-    private String event;
+    private String activityType;
 
     @ApiModelProperty(value = "价格")
     private BigDecimal price;
 
-    @ApiModelProperty(value = "来自")
-    private String from;
+    @ApiModelProperty(value = "卖家")
+    private String fromAddress;
 
-    @ApiModelProperty(value = "去往")
-    private String to;
+    @ApiModelProperty(value = "买家")
+    private String toAddress;
 
     @ApiModelProperty(value = "距离多久")
     private String date;

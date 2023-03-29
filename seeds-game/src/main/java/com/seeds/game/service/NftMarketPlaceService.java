@@ -1,7 +1,6 @@
 package com.seeds.game.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.game.dto.request.NftBuySuccessReq;
-import com.seeds.common.dto.PageReq;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.*;
 
@@ -50,14 +49,14 @@ public interface NftMarketPlaceService {
      * @param req 分页入参
      * @return nft拍卖出价信息
      */
-    NftOfferResp offerPage(PageReq req);
+    NftOfferResp offerPage(NftOfferPageReq req);
 
     /**
      * 获取nft活动信息
      * @param req 分页入参
      * @return nft活动信息
      */
-    NftActivityResp activityPage(PageReq req);
+    IPage<NftActivityResp> activityPage(NftActivityPageReq req);
 
     /**
      * 接受nft出价

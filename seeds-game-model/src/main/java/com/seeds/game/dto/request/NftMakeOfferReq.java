@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author hang.yu
@@ -15,6 +16,10 @@ public class NftMakeOfferReq {
     @ApiModelProperty("拍卖id")
     @NotBlank(message = "Auction Id cannot be empty")
     private String auctionId;
+
+    @ApiModelProperty("Nft id")
+    @NotNull(message = "Nft id cannot be empty")
+    private Long nftId;
 
     @ApiModelProperty("购买收据")
     @NotBlank(message = "Receipt cannot be empty")

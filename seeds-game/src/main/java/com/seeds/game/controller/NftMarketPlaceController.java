@@ -1,7 +1,6 @@
 package com.seeds.game.controller;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.*;
-import com.seeds.game.dto.response.*;
 import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.NftMarketPlaceService;
@@ -61,12 +60,6 @@ public class NftMarketPlaceController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("offer-page")
-    @ApiOperation("拍卖出价分页")
-    public GenericDto<NftOfferResp> offerPage(@Valid @RequestBody NftOfferPageReq req) {
-        return GenericDto.success(nftMarketPlaceService.offerPage(req));
-    }
-
     @PostMapping("accept-offer")
     @ApiOperation("接受拍卖出价")
     public GenericDto<Object> acceptOffer(@Valid @RequestBody NftAcceptOfferReq req) {
@@ -79,12 +72,6 @@ public class NftMarketPlaceController {
     public GenericDto<Object> cancelOffer(@Valid @RequestBody NftCancelOfferReq req) {
         nftMarketPlaceService.cancelOffer(req);
         return GenericDto.success(null);
-    }
-
-    @PostMapping("activity-page")
-    @ApiOperation("活动分页")
-    public GenericDto<NftActivityResp> activityPage(@Valid @RequestBody NftActivityPageReq req) {
-        return GenericDto.success(nftMarketPlaceService.activityPage(req));
     }
 
 }

@@ -18,10 +18,22 @@ public class SeedsApiConfig {
     @Value("${seeds.api.placeOrder:/api/chainOp/placeOrder}")
     private String placeOrderApi;
 
-    @Value("${redisson.max.englishOrder:/api/auction/english}")
+    @Value("${seeds.api.englishOrder:/api/auction/english}")
     private String englishOrderApi;
 
-    @Value("${redisson.max.cancelOrder:/api/chainOp/cancelOrder}")
+    @Value("${seeds.api.cancelOrder:/api/chainOp/cancelOrder}")
     private String cancelOrderApi;
+
+    @Value("${seeds.api.auctionBid:/api/auction/bid}")
+    private String auctionBid;
+
+    @Value("${seeds.api.buySuccess:/api/chainOp/buySuccess}")
+    private String buySuccess;
+
+    @Value("${seeds.api.endAuction:/api/auction/endAuction}")
+    private String endAuction;
+
+    @Value("${seeds.api.auctionCancel:/api/auction/cancel}")
+    private String auctionCancel;
 
 }

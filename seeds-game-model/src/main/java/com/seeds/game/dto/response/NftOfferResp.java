@@ -20,9 +20,6 @@ public class NftOfferResp {
     @ApiModelProperty(value = "最高出价")
     private BigDecimal highestOffer;
 
-    @ApiModelProperty("nft地址")
-    private String mintAddress;
-
     @ApiModelProperty(value = "拍卖出价列表")
     private IPage<NftOffer> nftOffers;
 
@@ -43,7 +40,7 @@ public class NftOfferResp {
         private String expiration;
 
         @ApiModelProperty("出价人")
-        private String from;
+        private String buyer;
 
         @ApiModelProperty("状态")
         private String status;

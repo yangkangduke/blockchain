@@ -1,6 +1,8 @@
 package com.seeds.game.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.game.dto.request.NftOfferPageReq;
+import com.seeds.game.dto.response.NftOfferResp;
 import com.seeds.game.entity.NftAuctionHouseBiding;
 
 /**
@@ -13,5 +15,11 @@ import com.seeds.game.entity.NftAuctionHouseBiding;
  */
 public interface INftAuctionHouseBidingService extends IService<NftAuctionHouseBiding> {
 
+    /**
+     * 分页获取NFT拍卖出价信息
+     * @param req 分页查询条件
+     * @return NFT拍卖出价信息
+     */
+    NftOfferResp queryPage(NftOfferPageReq req);
 
 }

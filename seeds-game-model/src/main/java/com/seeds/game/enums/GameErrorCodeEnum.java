@@ -17,6 +17,7 @@ public enum GameErrorCodeEnum {
     ERR_504_MISSING_ARGUMENTS(504, "缺少参数", "missing arguments"),
     ERR_505_MISSING_UCTOKEN(505, "缺少ucToken", "missing ucToken"),
     ERR_506_INVALID_UCTOKEN(506, "无效ucToken", "invalid ucToken"),
+    ERR_507_NO_PERMISSION(507, "没有权限", "No permission"),
     // nft
     ERR_10001_NFT_ITEM_NOT_EXIST(10001, "NFT物品不存在", "NFT item does not exist"),
     ERR_10002_NFT_ITEM_DOES_NOT_BELONG_TO_CURRENT_USER(10002, "NFT物品不属于当前用户", "NFT item does not belong to current user"),
@@ -25,9 +26,13 @@ public enum GameErrorCodeEnum {
     ERR_10005_NFT_ITEM_ALREADY_BELONGS_TO_THE_ROLE(10005, "NFT物品已经属于该角色", "NFT item already belongs to the role"),
     ERR_10006_NFT_PROCESSING(10006, "操作中...请稍后再试", "In operation... Please try again later"),
     ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE(10007, "NFT已经在售卖中", "NFT item is already on sale"),
-    ERR_10008_NFT_ITEM_IS_DEPOSIT(10008, "NFT托管中，请解除托管后再试", "NFT item is deposit, please unDeposit and try again"),
+    ERR_10008_NFT_ITEM_IS_DEPOSIT(10008, "NFT托管中", "NFT item is deposit"),
     ERR_10009_NFT_ITEM_HAS_NOT_BEEN_GENERATED(10009, "NFT还未生成", "NFT item has not been generated"),
     ERR_10010_NFT_ITEM_HAS_BEEN_REMOVAL(10010, "NFT已经下架", "NFT item has been removed from the shelves"),
+    ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST(10011, "该NFT拍卖不存在", "This NFT item auction not exist"),
+    ERR_10012_NFT_ITEM_AUCTION_HAS_ENDED(10012, "该NFT拍卖已经结束", "This NFT item auction has ended"),
+    ERR_10013_NFT_ITEM_ALREADY_HAS(10013, "已拥有该NFT", "Already have this NFT item"),
+    ERR_10013_NFT_ITEM_OFFER_NOT_BELONG_TO_CURRENT_USER(10014, "NFT出价不属于当前用户", "Already have this NFT item"),
     // role
     ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN(20001, "角色等级不满十级", "The role level is less than ten"),
     ERR_20002_ROLE_NOT_EXIST(20002, "角色不存在", "The role does not exist"),

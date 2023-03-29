@@ -1,6 +1,8 @@
 package com.seeds.game.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.game.dto.request.NftOfferPageReq;
+import com.seeds.game.dto.response.NftOfferResp;
 import com.seeds.game.entity.NftAuctionHouseBiding;
 import com.seeds.game.mapper.NftAuctionHouseBidingMapper;
 import com.seeds.game.service.INftAuctionHouseBidingService;
@@ -17,4 +19,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHouseBidingMapper, NftAuctionHouseBiding> implements INftAuctionHouseBidingService {
 
+    @Override
+    public NftOfferResp queryPage(NftOfferPageReq req) {
+
+        return null;
+    }
 }
