@@ -162,6 +162,13 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         NftEventEquipment equipment = eventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
         this.callGameNotify(event.getServerRoleId(), 2, "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId());
         // 更新本地数据库
+
+        List<NftEventEquipment> equipments = eventEquipmentService.list(new LambdaQueryWrapper<NftEventEquipment>().in(NftEventEquipment::getEventId, id));
+        equipments.stream().forEach(p -> {
+            p.setAutoId(p.getAutoId() * 10);
+        });
+        eventEquipmentService.updateBatchById(equipments);
+
         return this.updateById(nftEvent);
     }
 
