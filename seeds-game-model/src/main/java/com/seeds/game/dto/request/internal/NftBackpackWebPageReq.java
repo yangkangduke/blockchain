@@ -17,6 +17,9 @@ public class NftBackpackWebPageReq {
     @ApiModelProperty(value = "分类id")
     private Integer itemTypeId;
 
+    @ApiModelProperty(value = "serverRoleId")
+    private Long serverRoleId;
+
     @ApiModelProperty(value = "排序字段")
     private String sort;
 
