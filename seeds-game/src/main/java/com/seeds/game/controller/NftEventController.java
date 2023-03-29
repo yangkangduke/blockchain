@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Api(tags = "nft事件通知")
 @RestController
-@RequestMapping("/web/game/nft-event")
+@RequestMapping("/web/nft-event")
 public class NftEventController {
 
     @Autowired
