@@ -180,9 +180,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
 
         // todo 调用凤龙接口,如果是自动托管还需要调用托管的接口
+        Long eqNftId = 0L;
 
         //   插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setEqNftId(eqNftId);
         backpackEntity.setName(nftEvent.getName());
         backpackEntity.setUserId(nftEvent.getUserId());
         backpackEntity.setServerRoleId(nftEvent.getServerRoleId());

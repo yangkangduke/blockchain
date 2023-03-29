@@ -371,9 +371,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
-    public List<NftType> getNftTypeList() {
+    public List<NftType> getNftTypeList(Integer type) {
         Long userId = UserContext.getCurrentUserId();
-        return baseMapper.getNftTypeList(userId);
+        return baseMapper.getNftTypeList(userId,type);
     }
 
     @Override

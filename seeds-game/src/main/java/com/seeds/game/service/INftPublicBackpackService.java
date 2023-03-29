@@ -70,7 +70,7 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
      *
      * @return
      */
-    List<NftType> getNftTypeList();
+    List<NftType> getNftTypeList(Integer type);
 
     List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req);
 
