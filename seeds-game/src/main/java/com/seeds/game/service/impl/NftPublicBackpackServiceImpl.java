@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.internal.*;
 import com.seeds.game.dto.response.*;
@@ -364,17 +365,28 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Override
     public List<NftTypeNum> typeNum() {
-        return null;
+        Long userId = UserContext.getCurrentUserId();
+        return baseMapper.selectTypeNum(userId);
+
     }
 
     @Override
     public List<NftType> getNftTypeList() {
-        return null;
+        Long userId = UserContext.getCurrentUserId();
+        return baseMapper.getNftTypeList(userId);
     }
 
     @Override
     public List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req) {
-        return null;
+        List<NftPublicBackpackWebResp> list = baseMapper.getPageForWeb(req);
+        list = list.stream().map(p -> {
+            NftPublicBackpackWebResp resp = new NftPublicBackpackWebResp();
+            BeanUtils.copyProperties(p, resp);
+            ServerRegionEntity serverRegionEntity = this.getServerRegionEntity(p.getServerRoleId());
+            resp.setServerName(serverRegionEntity.getGameServerName());
+            return resp;
+        }).collect(Collectors.toList());
+        return list;
     }
 
 

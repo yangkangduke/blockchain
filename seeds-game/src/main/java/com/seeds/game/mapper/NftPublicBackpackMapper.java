@@ -1,7 +1,13 @@
 package com.seeds.game.mapper;
 
+import com.seeds.game.dto.request.internal.NftBackpackWebPageReq;
+import com.seeds.game.dto.response.NftPublicBackpackWebResp;
+import com.seeds.game.dto.response.NftType;
+import com.seeds.game.dto.response.NftTypeNum;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +19,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface NftPublicBackpackMapper extends BaseMapper<NftPublicBackpackEntity> {
 
+    List<NftTypeNum> selectTypeNum(Long userId);
+
+    List<NftType> getNftTypeList(Long userId);
+
+    List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req);
 }

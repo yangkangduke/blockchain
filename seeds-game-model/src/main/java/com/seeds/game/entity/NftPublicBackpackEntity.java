@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -101,4 +102,14 @@ public class NftPublicBackpackEntity implements Serializable {
 
     @ApiModelProperty("nft元数据，存json")
     private String metadata;
+
+    @ApiModelProperty("nft价格")
+    private BigDecimal price;
+
+    @ApiModelProperty("nft等级")
+    private Integer grade;
+
+    private String tokenName;
+
+    private String tokenAddress;
 }
