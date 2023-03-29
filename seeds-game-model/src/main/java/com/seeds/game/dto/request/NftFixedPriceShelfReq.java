@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author hang.yu
@@ -12,9 +13,9 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class NftFixedPriceShelfReq {
 
-    @ApiModelProperty("nft地址")
-    @NotBlank(message = "Mint Address cannot be empty")
-    private String mintAddress;
+    @ApiModelProperty("Nft id")
+    @NotNull(message = "Nft id cannot be empty")
+    private Long nftId;
 
     @ApiModelProperty("购买收据")
     @NotBlank(message = "Receipt cannot be empty")

@@ -69,7 +69,7 @@ public class NftEquipment implements Serializable {
     @ApiModelProperty("是否托管状态  0：未托管  1:已托管")
     private Integer isDeposit;
 
-    @ApiModelProperty("cancel_time")
+    @ApiModelProperty("取消时间")
     private Long cancelTime;
 
 }

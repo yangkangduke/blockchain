@@ -21,4 +21,7 @@ public class SeedsApiConfig {
     @Value("${redisson.max.englishOrder:/api/auction/english}")
     private String englishOrderApi;
 
+    @Value("${redisson.max.cancelOrder:/api/chainOp/cancelOrder}")
+    private String cancelOrderApi;
+
 }

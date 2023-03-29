@@ -30,9 +30,9 @@ public class NftBritishAuctionShelfReq {
     @NotNull(message = "Duration cannot be empty")
     private Integer duration;
 
-    @ApiModelProperty("nft地址")
-    @NotBlank(message = "Mint Address cannot be empty")
-    private String mintAddress;
+    @ApiModelProperty("Nft id")
+    @NotNull(message = "Nft id cannot be empty")
+    private Long nftId;
 
     @ApiModelProperty("随机码")
     @NotBlank(message = "Nonce Address cannot be empty")

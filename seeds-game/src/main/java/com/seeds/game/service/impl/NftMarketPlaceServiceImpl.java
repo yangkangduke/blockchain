@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
@@ -68,11 +67,16 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     @Override
     public void fixedPriceShelf(NftFixedPriceShelfReq req) {
         // 上架前的校验
-        preShelfValidation(req.getMintAddress());
+        NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
+        shelfValidation(nftEquipment);
+        // 不能重复上架
+        if (WhetherEnum.YES.value() == nftEquipment.getOnSale()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
+        }
         // 调用/api/chainOp/placeOrder通知，链上上架成功
         String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getPlaceOrderApi() + "?" + params;
-        log.info("一口价上架成功，开始通知， url:{}， params:{}", url, params);
+        log.info("NFT一口价上架成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpRequest.get(url)
                     .timeout(5 * 1000)
@@ -86,14 +90,19 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     @Override
     public void britishAuctionShelf(NftBritishAuctionShelfReq req) {
         // 上架前的校验
-        String publicAddress = preShelfValidation(req.getMintAddress());
+        NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
+        String publicAddress = shelfValidation(nftEquipment);
+        // 不能重复上架
+        if (WhetherEnum.YES.value() == nftEquipment.getOnSale()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
+        }
         // 调用/api/auction/english通知，链上英式拍卖上架成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getEnglishOrderApi();
         EnglishAuctionReqDto dto  = new EnglishAuctionReqDto();
         BeanUtils.copyProperties(req, dto);
         dto.setOwnerAddress(publicAddress);
         String param = JSONUtil.toJsonStr(dto);
-        log.info("英式拍卖上架成功，开始通知， url:{}， params:{}", url, param);
+        log.info("NFT英式拍卖上架成功，开始通知， url:{}， params:{}", url, param);
         try {
             HttpRequest.post(url)
                     .timeout(5 * 1000)
@@ -107,11 +116,30 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public void shelved(NftShelvedReq req) {
-
+        // 下架前的校验
+        NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
+        shelfValidation(nftEquipment);
+        // 不能重复下架
+        if (WhetherEnum.NO.value() == nftEquipment.getOnSale()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10010_NFT_ITEM_HAS_BEEN_REMOVAL);
+        }
+        // 调用/api/chainOp/cancelOrder通知，下架成功
+        String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCancelOrderApi() + "?" + params;
+        log.info("NFT下架成功，开始通知， url:{}， params:{}", url, params);
+        try {
+            HttpRequest.get(url)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .execute();
+        } catch (Exception e) {
+            log.error("NFT下架成功通知失败，message：{}", e.getMessage());
+        }
     }
 
     @Override
     public void makeOffer(NftMakeOfferReq req) {
+        // 拍卖结束不能出价
 
     }
 
@@ -174,22 +202,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     }
 
-    private String preShelfValidation(String mintAddress) {
-        NftEquipment nftEquipment = nftEquipmentService.queryByMintAddress(mintAddress);
+    private String shelfValidation(NftEquipment nftEquipment) {
         if (nftEquipment == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
-        }
-        // NFT装备还未生成
-        if (WhetherEnum.NO.value() == nftEquipment.getNftGenerated()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10009_NFT_ITEM_HAS_NOT_BEEN_GENERATED);
-        }
-        // 不能重复上架
-        if (WhetherEnum.YES.value() == nftEquipment.getOnSale()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
-        }
-        // 已托管不能上架
-        if (WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
         }
         // 归属人才能上架
         Long currentUserId = UserContext.getCurrentUserId();
@@ -202,6 +217,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         if (!nftEquipment.getOwner().equals(publicAddress)) {
             throw new GenericException(GameErrorCodeEnum.ERR_10002_NFT_ITEM_DOES_NOT_BELONG_TO_CURRENT_USER);
+        }
+        // NFT装备还未生成
+        if (WhetherEnum.NO.value() == nftEquipment.getNftGenerated()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10009_NFT_ITEM_HAS_NOT_BEEN_GENERATED);
+        }
+        // 已托管不能上架
+        if (WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
         }
         return publicAddress;
     }
