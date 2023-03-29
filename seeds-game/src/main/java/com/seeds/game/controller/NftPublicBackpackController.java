@@ -51,9 +51,9 @@ public class NftPublicBackpackController {
     }
 
     @GetMapping("type-list")
-    @ApiOperation("获取分类列表")
-    public GenericDto<List<NftType>> getNftTypeList() {
-        return GenericDto.success(nftPublicBackpackService.getNftTypeList());
+    @ApiOperation("获取分类列表, type：1装备 2道具 3英雄 ")
+    public GenericDto<List<NftType>> getNftTypeList(Integer type) {
+        return GenericDto.success(nftPublicBackpackService.getNftTypeList(type));
     }
 
     @PostMapping("page")

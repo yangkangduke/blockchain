@@ -19,6 +19,7 @@
         from (select item_type_id, min(grade) grade
               from ga_nft_public_backpack
               where user_id = #{userId}
+                and `type` = #{type}
               group by item_type_id) t1
                  left join ga_nft_public_backpack t2
                            on t1.item_type_id = t2.item_type_id
