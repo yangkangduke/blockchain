@@ -19,8 +19,11 @@ public class NftMarketPlaceEquipPageReq extends PageReq {
     @ApiModelProperty("token id")
     private String tokenId;
 
-    @ApiModelProperty("NFT交易模式：0：Buy Now  1：On Auction")
-    private Integer model;
+    @ApiModelProperty("类型：1装备 2道具 3英雄")
+    private Integer type;
+
+    @ApiModelProperty("交易模式：1，Buy Now   2，On Auction")
+    private Integer status;
 
     @ApiModelProperty("NFT等级")
     private Integer grade;
@@ -30,9 +33,6 @@ public class NftMarketPlaceEquipPageReq extends PageReq {
 
     @ApiModelProperty("稀有度：1，Common 2，Rare 3，Epic")
     private Integer rarity;
-
-    @ApiModelProperty("NFT类型：1，皮肤  2，装备")
-    private Integer type;
 
     @ApiModelProperty("最小价格")
     private BigDecimal MinPrice;

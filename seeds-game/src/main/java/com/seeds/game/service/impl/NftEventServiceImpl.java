@@ -228,7 +228,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
         //  插入属性表
         NftAttributeEntity attributeEntity = new NftAttributeEntity();
-        attributeEntity.setTokenAddress(tokenAddress);
+        attributeEntity.setMintAddress(tokenAddress);
         attributeEntity.setGrade(equipment.getLvl());
         attributeEntity.setDurability(durability);
         attributeService.save(attributeEntity);

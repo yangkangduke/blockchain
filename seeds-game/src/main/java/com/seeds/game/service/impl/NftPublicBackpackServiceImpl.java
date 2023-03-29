@@ -31,9 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -326,6 +324,16 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
+    public NftPublicBackpackEntity detailForMintAddress(String mintAddress) {
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        NftPublicBackpackEntity entity = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenId, mintAddress));
+        if (null != entity) {
+            BeanUtils.copyProperties(entity, backpackEntity);
+        }
+        return backpackEntity;
+    }
+
+    @Override
     public NftPublicBackpackEntity detailForTokenId(String tokenId) {
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
         NftPublicBackpackEntity entity = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenId, tokenId));
@@ -368,6 +376,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     public List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req) {
         return null;
     }
+
+
 
     private void callGameDistribute(NftPublicBackpackEntity nftItem, Long serverRoleId) {
 

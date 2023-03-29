@@ -8,8 +8,8 @@ import lombok.Getter;
 @Getter
 public enum NftTypeEnum {
 
-    skin(1,"皮肤"),
-    equip(2,"装备");
+    skin(1,"装备"),
+    equip(2,"皮肤");
 
 
     private int code;
