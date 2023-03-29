@@ -91,4 +91,10 @@ public class NftAttributeEntity extends BaseEntity {
     @ApiModelProperty("被NPC击杀数")
     private Integer goblin;
 
+    @ApiModelProperty("稀有属性值")
+    private String rarityAttrValue;
+
+    @ApiModelProperty("基础属性值")
+    private String baseAttrValue;
+
 }

@@ -17,9 +17,6 @@ public class NftPublicBackpackWebResp implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("id")
-    private Long id;
-
     @ApiModelProperty("图片")
     private String image;
 
@@ -47,8 +44,12 @@ public class NftPublicBackpackWebResp implements Serializable {
     @ApiModelProperty("稀有属性")
     private String rarity_attr;
 
-    @ApiModelProperty("耐久")
+    @ApiModelProperty("区服名字")
     private String serverName;
 
+    @ApiModelProperty("角色id")
+    private Long serverRoleId;
 
+    @ApiModelProperty("nft物品")
+    private Long autoId;
 }

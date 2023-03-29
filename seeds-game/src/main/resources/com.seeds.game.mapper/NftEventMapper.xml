@@ -12,11 +12,11 @@
     <select id="getTypeCount" resultType="com.seeds.game.dto.response.EventTypeNum">
 
         select distinct t1.type, ifnull(t2.num, 0) num
-        from (select `type` from ga_nft_event) t1
+        from ga_nft_event t1
                  left join
              (select `type` as type, count(*) num
               from ga_nft_event
-              where user_id = 36
+              where user_id = #{userId}
                 and click = 0
               group by type) t2 on t1.type = t2.type
     </select>

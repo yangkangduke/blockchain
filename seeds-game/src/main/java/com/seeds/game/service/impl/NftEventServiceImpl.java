@@ -204,6 +204,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         backpackEntity.setItemTypeId(equipment.getItemId());
         backpackEntity.setAutoId(equipment.getAutoId());
         backpackEntity.setItemId(equipment.getConfigId());
+        backpackEntity.setGrade(equipment.getLvl());
         HashMap<String, Object> attr = new HashMap<>();
 
         attr.put("level", equipment.getLvl());
@@ -231,6 +232,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         attributeEntity.setTokenAddress(tokenAddress);
         attributeEntity.setGrade(equipment.getLvl());
         attributeEntity.setDurability(durability);
+        attributeEntity.setBaseAttrValue(equipment.getBaseAttrValue());
+        attributeEntity.setRarityAttrValue(equipment.getRarityAttrValue());
         attributeService.save(attributeEntity);
 
 

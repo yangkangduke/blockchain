@@ -13,4 +13,7 @@ public class NftType {
 
     @ApiModelProperty("image")
     private String image;
+
+    @ApiModelProperty("itemTypeId")
+    private Long itemTypeId;
 }
