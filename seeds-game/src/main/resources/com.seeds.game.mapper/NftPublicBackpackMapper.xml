@@ -61,7 +61,7 @@
             order by t2.durability ${sortType}
         </if>
         <if test="sort != null and sort =='rarity'">
-            order by t1.rarity ${sortType}
+            order by t2.rarity ${sortType}
         </if>
 
     </select>
