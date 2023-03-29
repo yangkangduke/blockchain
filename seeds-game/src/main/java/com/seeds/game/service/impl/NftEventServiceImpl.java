@@ -162,6 +162,13 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         NftEventEquipment equipment = eventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
         this.callGameNotify(event.getServerRoleId(), 2, "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId());
         // 更新本地数据库
+
+        List<NftEventEquipment> equipments = eventEquipmentService.list(new LambdaQueryWrapper<NftEventEquipment>().in(NftEventEquipment::getEventId, id));
+        equipments.stream().forEach(p -> {
+            p.setAutoId(p.getAutoId() * 10);
+        });
+        eventEquipmentService.updateBatchById(equipments);
+
         return this.updateById(nftEvent);
     }
 
@@ -187,17 +194,19 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         backpackEntity.setEqNftId(eqNftId);
         backpackEntity.setName(nftEvent.getName());
         backpackEntity.setUserId(nftEvent.getUserId());
-        backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
         backpackEntity.setTokenId(tokenAddress);
         backpackEntity.setCreatedBy(nftEvent.getUserId());
         backpackEntity.setUpdatedBy(nftEvent.getUserId());
         backpackEntity.setCreatedAt(System.currentTimeMillis());
         backpackEntity.setUpdatedAt(System.currentTimeMillis());
-        backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
+
         if (autoDeposite.equals(1)) {
+            backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
+            backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
             backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
         } else {
-            backpackEntity.setState(NFTEnumConstant.NFTStateEnum.MINTED.getCode());
+            backpackEntity.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+            backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
         }
         //backpackEntity.setDesc();
         backpackEntity.setImage(equipment.getImageUrl());
