@@ -33,4 +33,10 @@ public class ServerRegionController {
         return GenericDto.success(serverRegionService.queryList());
     }
 
+    @PostMapping("self")
+    @ApiOperation("获取当前用户拥有角色的游戏区服")
+    public GenericDto<List<ServerRegionResp>> queryListForSelf() {
+        return GenericDto.success(serverRegionService.queryListForSelf());
+    }
+
 }
