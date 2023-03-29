@@ -29,14 +29,11 @@ public enum GameErrorCodeEnum {
     ERR_10008_NFT_ITEM_IS_DEPOSIT(10008, "NFT托管中", "NFT item is deposit"),
     ERR_10009_NFT_ITEM_HAS_NOT_BEEN_GENERATED(10009, "NFT还未生成", "NFT item has not been generated"),
     ERR_10010_NFT_ITEM_HAS_BEEN_REMOVAL(10010, "NFT已经下架", "NFT item has been removed from the shelves"),
-<<<<<<< HEAD
     ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST(10011, "该NFT拍卖不存在", "This NFT item auction not exist"),
     ERR_10012_NFT_ITEM_AUCTION_HAS_ENDED(10012, "该NFT拍卖已经结束", "This NFT item auction has ended"),
     ERR_10013_NFT_ITEM_ALREADY_HAS(10013, "已拥有该NFT", "Already have this NFT item"),
     ERR_10013_NFT_ITEM_OFFER_NOT_BELONG_TO_CURRENT_USER(10014, "NFT出价不属于当前用户", "Already have this NFT item"),
-=======
     ERR_10011_NFT_ITEM_HAS_NOT_BEEN_DEPOSITED(10011, "NFT物品未托管，请托管后再试", "NFT items are not deposited, please try again after deposit"),
->>>>>>> 2b5f46853e5ccd3eff755231e0f7d8fbfd6abd8e
     // role
     ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN(20001, "角色等级不满十级", "The role level is less than ten"),
     ERR_20002_ROLE_NOT_EXIST(20002, "角色不存在", "The role does not exist"),
