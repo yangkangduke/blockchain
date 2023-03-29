@@ -45,5 +45,15 @@
         <if test="sort != null and sort =='price'">
             order by t1.price ${sortType}
         </if>
+        <if test="sort != null and sort =='grade'">
+            order by t1.grade ${sortType}
+        </if>
+        <if test="sort != null and sort =='durability'">
+            order by t2.durability ${sortType}
+        </if>
+        <if test="sort != null and sort =='rarity'">
+            order by t1.rarity ${sortType}
+        </if>
+
     </select>
 </mapper>
