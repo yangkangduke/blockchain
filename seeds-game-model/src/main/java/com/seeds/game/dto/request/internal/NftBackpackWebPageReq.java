@@ -14,6 +14,10 @@ import lombok.Data;
 public class NftBackpackWebPageReq {
     private Long userId;
 
+
+    @ApiModelProperty(value = "type  1装备 2道具 3英雄")
+    private Integer type;
+
     @ApiModelProperty(value = "分类id")
     private Integer itemTypeId;
 
