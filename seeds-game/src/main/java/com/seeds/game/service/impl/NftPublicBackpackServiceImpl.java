@@ -32,7 +32,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -74,6 +76,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         LambdaQueryWrapper<NftPublicBackpackEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(!Objects.isNull(req.getIsConfiguration()), NftPublicBackpackEntity::getIsConfiguration, req.getIsConfiguration())
                 .like(!Objects.isNull(req.getName()), NftPublicBackpackEntity::getName, req.getName())
+                .ne(NftPublicBackpackEntity::getState, NFTEnumConstant.NFTStateEnum.LOCK.getCode())
                 .eq(NftPublicBackpackEntity::getUserId, req.getUserId());
 
         Page<NftPublicBackpackEntity> page = new Page<>(req.getCurrent(), req.getSize());
@@ -125,6 +128,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         if (Objects.isNull(nftItem)) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        }
+
+        // 校验当前NFT物品是否 托管
+        if (nftItem.getIsConfiguration().equals(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode())) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_HAS_NOT_BEEN_DEPOSITED);
         }
 
         // 1.校验当前NFT物品是否属于当前用户

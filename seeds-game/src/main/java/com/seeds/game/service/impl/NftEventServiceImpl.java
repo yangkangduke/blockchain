@@ -187,17 +187,19 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         backpackEntity.setEqNftId(eqNftId);
         backpackEntity.setName(nftEvent.getName());
         backpackEntity.setUserId(nftEvent.getUserId());
-        backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
         backpackEntity.setTokenId(tokenAddress);
         backpackEntity.setCreatedBy(nftEvent.getUserId());
         backpackEntity.setUpdatedBy(nftEvent.getUserId());
         backpackEntity.setCreatedAt(System.currentTimeMillis());
         backpackEntity.setUpdatedAt(System.currentTimeMillis());
-        backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
+
         if (autoDeposite.equals(1)) {
+            backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
+            backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
             backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
         } else {
-            backpackEntity.setState(NFTEnumConstant.NFTStateEnum.MINTED.getCode());
+            backpackEntity.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+            backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
         }
         //backpackEntity.setDesc();
         backpackEntity.setImage(equipment.getImageUrl());

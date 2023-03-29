@@ -29,7 +29,9 @@
     <select id="getPageForWeb" resultType="com.seeds.game.dto.response.NftPublicBackpackWebResp"
             parameterType="com.seeds.game.dto.request.internal.NftBackpackWebPageReq">
 
-        select t1.grade,
+        select
+        t1.name,
+        t1.grade,
         t1.image,
         t1.token_id,
         t1.price,
