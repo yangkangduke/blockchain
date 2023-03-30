@@ -115,4 +115,5 @@ public class NftPublicBackpackEntity implements Serializable {
 
     @ApiModelProperty("关联z_equipment_nft表")
     private Long eqNftId;
+
 }

@@ -299,6 +299,22 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
     }
 
+    @Override
+    public void ownerValidation(String owner) {
+        // 归属人权限校验
+        Long currentUserId = UserContext.getCurrentUserId();
+        String publicAddress = null;
+        try {
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(currentUserId);
+            publicAddress = result.getData();
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
+        if (!owner.equals(publicAddress)) {
+            throw new GenericException(GameErrorCodeEnum.ERR_507_NO_PERMISSION);
+        }
+    }
+
     private void shelfValidation(NftEquipment nftEquipment) {
         if (nftEquipment == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
@@ -342,21 +358,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             throw new GenericException(GameErrorCodeEnum.ERR_10013_NFT_ITEM_ALREADY_HAS);
         }
 
-    }
-
-    private void ownerValidation(String owner) {
-        // 归属人权限校验
-        Long currentUserId = UserContext.getCurrentUserId();
-        String publicAddress = null;
-        try {
-            GenericDto<String> result = userCenterFeignClient.getPublicAddress(currentUserId);
-            publicAddress = result.getData();
-        } catch (Exception e) {
-            log.error("内部请求uc获取用户公共地址失败");
-        }
-        if (!owner.equals(publicAddress)) {
-            throw new GenericException(GameErrorCodeEnum.ERR_507_NO_PERMISSION);
-        }
     }
 
 }

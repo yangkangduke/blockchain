@@ -46,6 +46,13 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     void ownerTransfer(OpenNftOwnershipTransferReq req);
 
     /**
+     * 通过NFT id查询NFT
+     * @param eqNftId NFT id
+     * @return  NFT
+     */
+    NftPublicBackpackEntity queryByEqNftId(Long eqNftId);
+
+    /**
      * nft托管
      * @param req 验证
      */

@@ -9,17 +9,22 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.game.config.SeedsApiConfig;
 import com.seeds.game.dto.request.*;
+import com.seeds.game.dto.request.external.DepositSuccessMessageDto;
+import com.seeds.game.dto.request.external.TransferNftMessageDto;
 import com.seeds.game.dto.request.internal.*;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
+import com.seeds.game.enums.NftOrderStatusEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftPublicBackpackMapper;
 import com.seeds.game.mq.producer.KafkaProducer;
@@ -68,7 +73,19 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     private INftEventService nftEventService;
 
     @Autowired
+    private INftEquipmentService nftEquipmentService;
+
+    @Autowired
     private INftEventEquipmentService nftEventEquipmentService;
+
+    @Autowired
+    private NftMarketPlaceService nftMarketPlaceService;
+
+    @Autowired
+    private INftMarketOrderService nftMarketOrderService;
+
+    @Autowired
+    private SeedsApiConfig seedsApiConfig;
 
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
@@ -132,7 +149,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         // 校验当前NFT物品是否 托管
         if (nftItem.getIsConfiguration().equals(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode())) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_HAS_NOT_BEEN_DEPOSITED);
+            throw new GenericException(GameErrorCodeEnum.ERR_10015_NFT_ITEM_HAS_NOT_BEEN_DEPOSITED);
         }
 
         // 1.校验当前NFT物品是否属于当前用户
@@ -362,13 +379,82 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
-    public void deposited(NftDepositedReq req) {
+    public NftPublicBackpackEntity queryByEqNftId(Long eqNftId) {
+        return getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, eqNftId));
+    }
 
+    @Override
+    public void deposited(NftDepositedReq req) {
+        NftEquipment nft = nftEquipmentService.getById(req.getNftId());
+        if (nft == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        }
+        // NFT已经处于托管中
+        if (WhetherEnum.YES.value() == nft.getIsDeposit()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
+        }
+        // NFT上架中不能托管
+        if (WhetherEnum.YES.value() == nft.getOnSale()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
+        }
+        // NFT结算中不能托管
+        NftMarketOrderEntity nftMarketOrderEntity = nftMarketOrderService.queryByMintAddressAndStatus(nft.getMintAddress(), NftOrderStatusEnum.PENDING.getCode());
+        if (nftMarketOrderEntity != null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10017_NFT_ITEM_IN_SETTLEMENT);
+        }
+        // NFT非归属人不能托管
+        nftMarketPlaceService.ownerValidation(nft.getOwner());
+        // 调用/api/equipment/depositNft通知，托管NFT成功
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getDepositNft();
+        DepositSuccessMessageDto dto  = new DepositSuccessMessageDto();
+        BeanUtils.copyProperties(req, dto);
+        dto.setMintAddress(nft.getMintAddress());
+        String param = JSONUtil.toJsonStr(dto);
+        log.info("NFT托管成功，开始通知， url:{}， params:{}", url, param);
+        try {
+            HttpRequest.post(url)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+        } catch (Exception e) {
+            log.error("NFT托管成功通知失败，message：{}", e.getMessage());
+        }
     }
 
     @Override
     public void unDeposited(NftUnDepositedReq req) {
-
+        // NFT锁定中不能取回
+        NftPublicBackpackEntity backpackNft = queryByEqNftId(req.getNftId());
+        if (backpackNft == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        }
+        NftEquipment nft = nftEquipmentService.getById(req.getNftId());
+        if (nft == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        }
+        // NFT已经取回
+        if (WhetherEnum.NO.value() == nft.getIsDeposit()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10016_NFT_ITEM_HAS_BEEN_RETRIEVED);
+        }
+        // NFT非归属人不能取回
+        nftMarketPlaceService.ownerValidation(nft.getOwner());
+        // 调用/api/equipment/withdrawNft通知，取回NFT成功
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getWithdrawNft();
+        TransferNftMessageDto dto  = new TransferNftMessageDto();
+        BeanUtils.copyProperties(req, dto);
+        dto.setMintAddress(nft.getMintAddress());
+        String param = JSONUtil.toJsonStr(dto);
+        log.info("NFT取回成功，开始通知， url:{}， params:{}", url, param);
+        try {
+            HttpRequest.post(url)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+        } catch (Exception e) {
+            log.error("NFT取回成功通知失败，message：{}", e.getMessage());
+        }
     }
 
     @Override
@@ -537,4 +623,5 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         return serverRegion;
     }
+
 }

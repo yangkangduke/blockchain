@@ -90,4 +90,11 @@ public interface NftMarketPlaceService {
      * @return NFT浏览量
      */
     NftMarketPlaceDetailViewResp view(NftMarketPlaceDetailViewReq req);
+
+    /**
+     * 归属人校验
+     * @param owner 归属人地址
+     */
+    void ownerValidation(String owner);
+
 }

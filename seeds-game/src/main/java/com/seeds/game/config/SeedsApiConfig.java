@@ -36,4 +36,10 @@ public class SeedsApiConfig {
     @Value("${seeds.api.auctionCancel:/api/auction/cancel}")
     private String auctionCancel;
 
+    @Value("${seeds.api.withdrawNft:/api/equipment/withdrawNft}")
+    private String withdrawNft;
+
+    @Value("${seeds.api.depositNft:/api/equipment/depositNft}")
+    private String depositNft;
+
 }

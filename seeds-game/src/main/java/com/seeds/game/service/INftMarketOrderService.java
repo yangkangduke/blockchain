@@ -5,7 +5,11 @@ import com.seeds.game.entity.NftMarketOrderEntity;
 public interface INftMarketOrderService extends IService<NftMarketOrderEntity> {
 
     /**
-     * 通过mintAddress获取对象
+     * 通过nft地址查询挂单的NFT
+     * @param mintAddress nft地址
+     * @param status 订单状态
+     * @return 挂单的NFT
      */
-    NftMarketOrderEntity  detailForTokenAddress(String mintAddress);
+    NftMarketOrderEntity queryByMintAddressAndStatus(String mintAddress, Integer status);
+
 }
