@@ -95,12 +95,6 @@ public interface NftMarketPlaceService {
     NftMarketPlaceDetailViewResp view(NftMarketPlaceDetailViewReq req);
 
     /**
-     * 归属人校验
-     * @param owner 归属人地址
-     */
-    void ownerValidation(String owner);
-
-    /**
      * 获取nft 道具列表
      * @param propsQuery
      * @return 商场nft道具列表

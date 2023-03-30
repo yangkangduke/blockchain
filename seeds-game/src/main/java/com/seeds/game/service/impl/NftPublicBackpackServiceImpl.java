@@ -79,13 +79,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     private INftEventEquipmentService nftEventEquipmentService;
 
     @Autowired
-    private NftMarketPlaceService nftMarketPlaceService;
-
-    @Autowired
     private INftMarketOrderService nftMarketOrderService;
 
     @Autowired
     private SeedsApiConfig seedsApiConfig;
+
+    @Autowired
+    private UcUserService ucUserService;
 
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
@@ -403,7 +403,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             throw new GenericException(GameErrorCodeEnum.ERR_10017_NFT_ITEM_IN_SETTLEMENT);
         }
         // NFT非归属人不能托管
-        nftMarketPlaceService.ownerValidation(nft.getOwner());
+        ucUserService.ownerValidation(nft.getOwner());
         // 调用/api/equipment/depositNft通知，托管NFT成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getDepositNft();
         DepositSuccessMessageDto dto  = new DepositSuccessMessageDto();
@@ -438,7 +438,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             throw new GenericException(GameErrorCodeEnum.ERR_10016_NFT_ITEM_HAS_BEEN_RETRIEVED);
         }
         // NFT非归属人不能取回
-        nftMarketPlaceService.ownerValidation(nft.getOwner());
+        ucUserService.ownerValidation(nft.getOwner());
         // 调用/api/equipment/withdrawNft通知，取回NFT成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getWithdrawNft();
         TransferNftMessageDto dto  = new TransferNftMessageDto();

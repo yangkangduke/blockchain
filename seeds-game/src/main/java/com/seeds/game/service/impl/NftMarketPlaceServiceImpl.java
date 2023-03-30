@@ -81,6 +81,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     private SeedsApiConfig seedsApiConfig;
 
     @Autowired
+    private UcUserService ucUserService;
+
+    @Autowired
     private NftMarketOrderMapper nftMarketOrderMapper;
 
     @Override
@@ -392,7 +395,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
         }
         // 归属人验证
-        ownerValidation(nftEquipment.getOwner());
+        ucUserService.ownerValidation(nftEquipment.getOwner());
         // 已托管不能接受报价
         if (WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
@@ -424,7 +427,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (auctionBiding == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);}
         // offer归属人验证
-        ownerValidation(auctionBiding.getBuyer());
+        ucUserService.ownerValidation(auctionBiding.getBuyer());
         // 调用/api/auction/cancelBid通知，取消出价成功
         String params = String.format("bidingId=%s&receipt=%s&signature=%s", req.getBidingId(), req.getReceipt(), req.getSignature());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionCancel() + "?" + params;
@@ -439,28 +442,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
     }
 
-    @Override
-    public void ownerValidation(String owner) {
-        // 归属人权限校验
-        Long currentUserId = UserContext.getCurrentUserId();
-        String publicAddress = null;
-        try {
-            GenericDto<String> result = userCenterFeignClient.getPublicAddress(currentUserId);
-            publicAddress = result.getData();
-        } catch (Exception e) {
-            log.error("内部请求uc获取用户公共地址失败");
-        }
-        if (!owner.equals(publicAddress)) {
-            throw new GenericException(GameErrorCodeEnum.ERR_507_NO_PERMISSION);
-        }
-    }
-
     private void shelfValidation(NftEquipment nftEquipment) {
         if (nftEquipment == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
         }
         // 归属人才能上架
-        ownerValidation(nftEquipment.getOwner());
+        ucUserService.ownerValidation(nftEquipment.getOwner());
         // NFT装备还未生成
         if (WhetherEnum.NO.value() == nftEquipment.getNftGenerated()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10009_NFT_ITEM_HAS_NOT_BEEN_GENERATED);
