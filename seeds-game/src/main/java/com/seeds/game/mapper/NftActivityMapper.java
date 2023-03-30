@@ -2,6 +2,7 @@ package com.seeds.game.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.seeds.game.entity.NftActivity;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * <p>
@@ -11,6 +12,7 @@ import com.seeds.game.entity.NftActivity;
  * @author hang.yu
  * @since 2023-03-28
  */
+@Mapper
 public interface NftActivityMapper extends BaseMapper<NftActivity> {
 
 }

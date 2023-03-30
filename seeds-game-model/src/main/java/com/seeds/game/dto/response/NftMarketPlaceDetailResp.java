@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "MarketPlaceNftDetailResp")
 public class NftMarketPlaceDetailResp {
 
-    @ApiModelProperty("id")
+    @ApiModelProperty("商品id")
     private Long id;
 
     @ApiModelProperty("nft id")
@@ -64,7 +64,7 @@ public class NftMarketPlaceDetailResp {
     private String contractAddress;
 
     @ApiModelProperty("Token Id")
-    private String tokenId;
+    private Long tokenId;
 
     @ApiModelProperty("Token Standard")
     private String tokenStandard;
@@ -73,7 +73,7 @@ public class NftMarketPlaceDetailResp {
     private String chain;
 
     @ApiModelProperty("最后更改时间")
-    private String lastUpdated;
+    private Long lastUpdated;
 
     @ApiModelProperty("创造者收益")
     private String creatorEarnings;

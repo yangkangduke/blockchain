@@ -19,4 +19,6 @@ public class NftActivityPageReq extends PageReq {
     @NotNull(message = "Nft id cannot be empty")
     private Long nftId;
 
+    private String mintAddress;
+
 }

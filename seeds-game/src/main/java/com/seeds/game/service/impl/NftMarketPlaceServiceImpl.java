@@ -1,12 +1,16 @@
 package com.seeds.game.service.impl;
 import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.enums.CurrencyEnum;
+import com.seeds.common.utils.RelativeDateFormat;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.config.SeedsApiConfig;
 import com.seeds.game.dto.request.NftBuySuccessReq;
@@ -17,10 +21,8 @@ import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.external.EndAuctionMessageDto;
 import com.seeds.game.dto.request.external.EnglishAuctionReqDto;
 import com.seeds.game.dto.response.*;
-import com.seeds.game.entity.NftAuctionHouseBiding;
-import com.seeds.game.entity.NftAuctionHouseSetting;
-import com.seeds.game.entity.NftEquipment;
-import com.seeds.game.entity.NftPublicBackpackEntity;
+import com.seeds.game.entity.*;
+import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.INftMarketOrderService;
@@ -28,13 +30,16 @@ import com.seeds.game.service.INftPublicBackpackService;
 import com.seeds.game.enums.*;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.service.*;
+import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,15 +69,61 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     private INftEquipmentService nftEquipmentService;
 
     @Autowired
+    private INftActivityService nftActivityService;
+
+    @Autowired
+    private NftEquipmentMapper nftEquipmentMapper;
+
+    @Autowired
+    private GameCacheService gameCacheService;
+
+    @Autowired
     private SeedsApiConfig seedsApiConfig;
 
     @Autowired
     private NftMarketOrderMapper nftMarketOrderMapper;
 
-
     @Override
     public NftMarketPlaceDetailResp detail(Long id) {
-        return null;
+        NftMarketPlaceDetailResp resp = new NftMarketPlaceDetailResp();
+        // 查询marker order表
+        NftMarketOrderEntity order = nftMarketOrderService.getById(id);
+        if (order == null) {
+            return resp;
+        }
+        resp.setId(order.getId());
+        resp.setCurrentPrice(order.getPrice());
+        NftEquipment nftEquipment = nftEquipmentMapper.getByMintAddress(order.getMintAddress());
+        if (nftEquipment == null) {
+            return resp;
+        }
+        NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftEquipment.getId());
+        if (publicBackpack != null) {
+            BeanUtils.copyProperties(publicBackpack, resp);
+        }
+        resp.setNftId(nftEquipment.getId());
+        resp.setTokenId(nftEquipment.getTokenId());
+        resp.setName(nftEquipment.getName());
+        resp.setNumber("#" + nftEquipment.getTokenId());
+        resp.setLastUpdated(nftEquipment.getUpdateTime());
+        UcUserResp ucUserResp = null;
+        try {
+            GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
+            ucUserResp = result.getData();
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
+        if (ucUserResp != null) {
+            resp.setOwnerId(ucUserResp.getId());
+            resp.setOwnerName(ucUserResp.getNickname());
+        }
+        resp.setState(convertOrderState(nftEquipment.getIsDelete(), nftEquipment.getIsDeposit(), nftEquipment.getOnSale(), order.getStatus(), order.getOrderType()));
+        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.queryByListingId(order.getListingId());
+        if (auctionSetting != null) {
+            long time = System.currentTimeMillis() - (auctionSetting.getStart() + auctionSetting.getDuration() * 60 * 60 * 1000);
+            resp.setTimeLeft(RelativeDateFormat.formatTime(time));
+        }
+        return resp;
     }
 
     @Override
@@ -255,19 +306,79 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
+    public BigDecimal usdRate(String currency) {
+        BigDecimal rate = null;
+        if (CurrencyEnum.SOL.getCode().equals(currency)) {
+            // 先从Redis获取
+            String usdRate = gameCacheService.getUsdRate(currency);
+            if (StringUtils.isBlank(usdRate)) {
+                // 调用/market/token获取美元汇率
+                String url = seedsApiConfig.getSolToUsdApi() + seedsApiConfig.getSolTokenAddress();
+                log.info("获取美元汇率， url:{}， params:{}", url, currency);
+                try {
+                    HttpResponse response = HttpRequest.get(url)
+                            .timeout(5 * 1000)
+                            .header("Content-Type", "application/json")
+                            .header("token", seedsApiConfig.getSolToken())
+                            .execute();
+                    String body = response.body();
+                    SolToUsdRateResp resp = JSONUtil.toBean(body, SolToUsdRateResp.class);
+                    rate = resp.getPriceUsdt();
+                    gameCacheService.putUsdRate(currency, rate.toString());
+                } catch (Exception e) {
+                    log.error("获取美元汇率失败，message：{}", e.getMessage());
+                }
+            } else {
+                rate = new BigDecimal(usdRate);
+            }
+        }
+        return rate;
+    }
+
+    @Override
     public NftOfferResp offerPage(NftOfferPageReq req) {
         NftOfferResp resp = new NftOfferResp();
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
         if (nftEquipment == null) {
             return resp;
         }
-        req.setMintAddress(nftEquipment.getMintAddress());
-        return nftAuctionHouseBidingService.queryPage(req);
+        NftMarketOrderEntity marketOrder = nftMarketOrderService.getById(nftEquipment.getOrderId());
+        if (marketOrder == null || marketOrder.getListingId() == null) {
+            return resp;
+        }
+        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.queryByListingId(marketOrder.getListingId());
+        if (auctionSetting == null) {
+            return resp;
+        }
+        req.setAuctionId(auctionSetting.getId());
+        req.setPrice(marketOrder.getPrice());
+        req.setUsdRate(usdRate(CurrencyEnum.SOL.getCode()));
+        String publicAddress = null;
+        try {
+            Long currentUserId = UserContext.getCurrentUserId();
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(currentUserId);
+            publicAddress = result.getData();
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
+        req.setPublicAddress(publicAddress);
+        IPage<NftOfferResp.NftOffer> nftOfferPage = nftAuctionHouseBidingService.queryPage(req);
+        List<NftOfferResp.NftOffer> records = nftOfferPage.getRecords();
+        if (!CollectionUtils.isEmpty(records)) {
+            resp.setHighestOffer(records.get(0).getPrice());
+        }
+        resp.setNftOffers(nftOfferPage);
+        return resp;
     }
 
     @Override
     public IPage<NftActivityResp> activityPage(NftActivityPageReq req) {
-        return null;
+        NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
+        if (nftEquipment == null) {
+            return new Page<>(req.getCurrent(), req.getSize());
+        }
+        req.setMintAddress(nftEquipment.getMintAddress());
+        return nftActivityService.queryPage(req);
     }
 
     @Override
@@ -387,6 +498,32 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             throw new GenericException(GameErrorCodeEnum.ERR_10013_NFT_ITEM_ALREADY_HAS);
         }
 
+    }
+
+    private Integer convertOrderState(Integer isBurned, Integer isDeposit, Integer onSale, Integer orderStatus, Integer orderType) {
+        int state;
+        if (WhetherEnum.YES.value() == isBurned) {
+            return NftStateEnum.BURNED.getCode();
+        }
+        if (WhetherEnum.YES.value() == isDeposit) {
+            state = NftStateEnum.DEPOSITED.getCode();
+        } else {
+            if (WhetherEnum.YES.value() == onSale) {
+                if (NftOrderTypeEnum.BUY_NOW.getCode() == orderType) {
+                    state = NftStateEnum.ON_SHELF.getCode();
+                } else {
+                    state = NftStateEnum.ON_AUCTION.getCode();
+                }
+            } else {
+                // 下架但挂单中，结算中
+                if (NftOrderStatusEnum.PENDING.getCode() == orderStatus) {
+                    state = NftStateEnum.IN_SETTLEMENT.getCode();
+                } else {
+                    state = NftStateEnum.UNDEPOSITED.getCode();
+                }
+            }
+        }
+        return state;
     }
 
 }

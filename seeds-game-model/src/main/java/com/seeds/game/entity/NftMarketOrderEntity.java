@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import java.math.BigDecimal;
-import java.util.Date;
 
 @TableName("z_market_order")
 @ApiModel(value = "NftMarketOrder对象", description = "Marketplace列表")
@@ -13,6 +12,9 @@ public class NftMarketOrderEntity {
 
     @ApiModelProperty("id")
     private Long id;
+
+    @ApiModelProperty("拍卖id")
+    private Long listingId;
 
     @ApiModelProperty("售卖人id")
     private Long sellerId;
@@ -41,6 +43,9 @@ public class NftMarketOrderEntity {
     @ApiModelProperty("状态：1，挂单中， 2，已成交  3，已取消")
     private Integer status;
 
+    @ApiModelProperty("状态：1，buy now， 2，on auction")
+    private Integer orderType;
+
     @ApiModelProperty("挂单收据")
     private String listReceipt;
 
@@ -64,4 +69,5 @@ public class NftMarketOrderEntity {
 
     @ApiModelProperty("cancel_time")
     private Long cancelTime;
+
 }

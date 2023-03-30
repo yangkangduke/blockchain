@@ -64,4 +64,13 @@ public interface UserCenterFeignClient {
     @GetMapping("/uc-internal/user/get-public-address")
     GenericDto<String> getPublicAddress(@RequestParam Long id);
 
+    /**
+     * 根据用户钱包地址获取用户信息
+     *
+     * @param publicAddress 钱包地址
+     * @return 用户信息
+     */
+    @GetMapping("/uc-internal/user/get-by-public-address")
+    GenericDto<UcUserResp> getByPublicAddress(@RequestParam String publicAddress);
+
 }

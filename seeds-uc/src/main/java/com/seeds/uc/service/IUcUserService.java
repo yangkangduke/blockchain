@@ -235,5 +235,13 @@ public interface IUcUserService extends IService<UcUser> {
      */
     String getPublicAddress(Long id);
 
+    /**
+     * 根据用户钱包地址获取用户信息
+     *
+     * @param publicAddress 钱包地址
+     * @return 用户信息
+     */
+    UcUserResp getByPublicAddress(String publicAddress);
+
 }
 

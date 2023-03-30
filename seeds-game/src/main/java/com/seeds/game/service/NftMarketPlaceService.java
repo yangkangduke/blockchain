@@ -4,6 +4,7 @@ import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -105,5 +106,12 @@ public interface NftMarketPlaceService {
      * @return 商场nft道具列表
      */
     List<NftMarketPlacePropsResp> propsQueryPage(NftMarketPlacePropsPageReq propsQuery);
+
+    /**
+     * 获取美元汇率
+     * @param currency 币种
+     * @return 美元汇率
+     */
+    BigDecimal usdRate(String currency);
 
 }

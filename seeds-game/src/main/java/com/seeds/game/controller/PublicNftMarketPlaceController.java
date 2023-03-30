@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -72,5 +73,11 @@ public class PublicNftMarketPlaceController {
     @ApiOperation("浏览量")
     public GenericDto<NftMarketPlaceDetailViewResp>view(@RequestBody NftMarketPlaceDetailViewReq req){
         return GenericDto.success(nftMarketPlaceService.view(req));
+    }
+
+    @GetMapping("usd-rate/{currency}")
+    @ApiOperation("获取美元汇率")
+    public GenericDto<BigDecimal> usdRate(@PathVariable String currency) {
+        return GenericDto.success(nftMarketPlaceService.usdRate(currency));
     }
 }

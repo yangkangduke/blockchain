@@ -2,4 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seeds.game.mapper.NftEquipmentMapper">
 
+    <resultMap id="BaseResultMap" type="com.seeds.admin.entity.SysNftTypeEntity">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="token_id" jdbcType="BIGINT" property="token_id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="mint_address" jdbcType="VARCHAR" property="mint_address"/>
+        <result column="owner" jdbcType="VARCHAR" property="owner"/>
+        <result column="nft_generated" jdbcType="TINYINT" property="nft_generated"/>
+        <result column="mint_time" jdbcType="BIGINT" property="mint_time"/>
+        <result column="mint_trx" jdbcType="VARCHAR" property="mint_trx"/>
+        <result column="update_time" jdbcType="BIGINT" property="update_time"/>
+        <result column="on_sale" jdbcType="TINYINT" property="on_sale"/>
+        <result column="order_id" jdbcType="VARCHAR" property="order_id"/>
+        <result column="is_delete" jdbcType="TINYINT" property="is_delete"/>
+        <result column="delete_time" jdbcType="BIGINT" property="delete_time"/>
+        <result column="is_deposit" jdbcType="TINYINT" property="is_deposit"/>
+        <result column="cancel_time" jdbcType="BIGINT" property="cancel_time"/>
+    </resultMap>
+
+    <sql id="mainColumns">
+        id, token_id, name, mint_address, owner, nft_generated, mint_time, mint_trx, update_time, on_sale, order_id, is_delete, delete_time, is_deposit, cancel_time
+    </sql>
+
+    <select id="getByMintAddress" resultMap="BaseResultMap">
+        select
+        <include refid="mainColumns"/>
+        from z_equipment_nft
+        where 1 = 1
+        <if test="mint_address != null and mint_address != ''">
+            and mint_address = #{mintAddress}
+        </if>
+    </select>
+
 </mapper>

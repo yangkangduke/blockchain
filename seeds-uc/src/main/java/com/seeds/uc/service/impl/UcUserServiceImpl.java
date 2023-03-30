@@ -494,6 +494,18 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return user.getPublicAddress();
     }
 
+    @Override
+    public UcUserResp getByPublicAddress(String publicAddress) {
+        UcUser user = getOne(new QueryWrapper<UcUser>().lambda()
+                .eq(UcUser::getPublicAddress, publicAddress));
+        if (user == null) {
+            return null;
+        }
+        UcUserResp userResp = new UcUserResp();
+        BeanUtils.copyProperties(user, userResp);
+        return userResp;
+    }
+
     /**
      * 校验登陆
      * @param loginReq

@@ -1,5 +1,6 @@
 package com.seeds.game.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.game.entity.NftAuctionHouseSetting;
 import com.seeds.game.mapper.NftAuctionHouseSettingMapper;
@@ -17,4 +18,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class NftAuctionHouseSettingServiceImpl extends ServiceImpl<NftAuctionHouseSettingMapper, NftAuctionHouseSetting> implements INftAuctionHouseSettingService {
 
+    @Override
+    public NftAuctionHouseSetting queryByListingId(Long listingId) {
+        return getOne(new LambdaQueryWrapper<NftAuctionHouseSetting>().eq(NftAuctionHouseSetting::getListingId, listingId));
+    }
 }

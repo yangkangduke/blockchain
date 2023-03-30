@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 /**
  * @author hang.yu
@@ -19,6 +20,12 @@ public class NftOfferPageReq extends PageReq {
     @NotNull(message = "Nft id cannot be empty")
     private Long nftId;
 
-    private String mintAddress;
+    private Long auctionId;
+
+    private String publicAddress;
+
+    private BigDecimal usdRate;
+
+    private BigDecimal price;
 
 }

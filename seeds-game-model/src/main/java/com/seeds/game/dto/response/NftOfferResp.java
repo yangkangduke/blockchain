@@ -27,6 +27,15 @@ public class NftOfferResp {
     @ApiModel(value = "NftOffer", description = "拍卖出价")
     public static class NftOffer {
 
+        @ApiModelProperty("offerId")
+        private Long id;
+
+        @ApiModelProperty("拍卖订单Id")
+        private Long auctionId;
+
+        @ApiModelProperty("拍卖合约地址")
+        private String auctionHouseAddress;
+
         @ApiModelProperty("出价价格")
         private BigDecimal price;
 
@@ -34,10 +43,7 @@ public class NftOfferResp {
         private String usdPrice;
 
         @ApiModelProperty("价格差异")
-        private String floorDifference;
-
-        @ApiModelProperty("离出价时间")
-        private String expiration;
+        private String difference;
 
         @ApiModelProperty("出价人")
         private String buyer;

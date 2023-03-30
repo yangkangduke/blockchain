@@ -13,5 +13,11 @@ import com.seeds.game.entity.NftAuctionHouseSetting;
  */
 public interface INftAuctionHouseSettingService extends IService<NftAuctionHouseSetting> {
 
+    /**
+     * 查询拍卖配置
+     * @param listingId auction list表id
+     * @return 拍卖配置
+     */
+    NftAuctionHouseSetting queryByListingId(Long listingId);
 
 }
