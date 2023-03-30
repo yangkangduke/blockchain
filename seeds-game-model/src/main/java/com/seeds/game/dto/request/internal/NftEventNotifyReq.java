@@ -24,4 +24,6 @@ public class NftEventNotifyReq {
     private String serverName;
     // 1 装备2道具3英雄
     private Integer type;
+    // 3 托管  4 未托管
+    private Integer state;
 }
