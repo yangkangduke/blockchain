@@ -188,6 +188,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         // todo 调用凤龙接口,如果是自动托管还需要调用托管的接口
         Long eqNftId = 0L;
 
+
+
+        // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
+        this.callGameNotify(nftEvent.getServerRoleId(), autoDeposite, 1, tokenAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+
         //   插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
         backpackEntity.setEqNftId(eqNftId);
@@ -226,16 +231,16 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
         nftPublicBackpackService.save(backpackEntity);
 
-//        // 如果是合成，作为合成材料的nft标记为临时锁定的状态
-//        if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
-//            NftEventEquipment consumeNft = eventEquipmentService
-//                    .getOne(new LambdaQueryWrapper<NftEventEquipment>()
-//                            .eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.YES.value())
-//                            .eq(NftEventEquipment::getIsNft, WhetherEnum.YES.value()));
-//            NftPublicBackpackEntity nftbackpack = nftPublicBackpackService.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, consumeNft.getAutoId()));
-//            nftbackpack.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
-//            nftPublicBackpackService.updateById(nftbackpack);
-//        }
+        // 如果是合成，作为合成材料的nft标记为临时锁定的状态
+        if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
+            NftEventEquipment consumeNft = eventEquipmentService
+                    .getOne(new LambdaQueryWrapper<NftEventEquipment>()
+                            .eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.YES.value())
+                            .eq(NftEventEquipment::getIsNft, WhetherEnum.YES.value()));
+            NftPublicBackpackEntity nftbackpack = nftPublicBackpackService.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, consumeNft.getAutoId()));
+            nftbackpack.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
+            nftPublicBackpackService.updateById(nftbackpack);
+        }
 
         //  插入属性表
         NftAttributeEntity attributeEntity = new NftAttributeEntity();
@@ -252,8 +257,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         this.updateById(nftEvent);
 
 
-        // 通知游戏mint或者合成成功
-        this.callGameNotify(nftEvent.getServerRoleId(), autoDeposite, 1, tokenAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
 
     }
 
