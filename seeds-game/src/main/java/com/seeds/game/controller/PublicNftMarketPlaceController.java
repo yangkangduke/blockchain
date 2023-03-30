@@ -1,6 +1,12 @@
 package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.game.dto.request.NftMarketPlaceDetailViewReq;
+import com.seeds.game.dto.request.NftMarketPlaceEquipPageReq;
+import com.seeds.game.dto.request.NftMarketPlacePropsPageReq;
+import com.seeds.game.dto.request.NftMarketPlaceSkinPageReq;
+import com.seeds.game.dto.response.*;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.enums.NftTypeEnum;
@@ -10,6 +16,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -47,16 +55,20 @@ public class PublicNftMarketPlaceController {
 
     @PostMapping("page-skin")
     @ApiOperation("获取皮肤分页信息")
-    public GenericDto<IPage<NftMarketPlaceSkinResp>> skinQueryPage(@RequestBody NftMarketPlaceSkinPageReq skinQuery){
-        skinQuery.setType(NftTypeEnum.skin.getCode());
+    public GenericDto<List<NftMarketPlaceSkinResp>> skinQueryPage(@RequestBody NftMarketPlaceSkinPageReq skinQuery){
         return GenericDto.success(nftMarketPlaceService.skinQueryPage(skinQuery));
     }
 
     @PostMapping("page-equip")
     @ApiOperation("获取装备分页信息")
-    public GenericDto<IPage<NftMarketPlaceEqiupmentResp>>equipQueryPage(@RequestBody NftMarketPlaceEquipPageReq equipQuery){
-        equipQuery.setType(NftTypeEnum.equip.getCode());
+    public GenericDto<List<NftMarketPlaceEqiupmentResp>>equipQueryPage(@RequestBody NftMarketPlaceEquipPageReq equipQuery){
         return GenericDto.success(nftMarketPlaceService.equipQueryPage(equipQuery));
+    }
+
+    @PostMapping("page-props")
+    @ApiOperation("获取道具分页信息")
+    public GenericDto<List<NftMarketPlacePropsResp>>equipPropsPage(@RequestBody NftMarketPlacePropsPageReq propsQuery){
+        return GenericDto.success(nftMarketPlaceService.propsQueryPage(propsQuery));
     }
 
     @PostMapping("view")

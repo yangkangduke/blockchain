@@ -16,28 +16,28 @@ import com.seeds.game.dto.request.NftMarketPlaceSkinPageReq;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.external.EndAuctionMessageDto;
 import com.seeds.game.dto.request.external.EnglishAuctionReqDto;
-import com.seeds.game.dto.response.NftActivityResp;
-import com.seeds.game.dto.response.NftMarketPlaceDetailResp;
-import com.seeds.game.dto.response.NftMarketPlaceDetailViewResp;
-import com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp;
-import com.seeds.game.dto.response.NftMarketPlaceSkinResp;
+import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.NftAuctionHouseBiding;
 import com.seeds.game.entity.NftAuctionHouseSetting;
 import com.seeds.game.entity.NftEquipment;
 import com.seeds.game.entity.NftPublicBackpackEntity;
+import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.INftMarketOrderService;
 import com.seeds.game.service.INftPublicBackpackService;
 import com.seeds.game.enums.*;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.service.*;
-import com.seeds.game.dto.response.NftOfferResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -66,6 +66,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Autowired
     private SeedsApiConfig seedsApiConfig;
+
+    @Autowired
+    private NftMarketOrderMapper nftMarketOrderMapper;
+
 
     @Override
     public NftMarketPlaceDetailResp detail(Long id) {
@@ -192,24 +196,37 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
-    public IPage<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery) {
-        return null;
+    public List<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery) {
+        List<NftMarketPlaceSkinResp> skinList = nftMarketOrderMapper.getSkinPage(skinQuery);
+        skinList = skinList.stream().map(p->{
+            NftMarketPlaceSkinResp resp = new NftMarketPlaceSkinResp();
+            BeanUtils.copyProperties(p, resp);
+            resp.setNumber("#"+p.getTokenId());
+            return resp;
+                }).collect(Collectors.toList());
+        return skinList;
     }
 
     @Override
-    public IPage<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery) {
-        return null;
+    public List<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery) {
+        List<NftMarketPlaceEqiupmentResp> equipList = nftMarketOrderMapper.getEquipPage(equipQuery);
+        equipList = equipList.stream().map(p->{
+            NftMarketPlaceEqiupmentResp resp = new NftMarketPlaceEqiupmentResp();
+            resp.setNumber("#" + p.getTokenId());
+            return resp;
+        }).collect(Collectors.toList());
+        return equipList;
     }
 
     @Override
     public NftMarketPlaceDetailViewResp view(NftMarketPlaceDetailViewReq req) {
-        NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.detailForMintAddress(req.getMintAddress());
+        NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.detailForTokenId(req.getTokenId());
         Long userId = backpackEntity.getUserId();
 
         // 获取当前登录的用户的id
         Long currentUserId = UserContext.getCurrentUserId();
         LambdaQueryWrapper<NftPublicBackpackEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(!StringUtils.isEmpty(req.getMintAddress()),NftPublicBackpackEntity::getContractAddress,req.getMintAddress());
+        queryWrapper.eq(!StringUtils.isEmpty(req.getTokenId()),NftPublicBackpackEntity::getTokenId,req.getTokenId());
         NftPublicBackpackEntity one = nftPublicBackpackService.getOne(queryWrapper);
 
         // 第一视角，浏览量不变；第三视角，则浏览量+1
@@ -217,12 +234,25 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             // 属性表更新NFT浏览量
             LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
                     .setSql("`views`=`views`+1")
-                    .eq(NftPublicBackpackEntity::getContractAddress,req.getMintAddress());
+                    .eq(NftPublicBackpackEntity::getTokenId,req.getTokenId());
             nftPublicBackpackService.update(updateWrap);
         }
         NftMarketPlaceDetailViewResp resp = new NftMarketPlaceDetailViewResp();
         resp.setViews(backpackEntity.getViews());
         return resp;
+    }
+
+    @Override
+    public List<NftMarketPlacePropsResp> propsQueryPage(NftMarketPlacePropsPageReq propsQuery) {
+
+        List<NftMarketPlacePropsResp> propsList = nftMarketOrderMapper.getPropsPage(propsQuery);
+        propsList = propsList.stream().map(p->{
+            NftMarketPlacePropsResp propsResp = new NftMarketPlacePropsResp();
+            BeanUtils.copyProperties(p,propsResp);
+            propsResp.setNumber(p.getTokenId());
+            return propsResp;
+        }).collect(Collectors.toList());
+        return propsList;
     }
 
     @Override

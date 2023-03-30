@@ -80,4 +80,6 @@ public class NftAttributeEntity extends BaseEntity {
     @ApiModelProperty("基础属性值")
     private String baseAttrValue;
 
+    @ApiModelProperty("关联z_equipment_nft表")
+    private Long eqNftId;
 }

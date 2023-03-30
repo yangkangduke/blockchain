@@ -2,17 +2,15 @@ package com.seeds.game.dto.request;
 import com.seeds.common.dto.PageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
 import java.math.BigDecimal;
 
 /**
- * 装备分页查询
+ * 道具分页查询
  * @author: dengyang
  * @date 2023/2/22
  */
 @Data
-public class NftMarketPlaceEquipPageReq extends PageReq {
-
+public class NftMarketPlacePropsPageReq extends PageReq {
     @ApiModelProperty("NFT名称")
     private String name;
 
