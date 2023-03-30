@@ -141,7 +141,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             p.setEventId(nftEvent.getId());
         });
         eventEquipmentService.saveBatch(equipments);
-        // todo 生成JSON文件
 
     }
 
@@ -227,16 +226,16 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
         nftPublicBackpackService.save(backpackEntity);
 
-        // 如果是合成，作为合成材料的nft标记为临时锁定的状态
-        if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
-            NftEventEquipment consumeNft = eventEquipmentService
-                    .getOne(new LambdaQueryWrapper<NftEventEquipment>()
-                            .eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.YES.value())
-                            .eq(NftEventEquipment::getIsNft, WhetherEnum.YES.value()));
-            NftPublicBackpackEntity nftbackpack = nftPublicBackpackService.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, consumeNft.getAutoId()));
-            nftbackpack.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
-            nftPublicBackpackService.updateById(nftbackpack);
-        }
+//        // 如果是合成，作为合成材料的nft标记为临时锁定的状态
+//        if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
+//            NftEventEquipment consumeNft = eventEquipmentService
+//                    .getOne(new LambdaQueryWrapper<NftEventEquipment>()
+//                            .eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.YES.value())
+//                            .eq(NftEventEquipment::getIsNft, WhetherEnum.YES.value()));
+//            NftPublicBackpackEntity nftbackpack = nftPublicBackpackService.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, consumeNft.getAutoId()));
+//            nftbackpack.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
+//            nftPublicBackpackService.updateById(nftbackpack);
+//        }
 
         //  插入属性表
         NftAttributeEntity attributeEntity = new NftAttributeEntity();
