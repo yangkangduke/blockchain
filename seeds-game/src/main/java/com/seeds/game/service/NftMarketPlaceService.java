@@ -4,6 +4,8 @@ import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.*;
 
+import java.util.List;
+
 
 public interface NftMarketPlaceService {
 
@@ -75,14 +77,14 @@ public interface NftMarketPlaceService {
      * @param skinQuery
      * @return 商场nft皮肤列表
      */
-    IPage<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery);
+    List<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery);
 
     /**
      * 获取nft 装备列表
      * @param equipQuery
      * @return 商场nft装备列表
      */
-    IPage<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery);
+    List<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery);
 
     /**
      * 浏览量
@@ -96,5 +98,12 @@ public interface NftMarketPlaceService {
      * @param owner 归属人地址
      */
     void ownerValidation(String owner);
+
+    /**
+     * 获取nft 道具列表
+     * @param propsQuery
+     * @return 商场nft道具列表
+     */
+    List<NftMarketPlacePropsResp> propsQueryPage(NftMarketPlacePropsPageReq propsQuery);
 
 }

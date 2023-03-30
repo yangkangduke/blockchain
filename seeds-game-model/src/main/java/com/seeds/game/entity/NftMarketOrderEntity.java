@@ -54,14 +54,14 @@ public class NftMarketOrderEntity {
     private String cancelTx;
 
     @ApiModelProperty("create_time")
-    private Date createTime;
+    private Long createTime;
 
     @ApiModelProperty("place_time")
-    private Date placeTime;
+    private Long placeTime;
 
     @ApiModelProperty("fulfill_time")
-    private Date fulfillTime;
+    private Long fulfillTime;
 
     @ApiModelProperty("cancel_time")
-    private Date cancelTime;
+    private Long cancelTime;
 }

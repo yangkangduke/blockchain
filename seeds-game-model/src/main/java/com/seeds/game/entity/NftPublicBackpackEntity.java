@@ -43,7 +43,7 @@ public class NftPublicBackpackEntity implements Serializable {
     @ApiModelProperty("图片")
     private String image;
 
-    @ApiModelProperty("类型：1装备 2道具 3英雄")
+    @ApiModelProperty("类型：1装备 2道具 3英雄 4,皮肤")
     private Integer type;
 
     @ApiModelProperty("浏览量")

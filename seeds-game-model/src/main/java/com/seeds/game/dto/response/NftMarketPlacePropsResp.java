@@ -1,20 +1,18 @@
 package com.seeds.game.dto.response;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * 市场装备分页查询返回列表
+ * 市场道具分页查询返回列表
  * @author dengyang
  * @since 2023-03-21
  */
-@ApiModel(value = "NftMarketPlaceEqiupmentResp")
+@ApiModel(value = "NftMarketPlacePropsResp")
 @Data
-public class NftMarketPlaceEqiupmentResp implements Serializable {
+public class NftMarketPlacePropsResp implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
@@ -29,9 +27,6 @@ public class NftMarketPlaceEqiupmentResp implements Serializable {
 
     @ApiModelProperty("NFT交易模式：0：Buy Now  1：On Auction")
     private Integer model;
-
-    @ApiModelProperty("NFT名称")
-    private String name;
 
     @ApiModelProperty("NFT价格")
     private BigDecimal price;
