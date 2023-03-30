@@ -141,7 +141,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             p.setEventId(nftEvent.getId());
         });
         eventEquipmentService.saveBatch(equipments);
-        // todo 生成JSON文件
 
     }
 
@@ -160,7 +159,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         // 通知游戏方事件取消
         NftEvent event = this.getById(id);
         NftEventEquipment equipment = eventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-        this.callGameNotify(event.getServerRoleId(), 2, "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId());
+        this.callGameNotify(event.getServerRoleId(), 0, 2, "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId());
         // 更新本地数据库
 
         List<NftEventEquipment> equipments = eventEquipmentService.list(new LambdaQueryWrapper<NftEventEquipment>().in(NftEventEquipment::getEventId, id));
@@ -188,6 +187,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
         // todo 调用凤龙接口,如果是自动托管还需要调用托管的接口
         Long eqNftId = 0L;
+
+
+
+        // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
+        this.callGameNotify(nftEvent.getServerRoleId(), autoDeposite, 1, tokenAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
 
         //   插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
@@ -253,14 +257,12 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         this.updateById(nftEvent);
 
 
-        // 通知游戏mint或者合成成功
-        this.callGameNotify(nftEvent.getServerRoleId(), 1, tokenAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
 
     }
 
 
     // nft 操作通知  // optType 1 mint成功,2取消
-    private void callGameNotify(Long serverRoleId, Integer optType, String tokenId, Integer itemType, Long autoId, Long configId, Long accId) {
+    private void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenId, Integer itemType, Long autoId, Long configId, Long accId) {
 
         ServerRegionEntity serverRegion = this.getServerRegionEntity(serverRoleId);
 
@@ -281,6 +283,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         if (optType.equals(1)) {
             notifyReq.setRegionName(serverRegion.getRegionName());
             notifyReq.setServerName(serverRegion.getGameServerName());
+            notifyReq.setState(autoDeposite.equals(1) ? 3 : 4);
             notifyReq.setTokenId(tokenId);
         }
         String params = JSONUtil.toJsonStr(notifyReq);
