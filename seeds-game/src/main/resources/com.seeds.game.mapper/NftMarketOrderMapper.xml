@@ -11,7 +11,15 @@
         t1.token_id,
         t2.name,
         t2.image,
-        t3.rarity
+        t3.rarity,
+        t3.victory,
+        t3.lose,
+        t3.max_streak,
+        t3.capture,
+        t3.killing_spree,
+        t3.goblin_kill,
+        t3.slaying,
+        t3.goblin
         from z_market_order t1
         left join ga_nft_public_backpack t2 on t1.token_id = t2.token_id and t1.mint_address = t2.token_address
         join ga_nft_attribute t3 on t1.token_id = t3.token_id and t1.mint_address = t3.mint_address
@@ -61,7 +69,12 @@
         t2.name,
         t2.image,
         t3.durability,
-        t3.grade
+        t3.grade,
+        t3.health,
+        t3.armor,
+        t3.vs_monster,
+        t3.passive,
+        t3.blade_buff
         from z_market_order t1
         left join ga_nft_public_backpack t2 on t1.token_id = t2.token_id and t1.mint_address = t2.token_address
         join ga_nft_attribute t3 on t1.token_id = t3.token_id and t1.mint_address = t3.mint_address
@@ -112,7 +125,12 @@
         t2.name,
         t2.image,
         t3.grade,
-        t3.durability
+        t3.durability,
+        t3.health,
+        t3.armor,
+        t3.vs_monster,
+        t3.passive,
+        t3.blade_buff
 
         from z_market_order t1
         left join ga_nft_public_backpack t2 on t1.token_id = t2.token_id and t1.mint_address = t2.token_address
