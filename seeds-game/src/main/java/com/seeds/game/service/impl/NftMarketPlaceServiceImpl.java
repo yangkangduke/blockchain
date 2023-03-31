@@ -123,7 +123,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         resp.setNumber("#" + nftEquipment.getTokenId());
         resp.setLastUpdated(nftEquipment.getUpdateTime());
         resp.setState(convertOrderState(nftEquipment.getIsDelete(), nftEquipment.getIsDeposit(), nftEquipment.getOnSale(), order.getStatus(), order.getOrderType()));
-        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.queryByListingId(order.getListingId());
+        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.queryByListingId(order.getAuctionId());
         if (auctionSetting != null) {
             long time = System.currentTimeMillis() - (auctionSetting.getStart() + auctionSetting.getDuration() * 60 * 60 * 1000);
             resp.setTimeLeft(RelativeDateFormat.formatTime(time));
@@ -348,10 +348,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             return resp;
         }
         NftMarketOrderEntity marketOrder = nftMarketOrderService.getById(nftEquipment.getOrderId());
-        if (marketOrder == null || marketOrder.getListingId() == null) {
+        if (marketOrder == null || marketOrder.getAuctionId() == null) {
             return resp;
         }
-        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.queryByListingId(marketOrder.getListingId());
+        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.queryByListingId(marketOrder.getAuctionId());
         if (auctionSetting == null) {
             return resp;
         }
