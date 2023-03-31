@@ -87,28 +87,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     private NftMarketOrderMapper nftMarketOrderMapper;
 
     @Override
-    public NftMarketPlaceDetailResp detail(Long id) {
+    public NftMarketPlaceDetailResp detail(Long nftId) {
         NftMarketPlaceDetailResp resp = new NftMarketPlaceDetailResp();
-        // 查询marker order表
-        NftMarketOrderEntity order = nftMarketOrderService.getById(id);
-        if (order == null) {
-            return resp;
-        }
-        resp.setId(order.getId());
-        resp.setCurrentPrice(order.getPrice());
-        NftEquipment nftEquipment = nftEquipmentMapper.getByMintAddress(order.getMintAddress());
+        // 查询NFT
+        NftEquipment nftEquipment = nftEquipmentMapper.getById(nftId);
         if (nftEquipment == null) {
             return resp;
         }
-        NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftEquipment.getId());
-        if (publicBackpack != null) {
-            BeanUtils.copyProperties(publicBackpack, resp);
-        }
-        resp.setNftId(nftEquipment.getId());
-        resp.setTokenId(nftEquipment.getTokenId());
-        resp.setName(nftEquipment.getName());
-        resp.setNumber("#" + nftEquipment.getTokenId());
-        resp.setLastUpdated(nftEquipment.getUpdateTime());
         UcUserResp ucUserResp = null;
         try {
             GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
@@ -120,6 +105,22 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             resp.setOwnerId(ucUserResp.getId());
             resp.setOwnerName(ucUserResp.getNickname());
         }
+        // 查询marker order表
+        NftMarketOrderEntity order = nftMarketOrderService.getById(nftEquipment.getOrderId());
+        if (order == null) {
+            return resp;
+        }
+        resp.setId(order.getId());
+        resp.setCurrentPrice(order.getPrice());
+        NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftId);
+        if (publicBackpack != null) {
+            BeanUtils.copyProperties(publicBackpack, resp);
+        }
+        resp.setNftId(nftEquipment.getId());
+        resp.setTokenId(nftEquipment.getTokenId());
+        resp.setName(nftEquipment.getName());
+        resp.setNumber("#" + nftEquipment.getTokenId());
+        resp.setLastUpdated(nftEquipment.getUpdateTime());
         resp.setState(convertOrderState(nftEquipment.getIsDelete(), nftEquipment.getIsDeposit(), nftEquipment.getOnSale(), order.getStatus(), order.getOrderType()));
         NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.queryByListingId(order.getListingId());
         if (auctionSetting != null) {
