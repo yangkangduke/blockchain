@@ -16,6 +16,6 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface NftEquipmentMapper extends BaseMapper<NftEquipment> {
 
-    NftEquipment getByMintAddress(@Param("mintAddress") String mintAddress);
+    NftEquipment getById(@Param("id") Long id);
 
 }

@@ -33,10 +33,10 @@ public class PublicNftMarketPlaceController {
     @Autowired
     private NftMarketPlaceService nftMarketPlaceService;
 
-    @GetMapping("detail/{id}")
+    @GetMapping("detail/{nftId}")
     @ApiOperation("详细信息")
-    public GenericDto<NftMarketPlaceDetailResp> detail(@PathVariable("id") Long id) {
-        return GenericDto.success(nftMarketPlaceService.detail(id));
+    public GenericDto<NftMarketPlaceDetailResp> detail(@PathVariable("nftId") Long nftId) {
+        return GenericDto.success(nftMarketPlaceService.detail(nftId));
     }
 
     @PostMapping("offer-page")

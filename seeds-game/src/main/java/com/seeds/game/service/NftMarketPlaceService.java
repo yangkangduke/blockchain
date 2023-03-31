@@ -12,10 +12,10 @@ public interface NftMarketPlaceService {
 
     /**
      * 获取商场nft详情
-     * @param id nft的id
+     * @param nftId nft的id
      * @return 商场nft详情
      */
-    NftMarketPlaceDetailResp detail(Long id);
+    NftMarketPlaceDetailResp detail(Long nftId);
 
     /**
      * nft固定价格上架

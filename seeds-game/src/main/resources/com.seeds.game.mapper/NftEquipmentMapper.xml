@@ -24,13 +24,13 @@
         id, token_id, name, mint_address, owner, nft_generated, mint_time, mint_trx, update_time, on_sale, order_id, is_delete, delete_time, is_deposit, cancel_time
     </sql>
 
-    <select id="getByMintAddress" resultMap="BaseResultMap">
+    <select id="getById" resultMap="BaseResultMap">
         select
         <include refid="mainColumns"/>
         from z_equipment_nft
         where 1 = 1
-        <if test="mint_address != null and mint_address != ''">
-            and mint_address = #{mintAddress}
+        <if test="id != null and id != ''">
+            and id = #{id}
         </if>
     </select>
 
