@@ -16,8 +16,8 @@ public class NftEventNotifyReq {
     private Long configId;
     // 操作类型：1mint成功,2取消
     private Integer optType;
-    // 链token（mint成功时传）
-    private String tokenId;
+    // tokenAddress（mint成功时传）
+    private String tokenAddress;
     // 大区名字（mint成功时传）
     private String regionName;
     // 游戏服名字（mint成功时传）

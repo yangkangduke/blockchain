@@ -13,6 +13,8 @@ import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
+import com.seeds.game.config.SeedsApiConfig;
+import com.seeds.game.dto.request.NftMintSuccessReq;
 import com.seeds.game.dto.request.internal.NftEventAddReq;
 import com.seeds.game.dto.request.internal.NftEventEquipmentReq;
 import com.seeds.game.dto.request.internal.NftEventNotifyReq;
@@ -32,6 +34,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -74,6 +77,9 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Autowired
     @Lazy
     private INftPublicBackpackService nftPublicBackpackService;
+
+    @Autowired
+    private SeedsApiConfig seedsApiConfig;
 
     @Override
     @Transactional
@@ -142,6 +148,21 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         });
         eventEquipmentService.saveBatch(equipments);
 
+        // todo 后期去掉 方便游戏测试直接mint成功
+        success(nftEvent);
+    }
+
+    @Async
+    void success(NftEvent nftEvent) {
+        NftMintSuccessReq req1 = new NftMintSuccessReq();
+        req1.setEventId(nftEvent.getId());
+        req1.setAutoDeposite(1);
+        req1.setTokenAddress(nftEvent.getId() + "token0xabc");
+        NftMintSuccessReq.Equipment equipment = new NftMintSuccessReq.Equipment();
+        equipment.setNftId(nftEvent.getId().intValue());
+        equipment.setNftTokenId(nftEvent.getId().intValue());
+        req1.setZequipment(equipment);
+        this.OptSuccess(req1);
     }
 
     @Override
@@ -180,31 +201,43 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Override
     @Transactional
-    public void OptSuccess(Long eventId, String tokenAddress, Integer autoDeposite) {
-        NftEvent nftEvent = this.getById(eventId);
+    public void OptSuccess(NftMintSuccessReq mintSuccessReq) {
+        NftEvent nftEvent = this.getById(mintSuccessReq.getEventId());
         NftEventEquipment equipment = eventEquipmentService
                 .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
 
-        // todo 调用凤龙接口,如果是自动托管还需要调用托管的接口
-        Long eqNftId = 0L;
-
-
+        // 调用/api/equipment/mintSuccess  mint成功
+//        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getMintSuccess();
+//        MintSuccessMessageDto dto = new MintSuccessMessageDto();
+//        BeanUtils.copyProperties(mintSuccessReq, dto);
+//        String param = JSONUtil.toJsonStr(dto);
+//        log.info("mint成功，开始通知， url:{}， params:{}", url, param);
+//        try {
+//            HttpRequest.post(url)
+//                    .timeout(5 * 1000)
+//                    .header("Content-Type", "application/json")
+//                    .body(param)
+//                    .execute();
+//        } catch (Exception e) {
+//            log.error("mint成功通知失败，message：{}", e.getMessage());
+//        }
 
         // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
-        this.callGameNotify(nftEvent.getServerRoleId(), autoDeposite, 1, tokenAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+        this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getTokenAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
 
         //   插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-        backpackEntity.setEqNftId(eqNftId);
+        backpackEntity.setEqNftId(Long.valueOf(mintSuccessReq.getZequipment().getNftId()));
         backpackEntity.setName(nftEvent.getName());
         backpackEntity.setUserId(nftEvent.getUserId());
-        backpackEntity.setTokenId(tokenAddress);
+        backpackEntity.setTokenId(mintSuccessReq.getZequipment().getNftTokenId().toString());
+        backpackEntity.setTokenAddress(mintSuccessReq.getTokenAddress());
         backpackEntity.setCreatedBy(nftEvent.getUserId());
         backpackEntity.setUpdatedBy(nftEvent.getUserId());
         backpackEntity.setCreatedAt(System.currentTimeMillis());
         backpackEntity.setUpdatedAt(System.currentTimeMillis());
 
-        if (autoDeposite.equals(1)) {
+        if (mintSuccessReq.getAutoDeposite().equals(1)) {
             backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
             backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
             backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
@@ -228,7 +261,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         attr.put("durability", durability);
         String jsonStr = JSONUtil.toJsonStr(attr);
         backpackEntity.setAttributes(jsonStr);
-
         nftPublicBackpackService.save(backpackEntity);
 
         // 如果是合成，作为合成材料的nft标记为临时锁定的状态
@@ -241,28 +273,23 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             nftbackpack.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
             nftPublicBackpackService.updateById(nftbackpack);
         }
-
         //  插入属性表
         NftAttributeEntity attributeEntity = new NftAttributeEntity();
-        attributeEntity.setMintAddress(tokenAddress);
+        attributeEntity.setEqNftId(Long.valueOf(mintSuccessReq.getZequipment().getNftId()));
         attributeEntity.setGrade(equipment.getLvl());
         attributeEntity.setDurability(durability);
         attributeEntity.setBaseAttrValue(equipment.getBaseAttrValue());
         attributeEntity.setRarityAttrValue(equipment.getRarityAttrValue());
         attributeService.save(attributeEntity);
 
-
         // 更新event事件状态
         nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTED.getCode());
         this.updateById(nftEvent);
-
-
-
     }
 
 
     // nft 操作通知  // optType 1 mint成功,2取消
-    private void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenId, Integer itemType, Long autoId, Long configId, Long accId) {
+    private void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenAddress, Integer itemType, Long autoId, Long configId, Long accId) {
 
         ServerRegionEntity serverRegion = this.getServerRegionEntity(serverRoleId);
 
@@ -284,7 +311,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             notifyReq.setRegionName(serverRegion.getRegionName());
             notifyReq.setServerName(serverRegion.getGameServerName());
             notifyReq.setState(autoDeposite.equals(1) ? 3 : 4);
-            notifyReq.setTokenId(tokenId);
+            notifyReq.setTokenAddress(tokenAddress);
         }
         String params = JSONUtil.toJsonStr(notifyReq);
 
