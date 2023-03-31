@@ -26,7 +26,6 @@ import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.INftMarketOrderService;
-import com.seeds.game.service.INftPublicBackpackService;
 import com.seeds.game.enums.*;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.service.*;
