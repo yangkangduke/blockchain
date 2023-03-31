@@ -39,9 +39,9 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     List<NftPublicBackpackResp> queryList(NftPublicBackpackPageReq req);
 
-    NftPublicBackpackEntity detailForMintAddress(String mintAddress);
+    NftPublicBackpackEntity queryByMintAddress(String mintAddress);
 
-    NftPublicBackpackEntity detailForTokenId(String tokenId);
+    NftPublicBackpackEntity queryByTokenId(String tokenId);
 
     void ownerTransfer(OpenNftOwnershipTransferReq req);
 

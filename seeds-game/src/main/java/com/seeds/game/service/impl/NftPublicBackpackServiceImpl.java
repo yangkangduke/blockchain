@@ -350,23 +350,15 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
-    public NftPublicBackpackEntity detailForMintAddress(String mintAddress) {
-        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-        NftPublicBackpackEntity entity = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenId, mintAddress));
-        if (null != entity) {
-            BeanUtils.copyProperties(entity, backpackEntity);
-        }
-        return backpackEntity;
+    public NftPublicBackpackEntity queryByMintAddress(String mintAddress) {
+        return getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>()
+                .eq(NftPublicBackpackEntity::getTokenId, mintAddress));
     }
 
     @Override
-    public NftPublicBackpackEntity detailForTokenId(String tokenId) {
-        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-        NftPublicBackpackEntity entity = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenId, tokenId));
-        if (null != entity) {
-            BeanUtils.copyProperties(entity, backpackEntity);
-        }
-        return backpackEntity;
+    public NftPublicBackpackEntity queryByTokenId(String tokenId) {
+        return getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>()
+                .eq(NftPublicBackpackEntity::getTokenId, tokenId));
     }
 
     // lootmode 结算 nft物品所有权转移，中心化操作

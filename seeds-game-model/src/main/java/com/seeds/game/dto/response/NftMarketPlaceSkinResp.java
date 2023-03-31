@@ -33,4 +33,6 @@ public class NftMarketPlaceSkinResp implements Serializable {
      @ApiModelProperty("NFT价格")
      private BigDecimal price;
 
+     @ApiModelProperty("上架时间")
+     private Long ListTime;
 }

@@ -273,7 +273,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public NftMarketPlaceDetailViewResp view(NftMarketPlaceDetailViewReq req) {
-        NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.detailForTokenId(req.getTokenId());
+        NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.queryByTokenId(req.getTokenId());
         Long userId = backpackEntity.getUserId();
 
         // 获取当前登录的用户的id

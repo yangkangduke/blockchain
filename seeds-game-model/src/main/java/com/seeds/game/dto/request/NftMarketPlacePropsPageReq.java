@@ -10,7 +10,7 @@ import java.math.BigDecimal;
  * @date 2023/2/22
  */
 @Data
-public class NftMarketPlacePropsPageReq extends PageReq {
+public class NftMarketPlacePropsPageReq {
     @ApiModelProperty("NFT名称")
     private String name;
 
