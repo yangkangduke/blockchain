@@ -15,7 +15,7 @@ public class WebMvcConfig implements WebMvcConfigurer, WebMvcRegistrations {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(getOpenContextInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/swagger-resources/**", "/v2/api-docs", "/v3/api-docs");
+                .excludePathPatterns("/public/**","/swagger-resources/**", "/v2/api-docs", "/v3/api-docs");
     }
 
     @Bean
