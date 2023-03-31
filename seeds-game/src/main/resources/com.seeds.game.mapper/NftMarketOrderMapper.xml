@@ -3,83 +3,96 @@
 <mapper namespace="com.seeds.game.mapper.NftMarketOrderMapper">
     <select id="getSkinPage" resultType="com.seeds.game.dto.response.NftMarketPlaceSkinResp"
             parameterType="com.seeds.game.dto.request.NftMarketPlaceSkinPageReq">
-        select t1.name,
+        select
+        t1.id,
         t1.price,
-        t1.image,
+        t1.transaction_type,
+        t1.create_time,
         t1.token_id,
-        t1.model,
-        t2.rarity
-        from ga_nft_public_backpack t1
-        left join ga_nft_attribute t2 on t1.token_id = t2.token_id and t1.token_address = t2.mint_address
-        where t1.type = 4
-
-            <if test="name != null">
-                and t1.name = #{name}
-            </if>
-            <if test="tokenId != null">
-                and t1.token_id = #{tokenId}
-            </if>
-            <if test="status != null">
-                and t1.model = #{status}
-            </if>
-            <if test="rarity != null">
-                and t2.rarity = #{rarity}
-            </if>
-            <if test="heroType != null">
-                and t2.hero_type = #{heroType}
-            </if>
-            <if test="sort != null and sort =='price'">
-                order by t1.price ${sortType}
-            </if>
-            <if test="sort != null and sort =='rarity'">
-                order by t2.rarity ${sortType}
-            </if>
-            <if test="sort != null and sort =='durability'">
-                order by t2.durability ${sortType}
-            </if>
-            <if test="minPrice > 0">
-                and t1.price &gt;= #{minPrice,jdbcType=BigDecimal}
-            </if>
-            <if test="maxPrice > 0">
-                and t1.price &lt;= #{maxPrice,jdbcType=BigDecimal}
-            </if>
-    </select>
-    <select id="getEquipPage" resultType="com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp"
-            parameterType="com.seeds.game.dto.request.NftMarketPlaceEquipPageReq">
-        select t1.name,
-        t1.price,
-        t1.image,
-        t1.token_id,
-        t1.grade,
-        t1.model,
-        t2.durability
-        from ga_nft_public_backpack t1
-        left join ga_nft_attribute t2 on t1.token_id = t2.token_id and t1.token_address = t2.mint_address
-        where t1.type = 1
-
+        t2.name,
+        t2.image,
+        t3.rarity
+        from z_market_order t1
+        left join ga_nft_public_backpack t2 on t1.token_id = t2.token_id and t1.mint_address = t2.token_address
+        join ga_nft_attribute t3 on t1.token_id = t3.token_id and t1.mint_address = t3.mint_address
+        where t2.type = 4
         <if test="name != null">
-            and t1.name = #{name}
+            and t2.name = #{name}
         </if>
         <if test="tokenId != null">
             and t1.token_id = #{tokenId}
         </if>
         <if test="status != null">
-            and t1.model = #{status}
+            and t1.transaction_type  = #{status}
+        </if>
+        <if test="rarity != null">
+            and t3.rarity = #{rarity}
+        </if>
+        <if test="heroType != null">
+            and t3.hero_type = #{heroType}
+        </if>
+        <if test="sort != null and sort =='price'">
+            order by t1.price ${sortType}
+        </if>
+        <if test="sort != null and sort =='rarity'">
+            order by t3.rarity ${sortType}
+        </if>
+        <if test="sort != null and sort =='durability'">
+            order by t3.durability ${sortType}
+        </if>
+        <if test="sort != null and sort =='create_time'">
+            order by t1.create_time ${sortType}
+        </if>
+        <if test="minPrice > 0">
+            and t1.price &gt;= #{minPrice,jdbcType=BigDecimal}
+        </if>
+        <if test="maxPrice > 0">
+            and t1.price &lt;= #{maxPrice,jdbcType=BigDecimal}
+        </if>
+    </select>
+    <select id="getEquipPage" resultType="com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp"
+            parameterType="com.seeds.game.dto.request.NftMarketPlaceEquipPageReq">
+        select
+        t1.id,
+        t1.create_time,
+        t1.transaction_type,
+        t1.price,
+        t1.token_id,
+        t2.name,
+        t2.image,
+        t3.durability,
+        t3.grade
+        from z_market_order t1
+        left join ga_nft_public_backpack t2 on t1.token_id = t2.token_id and t1.mint_address = t2.token_address
+        join ga_nft_attribute t3 on t1.token_id = t3.token_id and t1.mint_address = t3.mint_address
+        where t2.type = 1
+
+        <if test="name != null">
+            and t2.name = #{name}
+        </if>
+        <if test="tokenId != null">
+            and t1.token_id = #{tokenId}
+        </if>
+        <if test="status != null">
+            and t1.transaction_type = #{status}
         </if>
         <if test="grade != null">
-            and t1.grade = #{grade}
+            and t3.grade = #{grade}
         </if>
         <if test="durability != null">
-            and t2.durability = #{durability}
+            and t3.durability = #{durability}
         </if>
         <if test="sort != null and sort =='price'">
             order by t1.price ${sortType}
         </if>
         <if test="sort != null and sort =='grade'">
-            order by t1.grade ${sortType}
+            order by t3.grade ${sortType}
         </if>
         <if test="sort != null and sort =='durability'">
-            order by t2.durability ${sortType}
+            order by t3.durability ${sortType}
+        </if>
+        <if test="sort != null and sort =='create_time'">
+            order by t1.create_time ${sortType}
         </if>
         <if test="minPrice > 0">
             and t1.price &gt;= #{minPrice,jdbcType=BigDecimal}
@@ -90,40 +103,48 @@
     </select>
     <select id="getPropsPage" resultType="com.seeds.game.dto.response.NftMarketPlacePropsResp"
             parameterType="com.seeds.game.dto.request.NftMarketPlacePropsPageReq">
-        select t1.name,
+        select
+        t1.id,
         t1.price,
-        t1.image,
+        t1.transaction_type,
+        t1.create_time,
         t1.token_id,
-        t1.grade,
-        t1.model,
-        t2.durability
-        from ga_nft_public_backpack t1
-        left join ga_nft_attribute t2 on t1.token_id = t2.token_id and t1.token_address = t2.mint_address
-        where t1.type = 2
+        t2.name,
+        t2.image,
+        t3.grade,
+        t3.durability
+
+        from z_market_order t1
+        left join ga_nft_public_backpack t2 on t1.token_id = t2.token_id and t1.mint_address = t2.token_address
+        join ga_nft_attribute t3 on t1.token_id = t3.token_id and t1.mint_address = t3.mint_address
+        where t2.type = 2
 
         <if test="name != null">
-            and t1.name = #{name}
+            and t2.name = #{name}
         </if>
         <if test="tokenId != null">
             and t1.token_id = #{tokenId}
         </if>
         <if test="status != null">
-            and t1.model = #{status}
+            and t1.transaction_type = #{status}
         </if>
         <if test="grade != null">
-            and t1.grade = #{grade}
+            and t3.grade = #{grade}
         </if>
         <if test="durability != null">
-            and t2.durability = #{durability}
+            and t3.durability = #{durability}
         </if>
         <if test="sort != null and sort =='price'">
             order by t1.price ${sortType}
         </if>
         <if test="sort != null and sort =='grade'">
-            order by t1.grade ${sortType}
+            order by t3.grade ${sortType}
         </if>
         <if test="sort != null and sort =='durability'">
-            order by t2.durability ${sortType}
+            order by t3.durability ${sortType}
+        </if>
+        <if test="sort != null and sort =='create_time'">
+            order by t1.create_time ${sortType}
         </if>
         <if test="minPrice > 0">
             and t1.price &gt;= #{minPrice,jdbcType=BigDecimal}

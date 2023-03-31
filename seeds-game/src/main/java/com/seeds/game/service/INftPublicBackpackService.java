@@ -31,6 +31,12 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     NftPublicBackpackResp detail(Integer autoId);
 
+    OpenNftPublicBackpackDisResp distributeBatch(List<NftPublicBackpackDisReq> reqs);
+
+    void takeBackBatch(List<NftPublicBackpackTakeBackReq> reqs);
+
+    OpenNftPublicBackpackDisResp transferBatch(List<NftPublicBackpackDisReq> reqs);
+
     OpenNftPublicBackpackDisResp distribute(NftPublicBackpackDisReq req);
 
     void takeBack(NftPublicBackpackTakeBackReq req);
@@ -39,9 +45,9 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     List<NftPublicBackpackResp> queryList(NftPublicBackpackPageReq req);
 
-    NftPublicBackpackEntity detailForMintAddress(String mintAddress);
+    NftPublicBackpackEntity queryByMintAddress(String mintAddress);
 
-    NftPublicBackpackEntity detailForTokenId(String tokenId);
+    NftPublicBackpackEntity queryByTokenId(String tokenId);
 
     void ownerTransfer(OpenNftOwnershipTransferReq req);
 

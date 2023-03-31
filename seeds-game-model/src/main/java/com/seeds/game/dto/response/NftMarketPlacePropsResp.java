@@ -37,4 +37,6 @@ public class NftMarketPlacePropsResp implements Serializable{
     @ApiModelProperty("耐久度")
     private Integer durability;
 
+    @ApiModelProperty("上架时间")
+    private Long ListTime;
 }

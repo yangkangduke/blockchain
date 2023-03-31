@@ -51,4 +51,7 @@ public class SeedsApiConfig {
     @Value("${seeds.api.depositNft:/api/equipment/depositNft}")
     private String depositNft;
 
+    @Value("${seeds.api.mintSuccess:/api/equipment/mintSuccess}")
+    private String mintSuccess;
+
 }

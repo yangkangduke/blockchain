@@ -30,8 +30,6 @@ public class NftMarketPlaceEqiupmentResp implements Serializable {
     @ApiModelProperty("NFT交易模式：0：Buy Now  1：On Auction")
     private Integer model;
 
-    @ApiModelProperty("NFT名称")
-    private String name;
 
     @ApiModelProperty("NFT价格")
     private BigDecimal price;
@@ -42,4 +40,6 @@ public class NftMarketPlaceEqiupmentResp implements Serializable {
     @ApiModelProperty("耐久度")
     private Integer durability;
 
+    @ApiModelProperty("上架时间")
+    private Long ListTime;
 }

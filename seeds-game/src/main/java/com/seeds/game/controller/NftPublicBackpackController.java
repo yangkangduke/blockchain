@@ -11,7 +11,10 @@ import com.seeds.game.dto.request.NftUnDepositedReq;
 import com.seeds.game.dto.request.internal.NftBackpackWebPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
-import com.seeds.game.dto.response.*;
+import com.seeds.game.dto.response.NftPublicBackpackWebResp;
+import com.seeds.game.dto.response.NftType;
+import com.seeds.game.dto.response.NftTypeNum;
+import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.service.INftPublicBackpackService;
@@ -57,7 +60,7 @@ public class NftPublicBackpackController {
     }
 
     @PostMapping("page")
-    @ApiOperation("获取分页信息")
+    @ApiOperation("获取列表信息")
     public GenericDto<List<NftPublicBackpackWebResp>> getPage(@Valid @RequestBody NftBackpackWebPageReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(nftPublicBackpackService.getPageForWeb(req));
@@ -95,39 +98,38 @@ public class NftPublicBackpackController {
 
     @PostMapping("distribute")
     @ApiOperation("分配")
-    public GenericDto<OpenNftPublicBackpackDisResp> distribute(@RequestBody @Valid NftPublicBackpackDisReq req) {
-        req.setUserId(UserContext.getCurrentUserId());
+    public GenericDto<OpenNftPublicBackpackDisResp> distributeBatch(@RequestBody @Valid List<NftPublicBackpackDisReq> reqs) {
+
         GenericDto<SysGameResp> gameDetail = remoteGameService.ucDetail(GameEnum.BLADERITE.getCode());
         // 游戏正在维护中，web端无法操作
         if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())) {
             throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
         }
-        return GenericDto.success(nftPublicBackpackService.distribute(req));
+        return GenericDto.success(nftPublicBackpackService.distributeBatch(reqs));
     }
 
     @PostMapping("take-back")
     @ApiOperation("收回")
-    public GenericDto<Object> takeBack(@RequestBody @Valid NftPublicBackpackTakeBackReq req) {
-        req.setUserId(UserContext.getCurrentUserId());
+    public GenericDto<Object> takeBackBatch(@RequestBody @Valid List<NftPublicBackpackTakeBackReq> reqs) {
+
         GenericDto<SysGameResp> gameDetail = remoteGameService.ucDetail(GameEnum.BLADERITE.getCode());
         // 游戏正在维护中，web端无法操作
         if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())) {
             throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
         }
-        nftPublicBackpackService.takeBack(req);
+        nftPublicBackpackService.takeBackBatch(reqs);
         return GenericDto.success(null);
     }
 
     @PostMapping("transfer")
     @ApiOperation("转移")
-    public GenericDto<OpenNftPublicBackpackDisResp> transfer(@RequestBody @Valid NftPublicBackpackDisReq req) {
-        req.setUserId(UserContext.getCurrentUserId());
+    public GenericDto<OpenNftPublicBackpackDisResp> transferBatch(@RequestBody @Valid List<NftPublicBackpackDisReq> reqs) {
         GenericDto<SysGameResp> gameDetail = remoteGameService.ucDetail(GameEnum.BLADERITE.getCode());
         // 游戏正在维护中，web端无法操作
         if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())) {
             throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
         }
-        return GenericDto.success(nftPublicBackpackService.transfer(req));
+        return GenericDto.success(nftPublicBackpackService.transferBatch(reqs));
     }
 
     @PostMapping("deposited")
