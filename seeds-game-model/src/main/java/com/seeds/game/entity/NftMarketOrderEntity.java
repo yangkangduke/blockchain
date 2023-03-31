@@ -14,7 +14,7 @@ public class NftMarketOrderEntity {
     private Long id;
 
     @ApiModelProperty("拍卖id")
-    private Long listingId;
+    private Long auctionId;
 
     @ApiModelProperty("售卖人id")
     private Long sellerId;
@@ -42,9 +42,6 @@ public class NftMarketOrderEntity {
 
     @ApiModelProperty("状态：1，挂单中， 2，已成交  3，已取消")
     private Integer status;
-
-    @ApiModelProperty("状态：1，buy now， 2，on auction")
-    private Integer orderType;
 
     @ApiModelProperty("挂单收据")
     private String listReceipt;
