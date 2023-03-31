@@ -2,6 +2,7 @@ package com.seeds.game.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.game.dto.request.NftMintSuccessReq;
 import com.seeds.game.dto.request.internal.NftEventAddReq;
 import com.seeds.game.dto.request.internal.NftEventPageReq;
 import com.seeds.game.dto.response.NftEventResp;
@@ -32,5 +33,5 @@ public interface INftEventService extends IService<NftEvent> {
 
     List<EventTypeNum> getTypeNum(Long userId);
 
-    void OptSuccess(Long eventId, String tokenAddress, Integer autoDeposite);
+    void OptSuccess(NftMintSuccessReq mintSuccessReq);
 }

@@ -3,9 +3,10 @@ package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.NftMintSuccessReq;
 import com.seeds.game.dto.request.internal.NftEventPageReq;
-import com.seeds.game.dto.response.NftEventResp;
 import com.seeds.game.dto.response.EventTypeNum;
+import com.seeds.game.dto.response.NftEventResp;
 import com.seeds.game.service.INftEventService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -62,10 +63,10 @@ public class NftEventController {
         return GenericDto.success(nftEventService.cancel(id));
     }
 
-    @PostMapping("opt-success")
-    @ApiOperation("mint/compound 操作成功, 1 自动托管，0 不自动托管")
-    GenericDto<Object> OptSuccess(@RequestParam("eventId") Long eventId, @RequestParam("tokenAddress") String tokenAddress, @RequestParam("autoDeposite") Integer autoDeposite) {
-        nftEventService.OptSuccess(eventId, tokenAddress, autoDeposite);
+    @PostMapping("mint-success")
+    @ApiOperation("mint/compound 操作成功")
+    GenericDto<Object> OptSuccess(@RequestBody NftMintSuccessReq mintSuccessReq) {
+        nftEventService.OptSuccess(mintSuccessReq);
         return GenericDto.success(null);
     }
 

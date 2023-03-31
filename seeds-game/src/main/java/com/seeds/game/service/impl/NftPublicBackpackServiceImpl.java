@@ -139,6 +139,29 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
+    public OpenNftPublicBackpackDisResp distributeBatch(List<NftPublicBackpackDisReq> reqs) {
+        for (NftPublicBackpackDisReq req : reqs) {
+            this.distribute(req);
+        }
+        return null;
+    }
+
+    @Override
+    public void takeBackBatch(List<NftPublicBackpackTakeBackReq> reqs) {
+        for (NftPublicBackpackTakeBackReq req : reqs) {
+            this.takeBack(req);
+        }
+    }
+
+    @Override
+    public OpenNftPublicBackpackDisResp transferBatch(List<NftPublicBackpackDisReq> reqs) {
+        for (NftPublicBackpackDisReq req : reqs) {
+            this.transfer(req);
+        }
+        return null;
+    }
+
+    @Override
     @Transactional
     public OpenNftPublicBackpackDisResp distribute(NftPublicBackpackDisReq req) {
         NftPublicBackpackEntity nftItem = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
@@ -225,8 +248,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             throw new GenericException(GameErrorCodeEnum.ERR_10004_NFT_ITEM_NOT_ASSIGNED);
         }
 
-        // 调用游戏方接口，执行收回
-        this.callGameTakeback(nftItem);
+//        // 调用游戏方接口，执行收回
+//        this.callGameTakeback(nftItem);
 
         ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
         // 记录转移事件
@@ -318,7 +341,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         nftEvent.setCreatedAt(System.currentTimeMillis());
         nftEventService.save(nftEvent);
         //插入nft_event_equipment表
-        NftEventEquipment one = nftEventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getAutoId, nftItem.getAutoId()));
+        NftEventEquipment one = nftEventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>()
+                .eq(NftEventEquipment::getAutoId, nftItem.getAutoId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
         if (Objects.isNull(one)) {
             NftEventEquipment equipment = new NftEventEquipment();
             equipment.setEventId(nftEvent.getId());
@@ -336,6 +360,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         LambdaQueryWrapper<NftPublicBackpackEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(!Objects.isNull(req.getIsConfiguration()), NftPublicBackpackEntity::getIsConfiguration, req.getIsConfiguration())
                 .like(!Objects.isNull(req.getName()), NftPublicBackpackEntity::getName, req.getName())
+                .eq(NftPublicBackpackEntity::getState, NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode())
                 .eq(NftPublicBackpackEntity::getUserId, req.getUserId());
         List<NftPublicBackpackEntity> list = this.list(wrapper);
 
