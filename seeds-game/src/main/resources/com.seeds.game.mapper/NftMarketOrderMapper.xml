@@ -6,9 +6,9 @@
         select
         t1.id,
         t1.price,
-        t1.transaction_type,
         t1.create_time,
         t1.token_id,
+        t1.transaction_type,
         t2.name,
         t2.image,
         t3.rarity,
@@ -21,8 +21,8 @@
         t3.slaying,
         t3.goblin
         from z_market_order t1
-        left join ga_nft_public_backpack t2 on t1.token_id = t2.token_id and t1.mint_address = t2.token_address
-        join ga_nft_attribute t3 on t1.token_id = t3.token_id and t1.mint_address = t3.mint_address
+        left join ga_nft_public_backpack t2 on CONVERT(t1.token_id USING gbk) = t2.token_id and CONVERT(t1.mint_address USING gbk) = t2.token_address
+        join ga_nft_attribute t3 on CONVERT(t1.token_id USING gbk) = t3.token_id and CONVERT(t1.mint_address USING gbk) = t3.mint_address
         where t2.type = 4
         <if test="name != null">
             and t2.name = #{name}
@@ -63,9 +63,9 @@
         select
         t1.id,
         t1.create_time,
-        t1.transaction_type,
         t1.price,
         t1.token_id,
+        t1.transaction_type,
         t2.name,
         t2.image,
         t3.durability,
@@ -76,8 +76,8 @@
         t3.passive,
         t3.blade_buff
         from z_market_order t1
-        left join ga_nft_public_backpack t2 on t1.token_id = t2.token_id and t1.mint_address = t2.token_address
-        join ga_nft_attribute t3 on t1.token_id = t3.token_id and t1.mint_address = t3.mint_address
+        left join ga_nft_public_backpack t2 on CONVERT(t1.token_id USING gbk) = t2.token_id and CONVERT(t1.mint_address USING gbk) = t2.token_address
+        join ga_nft_attribute t3 on CONVERT(t1.token_id USING gbk) = t3.token_id and CONVERT(t1.mint_address USING gbk) = t3.mint_address
         where t2.type = 1
 
         <if test="name != null">
@@ -119,9 +119,9 @@
         select
         t1.id,
         t1.price,
-        t1.transaction_type,
         t1.create_time,
         t1.token_id,
+        t1.transaction_type,
         t2.name,
         t2.image,
         t3.grade,
@@ -133,8 +133,8 @@
         t3.blade_buff
 
         from z_market_order t1
-        left join ga_nft_public_backpack t2 on t1.token_id = t2.token_id and t1.mint_address = t2.token_address
-        join ga_nft_attribute t3 on t1.token_id = t3.token_id and t1.mint_address = t3.mint_address
+        left join ga_nft_public_backpack t2 on CONVERT(t1.token_id USING gbk) = t2.token_id and CONVERT(t1.mint_address USING gbk) = t2.token_address
+        join ga_nft_attribute t3 on CONVERT(t1.token_id USING gbk) = t3.token_id and CONVERT(t1.mint_address USING gbk) = t3.mint_address
         where t2.type = 2
 
         <if test="name != null">
