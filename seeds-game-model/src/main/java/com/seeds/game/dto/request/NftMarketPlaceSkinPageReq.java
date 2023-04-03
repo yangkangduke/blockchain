@@ -1,5 +1,6 @@
 package com.seeds.game.dto.request;
 import com.seeds.common.dto.PageReq;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ApiModel(value = "NftMarketPlaceSkinPageReq")
 public class NftMarketPlaceSkinPageReq extends PageReq {
 
     @ApiModelProperty("NFT名称")
