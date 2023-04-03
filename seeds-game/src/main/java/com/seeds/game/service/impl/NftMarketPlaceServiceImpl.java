@@ -26,13 +26,13 @@ import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.INftMarketOrderService;
-import com.seeds.game.service.INftPublicBackpackService;
 import com.seeds.game.enums.*;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.service.*;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -289,20 +289,19 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.queryByTokenId(req.getTokenId());
         Long userId = backpackEntity.getUserId();
 
-        // 获取当前登录的用户的id
-        Long currentUserId = UserContext.getCurrentUserId();
         LambdaQueryWrapper<NftPublicBackpackEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(!StringUtils.isEmpty(req.getTokenId()),NftPublicBackpackEntity::getTokenId,req.getTokenId());
+        queryWrapper.eq(!StringUtils.isEmpty(req.getTokenId()),NftPublicBackpackEntity::getTokenId,req.getTokenId())
+                .eq(ObjectUtils.isEmpty(req.getUserId()),NftPublicBackpackEntity::getUserId,req.getUserId());
         NftPublicBackpackEntity one = nftPublicBackpackService.getOne(queryWrapper);
 
-        // 第一视角，浏览量不变；第三视角，则浏览量+1
-        if (one != null && !userId.equals(currentUserId)){
-            // 属性表更新NFT浏览量
-            LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
-                    .setSql("`views`=`views`+1")
-                    .eq(NftPublicBackpackEntity::getTokenId,req.getTokenId());
-            nftPublicBackpackService.update(updateWrap);
-        }
+            // 第一视角，浏览量不变；第三视角，则浏览量+1
+            if (req.getUserId() == null || one == null ||!req.getUserId().equals(userId)){
+                // 属性表更新NFT浏览量
+                LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
+                        .setSql("`views`=`views`+1")
+                        .eq(NftPublicBackpackEntity::getTokenId,req.getTokenId());
+                nftPublicBackpackService.update(updateWrap);
+            }
         NftMarketPlaceDetailViewResp resp = new NftMarketPlaceDetailViewResp();
         resp.setViews(backpackEntity.getViews());
         return resp;
