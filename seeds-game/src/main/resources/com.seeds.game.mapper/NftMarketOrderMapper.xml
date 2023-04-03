@@ -8,7 +8,7 @@
         t1.price,
         t1.place_time,
         t1.token_id,
-        t1.transaction_type,
+        t1.auction_id,
         t2.name,
         t2.image,
         t3.rarity,
@@ -20,10 +20,11 @@
         t3.goblin_kill,
         t3.slaying,
         t3.goblin
+
         from z_market_order t1
         left join ga_nft_public_backpack t2 on CONVERT(t1.token_id USING gbk) = t2.token_id and CONVERT(t1.mint_address USING gbk) = t2.token_address
         left join ga_nft_attribute t3 on t2.token_id = t3.token_id and t2.token_address  = t3.mint_address
-        where t2.type = 4
+        where t2.type = 3
         <if test="name != null">
             and t2.name = #{name}
         </if>
@@ -65,7 +66,7 @@
         t1.place_time,
         t1.price,
         t1.token_id,
-        t1.transaction_type,
+        t1.auction_id,
         t2.name,
         t2.image,
         t3.durability,
@@ -121,7 +122,7 @@
         t1.price,
         t1.place_time,
         t1.token_id,
-        t1.transaction_type,
+        t1.auction_id,
         t2.name,
         t2.image,
         t3.grade,

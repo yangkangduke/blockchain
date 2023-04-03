@@ -27,8 +27,11 @@ public class NftMarketPlaceSkinResp implements Serializable {
      @ApiModelProperty("NFT图片")
      private String image;
 
-     @ApiModelProperty("NFT交易模式：0：Buy Now  1：On Auction")
+     @ApiModelProperty("NFT交易模式：1：Buy Now  2：On Auction")
      private Integer model;
+
+     @ApiModelProperty("拍卖NFT(setting id)")
+     private Long auctionId;
 
      @ApiModelProperty("NFT价格")
      private BigDecimal price;
