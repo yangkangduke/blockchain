@@ -4,8 +4,10 @@ import cn.hutool.extra.cglib.CglibUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,6 +23,7 @@ import com.seeds.game.dto.request.internal.NftEventEquipmentReq;
 import com.seeds.game.dto.request.internal.NftEventNotifyReq;
 import com.seeds.game.dto.request.internal.NftEventPageReq;
 import com.seeds.game.dto.response.EventTypeNum;
+import com.seeds.game.dto.response.MintSuccessMessageResp;
 import com.seeds.game.dto.response.NftEventEquipmentResp;
 import com.seeds.game.dto.response.NftEventResp;
 import com.seeds.game.entity.*;
@@ -127,7 +130,14 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Transactional
     public void toNft(NftEventAddReq req) {
         if (req.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
-            // 必须有一个是nft,且是托管状态 todo  合成时作为材料的nft标记为临时锁定，不能被withdraw
+            // 合成时作为材料的nft标记为临时锁定，
+            NftEventEquipmentReq equipment = req.getEquipments().stream()
+                    .filter(p -> p.getIsNft().equals(WhetherEnum.YES.value()) && p.getIsConsume().equals(WhetherEnum.YES.value()))
+                    .collect(Collectors.toList()).get(0);
+
+            NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
+            entity.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
+            nftPublicBackpackService.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, equipment.getAutoId()));
         }
         // 记录toNFT请求
         NftEvent nftEvent = new NftEvent();
@@ -165,10 +175,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         req1.setEventId(nftEvent.getId());
         req1.setAutoDeposite(1);
         req1.setTokenAddress(nftEvent.getId() + "token0xabc");
-        NftMintSuccessReq.Equipment equipment = new NftMintSuccessReq.Equipment();
-        equipment.setNftId(nftEvent.getId().intValue());
-        equipment.setNftTokenId(nftEvent.getId().intValue());
-        req1.setZequipment(equipment);
         this.OptSuccess(req1);
     }
 
@@ -219,12 +225,16 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         BeanUtils.copyProperties(mintSuccessReq, dto);
         String param = JSONUtil.toJsonStr(dto);
         log.info("mint成功，开始通知， url:{}， params:{}", url, param);
+        MintSuccessMessageResp data = null;
         try {
-            HttpRequest.post(url)
+            HttpResponse response = HttpRequest.post(url)
                     .timeout(5 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
+
         } catch (Exception e) {
             log.error("mint成功通知失败，message：{}", e.getMessage());
         }
@@ -233,65 +243,71 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 //        this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getTokenAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
 
         //   插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
-        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-        backpackEntity.setEqNftId(Long.valueOf(mintSuccessReq.getZequipment().getNftId()));
-        backpackEntity.setName(nftEvent.getName());
-        backpackEntity.setUserId(nftEvent.getUserId());
-        backpackEntity.setTokenId(mintSuccessReq.getZequipment().getNftTokenId().toString());
-        backpackEntity.setTokenAddress(mintSuccessReq.getTokenAddress());
-        backpackEntity.setCreatedBy(nftEvent.getUserId());
-        backpackEntity.setUpdatedBy(nftEvent.getUserId());
-        backpackEntity.setCreatedAt(System.currentTimeMillis());
-        backpackEntity.setUpdatedAt(System.currentTimeMillis());
+        if (Objects.nonNull(data)) {
+            NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+            backpackEntity.setEqNftId(data.getId());
+            backpackEntity.setName(nftEvent.getName());
+            backpackEntity.setTokenName(data.getName());
+            backpackEntity.setOwner(data.getOwner());
+            backpackEntity.setUserId(nftEvent.getUserId());
+            backpackEntity.setTokenId(data.getTokenId().toString());
+            backpackEntity.setTokenAddress(data.getMintAddress());
+            backpackEntity.setCreatedBy(nftEvent.getUserId());
+            backpackEntity.setUpdatedBy(nftEvent.getUserId());
+            backpackEntity.setCreatedAt(System.currentTimeMillis());
+            backpackEntity.setUpdatedAt(System.currentTimeMillis());
 
-        if (mintSuccessReq.getAutoDeposite().equals(1)) {
-            backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
-            backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
-            backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
-        } else {
-            backpackEntity.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
-            backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+            if (mintSuccessReq.getAutoDeposite().equals(1)) {
+                // 自动托管
+                backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
+                backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
+                backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
+            } else {
+                backpackEntity.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+                backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+            }
+            //backpackEntity.setDesc();
+            backpackEntity.setImage(equipment.getImageUrl());
+            backpackEntity.setType(equipment.getItemType());
+            backpackEntity.setItemId(equipment.getConfigId());
+            backpackEntity.setItemTypeId(equipment.getItemId());
+            backpackEntity.setAutoId(equipment.getAutoId());
+            backpackEntity.setItemId(equipment.getConfigId());
+            backpackEntity.setGrade(equipment.getLvl());
+            HashMap<String, Object> attr = new HashMap<>();
+
+            attr.put("level", equipment.getLvl());
+            JSONObject jsonObject = JSONObject.parseObject(equipment.getAttributes());
+            Integer durability = Integer.valueOf(jsonObject.getString("durability"));
+            attr.put("durability", durability);
+            String jsonStr = JSONUtil.toJsonStr(attr);
+            backpackEntity.setAttributes(jsonStr);
+            nftPublicBackpackService.save(backpackEntity);
+
+            // 如果是合成，作为合成材料的nft标记为销毁的状态
+            if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
+                NftEventEquipment consumeNft = eventEquipmentService
+                        .getOne(new LambdaQueryWrapper<NftEventEquipment>()
+                                .eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.YES.value())
+                                .eq(NftEventEquipment::getIsNft, WhetherEnum.YES.value()));
+                NftPublicBackpackEntity nftbackpack = nftPublicBackpackService.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, consumeNft.getAutoId()));
+                nftbackpack.setState(NFTEnumConstant.NFTStateEnum.BURNED.getCode());
+                nftPublicBackpackService.updateById(nftbackpack);
+            }
+            //  插入属性表
+            NftAttributeEntity attributeEntity = new NftAttributeEntity();
+            attributeEntity.setEqNftId(data.getId());
+            attributeEntity.setGrade(equipment.getLvl());
+            attributeEntity.setDurability(durability);
+            attributeEntity.setBaseAttrValue(equipment.getBaseAttrValue());
+            attributeEntity.setRarityAttrValue(equipment.getRarityAttrValue());
+            attributeService.save(attributeEntity);
+
+            // 更新event事件状态
+            nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTED.getCode());
+            this.updateById(nftEvent);
         }
-        //backpackEntity.setDesc();
-        backpackEntity.setImage(equipment.getImageUrl());
-        backpackEntity.setType(equipment.getItemType());
-        backpackEntity.setItemId(equipment.getConfigId());
-        backpackEntity.setItemTypeId(equipment.getItemId());
-        backpackEntity.setAutoId(equipment.getAutoId());
-        backpackEntity.setItemId(equipment.getConfigId());
-        backpackEntity.setGrade(equipment.getLvl());
-        HashMap<String, Object> attr = new HashMap<>();
 
-        attr.put("level", equipment.getLvl());
-        JSONObject jsonObject = JSONObject.parseObject(equipment.getAttributes());
-        Integer durability = Integer.valueOf(jsonObject.getString("durability"));
-        attr.put("durability", durability);
-        String jsonStr = JSONUtil.toJsonStr(attr);
-        backpackEntity.setAttributes(jsonStr);
-        nftPublicBackpackService.save(backpackEntity);
-
-        // 如果是合成，作为合成材料的nft标记为临时锁定的状态
-        if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
-            NftEventEquipment consumeNft = eventEquipmentService
-                    .getOne(new LambdaQueryWrapper<NftEventEquipment>()
-                            .eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.YES.value())
-                            .eq(NftEventEquipment::getIsNft, WhetherEnum.YES.value()));
-            NftPublicBackpackEntity nftbackpack = nftPublicBackpackService.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, consumeNft.getAutoId()));
-            nftbackpack.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
-            nftPublicBackpackService.updateById(nftbackpack);
-        }
-        //  插入属性表
-        NftAttributeEntity attributeEntity = new NftAttributeEntity();
-        attributeEntity.setEqNftId(Long.valueOf(mintSuccessReq.getZequipment().getNftId()));
-        attributeEntity.setGrade(equipment.getLvl());
-        attributeEntity.setDurability(durability);
-        attributeEntity.setBaseAttrValue(equipment.getBaseAttrValue());
-        attributeEntity.setRarityAttrValue(equipment.getRarityAttrValue());
-        attributeService.save(attributeEntity);
-
-        // 更新event事件状态
-        nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTED.getCode());
-        this.updateById(nftEvent);
     }
 
 

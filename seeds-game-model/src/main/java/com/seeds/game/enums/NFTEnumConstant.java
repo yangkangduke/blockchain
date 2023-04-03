@@ -69,11 +69,14 @@ public class NFTEnumConstant {
      */
     @Getter
     public enum NFTStateEnum {
-
+        BURNED(1, "BURNED"),
         LOCK(2, "LOCK"),   // 作为合成材料被临时锁定
         DEPOSITED(3, "DEPOSITED"), // 托管给平台
-        UNDEPOSITED(4, "UNDEPOSITED"); // 解除托管
-
+        UNDEPOSITED(4, "UNDEPOSITED"),// 解除托管
+        ON_SHELF(5, "ON SHELF"), // 固定价格售卖中
+        ON_ACTION(6, "ON AUCTION"), // 拍卖中
+        IN_SETTLEMENT(7, "IN_SETTLEMENT"), // 结算中（拍卖到期后到成交之前的状态）
+        ;
         private final int code;
         private final String desc;
 

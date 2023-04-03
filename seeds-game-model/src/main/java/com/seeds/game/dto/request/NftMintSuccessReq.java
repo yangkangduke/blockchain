@@ -32,26 +32,4 @@ public class NftMintSuccessReq {
 
     @ApiModelProperty(value = "token address")
     private String tokenAddress;
-
-    @ApiModelProperty(value = "装备nft")
-    private Equipment zequipment;
-
-    @Data
-    public static class Equipment {
-
-        @ApiModelProperty(value = "装备nft")
-        private int createTime;
-
-        @ApiModelProperty(value = "id")
-        private int id;
-
-        @ApiModelProperty(value = "nftId")
-        private int nftId;
-
-        @ApiModelProperty(value = "nftTokenId")
-        private Integer nftTokenId;
-
-        @ApiModelProperty(value = "ownerId")
-        private String ownerId;
-    }
 }
