@@ -37,6 +37,7 @@
         t1.price,
         t1.state,
         t1.auto_id,
+        t1.eq_nft_id,
         t1.server_role_id,
         t2.durability,
         t2.base_attr_value,

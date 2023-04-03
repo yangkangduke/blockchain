@@ -55,4 +55,7 @@ public class NftPublicBackpackWebResp implements Serializable {
 
     @ApiModelProperty("nft物品")
     private Long autoId;
+
+    @ApiModelProperty("nftId")
+    private Long eqNftId;
 }
