@@ -43,9 +43,6 @@ public class NftMarketOrderEntity {
     @ApiModelProperty("状态：1，挂单中， 2，已成交  3，已取消")
     private Integer status;
 
-    @ApiModelProperty("状态：1，buy now， 2，on auction")
-    private Integer orderType;
-
     @ApiModelProperty("挂单收据")
     private String listReceipt;
 
@@ -58,16 +55,16 @@ public class NftMarketOrderEntity {
     @ApiModelProperty("取消交易签名")
     private String cancelTx;
 
-    @ApiModelProperty("创建时间")
+    @ApiModelProperty("create_time")
     private Long createTime;
 
-    @ApiModelProperty("上架时间")
+    @ApiModelProperty("place_time")
     private Long placeTime;
 
-    @ApiModelProperty("执行交易时间")
+    @ApiModelProperty("fulfill_time")
     private Long fulfillTime;
 
-    @ApiModelProperty("取消时间")
+    @ApiModelProperty("cancel_time")
     private Long cancelTime;
 
 }

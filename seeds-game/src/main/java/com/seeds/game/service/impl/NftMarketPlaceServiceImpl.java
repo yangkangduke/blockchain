@@ -26,6 +26,7 @@ import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.INftMarketOrderService;
+import com.seeds.game.service.INftPublicBackpackService;
 import com.seeds.game.enums.*;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.service.*;
@@ -122,8 +123,8 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         resp.setName(nftEquipment.getName());
         resp.setNumber("#" + nftEquipment.getTokenId());
         resp.setLastUpdated(nftEquipment.getUpdateTime());
-        resp.setState(convertOrderState(nftEquipment.getIsDelete(), nftEquipment.getIsDeposit(), nftEquipment.getOnSale(), order.getStatus(), order.getOrderType()));
-        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.queryByListingId(order.getAuctionId());
+        resp.setState(convertOrderState(nftEquipment.getIsDelete(), nftEquipment.getIsDeposit(), nftEquipment.getOnSale(), order.getStatus(), order.getAuctionId()));
+        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(order.getAuctionId());
         if (auctionSetting != null) {
             long time = System.currentTimeMillis() - (auctionSetting.getStart() + auctionSetting.getDuration() * 60 * 60 * 1000);
             resp.setTimeLeft(RelativeDateFormat.formatTime(time));
@@ -363,10 +364,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             return resp;
         }
         NftMarketOrderEntity marketOrder = nftMarketOrderService.getById(nftEquipment.getOrderId());
-        if (marketOrder == null || marketOrder.getAuctionId() == null) {
+        if (marketOrder == null || marketOrder.getAuctionId() <= 0) {
             return resp;
         }
-        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.queryByListingId(marketOrder.getAuctionId());
+        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(marketOrder.getAuctionId());
         if (auctionSetting == null) {
             return resp;
         }
@@ -504,7 +505,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     }
 
-    private Integer convertOrderState(Integer isBurned, Integer isDeposit, Integer onSale, Integer orderStatus, Integer orderType) {
+    private Integer convertOrderState(Integer isBurned, Integer isDeposit, Integer onSale, Integer orderStatus, Long auctionId) {
         int state;
         if (WhetherEnum.YES.value() == isBurned) {
             return NftStateEnum.BURNED.getCode();
@@ -513,10 +514,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             state = NftStateEnum.DEPOSITED.getCode();
         } else {
             if (WhetherEnum.YES.value() == onSale) {
-                if (NftOrderTypeEnum.BUY_NOW.getCode() == orderType) {
-                    state = NftStateEnum.ON_SHELF.getCode();
-                } else {
+                if (auctionId > 0) {
                     state = NftStateEnum.ON_AUCTION.getCode();
+                } else {
+                    state = NftStateEnum.ON_SHELF.getCode();
                 }
             } else {
                 // 下架但挂单中，结算中
