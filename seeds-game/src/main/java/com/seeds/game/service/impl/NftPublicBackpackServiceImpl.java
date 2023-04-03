@@ -248,8 +248,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             throw new GenericException(GameErrorCodeEnum.ERR_10004_NFT_ITEM_NOT_ASSIGNED);
         }
 
-        // 调用游戏方接口，执行收回
-        this.callGameTakeback(nftItem);
+//        // 调用游戏方接口，执行收回
+//        this.callGameTakeback(nftItem);
 
         ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
         // 记录转移事件
