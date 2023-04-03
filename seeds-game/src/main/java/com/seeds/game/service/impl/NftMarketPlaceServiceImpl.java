@@ -258,7 +258,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             NftMarketPlaceSkinResp resp = new NftMarketPlaceSkinResp();
             BeanUtils.copyProperties(p, resp);
             resp.setNumber("#"+p.getTokenId());
-            if (p.getAuctionId().equals(0)){
+            if (p.getAuctionId() == 0){
                 resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
             }else {
                 resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
@@ -273,12 +273,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         List<NftMarketPlaceEqiupmentResp> equipList = nftMarketOrderMapper.getEquipPage(equipQuery);
         equipList = equipList.stream().map(p->{
             NftMarketPlaceEqiupmentResp resp = new NftMarketPlaceEqiupmentResp();
+            BeanUtils.copyProperties(p,resp);
             resp.setNumber("#" + p.getTokenId());
-            if (p.getAuctionId().equals(0)){
+            if (p.getAuctionId() == 0){
                 resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
             }else {
                 resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
             }
+
             return resp;
         }).collect(Collectors.toList());
         return equipList;
@@ -314,8 +316,8 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         propsList = propsList.stream().map(p->{
             NftMarketPlacePropsResp propsResp = new NftMarketPlacePropsResp();
             BeanUtils.copyProperties(p,propsResp);
-            propsResp.setNumber(p.getTokenId());
-            if (p.getAuctionId().equals(0)){
+            propsResp.setNumber("#" + p.getTokenId());
+            if (p.getAuctionId() == 0){
                 propsResp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
             }else {
                 propsResp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());

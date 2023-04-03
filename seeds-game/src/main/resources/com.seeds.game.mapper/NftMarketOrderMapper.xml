@@ -49,14 +49,14 @@
         <if test="sort != null and sort =='durability'">
             order by t3.durability ${sortType}
         </if>
-        <if test="sort != null and sort =='create_time'">
-            order by t1.create_time ${sortType}
+        <if test="sort != null and sort =='place_time'">
+            order by t1.place_time ${sortType}
         </if>
         <if test="minPrice > 0">
-            and t1.price &gt;= #{minPrice,jdbcType=BigDecimal}
+            and t1.price &gt;= #{minPrice}
         </if>
         <if test="maxPrice > 0">
-            and t1.price &lt;= #{maxPrice,jdbcType=BigDecimal}
+            and t1.price &lt;= #{maxPrice}
         </if>
     </select>
     <select id="getEquipPage" resultType="com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp"
@@ -105,14 +105,14 @@
         <if test="sort != null and sort =='durability'">
             order by t3.durability ${sortType}
         </if>
-        <if test="sort != null and sort =='create_time'">
-            order by t1.create_time ${sortType}
+        <if test="sort != null and sort =='place_time'">
+            order by t1.place_time ${sortType}
         </if>
         <if test="minPrice > 0">
-            and t1.price &gt;= #{minPrice,jdbcType=BigDecimal}
+            and t1.price &gt;= #{minPrice}
         </if>
         <if test="maxPrice > 0">
-            and t1.price &lt;= #{maxPrice,jdbcType=BigDecimal}
+            and t1.price &lt;= #{maxPrice}
         </if>
     </select>
     <select id="getPropsPage" resultType="com.seeds.game.dto.response.NftMarketPlacePropsResp"
@@ -162,14 +162,14 @@
         <if test="sort != null and sort =='durability'">
             order by t3.durability ${sortType}
         </if>
-        <if test="sort != null and sort =='create_time'">
-            order by t1.create_time ${sortType}
+        <if test="sort != null and sort =='place_time'">
+            order by t1.place_time ${sortType}
         </if>
         <if test="minPrice > 0">
-            and t1.price &gt;= #{minPrice,jdbcType=BigDecimal}
+            and t1.price &gt;= #{minPrice}
         </if>
         <if test="maxPrice > 0">
-            and t1.price &lt;= #{maxPrice,jdbcType=BigDecimal}
+            and t1.price &lt;= #{maxPrice}
         </if>
     </select>
 </mapper>

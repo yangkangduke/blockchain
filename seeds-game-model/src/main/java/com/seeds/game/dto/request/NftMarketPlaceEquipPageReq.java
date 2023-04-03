@@ -38,4 +38,5 @@ public class NftMarketPlaceEquipPageReq {
 
     @ApiModelProperty(value = "排序类型 asc:升序 desc:降序")
     private String sortType;
+
 }

@@ -43,7 +43,7 @@ public class NftMarketPlaceEqiupmentResp implements Serializable {
     private Integer durability;
 
     @ApiModelProperty("上架时间")
-    private Long ListTime;
+    private Long placeTime;
 
     @ApiModelProperty("健康属性值")
     private Integer health;
