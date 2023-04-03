@@ -25,8 +25,11 @@ public class NftMarketPlacePropsResp implements Serializable{
     @ApiModelProperty("tokenId")
     private String tokenId;
 
-    @ApiModelProperty("NFT交易模式：0：Buy Now  1：On Auction")
+    @ApiModelProperty("NFT交易模式：1：Buy Now  2：On Auction")
     private Integer model;
+
+    @ApiModelProperty("拍卖NFT(setting id)")
+    private Long auctionId;
 
     @ApiModelProperty("NFT价格")
     private BigDecimal price;
@@ -38,5 +41,20 @@ public class NftMarketPlacePropsResp implements Serializable{
     private Integer durability;
 
     @ApiModelProperty("上架时间")
-    private Long ListTime;
+    private Long placeTime;
+
+    @ApiModelProperty("健康属性值")
+    private Integer health;
+
+    @ApiModelProperty("装备属性值")
+    private Integer armor;
+
+    @ApiModelProperty("怪物属性值")
+    private Integer vsMonster;
+
+    @ApiModelProperty("属性综合介绍")
+    private String passive;
+
+    @ApiModelProperty("blade属性综合介绍")
+    private String bladeBuff;
 }

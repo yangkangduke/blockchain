@@ -26,10 +26,15 @@ import com.seeds.game.enums.NftStateEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
+import com.seeds.game.service.INftAttributeService;
+import com.seeds.game.service.INftMarketOrderService;
+import com.seeds.game.enums.*;
+import com.seeds.game.exception.GenericException;
 import com.seeds.game.service.*;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,7 +180,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
         // 调用/api/auction/english通知，链上英式拍卖上架成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getEnglishOrderApi();
-        EnglishAuctionReqDto dto = new EnglishAuctionReqDto();
+        EnglishAuctionReqDto dto  = new EnglishAuctionReqDto();
         BeanUtils.copyProperties(req, dto);
         dto.setOwnerAddress(nftEquipment.getOwner());
         String param = JSONUtil.toJsonStr(dto);
@@ -279,6 +284,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             NftMarketPlaceSkinResp resp = new NftMarketPlaceSkinResp();
             BeanUtils.copyProperties(p, resp);
             resp.setNumber("#"+p.getTokenId());
+            if (p.getAuctionId() == 0){
+                resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
+            }else {
+                resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
+            }
             return resp;
                 }).collect(Collectors.toList());
         return skinList;
@@ -289,7 +299,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         List<NftMarketPlaceEqiupmentResp> equipList = nftMarketOrderMapper.getEquipPage(equipQuery);
         equipList = equipList.stream().map(p->{
             NftMarketPlaceEqiupmentResp resp = new NftMarketPlaceEqiupmentResp();
+            BeanUtils.copyProperties(p,resp);
             resp.setNumber("#" + p.getTokenId());
+            if (p.getAuctionId() == 0){
+                resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
+            }else {
+                resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
+            }
+
             return resp;
         }).collect(Collectors.toList());
         return equipList;
@@ -300,20 +317,19 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.queryByTokenId(req.getTokenId());
         Long userId = backpackEntity.getUserId();
 
-        // 获取当前登录的用户的id
-        Long currentUserId = UserContext.getCurrentUserId();
         LambdaQueryWrapper<NftPublicBackpackEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(!StringUtils.isEmpty(req.getTokenId()),NftPublicBackpackEntity::getTokenId,req.getTokenId());
+        queryWrapper.eq(!StringUtils.isEmpty(req.getTokenId()),NftPublicBackpackEntity::getTokenId,req.getTokenId())
+                .eq(ObjectUtils.isEmpty(req.getUserId()),NftPublicBackpackEntity::getUserId,req.getUserId());
         NftPublicBackpackEntity one = nftPublicBackpackService.getOne(queryWrapper);
 
-        // 第一视角，浏览量不变；第三视角，则浏览量+1
-        if (one != null && !userId.equals(currentUserId)){
-            // 属性表更新NFT浏览量
-            LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
-                    .setSql("`views`=`views`+1")
-                    .eq(NftPublicBackpackEntity::getTokenId,req.getTokenId());
-            nftPublicBackpackService.update(updateWrap);
-        }
+            // 第一视角，浏览量不变；第三视角，则浏览量+1
+            if (req.getUserId() == null || one == null ||!req.getUserId().equals(userId)){
+                // 属性表更新NFT浏览量
+                LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
+                        .setSql("`views`=`views`+1")
+                        .eq(NftPublicBackpackEntity::getTokenId,req.getTokenId());
+                nftPublicBackpackService.update(updateWrap);
+            }
         NftMarketPlaceDetailViewResp resp = new NftMarketPlaceDetailViewResp();
         resp.setViews(backpackEntity.getViews());
         return resp;
@@ -326,7 +342,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         propsList = propsList.stream().map(p->{
             NftMarketPlacePropsResp propsResp = new NftMarketPlacePropsResp();
             BeanUtils.copyProperties(p,propsResp);
-            propsResp.setNumber(p.getTokenId());
+            propsResp.setNumber("#" + p.getTokenId());
+            if (p.getAuctionId() == 0){
+                propsResp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
+            }else {
+                propsResp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
+            }
             return propsResp;
         }).collect(Collectors.toList());
         return propsList;

@@ -1,5 +1,4 @@
 package com.seeds.game.dto.request;
-import com.seeds.common.dto.PageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import java.math.BigDecimal;

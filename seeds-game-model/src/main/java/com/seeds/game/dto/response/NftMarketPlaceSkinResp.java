@@ -27,12 +27,39 @@ public class NftMarketPlaceSkinResp implements Serializable {
      @ApiModelProperty("NFT图片")
      private String image;
 
-     @ApiModelProperty("NFT交易模式：0：Buy Now  1：On Auction")
+     @ApiModelProperty("NFT交易模式：1：Buy Now  2：On Auction")
      private Integer model;
+
+     @ApiModelProperty("拍卖NFT(setting id)")
+     private Long auctionId;
 
      @ApiModelProperty("NFT价格")
      private BigDecimal price;
 
      @ApiModelProperty("上架时间")
-     private Long ListTime;
+     private Long placeTime;
+
+     @ApiModelProperty("获胜次数")
+     private Integer victory;
+
+     @ApiModelProperty("失败次数")
+     private Integer lose;
+
+     @ApiModelProperty("最大连胜场数")
+     private Integer maxStreak;
+
+     @ApiModelProperty("击杀玩家数")
+     private Integer capture;
+
+     @ApiModelProperty("最大连杀数")
+     private Integer killingSpree;
+
+     @ApiModelProperty("击杀NPC数")
+     private Integer goblinKill;
+
+     @ApiModelProperty("被玩家击杀数")
+     private Integer slaying;
+
+     @ApiModelProperty("被NPC击杀数")
+     private Integer goblin;
 }

@@ -13,7 +13,7 @@ public class NftMarketOrderEntity {
     @ApiModelProperty("id")
     private Long id;
 
-    @ApiModelProperty("拍卖id")
+    @ApiModelProperty("拍卖NFT(setting id)")
     private Long auctionId;
 
     @ApiModelProperty("售卖人id")
