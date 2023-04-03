@@ -1,4 +1,5 @@
 package com.seeds.game.service.impl;
+
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
@@ -13,15 +14,16 @@ import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.common.utils.RelativeDateFormat;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.config.SeedsApiConfig;
-import com.seeds.game.dto.request.NftBuySuccessReq;
-import com.seeds.game.dto.request.NftMarketPlaceDetailViewReq;
-import com.seeds.game.dto.request.NftMarketPlaceEquipPageReq;
-import com.seeds.game.dto.request.NftMarketPlaceSkinPageReq;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.external.EndAuctionMessageDto;
 import com.seeds.game.dto.request.external.EnglishAuctionReqDto;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.*;
+import com.seeds.game.enums.GameErrorCodeEnum;
+import com.seeds.game.enums.NFTEnumConstant;
+import com.seeds.game.enums.NftOrderStatusEnum;
+import com.seeds.game.enums.NftStateEnum;
+import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.INftAttributeService;
@@ -141,6 +143,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (WhetherEnum.YES.value() == nftEquipment.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
         }
+
+        //更新背包状态(undeposited => on shelf)
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.ON_SHELF.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
+
         // 调用/api/chainOp/placeOrder通知，链上上架成功
         String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getPlaceOrderApi() + "?" + params;
@@ -164,6 +172,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (WhetherEnum.YES.value() == nftEquipment.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
         }
+
+        //更新背包状态(undeposited => on auction)
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.ON_ACTION.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
+
         // 调用/api/auction/english通知，链上英式拍卖上架成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getEnglishOrderApi();
         EnglishAuctionReqDto dto  = new EnglishAuctionReqDto();
@@ -191,6 +205,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (WhetherEnum.NO.value() == nftEquipment.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10010_NFT_ITEM_HAS_BEEN_REMOVAL);
         }
+
+        //更新背包状态 undeposited
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
+
         // 调用/api/chainOp/cancelOrder通知，下架成功
         String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCancelOrderApi() + "?" + params;
@@ -237,6 +257,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // 购买成功前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
         buyValidation(nftEquipment);
+
+        //更新背包状态 undeposited
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
+
         // 调用/api/chainOp/buySuccess通知，购买成功
         String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getBuySuccess() + "?" + params;

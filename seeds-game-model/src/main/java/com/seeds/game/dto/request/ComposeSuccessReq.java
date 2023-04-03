@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel(value = "NftMintSuccessReq")
-public class NftMintSuccessReq {
+public class ComposeSuccessReq {
 
     @ApiModelProperty(value = "nftEventId")
     private Long eventId;
@@ -18,18 +18,12 @@ public class NftMintSuccessReq {
     @ApiModelProperty(value = "是否自动托管 1 是 0 否")
     private Integer autoDeposite;
 
-    @ApiModelProperty(value = "mint address")
-    private String mintAddress;
+    @ApiModelProperty(value = "销毁装备地址")
+    private String mintAddresses;
 
-    @ApiModelProperty(value = "name: tokenId")
-    private String name;
+    @ApiModelProperty(value = "销毁装备的签名数组")
+    private String sigs;
 
-    @ApiModelProperty(value = "用户地址")
-    private String owner;
-
-    @ApiModelProperty(value = "交易签名")
-    private String sig;
-
-    @ApiModelProperty(value = "token address")
-    private String tokenAddress;
+    @ApiModelProperty(value = "用户钱包地址")
+    private String walletAddress;
 }
