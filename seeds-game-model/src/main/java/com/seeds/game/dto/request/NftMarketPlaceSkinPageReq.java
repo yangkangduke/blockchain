@@ -23,8 +23,8 @@ public class NftMarketPlaceSkinPageReq extends PageReq {
     @ApiModelProperty("token id")
     private String tokenId;
 
-    @ApiModelProperty("交易模式：1，Buy Now   2，On Auction")
-    private Integer status;
+    @ApiModelProperty("由：auction_id判断：1，0：一口价  2，大于0：On Auction ")
+    private Integer auctionId;
 
     @ApiModelProperty("稀有度：1，Common 2，Rare 3，Epic")
     private Integer rarity;

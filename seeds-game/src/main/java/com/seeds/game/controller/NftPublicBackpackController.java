@@ -43,6 +43,7 @@ public class NftPublicBackpackController {
 
     @Autowired
     private INftPublicBackpackService nftPublicBackpackService;
+
     @Autowired
     private RemoteGameService remoteGameService;
 

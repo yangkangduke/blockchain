@@ -1,4 +1,5 @@
 package com.seeds.game.mapper;
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -20,6 +21,7 @@ public interface NftMarketOrderMapper extends BaseMapper<NftMarketOrderEntity> {
      * @param skinQuery
      * @return
      */
+    @InterceptorIgnore(tenantLine = "true")
     IPage<NftMarketPlaceSkinResp> getSkinPage(Page page,@Param("params") NftMarketPlaceSkinPageReq skinQuery);
 
     /**
@@ -27,6 +29,7 @@ public interface NftMarketOrderMapper extends BaseMapper<NftMarketOrderEntity> {
      * @param equipQuery
      * @return
      */
+    @InterceptorIgnore(tenantLine = "true")
     IPage<NftMarketPlaceEqiupmentResp> getEquipPage(Page page,@Param("params") NftMarketPlaceEquipPageReq equipQuery);
 
     /**
@@ -34,5 +37,6 @@ public interface NftMarketOrderMapper extends BaseMapper<NftMarketOrderEntity> {
      * @param propsQuery
      * @return
      */
+    @InterceptorIgnore(tenantLine = "true")
     IPage<NftMarketPlacePropsResp> getPropsPage(Page page,@Param("params") NftMarketPlacePropsPageReq propsQuery);
 }
