@@ -1,5 +1,6 @@
 package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.NftMarketPlaceDetailViewReq;
 import com.seeds.game.dto.request.NftMarketPlaceEquipPageReq;
@@ -53,19 +54,19 @@ public class PublicNftMarketPlaceController {
 
     @PostMapping("page-skin")
     @ApiOperation("获取皮肤分页信息")
-    public GenericDto<List<NftMarketPlaceSkinResp>> skinQueryPage(@RequestBody NftMarketPlaceSkinPageReq skinQuery){
+    public GenericDto<IPage<NftMarketPlaceSkinResp>> skinQueryPage(@RequestBody NftMarketPlaceSkinPageReq skinQuery){
         return GenericDto.success(nftMarketPlaceService.skinQueryPage(skinQuery));
     }
 
     @PostMapping("page-equip")
     @ApiOperation("获取装备分页信息")
-    public GenericDto<List<NftMarketPlaceEqiupmentResp>>equipQueryPage(@RequestBody NftMarketPlaceEquipPageReq equipQuery){
+    public GenericDto<IPage<NftMarketPlaceEqiupmentResp>>equipQueryPage(@RequestBody NftMarketPlaceEquipPageReq equipQuery){
         return GenericDto.success(nftMarketPlaceService.equipQueryPage(equipQuery));
     }
 
     @PostMapping("page-props")
     @ApiOperation("获取道具分页信息")
-    public GenericDto<List<NftMarketPlacePropsResp>>equipPropsPage(@RequestBody NftMarketPlacePropsPageReq propsQuery){
+    public GenericDto<IPage<NftMarketPlacePropsResp>>equipPropsPage(@RequestBody NftMarketPlacePropsPageReq propsQuery){
         return GenericDto.success(nftMarketPlaceService.propsQueryPage(propsQuery));
     }
 

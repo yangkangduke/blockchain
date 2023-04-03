@@ -4,7 +4,6 @@ import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.NftMarketPlaceService;
-import com.seeds.game.service.INftPublicBackpackService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,6 @@ public class NftMarketPlaceController {
     @Autowired
     private NftMarketPlaceService nftMarketPlaceService;
 
-    @Autowired
-    private INftPublicBackpackService nftPublicBackpackService;
 
     @Autowired
     private INftAttributeService nftAttributeService;

@@ -1,4 +1,5 @@
 package com.seeds.game.dto.request;
+import com.seeds.common.dto.PageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ import java.math.BigDecimal;
  * @date 2023/2/22
  */
 @Data
-public class NftMarketPlaceEquipPageReq {
+public class NftMarketPlaceEquipPageReq extends PageReq {
 
     @ApiModelProperty("NFT名称")
     private String name;

@@ -1,5 +1,6 @@
 package com.seeds.game.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.*;
@@ -78,14 +79,14 @@ public interface NftMarketPlaceService {
      * @param skinQuery
      * @return 商场nft皮肤列表
      */
-    List<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery);
+    IPage<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery);
 
     /**
      * 获取nft 装备列表
      * @param equipQuery
      * @return 商场nft装备列表
      */
-    List<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery);
+    IPage<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery);
 
     /**
      * 浏览量
@@ -99,7 +100,7 @@ public interface NftMarketPlaceService {
      * @param propsQuery
      * @return 商场nft道具列表
      */
-    List<NftMarketPlacePropsResp> propsQueryPage(NftMarketPlacePropsPageReq propsQuery);
+    IPage<NftMarketPlacePropsResp> propsQueryPage(NftMarketPlacePropsPageReq propsQuery);
 
     /**
      * 获取美元汇率

@@ -252,38 +252,51 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
-    public List<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery) {
-        List<NftMarketPlaceSkinResp> skinList = nftMarketOrderMapper.getSkinPage(skinQuery);
-        skinList = skinList.stream().map(p->{
+    public IPage<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery) {
+        Page<NftMarketPlaceSkinResp> page = new Page<>();
+        page.setCurrent(skinQuery.getCurrent());
+        page.setSize(skinQuery.getSize());
+        IPage<NftMarketPlaceSkinResp> skinPage = nftMarketOrderMapper.getSkinPage(page, skinQuery);
+        List<NftMarketPlaceSkinResp> records = skinPage.getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        return page.convert(p -> {
             NftMarketPlaceSkinResp resp = new NftMarketPlaceSkinResp();
             BeanUtils.copyProperties(p, resp);
-            resp.setNumber("#"+p.getTokenId());
+            resp.setNumber("#"+ p.getTokenId());
             if (p.getAuctionId() == 0){
                 resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
             }else {
                 resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
             }
             return resp;
-                }).collect(Collectors.toList());
-        return skinList;
+        });
+
     }
 
     @Override
-    public List<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery) {
-        List<NftMarketPlaceEqiupmentResp> equipList = nftMarketOrderMapper.getEquipPage(equipQuery);
-        equipList = equipList.stream().map(p->{
+    public IPage<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery) {
+        Page<NftMarketPlaceEqiupmentResp> page = new Page<>();
+        page.setCurrent(equipQuery.getCurrent());
+        page.setSize(equipQuery.getSize());
+        IPage<NftMarketPlaceEqiupmentResp> equipPage = nftMarketOrderMapper.getEquipPage(page,equipQuery);
+        List<NftMarketPlaceEqiupmentResp> records = equipPage.getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        return page.convert(p -> {
             NftMarketPlaceEqiupmentResp resp = new NftMarketPlaceEqiupmentResp();
-            BeanUtils.copyProperties(p,resp);
-            resp.setNumber("#" + p.getTokenId());
+            BeanUtils.copyProperties(p, resp);
+            resp.setNumber("#"+ p.getTokenId());
             if (p.getAuctionId() == 0){
                 resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
             }else {
                 resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
             }
-
             return resp;
-        }).collect(Collectors.toList());
-        return equipList;
+        });
+
     }
 
     @Override
@@ -310,21 +323,26 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
-    public List<NftMarketPlacePropsResp> propsQueryPage(NftMarketPlacePropsPageReq propsQuery) {
-
-        List<NftMarketPlacePropsResp> propsList = nftMarketOrderMapper.getPropsPage(propsQuery);
-        propsList = propsList.stream().map(p->{
-            NftMarketPlacePropsResp propsResp = new NftMarketPlacePropsResp();
-            BeanUtils.copyProperties(p,propsResp);
-            propsResp.setNumber("#" + p.getTokenId());
+    public IPage<NftMarketPlacePropsResp> propsQueryPage(NftMarketPlacePropsPageReq propsQuery) {
+        Page<NftMarketPlacePropsResp> page = new Page<>();
+        page.setCurrent(propsQuery.getCurrent());
+        page.setSize(propsQuery.getSize());
+        IPage<NftMarketPlacePropsResp> propPage= nftMarketOrderMapper.getPropsPage(page,propsQuery);
+        List<NftMarketPlacePropsResp> records = propPage.getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        return page.convert(p -> {
+            NftMarketPlacePropsResp resp = new NftMarketPlacePropsResp();
+            BeanUtils.copyProperties(p, resp);
+            resp.setNumber("#"+ p.getTokenId());
             if (p.getAuctionId() == 0){
-                propsResp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
+                resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
             }else {
-                propsResp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
+                resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
             }
-            return propsResp;
-        }).collect(Collectors.toList());
-        return propsList;
+            return resp;
+        });
     }
 
     @Override
