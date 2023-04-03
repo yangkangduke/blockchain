@@ -154,6 +154,12 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Async
     void success(NftEvent nftEvent) {
+
+        try {
+            Thread.sleep(2000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         NftMintSuccessReq req1 = new NftMintSuccessReq();
         req1.setEventId(nftEvent.getId());
         req1.setAutoDeposite(1);
