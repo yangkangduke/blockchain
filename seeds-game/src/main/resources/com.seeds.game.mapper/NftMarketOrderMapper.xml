@@ -31,8 +31,8 @@
         <if test="tokenId != null">
             and t1.token_id = #{tokenId}
         </if>
-        <if test="status != null">
-            and t1.transaction_type  = #{status}
+        <if test="auctionId != null">
+            and t1.auction_id  = #{auctionId}
         </if>
         <if test="rarity != null">
             and t3.rarity = #{rarity}
@@ -45,9 +45,6 @@
         </if>
         <if test="sort != null and sort =='rarity'">
             order by t3.rarity ${sortType}
-        </if>
-        <if test="sort != null and sort =='durability'">
-            order by t3.durability ${sortType}
         </if>
         <if test="sort != null and sort =='place_time'">
             order by t1.place_time ${sortType}
@@ -87,8 +84,8 @@
         <if test="tokenId != null">
             and t1.token_id = #{tokenId}
         </if>
-        <if test="status != null">
-            and t1.transaction_type = #{status}
+        <if test="auctionId != null">
+            and t1.auction_id  = #{auctionId}
         </if>
         <if test="grade != null">
             and t3.grade = #{grade}
@@ -144,8 +141,8 @@
         <if test="tokenId != null">
             and t1.token_id = #{tokenId}
         </if>
-        <if test="status != null">
-            and t1.transaction_type = #{status}
+        <if test="auctionId != null">
+            and t1.auction_id  = #{auctionId}
         </if>
         <if test="grade != null">
             and t3.grade = #{grade}
