@@ -16,6 +16,7 @@ import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.game.config.SeedsApiConfig;
+import com.seeds.game.dto.request.ComposeSuccessReq;
 import com.seeds.game.dto.request.NftMintSuccessReq;
 import com.seeds.game.dto.request.external.MintSuccessMessageDto;
 import com.seeds.game.dto.request.internal.NftEventAddReq;
@@ -256,10 +257,9 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             backpackEntity.setUpdatedBy(nftEvent.getUserId());
             backpackEntity.setCreatedAt(System.currentTimeMillis());
             backpackEntity.setUpdatedAt(System.currentTimeMillis());
-
+            backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
             if (mintSuccessReq.getAutoDeposite().equals(1)) {
                 // 自动托管
-                backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
             } else {
@@ -310,6 +310,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     }
 
+    @Override
+    public void composeSuccess(ComposeSuccessReq req) {
+
+    }
+
 
     // nft 操作通知  // optType 1 mint成功,2取消
     private void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenAddress, Integer itemType, Long autoId, Long configId, Long accId) {
@@ -333,7 +338,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         if (optType.equals(1)) {
             notifyReq.setRegionName(serverRegion.getRegionName());
             notifyReq.setServerName(serverRegion.getGameServerName());
-            notifyReq.setState(autoDeposite.equals(1) ? 3 : 4);
+            notifyReq.setState(autoDeposite.equals(1) ? NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode() : NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
             notifyReq.setTokenAddress(tokenAddress);
         }
         String params = JSONUtil.toJsonStr(notifyReq);
