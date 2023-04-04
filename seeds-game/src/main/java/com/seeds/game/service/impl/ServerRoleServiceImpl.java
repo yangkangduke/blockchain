@@ -61,17 +61,22 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
     @Override
     public void createOrUpdate(ServerRoleCreateUpdateReq req) {
         ServerRoleEntity serverRole = this.getById(req.getId());
+        ServerRegionEntity serverRegion = serverRegionService.getOne(new LambdaQueryWrapper<ServerRegionEntity>()
+                .eq(ServerRegionEntity::getRegion, req.getRegion())
+                .eq(ServerRegionEntity::getGameServer, req.getGameServer()));
+        ServerRoleEntity entity = new ServerRoleEntity();
+        BeanUtils.copyProperties(req, entity);
+        if (null != serverRegion) {
+            entity.setRegionName(serverRegion.getRegionName());
+            entity.setGameServerName(serverRole.getGameServerName());
+        }
         if (Objects.isNull(serverRole)) {
-            ServerRoleEntity entity = new ServerRoleEntity();
-            BeanUtils.copyProperties(req, entity);
             entity.setCreatedAt(System.currentTimeMillis());
             entity.setCreatedBy(req.getUserId());
             entity.setUpdatedAt(System.currentTimeMillis());
             entity.setUpdatedBy(req.getUserId());
             this.save(entity);
         } else {
-            ServerRoleEntity entity = new ServerRoleEntity();
-            BeanUtils.copyProperties(req, entity);
             entity.setUpdatedAt(System.currentTimeMillis());
             entity.setUpdatedBy(req.getUserId());
             this.updateById(entity);
