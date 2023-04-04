@@ -3,6 +3,7 @@ package com.seeds.game.service.impl;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -43,6 +44,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -101,6 +103,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         try {
             GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
             ucUserResp = result.getData();
+            resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
         } catch (Exception e) {
             log.error("内部请求uc获取用户公共地址失败");
         }
@@ -110,26 +113,29 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         // 查询marker order表
         NftMarketOrderEntity order = nftMarketOrderService.getById(nftEquipment.getOrderId());
-        if (order == null) {
-            return resp;
+        if (order != null) {
+            resp.setId(order.getId());
+            resp.setCurrentPrice(order.getPrice());
+            NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(order.getAuctionId());
+            if (auctionSetting != null) {
+                long time = System.currentTimeMillis() - (auctionSetting.getStart() + auctionSetting.getDuration() * 60 * 60 * 1000);
+                resp.setTimeLeft(RelativeDateFormat.formatTime(time));
+            }
         }
-        resp.setId(order.getId());
-        resp.setCurrentPrice(order.getPrice());
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftId);
         if (publicBackpack != null) {
+            resp.setAttributes(JSON.parseObject(publicBackpack.getAttributes(), Map.class));
+            resp.setMetadata(JSON.parseObject(publicBackpack.getMetadata(), Map.class));
             BeanUtils.copyProperties(publicBackpack, resp);
         }
+        resp.setOwnerAddress(nftEquipment.getOwner());
+        resp.setMintAddress(nftEquipment.getMintAddress());
         resp.setNftId(nftEquipment.getId());
         resp.setTokenId(nftEquipment.getTokenId());
         resp.setName(nftEquipment.getName());
         resp.setNumber("#" + nftEquipment.getTokenId());
         resp.setLastUpdated(nftEquipment.getUpdateTime());
-        resp.setState(convertOrderState(nftEquipment.getIsDelete(), nftEquipment.getIsDeposit(), nftEquipment.getOnSale(), order.getStatus(), order.getAuctionId()));
-        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(order.getAuctionId());
-        if (auctionSetting != null) {
-            long time = System.currentTimeMillis() - (auctionSetting.getStart() + auctionSetting.getDuration() * 60 * 60 * 1000);
-            resp.setTimeLeft(RelativeDateFormat.formatTime(time));
-        }
+        resp.setState(convertOrderState(nftEquipment.getIsDelete(), nftEquipment.getIsDeposit(), nftEquipment.getOnSale(), order == null ? null : order.getStatus(), order == null ? null : order.getAuctionId()));
         return resp;
     }
 
@@ -558,14 +564,16 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             state = NftStateEnum.DEPOSITED.getCode();
         } else {
             if (WhetherEnum.YES.value() == onSale) {
-                if (auctionId > 0) {
+                if (auctionId == null) {
+                    state = NftStateEnum.UNDEPOSITED.getCode();
+                } else if (auctionId > 0) {
                     state = NftStateEnum.ON_AUCTION.getCode();
                 } else {
                     state = NftStateEnum.ON_SHELF.getCode();
                 }
             } else {
                 // 下架但挂单中，结算中
-                if (NftOrderStatusEnum.PENDING.getCode() == orderStatus) {
+                if (NftOrderStatusEnum.PENDING.getCode().equals(orderStatus)) {
                     state = NftStateEnum.IN_SETTLEMENT.getCode();
                 } else {
                     state = NftStateEnum.UNDEPOSITED.getCode();

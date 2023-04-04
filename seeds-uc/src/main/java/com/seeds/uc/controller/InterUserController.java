@@ -92,7 +92,7 @@ public class InterUserController {
     @ApiOperation("根据用户钱包地址获取用户信息")
     @Inner
     @GetMapping("/get-by-public-address")
-    GenericDto<UcUserResp> getByPublicAddress(String publicAddress) {
+    GenericDto<UcUserResp> getByPublicAddress(@RequestParam String publicAddress) {
         return GenericDto.success(ucUserService.getByPublicAddress(publicAddress));
     }
 

@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * @author hang.yu
@@ -25,6 +26,9 @@ public class NftMarketPlaceDetailResp {
     @JsonSerialize(using= ToStringSerializer.class)
     private Long nftId;
 
+    @ApiModelProperty("NFT address")
+    private String mintAddress;
+
     @ApiModelProperty("NFT名称")
     private String name;
 
@@ -39,6 +43,12 @@ public class NftMarketPlaceDetailResp {
 
     @ApiModelProperty("NFT拥有用户名称")
     private String ownerName;
+
+    @ApiModelProperty("NFT拥有用户地址")
+    private String ownerAddress;
+
+    @ApiModelProperty("是否是拥有者，0 否 1 是")
+    private Integer isOwner = 0;
 
     @ApiModelProperty("浏览量")
     private Integer views;
@@ -59,10 +69,10 @@ public class NftMarketPlaceDetailResp {
     private String timeLeft;
 
     @ApiModelProperty("NFT动态属性")
-    private String attributes;
+    private Map attributes;
 
     @ApiModelProperty("NFT元数据")
-    private String metadata;
+    private Map metadata;
 
     @ApiModelProperty("合约地址")
     private String contractAddress;
