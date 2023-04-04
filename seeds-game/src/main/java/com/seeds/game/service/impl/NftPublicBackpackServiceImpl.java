@@ -539,7 +539,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             distributeReq.setImgUrl(nftItem.getImage());
         }
         distributeReq.setConfigId(nftItem.getItemId().intValue());
-        distributeReq.setTokenId(nftItem.getTokenAddress());
+        distributeReq.setTokenAddress(nftItem.getTokenAddress());
         distributeReq.setServerName(serverRegion.getGameServerName());
         distributeReq.setRegionName(serverRegion.getRegionName());
 
@@ -599,7 +599,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         takeback.setAutoId(nftItem.getAutoId());
         takeback.setAccId(nftItem.getServerRoleId());
         takeback.setConfigId(nftItem.getItemId().intValue());
-        takeback.setTokenId(nftItem.getTokenAddress());
+        takeback.setTokenAddress(nftItem.getTokenAddress());
 
         String params = JSONUtil.toJsonStr(takeback);
 
