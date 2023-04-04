@@ -44,7 +44,7 @@ public class NftBritishAuctionShelfReq {
 
     @ApiModelProperty("开始时间")
     @NotBlank(message = "Start time cannot be empty")
-    private String start;
+    private Long startTime;
 
     @ApiModelProperty("开始价格")
     @NotNull(message = "Start price cannot be empty")

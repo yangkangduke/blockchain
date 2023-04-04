@@ -38,7 +38,7 @@ public class EnglishAuctionReqDto {
     private String signature;
 
     @ApiModelProperty("开始时间")
-    private String start;
+    private Long startTime;
 
     @ApiModelProperty("开始价格")
     private BigDecimal startPrice;

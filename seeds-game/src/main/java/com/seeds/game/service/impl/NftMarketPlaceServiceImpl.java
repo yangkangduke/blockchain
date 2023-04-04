@@ -217,6 +217,36 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
 
         // 调用/api/chainOp/cancelOrder通知，下架成功
+        String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCancelOrderApi() + "?" + params;
+        log.info("NFT下架成功，开始通知， url:{}， params:{}", url, params);
+        try {
+            HttpRequest.get(url)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .execute();
+        } catch (Exception e) {
+            log.error("NFT下架成功通知失败，message：{}", e.getMessage());
+        }
+
+    }
+
+    @Override
+    public void cancelAuction(NftCancelAuctionReq req) {
+        // 取消拍卖前的校验
+        NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
+        shelfValidation(nftEquipment);
+        // 没有进行中的拍卖
+        if (nftEquipment.getAuctionId() <= 0) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+        }
+
+        // 更新背包状态 undeposited
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
+
+        // 调用/api/chainOp/cancelOrder通知，取消拍卖成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionCancel();
         EndAuctionMessageDto dto  = new EndAuctionMessageDto();
         BeanUtils.copyProperties(req, dto);
@@ -234,35 +264,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .execute();
         } catch (Exception e) {
             log.error("NFT取消拍卖成功通知失败，message：{}", e.getMessage());
-        }
-    }
-
-    @Override
-    public void cancelAuction(NftShelvedReq req) {
-        // 取消拍卖前的校验
-        NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
-        shelfValidation(nftEquipment);
-        // 没有进行中的拍卖
-        if (nftEquipment.getAuctionId() <= 0) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
-        }
-
-        // 更新背包状态 undeposited
-        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
-        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
-
-        // 调用/api/chainOp/cancelOrder通知，取消拍卖成功
-        String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
-        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCancelOrderApi() + "?" + params;
-        log.info("NFT下架成功，开始通知， url:{}， params:{}", url, params);
-        try {
-            HttpRequest.get(url)
-                    .timeout(5 * 1000)
-                    .header("Content-Type", "application/json")
-                    .execute();
-        } catch (Exception e) {
-            log.error("NFT下架成功通知失败，message：{}", e.getMessage());
         }
     }
 

@@ -414,11 +414,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (WhetherEnum.YES.value() == nft.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
         }
-        // NFT结算中不能托管
-        NftMarketOrderEntity nftMarketOrderEntity = nftMarketOrderService.queryByMintAddressAndStatus(nft.getMintAddress(), NftOrderStatusEnum.PENDING.getCode());
-        if (nftMarketOrderEntity != null) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10017_NFT_ITEM_IN_SETTLEMENT);
-        }
         //更新背包状态 deposited
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
         backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());

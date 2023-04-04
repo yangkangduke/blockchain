@@ -45,7 +45,7 @@ public class NftMarketPlaceController {
 
     @PostMapping("cancel-auction")
     @ApiOperation("取消拍卖")
-    public GenericDto<Object> cancelAuction(@Valid @RequestBody NftShelvedReq req) {
+    public GenericDto<Object> cancelAuction(@Valid @RequestBody NftCancelAuctionReq req) {
         nftMarketPlaceService.cancelAuction(req);
         return GenericDto.success(null);
     }
