@@ -67,7 +67,7 @@ public class NftEventController {
     @PostMapping("mint-success")
     @ApiOperation("mint 操作成功")
     GenericDto<Object> mintSuccess(@RequestBody NftMintSuccessReq mintSuccessReq) {
-        nftEventService.OptSuccess(mintSuccessReq);
+        nftEventService.mintSuccess(mintSuccessReq);
         return GenericDto.success(null);
     }
 

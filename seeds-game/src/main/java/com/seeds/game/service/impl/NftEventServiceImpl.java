@@ -175,8 +175,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         NftMintSuccessReq req1 = new NftMintSuccessReq();
         req1.setEventId(nftEvent.getId());
         req1.setAutoDeposite(1);
-        req1.setTokenAddress(nftEvent.getId() + "token0xabc");
-        this.OptSuccess(req1);
+        req1.setMintAddress(nftEvent.getId() + "token0xabc");
+        this.mintSuccess(req1);
     }
 
     @Override
@@ -215,7 +215,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Override
     @Transactional
-    public void OptSuccess(NftMintSuccessReq mintSuccessReq) {
+    public void mintSuccess(NftMintSuccessReq mintSuccessReq) {
         NftEvent nftEvent = this.getById(mintSuccessReq.getEventId());
         NftEventEquipment equipment = eventEquipmentService
                 .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
@@ -241,7 +241,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         }
 
 //        // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
-//        this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getTokenAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+//        this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getMintAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
 
         //   插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         if (Objects.nonNull(data)) {
