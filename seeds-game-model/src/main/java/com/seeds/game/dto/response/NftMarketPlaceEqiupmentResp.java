@@ -59,4 +59,10 @@ public class NftMarketPlaceEqiupmentResp implements Serializable {
 
     @ApiModelProperty("blade属性综合介绍")
     private String bladeBuff;
+
+    @ApiModelProperty("稀有属性值")
+    private String rarityAttrValue;
+
+    @ApiModelProperty("基础属性值")
+    private String baseAttrValue;
 }
