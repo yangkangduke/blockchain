@@ -13,10 +13,10 @@ public enum NftOrderStatusEnum {
     CANCELED(2,"已取消"),
     ;
 
-    private int code;
+    private Integer code;
     private String message;
 
-    NftOrderStatusEnum(int code, String message){
+    NftOrderStatusEnum(Integer code, String message){
         this.code = code;
         this.message = message;
     }

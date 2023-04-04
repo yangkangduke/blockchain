@@ -1,12 +1,10 @@
 package com.seeds.game.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 
 public interface NftMarketPlaceService {

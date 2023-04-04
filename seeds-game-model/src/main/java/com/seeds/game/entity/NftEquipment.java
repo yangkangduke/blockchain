@@ -72,4 +72,7 @@ public class NftEquipment implements Serializable {
     @ApiModelProperty("取消时间")
     private Long cancelTime;
 
+    @ApiModelProperty("拍卖ID")
+    private Long auctionId;
+
 }
