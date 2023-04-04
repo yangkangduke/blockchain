@@ -162,10 +162,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         success(nftEvent);
     }
 
+    @Async
     void success(NftEvent nftEvent) {
 
         try {
-            Thread.sleep(1000L);
+            Thread.sleep(5000L);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
