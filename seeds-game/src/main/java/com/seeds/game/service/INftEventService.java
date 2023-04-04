@@ -34,7 +34,7 @@ public interface INftEventService extends IService<NftEvent> {
 
     List<EventTypeNum> getTypeNum(Long userId);
 
-    void OptSuccess(NftMintSuccessReq mintSuccessReq);
+    void mintSuccess(NftMintSuccessReq mintSuccessReq);
 
     void composeSuccess(ComposeSuccessReq req);
 }

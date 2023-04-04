@@ -54,4 +54,7 @@ public class SeedsApiConfig {
     @Value("${seeds.api.mintSuccess:/api/equipment/mintSuccess}")
     private String mintSuccess;
 
+    @Value("${seeds.api.compose:/api/equipment/compose}")
+    private String compose;
+
 }
