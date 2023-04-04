@@ -35,6 +35,12 @@ public interface NftMarketPlaceService {
     void shelved(NftShelvedReq req);
 
     /**
+     * nft取消拍卖
+     * @param req 收据
+     */
+    void cancelAuction(NftShelvedReq req);
+
+    /**
      * nft拍卖出价
      * @param req 收据
      */

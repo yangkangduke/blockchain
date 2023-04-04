@@ -39,10 +39,13 @@ public class SeedsApiConfig {
     @Value("${seeds.api.buySuccess:/api/chainOp/buySuccess}")
     private String buySuccess;
 
+    @Value("${seeds.api.auctionCancel:/api/auction/cancelBid}")
+    private String auctionCancelBid;
+
     @Value("${seeds.api.endAuction:/api/auction/endAuction}")
     private String endAuction;
 
-    @Value("${seeds.api.auctionCancel:/api/auction/cancel}")
+    @Value("${seeds.api.auctionCancel:/api/auction/cancelAuction}")
     private String auctionCancel;
 
     @Value("${seeds.api.withdrawNft:/api/equipment/withdrawNft}")

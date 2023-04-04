@@ -22,7 +22,6 @@ import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
-import com.seeds.game.enums.NftOrderStatusEnum;
 import com.seeds.game.enums.NftStateEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftEquipmentMapper;
@@ -113,10 +112,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         // 查询marker order表
         NftMarketOrderEntity order = nftMarketOrderService.getById(nftEquipment.getOrderId());
+        NftAuctionHouseSetting auctionSetting = null;
         if (order != null) {
             resp.setId(order.getId());
             resp.setCurrentPrice(order.getPrice());
-            NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(order.getAuctionId());
+            auctionSetting = nftAuctionHouseSettingService.getById(order.getAuctionId());
             if (auctionSetting != null) {
                 long time = System.currentTimeMillis() - (auctionSetting.getStartTime() + auctionSetting.getDuration() * 60 * 60 * 1000);
                 resp.setTimeLeft(RelativeDateFormat.formatTime(time));
@@ -135,7 +135,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         resp.setName(nftEquipment.getName());
         resp.setNumber("#" + nftEquipment.getTokenId());
         resp.setLastUpdated(nftEquipment.getUpdateTime());
-        resp.setState(convertOrderState(nftEquipment.getIsDelete(), nftEquipment.getIsDeposit(), nftEquipment.getOnSale(), order == null ? null : order.getStatus(), order == null ? null : order.getAuctionId()));
+        resp.setState(convertOrderState(nftEquipment, order, auctionSetting));
         return resp;
     }
 
@@ -217,6 +217,42 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
 
         // 调用/api/chainOp/cancelOrder通知，下架成功
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionCancel();
+        EndAuctionMessageDto dto  = new EndAuctionMessageDto();
+        BeanUtils.copyProperties(req, dto);
+        dto.setAuctionId(nftEquipment.getAuctionId());
+        dto.setMintAddress(nftEquipment.getMintAddress());
+        dto.setNftId(nftEquipment.getId());
+        dto.setToAddress(nftEquipment.getOwner());
+        String param = JSONUtil.toJsonStr(dto);
+        log.info("NFT取消拍卖成功，开始通知， url:{}， params:{}", url, param);
+        try {
+            HttpRequest.post(url)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+        } catch (Exception e) {
+            log.error("NFT取消拍卖成功通知失败，message：{}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void cancelAuction(NftShelvedReq req) {
+        // 取消拍卖前的校验
+        NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
+        shelfValidation(nftEquipment);
+        // 没有进行中的拍卖
+        if (nftEquipment.getAuctionId() <= 0) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+        }
+
+        // 更新背包状态 undeposited
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
+
+        // 调用/api/chainOp/cancelOrder通知，取消拍卖成功
         String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCancelOrderApi() + "?" + params;
         log.info("NFT下架成功，开始通知， url:{}， params:{}", url, params);
@@ -242,6 +278,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         if (WhetherEnum.YES.value() == auction.getIsFinished()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10012_NFT_ITEM_AUCTION_HAS_ENDED);
+        }
+        // 拍卖到期不能出价
+        if (System.currentTimeMillis() > auction.getStartTime() + auction.getDuration() * 60 * 60 * 1000) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10017_NFT_ITEM_IN_SETTLEMENT);
         }
         // 调用/api/auction/bid通知，出价成功
         String params = String.format("auctionId=%s&receipt=%s&sig=%s", req.getAuctionId(), req.getReceipt(), req.getSig());
@@ -498,7 +538,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         ucUserService.ownerValidation(auctionBiding.getBuyer());
         // 调用/api/auction/cancelBid通知，取消出价成功
         String params = String.format("bidingId=%s&receipt=%s&signature=%s", req.getBidingId(), req.getReceipt(), req.getSignature());
-        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionCancel() + "?" + params;
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionCancelBid() + "?" + params;
         log.info("NFT取消出价成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpRequest.get(url)
@@ -514,13 +554,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (nftEquipment == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
         }
-        // 归属人才能上架
+        // 归属人才能上/下架
         ucUserService.ownerValidation(nftEquipment.getOwner());
         // NFT装备还未生成
         if (WhetherEnum.NO.value() == nftEquipment.getNftGenerated()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10009_NFT_ITEM_HAS_NOT_BEEN_GENERATED);
         }
-        // 已托管不能上架
+        // 已托管不能上/下架
         if (WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
         }
@@ -555,29 +595,33 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     }
 
-    private Integer convertOrderState(Integer isBurned, Integer isDeposit, Integer onSale, Integer orderStatus, Long auctionId) {
+    private Integer convertOrderState(NftEquipment nftEquipment, NftMarketOrderEntity order, NftAuctionHouseSetting auction) {
         int state;
-        if (WhetherEnum.YES.value() == isBurned) {
+        if (WhetherEnum.YES.value() == nftEquipment.getIsDelete()) {
             return NftStateEnum.BURNED.getCode();
         }
-        if (WhetherEnum.YES.value() == isDeposit) {
+        if (WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
             state = NftStateEnum.DEPOSITED.getCode();
         } else {
-            if (WhetherEnum.YES.value() == onSale) {
-                if (auctionId == null) {
+            if (WhetherEnum.YES.value() == nftEquipment.getOnSale()) {
+                if (order == null) {
                     state = NftStateEnum.UNDEPOSITED.getCode();
-                } else if (auctionId > 0) {
-                    state = NftStateEnum.ON_AUCTION.getCode();
                 } else {
-                    state = NftStateEnum.ON_SHELF.getCode();
+                    if (auction == null) {
+                        state = NftStateEnum.ON_SHELF.getCode();
+                    } else {
+                        // 拍卖时间到期为结算中
+                        if (System.currentTimeMillis() > auction.getStartTime() + auction.getDuration() * 60 * 60 * 1000) {
+                            state = NftStateEnum.IN_SETTLEMENT.getCode();
+                        } else {
+                            // 拍卖中
+                            state = NftStateEnum.ON_AUCTION.getCode();
+                        }
+                    }
                 }
             } else {
-                // 下架但挂单中，结算中
-                if (NftOrderStatusEnum.PENDING.getCode().equals(orderStatus)) {
-                    state = NftStateEnum.IN_SETTLEMENT.getCode();
-                } else {
-                    state = NftStateEnum.UNDEPOSITED.getCode();
-                }
+                // 未上架
+                state = NftStateEnum.UNDEPOSITED.getCode();
             }
         }
         return state;

@@ -24,7 +24,6 @@ import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
-import com.seeds.game.enums.NftOrderStatusEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftPublicBackpackMapper;
 import com.seeds.game.mq.producer.KafkaProducer;
@@ -413,11 +412,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         // NFT上架中不能托管
         if (WhetherEnum.YES.value() == nft.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
-        }
-        // NFT结算中不能托管
-        NftMarketOrderEntity nftMarketOrderEntity = nftMarketOrderService.queryByMintAddressAndStatus(nft.getMintAddress(), NftOrderStatusEnum.PENDING.getCode());
-        if (nftMarketOrderEntity != null) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10017_NFT_ITEM_IN_SETTLEMENT);
         }
         // NFT非归属人不能托管
         ucUserService.ownerValidation(nft.getOwner());
