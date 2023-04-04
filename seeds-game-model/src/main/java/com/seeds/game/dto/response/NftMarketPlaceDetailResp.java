@@ -1,5 +1,7 @@
 package com.seeds.game.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,10 +18,12 @@ import java.math.BigDecimal;
 public class NftMarketPlaceDetailResp {
 
     @ApiModelProperty("商品id")
-    private String id;
+    @JsonSerialize(using= ToStringSerializer.class)
+    private Long id;
 
     @ApiModelProperty("nft id")
-    private String nftId;
+    @JsonSerialize(using= ToStringSerializer.class)
+    private Long nftId;
 
     @ApiModelProperty("NFT名称")
     private String name;
