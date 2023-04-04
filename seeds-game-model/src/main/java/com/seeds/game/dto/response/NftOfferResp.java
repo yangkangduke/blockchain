@@ -1,6 +1,8 @@
 package com.seeds.game.dto.response;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -28,9 +30,11 @@ public class NftOfferResp {
     public static class NftOffer {
 
         @ApiModelProperty("offerId")
+        @JsonSerialize(using= ToStringSerializer.class)
         private Long id;
 
         @ApiModelProperty("拍卖订单Id")
+        @JsonSerialize(using= ToStringSerializer.class)
         private Long auctionId;
 
         @ApiModelProperty("拍卖合约地址")
