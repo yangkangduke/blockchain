@@ -4,7 +4,6 @@ import cn.hutool.extra.cglib.CglibUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -18,7 +17,6 @@ import com.seeds.common.enums.ApiType;
 import com.seeds.game.config.SeedsApiConfig;
 import com.seeds.game.dto.request.ComposeSuccessReq;
 import com.seeds.game.dto.request.NftMintSuccessReq;
-import com.seeds.game.dto.request.external.MintSuccessMessageDto;
 import com.seeds.game.dto.request.internal.NftEventAddReq;
 import com.seeds.game.dto.request.internal.NftEventEquipmentReq;
 import com.seeds.game.dto.request.internal.NftEventNotifyReq;
@@ -221,27 +219,37 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
 
         // 调用/api/equipment/mintSuccess  mint成功
-        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getMintSuccess();
-        MintSuccessMessageDto dto = new MintSuccessMessageDto();
-        BeanUtils.copyProperties(mintSuccessReq, dto);
-        String param = JSONUtil.toJsonStr(dto);
-        log.info("mint成功，开始通知， url:{}， params:{}", url, param);
-        MintSuccessMessageResp data = null;
-        try {
-            HttpResponse response = HttpRequest.post(url)
-                    .timeout(5 * 1000)
-                    .header("Content-Type", "application/json")
-                    .body(param)
-                    .execute();
-            JSONObject jsonObject = JSONObject.parseObject(response.body());
-            data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
+//        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getMintSuccess();
+//        MintSuccessMessageDto dto = new MintSuccessMessageDto();
+//        BeanUtils.copyProperties(mintSuccessReq, dto);
+//        String param = JSONUtil.toJsonStr(dto);
+//        log.info("mint成功，开始通知， url:{}， params:{}", url, param);
+//        MintSuccessMessageResp data = null;
+//        try {
+//            HttpResponse response = HttpRequest.post(url)
+//                    .timeout(5 * 1000)
+//                    .header("Content-Type", "application/json")
+//                    .body(param)
+//                    .execute();
+//            JSONObject jsonObject = JSONObject.parseObject(response.body());
+//            data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
+//
+//        } catch (Exception e) {
+//            log.error("mint成功通知失败，message：{}", e.getMessage());
+//        }
 
-        } catch (Exception e) {
-            log.error("mint成功通知失败，message：{}", e.getMessage());
-        }
+        // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
+        this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getMintAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
 
-//        // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
-//        this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getMintAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+        MintSuccessMessageResp data = new MintSuccessMessageResp();
+        data.setId(nftEvent.getId());
+        data.setName("Seeds NFT #" + nftEvent.getId());
+        data.setOwner("xxaa");
+        data.setTokenId(nftEvent.getId());
+        data.setMintAddress(mintSuccessReq.getMintAddress());
+
+        // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
+        this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getMintAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
 
         //   插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         if (Objects.nonNull(data)) {
