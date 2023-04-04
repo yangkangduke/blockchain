@@ -39,7 +39,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -251,7 +250,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             backpackEntity.setCreatedAt(System.currentTimeMillis());
             backpackEntity.setUpdatedAt(System.currentTimeMillis());
             backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
-            if (mintSuccessReq.getAutoDeposite().equals(1)) {
+            if (mintSuccessReq.getAutoDeposite().equals(WhetherEnum.YES.value())) {
                 // 自动托管
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
@@ -331,7 +330,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         if (optType.equals(1)) {
             notifyReq.setRegionName(serverRegion.getRegionName());
             notifyReq.setServerName(serverRegion.getGameServerName());
-            notifyReq.setState(autoDeposite.equals(1) ? NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode() : NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+            notifyReq.setState(autoDeposite.equals(WhetherEnum.YES.value()) ? NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode() : NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
             notifyReq.setTokenAddress(tokenAddress);
         }
         String params = JSONUtil.toJsonStr(notifyReq);
