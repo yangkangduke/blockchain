@@ -87,4 +87,24 @@ public class NFTEnumConstant {
 
     }
 
+    /**
+     * nft 类型枚举
+     */
+    @Getter
+    public enum NftTypeEnum {
+
+        EQUIP(1, "装备"),
+        PROPS(2, "道具"),
+        HERO(3, "英雄");
+
+        private int code;
+        private String desc;
+
+        NftTypeEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+    }
+
+
 }

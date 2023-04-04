@@ -413,6 +413,15 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (WhetherEnum.YES.value() == nft.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
         }
+        // NFT结算中不能托管
+        NftMarketOrderEntity nftMarketOrderEntity = nftMarketOrderService.queryByMintAddressAndStatus(nft.getMintAddress(), NftOrderStatusEnum.PENDING.getCode());
+        if (nftMarketOrderEntity != null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10017_NFT_ITEM_IN_SETTLEMENT);
+        }
+        //更新背包状态 deposited
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
+        this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nft.getId()));
         // NFT非归属人不能托管
         ucUserService.ownerValidation(nft.getOwner());
         // 调用/api/equipment/depositNft通知，托管NFT成功
@@ -450,11 +459,19 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (WhetherEnum.NO.value() == nft.getIsDeposit()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10016_NFT_ITEM_HAS_BEEN_RETRIEVED);
         }
+        // 更改背包状态，通知游戏方NFT收回到背包。
+        // 调用游戏方接口，执行收回
+        this.callGameTakeback(backpackNft);
+        // 更新背包状态
+        backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+        backpackNft.setServerRoleId(0L);
+        backpackNft.setUpdatedAt(System.currentTimeMillis());
+        this.updateById(backpackNft);
         // NFT非归属人不能取回
         ucUserService.ownerValidation(nft.getOwner());
         // 调用/api/equipment/withdrawNft通知，取回NFT成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getWithdrawNft();
-        TransferNftMessageDto dto  = new TransferNftMessageDto();
+        TransferNftMessageDto dto = new TransferNftMessageDto();
         BeanUtils.copyProperties(req, dto);
         dto.setMintAddress(nft.getMintAddress());
         String param = JSONUtil.toJsonStr(dto);
@@ -517,11 +534,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         distributeReq.setAutoId(nftItem.getAutoId());
         distributeReq.setAccId(serverRoleId);
         distributeReq.setType(nftItem.getType());
-        if (nftItem.getType().equals(3)) {
+        if (nftItem.getType().equals(NFTEnumConstant.NftTypeEnum.HERO.getCode())) {
             distributeReq.setImgUrl(nftItem.getImage());
         }
         distributeReq.setConfigId(nftItem.getItemId().intValue());
-        distributeReq.setTokenId(nftItem.getTokenId());
+        distributeReq.setTokenAddress(nftItem.getTokenAddress());
         distributeReq.setServerName(serverRegion.getGameServerName());
         distributeReq.setRegionName(serverRegion.getRegionName());
 
@@ -581,7 +598,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         takeback.setAutoId(nftItem.getAutoId());
         takeback.setAccId(nftItem.getServerRoleId());
         takeback.setConfigId(nftItem.getItemId().intValue());
-        takeback.setTokenId(nftItem.getTokenId());
+        takeback.setTokenAddress(nftItem.getTokenAddress());
 
         String params = JSONUtil.toJsonStr(takeback);
 
