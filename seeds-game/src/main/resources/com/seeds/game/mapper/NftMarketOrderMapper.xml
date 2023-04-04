@@ -74,7 +74,10 @@
         t3.armor,
         t3.vs_monster,
         t3.passive,
-        t3.blade_buff
+        t3.blade_buff,
+        t3.rarity_attr_value,
+        t3.base_attr_value
+
         from z_market_order t1
         left join ga_nft_public_backpack t2 on CONVERT(t1.token_id USING gbk) = t2.token_id and CONVERT(t1.mint_address USING gbk) = t2.token_address
         left join ga_nft_attribute t3 on t2.token_id  = t3.token_id and t2.token_address = t3.mint_address
@@ -92,8 +95,11 @@
         <if test="params.grade != null">
             and t3.grade = #{params.grade}
         </if>
-        <if test="params.durability != null">
-            and t3.durability = #{params.durability}
+        <if test="params.minDurability != null">
+            and t3.durability &gt;= ${params.minDurability}
+        </if>
+        <if test="params.maxDurability != null">
+            and t3.durability &lt;= ${params.maxDurability}
         </if>
         <if test="params.minPrice != null">
             and t1.price &gt;= ${params.minPrice}
@@ -131,7 +137,9 @@
         t3.armor,
         t3.vs_monster,
         t3.passive,
-        t3.blade_buff
+        t3.blade_buff,
+        t3.rarity_attr_value,
+        t3.base_attr_value
 
         from z_market_order t1
         left join ga_nft_public_backpack t2 on CONVERT(t1.token_id USING gbk) = t2.token_id and CONVERT(t1.mint_address USING gbk) = t2.token_address
@@ -150,8 +158,11 @@
         <if test="params.grade != null">
             and t3.grade = #{params.grade}
         </if>
-        <if test="params.durability != null">
-            and t3.durability = #{params.durability}
+        <if test="params.minDurability != null">
+            and t3.durability &gt;= ${params.minDurability}
+        </if>
+        <if test="params.maxDurability != null">
+            and t3.durability &lt;= ${params.maxDurability}
         </if>
         <if test="params.minPrice != null">
             and t1.price &gt;= ${params.minPrice}

@@ -13,10 +13,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class NftDepositedReq {
 
-    @ApiModelProperty("Nft id")
-    @NotNull(message = "Nft id cannot be empty")
-    private Long nftId;
-
     @ApiModelProperty("交易签名")
     @NotBlank(message = "Sig cannot be empty")
     private String sig;
@@ -25,4 +21,12 @@ public class NftDepositedReq {
     @NotBlank(message = "Token address cannot be empty")
     private String tokenAddress;
 
+    @ApiModelProperty("nft地址")
+    private String mintAddress;
+
+    @ApiModelProperty("tokenId")
+    private String name;
+
+    @ApiModelProperty("用户地址")
+    private String owner;
 }

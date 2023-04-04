@@ -1,67 +1,44 @@
 package com.seeds.game.service.impl;
 
-import cn.hutool.extra.cglib.CglibUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
-import com.seeds.game.config.SeedsApiConfig;
-import com.seeds.game.dto.request.ComposeSuccessReq;
 import com.seeds.game.dto.request.NftMintSuccessReq;
-import com.seeds.game.dto.request.external.MintSuccessMessageDto;
-import com.seeds.game.dto.request.internal.NftEventAddReq;
-import com.seeds.game.dto.request.internal.NftEventEquipmentReq;
 import com.seeds.game.dto.request.internal.NftEventNotifyReq;
-import com.seeds.game.dto.request.internal.NftEventPageReq;
-import com.seeds.game.dto.response.EventTypeNum;
 import com.seeds.game.dto.response.MintSuccessMessageResp;
-import com.seeds.game.dto.response.NftEventEquipmentResp;
-import com.seeds.game.dto.response.NftEventResp;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
 import com.seeds.game.exception.GenericException;
-import com.seeds.game.mapper.NftEventMapper;
 import com.seeds.game.service.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
- * <p>
- * nft通知 服务实现类
- * </p>
- *
- * @author hewei
- * @since 2023-03-23
+ * @author: hewei
+ * @date 2023/4/4
  */
 @Service
 @Slf4j
-public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> implements INftEventService {
+public class AsyncNotifyGame {
 
+    @Autowired
+    @Lazy
+    private INftEventService nftEventService;
     @Autowired
     private INftEventEquipmentService eventEquipmentService;
 
@@ -83,158 +60,48 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Lazy
     private INftPublicBackpackService nftPublicBackpackService;
 
-    @Autowired
-    private SeedsApiConfig seedsApiConfig;
-
-    @Autowired
-    private AsyncNotifyGame asyncNotifyGame;
-
-    @Override
-    @Transactional
-    public IPage<NftEventResp> getPage(NftEventPageReq req) {
-
-
-        LambdaQueryWrapper<NftEvent> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Objects.nonNull(req.getType()), NftEvent::getType, req.getType())
-                .eq(NftEvent::getUserId, req.getUserId())
-                .in(!CollectionUtils.isEmpty(req.getStatus()), NftEvent::getStatus, req.getStatus());
-
-        wrapper.last(!CollectionUtils.isEmpty(req.getSorts()), NftEventPageReq.getOrderByStatement(req.getSorts()));
-        Page<NftEvent> page = new Page<>(req.getCurrent(), req.getSize());
-        List<NftEvent> records = this.page(page, wrapper).getRecords();
-        if (CollectionUtils.isEmpty(records)) {
-            return page.convert(p -> null);
-        }
-        // 获取事件涉及的装备
-        List<Long> eventIds = records.stream().map(p -> p.getId()).collect(Collectors.toList());
-        Map<Long, List<NftEventEquipment>> map = eventEquipmentService.list(new LambdaQueryWrapper<NftEventEquipment>().in(NftEventEquipment::getEventId, eventIds))
-                .stream().collect(Collectors.groupingBy(NftEventEquipment::getEventId));
-
-        // 更新未读数（click设置为以点击）
-        baseMapper.updateClick(req.getType(), req.getUserId());
-
-        return page.convert(p -> {
-            NftEventResp resp = new NftEventResp();
-            BeanUtils.copyProperties(p, resp);
-            List<NftEventEquipment> equipments = map.get(p.getId());
-            if (!CollectionUtils.isEmpty(equipments)) {
-                resp.setEventEquipments(CglibUtil.copyList(equipments, NftEventEquipmentResp::new));
-            }
-            return resp;
-        });
-
-    }
-
-    @Override
-    public Long getHandleFlag(Long userId) {
-        return this.count(new LambdaQueryWrapper<NftEvent>().eq(NftEvent::getUserId, userId).eq(NftEvent::getClick, WhetherEnum.NO.value()));
-    }
-
-    @Override
-    @Transactional
-    public void toNft(NftEventAddReq req) {
-        if (req.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
-            // 合成时作为材料的nft标记为临时锁定，
-            NftEventEquipmentReq equipment = req.getEquipments().stream()
-                    .filter(p -> p.getIsNft().equals(WhetherEnum.YES.value()) && p.getIsConsume().equals(WhetherEnum.YES.value()))
-                    .collect(Collectors.toList()).get(0);
-
-            NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
-            entity.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
-            nftPublicBackpackService.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, equipment.getAutoId()));
-        }
-        // 记录toNFT请求
-        NftEvent nftEvent = new NftEvent();
-        BeanUtils.copyProperties(req, nftEvent);
-        List<NftEventEquipmentReq> eventEquipmentReqs = req.getEquipments().stream().filter(p -> p.getIsConsume().equals(WhetherEnum.NO.value())).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(eventEquipmentReqs)) {
-            nftEvent.setName(eventEquipmentReqs.get(0).getName());
-        }
-        nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.PENDING.getCode());
-        nftEvent.setCreatedAt(System.currentTimeMillis());
-        nftEvent.setCreatedBy(req.getUserId());
-        nftEvent.setUpdatedAt(System.currentTimeMillis());
-        nftEvent.setUpdatedBy(req.getUserId());
-        this.save(nftEvent);
-        List<NftEventEquipment> equipments = CglibUtil.copyList(req.getEquipments(), NftEventEquipment::new);
-
-        equipments.forEach(p -> {
-            p.setEventId(nftEvent.getId());
-        });
-        eventEquipmentService.saveBatch(equipments);
-
-        // todo 后期去掉 方便游戏测试直接mint成功
-        NftMintSuccessReq req1 = new NftMintSuccessReq();
-        req1.setEventId(nftEvent.getId());
-        req1.setAutoDeposite(1);
-        req1.setMintAddress(nftEvent.getId() + "token0xabc");
-        asyncNotifyGame.mintSuccess(req1);
-    }
-
-
-    @Override
-    public Boolean delete(Long id) {
-        return this.removeById(id);
-    }
-
-    @Override
-    public Boolean cancel(Long id) {
-
-        NftEvent nftEvent = new NftEvent();
-        nftEvent.setId(id);
-        nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.CANCELLED.getCode());
-
-        // 通知游戏方事件取消
-        NftEvent event = this.getById(id);
-        NftEventEquipment equipment = eventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-        this.callGameNotify(event.getServerRoleId(), 0, 2, "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId());
-        // 更新本地数据库
-
-        List<NftEventEquipment> equipments = eventEquipmentService.list(new LambdaQueryWrapper<NftEventEquipment>().in(NftEventEquipment::getEventId, id));
-        equipments.stream().forEach(p -> {
-            p.setAutoId(p.getAutoId() * 10);
-        });
-        eventEquipmentService.updateBatchById(equipments);
-
-        return this.updateById(nftEvent);
-    }
-
-    @Override
-    public List<EventTypeNum> getTypeNum(Long userId) {
-        // 获取各个类型的数量
-        List<EventTypeNum> typeCount = baseMapper.getTypeCount(userId);
-        return typeCount;
-    }
-
-    @Override
-    @Transactional
+    @Async
     public void mintSuccess(NftMintSuccessReq mintSuccessReq) {
-        NftEvent nftEvent = this.getById(mintSuccessReq.getEventId());
+
+        try {
+            Thread.sleep(3000); // 5000毫秒 = 5秒
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        NftEvent nftEvent = nftEventService.getById(mintSuccessReq.getEventId());
         NftEventEquipment equipment = eventEquipmentService
                 .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
 
         // 调用/api/equipment/mintSuccess  mint成功
-        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getMintSuccess();
-        MintSuccessMessageDto dto = new MintSuccessMessageDto();
-        BeanUtils.copyProperties(mintSuccessReq, dto);
-        String param = JSONUtil.toJsonStr(dto);
-        log.info("mint成功，开始通知， url:{}， params:{}", url, param);
-        MintSuccessMessageResp data = null;
-        try {
-            HttpResponse response = HttpRequest.post(url)
-                    .timeout(5 * 1000)
-                    .header("Content-Type", "application/json")
-                    .body(param)
-                    .execute();
-            JSONObject jsonObject = JSONObject.parseObject(response.body());
-            data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
-
-        } catch (Exception e) {
-            log.error("mint成功通知失败，message：{}", e.getMessage());
-        }
+//        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getMintSuccess();
+//        MintSuccessMessageDto dto = new MintSuccessMessageDto();
+//        BeanUtils.copyProperties(mintSuccessReq, dto);
+//        String param = JSONUtil.toJsonStr(dto);
+//        log.info("mint成功，开始通知， url:{}， params:{}", url, param);
+//        MintSuccessMessageResp data = null;
+//        try {
+//            HttpResponse response = HttpRequest.post(url)
+//                    .timeout(5 * 1000)
+//                    .header("Content-Type", "application/json")
+//                    .body(param)
+//                    .execute();
+//            JSONObject jsonObject = JSONObject.parseObject(response.body());
+//            data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
+//
+//        } catch (Exception e) {
+//            log.error("mint成功通知失败，message：{}", e.getMessage());
+//        }
 
         // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
         this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getMintAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+
+        MintSuccessMessageResp data = new MintSuccessMessageResp();
+        data.setId(nftEvent.getId());
+        data.setName("Seeds NFT #" + nftEvent.getId());
+        data.setOwner("xxaa");
+        data.setTokenId(nftEvent.getId());
+        data.setMintAddress(mintSuccessReq.getMintAddress());
 
         //   插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         if (Objects.nonNull(data)) {
@@ -298,19 +165,12 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
             // 更新event事件状态
             nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTED.getCode());
-            this.updateById(nftEvent);
+            nftEventService.updateById(nftEvent);
         }
 
     }
 
-    @Override
-    public void composeSuccess(ComposeSuccessReq req) {
-
-    }
-
-
-    // nft 操作通知  // optType 1 mint成功,2取消
-    private void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenAddress, Integer itemType, Long autoId, Long configId, Long accId) {
+    public void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenAddress, Integer itemType, Long autoId, Long configId, Long accId) {
 
         ServerRegionEntity serverRegion = this.getServerRegionEntity(serverRoleId);
 
