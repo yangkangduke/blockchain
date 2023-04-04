@@ -1,5 +1,7 @@
 package com.seeds.game.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -57,5 +59,6 @@ public class NftPublicBackpackWebResp implements Serializable {
     private Long autoId;
 
     @ApiModelProperty("nftId")
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long eqNftId;
 }
