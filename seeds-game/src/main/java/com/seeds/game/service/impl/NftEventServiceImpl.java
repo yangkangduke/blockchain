@@ -126,7 +126,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     }
 
     @Override
-    @Transactional
     public void toNft(NftEventAddReq req) {
         if (req.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
             // 合成时作为材料的nft标记为临时锁定，
@@ -166,7 +165,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     void success(NftEvent nftEvent) {
 
         try {
-            Thread.sleep(2000L);
+            Thread.sleep(4000L);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
