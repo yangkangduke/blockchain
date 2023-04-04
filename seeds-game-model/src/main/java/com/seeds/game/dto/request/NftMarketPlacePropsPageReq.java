@@ -26,8 +26,11 @@ public class NftMarketPlacePropsPageReq extends PageReq {
     @ApiModelProperty("NFT等级")
     private Integer grade;
 
-    @ApiModelProperty("耐久度")
-    private Integer durability;
+    @ApiModelProperty("最小耐久度")
+    private Integer minDurability;
+
+    @ApiModelProperty("最大耐久度")
+    private Integer maxDurability;
 
     @ApiModelProperty("最小价格")
     private BigDecimal minPrice;
