@@ -42,7 +42,7 @@ public class NftAuctionHouseSetting implements Serializable {
     private Integer bidder;
 
     @ApiModelProperty("开始时间")
-    private Long start;
+    private Long startTime;
 
     @ApiModelProperty("持续时间")
     private Long duration;

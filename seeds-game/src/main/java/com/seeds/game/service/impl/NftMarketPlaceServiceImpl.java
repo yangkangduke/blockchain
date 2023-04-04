@@ -118,7 +118,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             resp.setCurrentPrice(order.getPrice());
             NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(order.getAuctionId());
             if (auctionSetting != null) {
-                long time = System.currentTimeMillis() - (auctionSetting.getStart() + auctionSetting.getDuration() * 60 * 60 * 1000);
+                long time = System.currentTimeMillis() - (auctionSetting.getStartTime() + auctionSetting.getDuration() * 60 * 60 * 1000);
                 resp.setTimeLeft(RelativeDateFormat.formatTime(time));
             }
         }
