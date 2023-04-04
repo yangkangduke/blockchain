@@ -249,7 +249,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
 
 //        // 调用游戏方接口，执行收回
-//        this.callGameTakeback(nftItem);
+        this.callGameTakeback(nftItem);
 
         ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
         // 记录转移事件
@@ -402,7 +402,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Override
     public void deposited(NftDepositedReq req) {
-        NftEquipment nft = nftEquipmentService.getById(req.getNftId());
+        NftEquipment nft = nftEquipmentService.getOne(new LambdaQueryWrapper<NftEquipment>().eq(NftEquipment::getMintAddress, req.getMintAddress()));
         if (nft == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
         }
@@ -441,12 +441,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Override
     public void unDeposited(NftUnDepositedReq req) {
+
         // NFT锁定中不能取回
-        NftPublicBackpackEntity backpackNft = queryByEqNftId(req.getNftId());
+        //  NftPublicBackpackEntity backpackNft = queryByEqNftId(req.getNftId());
+        NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenAddress, req.getMintAddress()));
         if (backpackNft == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
         }
-        NftEquipment nft = nftEquipmentService.getById(req.getNftId());
+        NftEquipment nft = nftEquipmentService.getOne(new LambdaQueryWrapper<NftEquipment>().eq(NftEquipment::getMintAddress, req.getMintAddress()));
         if (nft == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
         }

@@ -13,9 +13,9 @@ import javax.validation.constraints.NotNull;
 @Data
 public class NftUnDepositedReq {
 
-    @ApiModelProperty("Nft id")
-    @NotNull(message = "Nft id cannot be empty")
-    private Long nftId;
+    @ApiModelProperty("mintAddress")
+    @NotBlank(message = "mintAddress cannot be empty")
+    private String mintAddress;
 
     @ApiModelProperty("随机码")
     @NotBlank(message = "Nonce cannot be empty")

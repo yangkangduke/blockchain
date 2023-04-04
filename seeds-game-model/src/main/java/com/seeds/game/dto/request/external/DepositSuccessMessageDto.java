@@ -23,4 +23,6 @@ public class DepositSuccessMessageDto {
     @ApiModelProperty("交易签名")
     private String sig;
 
+    @ApiModelProperty("tokenAddress")
+    private String tokenAddress;
 }
