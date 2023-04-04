@@ -37,6 +37,7 @@ import java.util.Objects;
 public class AsyncNotifyGame {
 
     @Autowired
+    @Lazy
     private INftEventService nftEventService;
     @Autowired
     private INftEventEquipmentService eventEquipmentService;
