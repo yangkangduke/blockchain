@@ -28,10 +28,10 @@ public class NftOfferResp {
     public static class NftOffer {
 
         @ApiModelProperty("offerId")
-        private Long id;
+        private String id;
 
         @ApiModelProperty("拍卖订单Id")
-        private Long auctionId;
+        private String auctionId;
 
         @ApiModelProperty("拍卖合约地址")
         private String auctionHouseAddress;

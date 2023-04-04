@@ -114,13 +114,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (order == null) {
             return resp;
         }
-        resp.setId(order.getId());
+        resp.setId(order.getId().toString());
         resp.setCurrentPrice(order.getPrice());
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftId);
         if (publicBackpack != null) {
             BeanUtils.copyProperties(publicBackpack, resp);
         }
-        resp.setNftId(nftEquipment.getId());
+        resp.setNftId(nftEquipment.getId().toString());
         resp.setTokenId(nftEquipment.getTokenId());
         resp.setName(nftEquipment.getName());
         resp.setNumber("#" + nftEquipment.getTokenId());

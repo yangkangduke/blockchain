@@ -16,10 +16,10 @@ import java.math.BigDecimal;
 public class NftMarketPlaceDetailResp {
 
     @ApiModelProperty("商品id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty("nft id")
-    private Long nftId;
+    private String nftId;
 
     @ApiModelProperty("NFT名称")
     private String name;

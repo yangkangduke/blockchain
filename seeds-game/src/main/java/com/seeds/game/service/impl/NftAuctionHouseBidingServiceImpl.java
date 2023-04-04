@@ -49,6 +49,8 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
         for (NftAuctionHouseBiding record : records) {
             NftOfferResp.NftOffer resp = new NftOfferResp.NftOffer();
             BeanUtils.copyProperties(record, resp);
+            resp.setId(record.getId().toString());
+            resp.setAuctionId(resp.getAuctionId().toString());
             resp.setUsdPrice("$ " + record.getPrice().multiply(req.getUsdRate()));
             BigDecimal difference = record.getPrice().subtract(req.getPrice())
                     .divide(req.getPrice(), 4, RoundingMode.HALF_UP)

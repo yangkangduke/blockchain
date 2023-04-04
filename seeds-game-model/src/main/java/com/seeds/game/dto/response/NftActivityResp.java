@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class NftActivityResp {
 
     @ApiModelProperty(value = "id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "事件")
     private String activityType;

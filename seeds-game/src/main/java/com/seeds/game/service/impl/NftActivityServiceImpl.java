@@ -42,6 +42,7 @@ public class NftActivityServiceImpl extends ServiceImpl<NftActivityMapper, NftAc
         return page.convert(p -> {
             NftActivityResp resp = new NftActivityResp();
             BeanUtils.copyProperties(p, resp);
+            resp.setId(p.getId().toString());
             RelativeDateFormat.format(new Date(p.getCreateTime()));
             return resp;
         });
