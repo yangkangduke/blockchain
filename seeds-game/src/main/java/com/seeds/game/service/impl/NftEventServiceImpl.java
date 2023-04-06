@@ -45,7 +45,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -315,9 +317,14 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             HashMap<String, Object> attr = new HashMap<>();
 
             attr.put("level", equipment.getLvl());
-            JSONObject jsonObject = JSONObject.parseObject(equipment.getAttributes());
-            Integer durability = Integer.valueOf(jsonObject.getString("durability"));
-            attr.put("durability", durability);
+            Integer durability = null;
+            try {
+                JSONObject jsonObject = JSONObject.parseObject(equipment.getAttributes());
+                durability = Integer.valueOf(jsonObject.getString("durability"));
+                attr.put("durability", durability);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             String jsonStr = JSONUtil.toJsonStr(attr);
             backpackEntity.setAttributes(jsonStr);
             // 设置参考价，TODO  根据规则来设置  先设置成固定值
@@ -339,8 +346,12 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             attributeEntity.setEqNftId(data.getId());
             attributeEntity.setGrade(equipment.getLvl());
             attributeEntity.setDurability(durability);
-            attributeEntity.setBaseAttrValue(equipment.getBaseAttrValue());
-            attributeEntity.setRarityAttrValue(equipment.getRarityAttrValue());
+            try {
+                attributeEntity.setBaseAttrValue(URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
+                attributeEntity.setRarityAttrValue(URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             attributeService.save(attributeEntity);
 
             // 更新event事件状态

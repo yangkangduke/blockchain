@@ -13,6 +13,8 @@
 
     </select>
 
+
+
     <select id="getNftTypeList" resultType="com.seeds.game.dto.response.NftType">
 
         select t1.item_type_id, t2.name, t2.image
