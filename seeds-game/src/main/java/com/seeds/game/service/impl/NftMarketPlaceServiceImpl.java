@@ -5,7 +5,6 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson2.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -351,6 +350,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public IPage<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery) {
+        log.info("NftMarketPlaceEquipPageReq= {}",equipQuery);
         Page<NftMarketPlaceEqiupmentResp> page = new Page<>();
         page.setCurrent(equipQuery.getCurrent());
         page.setSize(equipQuery.getSize());
@@ -375,24 +375,31 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public NftMarketPlaceDetailViewResp view(NftMarketPlaceDetailViewReq req) {
-        NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.queryByTokenId(req.getTokenId());
-        Long userId = backpackEntity.getUserId();
+        log.info("NftMarketPlaceDetailViewReq -->{}",req);
+        NftMarketPlaceDetailViewResp resp = new NftMarketPlaceDetailViewResp();
+        // 查询NFT
+        NftEquipment nftEquipment = nftEquipmentMapper.getById(req.getNftId());
+        if (nftEquipment == null) {
+            return resp;
+        }
 
-        LambdaQueryWrapper<NftPublicBackpackEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(!StringUtils.isEmpty(req.getTokenId()),NftPublicBackpackEntity::getTokenId,req.getTokenId())
-                .eq(ObjectUtils.isEmpty(req.getUserId()),NftPublicBackpackEntity::getUserId,req.getUserId());
-        NftPublicBackpackEntity one = nftPublicBackpackService.getOne(queryWrapper);
+        // 通过钱包地址获取拥有者用户id;
+        GenericDto<UcUserResp> userRespGenericDto = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
+        UcUserResp userData = userRespGenericDto.getData();
+        Long userId = userData.getId();
+        if (userId == null){
+            return resp;
+        }
 
-            // 第一视角，浏览量不变；第三视角，则浏览量+1
-            if (req.getUserId() == null || one == null ||!req.getUserId().equals(userId)){
+        NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(req.getNftId());
+        if (req.getUserId() == null || !req.getUserId().equals(userId)){
                 // 属性表更新NFT浏览量
                 LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
                         .setSql("`views`=`views`+1")
-                        .eq(NftPublicBackpackEntity::getTokenId,req.getTokenId());
+                        .eq(NftPublicBackpackEntity::getEqNftId,req.getNftId());
                 nftPublicBackpackService.update(updateWrap);
             }
-        NftMarketPlaceDetailViewResp resp = new NftMarketPlaceDetailViewResp();
-        resp.setViews(backpackEntity.getViews());
+        resp.setViews(publicBackpack.getViews());
         return resp;
     }
 
