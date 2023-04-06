@@ -3,6 +3,7 @@ package com.seeds.game.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.game.dto.request.ComposeSuccessReq;
+import com.seeds.game.dto.request.MintSuccessReq;
 import com.seeds.game.dto.request.NftMintSuccessReq;
 import com.seeds.game.dto.request.internal.NftEventAddReq;
 import com.seeds.game.dto.request.internal.NftEventPageReq;
@@ -35,6 +36,8 @@ public interface INftEventService extends IService<NftEvent> {
     List<EventTypeNum> getTypeNum(Long userId);
 
     void mintSuccess(NftMintSuccessReq mintSuccessReq);
+
+    void mintSuccessCallback(MintSuccessReq req);
 
     void composeSuccess(ComposeSuccessReq req);
 }

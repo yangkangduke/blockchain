@@ -4,7 +4,7 @@
     <select id="getSkinPage" resultType="com.seeds.game.dto.response.NftMarketPlaceSkinResp"
             parameterType="com.seeds.game.dto.request.NftMarketPlaceSkinPageReq">
         select
-        t1.id,
+        t4.id,
         t1.price,
         t1.place_time,
         t1.token_id,
@@ -22,8 +22,9 @@
         t3.goblin
 
         from z_market_order t1
-        left join ga_nft_public_backpack t2 on CONVERT(t1.token_id USING gbk) = t2.token_id and CONVERT(t1.mint_address USING gbk) = t2.token_address
-        left join ga_nft_attribute t3 on t2.token_id = t3.token_id and t2.token_address  = t3.mint_address
+        join z_equipment_nft t4 on CONVERT(t4.mint_address USING gbk) = CONVERT(t1.mint_address USING gbk)
+        left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
+        left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
         where t2.type = 3
         <if test="params.name != null">
             and t2.name = #{params.name}
@@ -61,7 +62,7 @@
     <select id="getEquipPage" resultType="com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp"
             parameterType="com.seeds.game.dto.request.NftMarketPlaceEquipPageReq">
         select
-        t1.id,
+        t4.id,
         t1.place_time,
         t1.price,
         t1.token_id,
@@ -79,8 +80,9 @@
         t3.base_attr_value
 
         from z_market_order t1
-        left join ga_nft_public_backpack t2 on CONVERT(t1.token_id USING gbk) = t2.token_id and CONVERT(t1.mint_address USING gbk) = t2.token_address
-        left join ga_nft_attribute t3 on t2.token_id  = t3.token_id and t2.token_address = t3.mint_address
+        join z_equipment_nft t4 on CONVERT(t4.mint_address USING gbk) = CONVERT(t1.mint_address USING gbk)
+        left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
+        left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
         where t2.type = 1
 
         <if test="params.name != null">
@@ -124,7 +126,7 @@
     <select id="getPropsPage" resultType="com.seeds.game.dto.response.NftMarketPlacePropsResp"
             parameterType="com.seeds.game.dto.request.NftMarketPlacePropsPageReq">
         select
-        t1.id,
+        t4.id,
         t1.price,
         t1.place_time,
         t1.token_id,
@@ -142,8 +144,9 @@
         t3.base_attr_value
 
         from z_market_order t1
-        left join ga_nft_public_backpack t2 on CONVERT(t1.token_id USING gbk) = t2.token_id and CONVERT(t1.mint_address USING gbk) = t2.token_address
-        left join ga_nft_attribute t3 on t2.token_id  = t3.token_id and t2.token_address  = t3.mint_address
+        join z_equipment_nft t4 on CONVERT(t4.mint_address USING gbk) = CONVERT(t1.mint_address USING gbk)
+        left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
+        left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
         where t2.type = 2
 
         <if test="params.name != null">

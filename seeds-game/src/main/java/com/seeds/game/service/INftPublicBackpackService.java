@@ -2,13 +2,12 @@ package com.seeds.game.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.game.dto.request.NftDepositedReq;
-import com.seeds.game.dto.request.NftUnDepositedReq;
-import com.seeds.game.dto.request.OpenNftOwnershipTransferReq;
+import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.internal.*;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,4 +86,9 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req);
 
+    void updateState(NftBackpakcUpdateStateReq req);
+
+    void insertCallback(MintSuccessReq req);
+
+    BigDecimal getTotalPrice(List<Long> autoIds);
 }

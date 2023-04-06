@@ -6,6 +6,8 @@ import com.seeds.admin.enums.GameEnum;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.MintSuccessReq;
+import com.seeds.game.dto.request.NftBackpakcUpdateStateReq;
 import com.seeds.game.dto.request.NftDepositedReq;
 import com.seeds.game.dto.request.NftUnDepositedReq;
 import com.seeds.game.dto.request.internal.NftBackpackWebPageReq;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -146,5 +149,4 @@ public class NftPublicBackpackController {
         nftPublicBackpackService.unDeposited(req);
         return GenericDto.success(null);
     }
-
 }
