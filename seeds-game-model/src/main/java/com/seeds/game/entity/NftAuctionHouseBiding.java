@@ -36,10 +36,10 @@ public class NftAuctionHouseBiding implements Serializable {
     private String auctionHouseAddress;
 
     @ApiModelProperty("创建时间")
-    private Long createAt;
+    private Long createTime;
 
     @ApiModelProperty("取消时间")
-    private Long cancelAt;
+    private Long canceledTime;
 
     @ApiModelProperty("nft 名称")
     private String name;
