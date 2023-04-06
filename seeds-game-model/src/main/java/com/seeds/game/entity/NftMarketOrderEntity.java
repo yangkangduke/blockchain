@@ -67,7 +67,7 @@ public class NftMarketOrderEntity {
     @ApiModelProperty("取消时间")
     private Long cancelTime;
 
-    @ApiModelProperty("随机码")
+    @ApiModelProperty("交易顺序")
     private Long nonce;
 
 }

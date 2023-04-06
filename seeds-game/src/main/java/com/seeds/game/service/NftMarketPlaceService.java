@@ -114,8 +114,8 @@ public interface NftMarketPlaceService {
     BigDecimal usdRate(String currency);
 
     /**
-     * 获取随机码
-     * @return 随机码
+     * 获取交易顺序
+     * @return 交易顺序
      */
     String chainNonce();
 
