@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  */
 
 @Data
-@ApiModel(value = "NftOfferResp")
+@ApiModel(value = "NftOfferRespNew")
 public class NftOfferResp {
 
     @ApiModelProperty(value = "最高出价")
@@ -26,7 +26,7 @@ public class NftOfferResp {
     private IPage<NftOffer> nftOffers;
 
     @Data
-    @ApiModel(value = "NftOffer", description = "拍卖出价")
+    @ApiModel(value = "NftOfferNew", description = "拍卖出价")
     public static class NftOffer {
 
         @ApiModelProperty("offerId")

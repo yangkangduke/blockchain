@@ -22,7 +22,7 @@ public class NftActivityResp {
     @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
-    @ApiModelProperty(value = "事件")
+    @ApiModelProperty(value = "事件: 0 mint, 1 list 2 bidList 3 saleSuccess 4 transfer")
     private String activityType;
 
     @ApiModelProperty(value = "价格")
