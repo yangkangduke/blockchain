@@ -3,10 +3,7 @@ package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.game.dto.request.OpenNftPublicBackpackCreateUpdateReq;
-import com.seeds.game.dto.request.OpenNftPublicBackpackDisReq;
-import com.seeds.game.dto.request.OpenNftPublicBackpackPageReq;
-import com.seeds.game.dto.request.OpenNftPublicBackpackTakeBackReq;
+import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.NftPublicBackpackResp;
 import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
 import com.seeds.game.service.INftPublicBackpackService;
@@ -99,9 +96,9 @@ public class OpenNftPublicBackpackController {
 
     @PostMapping("total-price")
     @ApiOperation("获取nft的参考价")
-    public GenericDto<BigDecimal> getTotalPrice(@RequestBody List<Long> autoIds) {
+    public GenericDto<BigDecimal> getTotalPrice(@RequestBody OpenGetNFTPriceReq req) {
 
-        return GenericDto.success(nftPublicBackpackService.getTotalPrice(autoIds));
+        return GenericDto.success(nftPublicBackpackService.getTotalPrice(req.getAutoIds()));
     }
 
 }
