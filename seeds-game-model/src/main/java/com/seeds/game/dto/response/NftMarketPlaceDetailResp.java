@@ -29,6 +29,10 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("NFT address")
     private String mintAddress;
 
+    @ApiModelProperty("拍卖ID")
+    @JsonSerialize(using= ToStringSerializer.class)
+    private Long auctionId;
+
     @ApiModelProperty("NFT名称")
     private String name;
 

@@ -42,7 +42,7 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
-        NftOfferResp.NftOffer bidderOffer = null;
+        List<NftOfferResp.NftOffer> bidderOfferList = new ArrayList<>();
         List<NftOfferResp.NftOffer> list = new ArrayList<>();
         IPage<NftOfferResp.NftOffer> respPage = new Page<>();
         BeanUtils.copyProperties(page, respPage);
@@ -60,20 +60,20 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
                 resp.setDifference(difference.abs() + "% below");
             }
             resp.setStatus(NftOfferStatusEnum.BIDDING.getDescEn());
-            if (record.getCancelAt() != null) {
+            if (record.getCanceledTime() != null) {
                 resp.setStatus(NftOfferStatusEnum.CANCELLED.getDescEn());
             }
             resp.setIsBidder(WhetherEnum.NO.value());
             if (record.getBuyer().equals(req.getPublicAddress())) {
                 resp.setIsBidder(WhetherEnum.YES.value());
-                bidderOffer = resp;
+                bidderOfferList.add(resp);
             } else {
                 list.add(resp);
             }
         }
         // 将登录用户出价添加到最前面
-        if (bidderOffer != null) {
-            list.add(0, bidderOffer);
+        if (!CollectionUtils.isEmpty(bidderOfferList)) {
+            list.addAll(0, bidderOfferList);
         }
         respPage.setRecords(list);
         return respPage;
