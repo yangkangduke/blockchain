@@ -24,7 +24,6 @@ import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
-import com.seeds.game.enums.NftOrderStatusEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftPublicBackpackMapper;
 import com.seeds.game.mq.producer.KafkaProducer;
@@ -86,6 +85,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Autowired
     private UcUserService ucUserService;
+    @Autowired
+    private IUpdateBackpackErrorLogService updateBackpackErrorLogService;
 
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
@@ -425,6 +426,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         DepositSuccessMessageDto dto  = new DepositSuccessMessageDto();
         BeanUtils.copyProperties(req, dto);
         dto.setMintAddress(nft.getMintAddress());
+        dto.setTokenAddress("");
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT托管成功，开始通知， url:{}， params:{}", url, param);
         try {
@@ -509,6 +511,30 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         return list;
     }
 
+    @Override
+    public void updateState(NftBackpakcUpdateStateReq req) {
+
+        // 如果是withdraw，需要通知游戏方把nft收回到背包
+        if (req.getState().equals(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode())) {
+            NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, req.getNftId()));
+            // 调用游戏方接口，执行收回
+            this.callGameTakeback(backpackNft);
+            // 更新背包状态
+            backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+            backpackNft.setServerRoleId(0L);
+            backpackNft.setUpdatedAt(System.currentTimeMillis());
+            this.updateById(backpackNft);
+        }
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(req.getState());
+        this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, req.getNftId()));
+
+    }
+
+    @Override
+    public void insertCallback(MintSuccessReq req) {
+        nftEventService.mintSuccessCallback(req);
+    }
 
 
     private void callGameDistribute(NftPublicBackpackEntity nftItem, Long serverRoleId) {

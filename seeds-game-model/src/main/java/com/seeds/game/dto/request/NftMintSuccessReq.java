@@ -32,4 +32,7 @@ public class NftMintSuccessReq {
 
     @ApiModelProperty(value = "token address")
     private String tokenAddress;
+
+    @ApiModelProperty(value = "是否补偿时回调")
+    private Integer isCallback = 0;
 }

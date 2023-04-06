@@ -6,6 +6,8 @@ import com.seeds.admin.enums.GameEnum;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.MintSuccessReq;
+import com.seeds.game.dto.request.NftBackpakcUpdateStateReq;
 import com.seeds.game.dto.request.NftDepositedReq;
 import com.seeds.game.dto.request.NftUnDepositedReq;
 import com.seeds.game.dto.request.internal.NftBackpackWebPageReq;
@@ -146,5 +148,4 @@ public class NftPublicBackpackController {
         nftPublicBackpackService.unDeposited(req);
         return GenericDto.success(null);
     }
-
 }
