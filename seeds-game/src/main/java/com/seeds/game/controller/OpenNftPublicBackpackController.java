@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -94,6 +95,13 @@ public class OpenNftPublicBackpackController {
     public GenericDto<OpenNftPublicBackpackDisResp> transfer(@RequestBody @Valid OpenNftPublicBackpackDisReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(nftPublicBackpackService.transfer(req));
+    }
+
+    @PostMapping("total-price")
+    @ApiOperation("获取nft的参考价")
+    public GenericDto<BigDecimal> getTotalPrice(@RequestBody List<Long> autoIds) {
+
+        return GenericDto.success(nftPublicBackpackService.getTotalPrice(autoIds));
     }
 
 }
