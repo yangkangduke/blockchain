@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -534,6 +535,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public void insertCallback(MintSuccessReq req) {
         nftEventService.mintSuccessCallback(req);
+    }
+
+    @Override
+    public BigDecimal getTotalPrice(List<Long> autoIds) {
+
+        List<NftPublicBackpackEntity> list = this.list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getAutoId, autoIds));
+        return list.stream().map(NftPublicBackpackEntity::getProposedPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
 

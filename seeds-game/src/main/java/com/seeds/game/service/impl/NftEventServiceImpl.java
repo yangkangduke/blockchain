@@ -45,6 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -235,15 +236,15 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
                 data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
             } else {
-                recordLog(mintSuccessReq);
+                recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
             }
             log.info("mint成功，通知成功， resp:{}", data.toString());
         } catch (Exception e) {
             log.error("mint成功通知失败，message：{}", e.getMessage());
-            recordLog(mintSuccessReq);
+            recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
         }
         // 通知游戏方，更新本地数据库
-        updateLocalDB(mintSuccessReq, nftEvent, equipment, data);
+        updateLocalDB(mintSuccessReq.getAutoDeposite(), nftEvent, equipment, data);
 
     }
 
@@ -263,20 +264,20 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         MintSuccessMessageResp data = new MintSuccessMessageResp();
         BeanUtils.copyProperties(req, data);
         // 通知游戏方，更新本地数据库
-        updateLocalDB(mintSuccessReq, nftEvent, equipment, data);
+        updateLocalDB(mintSuccessReq.getAutoDeposite(), nftEvent, equipment, data);
 
     }
 
-    private void recordLog(NftMintSuccessReq mintSuccessReq) {
+    private void recordLog(Long eventId, String mintAddress) {
         // 记录失败日志
         UpdateBackpackErrorLog backpackErrorLog = new UpdateBackpackErrorLog();
-        backpackErrorLog.setEventId(mintSuccessReq.getEventId());
-        backpackErrorLog.setMintAddress(mintSuccessReq.getMintAddress());
+        backpackErrorLog.setEventId(eventId);
+        backpackErrorLog.setMintAddress(mintAddress);
         backpackErrorLog.setCreatedAt(System.currentTimeMillis());
         updateBackpackErrorLogService.save(backpackErrorLog);
     }
 
-    private void updateLocalDB(NftMintSuccessReq mintSuccessReq, NftEvent nftEvent, NftEventEquipment equipment, MintSuccessMessageResp data) {
+    private void updateLocalDB(Integer autoDeposit, NftEvent nftEvent, NftEventEquipment equipment, MintSuccessMessageResp data) {
         // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
         // todo  后面取消注释
         //  this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getMintAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
@@ -295,7 +296,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             backpackEntity.setCreatedAt(System.currentTimeMillis());
             backpackEntity.setUpdatedAt(System.currentTimeMillis());
             backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
-            if (mintSuccessReq.getAutoDeposite().equals(WhetherEnum.YES.value())) {
+            if (autoDeposit.equals(WhetherEnum.YES.value())) {
                 // 自动托管
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
@@ -319,6 +320,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             attr.put("durability", durability);
             String jsonStr = JSONUtil.toJsonStr(attr);
             backpackEntity.setAttributes(jsonStr);
+            // 设置参考价，TODO  根据规则来设置  先设置成固定值
+            backpackEntity.setProposedPrice(new BigDecimal(1));
             nftPublicBackpackService.save(backpackEntity);
 
             // 如果是合成，作为合成材料的nft标记为销毁的状态
@@ -349,6 +352,29 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Override
     public void composeSuccess(ComposeSuccessReq req) {
 
+        // 调用/api/chainOp/buySuccess通知，购买成功
+        String params = String.format("isDeposit=%s&mintAddresses=%s&sigs=%s&walletAddress=%s", req.getAutoDeposite(), req.getMintAddresses(), req.getSigs(), req.getWalletAddress());
+        // 调用/api/equipment/compose  合成成功
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCompose();
+        log.info("合成成功，开始通知， url:{}， params:{}", url, params);
+        MintSuccessMessageResp data = null;
+        try {
+            HttpResponse response = HttpRequest.get(url)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .execute();
+
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+                data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
+            } else {
+                //   recordLog(req.getEventId(), req.getMintAddress());
+            }
+        } catch (Exception e) {
+            log.error("NFT购买成功通知失败，message：{}", e.getMessage());
+            //   recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
+        }
+        //  updateLocalDB();
     }
 
 

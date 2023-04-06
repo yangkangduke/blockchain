@@ -7,6 +7,7 @@ import com.seeds.game.dto.request.internal.*;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -88,4 +89,6 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     void updateState(NftBackpakcUpdateStateReq req);
 
     void insertCallback(MintSuccessReq req);
+
+    BigDecimal getTotalPrice(List<Long> autoIds);
 }
