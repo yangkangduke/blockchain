@@ -5,7 +5,6 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson2.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -351,6 +350,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public IPage<NftMarketPlaceEqiupmentResp> equipQueryPage(NftMarketPlaceEquipPageReq equipQuery) {
+        log.info("NftMarketPlaceEquipPageReq= {}",equipQuery);
         Page<NftMarketPlaceEqiupmentResp> page = new Page<>();
         page.setCurrent(equipQuery.getCurrent());
         page.setSize(equipQuery.getSize());
