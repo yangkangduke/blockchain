@@ -375,6 +375,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public NftMarketPlaceDetailViewResp view(NftMarketPlaceDetailViewReq req) {
+        log.info("NftMarketPlaceDetailViewReq -->{}",req);
         NftMarketPlaceDetailViewResp resp = new NftMarketPlaceDetailViewResp();
         // 查询NFT
         NftEquipment nftEquipment = nftEquipmentMapper.getById(req.getNftId());
