@@ -55,16 +55,19 @@ public class NftMarketOrderEntity {
     @ApiModelProperty("取消交易签名")
     private String cancelTx;
 
-    @ApiModelProperty("create_time")
+    @ApiModelProperty("创建时间")
     private Long createTime;
 
-    @ApiModelProperty("place_time")
+    @ApiModelProperty("上架时间")
     private Long placeTime;
 
-    @ApiModelProperty("fulfill_time")
+    @ApiModelProperty("执行交易时间")
     private Long fulfillTime;
 
-    @ApiModelProperty("cancel_time")
+    @ApiModelProperty("取消时间")
     private Long cancelTime;
+
+    @ApiModelProperty("随机码")
+    private Long nonce;
 
 }

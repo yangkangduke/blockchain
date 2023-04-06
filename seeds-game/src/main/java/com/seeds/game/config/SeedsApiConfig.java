@@ -60,4 +60,7 @@ public class SeedsApiConfig {
     @Value("${seeds.api.compose:/api/equipment/compose}")
     private String compose;
 
+    @Value("${seeds.api.compose:/api/chainOp/nonce}")
+    private String nonce;
+
 }

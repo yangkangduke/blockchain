@@ -1,6 +1,5 @@
 package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.NftMarketPlaceDetailViewReq;
 import com.seeds.game.dto.request.NftMarketPlaceEquipPageReq;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import javax.validation.Valid;
 
@@ -80,5 +78,11 @@ public class PublicNftMarketPlaceController {
     @ApiOperation("获取美元汇率")
     public GenericDto<BigDecimal> usdRate(@PathVariable String currency) {
         return GenericDto.success(nftMarketPlaceService.usdRate(currency));
+    }
+
+    @GetMapping("chain-nonce")
+    @ApiOperation("获取随机码")
+    public GenericDto<String> chainNonce() {
+        return GenericDto.success(nftMarketPlaceService.chainNonce());
     }
 }

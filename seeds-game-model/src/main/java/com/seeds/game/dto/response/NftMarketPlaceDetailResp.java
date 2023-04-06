@@ -92,5 +92,8 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("创造者收益")
     private String creatorEarnings;
 
+    @ApiModelProperty("挂单收据")
+    private String listReceipt;
+
 }
 

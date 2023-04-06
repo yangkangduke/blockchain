@@ -43,7 +43,12 @@ public enum GameErrorCodeEnum {
     ERR_20004_SERVER_REGION_NOT_EXIST(20004, "区服不存在", "The sever region not exist"),
 
     // game
-    ERR_30001_GAME_IS_UNDER_MAINTENANCE(30001, "游戏正在维护中,Web端请稍后再操作", "The game is under maintenance. Please try again later");
+    ERR_30001_GAME_IS_UNDER_MAINTENANCE(30001, "游戏正在维护中,Web端请稍后再操作", "The game is under maintenance. Please try again later"),
+
+    // user
+    ERR_40001_FAILED_TO_GET_USER_INFORMATION(40001, "获取用户信息失败", "Failed to get user information"),
+    ;
+
 
     @JsonValue
     @EnumValue

@@ -3,6 +3,7 @@ package com.seeds.game.service.impl;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -116,6 +117,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (order != null) {
             resp.setId(order.getId());
             resp.setCurrentPrice(order.getPrice());
+            resp.setListReceipt(order.getListReceipt());
             auctionSetting = nftAuctionHouseSettingService.getById(order.getAuctionId());
             if (auctionSetting != null) {
                 long time = System.currentTimeMillis() - (auctionSetting.getStartTime() + auctionSetting.getDuration() * 60 * 60 * 1000);
@@ -445,6 +447,40 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             }
         }
         return rate;
+    }
+
+    @Override
+    public String chainNonce() {
+        Long currentUserId = UserContext.getCurrentUserId();
+        String publicAddress = null;
+        try {
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(currentUserId);
+            publicAddress = result.getData();
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
+        if (publicAddress == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_40001_FAILED_TO_GET_USER_INFORMATION);
+        }
+        // 调用/api/chainOp/nonce获取随机码
+        String params = String.format("address=%s", publicAddress);
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getNonce() + "?" + params;
+        log.info("NFT获取随机码， url:{}， params:{}", url, params);
+        try {
+            HttpResponse response = HttpRequest.get(url)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .execute();
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException("Failed to get nonce, code:" + code);
+            }
+            return jsonObject.getString("data");
+        } catch (Exception e) {
+            log.error("NFT获取随机码失败，message：{}", e.getMessage());
+            throw new GenericException(e.getMessage());
+        }
     }
 
     @Override
