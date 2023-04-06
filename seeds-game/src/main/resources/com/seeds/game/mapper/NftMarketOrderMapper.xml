@@ -22,7 +22,7 @@
         t3.goblin
 
         from z_market_order t1
-        join z_equipment_nft t4 on CONVERT(t4.mint_address USING gbk) = CONVERT(t1.mint_address USING gbk)
+        join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
         where t2.type = 3
@@ -80,7 +80,7 @@
         t3.base_attr_value
 
         from z_market_order t1
-        join z_equipment_nft t4 on CONVERT(t4.mint_address USING gbk) = CONVERT(t1.mint_address USING gbk)
+        join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
         where t2.type = 1
@@ -144,7 +144,7 @@
         t3.base_attr_value
 
         from z_market_order t1
-        join z_equipment_nft t4 on CONVERT(t4.mint_address USING gbk) = CONVERT(t1.mint_address USING gbk)
+        join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
         where t2.type = 2

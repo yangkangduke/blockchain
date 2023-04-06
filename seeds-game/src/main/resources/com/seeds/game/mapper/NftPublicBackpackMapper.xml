@@ -34,7 +34,7 @@
         t1.grade,
         t1.image,
         t1.token_id,
-        t1.price,
+        t3.price,
         t1.state,
         t1.auto_id,
         t1.eq_nft_id,
@@ -44,6 +44,7 @@
         t2.rarity_attr_value
         from ga_nft_public_backpack t1
         left join ga_nft_attribute t2 on t1.eq_nft_id = t2.eq_nft_id
+        left join z_market_order t3 on t1.token_address = t3.mint_address
         where t1.user_id = #{userId}
         <if test="type != null">
             and t1.type = #{type}
