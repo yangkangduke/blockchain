@@ -405,6 +405,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public IPage<NftMarketPlacePropsResp> propsQueryPage(NftMarketPlacePropsPageReq propsQuery) {
+        log.info("NftMarketPlacePropsPageReq---> {}",propsQuery);
         Page<NftMarketPlacePropsResp> page = new Page<>();
         page.setCurrent(propsQuery.getCurrent());
         page.setSize(propsQuery.getSize());
