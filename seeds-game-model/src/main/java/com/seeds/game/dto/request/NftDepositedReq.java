@@ -18,7 +18,6 @@ public class NftDepositedReq {
     private String sig;
 
     @ApiModelProperty("交易地址")
-    @NotBlank(message = "Token address cannot be empty")
     private String tokenAddress;
 
     @ApiModelProperty("nft地址")
