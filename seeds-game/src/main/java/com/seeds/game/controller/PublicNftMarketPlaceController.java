@@ -1,4 +1,5 @@
 package com.seeds.game.controller;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.NftMarketPlaceDetailViewReq;
@@ -20,6 +21,7 @@ import javax.validation.Valid;
 
 /**
  * NFT市场外部调用
+ *
  * @author dengyang
  * @date 2023/3/27
  */
@@ -52,26 +54,27 @@ public class PublicNftMarketPlaceController {
 
     @PostMapping("page-skin")
     @ApiOperation("获取皮肤分页信息")
-    public GenericDto<IPage<NftMarketPlaceSkinResp>> skinQueryPage(@Valid @RequestBody NftMarketPlaceSkinPageReq skinQuery){
+    public GenericDto<IPage<NftMarketPlaceSkinResp>> skinQueryPage(@Valid @RequestBody NftMarketPlaceSkinPageReq skinQuery) {
         return GenericDto.success(nftMarketPlaceService.skinQueryPage(skinQuery));
     }
 
     @PostMapping("page-equip")
     @ApiOperation("获取装备分页信息")
-    public GenericDto<IPage<NftMarketPlaceEqiupmentResp>>equipQueryPage(@Valid @RequestBody NftMarketPlaceEquipPageReq equipQuery){
+    public GenericDto<IPage<NftMarketPlaceEqiupmentResp>> equipQueryPage(@Valid @RequestBody NftMarketPlaceEquipPageReq equipQuery) {
         return GenericDto.success(nftMarketPlaceService.equipQueryPage(equipQuery));
     }
 
     @PostMapping("page-props")
     @ApiOperation("获取道具分页信息")
-    public GenericDto<IPage<NftMarketPlacePropsResp>>equipPropsPage(@Valid @RequestBody NftMarketPlacePropsPageReq propsQuery){
+    public GenericDto<IPage<NftMarketPlacePropsResp>> equipPropsPage(@Valid @RequestBody NftMarketPlacePropsPageReq propsQuery) {
         return GenericDto.success(nftMarketPlaceService.propsQueryPage(propsQuery));
     }
 
     @PostMapping("view")
     @ApiOperation("浏览量")
-    public GenericDto<NftMarketPlaceDetailViewResp>view(@RequestBody NftMarketPlaceDetailViewReq req){
-        return GenericDto.success(nftMarketPlaceService.view(req));
+    public GenericDto<Object> view(@RequestBody NftMarketPlaceDetailViewReq req) {
+        nftMarketPlaceService.view(req);
+        return GenericDto.success(null);
     }
 
     @GetMapping("usd-rate/{currency}")

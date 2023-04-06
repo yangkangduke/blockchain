@@ -374,33 +374,15 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
-    public NftMarketPlaceDetailViewResp view(NftMarketPlaceDetailViewReq req) {
-        log.info("NftMarketPlaceDetailViewReq -->{}",req);
-        NftMarketPlaceDetailViewResp resp = new NftMarketPlaceDetailViewResp();
-        // 查询NFT
-        NftEquipment nftEquipment = nftEquipmentMapper.getById(req.getNftId());
-        if (nftEquipment == null) {
-            return resp;
-        }
-
-        // 通过钱包地址获取拥有者用户id;
-        GenericDto<UcUserResp> userRespGenericDto = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
-        UcUserResp userData = userRespGenericDto.getData();
-        Long userId = userData.getId();
-        if (userId == null){
-            return resp;
-        }
-
+    public void view(NftMarketPlaceDetailViewReq req) {
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(req.getNftId());
-        if (req.getUserId() == null || !req.getUserId().equals(userId)){
+        if (req.getUserId() == null || !req.getUserId().equals(publicBackpack.getUserId())){
                 // 属性表更新NFT浏览量
                 LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
                         .setSql("`views`=`views`+1")
                         .eq(NftPublicBackpackEntity::getEqNftId,req.getNftId());
                 nftPublicBackpackService.update(updateWrap);
             }
-        resp.setViews(publicBackpack.getViews());
-        return resp;
     }
 
     @Override

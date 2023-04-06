@@ -97,7 +97,7 @@ public interface NftMarketPlaceService {
      * @param req
      * @return NFT浏览量
      */
-    NftMarketPlaceDetailViewResp view(NftMarketPlaceDetailViewReq req);
+    void view(NftMarketPlaceDetailViewReq req);
 
     /**
      * 获取nft 道具列表
