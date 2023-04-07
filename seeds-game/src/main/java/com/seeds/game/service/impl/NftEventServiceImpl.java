@@ -356,14 +356,10 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             //  插入属性表
             NftAttributeEntity attributeEntity = new NftAttributeEntity();
             attributeEntity.setEqNftId(data.getId());
+            attributeEntity.setMintAddress(data.getMintAddress());
             attributeEntity.setGrade(equipment.getLvl());
             attributeEntity.setDurability(durability);
             try {
-                log.info("baseAttr={}", equipment.getBaseAttrValue());
-                log.info("rarityAttr={}", equipment.getRarityAttrValue());
-                log.info("baseAttrDecode={}", URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
-                log.info("rarityAttrDecode={}", URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
-
                 attributeEntity.setBaseAttrValue(URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
                 attributeEntity.setRarityAttrValue(URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
 

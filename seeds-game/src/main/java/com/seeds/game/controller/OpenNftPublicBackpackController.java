@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -96,7 +97,7 @@ public class OpenNftPublicBackpackController {
 
     @PostMapping("total-price")
     @ApiOperation("获取nft的参考价")
-    public GenericDto<BigDecimal> getTotalPrice(@RequestBody OpenGetNFTPriceReq req) {
+    public GenericDto<Map<Long, BigDecimal>> getTotalPrice(@RequestBody OpenGetNFTPriceReq req) {
 
         return GenericDto.success(nftPublicBackpackService.getTotalPrice(req.getAutoIds()));
     }

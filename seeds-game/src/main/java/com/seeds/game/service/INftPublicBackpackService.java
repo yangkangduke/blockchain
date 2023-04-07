@@ -92,5 +92,5 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     void insertCallback(MintSuccessReq req);
 
-    BigDecimal getTotalPrice(List<Long> autoIds);
+    Map<Long, BigDecimal> getTotalPrice(List<Long> autoIds);
 }
