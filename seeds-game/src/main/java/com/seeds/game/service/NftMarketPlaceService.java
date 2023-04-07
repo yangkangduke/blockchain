@@ -73,6 +73,12 @@ public interface NftMarketPlaceService {
     void acceptOffer(NftAcceptOfferReq req);
 
     /**
+     * 拍卖达成交易
+     * @param req 收据
+     */
+    void auctionSuccess(NftSaleSuccessReq req);
+
+    /**
      * 取消nft出价
      * @param req 收据
      */
