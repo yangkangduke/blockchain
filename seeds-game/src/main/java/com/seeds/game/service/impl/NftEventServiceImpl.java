@@ -125,7 +125,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             BeanUtils.copyProperties(p, resp);
             List<NftEventEquipment> equipments = map.get(p.getId());
             if (!CollectionUtils.isEmpty(equipments)) {
-                resp.setEventEquipments(CglibUtil.copyList(equipments, NftEventEquipmentResp::new));
+                List<NftEventEquipmentResp> equipmentResps = CglibUtil.copyList(equipments, NftEventEquipmentResp::new);
+                equipmentResps.forEach(i -> {
+                    i.setMintAddress(nftPublicBackpackService.queryTokenAddressByAutoId(i.getAutoId()));
+                });
+                resp.setEventEquipments(equipmentResps);
             }
             return resp;
         });
@@ -163,6 +167,14 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         nftEvent.setUpdatedAt(System.currentTimeMillis());
         nftEvent.setUpdatedBy(req.getUserId());
         this.save(nftEvent);
+        req.getEquipments().forEach(p -> {
+            try {
+                p.setBaseAttrValue(URLDecoder.decode(p.getBaseAttrValue(), "UTF-8"));
+                p.setRarityAttrValue(URLDecoder.decode(p.getRarityAttrValue(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        });
         List<NftEventEquipment> equipments = CglibUtil.copyList(req.getEquipments(), NftEventEquipment::new);
 
         equipments.forEach(p -> {
@@ -347,8 +359,14 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             attributeEntity.setGrade(equipment.getLvl());
             attributeEntity.setDurability(durability);
             try {
+                log.info("baseAttr={}", equipment.getBaseAttrValue());
+                log.info("rarityAttr={}", equipment.getRarityAttrValue());
+                log.info("baseAttrDecode={}", URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
+                log.info("rarityAttrDecode={}", URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
+
                 attributeEntity.setBaseAttrValue(URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
                 attributeEntity.setRarityAttrValue(URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
+
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -378,14 +396,17 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
                 data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
-            } else {
-                //   recordLog(req.getEventId(), req.getMintAddress());
             }
         } catch (Exception e) {
             log.error("NFT购买成功通知失败，message：{}", e.getMessage());
             //   recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
         }
-        //  updateLocalDB();
+
+        NftEvent nftEvent = this.getById(req.getEventId());
+        NftEventEquipment equipment = eventEquipmentService
+                .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
+
+        updateLocalDB(req.getAutoDeposite(), nftEvent, equipment, data);
     }
 
 

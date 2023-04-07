@@ -392,12 +392,30 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 .eq(NftPublicBackpackEntity::getTokenId, tokenId));
     }
 
+    @Override
+    public String queryTokenAddressByAutoId(Long autoId) {
+        String tokenAddress = "";
+        NftPublicBackpackEntity one = getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>()
+                .eq(NftPublicBackpackEntity::getAutoId, autoId));
+        if (Objects.nonNull(one)) {
+            tokenAddress = one.getTokenAddress();
+        }
+        return tokenAddress;
+    }
+
     // lootmode 结算 nft物品所有权转移，中心化操作
     @Override
     public void ownerTransfer(OpenNftOwnershipTransferReq req) {
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
         BeanUtils.copyProperties(req, entity);
         entity.setUserId(req.getToUserId());
+        try {
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(req.getToUserId());
+            String owner = result.getData();
+            entity.setOwner(owner);
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
         this.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
     }
 

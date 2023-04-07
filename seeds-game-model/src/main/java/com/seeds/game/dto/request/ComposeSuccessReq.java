@@ -9,7 +9,7 @@ import lombok.Data;
  * @date 2023/3/30
  */
 @Data
-@ApiModel(value = "NftMintSuccessReq")
+@ApiModel(value = "ComposeSuccessReq")
 public class ComposeSuccessReq {
 
     @ApiModelProperty(value = "nftEventId")

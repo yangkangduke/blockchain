@@ -9,7 +9,7 @@
         t1.place_time,
         t1.token_id,
         t1.auction_id,
-        t2.name,
+        t4.name,
         t2.image,
         t3.rarity,
         t3.victory,
@@ -25,7 +25,7 @@
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
-        where t2.type = 3
+        where t2.type = 3  AND t2.state IN(5,6)
         <if test="params.name != null">
             and t2.name = #{params.name}
         </if>
@@ -67,7 +67,7 @@
         t1.price,
         t1.token_id,
         t1.auction_id,
-        t2.name,
+        t4.name,
         t2.image,
         t3.durability,
         t3.grade,
@@ -83,7 +83,7 @@
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
-        where t2.type = 1
+        where t2.type = 1 AND t2.state IN(5,6)
 
         <if test="params.name != null">
             and t2.name = #{params.name}
@@ -131,7 +131,7 @@
         t1.place_time,
         t1.token_id,
         t1.auction_id,
-        t2.name,
+        t4.name,
         t2.image,
         t3.grade,
         t3.durability,
@@ -147,7 +147,7 @@
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
-        where t2.type = 2
+        where t2.type = 2 AND t2.state IN(5,6)
 
         <if test="params.name != null">
             and t2.name = #{params.name}
