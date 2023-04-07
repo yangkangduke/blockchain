@@ -28,7 +28,10 @@ import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftPublicBackpackMapper;
 import com.seeds.game.mq.producer.KafkaProducer;
 import com.seeds.game.service.*;
+import com.seeds.uc.dto.response.UcUserResp;
+import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -86,8 +89,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Autowired
     private UcUserService ucUserService;
+
     @Autowired
-    private IUpdateBackpackErrorLogService updateBackpackErrorLogService;
+    private UserCenterFeignClient userCenterFeignClient;
 
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
@@ -528,6 +532,15 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
         backpackEntity.setState(req.getState());
+        if (StringUtils.isNotBlank(req.getOwner())) {
+            try {
+                GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(req.getOwner());
+                backpackEntity.setUserId(result.getData().getId());
+            } catch (Exception e) {
+                log.error("内部请求uc获取用户信息失败");
+            }
+            backpackEntity.setOwner(req.getOwner());
+        }
         this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, req.getNftId()));
 
     }

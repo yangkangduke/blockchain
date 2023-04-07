@@ -22,18 +22,15 @@ import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
+import com.seeds.game.enums.NftOrderTypeEnum;
 import com.seeds.game.enums.NftStateEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
-import com.seeds.game.service.INftAttributeService;
-import com.seeds.game.service.INftMarketOrderService;
-import com.seeds.game.enums.*;
 import com.seeds.game.service.*;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -326,8 +323,17 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
         buyValidation(nftEquipment);
 
-        //更新背包状态 undeposited
+        //更新背包状态 undeposited  userId,owner
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        Long userId = UserContext.getCurrentUserId();
+        backpackEntity.setUserId(userId);
+        try {
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(userId);
+            String owner = result.getData();
+            backpackEntity.setOwner(owner);
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
         backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
         nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
 

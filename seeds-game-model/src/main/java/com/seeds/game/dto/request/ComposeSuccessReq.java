@@ -21,8 +21,8 @@ public class ComposeSuccessReq {
     @ApiModelProperty(value = "销毁装备地址")
     private String mintAddresses;
 
-    @ApiModelProperty(value = "销毁装备的签名数组")
-    private String sigs;
+    @ApiModelProperty(value = "销毁装备的签名")
+    private String sig;
 
     @ApiModelProperty(value = "用户钱包地址")
     private String walletAddress;
