@@ -125,7 +125,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             BeanUtils.copyProperties(p, resp);
             List<NftEventEquipment> equipments = map.get(p.getId());
             if (!CollectionUtils.isEmpty(equipments)) {
-                resp.setEventEquipments(CglibUtil.copyList(equipments, NftEventEquipmentResp::new));
+                List<NftEventEquipmentResp> equipmentResps = CglibUtil.copyList(equipments, NftEventEquipmentResp::new);
+                equipmentResps.forEach(i -> {
+                    i.setMintAddress(nftPublicBackpackService.queryTokenAddressByAutoId(i.getAutoId()));
+                });
+                resp.setEventEquipments(equipmentResps);
             }
             return resp;
         });
