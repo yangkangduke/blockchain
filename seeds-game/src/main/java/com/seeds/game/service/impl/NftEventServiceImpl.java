@@ -167,6 +167,14 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         nftEvent.setUpdatedAt(System.currentTimeMillis());
         nftEvent.setUpdatedBy(req.getUserId());
         this.save(nftEvent);
+        req.getEquipments().forEach(p -> {
+            try {
+                p.setBaseAttrValue(URLDecoder.decode(p.getBaseAttrValue(), "UTF-8"));
+                p.setRarityAttrValue(URLDecoder.decode(p.getRarityAttrValue(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        });
         List<NftEventEquipment> equipments = CglibUtil.copyList(req.getEquipments(), NftEventEquipment::new);
 
         equipments.forEach(p -> {
@@ -351,10 +359,10 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             attributeEntity.setGrade(equipment.getLvl());
             attributeEntity.setDurability(durability);
             try {
-                log.info("baseAttr{}",equipment.getBaseAttrValue());
-                log.info("rarityAttr{}",equipment.getRarityAttrValue());
-                log.info("baseAttrDecode{}",URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
-                log.info("rarityAttrDecode{}",URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
+                log.info("baseAttr={}", equipment.getBaseAttrValue());
+                log.info("rarityAttr={}", equipment.getRarityAttrValue());
+                log.info("baseAttrDecode={}", URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
+                log.info("rarityAttrDecode={}", URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
 
                 attributeEntity.setBaseAttrValue(URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
                 attributeEntity.setRarityAttrValue(URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
