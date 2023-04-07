@@ -15,6 +15,9 @@ import java.math.BigDecimal;
 public class NftMarketPlaceSkinResp implements Serializable {
      private static final long serialVersionUID = 1L;
 
+     @ApiModelProperty("NFT id")
+     private Long id;
+
      @ApiModelProperty("NFT编号")
      private String number;
 
