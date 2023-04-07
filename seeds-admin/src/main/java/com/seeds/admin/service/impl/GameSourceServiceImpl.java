@@ -20,6 +20,7 @@ import com.seeds.admin.enums.*;
 import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.mapper.SysGameSourceMapper;
 import com.seeds.admin.service.GameSourceService;
+import com.seeds.admin.service.SysFileService;
 import com.seeds.admin.service.SysUserService;
 import com.seeds.admin.utils.IPUtil;
 import com.seeds.common.web.context.UserContext;
@@ -55,6 +56,9 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
 
     @Autowired
     private CountryContinentService countryContinentService;
+
+    @Autowired
+    private SysFileService sysFileService;
 
     @Override
     public void upload(MultipartFile[] files, SysGameSrcAddReq req) {
@@ -106,9 +110,12 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                 gameFileResp.setBucketName(p.getBucketName());
                 gameFileResp.setKey(p.getKey());
                 gameFileResp.setFileName(p.getKey().substring(p.getKey().lastIndexOf("/") + 1));
-                gameFileResp.setJapanURL(getFileUrl(properties.getGame().getOss1().getCdn(), p.getKey()));
-                gameFileResp.setEuURL(getFileUrl(properties.getGame().getOss2().getCdn(), p.getKey()));
-                gameFileResp.setUsURL(getFileUrl(properties.getGame().getOss3().getCdn(), p.getKey()));
+//                gameFileResp.setJapanURL(getFileUrl(properties.getGame().getOss1().getCdn(), p.getKey()));
+//                gameFileResp.setEuURL(getFileUrl(properties.getGame().getOss2().getCdn(), p.getKey()));
+//                gameFileResp.setUsURL(getFileUrl(properties.getGame().getOss3().getCdn(), p.getKey()));
+                gameFileResp.setJapanURL(sysFileService.getFileUrl(p.getKey()));
+                gameFileResp.setUsURL(sysFileService.getFileUrl(p.getKey()));
+                gameFileResp.setEuURL(sysFileService.getFileUrl(p.getKey()));
                 gameFileResp.setSize(getPrintSize(p.getSize()));
                 gameFileResp.setUploadTime(DateUtil.format(p.getLastModified(), "yyyy-MM-dd HH:mm:ss"));
                 return gameFileResp;
@@ -273,9 +280,12 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
                 gameFileResp.setBucketName(p.getBucketName());
                 gameFileResp.setKey(p.getKey());
                 gameFileResp.setFileName(p.getKey().substring(p.getKey().lastIndexOf("/") + 1));
-                gameFileResp.setJapanURL(getFileUrl(properties.getGame().getOss1().getCdn(), p.getKey()));
-                gameFileResp.setEuURL(getFileUrl(properties.getGame().getOss2().getCdn(), p.getKey()));
-                gameFileResp.setUsURL(getFileUrl(properties.getGame().getOss3().getCdn(), p.getKey()));
+//                gameFileResp.setJapanURL(getFileUrl(properties.getGame().getOss1().getCdn(), p.getKey()));
+//                gameFileResp.setEuURL(getFileUrl(properties.getGame().getOss2().getCdn(), p.getKey()));
+//                gameFileResp.setUsURL(getFileUrl(properties.getGame().getOss3().getCdn(), p.getKey()));
+                gameFileResp.setJapanURL(sysFileService.getFileUrl(p.getKey()));
+                gameFileResp.setUsURL(sysFileService.getFileUrl(p.getKey()));
+                gameFileResp.setEuURL(sysFileService.getFileUrl(p.getKey()));
                 gameFileResp.setSize(getPrintSize(p.getSize()));
                 gameFileResp.setUploadTime(DateUtil.format(p.getLastModified(), "yyyy-MM-dd HH:mm:ss"));
                 return gameFileResp;
@@ -289,9 +299,11 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         PreUploadResp resp = new PreUploadResp();
         String objectName = handleObjectNamePrefix(req.getType());
         String key = objectName + req.getFileName();
-        String bucketName = properties.getGame().getOss1().getBucketName();
+//        String bucketName = properties.getGame().getOss1().getBucketName();
+        String bucketName = properties.getBucketName();
         String presignedUrl = template.getPresignedUrl(key, bucketName);
-        String fileUrl = getFileUrl(properties.getGame().getOss1().getCdn(), key);
+//        String fileUrl = getFileUrl(properties.getGame().getOss1().getCdn(), key);
+        String fileUrl = sysFileService.getFileUrl(key);
         resp.setKey(key).setPreSignedUrl(presignedUrl).setCndUrl(fileUrl);
         return resp;
     }
@@ -299,7 +311,8 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
     @Override
     public PreUploadResp createUpload(UploadFileInfo req) {
         PreUploadResp resp = new PreUploadResp();
-        String gameBucketName = properties.getGame().getOss1().getBucketName();
+//        String gameBucketName = properties.getGame().getOss1().getBucketName();
+        String gameBucketName = properties.getBucketName();
         String objectName = handleObjectNamePrefix(req.getType());
         InitiateMultipartUploadResult initiateMultipartUpload;
         try {
@@ -314,7 +327,8 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
     @Override
     public String getPartUrl(FilePartReq req) {
         String preSignedUrl = "";
-        String gameBucketName = properties.getGame().getOss1().getBucketName();
+//        String gameBucketName = properties.getGame().getOss1().getBucketName();
+        String gameBucketName = properties.getBucketName();
         try {
             preSignedUrl = template.getPresignedUrl(req.getKey(), gameBucketName, req.getUploadId(), req.getPartNumber());
         } catch (Exception e) {
@@ -325,14 +339,16 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
 
     @Override
     public String completeMultipartUpload(CompleteUploadReq req) {
-        String gameBucketName = properties.getGame().getOss1().getBucketName();
+//        String gameBucketName = properties.getGame().getOss1().getBucketName();
+        String gameBucketName = properties.getBucketName();
         try {
             template.completeMultipartUpload(gameBucketName, req.getKey(), req.getUploadId());
         } catch (Exception e) {
             log.info("完成上传合并分段失败，{}", e.getMessage());
             template.abortUpload(gameBucketName, req.getKey(), req.getUploadId());
         }
-        return getFileUrl(properties.getGame().getOss1().getCdn(), req.getKey());
+//        return getFileUrl(properties.getGame().getOss1().getCdn(), req.getKey());
+        return sysFileService.getFileUrl(req.getKey());
     }
 
     @Override
@@ -361,7 +377,8 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
 
     @Override
     public Boolean abortUpload(CompleteUploadReq req) {
-        String gameBucketName = properties.getGame().getOss1().getBucketName();
+//        String gameBucketName = properties.getGame().getOss1().getBucketName();
+        String gameBucketName = properties.getBucketName();
         template.abortUpload(gameBucketName, req.getKey(), req.getUploadId());
         return true;
     }
@@ -507,9 +524,12 @@ public class GameSourceServiceImpl extends ServiceImpl<SysGameSourceMapper, SysG
         gameSrc.setOs(req.getOs());
         gameSrc.setSrcSize(getPrintSize(req.getSize()));
         gameSrc.setS3Path(objectName);
-        gameSrc.setJapanUrl(getFileUrl(properties.getGame().getOss1().getCdn(), objectName));
-        gameSrc.setEuUrl(getFileUrl(properties.getGame().getOss2().getCdn(), objectName));
-        gameSrc.setUsUrl(getFileUrl(properties.getGame().getOss3().getCdn(), objectName));
+//        gameSrc.setJapanUrl(getFileUrl(properties.getGame().getOss1().getCdn(), objectName));
+//        gameSrc.setEuUrl(getFileUrl(properties.getGame().getOss2().getCdn(), objectName));
+//        gameSrc.setUsUrl(getFileUrl(properties.getGame().getOss3().getCdn(), objectName));
+        gameSrc.setJapanUrl(sysFileService.getFileUrl(objectName));
+        gameSrc.setUsUrl(sysFileService.getFileUrl(objectName));
+        gameSrc.setEuUrl(sysFileService.getFileUrl(objectName));
         gameSrc.setRemark(req.getRemark());
         gameSrc.setCreatedAt(System.currentTimeMillis());
         gameSrc.setUpdatedAt(System.currentTimeMillis());
