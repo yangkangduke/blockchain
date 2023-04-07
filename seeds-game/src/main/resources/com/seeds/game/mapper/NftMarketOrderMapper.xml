@@ -25,7 +25,7 @@
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
-        where t2.type = 3 AND t4.on_sale = 1 OR t4.on_sale = 2
+        where t2.type = 3  AND t4.on_sale IN(1,2)
         <if test="params.name != null">
             and t2.name = #{params.name}
         </if>
@@ -83,7 +83,7 @@
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
-        where t2.type = 1 AND t4.on_sale = 1 OR t4.on_sale = 2
+        where t2.type = 1 AND t4.on_sale IN(1,2)
 
         <if test="params.name != null">
             and t2.name = #{params.name}
@@ -147,7 +147,7 @@
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
-        where t2.type = 2 AND t4.on_sale = 1 OR t4.on_sale = 2
+        where t2.type = 2 AND t4.on_sale IN(1,2)
 
         <if test="params.name != null">
             and t2.name = #{params.name}
