@@ -392,6 +392,17 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 .eq(NftPublicBackpackEntity::getTokenId, tokenId));
     }
 
+    @Override
+    public String queryTokenAddressByAutoId(Long autoId) {
+        String tokenAddress = "";
+        NftPublicBackpackEntity one = getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>()
+                .eq(NftPublicBackpackEntity::getAutoId, autoId));
+        if (Objects.nonNull(one)) {
+            tokenAddress = one.getTokenAddress();
+        }
+        return tokenAddress;
+    }
+
     // lootmode 结算 nft物品所有权转移，中心化操作
     @Override
     public void ownerTransfer(OpenNftOwnershipTransferReq req) {

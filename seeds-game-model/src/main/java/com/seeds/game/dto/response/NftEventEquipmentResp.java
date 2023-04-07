@@ -4,8 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -26,6 +24,9 @@ public class NftEventEquipmentResp implements Serializable {
     @ApiModelProperty("是否nft 1是 0 否")
     private Integer isNft;
 
+    @ApiModelProperty("mintAddress")
+    private String mintAddress;
+
     @ApiModelProperty("是否被消耗 1是 0 否")
     private Integer isConsume;
 
@@ -37,6 +38,9 @@ public class NftEventEquipmentResp implements Serializable {
 
     @ApiModelProperty("装备等级")
     private Integer lvl;
+
+    @ApiModelProperty("autoId")
+    private Long autoId;
 
     @ApiModelProperty("稀有属性值")
     private String rarityAttrValue;
