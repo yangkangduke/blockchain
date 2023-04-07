@@ -133,9 +133,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftId);
         if (publicBackpack != null) {
+            BeanUtils.copyProperties(publicBackpack, resp);
             resp.setAttributes(JSON.parseObject(publicBackpack.getAttributes(), Map.class));
             resp.setMetadata(JSON.parseObject(publicBackpack.getMetadata(), Map.class));
-            BeanUtils.copyProperties(publicBackpack, resp);
+            resp.setReferencePrice(publicBackpack.getProposedPrice());
         }
         resp.setOwnerAddress(nftEquipment.getOwner());
         resp.setMintAddress(nftEquipment.getMintAddress());
@@ -335,6 +336,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             log.error("内部请求uc获取用户公共地址失败");
         }
         backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        backpackEntity.setUserId(userId);
         nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
 
         // 调用/api/chainOp/buySuccess通知，购买成功
@@ -507,16 +509,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (nftEquipment == null) {
             return resp;
         }
-        NftMarketOrderEntity marketOrder = nftMarketOrderService.getById(nftEquipment.getOrderId());
-        if (marketOrder == null || marketOrder.getAuctionId() <= 0) {
-            return resp;
-        }
-        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(marketOrder.getAuctionId());
+        NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(nftEquipment.getAuctionId());
         if (auctionSetting == null) {
             return resp;
         }
         req.setAuctionId(auctionSetting.getId());
-        req.setPrice(marketOrder.getPrice());
+        req.setPrice(auctionSetting.getStartPrice());
         req.setUsdRate(usdRate(CurrencyEnum.SOL.getCode()));
         String publicAddress = null;
         try {
@@ -584,6 +582,26 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
+    public void auctionSuccess(NftSaleSuccessReq req) {
+        NftAuctionHouseBiding auctionBiding = nftAuctionHouseBidingService.getById(req.getBidingId());
+        if (auctionBiding == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+        }
+        // 调用/api/auction/saleSuccess通知，拍卖达成交易成功
+        String params = String.format("auctionId=%s&bidingId=%s&receipt=%s&sig=%s", auctionBiding.getAuctionId(), req.getBidingId(), auctionBiding.getReceipt(), req.getSig());
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getSaleSuccess() + "?" + params;
+        log.info("NFT拍卖达成交易成功，开始通知， url:{}， params:{}", url, params);
+        try {
+            HttpRequest.get(url)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .execute();
+        } catch (Exception e) {
+            log.error("NFT拍卖达成交易成功通知失败，message：{}", e.getMessage());
+        }
+    }
+
+    @Override
     public void cancelOffer(NftCancelOfferReq req) {
         NftAuctionHouseBiding auctionBiding = nftAuctionHouseBidingService.getById(req.getBidingId());
         if (auctionBiding == null) {
@@ -591,7 +609,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // offer归属人验证
         ucUserService.ownerValidation(auctionBiding.getBuyer());
         // 调用/api/auction/cancelBid通知，取消出价成功
-        String params = String.format("bidingId=%s&receipt=%s&signature=%s", req.getBidingId(), req.getReceipt(), req.getSignature());
+        String params = String.format("bidingId=%s&receipt=%s&signature=%s", req.getBidingId(), auctionBiding.getReceipt(), req.getSignature());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionCancelBid() + "?" + params;
         log.info("NFT取消出价成功，开始通知， url:{}， params:{}", url, params);
         try {
