@@ -37,6 +37,9 @@ public class NftOfferResp {
         @JsonSerialize(using= ToStringSerializer.class)
         private Long auctionId;
 
+        @ApiModelProperty("收据")
+        private String receipt;
+
         @ApiModelProperty("拍卖合约地址")
         private String auctionHouseAddress;
 

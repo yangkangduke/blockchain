@@ -11,14 +11,14 @@ import javax.validation.constraints.NotNull;
  * @date 2023/3/24
  */
 @Data
-public class NftCancelOfferReq {
+public class NftSaleSuccessReq {
 
-    @ApiModelProperty("取消的拍卖出价id")
+    @ApiModelProperty("接受的拍卖出价id")
     @NotNull(message = "Biding id cannot be empty")
     private Long bidingId;
 
     @ApiModelProperty("签名")
-    @NotBlank(message = "Signature cannot be empty")
-    private String signature;
+    @NotBlank(message = "signature cannot be empty")
+    private String sig;
 
 }

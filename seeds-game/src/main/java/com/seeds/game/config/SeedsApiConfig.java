@@ -45,6 +45,9 @@ public class SeedsApiConfig {
     @Value("${seeds.api.endAuction:/api/auction/endAuction}")
     private String endAuction;
 
+    @Value("${seeds.api.saleSuccess:/api/auction/saleSuccess}")
+    private String saleSuccess;
+
     @Value("${seeds.api.auctionCancel:/api/auction/cancelAuction}")
     private String auctionCancel;
 
