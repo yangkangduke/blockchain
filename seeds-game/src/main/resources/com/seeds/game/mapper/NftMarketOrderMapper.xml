@@ -26,11 +26,11 @@
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
         where t2.type = 3  AND t2.state IN(5,6)
-        <if test="params.name != null">
-            and t2.name = #{params.name}
+        <if test="params.name != null and params.name != ''">
+            and t2.name LIKE CONCAT('%', #{params.name}, '%')
         </if>
         <if test="params.tokenId != null">
-            and t1.token_id = #{params.tokenId}
+            and t1.token_id LIKE CONCAT('%', #{params.tokenId}, '%')
         </if>
         <if test="params.auctionId != null">
             and t1.auction_id  = #{params.auctionId}
@@ -85,11 +85,11 @@
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
         where t2.type = 1 AND t2.state IN(5,6)
 
-        <if test="params.name != null">
-            and t2.name = #{params.name}
+        <if test="params.name != null and params.name != ''">
+            and t2.name LIKE CONCAT('%', #{params.name}, '%')
         </if>
         <if test="params.tokenId != null">
-            and t1.token_id = #{params.tokenId}
+            and t1.token_id LIKE CONCAT('%', #{params.tokenId}, '%')
         </if>
         <if test="params.auctionId != null">
             and t1.auction_id  = #{params.auctionId}
@@ -149,11 +149,11 @@
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
         where t2.type = 2 AND t2.state IN(5,6)
 
-        <if test="params.name != null">
-            and t2.name = #{params.name}
+        <if test="params.name != null and params.name != ''">
+            and t2.name LIKE CONCAT('%', #{params.name}, '%')
         </if>
         <if test="params.tokenId != null">
-            and t1.token_id = #{params.tokenId}
+            and t1.token_id LIKE CONCAT('%', #{params.tokenId}, '%')
         </if>
         <if test="params.auctionId != null">
             and t1.auction_id  = #{params.auctionId}
