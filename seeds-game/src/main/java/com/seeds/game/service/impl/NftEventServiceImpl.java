@@ -351,8 +351,14 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             attributeEntity.setGrade(equipment.getLvl());
             attributeEntity.setDurability(durability);
             try {
+                log.info("baseAttr{}",equipment.getBaseAttrValue());
+                log.info("rarityAttr{}",equipment.getRarityAttrValue());
+                log.info("baseAttrDecode{}",URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
+                log.info("rarityAttrDecode{}",URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
+
                 attributeEntity.setBaseAttrValue(URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
                 attributeEntity.setRarityAttrValue(URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
+
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -382,14 +388,17 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
                 data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
-            } else {
-                //   recordLog(req.getEventId(), req.getMintAddress());
             }
         } catch (Exception e) {
             log.error("NFT购买成功通知失败，message：{}", e.getMessage());
             //   recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
         }
-        //  updateLocalDB();
+
+        NftEvent nftEvent = this.getById(req.getEventId());
+        NftEventEquipment equipment = eventEquipmentService
+                .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
+
+        updateLocalDB(req.getAutoDeposite(), nftEvent, equipment, data);
     }
 
 

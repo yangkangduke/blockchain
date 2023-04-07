@@ -409,6 +409,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
         BeanUtils.copyProperties(req, entity);
         entity.setUserId(req.getToUserId());
+        try {
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(req.getToUserId());
+            String owner = result.getData();
+            entity.setOwner(owner);
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
         this.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
     }
 
