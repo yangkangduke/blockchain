@@ -2,6 +2,7 @@ package com.seeds.game.controller;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.NftBuySuccessReq;
+import com.seeds.game.dto.response.NftOfferDetailResp;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.NftMarketPlaceService;
 import io.swagger.annotations.Api;
@@ -66,9 +67,8 @@ public class NftMarketPlaceController {
 
     @PostMapping("accept-offer")
     @ApiOperation("接受拍卖出价")
-    public GenericDto<String> acceptOffer(@Valid @RequestBody NftAcceptOfferReq req) {
-        nftMarketPlaceService.acceptOffer(req);
-        return GenericDto.success(null);
+    public GenericDto<NftOfferDetailResp> acceptOffer(@Valid @RequestBody NftAcceptOfferReq req) {
+        return GenericDto.success(nftMarketPlaceService.acceptOffer(req));
     }
 
     @PostMapping("auction-success")

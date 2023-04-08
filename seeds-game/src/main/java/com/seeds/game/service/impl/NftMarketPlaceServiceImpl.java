@@ -545,7 +545,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
-    public String acceptOffer(NftAcceptOfferReq req) {
+    public NftOfferDetailResp acceptOffer(NftAcceptOfferReq req) {
         NftAuctionHouseBiding auctionBiding = nftAuctionHouseBidingService.getById(req.getBidingId());
         if (auctionBiding == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
@@ -563,11 +563,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // 调用/api/auction/endAuction通知，接受报价成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getEndAuction();
         EndAuctionMessageDto dto  = new EndAuctionMessageDto();
+        dto.setNftId(nftEquipment.getId());
+        dto.setToAddress(nftEquipment.getOwner());
         BeanUtils.copyProperties(req, dto);
         dto.setAuctionId(auctionBiding.getAuctionId());
         dto.setMintAddress(auctionBiding.getMintAddress());
-        dto.setNftId(nftEquipment.getId());
-        dto.setToAddress(auctionBiding.getBuyer());
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT接受报价成功，开始通知， url:{}， params:{}", url, param);
         try {
@@ -578,8 +578,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .execute();
             String body = response.body();
             log.info("请求NFT接受报价成功接口返回，  result:{}", body);
-            NftAuctionHouseBiding resp = JSONUtil.toBean(body, NftAuctionHouseBiding.class);
-            return resp.getReceipt();
+            return JSONUtil.toBean(body, NftOfferDetailResp.class);
         } catch (Exception e) {
             log.error("NFT接受报价成功通知失败，message：{}", e.getMessage());
             throw new GenericException("Accept offer failed");

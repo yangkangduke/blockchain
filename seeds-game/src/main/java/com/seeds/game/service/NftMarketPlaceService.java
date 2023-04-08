@@ -69,8 +69,9 @@ public interface NftMarketPlaceService {
     /**
      * 接受nft出价
      * @param req 收据
+     * @return 拍卖信息
      */
-    String acceptOffer(NftAcceptOfferReq req);
+    NftOfferDetailResp acceptOffer(NftAcceptOfferReq req);
 
     /**
      * 拍卖达成交易
