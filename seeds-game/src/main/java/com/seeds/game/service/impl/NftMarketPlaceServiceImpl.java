@@ -577,8 +577,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .body(param)
                     .execute();
             String body = response.body();
+            JSONObject jsonObject = JSONObject.parseObject(body);
+            String data = jsonObject.getString("data");
             log.info("请求NFT接受报价成功接口返回，  result:{}", body);
-            return JSONUtil.toBean(body, NftOfferDetailResp.class);
+            return JSONUtil.toBean(data, NftOfferDetailResp.class);
         } catch (Exception e) {
             log.error("NFT接受报价成功通知失败，message：{}", e.getMessage());
             throw new GenericException("Accept offer failed");
