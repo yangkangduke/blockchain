@@ -545,7 +545,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
-    public void acceptOffer(NftAcceptOfferReq req) {
+    public String acceptOffer(NftAcceptOfferReq req) {
         NftAuctionHouseBiding auctionBiding = nftAuctionHouseBidingService.getById(req.getBidingId());
         if (auctionBiding == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
@@ -571,13 +571,18 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT接受报价成功，开始通知， url:{}， params:{}", url, param);
         try {
-            HttpRequest.post(url)
+            HttpResponse response = HttpRequest.post(url)
                     .timeout(5 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
+            String body = response.body();
+            log.info("请求NFT接受报价成功接口返回，  result:{}", body);
+            NftAuctionHouseBiding resp = JSONUtil.toBean(body, NftAuctionHouseBiding.class);
+            return resp.getReceipt();
         } catch (Exception e) {
             log.error("NFT接受报价成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("Accept offer failed");
         }
     }
 

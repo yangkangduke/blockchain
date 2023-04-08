@@ -66,7 +66,7 @@ public class NftMarketPlaceController {
 
     @PostMapping("accept-offer")
     @ApiOperation("接受拍卖出价")
-    public GenericDto<Object> acceptOffer(@Valid @RequestBody NftAcceptOfferReq req) {
+    public GenericDto<String> acceptOffer(@Valid @RequestBody NftAcceptOfferReq req) {
         nftMarketPlaceService.acceptOffer(req);
         return GenericDto.success(null);
     }

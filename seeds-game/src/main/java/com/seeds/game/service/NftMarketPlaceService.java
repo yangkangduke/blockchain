@@ -70,7 +70,7 @@ public interface NftMarketPlaceService {
      * 接受nft出价
      * @param req 收据
      */
-    void acceptOffer(NftAcceptOfferReq req);
+    String acceptOffer(NftAcceptOfferReq req);
 
     /**
      * 拍卖达成交易
