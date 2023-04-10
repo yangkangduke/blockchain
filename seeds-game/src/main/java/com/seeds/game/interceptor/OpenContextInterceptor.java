@@ -70,8 +70,16 @@ public class OpenContextInterceptor implements HandlerInterceptor {
         log.info("path-------->" + request.getServletPath());
         // 来自web端的请求不再校验签名
         if (request.getRequestURI().contains(FROM_WEB)) {
-            // 需要进行登录校验
+            // 不需要进行登录校验
             String token = request.getHeader(HttpHeaders.USER_TOKEN);
+            if (request.getRequestURI().contains(NO_LOGIN_REQUIRED_PATH)) {
+                LoginUserDTO user = redissonClient.<LoginUserDTO>getBucket(RedisKeys.getUcTokenKey(token)).get();
+                if (user != null) {
+                    UserContext.setCurrentUserId(user.getUserId());
+                }
+                return true;
+            }
+            // 需要进行登录校验
             if (StringUtils.isEmpty(token)) {
                 writeFailureResponse(response, INVALID_TOKEN_RESPONSE);
                 return false;

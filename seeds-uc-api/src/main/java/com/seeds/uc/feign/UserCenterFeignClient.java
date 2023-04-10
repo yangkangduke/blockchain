@@ -11,6 +11,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
@@ -53,4 +54,23 @@ public interface UserCenterFeignClient {
      */
     @GetMapping("uc-internal/user/user-registration")
     GenericDto<UserRegistrationResp> getUserRegistration();
+
+    /**
+     * 根据用户id获取用户地址
+     *
+     * @param id 用户编号
+     * @return 用户地址
+     */
+    @GetMapping("/uc-internal/user/get-public-address")
+    GenericDto<String> getPublicAddress(@RequestParam Long id);
+
+    /**
+     * 根据用户钱包地址获取用户信息
+     *
+     * @param publicAddress 钱包地址
+     * @return 用户信息
+     */
+    @GetMapping("/uc-internal/user/get-by-public-address")
+    GenericDto<UcUserResp> getByPublicAddress(@RequestParam String publicAddress);
+
 }

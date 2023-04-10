@@ -59,6 +59,9 @@ public class NftPublicBackpackResp implements Serializable {
     @ApiModelProperty("token id")
     private String tokenId;
 
+    @ApiModelProperty("token address")
+    private String tokenAddress;
+
     @ApiModelProperty("协议标准")
     private String tokenStandard;
 

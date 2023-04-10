@@ -77,6 +77,7 @@ public class UcRedisKeysConstant {
 
     public final String UC_PROFILE_INFO_TEMPLATE = UC_KEY_PREFIX + "profile:info:%s:%s";
 
+    public final String UC_USD_RATE_TEMPLATE = UC_KEY_PREFIX + "usd:rate:%s";
 
     /**
      * return uc:token:{uid} as redis key in login
@@ -185,6 +186,10 @@ public class UcRedisKeysConstant {
 
     public String getProfileInfoTemplate(String userId, String gameId) {
         return String.format(UC_PROFILE_INFO_TEMPLATE, userId, gameId);
+    }
+
+    public String getUsdRateTemplate(String currency) {
+        return String.format(UC_USD_RATE_TEMPLATE, currency);
     }
 
 }

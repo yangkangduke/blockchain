@@ -1,17 +1,16 @@
 package com.seeds.game.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.seeds.game.dto.request.*;
-import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
-import com.seeds.game.dto.response.NftPublicBackpackResp;
-import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
-import com.seeds.game.entity.NftPublicBackpackEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.game.dto.request.*;
+import com.seeds.game.dto.request.internal.*;
+import com.seeds.game.dto.response.*;
+import com.seeds.game.entity.NftPublicBackpackEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -31,6 +30,12 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     NftPublicBackpackResp detail(Integer autoId);
 
+    OpenNftPublicBackpackDisResp distributeBatch(List<NftPublicBackpackDisReq> reqs);
+
+    void takeBackBatch(List<NftPublicBackpackTakeBackReq> reqs);
+
+    OpenNftPublicBackpackDisResp transferBatch(List<NftPublicBackpackDisReq> reqs);
+
     OpenNftPublicBackpackDisResp distribute(NftPublicBackpackDisReq req);
 
     void takeBack(NftPublicBackpackTakeBackReq req);
@@ -38,4 +43,54 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     OpenNftPublicBackpackDisResp transfer(NftPublicBackpackDisReq req);
 
     List<NftPublicBackpackResp> queryList(NftPublicBackpackPageReq req);
+
+    NftPublicBackpackEntity queryByMintAddress(String mintAddress);
+
+    NftPublicBackpackEntity queryByTokenId(String tokenId);
+
+    String queryTokenAddressByAutoId(Long autoId);
+
+    void ownerTransfer(OpenNftOwnershipTransferReq req);
+
+    /**
+     * 通过NFT id查询NFT
+     * @param eqNftId NFT id
+     * @return  NFT
+     */
+    NftPublicBackpackEntity queryByEqNftId(Long eqNftId);
+
+    /**
+     * nft托管
+     * @param req 验证
+     */
+    void deposited(NftDepositedReq req);
+
+    /**
+     * 取消nft托管
+     *
+     * @param req 验证
+     */
+    void unDeposited(NftUnDepositedReq req);
+
+    /**
+     * 获取各个分类的数量
+     *
+     * @return
+     */
+    List<NftTypeNum> typeNum();
+
+    /**
+     * 获取各个分类的列表
+     *
+     * @return
+     */
+    List<NftType> getNftTypeList(Integer type);
+
+    List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req);
+
+    void updateState(NftBackpakcUpdateStateReq req);
+
+    void insertCallback(MintSuccessReq req);
+
+    Map<Long, BigDecimal> getTotalPrice(String autoIds);
 }

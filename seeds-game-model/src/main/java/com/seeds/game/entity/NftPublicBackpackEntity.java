@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -45,8 +46,14 @@ public class NftPublicBackpackEntity implements Serializable {
     @ApiModelProperty("类型：1装备 2道具 3英雄")
     private Integer type;
 
+    @ApiModelProperty("浏览量")
+    private Integer views;
+
     @ApiModelProperty("对应游戏那边的conf_id，找静态表中的数据")
     private Long itemId;
+
+    @ApiModelProperty("对应游戏那边的item_id")
+    private Long itemTypeId;
 
     @ApiModelProperty("游戏那边传的。大区+game+流水")
     private Long autoId;
@@ -87,7 +94,7 @@ public class NftPublicBackpackEntity implements Serializable {
     @ApiModelProperty("是否分配。0未分配 1已分配")
     private Integer isConfiguration;
 
-    @ApiModelProperty("单据状态 1 转化中，2 转化成功，3 withdraw  ")
+    @ApiModelProperty("状态 1 MINTED (mint成功)，2 LOCK (作为合成材料被临时锁定)，3 DEPOSITED (托管给平台) 4 UNDEPOSITED (解除托管)  5 on shelf 6 on auction 7 结算中   ")
     private Integer state;
 
     @ApiModelProperty("动态属性，存json")
@@ -95,4 +102,24 @@ public class NftPublicBackpackEntity implements Serializable {
 
     @ApiModelProperty("nft元数据，存json")
     private String metadata;
+
+    @ApiModelProperty("nft价格")
+    private BigDecimal price;
+
+    @ApiModelProperty("nft等级")
+    private Integer grade;
+
+    private String tokenName;
+
+    private String owner;
+
+    private String tokenAddress;
+
+    @ApiModelProperty("关联z_equipment_nft表")
+    private Long eqNftId;
+
+    @ApiModelProperty("参考价格")
+    private BigDecimal proposedPrice;
+
+
 }

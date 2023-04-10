@@ -3,10 +3,7 @@ package com.seeds.game.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
-import com.seeds.game.dto.request.OpenNftPublicBackpackCreateUpdateReq;
-import com.seeds.game.dto.request.OpenNftPublicBackpackDisReq;
-import com.seeds.game.dto.request.OpenNftPublicBackpackPageReq;
-import com.seeds.game.dto.request.OpenNftPublicBackpackTakeBackReq;
+import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.NftPublicBackpackResp;
 import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
 import com.seeds.game.service.INftPublicBackpackService;
@@ -16,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -94,6 +93,13 @@ public class OpenNftPublicBackpackController {
     public GenericDto<OpenNftPublicBackpackDisResp> transfer(@RequestBody @Valid OpenNftPublicBackpackDisReq req) {
         req.setUserId(UserContext.getCurrentUserId());
         return GenericDto.success(nftPublicBackpackService.transfer(req));
+    }
+
+    @PostMapping("total-price")
+    @ApiOperation("获取nft的参考价")
+    public GenericDto<Map<Long, BigDecimal>> getTotalPrice(@RequestBody OpenGetNFTPriceReq req) {
+
+        return GenericDto.success(nftPublicBackpackService.getTotalPrice(req.getAutoIds()));
     }
 
 }

@@ -28,4 +28,19 @@ public interface GameCacheService {
      */
     String getHeroRankCache(String gameServerId, Long heroId, Long accId);
 
+
+    /**
+     * 获取美元汇率
+     * @param currency  币种
+     * @return 美元汇率
+     */
+    String getUsdRate(String currency);
+
+    /**
+     * 缓存美元汇率
+     * @param currency 币种
+     * @param rate 汇率
+     */
+    void putUsdRate(String currency, String rate);
+
 }

@@ -2,7 +2,9 @@ package com.seeds.game.service.impl;
 
 import com.seeds.game.constant.GameRedisKeys;
 import com.seeds.game.service.GameCacheService;
+import com.seeds.uc.constant.UcRedisKeysConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBucket;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -24,6 +27,9 @@ public class GameCacheServiceImpl implements GameCacheService {
 
     @Value("${game.hero.rank.max:100}")
     private Integer heroRankMax;
+
+    @Value("${uc.usd.rate.expire:1}")
+    private Integer usdRateExpireAfter;
 
     @Autowired
     private RedissonClient redissonClient;
@@ -50,5 +56,19 @@ public class GameCacheServiceImpl implements GameCacheService {
             rank = rank + 1;
         }
         return rank.toString();
+    }
+
+    @Override
+    public String getUsdRate(String currency) {
+        String key = UcRedisKeysConstant.getUsdRateTemplate(currency);
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        return bucket.get();
+    }
+
+    @Override
+    public void putUsdRate(String currency, String rate) {
+        String key = UcRedisKeysConstant.getUsdRateTemplate(currency);
+        RBucket<String> bucket = redissonClient.getBucket(key);
+        bucket.set(rate, usdRateExpireAfter, TimeUnit.HOURS);
     }
 }
