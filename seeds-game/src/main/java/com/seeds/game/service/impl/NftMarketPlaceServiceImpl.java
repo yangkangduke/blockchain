@@ -560,9 +560,21 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
         }
+        //更新背包状态 undeposited  userId,owner
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        try {
+            GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(auctionBiding.getBuyer());
+            backpackEntity.setUserId(result.getData().getId());
+            backpackEntity.setOwner(auctionBiding.getBuyer());
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户信息失败");
+        }
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
+
         // 调用/api/auction/endAuction通知，接受报价成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getEndAuction();
-        EndAuctionMessageDto dto  = new EndAuctionMessageDto();
+        EndAuctionMessageDto dto = new EndAuctionMessageDto();
         dto.setNftId(nftEquipment.getId());
         dto.setToAddress(nftEquipment.getOwner());
         BeanUtils.copyProperties(req, dto);

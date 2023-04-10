@@ -394,7 +394,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
             }
         } catch (Exception e) {
-            log.error("NFT购买成功通知失败，message：{}", e.getMessage());
+            log.error("NFT合成成功通知失败，message：{}", e.getMessage());
             //   recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
         }
 
