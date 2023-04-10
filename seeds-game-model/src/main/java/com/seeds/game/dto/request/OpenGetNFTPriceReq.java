@@ -3,8 +3,7 @@ package com.seeds.game.dto.request;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-import java.util.List;
+import javax.validation.constraints.NotBlank;
 
 /**
  * NFT 价格
@@ -16,7 +15,7 @@ import java.util.List;
 public class OpenGetNFTPriceReq extends OpenSignReq {
 
     @ApiModelProperty(value = "autoIds", required = true)
-    @NotNull(message = "autoIds cannot be empty")
-    private List<Long> autoIds;
+    @NotBlank(message = "autoIds cannot be empty")
+    private String autoIds;
 
 }

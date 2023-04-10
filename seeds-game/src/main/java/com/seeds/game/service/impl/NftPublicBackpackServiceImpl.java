@@ -570,9 +570,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
-    public Map<Long, BigDecimal> getTotalPrice(List<Long> autoIds) {
+    public Map<Long, BigDecimal> getTotalPrice(String autoIds) {
 
-        List<NftPublicBackpackEntity> list = this.list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getAutoId, autoIds));
+        List<NftPublicBackpackEntity> list = this.list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getAutoId, autoIds.split(",")));
         return list.stream().collect(Collectors.toMap(NftPublicBackpackEntity::getAutoId, NftPublicBackpackEntity::getProposedPrice));
     }
 
