@@ -376,6 +376,16 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 NftPublicBackpackResp resp = new NftPublicBackpackResp();
                 BeanUtils.copyProperties(p, resp);
                 return resp;
+            }).filter(i -> {
+                String attributes = i.getAttributes();
+                Integer durability = 0;
+                try {
+                    JSONObject jsonObject = JSONObject.parseObject(attributes);
+                    durability = Integer.parseInt(jsonObject.getString("durability"));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+                return durability > 0;
             }).collect(Collectors.toList());
         }
         return respList;
