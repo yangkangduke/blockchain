@@ -5,6 +5,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -46,6 +47,8 @@ import java.util.Map;
 @Slf4j
 @Service
 public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
+
+    private  static final Integer maxDurability = 20;
 
     @Autowired
     private INftAuctionHouseSettingService nftAuctionHouseSettingService;
@@ -356,6 +359,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public IPage<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery) {
+
         Page<NftMarketPlaceSkinResp> page = new Page<>();
         page.setCurrent(skinQuery.getCurrent());
         page.setSize(skinQuery.getSize());
@@ -372,6 +376,21 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
             }else {
                 resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
+            }
+
+            // 查询NFT
+            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getId());
+            // 获取当前nftId 下的mintAddress
+            String mintAddress = nftEquipment.getMintAddress();
+            LambdaQueryWrapper<NftMarketOrderEntity> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(NftMarketOrderEntity::getStatus,2)
+                    .eq(NftMarketOrderEntity::getMintAddress,mintAddress)
+                    .orderByDesc(NftMarketOrderEntity::getFulfillTime)
+                    .last("limit 1");
+
+            NftMarketOrderEntity one = nftMarketOrderService.getOne(queryWrapper);
+            if (one != null) {
+                resp.setLastSale(one.getPrice());
             }
             return resp;
         });
@@ -398,6 +417,21 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             }else {
                 resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
             }
+            // 查询NFT
+            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getId());
+            // 获取当前nftId 下的mintAddress
+            String mintAddress = nftEquipment.getMintAddress();
+            LambdaQueryWrapper<NftMarketOrderEntity> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(NftMarketOrderEntity::getStatus,2)
+                    .eq(NftMarketOrderEntity::getMintAddress,mintAddress)
+                    .orderByDesc(NftMarketOrderEntity::getFulfillTime)
+                    .last("limit 1");
+
+            NftMarketOrderEntity one = nftMarketOrderService.getOne(queryWrapper);
+            if (one != null) {
+                resp.setLastSale(one.getPrice());
+            }
+            resp.setMaxDurability(maxDurability);
             return resp;
         });
 
@@ -435,6 +469,22 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             }else {
                 resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
             }
+
+            // 查询NFT
+            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getId());
+            // 获取当前nftId 下的mintAddress
+            String mintAddress = nftEquipment.getMintAddress();
+            LambdaQueryWrapper<NftMarketOrderEntity> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(NftMarketOrderEntity::getStatus,2)
+                    .eq(NftMarketOrderEntity::getMintAddress,mintAddress)
+                    .orderByDesc(NftMarketOrderEntity::getFulfillTime)
+                    .last("limit 1");
+
+            NftMarketOrderEntity one = nftMarketOrderService.getOne(queryWrapper);
+            if (one != null) {
+                resp.setLastSale(one.getPrice());
+            }
+            resp.setMaxDurability(maxDurability);
             return resp;
         });
     }
