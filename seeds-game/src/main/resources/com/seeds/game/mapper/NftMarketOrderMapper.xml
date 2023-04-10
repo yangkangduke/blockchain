@@ -51,7 +51,7 @@
         <if test="params.sort != null and params.sort =='rarity'">
             order by t3.rarity ${params.sortType}
         </if>
-        <if test="params.sort != null and params.sort =='place_time'">
+        <if test="params.sort != null and params.sort =='placeTime'">
             order by t1.place_time ${params.sortType}
         </if>
 
@@ -112,7 +112,7 @@
         <if test="params.sort != null and params.sort =='durability'">
             order by t3.durability ${params.sortType}
         </if>
-        <if test="params.sort != null and params.sort =='place_time'">
+        <if test="params.sort != null and params.sort =='placeTime'">
             order by t1.place_time ${params.sortType}
         </if>
 
@@ -173,7 +173,7 @@
         <if test="params.sort != null and params.sort =='durability'">
             order by t3.durability ${params.sortType}
         </if>
-        <if test="params.sort != null and params.sort =='place_time'">
+        <if test="params.sort != null and params.sort =='placeTime'">
             order by t1.place_time ${params.sortType}
         </if>
 

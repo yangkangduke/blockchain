@@ -55,20 +55,7 @@ public class NftMarketPlacePropsResp implements Serializable{
     @ApiModelProperty("上架时间")
     private Long placeTime;
 
-    @ApiModelProperty("健康属性值")
-    private Integer health;
 
-    @ApiModelProperty("装备属性值")
-    private Integer armor;
-
-    @ApiModelProperty("怪物属性值")
-    private Integer vsMonster;
-
-    @ApiModelProperty("属性综合介绍")
-    private String passive;
-
-    @ApiModelProperty("blade属性综合介绍")
-    private String bladeBuff;
 
     @ApiModelProperty("稀有属性值")
     private String rarityAttrValue;
