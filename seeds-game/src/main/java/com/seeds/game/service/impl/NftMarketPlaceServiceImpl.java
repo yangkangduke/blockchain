@@ -487,7 +487,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT获取交易顺序， url:{}， params:{}", url, params);
         try {
             HttpResponse response = HttpRequest.get(url)
-                    .timeout(5 * 1000)
+                    .timeout(10 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
             JSONObject jsonObject = JSONObject.parseObject(response.body());
