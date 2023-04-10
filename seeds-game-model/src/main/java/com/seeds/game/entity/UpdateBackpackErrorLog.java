@@ -9,7 +9,7 @@ import lombok.Data;
  * @author: hewei
  * @date 2023/4/5
  */
-@TableName("ga_server_role_statistics")
+@TableName("ga_update_backpack_error_log")
 @ApiModel(value = "ga_update_backpack_error_log", description = "更新背包数据失败记录")
 @Data
 public class UpdateBackpackErrorLog {
