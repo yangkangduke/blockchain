@@ -21,6 +21,9 @@ public class NftMarketPlaceSkinResp implements Serializable {
      @ApiModelProperty("NFT编号")
      private String number;
 
+     @ApiModelProperty("NFT名称")
+     private String name;
+
      @ApiModelProperty("tokenId")
      private String tokenId;
 
