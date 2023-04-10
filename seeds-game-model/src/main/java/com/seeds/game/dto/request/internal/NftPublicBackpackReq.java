@@ -62,6 +62,9 @@ public class NftPublicBackpackReq implements Serializable {
     @ApiModelProperty(value = "token id", example = "256")
     private String tokenId;
 
+    @ApiModelProperty(value = "tokenAddress", example = "256")
+    private String tokenAddress;
+
     @ApiModelProperty(value = "协议标准", example = "xxxx")
     private String tokenStandard;
 

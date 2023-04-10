@@ -24,4 +24,6 @@ public interface IServerRegionService extends IService<ServerRegionEntity> {
     List<ServerRegionResp> queryList();
 
     void createOrUpdate(OpenServerRegionCreateUpdateReq req);
+
+    List<ServerRegionResp> queryListForSelf();
 }

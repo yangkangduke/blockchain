@@ -17,6 +17,7 @@ public enum ApiType {
     PROFILE_INFO(4, "个人游戏概括信息"),
     NFT_PACKAGE_DISTRIBUTE(5, "公共背包-分发nft"),
     NFT_PACKAGE_TAKEBACK(6, "公共背包-收回nft"),
+    NFT_TO_NFT_NOTIFY(7, "toNft通知"),
     ;
 
     @JsonValue

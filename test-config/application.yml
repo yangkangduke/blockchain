@@ -63,7 +63,7 @@ file:
 
 
 email:
-  enable: true
+  enable: false
   host: email-smtp.ap-northeast-1.amazonaws.com
   from: seeds<no-reply-test@theseeds.io>
   user: AKIAQMKUPROLIXMNEIJK

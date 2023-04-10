@@ -356,4 +356,5 @@ public class CacheService {
         data.setExpireTime(System.currentTimeMillis() + profileInfoExpireAfter * 60 * 1000);
         bucket.set(JSONUtil.toJsonStr(data), profileInfoExpireAfter, TimeUnit.DAYS);
     }
+
 }

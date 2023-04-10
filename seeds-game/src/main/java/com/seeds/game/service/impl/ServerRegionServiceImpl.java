@@ -4,10 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.OpenServerRegionCreateUpdateReq;
+import com.seeds.game.dto.response.ServeRoleRegionResp;
 import com.seeds.game.dto.response.ServerRegionResp;
 import com.seeds.game.entity.ServerRegionEntity;
 import com.seeds.game.mapper.ServerRegionMapper;
 import com.seeds.game.service.IServerRegionService;
+import com.seeds.game.service.IServerRoleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -75,5 +78,38 @@ public class ServerRegionServiceImpl extends ServiceImpl<ServerRegionMapper, Ser
             entity.setId(one.getId());
             this.updateById(entity);
         }
+    }
+
+    @Override
+    public List<ServerRegionResp> queryListForSelf() {
+        Long userId = UserContext.getCurrentUserId();
+
+        List<ServeRoleRegionResp> roleRegionList = baseMapper.getListForSelf(userId);
+
+
+        if (CollectionUtils.isEmpty(roleRegionList)) {
+            return Collections.emptyList();
+        }
+        List<ServerRegionResp> respList = new ArrayList<>();
+        Map<Integer, List<ServeRoleRegionResp>> map = roleRegionList.stream().collect(Collectors.groupingBy(ServeRoleRegionResp::getRegion));
+        for (Integer key : map.keySet()) {
+            List<ServerRegionResp.GameServer> serverList = new ArrayList<>();
+            List<ServeRoleRegionResp> serverRegions = map.get(key);
+            for (ServeRoleRegionResp serverRegion : serverRegions) {
+                ServerRegionResp.GameServer gameServer = new ServerRegionResp.GameServer();
+                gameServer.setServer(serverRegion.getGameServer());
+                gameServer.setServerName(serverRegion.getGameServerName());
+                gameServer.setServerRoleId(serverRegion.getServerRoleId());
+                gameServer.setRoleLevel(serverRegion.getRoleLevel());
+                gameServer.setRoleName(serverRegion.getRoleName());
+                serverList.add(gameServer);
+            }
+            ServerRegionResp resp = new ServerRegionResp();
+            resp.setRegion(key);
+            resp.setRegionName(serverRegions.get(0).getRegionName());
+            resp.setGameServers(serverList);
+            respList.add(resp);
+        }
+        return respList;
     }
 }
