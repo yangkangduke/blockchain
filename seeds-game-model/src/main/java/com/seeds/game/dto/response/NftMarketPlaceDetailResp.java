@@ -84,6 +84,9 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("Token Id")
     private Long tokenId;
 
+    @ApiModelProperty("角色id")
+    private Long serverRoleId;
+
     @ApiModelProperty("Token Standard")
     private String tokenStandard;
 
