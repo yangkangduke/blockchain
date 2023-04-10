@@ -40,11 +40,17 @@ public class NftMarketPlacePropsResp implements Serializable{
     @ApiModelProperty("NFT价格")
     private BigDecimal price;
 
+    @ApiModelProperty("NFT最近历史交易价格")
+    private BigDecimal lastSale;
+
     @ApiModelProperty("NFT等级")
     private Integer grade;
 
-    @ApiModelProperty("耐久度")
+    @ApiModelProperty("当前耐久度")
     private Integer durability;
+
+    @ApiModelProperty("最大耐久度")
+    private Integer maxDurability;
 
     @ApiModelProperty("上架时间")
     private Long placeTime;

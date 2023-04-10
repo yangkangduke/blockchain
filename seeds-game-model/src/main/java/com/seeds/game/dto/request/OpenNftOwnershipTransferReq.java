@@ -31,10 +31,6 @@ public class OpenNftOwnershipTransferReq {
     @NotNull(message = "autoId can not null")
     private Long autoId;
 
-    @ApiModelProperty("toUserId")
-    @NotNull(message = "toUserId can not null")
-    private Long toUserId;
-
     @ApiModelProperty(value = "游戏服务角色id", required = true)
     @NotNull(message = "游戏服角色ID不能为空")
     private Long serverRoleId;
