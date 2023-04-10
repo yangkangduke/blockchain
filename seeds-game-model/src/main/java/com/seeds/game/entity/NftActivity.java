@@ -47,6 +47,9 @@ public class NftActivity implements Serializable {
     @ApiModelProperty("买家")
     private String toAddress;
 
+    @ApiModelProperty("交易hash")
+    private String txHash;
+
     @ApiModelProperty("创建时间")
     private Long createTime;
 

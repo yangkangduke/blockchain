@@ -37,4 +37,7 @@ public class NftActivityResp {
     @ApiModelProperty(value = "距离多久")
     private String date;
 
+    @ApiModelProperty(value = "交易hash")
+    private String txHash;
+
 }
