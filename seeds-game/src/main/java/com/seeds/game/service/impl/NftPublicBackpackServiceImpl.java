@@ -409,9 +409,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     public void ownerTransfer(OpenNftOwnershipTransferReq req) {
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
         BeanUtils.copyProperties(req, entity);
-        entity.setUserId(req.getToUserId());
+        ServerRoleEntity serverRole = serverRoleService.getById(req.getServerRoleId());
+        if (Objects.isNull(serverRole)) {
+            throw new GenericException(GameErrorCodeEnum.ERR_20002_ROLE_NOT_EXIST);
+        }
+        entity.setUserId(serverRole.getUserId());
         try {
-            GenericDto<String> result = userCenterFeignClient.getPublicAddress(req.getToUserId());
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(serverRole.getUserId());
             String owner = result.getData();
             entity.setOwner(owner);
         } catch (Exception e) {
