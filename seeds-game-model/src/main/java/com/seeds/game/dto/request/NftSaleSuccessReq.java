@@ -17,8 +17,12 @@ public class NftSaleSuccessReq {
     @NotNull(message = "Biding id cannot be empty")
     private Long bidingId;
 
+    @ApiModelProperty("收据")
+    @NotBlank(message = "Receipt cannot be empty")
+    private String receipt;
+
     @ApiModelProperty("签名")
-    @NotBlank(message = "signature cannot be empty")
+    @NotBlank(message = "Signature cannot be empty")
     private String sig;
 
 }

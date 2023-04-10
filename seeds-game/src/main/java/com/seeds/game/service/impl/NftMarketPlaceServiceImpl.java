@@ -657,7 +657,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
         }
         // 调用/api/auction/saleSuccess通知，拍卖达成交易成功
-        String params = String.format("auctionId=%s&bidingId=%s&receipt=%s&sig=%s", auctionBiding.getAuctionId(), req.getBidingId(), auctionBiding.getReceipt(), req.getSig());
+        String params = String.format("auctionId=%s&bidingId=%s&receipt=%s&sig=%s", auctionBiding.getAuctionId(), req.getBidingId(), req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getSaleSuccess() + "?" + params;
         log.info("NFT拍卖达成交易成功，开始通知， url:{}， params:{}", url, params);
         try {
