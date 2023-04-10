@@ -25,6 +25,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -118,7 +122,7 @@ public class AsyncNotifyGame {
             backpackEntity.setCreatedAt(System.currentTimeMillis());
             backpackEntity.setUpdatedAt(System.currentTimeMillis());
             backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
-            if (mintSuccessReq.getAutoDeposite().equals(1)) {
+            if (mintSuccessReq.getAutoDeposite().equals(WhetherEnum.YES.value())) {
                 // 自动托管
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
@@ -137,11 +141,18 @@ public class AsyncNotifyGame {
             HashMap<String, Object> attr = new HashMap<>();
 
             attr.put("level", equipment.getLvl());
-            JSONObject jsonObject = JSONObject.parseObject(equipment.getAttributes());
-            Integer durability = Integer.valueOf(jsonObject.getString("durability"));
-            attr.put("durability", durability);
+            Integer durability = null;
+            try {
+                JSONObject jsonObject = JSONObject.parseObject(equipment.getAttributes());
+                durability = Integer.valueOf(jsonObject.getString("durability"));
+                attr.put("durability", durability);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             String jsonStr = JSONUtil.toJsonStr(attr);
             backpackEntity.setAttributes(jsonStr);
+            // 设置参考价，TODO  根据规则来设置  先设置成固定值
+            backpackEntity.setProposedPrice(new BigDecimal(Math.random() * (10 - 1) + 1).setScale(2, RoundingMode.HALF_UP));
             nftPublicBackpackService.save(backpackEntity);
 
             // 如果是合成，作为合成材料的nft标记为销毁的状态
@@ -157,10 +168,16 @@ public class AsyncNotifyGame {
             //  插入属性表
             NftAttributeEntity attributeEntity = new NftAttributeEntity();
             attributeEntity.setEqNftId(data.getId());
+            attributeEntity.setMintAddress(data.getMintAddress());
             attributeEntity.setGrade(equipment.getLvl());
             attributeEntity.setDurability(durability);
-            attributeEntity.setBaseAttrValue(equipment.getBaseAttrValue());
-            attributeEntity.setRarityAttrValue(equipment.getRarityAttrValue());
+            try {
+                attributeEntity.setBaseAttrValue(URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
+                attributeEntity.setRarityAttrValue(URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
+
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             attributeService.save(attributeEntity);
 
             // 更新event事件状态
