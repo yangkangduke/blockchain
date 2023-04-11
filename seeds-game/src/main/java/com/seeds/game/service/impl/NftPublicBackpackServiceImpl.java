@@ -146,26 +146,45 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
-    public OpenNftPublicBackpackDisResp distributeBatch(List<NftPublicBackpackDisReq> reqs) {
+    public Integer distributeBatch(List<NftPublicBackpackDisReq> reqs) {
+        Integer num = reqs.size();
         for (NftPublicBackpackDisReq req : reqs) {
-            this.distribute(req);
+            try {
+                this.distribute(req);
+            } catch (Exception e) {
+                num -= 1;
+                log.info("nft 分配失败 autoId:{}", req.getAutoId());
+            }
         }
-        return null;
+        return num;
     }
 
     @Override
-    public void takeBackBatch(List<NftPublicBackpackTakeBackReq> reqs) {
+    public Integer takeBackBatch(List<NftPublicBackpackTakeBackReq> reqs) {
+        Integer num = reqs.size();
         for (NftPublicBackpackTakeBackReq req : reqs) {
-            this.takeBack(req);
+            try {
+                this.takeBack(req);
+            } catch (Exception e) {
+                num -= 1;
+                log.info("nft 收回失败 autoId:{}", req.getAutoId());
+            }
         }
+        return num;
     }
 
     @Override
-    public OpenNftPublicBackpackDisResp transferBatch(List<NftPublicBackpackDisReq> reqs) {
+    public Integer transferBatch(List<NftPublicBackpackDisReq> reqs) {
+        Integer num = reqs.size();
         for (NftPublicBackpackDisReq req : reqs) {
-            this.transfer(req);
+            try {
+                this.transfer(req);
+            } catch (Exception e) {
+                num -= 1;
+                log.info("nft 转移失败 autoId:{}", req.getAutoId());
+            }
         }
-        return null;
+        return num;
     }
 
     @Override
