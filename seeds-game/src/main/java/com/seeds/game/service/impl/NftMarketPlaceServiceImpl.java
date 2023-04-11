@@ -124,6 +124,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 if (auctionListing != null) {
                     resp.setListReceipt(auctionListing.getReceipt());
                 }
+                resp.setCurrentPrice(auctionSetting.getStartPrice());
+            }
+            BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(nftEquipment.getAuctionId());
+            if (currentPrice != null) {
+                resp.setCurrentPrice(currentPrice);
             }
         } else if (NftOrderTypeEnum.BUY_NOW.getCode() == nftEquipment.getOnSale()) {
             // 固定上架
