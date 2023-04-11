@@ -1,7 +1,4 @@
 package com.seeds.game.dto.response;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,7 +18,7 @@ public class NftMarketPlaceEqiupmentResp implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("nft id")
-    private Long id;
+    private Long nftId;
 
     @ApiModelProperty("NFT编号")
     private String number;
@@ -35,8 +32,8 @@ public class NftMarketPlaceEqiupmentResp implements Serializable {
     @ApiModelProperty("tokenId")
     private String tokenId;
 
-    @ApiModelProperty("NFT交易模式：1：Buy Now  2：On Auction")
-    private Integer model;
+    @ApiModelProperty("NFT状态：0：UnDeposited  1：Deposited 2:On shelf 3:On auction 4:In settlement 5: Burned")
+    private Integer state;
 
     @ApiModelProperty("拍卖NFT(setting id)")
     private Long auctionId;
