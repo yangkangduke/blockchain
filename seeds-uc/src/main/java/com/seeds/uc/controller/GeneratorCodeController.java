@@ -15,7 +15,7 @@ import java.util.Collections;
 public class GeneratorCodeController {
 
     public static void main(String[] args) {
-        FastAutoGenerator.create("jdbc:mysql://192.168.1.101:3306/seeds_game", "root", "Seeds123!")
+        FastAutoGenerator.create("jdbc:mysql://192.168.6.101:3306/seeds_game", "root", "Seeds123!")
                 .globalConfig(builder -> {
                     builder.author("hewei") // 设置作者
                             .enableSwagger() // 开启 swagger 模式
