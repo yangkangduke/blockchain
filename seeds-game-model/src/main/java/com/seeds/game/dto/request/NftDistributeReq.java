@@ -28,7 +28,7 @@ public class NftDistributeReq {
     /**
      * nft token
      */
-    private String tokenId;
+    private String tokenAddress;
     /**
      * 大区名称
      */

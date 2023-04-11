@@ -4,9 +4,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 @ApiModel(value = "分页请求入参")
-public class PageReq {
+public class PageReq implements Serializable {
 
     @ApiModelProperty(value = "当前页码")
     private Integer current = 1;

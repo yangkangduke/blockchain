@@ -16,6 +16,8 @@ public enum  CurrencyEnum {
     USDC("usdc", "usdc"),
     @JsonProperty("USDT")
     USDT("usdt", "usdt"),
+    @JsonProperty("SOL")
+    SOL("sol", "sol"),
 
     ;
     @JsonValue

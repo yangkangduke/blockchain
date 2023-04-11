@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.game.mapper.NftMarketOrderMapper">
+    <select id="getSkinPage" resultType="com.seeds.game.dto.response.NftMarketPlaceSkinResp"
+            parameterType="com.seeds.game.dto.request.NftMarketPlaceSkinPageReq">
+        select
+        t4.id,
+        t1.price,
+        t1.place_time,
+        t1.token_id,
+        t1.auction_id,
+        t4.name,
+        t2.image,
+        t3.rarity,
+        t3.victory,
+        t3.lose,
+        t3.max_streak,
+        t3.capture,
+        t3.killing_spree,
+        t3.goblin_kill,
+        t3.slaying,
+        t3.goblin
+
+        from z_market_order t1
+        join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
+        left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
+        left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
+        where t2.type = 3  AND t1.status = 1
+        <if test="params.name != null and params.name != ''">
+            and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')
+        </if>
+        <if test="params.auctionId != null">
+            and t1.auction_id  = #{params.auctionId}
+        </if>
+        <if test="params.rarity != null">
+            and t3.rarity = #{params.rarity}
+        </if>
+
+        <if test="params.heroType != null">
+            and t3.hero_type = #{params.heroType}
+        </if>
+        <if test="params.minPrice != null">
+            and t1.price &gt;= ${params.minPrice}
+        </if>
+        <if test="params.maxPrice != null">
+            and t1.price &lt;= ${params.maxPrice}
+        </if>
+        <if test="params.sort != null and params.sort =='price'">
+            order by t1.price ${params.sortType}
+        </if>
+        <if test="params.sort != null and params.sort =='rarity'">
+            order by t3.rarity ${params.sortType}
+        </if>
+        <if test="params.sort != null and params.sort =='placeTime'">
+            order by t1.place_time ${params.sortType}
+        </if>
+
+    </select>
+    <select id="getEquipPage" resultType="com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp"
+            parameterType="com.seeds.game.dto.request.NftMarketPlaceEquipPageReq">
+        select
+        t4.id,
+        t1.place_time,
+        t1.price,
+        t1.token_id,
+        t1.auction_id,
+        t4.name,
+        t2.image,
+        t3.durability,
+        t3.grade,
+        t3.health,
+        t3.armor,
+        t3.vs_monster,
+        t3.passive,
+        t3.blade_buff,
+        t3.rarity_attr_value,
+        t3.base_attr_value
+
+        from z_market_order t1
+        join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
+        left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
+        left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
+        where t2.type = 1 AND t1.status = 1
+
+        <if test="params.name != null and params.name != ''">
+            and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')
+        </if>
+        <if test="params.auctionId != null">
+            and t1.auction_id  = #{params.auctionId}
+        </if>
+        <if test="params.grade != null">
+            and t3.grade = #{params.grade}
+        </if>
+        <if test="params.minDurability != null">
+            and t3.durability &gt;= ${params.minDurability}
+        </if>
+        <if test="params.maxDurability != null">
+            and t3.durability &lt;= ${params.maxDurability}
+        </if>
+        <if test="params.minPrice != null">
+            and t1.price &gt;= ${params.minPrice}
+        </if>
+        <if test="params.maxPrice != null">
+            and t1.price &lt;= ${params.maxPrice}
+        </if>
+        <if test="params.sort != null and params.sort =='price'">
+            order by t1.price ${params.sortType}
+        </if>
+        <if test="params.sort != null and params.sort =='grade'">
+            order by t3.grade ${params.sortType}
+        </if>
+        <if test="params.sort != null and params.sort =='durability'">
+            order by t3.durability ${params.sortType}
+        </if>
+        <if test="params.sort != null and params.sort =='placeTime'">
+            order by t1.place_time ${params.sortType}
+        </if>
+
+    </select>
+    <select id="getPropsPage" resultType="com.seeds.game.dto.response.NftMarketPlacePropsResp"
+            parameterType="com.seeds.game.dto.request.NftMarketPlacePropsPageReq">
+        select
+        t4.id,
+        t1.price,
+        t1.place_time,
+        t1.token_id,
+        t1.auction_id,
+        t4.name,
+        t2.image,
+        t3.grade,
+        t3.durability,
+        t3.health,
+        t3.armor,
+        t3.vs_monster,
+        t3.passive,
+        t3.blade_buff,
+        t3.rarity_attr_value,
+        t3.base_attr_value
+
+        from z_market_order t1
+        join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
+        left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
+        left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
+        where t2.type = 2 AND t1.status = 1
+
+        <if test="params.name != null and params.name != ''">
+            and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')
+        </if>
+        <if test="params.auctionId != null">
+            and t1.auction_id  = #{params.auctionId}
+        </if>
+        <if test="params.grade != null">
+            and t3.grade = #{params.grade}
+        </if>
+        <if test="params.minDurability != null">
+            and t3.durability &gt;= ${params.minDurability}
+        </if>
+        <if test="params.maxDurability != null">
+            and t3.durability &lt;= ${params.maxDurability}
+        </if>
+        <if test="params.minPrice != null">
+            and t1.price &gt;= ${params.minPrice}
+        </if>
+        <if test="params.maxPrice != null">
+            and t1.price &lt;= ${params.maxPrice}
+        </if>
+        <if test="params.sort != null and params.sort =='price'">
+            order by t1.price ${params.sortType}
+        </if>
+        <if test="params.sort != null and params.sort =='grade'">
+            order by t3.grade ${params.sortType}
+        </if>
+        <if test="params.sort != null and params.sort =='durability'">
+            order by t3.durability ${params.sortType}
+        </if>
+        <if test="params.sort != null and params.sort =='placeTime'">
+            order by t1.place_time ${params.sortType}
+        </if>
+
+    </select>
+</mapper>

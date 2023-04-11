@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seeds.game.mapper.ServerRegionMapper">
+
+    <select id="getListForSelf" resultType="com.seeds.game.dto.response.ServeRoleRegionResp">
+        select t1.id as serverRoleId, t1.name as roleName, t1.level roleLevel, t2.region_name, t2.game_server_name, t2.region, t2.game_server
+        from ga_server_role t1
+                 left join ga_server_region t2 on t2.region = t1.region and t2.game_server = t1.game_server
+        where user_id = #{userId}
+    </select>
+</mapper>

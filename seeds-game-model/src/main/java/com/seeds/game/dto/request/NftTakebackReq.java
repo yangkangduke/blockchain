@@ -28,6 +28,6 @@ public class NftTakebackReq {
     /**
      * nft token
      */
-    private String tokenId;
+    private String tokenAddress;
 
 }

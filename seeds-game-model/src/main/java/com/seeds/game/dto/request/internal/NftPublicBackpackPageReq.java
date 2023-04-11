@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 
 /**
  * <p>
@@ -19,7 +18,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel(value = "NftPublicBackpackPageReq")
-public class NftPublicBackpackPageReq extends PageReq implements Serializable {
+public class NftPublicBackpackPageReq extends PageReq {
     @ApiModelProperty(value = "用户id")
     private Long userId;
 

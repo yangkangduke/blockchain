@@ -9,39 +9,40 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
-import com.seeds.game.dto.request.NftDistributeReq;
-import com.seeds.game.dto.request.NftTakebackReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackPageReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackReq;
-import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
-import com.seeds.game.dto.response.NftPublicBackpackResp;
-import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
-import com.seeds.game.entity.CallGameApiErrorLogEntity;
-import com.seeds.game.entity.NftPublicBackpackEntity;
-import com.seeds.game.entity.ServerRegionEntity;
-import com.seeds.game.entity.ServerRoleEntity;
+import com.seeds.common.web.context.UserContext;
+import com.seeds.game.config.SeedsApiConfig;
+import com.seeds.game.dto.request.*;
+import com.seeds.game.dto.request.external.DepositSuccessMessageDto;
+import com.seeds.game.dto.request.external.TransferNftMessageDto;
+import com.seeds.game.dto.request.internal.*;
+import com.seeds.game.dto.response.*;
+import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
+import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftPublicBackpackMapper;
 import com.seeds.game.mq.producer.KafkaProducer;
-import com.seeds.game.service.CallGameApiLogService;
-import com.seeds.game.service.INftPublicBackpackService;
-import com.seeds.game.service.IServerRegionService;
-import com.seeds.game.service.IServerRoleService;
+import com.seeds.game.service.*;
+import com.seeds.uc.dto.response.UcUserResp;
+import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -72,12 +73,34 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Autowired
     private CallGameApiLogService callGameApiLogService;
 
+    @Autowired
+    private INftEventService nftEventService;
+
+    @Autowired
+    private INftEquipmentService nftEquipmentService;
+
+    @Autowired
+    private INftEventEquipmentService nftEventEquipmentService;
+
+    @Autowired
+    private INftMarketOrderService nftMarketOrderService;
+
+    @Autowired
+    private SeedsApiConfig seedsApiConfig;
+
+    @Autowired
+    private UcUserService ucUserService;
+
+    @Autowired
+    private UserCenterFeignClient userCenterFeignClient;
+
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
 
         LambdaQueryWrapper<NftPublicBackpackEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(!Objects.isNull(req.getIsConfiguration()), NftPublicBackpackEntity::getIsConfiguration, req.getIsConfiguration())
                 .like(!Objects.isNull(req.getName()), NftPublicBackpackEntity::getName, req.getName())
+                .ne(NftPublicBackpackEntity::getState, NFTEnumConstant.NFTStateEnum.LOCK.getCode())
                 .eq(NftPublicBackpackEntity::getUserId, req.getUserId());
 
         Page<NftPublicBackpackEntity> page = new Page<>(req.getCurrent(), req.getSize());
@@ -109,7 +132,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         BeanUtils.copyProperties(req, entity);
         entity.setUpdatedAt(System.currentTimeMillis());
         entity.setUpdatedBy(req.getUserId());
-        this.update(new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
+        this.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
     }
 
     @Override
@@ -123,11 +146,59 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
+    public Integer distributeBatch(List<NftPublicBackpackDisReq> reqs) {
+        Integer num = reqs.size();
+        for (NftPublicBackpackDisReq req : reqs) {
+            try {
+                this.distribute(req);
+            } catch (Exception e) {
+                num -= 1;
+                log.info("nft 分配失败 autoId:{}", req.getAutoId());
+            }
+        }
+        return num;
+    }
+
+    @Override
+    public Integer takeBackBatch(List<NftPublicBackpackTakeBackReq> reqs) {
+        Integer num = reqs.size();
+        for (NftPublicBackpackTakeBackReq req : reqs) {
+            try {
+                this.takeBack(req);
+            } catch (Exception e) {
+                num -= 1;
+                log.info("nft 收回失败 autoId:{}", req.getAutoId());
+            }
+        }
+        return num;
+    }
+
+    @Override
+    public Integer transferBatch(List<NftPublicBackpackDisReq> reqs) {
+        Integer num = reqs.size();
+        for (NftPublicBackpackDisReq req : reqs) {
+            try {
+                this.transfer(req);
+            } catch (Exception e) {
+                num -= 1;
+                log.info("nft 转移失败 autoId:{}", req.getAutoId());
+            }
+        }
+        return num;
+    }
+
+    @Override
+    @Transactional
     public OpenNftPublicBackpackDisResp distribute(NftPublicBackpackDisReq req) {
         NftPublicBackpackEntity nftItem = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
 
         if (Objects.isNull(nftItem)) {
             throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        }
+
+        // 校验当前NFT物品是否 托管
+        if (nftItem.getIsConfiguration().equals(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode())) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10015_NFT_ITEM_HAS_NOT_BEEN_DEPOSITED);
         }
 
         // 1.校验当前NFT物品是否属于当前用户
@@ -156,9 +227,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         nftItem.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
         nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
+        ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
+
+        // 记录分配事件
+        recoredNftEvent(nftItem, userId, NFTEnumConstant.NFTTransEnum.BACKPACK.getDesc(), serverRegion.getGameServerName());
+
 
         // 组装返回值
-        ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
         resp.setGameServer(roleEntity.getGameServer());
         resp.setGameServerName(serverRegion.getGameServerName());
@@ -199,8 +274,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             throw new GenericException(GameErrorCodeEnum.ERR_10004_NFT_ITEM_NOT_ASSIGNED);
         }
 
-        // 调用游戏方接口，执行收回
+//        // 调用游戏方接口，执行收回
         this.callGameTakeback(nftItem);
+
+        ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
+        // 记录转移事件
+        recoredNftEvent(nftItem, userId, serverRegion.getGameServerName(), NFTEnumConstant.NFTTransEnum.BACKPACK.getDesc());
+
 
         // 更新公共背包数据
         nftItem.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
@@ -248,6 +328,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         // 分发
         this.callGameDistribute(nftItem, req.getServerRoleId());
 
+        String from = this.getServerRegionEntity(nftItem.getServerRoleId()).getGameServerName();
 
         // 更新公共背包数据
         nftItem.setServerRoleId(req.getServerRoleId());
@@ -255,8 +336,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         nftItem.setUpdatedAt(System.currentTimeMillis());
         this.updateById(nftItem);
 
-        // 组装返回值
+
         ServerRegionEntity serverRegion = this.getServerRegionEntity(req.getServerRoleId());
+        // 记录转移事件
+        recoredNftEvent(nftItem, userId, from, serverRegion.getGameServerName());
+
+        // 组装返回值
         OpenNftPublicBackpackDisResp resp = new OpenNftPublicBackpackDisResp();
         resp.setGameServer(roleEntity.getGameServer());
         resp.setGameServerName(serverRegion.getGameServerName());
@@ -268,6 +353,32 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         return resp;
     }
 
+    private void recoredNftEvent(NftPublicBackpackEntity nftItem, Long userId, String from, String to) {
+        //插入nft_event表
+        NftEvent nftEvent = new NftEvent();
+        nftEvent.setType(NFTEnumConstant.NFTEventType.OTHER.getCode());
+        nftEvent.setName(nftItem.getName());
+        nftEvent.setTransferFrom(from);
+        nftEvent.setTransferTo(to);
+        nftEvent.setUserId(userId);
+        nftEvent.setUpdatedBy(userId);
+        nftEvent.setCreatedBy(userId);
+        nftEvent.setUpdatedAt(System.currentTimeMillis());
+        nftEvent.setCreatedAt(System.currentTimeMillis());
+        nftEventService.save(nftEvent);
+        //插入nft_event_equipment表
+        NftEventEquipment one = nftEventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>()
+                .eq(NftEventEquipment::getAutoId, nftItem.getAutoId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
+        if (Objects.isNull(one)) {
+            NftEventEquipment equipment = new NftEventEquipment();
+            equipment.setEventId(nftEvent.getId());
+            equipment.setImageUrl(nftItem.getImage());
+            equipment.setAutoId(nftItem.getAutoId());
+            equipment.setAttributes(nftItem.getAttributes());
+            nftEventEquipmentService.save(equipment);
+        }
+    }
+
     @Override
     public List<NftPublicBackpackResp> queryList(NftPublicBackpackPageReq req) {
         List<NftPublicBackpackResp> respList = new ArrayList<>();
@@ -275,6 +386,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         LambdaQueryWrapper<NftPublicBackpackEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(!Objects.isNull(req.getIsConfiguration()), NftPublicBackpackEntity::getIsConfiguration, req.getIsConfiguration())
                 .like(!Objects.isNull(req.getName()), NftPublicBackpackEntity::getName, req.getName())
+                .eq(NftPublicBackpackEntity::getState, NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode())
                 .eq(NftPublicBackpackEntity::getUserId, req.getUserId());
         List<NftPublicBackpackEntity> list = this.list(wrapper);
 
@@ -283,10 +395,220 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 NftPublicBackpackResp resp = new NftPublicBackpackResp();
                 BeanUtils.copyProperties(p, resp);
                 return resp;
+            }).filter(i -> {
+                String attributes = i.getAttributes();
+                Integer durability = 0;
+                try {
+                    JSONObject jsonObject = JSONObject.parseObject(attributes);
+                    durability = Integer.parseInt(jsonObject.getString("durability"));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+                return durability > 0;
             }).collect(Collectors.toList());
         }
         return respList;
     }
+
+    @Override
+    public NftPublicBackpackEntity queryByMintAddress(String mintAddress) {
+        return getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>()
+                .eq(NftPublicBackpackEntity::getTokenId, mintAddress));
+    }
+
+    @Override
+    public NftPublicBackpackEntity queryByTokenId(String tokenId) {
+        return getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>()
+                .eq(NftPublicBackpackEntity::getTokenId, tokenId));
+    }
+
+    @Override
+    public String queryTokenAddressByAutoId(Long autoId) {
+        String tokenAddress = "";
+        NftPublicBackpackEntity one = getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>()
+                .eq(NftPublicBackpackEntity::getAutoId, autoId));
+        if (Objects.nonNull(one)) {
+            tokenAddress = one.getTokenAddress();
+        }
+        return tokenAddress;
+    }
+
+    // lootmode 结算 nft物品所有权转移，中心化操作
+    @Override
+    public void ownerTransfer(OpenNftOwnershipTransferReq req) {
+        NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
+        BeanUtils.copyProperties(req, entity);
+        ServerRoleEntity serverRole = serverRoleService.getById(req.getServerRoleId());
+        if (Objects.isNull(serverRole)) {
+            throw new GenericException(GameErrorCodeEnum.ERR_20002_ROLE_NOT_EXIST);
+        }
+        entity.setUserId(serverRole.getUserId());
+        try {
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(serverRole.getUserId());
+            String owner = result.getData();
+            entity.setOwner(owner);
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
+        this.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
+    }
+
+    @Override
+    public NftPublicBackpackEntity queryByEqNftId(Long eqNftId) {
+        return getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, eqNftId));
+    }
+
+    @Override
+    public void deposited(NftDepositedReq req) {
+        NftEquipment nft = nftEquipmentService.getOne(new LambdaQueryWrapper<NftEquipment>().eq(NftEquipment::getMintAddress, req.getMintAddress()));
+        if (nft == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        }
+        // NFT已经处于托管中
+        if (WhetherEnum.YES.value() == nft.getIsDeposit()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
+        }
+        // NFT上架中不能托管
+        if (WhetherEnum.YES.value() == nft.getOnSale()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
+        }
+        //更新背包状态 deposited
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
+        this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nft.getId()));
+        // NFT非归属人不能托管
+        ucUserService.ownerValidation(nft.getOwner());
+        // 调用/api/equipment/depositNft通知，托管NFT成功
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getDepositNft();
+        DepositSuccessMessageDto dto  = new DepositSuccessMessageDto();
+        BeanUtils.copyProperties(req, dto);
+        dto.setMintAddress(nft.getMintAddress());
+        dto.setTokenAddress("");
+        String param = JSONUtil.toJsonStr(dto);
+        log.info("NFT托管成功，开始通知， url:{}， params:{}", url, param);
+        try {
+            HttpRequest.post(url)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+        } catch (Exception e) {
+            log.error("NFT托管成功通知失败，message：{}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void unDeposited(NftUnDepositedReq req) {
+
+        // NFT锁定中不能取回
+        //  NftPublicBackpackEntity backpackNft = queryByEqNftId(req.getNftId());
+        NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenAddress, req.getMintAddress()));
+        if (backpackNft == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        }
+        NftEquipment nft = nftEquipmentService.getOne(new LambdaQueryWrapper<NftEquipment>().eq(NftEquipment::getMintAddress, req.getMintAddress()));
+        if (nft == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        }
+        // NFT已经取回
+        if (WhetherEnum.NO.value() == nft.getIsDeposit()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10016_NFT_ITEM_HAS_BEEN_RETRIEVED);
+        }
+        // 更改背包状态，通知游戏方NFT收回到背包。
+        // 调用游戏方接口，执行收回
+        //this.callGameTakeback(backpackNft);
+        // 更新背包状态
+        backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+        backpackNft.setServerRoleId(0L);
+        backpackNft.setUpdatedAt(System.currentTimeMillis());
+        this.updateById(backpackNft);
+        // NFT非归属人不能取回
+        ucUserService.ownerValidation(nft.getOwner());
+        // 调用/api/equipment/withdrawNft通知，取回NFT成功
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getWithdrawNft();
+        TransferNftMessageDto dto = new TransferNftMessageDto();
+        BeanUtils.copyProperties(req, dto);
+        dto.setMintAddress(nft.getMintAddress());
+        String param = JSONUtil.toJsonStr(dto);
+        log.info("NFT取回成功，开始通知， url:{}， params:{}", url, param);
+        try {
+            HttpRequest.post(url)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+        } catch (Exception e) {
+            log.error("NFT取回成功通知失败，message：{}", e.getMessage());
+        }
+    }
+
+    @Override
+    public List<NftTypeNum> typeNum() {
+        Long userId = UserContext.getCurrentUserId();
+        return baseMapper.selectTypeNum(userId);
+
+    }
+
+    @Override
+    public List<NftType> getNftTypeList(Integer type) {
+        Long userId = UserContext.getCurrentUserId();
+        return baseMapper.getNftTypeList(userId,type);
+    }
+
+    @Override
+    public List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req) {
+        List<NftPublicBackpackWebResp> list = baseMapper.getPageForWeb(req);
+        list = list.stream().map(p -> {
+            NftPublicBackpackWebResp resp = new NftPublicBackpackWebResp();
+            BeanUtils.copyProperties(p, resp);
+            ServerRegionEntity serverRegionEntity = this.getServerRegionEntity(p.getServerRoleId());
+            resp.setServerName(serverRegionEntity.getGameServerName());
+            return resp;
+        }).collect(Collectors.toList());
+        return list;
+    }
+
+    @Override
+    public void updateState(NftBackpakcUpdateStateReq req) {
+
+        // 如果是withdraw，需要通知游戏方把nft收回到背包
+        if (req.getState().equals(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode())) {
+            NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, req.getNftId()));
+            // 调用游戏方接口，执行收回
+            this.callGameTakeback(backpackNft);
+            // 更新背包状态
+            backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+            backpackNft.setServerRoleId(0L);
+            backpackNft.setUpdatedAt(System.currentTimeMillis());
+            this.updateById(backpackNft);
+        }
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(req.getState());
+        if (StringUtils.isNotBlank(req.getOwner())) {
+            try {
+                GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(req.getOwner());
+                backpackEntity.setUserId(result.getData().getId());
+            } catch (Exception e) {
+                log.error("内部请求uc获取用户信息失败");
+            }
+            backpackEntity.setOwner(req.getOwner());
+        }
+        this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, req.getNftId()));
+
+    }
+
+    @Override
+    public void insertCallback(MintSuccessReq req) {
+        nftEventService.mintSuccessCallback(req);
+    }
+
+    @Override
+    public Map<Long, BigDecimal> getTotalPrice(String autoIds) {
+
+        List<NftPublicBackpackEntity> list = this.list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getAutoId, autoIds.split(",")));
+        return list.stream().collect(Collectors.toMap(NftPublicBackpackEntity::getAutoId, NftPublicBackpackEntity::getProposedPrice));
+    }
+
 
     private void callGameDistribute(NftPublicBackpackEntity nftItem, Long serverRoleId) {
 
@@ -307,11 +629,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         distributeReq.setAutoId(nftItem.getAutoId());
         distributeReq.setAccId(serverRoleId);
         distributeReq.setType(nftItem.getType());
-        if (nftItem.getType().equals(3)) {
+        if (nftItem.getType().equals(NFTEnumConstant.NftTypeEnum.HERO.getCode())) {
             distributeReq.setImgUrl(nftItem.getImage());
         }
         distributeReq.setConfigId(nftItem.getItemId().intValue());
-        distributeReq.setTokenId(nftItem.getTokenId());
+        distributeReq.setTokenAddress(nftItem.getTokenAddress());
         distributeReq.setServerName(serverRegion.getGameServerName());
         distributeReq.setRegionName(serverRegion.getRegionName());
 
@@ -329,7 +651,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(distributeUrl, params, "connect timed out");
-            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to distribute nft,connect timed out");
+            throw new GenericException("Failed to call game-api to distribute nft,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());
@@ -339,7 +661,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(distributeUrl, params, ret);
-            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to distribute nft, ret" + ret);
+            throw new GenericException("Failed to call game-api to distribute nft, ret" + ret);
         }
 
 
@@ -371,7 +693,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         takeback.setAutoId(nftItem.getAutoId());
         takeback.setAccId(nftItem.getServerRoleId());
         takeback.setConfigId(nftItem.getItemId().intValue());
-        takeback.setTokenId(nftItem.getTokenId());
+        takeback.setTokenAddress(nftItem.getTokenAddress());
 
         String params = JSONUtil.toJsonStr(takeback);
 
@@ -387,7 +709,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(takebackUrl, params, "connect timed out");
-            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to takeback nft,connect timed out");
+            throw new GenericException("Failed to call game-api to takeback nft,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());
@@ -397,7 +719,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(takebackUrl, params, ret);
-            throw new com.seeds.uc.exceptions.GenericException("Failed to call game-api to takeback nft, ret" + ret);
+            throw new GenericException("Failed to call game-api to takeback nft, ret" + ret);
         }
 
     }
@@ -426,4 +748,5 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         return serverRegion;
     }
+
 }

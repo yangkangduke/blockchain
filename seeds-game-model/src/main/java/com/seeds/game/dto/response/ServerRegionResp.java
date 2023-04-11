@@ -1,5 +1,6 @@
 package com.seeds.game.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -36,6 +37,18 @@ public class ServerRegionResp {
 
         @ApiModelProperty("游戏服名称")
         private String serverName;
+
+        @ApiModelProperty("游戏服名称")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private Long serverRoleId;
+
+        @ApiModelProperty("角色名字")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private String roleName;
+
+        @ApiModelProperty("角色等级")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private Integer roleLevel;
 
     }
 
