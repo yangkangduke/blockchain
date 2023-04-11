@@ -567,7 +567,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             return resp;
         }
         NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(nftEquipment.getAuctionId());
-        if (auctionSetting == null || WhetherEnum.YES.value() == auctionSetting.getIsFinished()) {
+        if (auctionSetting == null) {
+            return resp;
+        }
+        if (auctionSetting.getIsFinished() != null && WhetherEnum.YES.value() == auctionSetting.getIsFinished()) {
             return resp;
         }
         req.setAuctionId(auctionSetting.getId());
