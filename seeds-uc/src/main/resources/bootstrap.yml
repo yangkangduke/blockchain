@@ -23,13 +23,13 @@ spring:
   cloud:
     config:
       uri: ${CONFIG_SERVERS:http://127.0.0.1:8888}
-      label: ${CONFIG_GIT_VERSION:dev}
-      prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/dev
+      label: ${CONFIG_GIT_VERSION:test}
+      prefix: ${spring.cloud.config.uri}/${spring.application.name}/${spring.profiles.active}/test
       enabled: true
 
 log:
   kafka:
-    servers: ${LOG_KAFKA_SERVERS:192.168.6.101:9092}
+    servers: ${LOG_KAFKA_SERVERS:192.168.6.100:9092}
     topic: ${LOG_KAFKA_TOPIC:applog}
 
 logging:
