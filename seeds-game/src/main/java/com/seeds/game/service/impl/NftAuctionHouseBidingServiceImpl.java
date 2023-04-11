@@ -80,4 +80,16 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
         respPage.setRecords(list);
         return respPage;
     }
+
+    @Override
+    public BigDecimal queryAuctionCurrentPrice(Long auctionId) {
+        LambdaQueryWrapper<NftAuctionHouseBiding> queryWrap = new QueryWrapper<NftAuctionHouseBiding>().lambda()
+                .eq(NftAuctionHouseBiding::getAuctionId, auctionId)
+                .orderByDesc(NftAuctionHouseBiding::getPrice);
+        List<NftAuctionHouseBiding> list = list(queryWrap);
+        if (CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+        return list.get(0).getPrice();
+    }
 }

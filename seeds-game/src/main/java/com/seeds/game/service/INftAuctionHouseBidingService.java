@@ -6,6 +6,8 @@ import com.seeds.game.dto.request.NftOfferPageReq;
 import com.seeds.game.dto.response.NftOfferResp;
 import com.seeds.game.entity.NftAuctionHouseBiding;
 
+import java.math.BigDecimal;
+
 /**
  * <p>
  * nft拍卖出价
@@ -22,5 +24,12 @@ public interface INftAuctionHouseBidingService extends IService<NftAuctionHouseB
      * @return NFT拍卖出价信息
      */
     IPage<NftOfferResp.NftOffer> queryPage(NftOfferPageReq req);
+
+    /**
+     * 获取NFT拍卖当前出价
+     * @param auctionId 拍卖id
+     * @return NFT拍卖当前出价
+     */
+    BigDecimal queryAuctionCurrentPrice(Long auctionId);
 
 }
