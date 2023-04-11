@@ -35,7 +35,7 @@ def harbor_auth = "cb0581c9-9096-4c3e-9068-ea98e1b90917"
 
         }
         stage('Deploy'){
-            sshPublisher(publishers: [sshPublisherDesc(configName: '192.168.1.100', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: "/seeds/script/deploy.sh $harbor_url $project_name $tag $port", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            sshPublisher(publishers: [sshPublisherDesc(configName: '192.168.6.100', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: "/seeds/script/deploy.sh $harbor_url $project_name $tag $port", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
         }
     }
 

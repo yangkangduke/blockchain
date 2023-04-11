@@ -24,7 +24,7 @@ spring:
 
 log:
   kafka:
-    servers: ${LOG_KAFKA_SERVERS:192.168.1.100:9092}
+    servers: ${LOG_KAFKA_SERVERS:192.168.6.100:9092}
     topic: ${LOG_KAFKA_TOPIC:applog}
 
 logging:
