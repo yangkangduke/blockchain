@@ -379,13 +379,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             BeanUtils.copyProperties(p, resp);
             resp.setNumber("#"+ p.getTokenId());
             if (p.getAuctionId() == 0){
-                resp.setState(NftStateEnum.ON_SHELF.getCode());
+                resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
             }else {
-                resp.setState(NftStateEnum.ON_AUCTION.getCode());
+                resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
             }
 
             // 查询NFT
-            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getNftId());
+            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getId());
             // 获取当前nftId 下的mintAddress
             String mintAddress = nftEquipment.getMintAddress();
             LambdaQueryWrapper<NftMarketOrderEntity> queryWrapper = new LambdaQueryWrapper<>();
@@ -419,12 +419,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             BeanUtils.copyProperties(p, resp);
             resp.setNumber("#"+ p.getTokenId());
             if (p.getAuctionId() == 0){
-                resp.setState(NftStateEnum.ON_SHELF.getCode());
+                resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
             }else {
-                resp.setState(NftStateEnum.ON_AUCTION.getCode());
+                resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
             }
+
             // 查询NFT
-            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getNftId());
+            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getId());
             // 获取当前nftId 下的mintAddress
             String mintAddress = nftEquipment.getMintAddress();
             LambdaQueryWrapper<NftMarketOrderEntity> queryWrapper = new LambdaQueryWrapper<>();
@@ -471,12 +472,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             BeanUtils.copyProperties(p, resp);
             resp.setNumber("#"+ p.getTokenId());
             if (p.getAuctionId() == 0){
-                resp.setState(NftStateEnum.ON_SHELF.getCode());
+                resp.setModel(NftOrderTypeEnum.BUY_NOW.getCode());
             }else {
-                resp.setState(NftStateEnum.ON_AUCTION.getCode());
+                resp.setModel(NftOrderTypeEnum.ON_AUCTION.getCode());
             }
+
             // 查询NFT
-            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getNftId());
+            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getId());
             // 获取当前nftId 下的mintAddress
             String mintAddress = nftEquipment.getMintAddress();
             LambdaQueryWrapper<NftMarketOrderEntity> queryWrapper = new LambdaQueryWrapper<>();

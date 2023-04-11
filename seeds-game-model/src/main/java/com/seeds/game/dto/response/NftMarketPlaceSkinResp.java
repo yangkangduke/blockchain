@@ -18,8 +18,7 @@ public class NftMarketPlaceSkinResp implements Serializable {
      private static final long serialVersionUID = 1L;
 
      @ApiModelProperty("nft id")
-     @JsonSerialize(using= ToStringSerializer.class)
-     private Long nftId;
+     private Long id;
 
      @ApiModelProperty("NFT编号")
      private String number;
@@ -36,8 +35,8 @@ public class NftMarketPlaceSkinResp implements Serializable {
      @ApiModelProperty("NFT图片")
      private String image;
 
-     @ApiModelProperty("NFT状态：0：UnDeposited  1：Deposited 2:On shelf 3:On auction 4:In settlement 5: Burned")
-     private Integer state;
+     @ApiModelProperty("NFT交易模式：1：Buy Now  2：On Auction")
+     private Integer model;
 
      @ApiModelProperty("拍卖NFT(setting id)")
      private Long auctionId;
