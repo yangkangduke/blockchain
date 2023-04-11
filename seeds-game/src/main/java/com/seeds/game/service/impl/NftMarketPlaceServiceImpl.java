@@ -146,6 +146,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             resp.setMetadata(JSON.parseObject(publicBackpack.getMetadata(), Map.class));
             resp.setReferencePrice(publicBackpack.getProposedPrice());
             resp.setServerRoleId(publicBackpack.getServerRoleId());
+            resp.setAutoId(publicBackpack.getAutoId());
         }
         resp.setOwnerAddress(nftEquipment.getOwner());
         resp.setMintAddress(nftEquipment.getMintAddress());
