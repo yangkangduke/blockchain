@@ -102,7 +102,7 @@ public class NftPublicBackpackController {
 
     @PostMapping("distribute")
     @ApiOperation("分配")
-    public GenericDto<OpenNftPublicBackpackDisResp> distributeBatch(@RequestBody @Valid List<NftPublicBackpackDisReq> reqs) {
+    public GenericDto<Integer> distributeBatch(@RequestBody @Valid List<NftPublicBackpackDisReq> reqs) {
 
         GenericDto<SysGameResp> gameDetail = remoteGameService.ucDetail(GameEnum.BLADERITE.getCode());
         // 游戏正在维护中，web端无法操作
@@ -114,7 +114,7 @@ public class NftPublicBackpackController {
 
     @PostMapping("take-back")
     @ApiOperation("收回")
-    public GenericDto<Object> takeBackBatch(@RequestBody @Valid List<NftPublicBackpackTakeBackReq> reqs) {
+    public GenericDto<Integer> takeBackBatch(@RequestBody @Valid List<NftPublicBackpackTakeBackReq> reqs) {
 
         GenericDto<SysGameResp> gameDetail = remoteGameService.ucDetail(GameEnum.BLADERITE.getCode());
         // 游戏正在维护中，web端无法操作
@@ -127,7 +127,7 @@ public class NftPublicBackpackController {
 
     @PostMapping("transfer")
     @ApiOperation("转移")
-    public GenericDto<OpenNftPublicBackpackDisResp> transferBatch(@RequestBody @Valid List<NftPublicBackpackDisReq> reqs) {
+    public GenericDto<Integer> transferBatch(@RequestBody @Valid List<NftPublicBackpackDisReq> reqs) {
         GenericDto<SysGameResp> gameDetail = remoteGameService.ucDetail(GameEnum.BLADERITE.getCode());
         // 游戏正在维护中，web端无法操作
         if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())) {

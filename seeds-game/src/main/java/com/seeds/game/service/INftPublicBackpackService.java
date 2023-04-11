@@ -30,11 +30,11 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     NftPublicBackpackResp detail(Integer autoId);
 
-    OpenNftPublicBackpackDisResp distributeBatch(List<NftPublicBackpackDisReq> reqs);
+    Integer distributeBatch(List<NftPublicBackpackDisReq> reqs);
 
-    void takeBackBatch(List<NftPublicBackpackTakeBackReq> reqs);
+    Integer takeBackBatch(List<NftPublicBackpackTakeBackReq> reqs);
 
-    OpenNftPublicBackpackDisResp transferBatch(List<NftPublicBackpackDisReq> reqs);
+    Integer transferBatch(List<NftPublicBackpackDisReq> reqs);
 
     OpenNftPublicBackpackDisResp distribute(NftPublicBackpackDisReq req);
 
