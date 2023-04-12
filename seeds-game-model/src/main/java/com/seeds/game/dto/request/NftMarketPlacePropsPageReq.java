@@ -21,7 +21,7 @@ public class NftMarketPlacePropsPageReq extends PageReq {
     private String tokenId;
 
     @ApiModelProperty("由：auction_id判断：0：一口价  大于0：On Auction ")
-    private Integer auctionId;
+    private Long auctionId;
 
     @ApiModelProperty("NFT等级")
     private Integer grade;
