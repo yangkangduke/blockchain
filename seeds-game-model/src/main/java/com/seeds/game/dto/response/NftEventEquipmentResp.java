@@ -47,4 +47,12 @@ public class NftEventEquipmentResp implements Serializable {
 
     @ApiModelProperty("基础属性值")
     private String baseAttrValue;
+
+    @ApiModelProperty("被动描述")
+    private String passiveAttrDesc;
+
+    @ApiModelProperty("特殊属性描述")
+    private String specialAttrDesc;
+
+
 }

@@ -60,20 +60,17 @@ public class NftEventEquipmentReq implements Serializable {
     @NotNull
     private Integer lvl;
 
-//    @ApiModelProperty("稀有属性描述")
-//    @NotBlank
-//    private String rarityAttrDesc;
-
     @ApiModelProperty("稀有属性值")
     private String rarityAttrValue;
-
-//    @ApiModelProperty("基础属性描述")
-//    @NotBlank
-//    private String baseAttrDesc;
 
     @ApiModelProperty("基础属性值")
     @NotBlank
     private String baseAttrValue;
 
+    @ApiModelProperty("被动描述")
+    private String passiveAttrDesc;
+
+    @ApiModelProperty("特殊属性描述")
+    private String specialAttrDesc;
 
 }

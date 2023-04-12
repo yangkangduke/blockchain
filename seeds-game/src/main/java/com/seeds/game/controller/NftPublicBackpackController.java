@@ -8,14 +8,12 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.NftDepositedReq;
 import com.seeds.game.dto.request.NftUnDepositedReq;
-import com.seeds.game.dto.request.OpenGetNFTPriceReq;
 import com.seeds.game.dto.request.internal.NftBackpackWebPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
 import com.seeds.game.dto.response.NftPublicBackpackWebResp;
 import com.seeds.game.dto.response.NftType;
 import com.seeds.game.dto.response.NftTypeNum;
-import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.service.INftPublicBackpackService;
@@ -25,9 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
