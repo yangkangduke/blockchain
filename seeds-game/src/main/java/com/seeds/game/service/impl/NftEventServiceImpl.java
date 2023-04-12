@@ -263,6 +263,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 // 通知游戏方，更新本地数据库
                 updateLocalDB(mintSuccessReq.getAutoDeposite(), mintSuccessReq.getMintAddress(), nftEvent, equipment, data);
             } else {
+                log.error("mint成功，通知失败，message：{}", jsonObject.get("message"));
                 recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
             }
         } catch (Exception e) {
