@@ -1,4 +1,6 @@
 package com.seeds.game.dto.request;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.seeds.common.dto.PageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,7 +24,7 @@ public class NftMarketPlaceEquipPageReq extends PageReq {
     private String tokenId;
 
     @ApiModelProperty("由：auction_id判断：0：一口价  大于0：On Auction ")
-    private Integer auctionId;
+    private Long auctionId;
 
     @ApiModelProperty("NFT等级")
     private Integer grade;
