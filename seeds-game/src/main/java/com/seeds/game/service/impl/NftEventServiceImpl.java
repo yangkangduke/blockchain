@@ -264,7 +264,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         JSONObject jsonObject = JSONObject.parseObject(response.body());
         log.info(" jsonObject:{}", jsonObject);
         if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
-            log.info("mint成功，通知成功， resp:{}", data.toString());
             data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
         } else {
             log.error("mint成功，通知失败，message：{}", jsonObject.get("message"));
