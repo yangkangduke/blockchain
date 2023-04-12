@@ -4,7 +4,7 @@
     <select id="getSkinPage" resultType="com.seeds.game.dto.response.NftMarketPlaceSkinResp"
             parameterType="com.seeds.game.dto.request.NftMarketPlaceSkinPageReq">
         select
-        t4.id,
+        t4.id as nft_id,
         t1.price,
         t1.place_time,
         t1.token_id,
@@ -59,7 +59,7 @@
     <select id="getEquipPage" resultType="com.seeds.game.dto.response.NftMarketPlaceEqiupmentResp"
             parameterType="com.seeds.game.dto.request.NftMarketPlaceEquipPageReq">
         select
-        t4.id,
+        t4.id as nft_id,
         t1.place_time,
         t1.price,
         t1.token_id,
@@ -120,7 +120,7 @@
     <select id="getPropsPage" resultType="com.seeds.game.dto.response.NftMarketPlacePropsResp"
             parameterType="com.seeds.game.dto.request.NftMarketPlacePropsPageReq">
         select
-        t4.id,
+        t4.id as nft_id,
         t1.price,
         t1.place_time,
         t1.token_id,
