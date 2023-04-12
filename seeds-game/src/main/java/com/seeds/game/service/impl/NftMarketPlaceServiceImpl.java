@@ -423,6 +423,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             }else {
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
             }
+
             // 查询NFT
             NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getNftId());
             // 获取当前nftId 下的mintAddress
@@ -475,6 +476,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             }else {
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
             }
+
             // 查询NFT
             NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getNftId());
             // 获取当前nftId 下的mintAddress

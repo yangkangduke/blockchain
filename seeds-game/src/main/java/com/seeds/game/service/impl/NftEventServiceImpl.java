@@ -94,12 +94,15 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Autowired
     private AsyncNotifyGame asyncNotifyGame;
+    @Autowired
+    private ItemImageService itemImageService;
 
     @Autowired
     private IUpdateBackpackErrorLogService updateBackpackErrorLogService;
 
     @Autowired
     private NftMarketPlaceService marketPlaceService;
+
     @Override
     @Transactional
     public IPage<NftEventResp> getPage(NftEventPageReq req) {
@@ -183,6 +186,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
         equipments.forEach(p -> {
             p.setEventId(nftEvent.getId());
+            p.setImageUrl(itemImageService.queryImgByItemId(p.getItemId()));
         });
         eventEquipmentService.saveBatch(equipments);
 
