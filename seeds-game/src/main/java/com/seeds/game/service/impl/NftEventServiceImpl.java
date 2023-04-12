@@ -94,12 +94,15 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Autowired
     private AsyncNotifyGame asyncNotifyGame;
+    @Autowired
+    private ItemImageService itemImageService;
 
     @Autowired
     private IUpdateBackpackErrorLogService updateBackpackErrorLogService;
 
     @Autowired
     private NftMarketPlaceService marketPlaceService;
+
     @Override
     @Transactional
     public IPage<NftEventResp> getPage(NftEventPageReq req) {
@@ -175,6 +178,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             try {
                 p.setBaseAttrValue(URLDecoder.decode(p.getBaseAttrValue(), "UTF-8"));
                 p.setRarityAttrValue(URLDecoder.decode(p.getRarityAttrValue(), "UTF-8"));
+//                p.setSpecialAttrDesc(URLDecoder.decode(p.getSpecialAttrDesc(), "UTF-8"));
+//                p.setPassiveAttrDesc(URLDecoder.decode(p.getPassiveAttrDesc(), "UTF-8"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -183,6 +188,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
         equipments.forEach(p -> {
             p.setEventId(nftEvent.getId());
+            p.setImageUrl(itemImageService.queryImgByItemId(p.getItemId()));
         });
         eventEquipmentService.saveBatch(equipments);
 
@@ -363,10 +369,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             attributeEntity.setMintAddress(data.getMintAddress());
             attributeEntity.setGrade(equipment.getLvl());
             attributeEntity.setDurability(durability);
+            attributeEntity.setSpecialAttrDesc(equipment.getSpecialAttrDesc());
+            attributeEntity.setPassiveAttrDesc(equipment.getPassiveAttrDesc());
             try {
                 attributeEntity.setBaseAttrValue(URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
                 attributeEntity.setRarityAttrValue(URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
-
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
