@@ -250,26 +250,28 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         String param = JSONUtil.toJsonStr(dto);
         log.info("mint成功，开始通知， url:{}， params:{}", url, param);
         MintSuccessMessageResp data = null;
+        HttpResponse response = null;
         try {
-            HttpResponse response = HttpRequest.post(url)
+            response = HttpRequest.post(url)
                     .timeout(5 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
-            JSONObject jsonObject = JSONObject.parseObject(response.body());
-            if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
-                log.info("mint成功，通知成功， resp:{}", data.toString());
-                data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
-                // 通知游戏方，更新本地数据库
-                updateLocalDB(mintSuccessReq.getAutoDeposite(), mintSuccessReq.getMintAddress(), nftEvent, equipment, data);
-            } else {
-                recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
-            }
         } catch (Exception e) {
             log.error("mint成功通知失败，message：{}", e.getMessage());
             recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
         }
+        JSONObject jsonObject = JSONObject.parseObject(response.body());
+        if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+            log.info("mint成功，通知成功， resp:{}", data.toString());
+            data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
+        } else {
+            log.error("mint成功，通知失败，message：{}", jsonObject.get("message"));
+            recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
+        }
 
+        // 通知游戏方，更新本地数据库
+        updateLocalDB(mintSuccessReq.getAutoDeposite(), mintSuccessReq.getMintAddress(), nftEvent, equipment, data);
     }
 
     @Override
@@ -394,24 +396,24 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCompose();
         log.info("合成成功，开始通知， url:{}， params:{}", url, params);
         MintSuccessMessageResp data = null;
+        HttpResponse response = null;
         try {
-            HttpResponse response = HttpRequest.get(url)
+            response = HttpRequest.get(url)
                     .timeout(5 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
-
-            JSONObject jsonObject = JSONObject.parseObject(response.body());
-            if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
-                data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
-                NftEvent nftEvent = this.getById(req.getEventId());
-                NftEventEquipment equipment = eventEquipmentService
-                        .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-
-                updateLocalDB(req.getAutoDeposite(), data.getMintAddress(), nftEvent, equipment, data);
-            }
         } catch (Exception e) {
             log.error("NFT合成成功通知失败，message：{}", e.getMessage());
             //   recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
+        }
+        JSONObject jsonObject = JSONObject.parseObject(response.body());
+        if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+            data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
+            NftEvent nftEvent = this.getById(req.getEventId());
+            NftEventEquipment equipment = eventEquipmentService
+                    .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
+
+            updateLocalDB(req.getAutoDeposite(), data.getMintAddress(), nftEvent, equipment, data);
         }
 
     }

@@ -29,9 +29,16 @@
         <if test="params.name != null and params.name != ''">
             and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')
         </if>
-        <if test="params.auctionId != null">
-            and t1.auction_id  = #{params.auctionId}
-        </if>
+        <choose>
+            <when test="params.auctionId !=null and params.auctionId != 0">
+                and t1.auction_id &gt; 0
+            </when>
+            <when test="params.auctionId !=null and params.auctionId == 0">
+                and t1.auction_id = 0
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
         <if test="params.rarity != null">
             and t3.rarity = #{params.rarity}
         </if>
@@ -74,7 +81,9 @@
         t3.passive,
         t3.blade_buff,
         t3.rarity_attr_value,
-        t3.base_attr_value
+        t3.base_attr_value,
+        t3.special_attr_desc,
+        t3.passive_attr_desc
 
         from z_market_order t1
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
@@ -85,9 +94,16 @@
         <if test="params.name != null and params.name != ''">
             and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')
         </if>
-        <if test="params.auctionId != null">
-            and t1.auction_id  = #{params.auctionId}
-        </if>
+        <choose>
+            <when test="params.auctionId !=null and params.auctionId != 0">
+                and t1.auction_id &gt; 0
+            </when>
+            <when test="params.auctionId !=null and params.auctionId == 0">
+                and t1.auction_id = 0
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
         <if test="params.grade != null">
             and t3.grade = #{params.grade}
         </if>
@@ -135,7 +151,9 @@
         t3.passive,
         t3.blade_buff,
         t3.rarity_attr_value,
-        t3.base_attr_value
+        t3.base_attr_value,
+        t3.special_attr_desc,
+        t3.passive_attr_desc
 
         from z_market_order t1
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
@@ -146,9 +164,16 @@
         <if test="params.name != null and params.name != ''">
             and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')
         </if>
-        <if test="params.auctionId != null">
-            and t1.auction_id  = #{params.auctionId}
-        </if>
+        <choose>
+            <when test="params.auctionId !=null and params.auctionId != 0">
+                and t1.auction_id &gt; 0
+            </when>
+            <when test="params.auctionId !=null and params.auctionId == 0">
+                and t1.auction_id = 0
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
         <if test="params.grade != null">
             and t3.grade = #{params.grade}
         </if>
