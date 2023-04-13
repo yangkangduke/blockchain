@@ -15,12 +15,12 @@ public class RelativeDateFormat {
     private static final long ONE_DAY = 86400000L;
     private static final long ONE_WEEK = 604800000L;
 
-    private static final String ONE_SECOND_AGO = "second ago";
-    private static final String ONE_MINUTE_AGO = "minute ago";
-    private static final String ONE_HOUR_AGO = "hour ago";
-    private static final String ONE_DAY_AGO = "days ago";
-    private static final String ONE_MONTH_AGO = "month ago";
-    private static final String ONE_YEAR_AGO = "year ago";
+    private static final String ONE_SECOND_AGO = "s ago";
+    private static final String ONE_MINUTE_AGO = "m ago";
+    private static final String ONE_HOUR_AGO = "h ago";
+    private static final String ONE_DAY_AGO = "d ago";
+    private static final String ONE_MONTH_AGO = "mo ago";
+    private static final String ONE_YEAR_AGO = "y ago";
     private static final String YESTERDAY = "yesterday";
 
     public static String format(Date date) {

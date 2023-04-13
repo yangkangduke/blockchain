@@ -1,5 +1,6 @@
 package com.seeds.game.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -43,6 +44,7 @@ public class NftActivityServiceImpl extends ServiceImpl<NftActivityMapper, NftAc
             NftActivityResp resp = new NftActivityResp();
             BeanUtils.copyProperties(p, resp);
             resp.setDate(RelativeDateFormat.format(new Date(p.getCreateTime())));
+            resp.setDateFormat(DateUtil.format(new Date(p.getCreateTime()), "EEE, dd MMM yyyy hh:mm:ss aaa"));
             return resp;
         });
     }
