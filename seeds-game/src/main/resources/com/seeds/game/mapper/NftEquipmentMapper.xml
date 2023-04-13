@@ -7,6 +7,7 @@
         <result column="token_id" jdbcType="BIGINT" property="tokenId"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="mint_address" jdbcType="VARCHAR" property="mintAddress"/>
+        <result column="token_address" jdbcType="VARCHAR" property="tokenAddress"/>
         <result column="owner" jdbcType="VARCHAR" property="owner"/>
         <result column="nft_generated" jdbcType="TINYINT" property="nftGenerated"/>
         <result column="mint_time" jdbcType="BIGINT" property="mintTime"/>
@@ -22,7 +23,7 @@
     </resultMap>
 
     <sql id="mainColumns">
-        id, token_id, name, mint_address, owner, nft_generated, mint_time, mint_trx, update_time, on_sale, order_id, is_delete, delete_time, is_deposit, cancel_time, auction_id
+        id, token_id, name, mint_address, token_address, owner, nft_generated, mint_time, mint_trx, update_time, on_sale, order_id, is_delete, delete_time, is_deposit, cancel_time, auction_id
     </sql>
 
     <select id="getById" resultMap="BaseResultMap">
