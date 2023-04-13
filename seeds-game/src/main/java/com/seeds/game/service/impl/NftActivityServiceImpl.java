@@ -1,5 +1,6 @@
 package com.seeds.game.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -9,6 +10,7 @@ import com.seeds.common.utils.RelativeDateFormat;
 import com.seeds.game.dto.request.NftActivityPageReq;
 import com.seeds.game.dto.response.NftActivityResp;
 import com.seeds.game.entity.NftActivity;
+import com.seeds.game.enums.NftActivityEnum;
 import com.seeds.game.mapper.NftActivityMapper;
 import com.seeds.game.service.INftActivityService;
 import org.springframework.beans.BeanUtils;
@@ -43,6 +45,12 @@ public class NftActivityServiceImpl extends ServiceImpl<NftActivityMapper, NftAc
             NftActivityResp resp = new NftActivityResp();
             BeanUtils.copyProperties(p, resp);
             resp.setDate(RelativeDateFormat.format(new Date(p.getCreateTime())));
+            resp.setDateFormat(DateUtil.format(new Date(p.getCreateTime()), "EEE, dd MMM yyyy hh:mm:ss aaa"));
+            // mint事件to为发起人地址
+            if (NftActivityEnum.MINT.getCode() == Integer.parseInt(p.getActivityType())) {
+                resp.setToAddress(p.getFromAddress());
+                resp.setFromAddress(null);
+            }
             return resp;
         });
     }

@@ -111,5 +111,11 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("mint交易地址")
     private String mintTrx;
 
+    @ApiModelProperty("类型：1装备 2道具 3英雄")
+    private Integer type;
+
+    @ApiModelProperty("图片")
+    private String image;
+
 }
 
