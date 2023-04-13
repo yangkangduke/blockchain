@@ -220,7 +220,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
 
         // 调用游戏方接口，执行分配
-        this.callGameDistribute(nftItem, req.getServerRoleId());
+     //   this.callGameDistribute(nftItem, req.getServerRoleId());
 
         // 更新公共背包数据
         nftItem.setServerRoleId(req.getServerRoleId());
@@ -275,7 +275,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
 
 //        // 调用游戏方接口，执行收回
-        this.callGameTakeback(nftItem);
+      //  this.callGameTakeback(nftItem);
 
         ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
         // 记录转移事件
