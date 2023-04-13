@@ -166,7 +166,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         BeanUtils.copyProperties(req, nftEvent);
         List<NftEventEquipmentReq> eventEquipmentReqs = req.getEquipments().stream().filter(p -> p.getIsConsume().equals(WhetherEnum.NO.value())).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(eventEquipmentReqs)) {
-            nftEvent.setName(eventEquipmentReqs.get(0).getName());
+            try {
+                nftEvent.setName(URLDecoder.decode(eventEquipmentReqs.get(0).getName(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
         nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.PENDING.getCode());
         nftEvent.setCreatedAt(System.currentTimeMillis());
@@ -305,7 +309,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     private void updateLocalDB(Integer autoDeposit, String mintAddress, NftEvent nftEvent, NftEventEquipment equipment, MintSuccessMessageResp data) {
         // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
-       // this.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, 1, mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+        this.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, 1, mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
         //  插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         if (Objects.nonNull(data)) {
             NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
@@ -329,7 +333,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
             }
-            //backpackEntity.setDesc();
+            backpackEntity.setDesc(NFTEnumConstant.NFTDescEnum.SEEDS_EQUIP.getDesc());
             backpackEntity.setImage(equipment.getImageUrl());
             backpackEntity.setType(equipment.getItemType());
             backpackEntity.setItemId(equipment.getConfigId());

@@ -130,7 +130,7 @@ public class AsyncNotifyGame {
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
             }
-            //backpackEntity.setDesc();
+            backpackEntity.setDesc(NFTEnumConstant.NFTDescEnum.SEEDS_EQUIP.getDesc());
             backpackEntity.setImage(equipment.getImageUrl());
             backpackEntity.setType(equipment.getItemType());
             backpackEntity.setItemId(equipment.getConfigId());

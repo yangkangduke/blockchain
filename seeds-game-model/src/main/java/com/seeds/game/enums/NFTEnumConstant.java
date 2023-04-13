@@ -64,6 +64,18 @@ public class NFTEnumConstant {
         }
     }
 
+    @Getter
+    public enum NFTDescEnum {
+
+        SEEDS_EQUIP("This is the NFT of the seeds equipment.");
+
+        private final String desc;
+
+        NFTDescEnum(String desc) {
+            this.desc = desc;
+        }
+    }
+
     /**
      * nft 状态 地枚举
      */
