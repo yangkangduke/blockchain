@@ -322,11 +322,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (!roleEntity.getUserId().equals(req.getUserId())) {
             throw new GenericException(GameErrorCodeEnum.ERR_20003_ROLE_NOT_BELONGS_TO_CURRENT_USER);
         }
-        // 调用游戏方接口，执行收回,再分发
-        // 执行收回
-        this.callGameTakeback(nftItem);
-        // 分发
-        this.callGameDistribute(nftItem, req.getServerRoleId());
+//        // 调用游戏方接口，执行收回,再分发
+//        // 执行收回
+//        this.callGameTakeback(nftItem);
+//        // 分发
+//        this.callGameDistribute(nftItem, req.getServerRoleId());
 
         String from = this.getServerRegionEntity(nftItem.getServerRoleId()).getGameServerName();
 
