@@ -178,8 +178,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             try {
                 p.setBaseAttrValue(URLDecoder.decode(p.getBaseAttrValue(), "UTF-8"));
                 p.setRarityAttrValue(URLDecoder.decode(p.getRarityAttrValue(), "UTF-8"));
-                p.setSpecialAttrDesc(URLDecoder.decode(p.getSpecialAttrDesc(), "UTF-8"));
-                p.setPassiveAttrDesc(URLDecoder.decode(p.getPassiveAttrDesc(), "UTF-8"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
