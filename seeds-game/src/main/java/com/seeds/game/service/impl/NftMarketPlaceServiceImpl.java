@@ -148,12 +148,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             resp.setServerRoleId(publicBackpack.getServerRoleId());
             resp.setAutoId(publicBackpack.getAutoId());
         }
+        BeanUtils.copyProperties(nftEquipment, resp);
         resp.setOwnerAddress(nftEquipment.getOwner());
-        resp.setMintAddress(nftEquipment.getMintAddress());
         resp.setNftId(nftEquipment.getId());
-        resp.setAuctionId(nftEquipment.getAuctionId());
-        resp.setTokenId(nftEquipment.getTokenId());
-        resp.setName(nftEquipment.getName());
         resp.setNumber("#" + nftEquipment.getTokenId());
         resp.setLastUpdated(nftEquipment.getUpdateTime());
         resp.setState(convertOrderState(nftEquipment, auctionSetting));

@@ -105,5 +105,11 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("挂单收据")
     private String listReceipt;
 
+    @ApiModelProperty("NFT 关联账号：托管时候不为空；")
+    private String tokenAddress;
+
+    @ApiModelProperty("mint交易地址")
+    private String mintTrx;
+
 }
 
