@@ -193,6 +193,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         equipments.forEach(p -> {
             p.setEventId(nftEvent.getId());
             p.setImageUrl(itemImageService.queryImgByItemId(p.getItemId()));
+            try {
+                p.setName(URLDecoder.decode(p.getName(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         });
         eventEquipmentService.saveBatch(equipments);
 
