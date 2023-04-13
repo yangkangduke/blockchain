@@ -17,4 +17,6 @@ import java.util.List;
 public interface ServerRegionMapper extends BaseMapper<ServerRegionEntity> {
 
     List<ServeRoleRegionResp> getListForSelf(Long userId);
+
+    ServerRegionEntity queryByServerRoleId(Long serverRoleId);
 }

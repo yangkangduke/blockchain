@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.entity.SysGameApiEntity;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
@@ -17,6 +18,7 @@ import com.seeds.common.web.context.UserContext;
 import com.seeds.game.config.SeedsApiConfig;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.external.DepositSuccessMessageDto;
+import com.seeds.game.dto.request.external.NftDepositCheckDto;
 import com.seeds.game.dto.request.external.TransferNftMessageDto;
 import com.seeds.game.dto.request.internal.*;
 import com.seeds.game.dto.response.*;
@@ -87,6 +89,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Autowired
     private SeedsApiConfig seedsApiConfig;
+
+    @Autowired
+    private INftAttributeService attributeService;
 
     @Autowired
     private UcUserService ucUserService;
@@ -607,6 +612,46 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         List<NftPublicBackpackEntity> list = this.list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getAutoId, autoIds.split(",")));
         return list.stream().collect(Collectors.toMap(NftPublicBackpackEntity::getAutoId, NftPublicBackpackEntity::getProposedPrice));
+    }
+
+    @Override
+    public Boolean depositCheck(NftDepositCheckReq req) {
+        boolean result = false;
+        NftPublicBackpackEntity one = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
+        if (Objects.nonNull(one)) {
+            NftAttributeEntity attribute = attributeService.queryByNftId(one.getEqNftId());
+            NftDepositCheckDto checkDto = new NftDepositCheckDto();
+            checkDto.setAutoId(one.getAutoId());
+            checkDto.setConfId(one.getItemId().intValue());
+            checkDto.setTokenAddress(one.getTokenAddress());
+            if (one.getType().equals(NFTEnumConstant.NftTypeEnum.HERO)) {
+                checkDto.setWin(attribute.getVictory());
+                checkDto.setDefeat(attribute.getLose());
+                checkDto.setSeqWin(attribute.getMaxStreak());
+                checkDto.setSeqDefeat(attribute.getMaxLose());
+            } else {
+                checkDto.setDurability(attribute.getDurability());
+                checkDto.setRarityAttr(attribute.getRarityAttr());
+            }
+            try {
+                GenericDto<SysGameApiEntity> dto = remoteGameService.queryByGameAndType(1L, ApiType.DEPOSIT_CHECK.getCode());
+                String depositCheckUrl = dto.getData().getBaseUrl() + dto.getData().getApi();
+                String params = JSONUtil.toJsonStr(checkDto);
+                log.info("开始请求游戏  deposit-check 接口， url:{}， params:{}", depositCheckUrl, params);
+                HttpResponse response = HttpRequest.post(depositCheckUrl)
+                        .timeout(5 * 1000)
+                        .header("Content-Type", "application/json")
+                        .body(params)
+                        .execute();
+                JSONObject jsonObject = JSONObject.parseObject(response.body());
+                log.info("请求游戏 deposit-check 接口返回，  result:{}", response.body());
+                int ret = (int) jsonObject.get("ret");
+                result = ret == 0 ? true : false;
+            } catch (Exception e) {
+                log.info("rpc all seeds-admin ,queryGameApi error {}", e.getMessage());
+            }
+        }
+        return result;
     }
 
 

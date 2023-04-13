@@ -4,4 +4,6 @@ import com.seeds.game.entity.NftAttributeEntity;
 public interface INftAttributeService extends IService<NftAttributeEntity> {
 
     NftAttributeEntity detailForMintAddress(String mintAddress);
+
+    NftAttributeEntity queryByNftId(Long nftId);
 }

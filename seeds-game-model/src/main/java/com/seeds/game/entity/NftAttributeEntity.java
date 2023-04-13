@@ -59,6 +59,9 @@ public class NftAttributeEntity extends BaseEntity {
     @ApiModelProperty("最大连胜场数")
     private Integer maxStreak;
 
+    @ApiModelProperty("最大连败场数")
+    private Integer maxLose;
+
     @ApiModelProperty("击杀玩家数")
     private Integer capture;
 
@@ -73,6 +76,9 @@ public class NftAttributeEntity extends BaseEntity {
 
     @ApiModelProperty("被NPC击杀数")
     private Integer goblin;
+
+    @ApiModelProperty("稀有属性ID")
+    private Integer rarityAttr;
 
     @ApiModelProperty("稀有属性值")
     private String rarityAttrValue;

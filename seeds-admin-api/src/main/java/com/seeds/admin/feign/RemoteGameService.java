@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.request.SysGamePageReq;
 import com.seeds.admin.dto.response.*;
+import com.seeds.admin.entity.SysGameApiEntity;
 import com.seeds.admin.feign.impl.RemoteGameServiceImpl;
 import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import com.seeds.common.dto.GenericDto;
@@ -80,6 +81,11 @@ public interface RemoteGameService {
 	@GetMapping("/internal-game/game-api")
 	@ApiOperation("获取游戏请求接口")
 	GenericDto<String> queryGameApi(@RequestParam Long id, @RequestParam Integer type);
+
+
+	@GetMapping("/internal-game/game-api-entity")
+	@ApiOperation("获取游戏请求接口")
+	GenericDto<SysGameApiEntity> queryByGameAndType(@RequestParam Long id, @RequestParam Integer type);
 
 	/**
 	 * 获取游戏胜场排行榜

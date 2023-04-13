@@ -13,7 +13,6 @@ import com.seeds.game.dto.request.NftMintSuccessReq;
 import com.seeds.game.dto.request.internal.NftEventNotifyReq;
 import com.seeds.game.dto.response.MintSuccessMessageResp;
 import com.seeds.game.entity.*;
-import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
 import com.seeds.game.exception.GenericException;
@@ -38,7 +37,7 @@ import java.util.Objects;
  */
 @Service
 @Slf4j
-public class AsyncNotifyGame {
+public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
 
     @Autowired
     @Lazy
@@ -65,6 +64,7 @@ public class AsyncNotifyGame {
     private INftPublicBackpackService nftPublicBackpackService;
 
     @Async
+    @Override
     public void mintSuccess(NftMintSuccessReq mintSuccessReq) {
 
         try {
@@ -187,9 +187,12 @@ public class AsyncNotifyGame {
 
     }
 
+    // nft 操作通知  // optType 1 mint成功,2取消
+    @Async
+    @Override
     public void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenAddress, Integer itemType, Long autoId, Long configId, Long accId) {
 
-        ServerRegionEntity serverRegion = this.getServerRegionEntity(serverRoleId);
+        ServerRegionEntity serverRegion = serverRegionService.queryByServerRoleId(serverRoleId);
 
         GenericDto<String> dto = null;
         try {
@@ -205,10 +208,10 @@ public class AsyncNotifyGame {
         notifyReq.setAccId(accId);
         notifyReq.setType(itemType);
         // 1 mint成功,2取消
-        if (optType.equals(1)) {
+        if (optType.equals(NFTEnumConstant.NftEventOptEnum.SUCCESS.getCode())) {
             notifyReq.setRegionName(serverRegion.getRegionName());
             notifyReq.setServerName(serverRegion.getGameServerName());
-            notifyReq.setState(autoDeposite.equals(1) ? NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode() : NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+            notifyReq.setState(autoDeposite.equals(WhetherEnum.YES.value()) ? NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode() : NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
             notifyReq.setTokenAddress(tokenAddress);
         }
         String params = JSONUtil.toJsonStr(notifyReq);
@@ -236,22 +239,6 @@ public class AsyncNotifyGame {
             throw new GenericException("Failed to call game-api to notify, " + ret);
         }
 
-    }
-
-
-    private ServerRegionEntity getServerRegionEntity(Long id) {
-        ServerRoleEntity role = serverRoleService.getById(id);
-        if (Objects.isNull(role)) {
-            throw new GenericException(GameErrorCodeEnum.ERR_20002_ROLE_NOT_EXIST);
-        }
-        ServerRegionEntity serverRegion = serverRegionService.getOne(new LambdaQueryWrapper<ServerRegionEntity>()
-                .eq(ServerRegionEntity::getRegion, role.getRegion())
-                .eq(ServerRegionEntity::getGameServer, role.getGameServer()));
-
-        if (Objects.isNull(serverRegion)) {
-            throw new GenericException(GameErrorCodeEnum.ERR_20004_SERVER_REGION_NOT_EXIST);
-        }
-        return serverRegion;
     }
 
     private void errorLog(String url, String params, String msg) {

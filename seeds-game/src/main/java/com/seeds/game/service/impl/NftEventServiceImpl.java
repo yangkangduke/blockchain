@@ -72,15 +72,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     private INftEventEquipmentService eventEquipmentService;
 
     @Autowired
-    private RemoteGameService remoteGameService;
-
-    @Autowired
-    private IServerRoleService serverRoleService;
-
-    @Autowired
-    private IServerRegionService serverRegionService;
-
-    @Autowired
     private CallGameApiLogService callGameApiLogService;
 
     @Autowired
@@ -93,8 +84,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     private SeedsApiConfig seedsApiConfig;
 
     @Autowired
-    private AsyncNotifyGame asyncNotifyGame;
-    @Autowired
     private ItemImageService itemImageService;
 
     @Autowired
@@ -102,6 +91,10 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Autowired
     private NftMarketPlaceService marketPlaceService;
+
+
+    @Autowired
+    private IAsyncNotifyGameService asyncNotifyGameService;
 
     @Override
     @Transactional
@@ -206,7 +199,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 //        req1.setEventId(nftEvent.getId());
 //        req1.setAutoDeposite(1);
 //        req1.setMintAddress(nftEvent.getId() + "token0xabc");
-//        asyncNotifyGame.mintSuccess(req1);
+//        asyncNotifyGameService.mintSuccess(req1);
     }
 
 
@@ -225,9 +218,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         // 通知游戏方事件取消
         NftEvent event = this.getById(id);
         NftEventEquipment equipment = eventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-        this.callGameNotify(event.getServerRoleId(), 0, 2, "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId());
+        asyncNotifyGameService.callGameNotify(event.getServerRoleId(), WhetherEnum.NO.value(), NFTEnumConstant.NftEventOptEnum.CANCEL.getCode(), "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId());
         // 更新本地数据库
-
         List<NftEventEquipment> equipments = eventEquipmentService.list(new LambdaQueryWrapper<NftEventEquipment>().in(NftEventEquipment::getEventId, id));
         equipments.stream().forEach(p -> {
             p.setAutoId(p.getAutoId() * 10);
@@ -314,7 +306,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     private void updateLocalDB(Integer autoDeposit, String mintAddress, NftEvent nftEvent, NftEventEquipment equipment, MintSuccessMessageResp data) {
         // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
-        this.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, 1, mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+        asyncNotifyGameService.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, NFTEnumConstant.NftEventOptEnum.SUCCESS.getCode(), mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
         //  插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         if (Objects.nonNull(data)) {
             NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
@@ -422,84 +414,5 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             updateLocalDB(req.getAutoDeposite(), data.getMintAddress(), nftEvent, equipment, data);
         }
 
-    }
-
-
-    // nft 操作通知  // optType 1 mint成功,2取消
-    private void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenAddress, Integer itemType, Long autoId, Long configId, Long accId) {
-
-        ServerRegionEntity serverRegion = this.getServerRegionEntity(serverRoleId);
-
-        GenericDto<String> dto = null;
-        try {
-            dto = remoteGameService.queryGameApi(1L, ApiType.NFT_TO_NFT_NOTIFY.getCode());
-        } catch (Exception e) {
-            log.info("rpc all seeds-admin ,queryGameApi error {}", e.getMessage());
-        }
-        String notifyUrl = "http://" + serverRegion.getInnerHost() + dto.getData();
-        NftEventNotifyReq notifyReq = new NftEventNotifyReq();
-        notifyReq.setOptType(optType);
-        notifyReq.setAutoId(autoId);
-        notifyReq.setConfigId(configId);
-        notifyReq.setAccId(accId);
-        notifyReq.setType(itemType);
-        // 1 mint成功,2取消
-        if (optType.equals(1)) {
-            notifyReq.setRegionName(serverRegion.getRegionName());
-            notifyReq.setServerName(serverRegion.getGameServerName());
-            notifyReq.setState(autoDeposite.equals(WhetherEnum.YES.value()) ? NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode() : NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
-            notifyReq.setTokenAddress(tokenAddress);
-        }
-        String params = JSONUtil.toJsonStr(notifyReq);
-
-        log.info("开始请求游戏 nft notify 接口， url:{}， params:{}", notifyUrl, params);
-        HttpResponse response = null;
-        try {
-            response = HttpRequest.post(notifyUrl)
-                    .timeout(10 * 1000)
-                    .header("Content-Type", "application/json")
-                    .body(params)
-                    .execute();
-        } catch (Exception e) {
-            // 记录调用错误日志
-            errorLog(notifyUrl, params, "connect timed out");
-            throw new GenericException("Failed to call game-api to notify,connect timed out");
-        }
-
-        JSONObject jsonObject = JSONObject.parseObject(response.body());
-        String ret = jsonObject.getString("ret");
-        log.info("请求游戏  nft notify 接口返回，  result:{}", response.body());
-        if (!"ok".equalsIgnoreCase(ret)) {
-            // 记录调用错误日志
-            errorLog(notifyUrl, params, ret);
-            throw new GenericException("Failed to call game-api to notify, " + ret);
-        }
-
-    }
-
-
-    private ServerRegionEntity getServerRegionEntity(Long id) {
-        ServerRoleEntity role = serverRoleService.getById(id);
-        if (Objects.isNull(role)) {
-            throw new GenericException(GameErrorCodeEnum.ERR_20002_ROLE_NOT_EXIST);
-        }
-        ServerRegionEntity serverRegion = serverRegionService.getOne(new LambdaQueryWrapper<ServerRegionEntity>()
-                .eq(ServerRegionEntity::getRegion, role.getRegion())
-                .eq(ServerRegionEntity::getGameServer, role.getGameServer()));
-
-        if (Objects.isNull(serverRegion)) {
-            throw new GenericException(GameErrorCodeEnum.ERR_20004_SERVER_REGION_NOT_EXIST);
-        }
-        return serverRegion;
-    }
-
-    private void errorLog(String url, String params, String msg) {
-        CallGameApiErrorLogEntity errorLog = new CallGameApiErrorLogEntity();
-        errorLog.setCallTime(System.currentTimeMillis());
-        errorLog.setUrl(url);
-        errorLog.setMethod(HttpMethod.POST.name());
-        errorLog.setParams(params);
-        errorLog.setMsg(msg);
-        callGameApiLogService.save(errorLog);
     }
 }

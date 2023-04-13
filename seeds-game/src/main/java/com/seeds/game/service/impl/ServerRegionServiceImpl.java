@@ -9,8 +9,6 @@ import com.seeds.game.dto.response.ServerRegionResp;
 import com.seeds.game.entity.ServerRegionEntity;
 import com.seeds.game.mapper.ServerRegionMapper;
 import com.seeds.game.service.IServerRegionService;
-import com.seeds.game.service.IServerRoleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -111,5 +109,10 @@ public class ServerRegionServiceImpl extends ServiceImpl<ServerRegionMapper, Ser
             respList.add(resp);
         }
         return respList;
+    }
+
+    @Override
+    public ServerRegionEntity queryByServerRoleId(Long serverRoleId) {
+        return baseMapper.queryByServerRoleId(serverRoleId);
     }
 }

@@ -19,6 +19,7 @@ public interface IServerRegionService extends IService<ServerRegionEntity> {
 
     /**
      * 获取游戏区服
+     *
      * @return 游戏区服
      */
     List<ServerRegionResp> queryList();
@@ -26,4 +27,7 @@ public interface IServerRegionService extends IService<ServerRegionEntity> {
     void createOrUpdate(OpenServerRegionCreateUpdateReq req);
 
     List<ServerRegionResp> queryListForSelf();
+
+    ServerRegionEntity queryByServerRoleId(Long serverRoleId);
+
 }

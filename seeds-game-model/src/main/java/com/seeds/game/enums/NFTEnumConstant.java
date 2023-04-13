@@ -118,5 +118,20 @@ public class NFTEnumConstant {
         }
     }
 
+    @Getter
+    public enum NftEventOptEnum {
+
+        SUCCESS(1, "SUCCESS"),
+        CANCEL(2, "CANCEL");
+
+        private int code;
+        private String desc;
+
+        NftEventOptEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+    }
+
 
 }

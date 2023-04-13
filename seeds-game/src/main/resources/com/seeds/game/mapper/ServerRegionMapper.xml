@@ -8,4 +8,16 @@
                  left join ga_server_region t2 on t2.region = t1.region and t2.game_server = t1.game_server
         where user_id = #{userId}
     </select>
+    <select id="queryByServerRoleId" resultType="com.seeds.game.entity.ServerRegionEntity">
+        select a.id,
+               a.region,
+               a.region_name,
+               a.game_server,
+               a.game_server_name,
+               a.inner_host
+        from ga_server_region a
+                 left join ga_server_role b on a.region = b.region and a.game_server = b.game_server
+        where b.id = #{serverRoleId}
+
+    </select>
 </mapper>
