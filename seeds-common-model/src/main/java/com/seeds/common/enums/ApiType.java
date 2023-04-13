@@ -18,6 +18,7 @@ public enum ApiType {
     NFT_PACKAGE_DISTRIBUTE(5, "公共背包-分发nft"),
     NFT_PACKAGE_TAKEBACK(6, "公共背包-收回nft"),
     NFT_TO_NFT_NOTIFY(7, "toNft通知"),
+    DEPOSIT_CHECK(8, "deposit 校验"),
     ;
 
     @JsonValue

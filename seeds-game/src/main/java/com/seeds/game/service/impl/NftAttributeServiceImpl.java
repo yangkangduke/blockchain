@@ -25,4 +25,10 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
         return nftAttributeEntity;
     }
 
+    @Override
+    public NftAttributeEntity queryByNftId(Long nftId) {
+        return this.getOne(new LambdaQueryWrapper<NftAttributeEntity>().eq(NftAttributeEntity::getEqNftId, nftId));
+    }
+
+
 }

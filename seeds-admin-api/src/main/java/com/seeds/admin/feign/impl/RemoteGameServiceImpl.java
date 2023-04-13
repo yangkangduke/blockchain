@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.request.SysGamePageReq;
 import com.seeds.admin.dto.response.*;
+import com.seeds.admin.entity.SysGameApiEntity;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -52,6 +52,11 @@ public class RemoteGameServiceImpl implements RemoteGameService {
 	public GenericDto<String> queryGameApi(Long id, Integer type) {
 		return GenericDto.failure("Internal Error:game api failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 
+	}
+
+	@Override
+	public GenericDto<SysGameApiEntity> queryByGameAndType(Long id, Integer type) {
+		return GenericDto.failure("Internal Error:game entity failed", HttpStatus.INTERNAL_SERVER_ERROR.value());
 	}
 
 	@Override

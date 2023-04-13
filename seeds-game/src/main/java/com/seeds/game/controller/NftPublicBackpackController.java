@@ -6,6 +6,7 @@ import com.seeds.admin.enums.GameEnum;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.game.dto.request.NftDepositCheckReq;
 import com.seeds.game.dto.request.NftDepositedReq;
 import com.seeds.game.dto.request.NftUnDepositedReq;
 import com.seeds.game.dto.request.internal.NftBackpackWebPageReq;
@@ -130,6 +131,12 @@ public class NftPublicBackpackController {
             throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
         }
         return GenericDto.success(nftPublicBackpackService.transferBatch(reqs));
+    }
+
+    @PostMapping("deposit-check")
+    @ApiOperation("托管校验")
+    public GenericDto<Boolean> depositCheck(@Valid @RequestBody NftDepositCheckReq req) {
+        return GenericDto.success(nftPublicBackpackService.depositCheck(req));
     }
 
     @PostMapping("deposited")

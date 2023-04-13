@@ -93,4 +93,6 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     void insertCallback(MintSuccessReq req);
 
     Map<Long, BigDecimal> getTotalPrice(String autoIds);
+
+    Boolean depositCheck(NftDepositCheckReq req);
 }
