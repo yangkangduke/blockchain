@@ -305,7 +305,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     private void updateLocalDB(Integer autoDeposit, String mintAddress, NftEvent nftEvent, NftEventEquipment equipment, MintSuccessMessageResp data) {
         // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
-        this.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, 1, mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+       // this.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, 1, mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
         //  插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         if (Objects.nonNull(data)) {
             NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
