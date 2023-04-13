@@ -72,9 +72,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     private INftEventEquipmentService eventEquipmentService;
 
     @Autowired
-    private CallGameApiLogService callGameApiLogService;
-
-    @Autowired
     private INftAttributeService attributeService;
     @Autowired
     @Lazy
