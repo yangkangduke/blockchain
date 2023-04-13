@@ -65,9 +65,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     private INftEventEquipmentService eventEquipmentService;
 
     @Autowired
-    private CallGameApiLogService callGameApiLogService;
-
-    @Autowired
     private INftAttributeService attributeService;
     @Autowired
     @Lazy
@@ -323,7 +320,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
             }
-            //backpackEntity.setDesc();
+            backpackEntity.setDesc(NFTEnumConstant.NFTDescEnum.SEEDS_EQUIP.getDesc());
             backpackEntity.setImage(equipment.getImageUrl());
             backpackEntity.setType(equipment.getItemType());
             backpackEntity.setItemId(equipment.getConfigId());
@@ -367,12 +364,9 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             attributeEntity.setDurability(durability);
             attributeEntity.setSpecialAttrDesc(equipment.getSpecialAttrDesc());
             attributeEntity.setPassiveAttrDesc(equipment.getPassiveAttrDesc());
-            try {
-                attributeEntity.setBaseAttrValue(URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
-                attributeEntity.setRarityAttrValue(URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+            attributeEntity.setBaseAttrValue(equipment.getBaseAttrValue());
+            attributeEntity.setRarityAttrValue(equipment.getRarityAttrValue());
+
             attributeService.save(attributeEntity);
 
             // 更新event事件状态
