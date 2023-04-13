@@ -38,6 +38,9 @@ public class NftEquipment implements Serializable {
     @ApiModelProperty("NFT address")
     private String mintAddress;
 
+    @ApiModelProperty("NFT 关联账号：托管时候不为空；")
+    private String tokenAddress;
+
     @ApiModelProperty("NFT拥有者地址")
     private String owner;
 
