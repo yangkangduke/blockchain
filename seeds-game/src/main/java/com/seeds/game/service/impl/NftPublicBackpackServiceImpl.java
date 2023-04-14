@@ -401,15 +401,18 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 BeanUtils.copyProperties(p, resp);
                 return resp;
             }).filter(i -> {
-                String attributes = i.getAttributes();
-                Integer durability = 0;
-                try {
-                    JSONObject jsonObject = JSONObject.parseObject(attributes);
-                    durability = Integer.parseInt(jsonObject.getString("durability"));
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
+                if (!i.getType().equals(NFTEnumConstant.NftTypeEnum.HERO)) {
+                    String attributes = i.getAttributes();
+                    Integer durability = 0;
+                    try {
+                        JSONObject jsonObject = JSONObject.parseObject(attributes);
+                        durability = Integer.parseInt(jsonObject.getString("durability"));
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                    return durability > 0;
                 }
-                return durability > 0;
+                return true;
             }).collect(Collectors.toList());
         }
         return respList;

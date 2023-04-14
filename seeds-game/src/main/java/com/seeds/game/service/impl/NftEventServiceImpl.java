@@ -162,6 +162,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         this.save(nftEvent);
         req.getEquipments().forEach(p -> {
             try {
+                p.setName(URLDecoder.decode(p.getName(), "UTF-8"));
                 p.setBaseAttrValue(URLDecoder.decode(p.getBaseAttrValue(), "UTF-8"));
                 p.setRarityAttrValue(URLDecoder.decode(p.getRarityAttrValue(), "UTF-8"));
                 p.setSpecialAttrDesc(handleStr(URLDecoder.decode(p.getSpecialAttrDesc(), "UTF-8")));
@@ -416,8 +417,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     }
 
 
-    private String handleStr(String str) {
+    private static String handleStr(String str) {
         // 去除方括号以及方括号中的字符
-        return str.replaceAll("\\[.+?\\]", "");
+        return str.replaceAll("\\[.+?\\]", "").replace("Blade buff", "");
     }
 }
