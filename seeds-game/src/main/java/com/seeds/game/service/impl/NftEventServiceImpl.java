@@ -366,7 +366,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         // 调用/api/chainOp/buySuccess通知，购买成功
         String params = String.format("isDeposit=%s&mintAddresses=%s&sig=%s&walletAddress=%s", req.getAutoDeposite(), req.getMintAddresses(), req.getSig(), req.getWalletAddress());
         // 调用/api/equipment/compose  合成成功
-        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCompose();
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCompose() + "?" + params;
         log.info("合成成功，开始通知， url:{}， params:{}", url, params);
         MintSuccessMessageResp data = null;
         HttpResponse response = null;
