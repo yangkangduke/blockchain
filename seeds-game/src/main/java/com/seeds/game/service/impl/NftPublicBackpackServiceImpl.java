@@ -401,7 +401,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 BeanUtils.copyProperties(p, resp);
                 return resp;
             }).filter(i -> {
-                if (!i.getType().equals(NFTEnumConstant.NftTypeEnum.HERO)) {
+                if (!i.getType().equals(NFTEnumConstant.NftTypeEnum.HERO.getCode())) {
                     String attributes = i.getAttributes();
                     Integer durability = 0;
                     try {
