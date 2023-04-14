@@ -43,7 +43,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -250,15 +249,15 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                     .execute();
         } catch (Exception e) {
             log.error("mint成功通知失败，message：{}", e.getMessage());
-            recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
+            recordNftEventLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
         }
         JSONObject jsonObject = JSONObject.parseObject(response.body());
-        log.info(" jsonObject:{}", jsonObject);
+        log.info(" mint成功--result:{}", jsonObject);
         if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
             data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
         } else {
             log.error("mint成功，通知失败，message：{}", jsonObject.get("message"));
-            recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
+            recordNftEventLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
         }
 
         // 通知游戏方，更新本地数据库
@@ -311,12 +310,13 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             backpackEntity.setUpdatedBy(nftEvent.getUserId());
             backpackEntity.setCreatedAt(System.currentTimeMillis());
             backpackEntity.setUpdatedAt(System.currentTimeMillis());
-            backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
             if (autoDeposit.equals(WhetherEnum.YES.value())) {
                 // 自动托管
+                backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
             } else {
+                backpackEntity.setServerRoleId(0L);
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
             }
@@ -328,24 +328,20 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             backpackEntity.setAutoId(equipment.getAutoId());
             backpackEntity.setItemId(equipment.getConfigId());
             backpackEntity.setGrade(equipment.getLvl());
-            HashMap<String, Object> attr = new HashMap<>();
-
-            attr.put("level", equipment.getLvl());
-            Integer durability = null;
+            int durability = 0;
+            int rarityAttr = 0;
             try {
                 JSONObject jsonObject = JSONObject.parseObject(equipment.getAttributes());
-                durability = Integer.valueOf(jsonObject.getString("durability"));
-                attr.put("durability", durability);
+                durability = (int) jsonObject.get("durability");
+                rarityAttr = (int) jsonObject.get("rarityAttr");
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            String jsonStr = JSONUtil.toJsonStr(attr);
-            backpackEntity.setAttributes(jsonStr);
+            backpackEntity.setAttributes(equipment.getAttributes());
             // 设置参考价，
             BigDecimal usdRate = marketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
             backpackEntity.setProposedPrice(new BigDecimal(Math.random() * (10 - 1) + 1).setScale(2, RoundingMode.HALF_UP));
             nftPublicBackpackService.save(backpackEntity);
-
             // 如果是合成，作为合成材料的nft标记为销毁的状态
             if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
                 NftEventEquipment consumeNft = eventEquipmentService
@@ -357,18 +353,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 nftPublicBackpackService.updateById(nftbackpack);
             }
             //  插入属性表
-            NftAttributeEntity attributeEntity = new NftAttributeEntity();
-            attributeEntity.setEqNftId(data.getId());
-            attributeEntity.setMintAddress(data.getMintAddress());
-            attributeEntity.setGrade(equipment.getLvl());
-            attributeEntity.setDurability(durability);
-            attributeEntity.setSpecialAttrDesc(equipment.getSpecialAttrDesc());
-            attributeEntity.setPassiveAttrDesc(equipment.getPassiveAttrDesc());
-            attributeEntity.setBaseAttrValue(equipment.getBaseAttrValue());
-            attributeEntity.setRarityAttrValue(equipment.getRarityAttrValue());
-
-            attributeService.save(attributeEntity);
-
+            insetAttr(equipment, data, durability, rarityAttr);
             // 更新event事件状态
             nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTED.getCode());
             this.updateById(nftEvent);
@@ -387,7 +372,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         HttpResponse response = null;
         try {
             response = HttpRequest.get(url)
-                    .timeout(5 * 1000)
+                    .timeout(30 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
         } catch (Exception e) {
@@ -395,6 +380,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             //   recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
         }
         JSONObject jsonObject = JSONObject.parseObject(response.body());
+        log.info(" 合成成功--result:{}", jsonObject);
         if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
             data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
             NftEvent nftEvent = this.getById(req.getEventId());
@@ -404,5 +390,28 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             updateLocalDB(req.getAutoDeposite(), data.getMintAddress(), nftEvent, equipment, data);
         }
 
+    }
+
+    private void insetAttr(NftEventEquipment equipment, MintSuccessMessageResp data, int durability, int rarityAttr) {
+        NftAttributeEntity attributeEntity = new NftAttributeEntity();
+        attributeEntity.setEqNftId(data.getId());
+        attributeEntity.setMintAddress(data.getMintAddress());
+        attributeEntity.setGrade(equipment.getLvl());
+        attributeEntity.setDurability(durability);
+        attributeEntity.setRarityAttr(rarityAttr);
+        attributeEntity.setSpecialAttrDesc(equipment.getSpecialAttrDesc());
+        attributeEntity.setPassiveAttrDesc(equipment.getPassiveAttrDesc());
+        attributeEntity.setBaseAttrValue(equipment.getBaseAttrValue());
+        attributeEntity.setRarityAttrValue(equipment.getRarityAttrValue());
+        attributeService.save(attributeEntity);
+    }
+
+    private void recordNftEventLog(Long eventId, String mintAddress) {
+        // 记录失败日志
+        UpdateBackpackErrorLog backpackErrorLog = new UpdateBackpackErrorLog();
+        backpackErrorLog.setEventId(eventId);
+        backpackErrorLog.setMintAddress(mintAddress);
+        backpackErrorLog.setCreatedAt(System.currentTimeMillis());
+        updateBackpackErrorLogService.save(backpackErrorLog);
     }
 }
