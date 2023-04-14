@@ -569,8 +569,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         list = list.stream().map(p -> {
             NftPublicBackpackWebResp resp = new NftPublicBackpackWebResp();
             BeanUtils.copyProperties(p, resp);
-            ServerRegionEntity serverRegionEntity = this.getServerRegionEntity(p.getServerRoleId());
-            resp.setServerName(serverRegionEntity.getGameServerName());
+            if (p.getServerRoleId().equals(NFTEnumConstant.NFTTransEnum.BACKPACK.getCode())) {
+                resp.setServerName(NFTEnumConstant.NFTTransEnum.BACKPACK.getDesc());
+            }
+            ServerRegionEntity serverRegionEntity = serverRegionService.queryByServerRoleId(p.getServerRoleId());
+            if (Objects.nonNull(serverRegionEntity)) {
+                resp.setServerName(serverRegionEntity.getGameServerName());
+            }
             return resp;
         }).collect(Collectors.toList());
         return list;

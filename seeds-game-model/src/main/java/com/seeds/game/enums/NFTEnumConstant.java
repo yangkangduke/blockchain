@@ -55,11 +55,12 @@ public class NFTEnumConstant {
     @Getter
     public enum NFTTransEnum {
 
-        BACKPACK("backpack");
-
+        BACKPACK(0, "My Package");
+        private final int code;
         private final String desc;
 
-        NFTTransEnum(String desc) {
+        NFTTransEnum(int code, String desc) {
+            this.code = code;
             this.desc = desc;
         }
     }
