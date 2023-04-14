@@ -121,12 +121,13 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
             backpackEntity.setUpdatedBy(nftEvent.getUserId());
             backpackEntity.setCreatedAt(System.currentTimeMillis());
             backpackEntity.setUpdatedAt(System.currentTimeMillis());
-            backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
             if (mintSuccessReq.getAutoDeposite().equals(WhetherEnum.YES.value())) {
                 // 自动托管
+                backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.ASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
             } else {
+                backpackEntity.setServerRoleId(0L);
                 backpackEntity.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
                 backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
             }
@@ -138,19 +139,16 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
             backpackEntity.setAutoId(equipment.getAutoId());
             backpackEntity.setItemId(equipment.getConfigId());
             backpackEntity.setGrade(equipment.getLvl());
-            HashMap<String, Object> attr = new HashMap<>();
-
-            attr.put("level", equipment.getLvl());
-            Integer durability = null;
+            int durability = 0;
+            int rarityAttr = 0;
             try {
                 JSONObject jsonObject = JSONObject.parseObject(equipment.getAttributes());
-                durability = Integer.valueOf(jsonObject.getString("durability"));
-                attr.put("durability", durability);
+                durability = (int) jsonObject.get("durability");
+                rarityAttr = (int) jsonObject.get("rarityAttr");
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            String jsonStr = JSONUtil.toJsonStr(attr);
-            backpackEntity.setAttributes(jsonStr);
+            backpackEntity.setAttributes(equipment.getAttributes());
             // 设置参考价，TODO  根据规则来设置  先设置成固定值
             backpackEntity.setProposedPrice(new BigDecimal(Math.random() * (10 - 1) + 1).setScale(2, RoundingMode.HALF_UP));
             nftPublicBackpackService.save(backpackEntity);
@@ -165,20 +163,7 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
                 nftbackpack.setState(NFTEnumConstant.NFTStateEnum.BURNED.getCode());
                 nftPublicBackpackService.updateById(nftbackpack);
             }
-            //  插入属性表
-            NftAttributeEntity attributeEntity = new NftAttributeEntity();
-            attributeEntity.setEqNftId(data.getId());
-            attributeEntity.setMintAddress(data.getMintAddress());
-            attributeEntity.setGrade(equipment.getLvl());
-            attributeEntity.setDurability(durability);
-            try {
-                attributeEntity.setBaseAttrValue(URLDecoder.decode(equipment.getBaseAttrValue(), "UTF-8"));
-                attributeEntity.setRarityAttrValue(URLDecoder.decode(equipment.getRarityAttrValue(), "UTF-8"));
-
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            attributeService.save(attributeEntity);
+            insetAttr(equipment, data, durability, rarityAttr);
 
             // 更新event事件状态
             nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTED.getCode());
@@ -249,5 +234,19 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
         errorLog.setParams(params);
         errorLog.setMsg(msg);
         callGameApiLogService.save(errorLog);
+    }
+
+    private void insetAttr(NftEventEquipment equipment, MintSuccessMessageResp data, int durability, int rarityAttr) {
+        NftAttributeEntity attributeEntity = new NftAttributeEntity();
+        attributeEntity.setEqNftId(data.getId());
+        attributeEntity.setMintAddress(data.getMintAddress());
+        attributeEntity.setGrade(equipment.getLvl());
+        attributeEntity.setDurability(durability);
+        attributeEntity.setRarityAttr(rarityAttr);
+        attributeEntity.setSpecialAttrDesc(equipment.getSpecialAttrDesc());
+        attributeEntity.setPassiveAttrDesc(equipment.getPassiveAttrDesc());
+        attributeEntity.setBaseAttrValue(equipment.getBaseAttrValue());
+        attributeEntity.setRarityAttrValue(equipment.getRarityAttrValue());
+        attributeService.save(attributeEntity);
     }
 }
