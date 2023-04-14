@@ -164,7 +164,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             try {
                 p.setBaseAttrValue(URLDecoder.decode(p.getBaseAttrValue(), "UTF-8"));
                 p.setRarityAttrValue(URLDecoder.decode(p.getRarityAttrValue(), "UTF-8"));
-                p.setSpecialAttrDesc(URLDecoder.decode(p.getSpecialAttrDesc(), "UTF-8"));
+                p.setSpecialAttrDesc(handleStr(URLDecoder.decode(p.getSpecialAttrDesc(), "UTF-8")));
                 p.setPassiveAttrDesc(URLDecoder.decode(p.getPassiveAttrDesc(), "UTF-8"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -413,5 +413,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         backpackErrorLog.setMintAddress(mintAddress);
         backpackErrorLog.setCreatedAt(System.currentTimeMillis());
         updateBackpackErrorLogService.save(backpackErrorLog);
+    }
+
+
+    private String handleStr(String str) {
+        // 去除方括号以及方括号中的字符
+        return str.replaceAll("\\[.+?\\]", "");
     }
 }
