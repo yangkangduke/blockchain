@@ -101,6 +101,19 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (nftEquipment == null) {
             return resp;
         }
+        NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftId);
+        if (publicBackpack != null) {
+            BeanUtils.copyProperties(publicBackpack, resp);
+            resp.setAttributes(JSON.parseObject(publicBackpack.getAttributes(), Map.class));
+            resp.setMetadata(JSON.parseObject(publicBackpack.getMetadata(), Map.class));
+            resp.setReferencePrice(publicBackpack.getProposedPrice());
+            resp.setServerRoleId(publicBackpack.getServerRoleId());
+            resp.setAutoId(publicBackpack.getAutoId());
+        }
+        NftAttributeEntity nftAttribute = nftAttributeService.queryByNftId(nftId);
+        if (nftAttribute != null) {
+            BeanUtils.copyProperties(nftAttribute, resp);
+        }
         UcUserResp ucUserResp = null;
         try {
             GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
@@ -138,15 +151,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 resp.setCurrentPrice(order.getPrice());
                 resp.setListReceipt(order.getListReceipt());
             }
-        }
-        NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftId);
-        if (publicBackpack != null) {
-            BeanUtils.copyProperties(publicBackpack, resp);
-            resp.setAttributes(JSON.parseObject(publicBackpack.getAttributes(), Map.class));
-            resp.setMetadata(JSON.parseObject(publicBackpack.getMetadata(), Map.class));
-            resp.setReferencePrice(publicBackpack.getProposedPrice());
-            resp.setServerRoleId(publicBackpack.getServerRoleId());
-            resp.setAutoId(publicBackpack.getAutoId());
         }
         BeanUtils.copyProperties(nftEquipment, resp);
         resp.setOwnerAddress(nftEquipment.getOwner());

@@ -164,7 +164,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             try {
                 p.setBaseAttrValue(URLDecoder.decode(p.getBaseAttrValue(), "UTF-8"));
                 p.setRarityAttrValue(URLDecoder.decode(p.getRarityAttrValue(), "UTF-8"));
-                p.setSpecialAttrDesc(URLDecoder.decode(p.getSpecialAttrDesc(), "UTF-8"));
+                p.setSpecialAttrDesc(handleStr(URLDecoder.decode(p.getSpecialAttrDesc(), "UTF-8")));
                 p.setPassiveAttrDesc(URLDecoder.decode(p.getPassiveAttrDesc(), "UTF-8"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -366,7 +366,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         // 调用/api/chainOp/buySuccess通知，购买成功
         String params = String.format("isDeposit=%s&mintAddresses=%s&sig=%s&walletAddress=%s", req.getAutoDeposite(), req.getMintAddresses(), req.getSig(), req.getWalletAddress());
         // 调用/api/equipment/compose  合成成功
-        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCompose();
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCompose() + "?" + params;
         log.info("合成成功，开始通知， url:{}， params:{}", url, params);
         MintSuccessMessageResp data = null;
         HttpResponse response = null;
@@ -413,5 +413,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         backpackErrorLog.setMintAddress(mintAddress);
         backpackErrorLog.setCreatedAt(System.currentTimeMillis());
         updateBackpackErrorLogService.save(backpackErrorLog);
+    }
+
+
+    private String handleStr(String str) {
+        // 去除方括号以及方括号中的字符
+        return str.replaceAll("\\[.+?\\]", "");
     }
 }
