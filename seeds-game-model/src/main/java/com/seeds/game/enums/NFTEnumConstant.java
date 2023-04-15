@@ -134,5 +134,32 @@ public class NFTEnumConstant {
         }
     }
 
+    @Getter
+    public enum EquMetadataAttrEnum {
+
+        CONFIGID("ConfigId"),
+        AUTOID("AutoId"),
+        DURABILITY("Durability"),
+        RAREATTRIBUTE("RareAttribute"),
+        QUALITY("Quality");
+
+        private String name;
+
+        EquMetadataAttrEnum(String name) {
+            this.name = name;
+        }
+    }
+
+    @Getter
+    public enum TokenNamePreEnum {
+
+        SEQN("Seqn #");
+        private String name;
+
+        TokenNamePreEnum(String name) {
+            this.name = name;
+        }
+    }
+
 
 }

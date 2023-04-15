@@ -20,6 +20,10 @@ public class FileProperties {
 	 * 默认的存储桶名称
 	 */
 	private String bucketName = "local";
+	/**
+	 * metadata 的存储桶名称
+	 */
+	private String metadataBucket = "metadata";
 
 	/**
 	 * 本地文件配置信息

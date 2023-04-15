@@ -51,4 +51,7 @@ public class KafkaTopic {
     public final String SERVER_ROLE_INSERT = "SERVER_ROLE_INSERT";
     public final String SERVER_ROLE_UPDATE = "SERVER_ROLE_UPDATE";
     public final String SERVER_ROLE_DELETE = "SERVER_ROLE_DELETE";
+
+    // NFT MINT
+    public final String NFT_MINT_SUCCESS = "NFT_MINT_SUCCESS";
 }

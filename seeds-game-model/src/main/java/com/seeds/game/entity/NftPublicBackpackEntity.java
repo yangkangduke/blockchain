@@ -103,6 +103,8 @@ public class NftPublicBackpackEntity implements Serializable {
     @ApiModelProperty("nft元数据，存json")
     private String metadata;
 
+    private String metadataUrl;
+
     @ApiModelProperty("nft价格")
     private BigDecimal price;
 
