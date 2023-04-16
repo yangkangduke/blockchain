@@ -2,6 +2,7 @@ package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.dto.request.ListReq;
+import com.seeds.admin.dto.request.SysApplyAutoIdsReq;
 import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
 import com.seeds.admin.dto.request.SysNftPicPageReq;
 import com.seeds.admin.dto.response.SysNftPicResp;
@@ -63,5 +64,18 @@ public class SysNftPicController {
     @PostMapping("/getPackageDownload")
     public void getPackageDownload(HttpServletResponse response, @Valid @RequestBody ListReq req) {
         sysNftPicService.getPackageDownload(response, req);
+    }
+
+    /**
+     * 申请autoIds
+     *
+     * @param
+     * @return
+     */
+    @ApiOperation(value = "申请autoIds")
+    @PostMapping("/apply-autoIds")
+    public GenericDto<Object> applyAutoIds(@RequestBody SysApplyAutoIdsReq ids) {
+        sysNftPicService.applyAutoIds(ids);
+        return GenericDto.success(null);
     }
 }

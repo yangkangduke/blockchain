@@ -19,6 +19,8 @@ public enum ApiType {
     NFT_PACKAGE_TAKEBACK(6, "公共背包-收回nft"),
     NFT_TO_NFT_NOTIFY(7, "toNft通知"),
     DEPOSIT_CHECK(8, "deposit 校验"),
+    APPLY_AUTOID(9, "申请autoID"),
+    SEND_TOKEN_ADDRESS(10, "皮肤mint成功后推送tokenAddress"),
     ;
 
     @JsonValue
