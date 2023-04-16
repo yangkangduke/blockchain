@@ -41,8 +41,8 @@
         t1.eq_nft_id,
         t1.server_role_id,
         t2.durability,
-        t2.base_attr_value,
-        t2.rarity_attr_value,
+        t2.base_attr_value as baseAttr,
+        t2.rarity_attr_value as rarityAttr,
         t2.special_attr_desc,
         t2.passive_attr_desc
         from ga_nft_public_backpack t1
