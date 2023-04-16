@@ -8,9 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.enums.WhetherEnum;
@@ -36,7 +34,6 @@ import com.seeds.game.mq.producer.KafkaProducer;
 import com.seeds.game.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
-import org.apache.ibatis.binding.MapperMethod;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -47,11 +44,9 @@ import org.springframework.util.CollectionUtils;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -368,7 +363,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                     nftBackpack.setState(NFTEnumConstant.NFTStateEnum.BURNED.getCode());
                     return nftBackpack;
                 }).collect(Collectors.toList());
-                updateBatchByQueryWrapper(updateList, item ->
+                nftPublicBackpackService.updateBatchByQueryWrapper(updateList, item ->
                         new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, item.getAutoId()));
             }
             //  插入属性表
@@ -412,6 +407,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         }
 
     }
+
 
     private void insetAttr(NftEventEquipment equipment, MintSuccessMessageResp data, int durability, int rarityAttr) {
         NftAttributeEntity attributeEntity = new NftAttributeEntity();
@@ -463,17 +459,5 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         metadataAttrDto.setName(NFTEnumConstant.TokenNamePreEnum.SEQN.getName() + tokenId);
         kafkaProducer.sendAsync(KafkaTopic.NFT_MINT_SUCCESS, JSONUtil.toJsonStr(metadataAttrDto));
         log.info("tokenId:{},发送【metadata】数据：{}", tokenId, JSONUtil.toJsonStr(metadataAttrDto));
-    }
-
-
-    @Transactional(rollbackFor = Exception.class)
-    public boolean updateBatchByQueryWrapper(Collection<NftPublicBackpackEntity> entityList, Function<NftPublicBackpackEntity, LambdaQueryWrapper> wrapperFunction) {
-        String sqlStatement = this.getSqlStatement(SqlMethod.UPDATE);
-        return this.executeBatch(entityList, DEFAULT_BATCH_SIZE, (sqlSession, entity) -> {
-            MapperMethod.ParamMap param = new MapperMethod.ParamMap();
-            param.put(Constants.ENTITY, entity);
-            param.put(Constants.WRAPPER, wrapperFunction.apply(entity));
-            sqlSession.update(sqlStatement, param);
-        });
     }
 }

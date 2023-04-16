@@ -1,5 +1,6 @@
 package com.seeds.game.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.game.dto.request.*;
@@ -8,9 +9,10 @@ import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -95,4 +97,13 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     Map<Long, BigDecimal> getTotalPrice(String autoIds);
 
     Boolean depositCheck(NftDepositCheckReq req);
+
+    /**
+     * 根据指定字段批量更新
+     * @param entityList
+     * @param wrapperFunction
+     * @return
+     */
+    boolean updateBatchByQueryWrapper(Collection<NftPublicBackpackEntity> entityList, Function<NftPublicBackpackEntity, LambdaQueryWrapper> wrapperFunction);
+
 }
