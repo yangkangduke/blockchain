@@ -94,7 +94,7 @@ public class NftPublicBackpackEntity implements Serializable {
     @ApiModelProperty("是否分配。0未分配 1已分配")
     private Integer isConfiguration;
 
-    @ApiModelProperty("状态 1 MINTED (mint成功)，2 LOCK (作为合成材料被临时锁定)，3 DEPOSITED (托管给平台) 4 UNDEPOSITED (解除托管)  5 on shelf 6 on auction 7 结算中   ")
+    @ApiModelProperty("状态 1 burn，2 LOCK (作为合成材料被临时锁定)，3 DEPOSITED (托管给平台) 4 UNDEPOSITED (解除托管)  5 on shelf 6 on auction 7 结算中   ")
     private Integer state;
 
     @ApiModelProperty("动态属性，存json")
