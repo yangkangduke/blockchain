@@ -1,6 +1,7 @@
 package com.seeds.admin.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.seeds.admin.enums.AutoIdApplyStateEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -120,4 +121,11 @@ public class SysNftPicEntity extends BaseEntity {
      */
     @TableField("his_id")
     private Long hisId;
+
+    @TableField("apply_state")
+    /**
+     * @see AutoIdApplyStateEnum
+     *
+     */
+    private Integer applyState;
 }

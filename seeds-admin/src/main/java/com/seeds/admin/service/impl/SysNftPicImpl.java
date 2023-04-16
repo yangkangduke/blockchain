@@ -5,40 +5,53 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.dto.SkinNftPushAutoIdReq;
 import com.seeds.admin.dto.SysNFTAttrDto;
 import com.seeds.admin.dto.SysNFTAttrJSONDto;
+import com.seeds.admin.dto.game.GameApplyAutoIdsDto;
 import com.seeds.admin.dto.request.ListReq;
+import com.seeds.admin.dto.request.SysApplyAutoIdsReq;
 import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
 import com.seeds.admin.dto.request.SysNftPicPageReq;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
+import com.seeds.admin.enums.AutoIdApplyStateEnum;
 import com.seeds.admin.enums.NftAttrEnum;
+import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.mapper.SysNftPicMapper;
 import com.seeds.admin.mq.producer.KafkaProducer;
+import com.seeds.admin.service.SysGameApiService;
 import com.seeds.admin.service.SysNftPicService;
 import com.seeds.admin.utils.CsvUtils;
 import com.seeds.common.constant.mq.KafkaTopic;
+import com.seeds.common.enums.ApiType;
 import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.uc.exceptions.GenericException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.binding.MapperMethod;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -53,6 +66,10 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
 
     @Autowired
     private FileTemplate template;
+
+    @Autowired
+    private SysGameApiService gameApiService;
+
 
     @Override
     public IPage<SysNftPicResp> queryPage(SysNftPicPageReq req) {
@@ -275,6 +292,66 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         }
     }
 
+    @Override
+    public void applyAutoIds(SysApplyAutoIdsReq ids) {
+        Set<Long> noApplyIds = this.list(new LambdaQueryWrapper<SysNftPicEntity>()
+                .in(SysNftPicEntity::getConfId, ids.getConfigIds())
+                .eq(SysNftPicEntity::getApplyState, AutoIdApplyStateEnum.NO_APPLY.getCode()))
+                .stream()
+                .map(p -> p.getConfId())
+                .collect(Collectors.toSet());
+        GameApplyAutoIdsDto dto = new GameApplyAutoIdsDto();
+        dto.setConfigIds(noApplyIds);
+        List<String> url = gameApiService.queryUrlByGameAndType(1L, ApiType.APPLY_AUTOID.getCode());
+        String applyUrl = url.get(0);
+        String param = JSONUtil.toJsonStr(dto);
+        log.info("调用游戏方接口申请autoId, url:{}， params:{}", url, param);
+        try {
+            HttpResponse response = HttpRequest.post(applyUrl)
+                    .timeout(5 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+            log.info("调用游戏方接口申请autoId,接口返回result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            int ret = (int) jsonObject.get("ret");
+            if (ret == 0) {
+                List<SysNftPicEntity> updateList = noApplyIds.stream().map(p -> {
+                    SysNftPicEntity entity = new SysNftPicEntity();
+                    entity.setConfId(p);
+                    entity.setApplyState(AutoIdApplyStateEnum.APPLYING.getCode());
+                    return entity;
+                }).collect(Collectors.toList());
+                this.updateBatchByQueryWrapper(updateList, item ->
+                        new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getConfId, item.getConfId()));
+            }
+
+        } catch (Exception e) {
+            log.error("调用游戏方接口申请autoId失败，message：{}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void pushAutoId(SkinNftPushAutoIdReq req) {
+        Set<Long> configIds = req.getAutoIds().keySet();
+        List<Long> validConfigIds = this.list(new LambdaQueryWrapper<SysNftPicEntity>()
+                .in(SysNftPicEntity::getConfId, configIds)
+                .eq(SysNftPicEntity::getAutoId, WhetherEnum.NO.value()))
+                .stream()
+                .map(p -> p.getConfId())
+                .collect(Collectors.toList());
+
+        List<SysNftPicEntity> updateList = req.getAutoIds().keySet().stream().filter(i -> validConfigIds.contains(i)).map(p -> {
+            SysNftPicEntity entity = new SysNftPicEntity();
+            entity.setConfId(p);
+            entity.setAutoId(req.getAutoIds().get(p));
+            entity.setApplyState(AutoIdApplyStateEnum.APPLIED.getCode());
+            return entity;
+        }).collect(Collectors.toList());
+        this.updateBatchByQueryWrapper(updateList, item ->
+                new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getConfId, item.getConfId()));
+    }
+
     private void fileToZip(String filePath, ZipOutputStream zipOut) throws IOException {
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
         //创建文件输入流
@@ -296,5 +373,17 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         // 需要注意的是缓冲流必须要关闭流,否则输出无效
         bufferStream.close();
         // 压缩流不必关闭,使用完后再关
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateBatchByQueryWrapper(Collection<SysNftPicEntity> entityList, Function<SysNftPicEntity, LambdaQueryWrapper> wrapperFunction) {
+        String sqlStatement = this.getSqlStatement(SqlMethod.UPDATE);
+        return this.executeBatch(entityList, DEFAULT_BATCH_SIZE, (sqlSession, entity) -> {
+            MapperMethod.ParamMap param = new MapperMethod.ParamMap();
+            param.put(Constants.ENTITY, entity);
+            param.put(Constants.WRAPPER, wrapperFunction.apply(entity));
+            sqlSession.update(sqlStatement, param);
+        });
     }
 }

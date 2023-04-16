@@ -26,6 +26,7 @@ import com.seeds.game.entity.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
+import com.seeds.game.enums.NftRarityEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftPublicBackpackMapper;
 import com.seeds.game.mq.producer.KafkaProducer;
@@ -138,7 +139,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         entity.setUpdatedAt(System.currentTimeMillis());
         entity.setUpdatedBy(req.getUserId());
         this.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
+        // 更新nft属性表
+        if (Objects.nonNull(req.getAttributes())) {
+            updateAttr(req);
+        }
     }
+
 
     @Override
     public NftPublicBackpackResp detail(Integer autoId) {
@@ -569,8 +575,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         list = list.stream().map(p -> {
             NftPublicBackpackWebResp resp = new NftPublicBackpackWebResp();
             BeanUtils.copyProperties(p, resp);
-            ServerRegionEntity serverRegionEntity = this.getServerRegionEntity(p.getServerRoleId());
-            resp.setServerName(serverRegionEntity.getGameServerName());
+            if (p.getServerRoleId().equals(NFTEnumConstant.NFTTransEnum.BACKPACK.getCode())) {
+                resp.setServerName(NFTEnumConstant.NFTTransEnum.BACKPACK.getDesc());
+            }
+            ServerRegionEntity serverRegionEntity = serverRegionService.queryByServerRoleId(p.getServerRoleId());
+            if (Objects.nonNull(serverRegionEntity)) {
+                resp.setServerName(serverRegionEntity.getGameServerName());
+            }
             return resp;
         }).collect(Collectors.toList());
         return list;
@@ -797,4 +808,27 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         return serverRegion;
     }
 
+    private void updateAttr(NftPublicBackpackReq req) {
+        NftAttributesDto attributesDto = JSONUtil.toBean(req.getAttributes(), NftAttributesDto.class);
+        NftPublicBackpackEntity backpackEntity = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
+        NftAttributeEntity nftAttributeEntity = new NftAttributeEntity();
+        if (backpackEntity.getType().equals(NFTEnumConstant.NftTypeEnum.HERO.getCode())) {
+            nftAttributeEntity.setVictory(attributesDto.getWin());
+            nftAttributeEntity.setLose(attributesDto.getDefeat());
+            nftAttributeEntity.setMaxStreak(attributesDto.getSeqWin());
+            nftAttributeEntity.setMaxLose(attributesDto.getSeqDefeat());
+            nftAttributeEntity.setCapture(attributesDto.getKillPlayer());
+            nftAttributeEntity.setKillingSpree(attributesDto.getSeqKill());
+            nftAttributeEntity.setGoblinKill(attributesDto.getKillNpc());
+            nftAttributeEntity.setSlaying(attributesDto.getKilledByPlayer());
+            nftAttributeEntity.setGoblin(attributesDto.getKilledByNpc());
+            if (StringUtils.isNotBlank(attributesDto.getRarity())) {
+                nftAttributeEntity.setRarity(NftRarityEnum.codeOfDesc(attributesDto.getRarity()));
+            }
+        } else {
+            nftAttributeEntity.setDurability(attributesDto.getDurability());
+            nftAttributeEntity.setRarityAttr(attributesDto.getRarityAttr());
+        }
+        attributeService.update(nftAttributeEntity, new LambdaUpdateWrapper<NftAttributeEntity>().eq(NftAttributeEntity::getEqNftId, backpackEntity.getEqNftId()));
+    }
 }

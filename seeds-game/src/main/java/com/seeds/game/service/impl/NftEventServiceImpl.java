@@ -12,8 +12,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.game.config.SeedsApiConfig;
+import com.seeds.game.dto.MetadataAttrDto;
 import com.seeds.game.dto.request.ComposeSuccessReq;
 import com.seeds.game.dto.request.MintSuccessReq;
 import com.seeds.game.dto.request.NftMintSuccessReq;
@@ -29,6 +31,7 @@ import com.seeds.game.entity.*;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
 import com.seeds.game.mapper.NftEventMapper;
+import com.seeds.game.mq.producer.KafkaProducer;
 import com.seeds.game.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
@@ -81,6 +84,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Autowired
     private NftMarketPlaceService marketPlaceService;
 
+    @Autowired
+    private KafkaProducer kafkaProducer;
 
     @Autowired
     private IAsyncNotifyGameService asyncNotifyGameService;
@@ -255,7 +260,9 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         JSONObject jsonObject = JSONObject.parseObject(response.body());
         log.info(" mint成功--result:{}", jsonObject);
         if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+            // 生成metadata
             data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
+            createMetadata(equipment, data.getTokenId());
         } else {
             log.error("mint成功，通知失败，message：{}", jsonObject.get("message"));
             recordNftEventLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
@@ -264,6 +271,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         // 通知游戏方，更新本地数据库
         updateLocalDB(mintSuccessReq.getAutoDeposite(), mintSuccessReq.getMintAddress(), nftEvent, equipment, data);
     }
+
 
     @Override
     public void mintSuccessCallback(MintSuccessReq req) {
@@ -280,6 +288,8 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
         MintSuccessMessageResp data = new MintSuccessMessageResp();
         BeanUtils.copyProperties(req, data);
+        //生成metadata
+        createMetadata(equipment, data.getTokenId());
         // 通知游戏方，更新本地数据库
         updateLocalDB(mintSuccessReq.getAutoDeposite(), req.getMintAddress(), nftEvent, equipment, data);
 
@@ -387,8 +397,10 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             NftEvent nftEvent = this.getById(req.getEventId());
             NftEventEquipment equipment = eventEquipmentService
                     .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-
             updateLocalDB(req.getAutoDeposite(), data.getMintAddress(), nftEvent, equipment, data);
+
+            //生成metadata
+            createMetadata(equipment, data.getTokenId());
         }
 
     }
@@ -420,5 +432,28 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     private static String handleStr(String str) {
         // 去除方括号以及方括号中的字符
         return str.replaceAll("\\[.+?\\]", "").replace("Blade buff", "");
+    }
+
+    private void createMetadata(NftEventEquipment equipment, Long tokenId) {
+        MetadataAttrDto metadataAttrDto = new MetadataAttrDto();
+        metadataAttrDto.setConfigId(equipment.getConfigId());
+        metadataAttrDto.setAutoId(equipment.getAutoId());
+        int durability = 0;
+        int rarityAttr = 0;
+        try {
+            JSONObject attr = JSONObject.parseObject(equipment.getAttributes());
+            durability = (int) attr.get("durability");
+            rarityAttr = (int) attr.get("rarityAttr");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        metadataAttrDto.setTokenId(tokenId.intValue());
+        metadataAttrDto.setDurability(durability);
+        metadataAttrDto.setQuality(equipment.getLvl());
+        metadataAttrDto.setRareAttribute(rarityAttr);
+        metadataAttrDto.setImage(equipment.getImageUrl());
+        metadataAttrDto.setName(NFTEnumConstant.TokenNamePreEnum.SEQN.getName() + tokenId);
+        kafkaProducer.sendAsync(KafkaTopic.NFT_MINT_SUCCESS, JSONUtil.toJsonStr(metadataAttrDto));
+        log.info("tokenId:{},发送【metadata】数据：{}", tokenId, JSONUtil.toJsonStr(metadataAttrDto));
     }
 }
