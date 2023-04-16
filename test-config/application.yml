@@ -40,6 +40,7 @@ ftp:
 
 file:
   bucketName: seeds # 上文创建的桶名称
+  metadataBucket: metadata # metadata存放位置，设置为公开访问
   oss:
     enable: true
     endpoint: http://192.168.6.100:9000
