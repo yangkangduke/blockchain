@@ -8,7 +8,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.enums.WhetherEnum;
@@ -35,6 +37,7 @@ import com.seeds.game.mq.producer.KafkaProducer;
 import com.seeds.game.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
+import org.apache.ibatis.binding.MapperMethod;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -46,9 +49,11 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URLDecoder;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -355,13 +360,19 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             nftPublicBackpackService.save(backpackEntity);
             // 如果是合成，作为合成材料的nft标记为销毁的状态
             if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
-                NftEventEquipment consumeNft = eventEquipmentService
-                        .getOne(new LambdaQueryWrapper<NftEventEquipment>()
+                List<NftEventEquipment> consumeNfts = eventEquipmentService
+                        .list(new LambdaQueryWrapper<NftEventEquipment>()
                                 .eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.YES.value())
                                 .eq(NftEventEquipment::getIsNft, WhetherEnum.YES.value()));
-                NftPublicBackpackEntity nftbackpack = nftPublicBackpackService.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, consumeNft.getAutoId()));
-                nftbackpack.setState(NFTEnumConstant.NFTStateEnum.BURNED.getCode());
-                nftPublicBackpackService.updateById(nftbackpack);
+
+                List<NftPublicBackpackEntity> updateList = consumeNfts.stream().map(p -> {
+                    NftPublicBackpackEntity nftBackpack = new NftPublicBackpackEntity();
+                    nftBackpack.setAutoId(p.getAutoId());
+                    nftBackpack.setState(NFTEnumConstant.NFTStateEnum.BURNED.getCode());
+                    return nftBackpack;
+                }).collect(Collectors.toList());
+                updateBatchByQueryWrapper(updateList, item ->
+                        new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, item.getAutoId()));
             }
             //  插入属性表
             insetAttr(equipment, data, durability, rarityAttr);
@@ -455,5 +466,17 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         metadataAttrDto.setName(NFTEnumConstant.TokenNamePreEnum.SEQN.getName() + tokenId);
         kafkaProducer.sendAsync(KafkaTopic.NFT_MINT_SUCCESS, JSONUtil.toJsonStr(metadataAttrDto));
         log.info("tokenId:{},发送【metadata】数据：{}", tokenId, JSONUtil.toJsonStr(metadataAttrDto));
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateBatchByQueryWrapper(Collection<NftPublicBackpackEntity> entityList, Function<NftPublicBackpackEntity, LambdaQueryWrapper> wrapperFunction) {
+        String sqlStatement = this.getSqlStatement(SqlMethod.UPDATE);
+        return this.executeBatch(entityList, DEFAULT_BATCH_SIZE, (sqlSession, entity) -> {
+            MapperMethod.ParamMap param = new MapperMethod.ParamMap();
+            param.put(Constants.ENTITY, entity);
+            param.put(Constants.WRAPPER, wrapperFunction.apply(entity));
+            sqlSession.update(sqlStatement, param);
+        });
     }
 }
