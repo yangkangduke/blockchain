@@ -106,9 +106,12 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         }
         // 获取事件涉及的装备
         List<Long> eventIds = records.stream().map(p -> p.getId()).collect(Collectors.toList());
-        Map<Long, List<NftEventEquipment>> map = eventEquipmentService.list(new LambdaQueryWrapper<NftEventEquipment>().in(NftEventEquipment::getEventId, eventIds))
+        List<NftEventEquipment> eventEquipments = eventEquipmentService.list(new LambdaQueryWrapper<NftEventEquipment>().in(NftEventEquipment::getEventId, eventIds));
+        Map<Long, List<NftEventEquipment>> map = eventEquipments
                 .stream().collect(Collectors.groupingBy(NftEventEquipment::getEventId));
 
+        List<Long> autoIds = eventEquipments.stream().map(p -> p.getAutoId()).collect(Collectors.toList());
+        Map<Long, String> autoIdTokneAddressMap = nftPublicBackpackService.queryTokenAddressByAutoIds(autoIds);
         // 更新未读数（click设置为以点击）
         baseMapper.updateClick(req.getType(), req.getUserId());
 
@@ -119,7 +122,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             if (!CollectionUtils.isEmpty(equipments)) {
                 List<NftEventEquipmentResp> equipmentResps = CglibUtil.copyList(equipments, NftEventEquipmentResp::new);
                 equipmentResps.forEach(i -> {
-                    i.setMintAddress(nftPublicBackpackService.queryTokenAddressByAutoId(i.getAutoId()));
+                    i.setMintAddress(autoIdTokneAddressMap.get(i.getAutoId()));
                 });
                 resp.setEventEquipments(equipmentResps);
             }
@@ -213,12 +216,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         NftEventEquipment equipment = eventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
         asyncNotifyGameService.callGameNotify(event.getServerRoleId(), WhetherEnum.NO.value(), NFTEnumConstant.NftEventOptEnum.CANCEL.getCode(), "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId());
         // 更新本地数据库
-        List<NftEventEquipment> equipments = eventEquipmentService.list(new LambdaQueryWrapper<NftEventEquipment>().in(NftEventEquipment::getEventId, id));
-        equipments.stream().forEach(p -> {
-            p.setAutoId(p.getAutoId() * 10);
-        });
-        eventEquipmentService.updateBatchById(equipments);
-
         return this.updateById(nftEvent);
     }
 
