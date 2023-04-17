@@ -6,6 +6,7 @@ import com.seeds.game.dto.request.NftActivityPageReq;
 import com.seeds.game.dto.response.NftActivityResp;
 import com.seeds.game.entity.NftActivity;
 
+
 /**
  * <p>
  * nft活动记录
@@ -22,5 +23,12 @@ public interface INftActivityService extends IService<NftActivity> {
      * @return NFT活动信息
      */
     IPage<NftActivityResp> queryPage(NftActivityPageReq req);
+
+    /**
+     * 获取NFT最后活动时间
+     * @param mintAddress NFT地址
+     * @return NFT最后活动时间
+     */
+    Long queryLastUpdateTime(String mintAddress);
 
 }
