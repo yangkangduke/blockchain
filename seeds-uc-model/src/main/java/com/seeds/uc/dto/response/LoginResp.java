@@ -26,5 +26,7 @@ public class LoginResp {
     private ClientAuthTypeEnum authType;
     @ApiModelProperty(value = "用于刷新token")
     private String refreshToken;
+    @ApiModelProperty(value = "邀请码")
+    private String inviteCode;
 
 }

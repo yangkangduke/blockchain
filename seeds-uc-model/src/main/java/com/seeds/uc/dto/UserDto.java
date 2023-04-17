@@ -23,4 +23,5 @@ public class UserDto {
     private String email;
     private Long updatedAt;
     private Long createdAt;
+    private String inviteCode;
 }

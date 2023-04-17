@@ -90,6 +90,7 @@ public class UcUser implements Serializable {
     @ApiModelProperty("instagram地址")
     private String instagram;
 
-
+    @ApiModelProperty("邀请码")
+    private String inviteCode;
 
 }
