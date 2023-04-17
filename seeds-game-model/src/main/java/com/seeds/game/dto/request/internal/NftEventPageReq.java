@@ -33,10 +33,10 @@ public class NftEventPageReq extends PageReq {
     @Data
     public static class Sort {
         @ApiModelProperty("排序字段")
-        private String sort;
+        private String sort = "created_at";
 
         @ApiModelProperty("sortType: asc、desc ")
-        private String sortType;
+        private String sortType = "desc";
     }
 
     public static String getOrderByStatement(List<Sort> sorts) {

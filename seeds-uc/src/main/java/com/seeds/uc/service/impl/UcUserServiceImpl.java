@@ -36,10 +36,7 @@ import com.seeds.uc.model.UcFile;
 import com.seeds.uc.model.UcSecurityStrategy;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.*;
-import com.seeds.uc.util.CryptoUtils;
-import com.seeds.uc.util.PasswordUtil;
-import com.seeds.uc.util.RandomUtil;
-import com.seeds.uc.util.WebUtil;
+import com.seeds.uc.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -132,6 +129,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         this.save(ucUser);
         Long id = ucUser.getId();
 
+        ucUser.setInviteCode(InviteCode.gen(id));
+        updateById(ucUser);
+
         // 消耗邀请码
         registerWriteOffsInviteCode(registerReq.getInviteCode(), id.toString(), WhetherEnum.YES.value());
 
@@ -170,6 +170,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     ClientAuthTypeEnum.GA);
             return LoginResp.builder()
                     .token(token)
+                    .inviteCode(userDto.getInviteCode())
                     .authType(ClientAuthTypeEnum.GA)
                     .build();
         } else {
@@ -185,6 +186,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
 
             return LoginResp.builder()
                     .token(token)
+                    .inviteCode(userDto.getInviteCode())
                     .authType(ClientAuthTypeEnum.EMAIL)
                     .account(userDto.getEmail())
                     .build();
@@ -208,6 +210,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getPublicAddress, publicAddress));
         Long userId;
+        String inviteCode;
         if (one == null) {
             // 新增
             UcUser ucUser = UcUser.builder()
@@ -221,10 +224,16 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .build();
             this.save(ucUser);
             userId = ucUser.getId();
+
+            inviteCode = InviteCode.gen(userId);
+            ucUser.setInviteCode(inviteCode);
+            updateById(ucUser);
+
             // 消耗邀请码
             registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), userId.toString(), WhetherEnum.YES.value());
         } else {
             userId = one.getId();
+            inviteCode = one.getInviteCode();
             this.updateById(UcUser.builder()
                     .id(userId)
                     .nonce(genMetamaskAuth.getNonce())
@@ -245,8 +254,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .updatedAt(currentTime)
                     .build());
         }
-
-        return buildLoginResponse(userId, publicAddress);
+        LoginResp loginResp = buildLoginResponse(userId, publicAddress);
+        loginResp.setInviteCode(inviteCode);
+        return loginResp;
     }
 
     /**
@@ -264,6 +274,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         UcUser one = this.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getPublicAddress, publicAddress));
         Long userId;
+        String inviteCode;
         if (one == null) {
             // 新增
             UcUser ucUser = UcUser.builder()
@@ -277,10 +288,16 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .build();
             this.save(ucUser);
             userId = ucUser.getId();
+
+            inviteCode = InviteCode.gen(userId);
+            ucUser.setInviteCode(inviteCode);
+            updateById(ucUser);
+
             // 消耗邀请码
             registerWriteOffsInviteCode(phantomVerifyReq.getInviteCode(), userId.toString(), WhetherEnum.YES.value());
         } else {
             userId = one.getId();
+            inviteCode = one.getInviteCode();
             this.updateById(UcUser.builder()
                     .id(userId)
                     .nonce(genPhantomAuth.getNonce())
@@ -301,8 +318,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                     .updatedAt(currentTime)
                     .build());
         }
-
-        return buildLoginResponse(userId, publicAddress);
+        LoginResp loginResp = buildLoginResponse(userId, publicAddress);
+        loginResp.setInviteCode(inviteCode);
+        return loginResp;
     }
 
     /**
@@ -450,7 +468,9 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             throw new LoginException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED, messageSource.getMessage("ERR_10023_TOKEN_EXPIRED", null, LocaleContextHolder.getLocale()));
         }
 //        this.sendLoginMsg(twoFactorAuth.getAuthAccountName(), twoFactorAuth.getUserIp(), twoFactorAuth.getServiceRegion());
-        return buildLoginResponse(user.getId(), twoFactorAuth.getAuthAccountName());
+        LoginResp loginResp = buildLoginResponse(user.getId(), twoFactorAuth.getAuthAccountName());
+        loginResp.setInviteCode(user.getInviteCode());
+        return loginResp;
     }
 
     @Override
