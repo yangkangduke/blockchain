@@ -50,7 +50,7 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     NftPublicBackpackEntity queryByTokenId(String tokenId);
 
-    String queryTokenAddressByAutoId(Long autoId);
+    Map<Long, String> queryTokenAddressByAutoIds(List<Long> autoIds);
 
     void ownerTransfer(OpenNftOwnershipTransferReq req);
 
