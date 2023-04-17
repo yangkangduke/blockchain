@@ -4,7 +4,6 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -16,15 +15,13 @@ import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.common.utils.RelativeDateFormat;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.config.SeedsApiConfig;
+import com.seeds.game.config.SolanaConfig;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.external.EndAuctionMessageDto;
 import com.seeds.game.dto.request.external.EnglishAuctionReqDto;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.*;
-import com.seeds.game.enums.GameErrorCodeEnum;
-import com.seeds.game.enums.NFTEnumConstant;
-import com.seeds.game.enums.NftOrderTypeEnum;
-import com.seeds.game.enums.NftStateEnum;
+import com.seeds.game.enums.*;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
@@ -40,8 +37,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -91,6 +89,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     private UcUserService ucUserService;
 
     @Autowired
+    private SolanaConfig solanaConfig;
+
+    @Autowired
     private NftMarketOrderMapper nftMarketOrderMapper;
 
     @Override
@@ -104,11 +105,17 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftId);
         if (publicBackpack != null) {
             BeanUtils.copyProperties(publicBackpack, resp);
-            resp.setAttributes(JSON.parseObject(publicBackpack.getAttributes(), Map.class));
-            resp.setMetadata(JSON.parseObject(publicBackpack.getMetadata(), Map.class));
+            resp.setAttributes(JSONUtil.parseObj(publicBackpack.getAttributes()));
+            resp.setMetadata(JSONUtil.toList(publicBackpack.getMetadata(), cn.hutool.json.JSONObject.class));
             resp.setReferencePrice(publicBackpack.getProposedPrice());
             resp.setServerRoleId(publicBackpack.getServerRoleId());
             resp.setAutoId(publicBackpack.getAutoId());
+            resp.setEquipmentName(publicBackpack.getName());
+            if (NftTypeEnum.hero.getCode() == resp.getType()) {
+                resp.setContractAddress(solanaConfig.getSkinContractAddress());
+            } else {
+                resp.setContractAddress(solanaConfig.getEquipmentContractAddress());
+            }
         }
         NftAttributeEntity nftAttribute = nftAttributeService.queryByNftId(nftId);
         if (nftAttribute != null) {
@@ -138,10 +145,21 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     resp.setListReceipt(auctionListing.getReceipt());
                 }
                 resp.setCurrentPrice(auctionSetting.getStartPrice());
-            }
-            BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(nftEquipment.getAuctionId());
-            if (currentPrice != null) {
-                resp.setCurrentPrice(currentPrice);
+
+                BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(nftEquipment.getAuctionId());
+                if (currentPrice != null) {
+                    resp.setCurrentPrice(currentPrice);
+                }
+
+                BigDecimal difference = resp.getCurrentPrice().subtract(auctionSetting.getStartPrice())
+                        .divide(auctionSetting.getStartPrice(), 4, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(100))
+                        .setScale(0, RoundingMode.HALF_UP);
+                if (resp.getCurrentPrice().compareTo(auctionSetting.getStartPrice()) > 0) {
+                    resp.setPriceDifference(difference + "% above");
+                } else {
+                    resp.setPriceDifference(difference.abs() + "% below");
+                }
             }
         } else if (NftOrderTypeEnum.BUY_NOW.getCode() == nftEquipment.getOnSale()) {
             // 固定上架
@@ -156,8 +174,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         resp.setOwnerAddress(nftEquipment.getOwner());
         resp.setNftId(nftEquipment.getId());
         resp.setNumber("#" + nftEquipment.getTokenId());
-        resp.setLastUpdated(nftEquipment.getUpdateTime());
         resp.setState(convertOrderState(nftEquipment, auctionSetting));
+        Long lastUpdated = nftActivityService.queryLastUpdateTime(nftEquipment.getMintAddress());
+        if (lastUpdated != null) {
+            resp.setLastUpdated(RelativeDateFormat.format(new Date(lastUpdated)));
+        } else {
+            resp.setLastUpdated(RelativeDateFormat.format(new Date(nftEquipment.getUpdateTime())));
+        }
+        BeanUtils.copyProperties(solanaConfig, resp);
         return resp;
     }
 

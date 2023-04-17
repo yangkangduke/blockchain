@@ -1,6 +1,5 @@
 package com.seeds.game.service.impl;
 
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -45,7 +44,7 @@ public class NftActivityServiceImpl extends ServiceImpl<NftActivityMapper, NftAc
             NftActivityResp resp = new NftActivityResp();
             BeanUtils.copyProperties(p, resp);
             resp.setDate(RelativeDateFormat.format(new Date(p.getCreateTime())));
-            resp.setDateFormat(DateUtil.format(new Date(p.getCreateTime()), "EEE, dd MMM yyyy hh:mm:ss aaa"));
+            resp.setDateFormat(p.getCreateTime().toString());
             // mint事件to为发起人地址
             if (NftActivityEnum.MINT.getCode() == Integer.parseInt(p.getActivityType())) {
                 resp.setToAddress(p.getFromAddress());
@@ -53,5 +52,18 @@ public class NftActivityServiceImpl extends ServiceImpl<NftActivityMapper, NftAc
             }
             return resp;
         });
+    }
+
+    @Override
+    public Long queryLastUpdateTime(String mintAddress) {
+        LambdaQueryWrapper<NftActivity> queryWrap = new QueryWrapper<NftActivity>().lambda()
+                .eq(NftActivity::getMintAddress, mintAddress)
+                .orderByDesc(NftActivity::getCreateTime)
+                .last("limit 1");
+        NftActivity nftActivity = getOne(queryWrap);
+        if (nftActivity == null) {
+            return null;
+        }
+        return nftActivity.getCreateTime();
     }
 }

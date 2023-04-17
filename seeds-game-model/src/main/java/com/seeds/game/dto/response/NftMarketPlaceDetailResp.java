@@ -1,5 +1,6 @@
 package com.seeds.game.dto.response;
 
+import cn.hutool.json.JSONObject;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
@@ -7,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author hang.yu
@@ -35,6 +36,9 @@ public class NftMarketPlaceDetailResp {
 
     @ApiModelProperty("NFT名称")
     private String name;
+
+    @ApiModelProperty("NFT名称")
+    private String equipmentName;
 
     @ApiModelProperty("NFT编号")
     private String number;
@@ -73,10 +77,10 @@ public class NftMarketPlaceDetailResp {
     private String timeLeft;
 
     @ApiModelProperty("NFT动态属性")
-    private Map attributes;
+    private JSONObject attributes;
 
     @ApiModelProperty("NFT元数据")
-    private Map metadata;
+    private List<JSONObject> metadata;
 
     @ApiModelProperty("合约地址")
     private String contractAddress;
@@ -97,7 +101,7 @@ public class NftMarketPlaceDetailResp {
     private String chain;
 
     @ApiModelProperty("最后更改时间")
-    private Long lastUpdated;
+    private String lastUpdated;
 
     @ApiModelProperty("创造者收益")
     private String creatorEarnings;
