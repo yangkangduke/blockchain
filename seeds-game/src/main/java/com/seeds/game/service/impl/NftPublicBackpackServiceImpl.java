@@ -288,7 +288,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
 //        // 调用游戏方接口，执行收回
       //  this.callGameTakeback(nftItem);
-
         ServerRegionEntity serverRegion = this.getServerRegionEntity(nftItem.getServerRoleId());
         // 记录转移事件
         recoredNftEvent(nftItem, userId, serverRegion.getGameServerName(), NFTEnumConstant.NFTTransEnum.BACKPACK.getDesc());

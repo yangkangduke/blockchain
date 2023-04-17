@@ -118,8 +118,7 @@ public class NftPublicBackpackController {
         if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())) {
             throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
         }
-        nftPublicBackpackService.takeBackBatch(reqs);
-        return GenericDto.success(null);
+        return GenericDto.success(nftPublicBackpackService.takeBackBatch(reqs));
     }
 
     @PostMapping("transfer")

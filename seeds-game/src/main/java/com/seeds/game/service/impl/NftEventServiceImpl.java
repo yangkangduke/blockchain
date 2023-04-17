@@ -44,6 +44,7 @@ import org.springframework.util.CollectionUtils;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -98,6 +99,15 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 .eq(NftEvent::getUserId, req.getUserId())
                 .in(!CollectionUtils.isEmpty(req.getStatus()), NftEvent::getStatus, req.getStatus());
 
+        // 默认创建时间倒序排序
+        if (!CollectionUtils.isEmpty(req.getSorts())) {
+            ArrayList<NftEventPageReq.Sort> sorts = new ArrayList<>();
+            NftEventPageReq.Sort sort = new NftEventPageReq.Sort();
+            sort.setSort("created_at");
+            sort.setSortType("desc");
+            sorts.add(sort);
+            req.setSorts(sorts);
+        }
         wrapper.last(!CollectionUtils.isEmpty(req.getSorts()), NftEventPageReq.getOrderByStatement(req.getSorts()));
         Page<NftEvent> page = new Page<>(req.getCurrent(), req.getSize());
         List<NftEvent> records = this.page(page, wrapper).getRecords();
