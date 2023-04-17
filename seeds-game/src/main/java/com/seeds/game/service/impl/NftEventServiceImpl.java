@@ -44,6 +44,7 @@ import org.springframework.util.CollectionUtils;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -98,6 +99,15 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 .eq(NftEvent::getUserId, req.getUserId())
                 .in(!CollectionUtils.isEmpty(req.getStatus()), NftEvent::getStatus, req.getStatus());
 
+        // 默认创建时间倒序排序
+        if (!CollectionUtils.isEmpty(req.getSorts())) {
+            ArrayList<NftEventPageReq.Sort> sorts = new ArrayList<>();
+            NftEventPageReq.Sort sort = new NftEventPageReq.Sort();
+            sort.setSort("created_at");
+            sort.setSortType("desc");
+            sorts.add(sort);
+            req.setSorts(sorts);
+        }
         wrapper.last(!CollectionUtils.isEmpty(req.getSorts()), NftEventPageReq.getOrderByStatement(req.getSorts()));
         Page<NftEvent> page = new Page<>(req.getCurrent(), req.getSize());
         List<NftEvent> records = this.page(page, wrapper).getRecords();
@@ -301,7 +311,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     private void updateLocalDB(Integer autoDeposit, String mintAddress, NftEvent nftEvent, NftEventEquipment equipment, MintSuccessMessageResp data) {
         // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
-        asyncNotifyGameService.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, NFTEnumConstant.NftEventOptEnum.SUCCESS.getCode(), mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+        // asyncNotifyGameService.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, NFTEnumConstant.NftEventOptEnum.SUCCESS.getCode(), mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
         //  插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         if (Objects.nonNull(data)) {
             NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();

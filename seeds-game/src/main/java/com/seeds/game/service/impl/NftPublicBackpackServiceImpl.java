@@ -525,8 +525,18 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         // 调用游戏方接口，执行收回
         this.callGameTakeback(backpackNft);
         // 更新背包状态
+        int durability = 0;
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(backpackNft.getAttributes());
+            durability = (int) jsonObject.get("durability");
+            // 设置参考价
+            backpackNft.setProposedPrice(new BigDecimal(durability));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
         backpackNft.setServerRoleId(0L);
+        backpackNft.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
         backpackNft.setUpdatedAt(System.currentTimeMillis());
         this.updateById(backpackNft);
         // NFT非归属人不能取回
@@ -568,7 +578,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         list = list.stream().map(p -> {
             NftPublicBackpackWebResp resp = new NftPublicBackpackWebResp();
             BeanUtils.copyProperties(p, resp);
-            if (p.getServerRoleId().equals(NFTEnumConstant.NFTTransEnum.BACKPACK.getCode())) {
+            if (p.getServerRoleId().compareTo(new Long(NFTEnumConstant.NFTTransEnum.BACKPACK.getCode())) == 0) {
                 resp.setServerName(NFTEnumConstant.NFTTransEnum.BACKPACK.getDesc());
             }
             ServerRegionEntity serverRegionEntity = serverRegionService.queryByServerRoleId(p.getServerRoleId());
