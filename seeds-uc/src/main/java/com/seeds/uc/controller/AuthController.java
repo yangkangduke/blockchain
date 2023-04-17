@@ -38,7 +38,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Locale;
 
 @Slf4j
 @RestController
@@ -100,6 +99,7 @@ public class AuthController {
             // 校验账号、密码
             UserDto userDto = ucUserService.verifyLogin(loginReq);
             LoginResp login = ucUserService.buildLoginResponse(userDto.getUid(), userDto.getEmail());
+            login.setInviteCode(userDto.getInviteCode());
 //            ucUserService.sendLoginMsg(email, loginReq.getUserIp(), loginReq.getServiceRegion());
             return GenericDto.success(login);
         }
