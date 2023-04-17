@@ -379,16 +379,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         nftEvent.setCreatedAt(System.currentTimeMillis());
         nftEventService.save(nftEvent);
         //插入nft_event_equipment表
-        NftEventEquipment one = nftEventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>()
-                .eq(NftEventEquipment::getAutoId, nftItem.getAutoId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-        if (Objects.isNull(one)) {
-            NftEventEquipment equipment = new NftEventEquipment();
-            equipment.setEventId(nftEvent.getId());
-            equipment.setImageUrl(nftItem.getImage());
-            equipment.setAutoId(nftItem.getAutoId());
-            equipment.setAttributes(nftItem.getAttributes());
-            nftEventEquipmentService.save(equipment);
-        }
+        NftEventEquipment equipment = new NftEventEquipment();
+        equipment.setEventId(nftEvent.getId());
+        equipment.setImageUrl(nftItem.getImage());
+        equipment.setAutoId(nftItem.getAutoId());
+        equipment.setAttributes(nftItem.getAttributes());
+        nftEventEquipmentService.save(equipment);
     }
 
     @Override
@@ -438,14 +434,10 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
-    public String queryTokenAddressByAutoId(Long autoId) {
-        String tokenAddress = "";
-        NftPublicBackpackEntity one = getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>()
-                .eq(NftPublicBackpackEntity::getAutoId, autoId));
-        if (Objects.nonNull(one)) {
-            tokenAddress = one.getTokenAddress();
-        }
-        return tokenAddress;
+    public Map<Long, String> queryTokenAddressByAutoIds(List<Long> autoIds) {
+
+        return list(new LambdaQueryWrapper<NftPublicBackpackEntity>()
+                .in(NftPublicBackpackEntity::getAutoId, autoIds)).stream().collect(Collectors.toMap(NftPublicBackpackEntity::getAutoId, NftPublicBackpackEntity::getTokenAddress));
     }
 
     // lootmode 结算 nft物品所有权转移，中心化操作
