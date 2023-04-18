@@ -494,11 +494,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT托管成功，开始通知， url:{}， params:{}", url, param);
         try {
-            HttpRequest.post(url)
+            HttpResponse response = HttpRequest.post(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
+            log.info("NFT托管成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("NFT托管成功通知失败，message：{}", e.getMessage());
         }
@@ -523,7 +524,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         // 更改背包状态，通知游戏方NFT收回到背包。
         // 调用游戏方接口，执行收回
-        this.callGameTakeback(backpackNft);
+        if (backpackNft.getServerRoleId().compareTo(new Long(NFTEnumConstant.NFTTransEnum.BACKPACK.getCode())) != 0){
+            this.callGameTakeback(backpackNft);
+        }
         // 更新背包状态
         int durability = 0;
         try {
@@ -549,11 +552,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT取回成功，开始通知， url:{}， params:{}", url, param);
         try {
-            HttpRequest.post(url)
+            HttpResponse response = HttpRequest.post(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
+            log.info("NFT取回成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("NFT取回成功通知失败，message：{}", e.getMessage());
         }
