@@ -48,7 +48,8 @@
         t2.passive_attr_desc
         from ga_nft_public_backpack t1
         left join ga_nft_attribute t2 on t1.eq_nft_id = t2.eq_nft_id
-        left join z_market_order t3 on t1.token_address = t3.mint_address
+        left join (select price, place_time, mint_address from z_market_order where status = 1) t3
+        on t1.token_address = t3.mint_address
         where t1.user_id = #{userId}
         <if test="type != null">
             and t1.type = #{type}
