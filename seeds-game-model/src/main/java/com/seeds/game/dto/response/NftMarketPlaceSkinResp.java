@@ -73,4 +73,8 @@ public class NftMarketPlaceSkinResp implements Serializable {
 
      @ApiModelProperty("被NPC击杀数")
      private Integer goblin;
+
+     @ApiModelProperty("是否是拥有者，0 否 1 是")
+     private Integer isOwner = 0;
+
 }

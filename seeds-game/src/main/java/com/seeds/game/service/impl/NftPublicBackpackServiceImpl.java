@@ -494,11 +494,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT托管成功，开始通知， url:{}， params:{}", url, param);
         try {
-            HttpRequest.post(url)
+            HttpResponse response = HttpRequest.post(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
+            log.info("NFT托管成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("NFT托管成功通知失败，message：{}", e.getMessage());
         }
@@ -549,11 +550,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT取回成功，开始通知， url:{}， params:{}", url, param);
         try {
-            HttpRequest.post(url)
+            HttpResponse response = HttpRequest.post(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
+            log.info("NFT取回成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("NFT取回成功通知失败，message：{}", e.getMessage());
         }
