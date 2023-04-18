@@ -64,7 +64,10 @@ public class NftPublicBackpackWebResp implements Serializable {
     @ApiModelProperty("特殊属性描述")
     private String specialAttrDesc;
 
+    @ApiModelProperty("上架时间")
+    private Long listTime;
+
     @ApiModelProperty("nftId")
-    @JsonSerialize(using= ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long eqNftId;
 }
