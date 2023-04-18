@@ -138,6 +138,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()) {
             auctionSetting = nftAuctionHouseSettingService.getById(nftEquipment.getAuctionId());
             if (auctionSetting != null) {
+                BeanUtils.copyProperties(auctionSetting, resp);
                 long time = System.currentTimeMillis() - (auctionSetting.getStartTime() + auctionSetting.getDuration() * 60 * 60 * 1000);
                 resp.setTimeLeft(RelativeDateFormat.formatTime(time));
                 NftAuctionHouseListing auctionListing = nftAuctionHouseListingService.getById(auctionSetting.getListingId());
@@ -206,7 +207,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT一口价上架成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpRequest.get(url)
-                    .timeout(5 * 1000)
+                    .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
         } catch (Exception e) {
@@ -239,7 +240,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT英式拍卖上架成功，开始通知， url:{}， params:{}", url, param);
         try {
             HttpRequest.post(url)
-                    .timeout(5 * 1000)
+                    .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
@@ -269,7 +270,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT下架成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpRequest.get(url)
-                    .timeout(5 * 1000)
+                    .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
         } catch (Exception e) {
@@ -313,7 +314,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT取消拍卖成功，开始通知， url:{}， params:{}", url, param);
         try {
             HttpRequest.post(url)
-                    .timeout(5 * 1000)
+                    .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
@@ -345,7 +346,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT拍卖出价成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpRequest.get(url)
-                    .timeout(5 * 1000)
+                    .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
         } catch (Exception e) {
@@ -380,7 +381,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT购买成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpRequest.get(url)
-                    .timeout(5 * 1000)
+                    .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
         } catch (Exception e) {
@@ -533,7 +534,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 log.info("获取美元汇率， url:{}， params:{}", url, currency);
                 try {
                     HttpResponse response = HttpRequest.get(url)
-                            .timeout(5 * 1000)
+                            .timeout(8 * 1000)
                             .header("Content-Type", "application/json")
                             .header("token", seedsApiConfig.getSolToken())
                             .execute();
@@ -670,7 +671,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT接受报价成功，开始通知， url:{}， params:{}", url, param);
         try {
             HttpResponse response = HttpRequest.post(url)
-                    .timeout(5 * 1000)
+                    .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
@@ -697,7 +698,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT拍卖达成交易成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpRequest.get(url)
-                    .timeout(5 * 1000)
+                    .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
         } catch (Exception e) {
@@ -718,7 +719,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT取消出价成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpRequest.get(url)
-                    .timeout(5 * 1000)
+                    .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
         } catch (Exception e) {
