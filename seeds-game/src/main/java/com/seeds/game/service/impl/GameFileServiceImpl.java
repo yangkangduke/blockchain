@@ -47,7 +47,7 @@ public class GameFileServiceImpl implements GameFileService {
 
     @Override
     public String getFileUrl(String objectName) {
-        return baseUrl + String.format("/game/public/file/download/%s?objectName=%s", properties.getBucketName(), objectName);
+        return baseUrl + String.format("/game/public/web/file/download/%s?objectName=%s", properties.getBucketName(), objectName);
     }
 
 }
