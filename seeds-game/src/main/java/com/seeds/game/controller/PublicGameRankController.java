@@ -1,13 +1,16 @@
-package com.seeds.uc.controller;
+package com.seeds.game.controller;
 
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.uc.service.GameRankService;
+import com.seeds.game.service.GameRankService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -22,7 +25,7 @@ import java.util.List;
  * @date 2022-12-12
  */
 @RestController
-@RequestMapping("/public/game-rank")
+@RequestMapping("/public/web/game-rank")
 @Api(tags = "公共游戏排行榜")
 public class PublicGameRankController {
 
