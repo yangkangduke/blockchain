@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * @date 2022-08-24
  */
 @RestController
-@RequestMapping("/public/file")
+@RequestMapping("/public/web/file")
 @Api(tags = "公共文件")
 public class PublicFileController {
 
