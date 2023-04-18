@@ -1,4 +1,4 @@
-package com.seeds.uc.service;
+package com.seeds.game.service;
 
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.response.GameWinRankResp;

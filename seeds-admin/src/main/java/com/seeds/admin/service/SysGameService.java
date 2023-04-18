@@ -3,7 +3,6 @@ package com.seeds.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.request.*;
-import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
@@ -106,13 +105,6 @@ public interface SysGameService extends IService<SysGameEntity> {
      * @return 密钥
      */
     String querySecretKey(String accessKey);
-
-    /**
-     * 获取游戏胜场排行榜
-     * @param query 查询条件
-     * @return 游戏胜场排行榜
-     */
-    List<GameWinRankResp.GameWinRank> winRankInfo(GameWinRankReq query);
 
     /**
      * 获取个人游戏概括信息

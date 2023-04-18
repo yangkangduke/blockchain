@@ -16,7 +16,10 @@ public class GameWinRankReq {
 
     @ApiModelProperty(value = "游戏id")
     @NotNull(message = "The game id can not be empty")
-    private Long gameId;
+    private Long gameId = 1L;
+
+    @ApiModelProperty(value = "排序方式 1 Total Score 2 Total Wins 3 Highest Streak 4 Game Played")
+    private Integer sortType = 1;
 
     @ApiModelProperty(value = "表示起始行数（从0开始，包含）")
     private Integer startRow = 0;

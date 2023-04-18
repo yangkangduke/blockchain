@@ -15,7 +15,7 @@ public class EquMetadataDto {
     private String name;
     private String symbol = "SEQN";
     private String description = "This is the NFT of the seeds equipment.";
-    private int seller_fee_basis_points = 0;
+    private int seller_fee_basis_points = 500;
     private String image;
     private String external_url = "https://www.theseeds.io/";
     private List<EquMetadataDto.Attributes> attributes;
