@@ -424,6 +424,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (one != null) {
                 resp.setLastSale(one.getPrice());
             }
+            UcUserResp ucUserResp = null;
+            try {
+                GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
+                ucUserResp = result.getData();
+                resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+            } catch (Exception e) {
+                log.error("内部请求uc获取用户公共地址失败");
+            }
             return resp;
         });
 
@@ -463,6 +471,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             NftMarketOrderEntity one = nftMarketOrderService.getOne(queryWrapper);
             if (one != null) {
                 resp.setLastSale(one.getPrice());
+            }
+            UcUserResp ucUserResp = null;
+            try {
+                GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
+                ucUserResp = result.getData();
+                resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+            } catch (Exception e) {
+                log.error("内部请求uc获取用户公共地址失败");
             }
             resp.setMaxDurability(maxDurability);
             return resp;
@@ -516,6 +532,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             NftMarketOrderEntity one = nftMarketOrderService.getOne(queryWrapper);
             if (one != null) {
                 resp.setLastSale(one.getPrice());
+            }
+            UcUserResp ucUserResp = null;
+            try {
+                GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
+                ucUserResp = result.getData();
+                resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+            } catch (Exception e) {
+                log.error("内部请求uc获取用户公共地址失败");
             }
             resp.setMaxDurability(maxDurability);
             return resp;
