@@ -13,11 +13,9 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.dto.request.*;
-import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.admin.dto.response.ProfileInfoResp;
 import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
-import com.seeds.admin.entity.SysGameApiEntity;
 import com.seeds.admin.entity.SysGameEntity;
 import com.seeds.admin.entity.SysGameTypeEntity;
 import com.seeds.admin.enums.*;
@@ -230,61 +228,6 @@ public class SysGameServiceImpl extends ServiceImpl<SysGameMapper, SysGameEntity
             return null;
         }
         return game.getSecretKey();
-    }
-
-    @Override
-    public List<GameWinRankResp.GameWinRank> winRankInfo(GameWinRankReq query) {
-        // 通知游戏方NFT创建结果
-        SysGameApiEntity gameApi = sysGameApiService.queryByGameAndType(query.getGameId(), ApiType.PLAYER_WIN_RANK.getCode());
-        List<String> rankUrls = new ArrayList<>();
-        if (gameApi.getBaseUrl().contains("|")) {
-            rankUrls = Arrays.stream(gameApi.getBaseUrl().split("\\|")).map(p -> p + gameApi.getApi()).collect(Collectors.toList());
-        } else {
-            rankUrls.add(gameApi.getBaseUrl() + gameApi.getApi());
-        }
-        List<GameWinRankResp.GameWinRank> rankList = new ArrayList<>();
-        for (String rankUrl : rankUrls) {
-            String params = String.format("startRow=%s&endRow=%s", query.getStartRow(), query.getEndRow() * 2);
-            rankUrl = rankUrl + "?" + params;
-            log.info("开始请求游戏胜场排行榜数据， url:{}， params:{}", rankUrl, params);
-            HttpResponse response = HttpRequest.get(rankUrl)
-                    .timeout(10 * 1000)
-                    .header("Content-Type", "application/json")
-                    .execute();
-            String body = response.body();
-            log.info("请求游戏胜场排行榜数据返回，result:{}", body);
-            if (!response.isOk()) {
-                log.error("Failed to get the win list from game");
-                throw new GenericException("Failed to get the win list");
-            }
-            GameWinRankResp resp = JSONUtil.toBean(body, GameWinRankResp.class);
-            if (!"OK".equalsIgnoreCase(resp.getRet())) {
-                log.error("Get the win list from game failed");
-                throw new GenericException("Get the win list from game failed");
-            }
-            rankList.addAll(resp.getInfos());
-        }
-        if (CollectionUtils.isEmpty(rankList)) {
-            return Collections.emptyList();
-        }
-        Map<String, GameWinRankResp.GameWinRank> rankMap = new HashMap<>(rankList.size());
-        for (GameWinRankResp.GameWinRank rank : rankList) {
-            String key = rank.getAccName();
-            GameWinRankResp.GameWinRank mapRank = rankMap.get(key);
-            // 头像url
-            rank.setPortraitUrl(sysFileService.getFileUrl("game/" + rank.getPortraitId() + gameApi.getDesc()));
-            if (mapRank == null) {
-                rankMap.put(key, rank);
-            } else {
-                // 分数高的服务器数据展示在排行榜
-                if (mapRank.getScore() < rank.getScore()) {
-                    rankMap.put(key, rank);
-                }
-            }
-        }
-        return rankMap.values().stream()
-                .sorted(Comparator.comparing(GameWinRankResp.GameWinRank::getScore).reversed())
-                .limit(query.getEndRow()).collect(Collectors.toList());
     }
 
     @Override

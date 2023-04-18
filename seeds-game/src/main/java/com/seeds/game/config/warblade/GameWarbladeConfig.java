@@ -1,22 +1,18 @@
 package com.seeds.game.config.warblade;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * 游戏Warblade配置
- *
  * @author hang.yu
- * @since 1.0.0
+ * @date 2023/3/28
  */
-@Slf4j
 @Data
-@Component
-@ConfigurationProperties(prefix = "game-warblade")
+@Configuration
 public class GameWarbladeConfig {
 
-    String nftNotificationApi;
+    @Value("${game.warblade.player.win.rank.api:/BladeRiteGame/ranking/info.do}")
+    private String playerWinRank;
 
 }
