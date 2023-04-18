@@ -44,7 +44,6 @@ import org.springframework.util.CollectionUtils;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -173,7 +172,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 p.setBaseAttrValue(URLDecoder.decode(p.getBaseAttrValue(), "UTF-8"));
                 p.setRarityAttrValue(URLDecoder.decode(p.getRarityAttrValue(), "UTF-8"));
                 p.setSpecialAttrDesc(handleStr(URLDecoder.decode(p.getSpecialAttrDesc(), "UTF-8")));
-                p.setPassiveAttrDesc(URLDecoder.decode(p.getPassiveAttrDesc(), "UTF-8"));
+                p.setPassiveAttrDesc(removePrefix(URLDecoder.decode(p.getPassiveAttrDesc(), "UTF-8")));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -434,6 +433,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     private static String handleStr(String str) {
         // 去除方括号以及方括号中的字符
         return str.replaceAll("\\[.+?\\]", "").replace("Blade buff", "");
+    }
+
+    private static String removePrefix(String str) {
+        // 去除方括号以及方括号中的字符
+        return str.replace("Passive: ", "");
     }
 
     private void createMetadata(NftEventEquipment equipment, Long tokenId) {
