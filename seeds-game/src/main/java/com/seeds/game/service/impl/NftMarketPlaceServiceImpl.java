@@ -206,10 +206,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getPlaceOrderApi() + "?" + params;
         log.info("NFT一口价上架成功，开始通知， url:{}， params:{}", url, params);
         try {
-            HttpRequest.get(url)
+            HttpResponse response = HttpRequest.get(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
+            log.info("NFT一口价上架成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("一口价上架成功通知失败，message：{}", e.getMessage());
         }
@@ -239,11 +240,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT英式拍卖上架成功，开始通知， url:{}， params:{}", url, param);
         try {
-            HttpRequest.post(url)
+            HttpResponse response = HttpRequest.post(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
+            log.info("NFT英式拍卖上架成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("英式拍卖上架成功通知失败，message：{}", e.getMessage());
         }
@@ -269,10 +271,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCancelOrderApi() + "?" + params;
         log.info("NFT下架成功，开始通知， url:{}， params:{}", url, params);
         try {
-            HttpRequest.get(url)
+            HttpResponse response = HttpRequest.get(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
+            log.info("NFT下架成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("NFT下架成功通知失败，message：{}", e.getMessage());
         }
@@ -313,11 +316,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT取消拍卖成功，开始通知， url:{}， params:{}", url, param);
         try {
-            HttpRequest.post(url)
+            HttpResponse response = HttpRequest.post(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
+            log.info("NFT取消拍卖成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("NFT取消拍卖成功通知失败，message：{}", e.getMessage());
         }
@@ -345,10 +349,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionBid() + "?" + params;
         log.info("NFT拍卖出价成功，开始通知， url:{}， params:{}", url, params);
         try {
-            HttpRequest.get(url)
+            HttpResponse response = HttpRequest.get(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
+            log.info("NFT拍卖出价成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("NFT拍卖出价成功通知失败，message：{}", e.getMessage());
         }
@@ -380,10 +385,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getBuySuccess() + "?" + params;
         log.info("NFT购买成功，开始通知， url:{}， params:{}", url, params);
         try {
-            HttpRequest.get(url)
+            HttpResponse response = HttpRequest.get(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
+            log.info("NFT购买成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("NFT购买成功通知失败，message：{}", e.getMessage());
         }
@@ -697,10 +703,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getSaleSuccess() + "?" + params;
         log.info("NFT拍卖达成交易成功，开始通知， url:{}， params:{}", url, params);
         try {
-            HttpRequest.get(url)
+            HttpResponse response = HttpRequest.get(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
+            log.info("NFT拍卖达成交易成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("NFT拍卖达成交易成功通知失败，message：{}", e.getMessage());
         }
@@ -718,10 +725,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionCancelBid() + "?" + params;
         log.info("NFT取消出价成功，开始通知， url:{}， params:{}", url, params);
         try {
-            HttpRequest.get(url)
+            HttpResponse response = HttpRequest.get(url)
                     .timeout(8 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
+            log.info("NFT取消出价成功通知返回，result:{}", response.body());
         } catch (Exception e) {
             log.error("NFT取消出价成功通知失败，message：{}", e.getMessage());
         }
