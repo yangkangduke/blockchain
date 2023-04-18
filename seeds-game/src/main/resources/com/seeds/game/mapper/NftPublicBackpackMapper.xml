@@ -59,6 +59,7 @@
         </if>
         <if test="serverRoleId != null">
             and t1.server_role_id = #{serverRoleId}
+            and state = 3
         </if>
         <if test="sort != null and sort =='price'">
             order by t1.price ${sortType}
