@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Service
 public class GameRankServiceImpl implements GameRankService {
 
-    public static final String GAME_WINS_RANKING_FILE = "GameWinsRanking";
+    public static final String GAME_WINS_RANKING_FILE = "GameWinsRanking.png";
 
     @Value("${uc.game.win.rank.expire:10}")
     private Integer winRankExpireAfter;
