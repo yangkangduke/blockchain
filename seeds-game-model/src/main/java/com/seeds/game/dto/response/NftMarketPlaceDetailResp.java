@@ -130,5 +130,17 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("特殊属性描述")
     private String specialAttrDesc;
 
+    @ApiModelProperty("开始时间")
+    private Long startTime;
+
+    @ApiModelProperty("持续时间")
+    private Long duration;
+
+    @ApiModelProperty("开始价格")
+    private BigDecimal startPrice;
+
+    @ApiModelProperty("托管费")
+    private String custodianFee;
+
 }
 

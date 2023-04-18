@@ -24,4 +24,7 @@ public class SolanaConfig {
     @Value("${solana.creator.earnings:5%}")
     private String creatorEarnings;
 
+    @Value("${solana.custodian.fee:1%/24h}")
+    private String custodianFee;
+
 }

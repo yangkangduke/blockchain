@@ -138,6 +138,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()) {
             auctionSetting = nftAuctionHouseSettingService.getById(nftEquipment.getAuctionId());
             if (auctionSetting != null) {
+                BeanUtils.copyProperties(auctionSetting, resp);
                 long time = System.currentTimeMillis() - (auctionSetting.getStartTime() + auctionSetting.getDuration() * 60 * 60 * 1000);
                 resp.setTimeLeft(RelativeDateFormat.formatTime(time));
                 NftAuctionHouseListing auctionListing = nftAuctionHouseListingService.getById(auctionSetting.getListingId());

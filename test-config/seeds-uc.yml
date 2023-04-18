@@ -25,4 +25,4 @@ springfox:
       enabled: true
 
 
-Use-invite-code-flag: true
+Use-invite-code-flag: false
