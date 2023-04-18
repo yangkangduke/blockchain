@@ -73,7 +73,7 @@ public class UcRedisKeysConstant {
 
     public final String UC_ONE_DAY_MARKING_TEMPLATE = UC_KEY_PREFIX + "one:day:marking:%s";
 
-    public final String UC_GAME_WIN_RANK_TEMPLATE = UC_KEY_PREFIX + "game:win:rank:%s";
+    public final String UC_GAME_WIN_RANK_TEMPLATE = UC_KEY_PREFIX + "game:win:rank:%s:%s";
 
     public final String UC_PROFILE_INFO_TEMPLATE = UC_KEY_PREFIX + "profile:info:%s:%s";
 
@@ -180,8 +180,8 @@ public class UcRedisKeysConstant {
         return String.format(UC_ONE_DAY_MARKING_TEMPLATE, key);
     }
 
-    public String getGameWinRankTemplate(String gameId) {
-        return String.format(UC_GAME_WIN_RANK_TEMPLATE, gameId);
+    public String getGameWinRankTemplate(String gameId, String sortType) {
+        return String.format(UC_GAME_WIN_RANK_TEMPLATE, gameId, sortType);
     }
 
     public String getProfileInfoTemplate(String userId, String gameId) {
