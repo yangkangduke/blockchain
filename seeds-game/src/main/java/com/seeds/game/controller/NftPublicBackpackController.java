@@ -134,8 +134,8 @@ public class NftPublicBackpackController {
 
     @PostMapping("deposit-check")
     @ApiOperation("托管校验")
-    public GenericDto<Boolean> depositCheck(@Valid @RequestBody NftDepositCheckReq req) {
-        return GenericDto.success(nftPublicBackpackService.depositCheck(req));
+    public GenericDto<Object> depositCheck(@Valid @RequestBody NftDepositCheckReq req) {
+        return nftPublicBackpackService.depositCheck(req);
     }
 
     @PostMapping("deposited")

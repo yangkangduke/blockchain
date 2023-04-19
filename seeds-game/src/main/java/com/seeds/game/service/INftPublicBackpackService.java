@@ -3,6 +3,7 @@ package com.seeds.game.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.internal.*;
 import com.seeds.game.dto.response.*;
@@ -96,7 +97,7 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     Map<Long, BigDecimal> getTotalPrice(String autoIds);
 
-    Boolean depositCheck(NftDepositCheckReq req);
+    GenericDto<Object> depositCheck(NftDepositCheckReq req);
 
     /**
      * 根据指定字段批量更新

@@ -635,8 +635,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
-    public Boolean depositCheck(NftDepositCheckReq req) {
-        boolean result = false;
+    public GenericDto<Object> depositCheck(NftDepositCheckReq req) {
         NftPublicBackpackEntity one = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
         if (Objects.nonNull(one)) {
             NftAttributeEntity attribute = attributeService.queryByNftId(one.getEqNftId());
@@ -666,12 +665,16 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 JSONObject jsonObject = JSONObject.parseObject(response.body());
                 log.info("请求游戏 deposit-check 接口返回，  result:{}", response.body());
                 int ret = (int) jsonObject.get("ret");
-                result = ret == 0 ? true : false;
+                if (ret == 0)
+                    return GenericDto.success(true);
+                else {
+                    return GenericDto.failure(ret, (String) jsonObject.get("message"));
+                }
             } catch (Exception e) {
                 log.info("rpc all seeds-admin ,queryGameApi error {}", e.getMessage());
             }
         }
-        return result;
+        return GenericDto.failure(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY.getCode(), "invalid NFT");
     }
 
 
