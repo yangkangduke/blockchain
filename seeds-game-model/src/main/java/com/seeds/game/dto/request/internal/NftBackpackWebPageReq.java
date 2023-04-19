@@ -29,4 +29,10 @@ public class NftBackpackWebPageReq {
 
     @ApiModelProperty(value = "排序类型 asc:升序 desc:降序")
     private String sortType;
+
+    @ApiModelProperty(value = "state")
+    /**
+     * @see  com.seeds.game.enums.NFTEnumConstant.NFTStateEnum
+     */
+    private Integer state;
 }
