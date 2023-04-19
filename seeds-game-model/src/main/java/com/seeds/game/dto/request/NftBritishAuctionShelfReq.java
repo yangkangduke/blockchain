@@ -50,4 +50,8 @@ public class NftBritishAuctionShelfReq {
     @NotNull(message = "Start price cannot be empty")
     private BigDecimal startPrice;
 
+    @ApiModelProperty("托管费交易hash")
+    @NotBlank(message = "FeeHash cannot be empty")
+    private String feeHash;
+
 }

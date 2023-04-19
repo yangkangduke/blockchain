@@ -43,4 +43,7 @@ public class EnglishAuctionReqDto {
     @ApiModelProperty("开始价格")
     private BigDecimal startPrice;
 
+    @ApiModelProperty("托管费交易hash")
+    private String feeHash;
+
 }

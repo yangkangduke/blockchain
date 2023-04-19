@@ -19,6 +19,7 @@ import com.seeds.game.config.SolanaConfig;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.external.EndAuctionMessageDto;
 import com.seeds.game.dto.request.external.EnglishAuctionReqDto;
+import com.seeds.game.dto.request.external.TransferSolMessageDto;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.*;
@@ -202,7 +203,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
 
         // 调用/api/chainOp/placeOrder通知，链上上架成功
-        String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
+        String params = String.format("feeHash=%s&receipt=%s&sig=%s", req.getFeeHash(), req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getPlaceOrderApi() + "?" + params;
         log.info("NFT一口价上架成功，开始通知， url:{}， params:{}", url, params);
         try {
@@ -279,7 +280,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         } catch (Exception e) {
             log.error("NFT下架成功通知失败，message：{}", e.getMessage());
         }
-
+        // 退还托管费
+        NftRefundFeeReq feeReq = new NftRefundFeeReq();
+        feeReq.setOrderId(Long.valueOf(nftEquipment.getOrderId()));
+        refundFee(feeReq);
     }
 
     @Override
@@ -325,6 +329,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         } catch (Exception e) {
             log.error("NFT取消拍卖成功通知失败，message：{}", e.getMessage());
         }
+        // 退还托管费
+        NftRefundFeeReq feeReq = new NftRefundFeeReq();
+        feeReq.setAuctionId(nftEquipment.getAuctionId());
+        refundFee(feeReq);
     }
 
     @Override
@@ -393,6 +401,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         } catch (Exception e) {
             log.error("NFT购买成功通知失败，message：{}", e.getMessage());
         }
+        // 退还托管费
+        NftRefundFeeReq feeReq = new NftRefundFeeReq();
+        feeReq.setOrderId(Long.valueOf(nftEquipment.getOrderId()));
+        refundFee(feeReq);
     }
 
     @Override
@@ -617,6 +629,69 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
+    public void refundFee(NftRefundFeeReq req) {
+
+        BigDecimal price;
+        long duration;
+        long placeTime;
+        String sellerAddress;
+        if (req.getAuctionId() != null) {
+            NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(req.getAuctionId());
+            if (auctionSetting == null) {
+                throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+            }
+            price = auctionSetting.getStartPrice();
+            duration = auctionSetting.getDuration();
+            placeTime = auctionSetting.getStartTime();
+            NftAuctionHouseListing auctionListing = nftAuctionHouseListingService.getById(auctionSetting.getListingId());
+            if (auctionListing == null) {
+                throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+            }
+            sellerAddress = auctionListing.getSeller();
+        } else if (req.getOrderId() != null) {
+            NftMarketOrderEntity order = nftMarketOrderService.getById(req.getOrderId());
+            if (order == null) {
+                throw new GenericException(GameErrorCodeEnum.ERR_10018_NFT_ITEM_ORDER_NOT_EXIST);
+            }
+            price = order.getPrice();
+            duration = 72L;
+            placeTime = order.getPlaceTime();
+            sellerAddress = order.getSellerAddress();
+        } else {
+            throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
+        }
+        BigDecimal baseFee = price.multiply(new BigDecimal("0.005"));
+        BigDecimal receivableFee = new BigDecimal(duration / 12L).multiply(baseFee);
+        long consumedHours = RelativeDateFormat.toHours(System.currentTimeMillis() - placeTime);
+        long base = consumedHours % 12L > 0 ? consumedHours / 12L + 1 : consumedHours / 12L;
+        BigDecimal refundFee = receivableFee.subtract(new BigDecimal(base).multiply(baseFee));
+        // 调用/api/admin/refundFee，请求NFT托管费退还
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getRefundFee();
+        TransferSolMessageDto dto = new TransferSolMessageDto();
+        dto.setAmount(refundFee);
+        dto.setToAddress(sellerAddress);
+        String param = JSONUtil.toJsonStr(dto);
+        log.info("NFT托管费退还开始请求， url:{}， params:{}", url, param);
+        try {
+            HttpResponse response = HttpRequest.post(url)
+                    .timeout(8 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+            String body = response.body();
+            log.info("请求NFT托管费退还接口返回，  result:{}", body);
+            JSONObject jsonObject = JSONObject.parseObject(body);
+            Integer code = jsonObject.getInteger("code");
+            if (code == null || code != 200) {
+                throw new GenericException("Failed to refund Fee, message:" + jsonObject.getString("message"));
+            }
+        } catch (Exception e) {
+            log.error("请求NFT托管费退还接口失败，message：{}", e.getMessage());
+
+        }
+    }
+
+    @Override
     public NftOfferResp offerPage(NftOfferPageReq req) {
         NftOfferResp resp = new NftOfferResp();
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
@@ -740,6 +815,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         } catch (Exception e) {
             log.error("NFT拍卖达成交易成功通知失败，message：{}", e.getMessage());
         }
+        // 退还托管费
+        NftRefundFeeReq feeReq = new NftRefundFeeReq();
+        feeReq.setAuctionId(auctionBiding.getAuctionId());
+        refundFee(feeReq);
     }
 
     @Override

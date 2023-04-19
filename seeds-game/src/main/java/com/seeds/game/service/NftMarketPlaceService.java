@@ -126,4 +126,10 @@ public interface NftMarketPlaceService {
      */
     String chainNonce();
 
+    /**
+     * 托管费退回
+     * @param req 订单信息
+     */
+    void refundFee(NftRefundFeeReq req);
+
 }

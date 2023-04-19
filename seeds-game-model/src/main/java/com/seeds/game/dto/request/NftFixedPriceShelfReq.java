@@ -25,4 +25,8 @@ public class NftFixedPriceShelfReq {
     @NotBlank(message = "Sig key cannot be empty")
     private String sig;
 
+    @ApiModelProperty("托管费交易hash")
+    @NotBlank(message = "Fee hash cannot be empty")
+    private String feeHash;
+
 }
