@@ -85,6 +85,7 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
     public BigDecimal queryAuctionCurrentPrice(Long auctionId) {
         LambdaQueryWrapper<NftAuctionHouseBiding> queryWrap = new QueryWrapper<NftAuctionHouseBiding>().lambda()
                 .eq(NftAuctionHouseBiding::getAuctionId, auctionId)
+                .isNull(NftAuctionHouseBiding::getCancelTime)
                 .orderByDesc(NftAuctionHouseBiding::getPrice);
         List<NftAuctionHouseBiding> list = list(queryWrap);
         if (CollectionUtils.isEmpty(list)) {

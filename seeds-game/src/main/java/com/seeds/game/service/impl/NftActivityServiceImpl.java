@@ -43,7 +43,7 @@ public class NftActivityServiceImpl extends ServiceImpl<NftActivityMapper, NftAc
         return page.convert(p -> {
             NftActivityResp resp = new NftActivityResp();
             BeanUtils.copyProperties(p, resp);
-            resp.setDate(RelativeDateFormat.format(new Date(p.getCreateTime())));
+            resp.setDate(RelativeDateFormat.convert(new Date(p.getCreateTime()), new Date()));
             resp.setDateFormat(p.getCreateTime().toString());
             // mint事件to为发起人地址
             if (NftActivityEnum.MINT.getCode() == Integer.parseInt(p.getActivityType())) {
