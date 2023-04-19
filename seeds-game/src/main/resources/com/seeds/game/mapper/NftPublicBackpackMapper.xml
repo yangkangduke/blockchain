@@ -8,7 +8,7 @@
                  left join
              (select `type` as type, count(*) num
               from ga_nft_public_backpack
-              where user_id = #{userId}
+              where user_id = #{userId} and state <![CDATA[<>]]> 1
               group by type) t2 on t1.type = t2.type
 
     </select>
