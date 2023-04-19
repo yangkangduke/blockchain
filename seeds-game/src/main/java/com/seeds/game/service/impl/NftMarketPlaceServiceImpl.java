@@ -139,7 +139,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             auctionSetting = nftAuctionHouseSettingService.getById(nftEquipment.getAuctionId());
             if (auctionSetting != null) {
                 BeanUtils.copyProperties(auctionSetting, resp);
-                long time = System.currentTimeMillis() - (auctionSetting.getStartTime() + auctionSetting.getDuration() * 60 * 60 * 1000);
+                long time = (auctionSetting.getStartTime() + auctionSetting.getDuration() * 60 * 60 * 1000) - System.currentTimeMillis();
                 resp.setTimeLeft(RelativeDateFormat.formatTime(time));
                 NftAuctionHouseListing auctionListing = nftAuctionHouseListingService.getById(auctionSetting.getListingId());
                 if (auctionListing != null) {
@@ -178,9 +178,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         resp.setState(convertOrderState(nftEquipment, auctionSetting));
         Long lastUpdated = nftActivityService.queryLastUpdateTime(nftEquipment.getMintAddress());
         if (lastUpdated != null) {
-            resp.setLastUpdated(RelativeDateFormat.format(new Date(lastUpdated)));
+            resp.setLastUpdated(RelativeDateFormat.convert(new Date(lastUpdated), new Date()));
         } else {
-            resp.setLastUpdated(RelativeDateFormat.format(new Date(nftEquipment.getUpdateTime())));
+            resp.setLastUpdated(RelativeDateFormat.convert(new Date(nftEquipment.getUpdateTime()), new Date()));
         }
         BeanUtils.copyProperties(solanaConfig, resp);
         return resp;
@@ -645,7 +645,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         IPage<NftOfferResp.NftOffer> nftOfferPage = nftAuctionHouseBidingService.queryPage(req);
         List<NftOfferResp.NftOffer> records = nftOfferPage.getRecords();
         if (!CollectionUtils.isEmpty(records)) {
-            resp.setHighestOffer(records.get(0).getPrice());
+            for (NftOfferResp.NftOffer nftOffer : records) {
+                if (nftOffer.getCancelTime() == null) {
+                    resp.setHighestOffer(nftOffer.getPrice());
+                    break;
+                }
+            }
         }
         resp.setNftOffers(nftOfferPage);
         return resp;
