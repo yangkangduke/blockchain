@@ -523,7 +523,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         // 更改背包状态，通知游戏方NFT收回到背包。
         // 调用游戏方接口，执行收回
-        //this.callGameTakeback(backpackNft);
+//        if (backpackNft.getServerRoleId().compareTo(new Long(NFTEnumConstant.NFTTransEnum.BACKPACK.getCode())) != 0){
+//            this.callGameTakeback(backpackNft);
+//        }
         // 更新背包状态
         int durability = 0;
         try {
