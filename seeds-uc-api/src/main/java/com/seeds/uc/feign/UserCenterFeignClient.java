@@ -75,8 +75,4 @@ public interface UserCenterFeignClient {
      */
     @GetMapping("/uc-internal/user/get-by-public-address")
     GenericDto<UcUserResp> getByPublicAddress(@RequestParam String publicAddress);
-
-    @GetMapping("/uc-internal/user/getInfo")
-    GenericDto<UserInfoResp> getInfo(@RequestBody HttpServletRequest request);
-
 }
