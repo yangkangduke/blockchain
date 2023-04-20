@@ -511,6 +511,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public void view(NftMarketPlaceDetailViewReq req, HttpServletRequest request) {
+        Long userId1 = UserContext.getCurrentUserId();
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(req.getNftId());
         try {
             GenericDto<UserInfoResp> respGenericDto = userCenterFeignClient.getInfo(request);

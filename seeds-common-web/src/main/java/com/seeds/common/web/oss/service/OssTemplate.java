@@ -47,9 +47,9 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	private final FileProperties properties;
 
 	private AmazonS3 amazonS3;
-//	private AmazonS3 gameoss1;
-//	private AmazonS3 gameoss2;
-//	private AmazonS3 gameoss3;
+	private AmazonS3 gameoss1;
+	private AmazonS3 gameoss2;
+	private AmazonS3 gameoss3;
 
 	/**
 	 * 创建bucket
@@ -225,9 +225,9 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 
 	@Override
 	public void removeObject(String objectName) throws Exception {
-//		gameoss1.deleteObject(properties.getGame().getOss1().getBucketName(), objectName);
-//		gameoss2.deleteObject(properties.getGame().getOss2().getBucketName(), objectName);
-//		gameoss3.deleteObject(properties.getGame().getOss3().getBucketName(), objectName);
+		gameoss1.deleteObject(properties.getGame().getOss1().getBucketName(), objectName);
+		gameoss2.deleteObject(properties.getGame().getOss2().getBucketName(), objectName);
+		gameoss3.deleteObject(properties.getGame().getOss3().getBucketName(), objectName);
 
 	}
 
@@ -249,18 +249,18 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 				.disableChunkedEncoding().withPathStyleAccessEnabled(properties.getOss().getPathStyleAccess()).build();
 
 
-//		this.gameoss1 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
-//				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss1().getRegion())
-//				.enablePathStyleAccess()
-//				.build();
-//		this.gameoss2 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
-//				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss2().getRegion())
-//				.enablePathStyleAccess()
-//				.build();
-//		this.gameoss3 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
-//				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss3().getRegion())
-//				.enablePathStyleAccess()
-//				.build();
+		this.gameoss1 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
+				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss1().getRegion())
+				.enablePathStyleAccess()
+				.build();
+		this.gameoss2 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
+				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss2().getRegion())
+				.enablePathStyleAccess()
+				.build();
+		this.gameoss3 = AmazonS3Client.builder().withClientConfiguration(clientConfiguration)
+				.withCredentials(awsGameCredentialsProvider).withRegion(properties.getGame().getOss3().getRegion())
+				.enablePathStyleAccess()
+				.build();
 	}
 
 	/**
@@ -290,7 +290,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, objectName, objectMetadata);
 		//设置公共读取权限
 		initRequest.withCannedACL(CannedAccessControlList.PublicRead);
-		InitiateMultipartUploadResult initResponse = amazonS3.initiateMultipartUpload(initRequest);
+		InitiateMultipartUploadResult initResponse = gameoss1.initiateMultipartUpload(initRequest);
 		log.info("开始上传");
 		long begin = System.currentTimeMillis();
 		try {
@@ -307,7 +307,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 							.withFile(toFile)
 							.withPartSize(Math.min(minPartSize, (size - positions.get(finalI))));
 					// 第二步，上传分段，并把当前段的 PartETag 放到列表中
-					partETags.add(amazonS3.uploadPart(uploadRequest).getPartETag());
+					partETags.add(gameoss1.uploadPart(uploadRequest).getPartETag());
 					long time2 = System.currentTimeMillis();
 					log.info("第{}段上传耗时：{}", finalI + 1, (time2 - time1) + "ms");
 				});
@@ -324,11 +324,11 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 			// 第三步，完成上传，合并分段
 			CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(bucketName, objectName,
 					initResponse.getUploadId(), partETags);
-			amazonS3.completeMultipartUpload(compRequest);
+			gameoss1.completeMultipartUpload(compRequest);
 			//删除本地缓存文件
 			toFile.delete();
 		} catch (Exception e) {
-			amazonS3.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName, objectName, initResponse.getUploadId()));
+			gameoss1.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName, objectName, initResponse.getUploadId()));
 			log.error("Failed to upload {}, " + e.getMessage());
 		}
 		long end = System.currentTimeMillis();
@@ -339,7 +339,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	public List<S3ObjectSummary> getAllObjects() {
 
 
-		ObjectListing japanList = amazonS3.listObjects(properties.getBucketName());
+		ObjectListing japanList = gameoss1.listObjects(properties.getGame().getOss1().getBucketName());
 		//ObjectListing euList = gameoss2.listObjects(properties.getGame().getOss2().getBucketName());
 		//ObjectListing usList = gameoss3.listObjects(properties.getGame().getOss3().getBucketName());
 		return new ArrayList<>(japanList.getObjectSummaries());
@@ -349,7 +349,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	public String getPresignedUrl(String fileName, String bucketName) {
 		// token设置1小时后过期
 		DateTime expiration = DateUtil.offsetHour(new Date(), 1);
-		URL url = amazonS3.generatePresignedUrl(new GeneratePresignedUrlRequest(bucketName, fileName).withExpiration(expiration).withMethod(HttpMethod.PUT));
+		URL url = gameoss1.generatePresignedUrl(new GeneratePresignedUrlRequest(bucketName, fileName).withExpiration(expiration).withMethod(HttpMethod.PUT));
 		return url.toString();
 	}
 
@@ -365,7 +365,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 				.withMethod(HttpMethod.PUT);
 		generatePresignedUrlRequest.addRequestParameter("partNumber", String.valueOf(partNumber));
 		generatePresignedUrlRequest.addRequestParameter("uploadId", uploadId);
-		URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
+		URL url = gameoss1.generatePresignedUrl(generatePresignedUrlRequest);
 		return url.toString();
 	}
 
@@ -375,7 +375,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		ObjectMetadata objectMetadata = new ObjectMetadata();
 		objectMetadata.setContentType(contentType);
 		InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, objectName, objectMetadata);
-		InitiateMultipartUploadResult initResponse = amazonS3.initiateMultipartUpload(initRequest);
+		InitiateMultipartUploadResult initResponse = gameoss1.initiateMultipartUpload(initRequest);
 		return initResponse;
 	}
 
@@ -384,7 +384,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 
 		// 获取已完成的 List<PartETag>
 		ListPartsRequest listPartsRequest = new ListPartsRequest(gameBucketName, key, uploadId);
-		PartListing partListing = amazonS3.listParts(listPartsRequest);
+		PartListing partListing = gameoss1.listParts(listPartsRequest);
 		List<PartETag> partETags = partListing.getParts().stream().map(p -> {
 			PartETag partETag = new PartETag(p.getPartNumber(), p.getETag());
 			return partETag;
@@ -397,13 +397,13 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		requset.setKey(key);
 		requset.setUploadId(uploadId);
 		requset.setPartETags(partETags);
-		amazonS3.completeMultipartUpload(requset);
+		gameoss1.completeMultipartUpload(requset);
 	}
 
 	@Override
 	public void abortUpload(String gameBucketName, String key, String uploadId) {
 		AbortMultipartUploadRequest request = new AbortMultipartUploadRequest(gameBucketName, key, uploadId);
-		amazonS3.abortMultipartUpload(request);
+		gameoss1.abortMultipartUpload(request);
 	}
 
 
@@ -412,7 +412,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	public List<S3ObjectSummary> getAllObjectsByPrefix(String bucketName, String prefix) {
 
 		ListObjectsV2Request request = new ListObjectsV2Request().withBucketName(bucketName).withPrefix(prefix);
-		ListObjectsV2Result listObjectsV2Result = amazonS3.listObjectsV2(request);
+		ListObjectsV2Result listObjectsV2Result = gameoss1.listObjectsV2(request);
 		return new ArrayList<>(listObjectsV2Result.getObjectSummaries());
 	}
 
