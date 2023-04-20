@@ -715,13 +715,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (nftFeeRecord == null) {
             nftFeeRecord = new NftFeeRecordEntity();
         }
-        BeanUtils.copyProperties(req, nftFeeRecord);
-        nftFeeRecord.setReceivableFee(receivableFee);
-        nftFeeRecord.setRefundFee(refundFee);
-        nftFeeRecord.setRefundTime(System.currentTimeMillis());
-        nftFeeRecord.setCurrency(CurrencyEnum.SOL.getCode());
-        nftFeeRecord.setToAddress(sellerAddress);
-        nftFeeRecord.setStatus(WhetherEnum.YES.value());
         try {
             HttpResponse response = HttpRequest.post(url)
                     .timeout(8 * 1000)
@@ -735,12 +728,18 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (code == null || code != 200) {
                 throw new GenericException("Failed to refund Fee, message:" + jsonObject.getString("message"));
             }
-            nftFeeRecordService.save(nftFeeRecord);
         } catch (Exception e) {
             log.error("请求NFT托管费退还接口失败，message：{}", e.getMessage());
             nftFeeRecord.setStatus(WhetherEnum.NO.value());
-            nftFeeRecordService.saveOrUpdate(nftFeeRecord);
         }
+        BeanUtils.copyProperties(req, nftFeeRecord);
+        nftFeeRecord.setReceivableFee(receivableFee);
+        nftFeeRecord.setRefundFee(refundFee);
+        nftFeeRecord.setRefundTime(System.currentTimeMillis());
+        nftFeeRecord.setCurrency(CurrencyEnum.SOL.getCode());
+        nftFeeRecord.setToAddress(sellerAddress);
+        nftFeeRecord.setStatus(WhetherEnum.YES.value());
+        nftFeeRecordService.saveOrUpdate(nftFeeRecord);
     }
 
     @Override
