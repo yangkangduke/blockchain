@@ -28,6 +28,7 @@ import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.*;
 import com.seeds.uc.dto.response.UcUserResp;
+import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
@@ -510,7 +512,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     @Override
     public void view(NftMarketPlaceDetailViewReq req) {
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(req.getNftId());
-        if (req.getUserId() == null || !req.getUserId().equals(publicBackpack.getUserId())){
+        Long userId = null;
+        try {
+            userId = UserContext.getCurrentUserId();
+        } catch (Exception ex) {
+            log.error("当前用户未登录");
+        }
+        if (userId == null || !userId.equals(publicBackpack.getUserId())){
                 // 属性表更新NFT浏览量
                 LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
                         .setSql("`views`=`views`+1")
