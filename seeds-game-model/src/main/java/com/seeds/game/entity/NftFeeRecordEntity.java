@@ -29,9 +29,6 @@ public class NftFeeRecordEntity implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty("nft id")
-    private Long nftId;
-
     @ApiModelProperty("order id")
     private Long orderId;
 

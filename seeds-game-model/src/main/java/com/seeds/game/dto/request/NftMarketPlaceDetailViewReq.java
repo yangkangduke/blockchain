@@ -13,6 +13,4 @@ public class NftMarketPlaceDetailViewReq {
 
     @ApiModelProperty("nftId")
     private Long nftId;
-
-    private Long userId;
 }
