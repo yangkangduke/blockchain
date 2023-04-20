@@ -669,7 +669,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 if (ret == 0)
                     return GenericDto.success(true);
                 else {
-                    return GenericDto.failure(ret, (String) jsonObject.get("message"));
+                    return GenericDto.failure(ret, NFTEnumConstant.NftDepositCheckEnum.getMessage(ret));
                 }
             } catch (Exception e) {
                 log.info("rpc all seeds-admin ,queryGameApi error {}", e.getMessage());

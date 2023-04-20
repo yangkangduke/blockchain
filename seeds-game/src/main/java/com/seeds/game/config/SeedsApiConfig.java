@@ -66,4 +66,7 @@ public class SeedsApiConfig {
     @Value("${seeds.api.compose:/api/chainOp/nonce}")
     private String nonce;
 
+    @Value("${seeds.api.refundFee:/api/admin/refundFee}")
+    private String refundFee;
+
 }

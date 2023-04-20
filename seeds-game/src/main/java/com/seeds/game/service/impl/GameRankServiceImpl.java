@@ -56,11 +56,13 @@ public class GameRankServiceImpl implements GameRankService {
         RBucket<String> bucket = redissonClient.getBucket(UcRedisKeysConstant.getGameWinRankTemplate(query.getGameId().toString(), query.getSortType().toString()));
         String data = bucket.get();
         GameWinRankResp resp;
+        List<GameWinRankResp.GameWinRank> cacheRankList = new ArrayList<>();
         if (StringUtils.isNotBlank(data)) {
             resp = JSONUtil.toBean(data, GameWinRankResp.class);
+            cacheRankList = resp.getInfos();
             // 判断是否过期
             if (resp.getExpireTime() > System.currentTimeMillis()) {
-                return resp.getInfos();
+                return cacheRankList;
             }
         }
         // 请求游戏方获取排行榜数据
@@ -70,53 +72,58 @@ public class GameRankServiceImpl implements GameRankService {
         }
         Set<String> rankUrls = servers.stream().map(p -> p.getInnerHost() + gameWarbladeConfig.getPlayerWinRank()).collect(Collectors.toSet());
         List<GameWinRankResp.GameWinRank> rankList = new ArrayList<>();
-        for (String rankUrl : rankUrls) {
-            String params = String.format("startRow=%s&endRow=%s", query.getStartRow(), query.getEndRow() * 2);
-            rankUrl = rankUrl + "?" + params;
-            log.info("开始请求游戏胜场排行榜数据， url:{}， params:{}", rankUrl, params);
-            HttpResponse response = HttpRequest.get(rankUrl)
-                    .timeout(10 * 1000)
-                    .header("Content-Type", "application/json")
-                    .execute();
-            String body = response.body();
-            log.info("请求游戏胜场排行榜数据返回，result:{}", body);
-            if (!response.isOk()) {
-                log.error("Failed to get the win list from game");
-                throw new GenericException("Failed to get the win list");
+        try {
+            for (String rankUrl : rankUrls) {
+                String params = String.format("startRow=%s&endRow=%s", query.getStartRow(), query.getEndRow() * 2);
+                rankUrl = rankUrl + "?" + params;
+                log.info("开始请求游戏胜场排行榜数据， url:{}， params:{}", rankUrl, params);
+                HttpResponse response = HttpRequest.get(rankUrl)
+                        .timeout(10 * 1000)
+                        .header("Content-Type", "application/json")
+                        .execute();
+                String body = response.body();
+                log.info("请求游戏胜场排行榜数据返回，result:{}", body);
+                if (!response.isOk()) {
+                    log.error("Failed to get the win list from game");
+                    throw new GenericException("Failed to get the win list");
+                }
+                resp = JSONUtil.toBean(body, GameWinRankResp.class);
+                if (!"OK".equalsIgnoreCase(resp.getRet())) {
+                    log.error("Get the win list from game failed");
+                    throw new GenericException("Get the win list from game failed");
+                }
+                rankList.addAll(resp.getInfos());
             }
-            resp = JSONUtil.toBean(body, GameWinRankResp.class);
-            if (!"OK".equalsIgnoreCase(resp.getRet())) {
-                log.error("Get the win list from game failed");
-                throw new GenericException("Get the win list from game failed");
+            if (CollectionUtils.isEmpty(rankList)) {
+                return Collections.emptyList();
             }
-            rankList.addAll(resp.getInfos());
-        }
-        if (CollectionUtils.isEmpty(rankList)) {
-            return Collections.emptyList();
-        }
-        Map<String, GameWinRankResp.GameWinRank> rankMap = new HashMap<>(rankList.size());
-        for (GameWinRankResp.GameWinRank rank : rankList) {
-            String key = rank.getAccName();
-            GameWinRankResp.GameWinRank mapRank = rankMap.get(key);
-            // 头像url
-            rank.setPortraitUrl(gameFileService.getFileUrl("game/" + rank.getPortraitId() + GAME_WINS_RANKING_FILE));
-            if (mapRank == null) {
-                rankMap.put(key, rank);
-            } else {
-                // 分数高的服务器数据展示在排行榜
-                if (mapRank.getScore() < rank.getScore()) {
+            Map<String, GameWinRankResp.GameWinRank> rankMap = new HashMap<>(rankList.size());
+            for (GameWinRankResp.GameWinRank rank : rankList) {
+                String key = rank.getAccName();
+                GameWinRankResp.GameWinRank mapRank = rankMap.get(key);
+                // 头像url
+                rank.setPortraitUrl(gameFileService.getFileUrl("game/" + rank.getPortraitId() + GAME_WINS_RANKING_FILE));
+                if (mapRank == null) {
                     rankMap.put(key, rank);
+                } else {
+                    // 分数高的服务器数据展示在排行榜
+                    if (mapRank.getScore() < rank.getScore()) {
+                        rankMap.put(key, rank);
+                    }
                 }
             }
-        }
-        rankList = sortBySortType(query.getSortType(), rankMap, query.getEndRow());
+            rankList = sortBySortType(query.getSortType(), rankMap, query.getEndRow());
 
-        // 设置redis排行榜缓存
-        if (!CollectionUtils.isEmpty(rankList)) {
-            resp = new GameWinRankResp();
-            resp.setInfos(rankList);
-            resp.setExpireTime(System.currentTimeMillis() + winRankExpireAfter * 60 * 1000);
-            bucket.set(JSONUtil.toJsonStr(resp), winRankExpireAfter, TimeUnit.DAYS);
+            // 设置redis排行榜缓存
+            if (!CollectionUtils.isEmpty(rankList)) {
+                resp = new GameWinRankResp();
+                resp.setInfos(rankList);
+                resp.setExpireTime(System.currentTimeMillis() + winRankExpireAfter * 60 * 1000);
+                bucket.set(JSONUtil.toJsonStr(resp), winRankExpireAfter, TimeUnit.DAYS);
+            }
+        } catch (Exception e) {
+            log.error("请求游戏胜场排行榜数据失败，message:{}", e.getMessage());
+            return cacheRankList;
         }
         return rankList;
     }

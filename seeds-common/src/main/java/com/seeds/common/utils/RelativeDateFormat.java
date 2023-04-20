@@ -82,4 +82,8 @@ public class RelativeDateFormat {
         return sb.toString();
     }
 
+    public static Long toHours(long ms) {
+        return ms / MILLI_SECOND / SECOND_MINUTE / MINUTE_HOUR;
+    }
+
 }

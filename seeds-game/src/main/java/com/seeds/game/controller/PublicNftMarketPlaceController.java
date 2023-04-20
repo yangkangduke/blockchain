@@ -88,4 +88,11 @@ public class PublicNftMarketPlaceController {
     public GenericDto<String> chainNonce() {
         return GenericDto.success(nftMarketPlaceService.chainNonce());
     }
+
+    @PostMapping("refund-fee")
+    @ApiOperation("托管费退还")
+    public GenericDto<Object> refundFee(@Valid @RequestBody NftRefundFeeReq req) {
+        nftMarketPlaceService.refundFee(req);
+        return GenericDto.success(null);
+    }
 }
