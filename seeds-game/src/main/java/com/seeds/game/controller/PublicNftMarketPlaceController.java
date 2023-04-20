@@ -73,8 +73,8 @@ public class PublicNftMarketPlaceController {
 
     @PostMapping("view")
     @ApiOperation("浏览量")
-    public GenericDto<Object> view(@RequestBody NftMarketPlaceDetailViewReq req, HttpServletRequest request) {
-        nftMarketPlaceService.view(req,request);
+    public GenericDto<Object> view(@RequestBody NftMarketPlaceDetailViewReq req) {
+        nftMarketPlaceService.view(req);
         return GenericDto.success(null);
     }
 

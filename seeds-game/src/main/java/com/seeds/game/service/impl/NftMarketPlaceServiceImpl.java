@@ -510,21 +510,21 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
-    public void view(NftMarketPlaceDetailViewReq req, HttpServletRequest request) {
+    public void view(NftMarketPlaceDetailViewReq req) {
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(req.getNftId());
+        Long userId = null;
         try {
-            GenericDto<UserInfoResp> respGenericDto = userCenterFeignClient.getInfo(request);
-            Long userId = respGenericDto.getData().getId();
-            if (userId == null || !userId.equals(publicBackpack.getUserId())){
+            userId = UserContext.getCurrentUserId();
+        } catch (Exception ex) {
+            log.error("当前用户未登录");
+        }
+        if (userId == null || !userId.equals(publicBackpack.getUserId())){
                 // 属性表更新NFT浏览量
                 LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
                         .setSql("`views`=`views`+1")
                         .eq(NftPublicBackpackEntity::getEqNftId,req.getNftId());
                 nftPublicBackpackService.update(updateWrap);
             }
-        } catch (Exception e) {
-            log.error("内部请求uc获取用户信息失败");
-        }
     }
 
     @Override
