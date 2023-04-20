@@ -104,13 +104,4 @@ public class InterUserController {
         return GenericDto.success(ucUserService.getByPublicAddress(publicAddress));
     }
 
-    @GetMapping("/getInfo")
-    @Inner
-    @ApiOperation(value = "获取用户信息", notes = "获取用户信息")
-    public GenericDto<UserInfoResp> getInfo(HttpServletRequest request) {
-        // 获取当前登陆人信息
-        String loginToken = WebUtil.getTokenFromRequest(request);
-        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
-        return GenericDto.success(ucUserService.getInfo(loginUser));
-    }
 }
