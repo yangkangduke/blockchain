@@ -150,7 +150,7 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
             }
             backpackEntity.setAttributes(equipment.getAttributes());
             // 设置参考价，TODO  根据规则来设置  先设置成固定值
-            backpackEntity.setProposedPrice(new BigDecimal(Math.random() * (10 - 1) + 1).setScale(2, RoundingMode.HALF_UP));
+            backpackEntity.setProposedPrice(new BigDecimal(durability));
             nftPublicBackpackService.save(backpackEntity);
 
             // 如果是合成，作为合成材料的nft标记为销毁的状态
