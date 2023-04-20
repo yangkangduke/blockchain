@@ -10,7 +10,7 @@ public enum NftOrderStatusEnum {
 
     PENDING(1,"挂单中"),
     COMPLETED(2,"已成交"),
-    CANCELED(2,"已取消"),
+    CANCELED(3,"已取消"),
     ;
 
     private Integer code;

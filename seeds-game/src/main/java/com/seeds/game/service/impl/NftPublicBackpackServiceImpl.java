@@ -476,7 +476,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         }
         // NFT上架中不能托管
         if (WhetherEnum.YES.value() == nft.getOnSale()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
+            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
         }
         //更新背包状态 deposited
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
