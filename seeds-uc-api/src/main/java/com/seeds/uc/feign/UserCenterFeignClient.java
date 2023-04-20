@@ -1,10 +1,12 @@
 package com.seeds.uc.feign;
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.common.web.inner.Inner;
 import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
 import com.seeds.uc.dto.response.UcUserResp;
+import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.dto.response.UserRegistrationResp;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -72,5 +75,8 @@ public interface UserCenterFeignClient {
      */
     @GetMapping("/uc-internal/user/get-by-public-address")
     GenericDto<UcUserResp> getByPublicAddress(@RequestParam String publicAddress);
+
+    @GetMapping("/uc-internal/user/getInfo")
+    GenericDto<UserInfoResp> getInfo(@RequestBody HttpServletRequest request);
 
 }

@@ -4,6 +4,7 @@ import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 
 
@@ -104,7 +105,7 @@ public interface NftMarketPlaceService {
      * @param req
      * @return NFT浏览量
      */
-    void view(NftMarketPlaceDetailViewReq req);
+    void view(NftMarketPlaceDetailViewReq req, HttpServletRequest request);
 
     /**
      * 获取nft 道具列表

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -72,8 +73,8 @@ public class PublicNftMarketPlaceController {
 
     @PostMapping("view")
     @ApiOperation("浏览量")
-    public GenericDto<Object> view(@RequestBody NftMarketPlaceDetailViewReq req) {
-        nftMarketPlaceService.view(req);
+    public GenericDto<Object> view(@RequestBody NftMarketPlaceDetailViewReq req, HttpServletRequest request) {
+        nftMarketPlaceService.view(req,request);
         return GenericDto.success(null);
     }
 

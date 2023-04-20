@@ -3,16 +3,21 @@ package com.seeds.uc.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
+import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.response.UcUserResp;
+import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.dto.response.UserRegistrationResp;
 import com.seeds.uc.service.IUcUserService;
+import com.seeds.uc.service.impl.CacheService;
+import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +33,9 @@ public class InterUserController {
 
     @Autowired
     private IUcUserService ucUserService;
+
+    @Autowired
+    private CacheService cacheService;
 
     @PostMapping("/metamask/verify-signature")
     public GenericDto<Boolean> metaMaskVerifySignature(@RequestBody MetamaskVerifyReq metamaskReq) {
@@ -96,4 +104,13 @@ public class InterUserController {
         return GenericDto.success(ucUserService.getByPublicAddress(publicAddress));
     }
 
+    @GetMapping("/getInfo")
+    @Inner
+    @ApiOperation(value = "获取用户信息", notes = "获取用户信息")
+    public GenericDto<UserInfoResp> getInfo(HttpServletRequest request) {
+        // 获取当前登陆人信息
+        String loginToken = WebUtil.getTokenFromRequest(request);
+        LoginUserDTO loginUser = cacheService.getUserByToken(loginToken);
+        return GenericDto.success(ucUserService.getInfo(loginUser));
+    }
 }
