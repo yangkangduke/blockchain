@@ -251,20 +251,24 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         } catch (Exception e) {
             log.error("mint成功通知失败，message：{}", e.getMessage());
             recordNftEventLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
+            nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
+            this.updateById(nftEvent);
         }
         JSONObject jsonObject = JSONObject.parseObject(response.body());
         log.info(" mint成功--result:{}", jsonObject);
         if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
             // 生成metadata
             data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
+            // 通知游戏方，更新本地数据库
+            updateLocalDB(mintSuccessReq.getAutoDeposite(), mintSuccessReq.getMintAddress(), nftEvent, equipment, data);
             createMetadata(equipment, data.getTokenId());
         } else {
             log.error("mint成功，通知失败，message：{}", jsonObject.get("message"));
+            nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
+            this.updateById(nftEvent);
             recordNftEventLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
         }
 
-        // 通知游戏方，更新本地数据库
-        updateLocalDB(mintSuccessReq.getAutoDeposite(), mintSuccessReq.getMintAddress(), nftEvent, equipment, data);
     }
 
 
@@ -373,7 +377,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Override
     public void composeSuccess(ComposeSuccessReq req) {
-
+        NftEvent nftEvent = this.getById(req.getEventId());
         // 调用/api/chainOp/buySuccess通知，购买成功
         String params = String.format("isDeposit=%s&mintAddresses=%s&sig=%s&walletAddress=%s", req.getAutoDeposite(), req.getMintAddresses(), req.getSig(), req.getWalletAddress());
         // 调用/api/equipment/compose  合成成功
@@ -389,18 +393,21 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         } catch (Exception e) {
             log.error("NFT合成成功通知失败，message：{}", e.getMessage());
             //   recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
+            nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
+            this.updateById(nftEvent);
         }
         JSONObject jsonObject = JSONObject.parseObject(response.body());
         log.info(" 合成成功--result:{}", jsonObject);
         if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
             data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
-            NftEvent nftEvent = this.getById(req.getEventId());
             NftEventEquipment equipment = eventEquipmentService
                     .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
             updateLocalDB(req.getAutoDeposite(), data.getMintAddress(), nftEvent, equipment, data);
-
             //生成metadata
             createMetadata(equipment, data.getTokenId());
+        } else {
+            nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
+            this.updateById(nftEvent);
         }
 
     }

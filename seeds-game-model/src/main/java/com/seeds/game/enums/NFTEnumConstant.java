@@ -2,6 +2,8 @@ package com.seeds.game.enums;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+
 /**
  * NFT常量
  *
@@ -38,7 +40,8 @@ public class NFTEnumConstant {
     public enum NFTEventStatus {
         PENDING(1, "Pending"),
         CANCELLED(2, "Cancelled"),
-        MINTED(3, "Minted");
+        MINTED(3, "Minted"),
+        MINTING(4, "Minting");
 
         private final int code;
         private final String desc;
@@ -97,7 +100,6 @@ public class NFTEnumConstant {
             this.code = code;
             this.desc = desc;
         }
-
     }
 
     /**
@@ -147,6 +149,34 @@ public class NFTEnumConstant {
 
         EquMetadataAttrEnum(String name) {
             this.name = name;
+        }
+    }
+
+    @Getter
+    public enum NftDepositCheckEnum {
+        AUTO_ID_ERROR(1122, "autoId invalid"),
+        CONF_ID_ERROR(1123, "confId invalid"),
+        TOKEN_ID_ERROR(1124, "tokenId invalid"),
+        NFT_NOT_FOUND(1104, "NFT not exist"),
+        CONF_ID_NOT_MATCH(1108, "confId does not match"),
+        TOKEN_ID_NOT_MATCH(1109, "tokenId does not match"),
+        NFT_NOT_AVAILABLE(1120, "The NFT is unavailable"),
+        OPERATE_DATA_NOT_FOUND(1105, "NFT last operation record does not exist"),
+        NFT_ATT_NOT_FOUND(1107, "The NFT attribute does not exist"),
+        NFT_ALREADY_IN_GAME(1708, "The NFT is already in the game");
+        private int code;
+        private String message;
+
+        NftDepositCheckEnum(int code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+        public static String getMessage(int code) {
+            return Arrays.stream(values())
+                    .filter(i -> i.getCode() == code)
+                    .findFirst()
+                    .map(a -> a.getMessage())
+                    .orElse(null);
         }
     }
 
