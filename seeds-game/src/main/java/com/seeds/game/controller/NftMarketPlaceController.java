@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import java.math.BigDecimal;
 
 @Api(tags = "NFT市场")
 @RestController
@@ -83,6 +84,12 @@ public class NftMarketPlaceController {
     public GenericDto<Object> cancelOffer(@Valid @RequestBody NftCancelOfferReq req) {
         nftMarketPlaceService.cancelOffer(req);
         return GenericDto.success(null);
+    }
+
+    @GetMapping("custodian-fee/{price}/{duration}")
+    @ApiOperation("获取托管费")
+    public GenericDto<BigDecimal> custodianFee(@PathVariable BigDecimal price, @PathVariable Long duration) {
+        return GenericDto.success(nftMarketPlaceService.custodianFee(price, duration));
     }
 
 }
