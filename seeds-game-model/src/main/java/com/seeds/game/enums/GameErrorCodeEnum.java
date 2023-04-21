@@ -37,6 +37,7 @@ public enum GameErrorCodeEnum {
     ERR_10016_NFT_ITEM_HAS_BEEN_RETRIEVED(10016, "NFT物品已经取回", "NFT items has been retrieved"),
     ERR_10017_NFT_ITEM_IN_SETTLEMENT(10017, "NFT物品结算中", "NFT items in settlement"),
     ERR_10018_NFT_ITEM_ORDER_NOT_EXIST(10018, "NFT物品订单不存在", "NFT item order does not exist"),
+    ERR_10019_NFT_IS_MINTING(10019, "NFT物品Mint中", "NFT item is minting"),
 
     // role
     ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN(20001, "角色等级不满十级", "The role level is less than ten"),
