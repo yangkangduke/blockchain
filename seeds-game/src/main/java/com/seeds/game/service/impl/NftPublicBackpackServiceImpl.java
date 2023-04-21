@@ -16,6 +16,7 @@ import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
+import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.config.SeedsApiConfig;
 import com.seeds.game.dto.request.*;
@@ -87,7 +88,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     private INftEventEquipmentService nftEventEquipmentService;
 
     @Autowired
-    private INftMarketOrderService nftMarketOrderService;
+    private NftMarketPlaceService nftMarketPlaceService;
 
     @Autowired
     private SeedsApiConfig seedsApiConfig;
@@ -389,7 +390,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public List<NftPublicBackpackResp> queryList(NftPublicBackpackPageReq req) {
         List<NftPublicBackpackResp> respList = new ArrayList<>();
-
+        BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
         LambdaQueryWrapper<NftPublicBackpackEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(!Objects.isNull(req.getIsConfiguration()), NftPublicBackpackEntity::getIsConfiguration, req.getIsConfiguration())
                 .like(!Objects.isNull(req.getName()), NftPublicBackpackEntity::getName, req.getName())
@@ -401,6 +402,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             respList = list.stream().map(p -> {
                 NftPublicBackpackResp resp = new NftPublicBackpackResp();
                 BeanUtils.copyProperties(p, resp);
+                resp.setPrice((p.getProposedPrice().divide(usdRate, 2, BigDecimal.ROUND_HALF_UP).toString()));
                 return resp;
             }).filter(i -> {
                 if (!i.getType().equals(NFTEnumConstant.NftTypeEnum.HERO.getCode())) {
