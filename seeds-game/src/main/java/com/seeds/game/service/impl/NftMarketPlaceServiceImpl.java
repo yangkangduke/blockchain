@@ -509,6 +509,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public void view(NftMarketPlaceDetailViewReq req) {
+        log.info("NftMarketPlaceDetailViewReq--->{}",req);
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(req.getNftId());
         Long userId = null;
         try {
@@ -742,6 +743,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public BigDecimal custodianFee(BigDecimal price, Long duration) {
+        duration = duration == null ? 72L : duration;
         BigDecimal baseFee = price.multiply(new BigDecimal("0.005"));
         return new BigDecimal(duration / 12L).multiply(baseFee);
     }

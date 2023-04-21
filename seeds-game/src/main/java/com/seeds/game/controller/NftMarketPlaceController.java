@@ -1,4 +1,5 @@
 package com.seeds.game.controller;
+import cn.hutool.core.lang.Assert;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.NftBuySuccessReq;
@@ -86,9 +87,9 @@ public class NftMarketPlaceController {
         return GenericDto.success(null);
     }
 
-    @GetMapping("custodian-fee/{price}/{duration}")
+    @GetMapping("custodian-fee")
     @ApiOperation("获取托管费")
-    public GenericDto<BigDecimal> custodianFee(@PathVariable BigDecimal price, @PathVariable Long duration) {
+    public GenericDto<BigDecimal> custodianFee(@RequestParam BigDecimal price, @RequestParam(required = false) Long duration) {
         return GenericDto.success(nftMarketPlaceService.custodianFee(price, duration));
     }
 
