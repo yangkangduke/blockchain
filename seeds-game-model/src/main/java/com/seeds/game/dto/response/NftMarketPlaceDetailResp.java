@@ -67,6 +67,9 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("当前价格")
     private BigDecimal currentPrice;
 
+    @ApiModelProperty("最高出价")
+    private BigDecimal highPrice;
+
     @ApiModelProperty("参考价格")
     private BigDecimal referencePrice;
 

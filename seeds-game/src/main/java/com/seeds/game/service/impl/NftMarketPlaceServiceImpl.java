@@ -107,6 +107,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             return resp;
         }
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftId);
+        Boolean isLock = Boolean.FALSE;
         if (publicBackpack != null) {
             BeanUtils.copyProperties(publicBackpack, resp);
             resp.setAttributes(JSONUtil.parseObj(publicBackpack.getAttributes()));
@@ -120,6 +121,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             } else {
                 resp.setContractAddress(solanaConfig.getEquipmentContractAddress());
             }
+            isLock = publicBackpack.getState() == NFTEnumConstant.NFTStateEnum.LOCK.getCode() ? Boolean.TRUE : Boolean.FALSE;
         }
         NftAttributeEntity nftAttribute = nftAttributeService.queryByNftId(nftId);
         if (nftAttribute != null) {
@@ -154,6 +156,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(nftEquipment.getAuctionId());
                 if (currentPrice != null) {
                     resp.setCurrentPrice(currentPrice);
+                    resp.setHighPrice(currentPrice);
                 }
 
                 BigDecimal difference = resp.getCurrentPrice().subtract(auctionSetting.getStartPrice())
@@ -179,7 +182,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         resp.setOwnerAddress(nftEquipment.getOwner());
         resp.setNftId(nftEquipment.getId());
         resp.setNumber("#" + nftEquipment.getTokenId());
-        resp.setState(convertOrderState(nftEquipment, auctionSetting));
+        resp.setState(convertOrderState(nftEquipment, auctionSetting, isLock));
         Long lastUpdated = nftActivityService.queryLastUpdateTime(nftEquipment.getMintAddress());
         if (lastUpdated != null) {
             resp.setLastUpdated(RelativeDateFormat.convert(new Date(lastUpdated), new Date()));
@@ -945,13 +948,17 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     }
 
-    private Integer convertOrderState(NftEquipment nftEquipment, NftAuctionHouseSetting auction) {
+    private Integer convertOrderState(NftEquipment nftEquipment, NftAuctionHouseSetting auction, Boolean isLock) {
         int state;
         if (WhetherEnum.YES.value() == nftEquipment.getIsDelete()) {
             return NftStateEnum.BURNED.getCode();
         }
         if (WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
-            state = NftStateEnum.DEPOSITED.getCode();
+            if (isLock) {
+                state = NftStateEnum.LOCKED.getCode();
+            } else {
+                state = NftStateEnum.DEPOSITED.getCode();
+            }
         } else {
             if (NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()) {
                 // 拍卖时间到期为结算中

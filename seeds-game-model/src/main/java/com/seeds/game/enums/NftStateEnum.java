@@ -14,6 +14,7 @@ public enum NftStateEnum {
     ON_AUCTION(3,"拍卖中"),
     IN_SETTLEMENT(4,"结算中"),
     BURNED(5,"已销毁"),
+    LOCKED(6,"已锁定"),
     ;
 
     private int code;
