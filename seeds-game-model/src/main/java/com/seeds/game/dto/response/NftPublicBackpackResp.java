@@ -65,6 +65,9 @@ public class NftPublicBackpackResp implements Serializable {
     @ApiModelProperty("协议标准")
     private String tokenStandard;
 
+    @ApiModelProperty("参考价格")
+    private String price;
+
     @ApiModelProperty("是否分配。0未分配 1已分配")
     private Integer isConfiguration;
 
