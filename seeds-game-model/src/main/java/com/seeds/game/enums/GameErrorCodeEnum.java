@@ -25,7 +25,7 @@ public enum GameErrorCodeEnum {
     ERR_10004_NFT_ITEM_NOT_ASSIGNED(10004, "NFT物品未分配", "NFT item not assigned"),
     ERR_10005_NFT_ITEM_ALREADY_BELONGS_TO_THE_ROLE(10005, "NFT物品已经属于该角色", "NFT item already belongs to the role"),
     ERR_10006_NFT_PROCESSING(10006, "操作中...请稍后再试", "In operation... Please try again later"),
-    ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE(10007, "NFT已经在售卖中", "NFT item is already on sale"),
+    ERR_10007_NFT_ITEM_IS_ON_SALE(10007, "NFT售卖中", "NFT item is on sale"),
     ERR_10008_NFT_ITEM_IS_DEPOSIT(10008, "NFT托管中", "NFT item is deposit"),
     ERR_10009_NFT_ITEM_HAS_NOT_BEEN_GENERATED(10009, "NFT还未生成", "NFT item has not been generated"),
     ERR_10010_NFT_ITEM_HAS_BEEN_REMOVAL(10010, "NFT已经下架", "NFT item has been removed from the shelves"),
@@ -37,6 +37,8 @@ public enum GameErrorCodeEnum {
     ERR_10016_NFT_ITEM_HAS_BEEN_RETRIEVED(10016, "NFT物品已经取回", "NFT items has been retrieved"),
     ERR_10017_NFT_ITEM_IN_SETTLEMENT(10017, "NFT物品结算中", "NFT items in settlement"),
     ERR_10018_NFT_ITEM_ORDER_NOT_EXIST(10018, "NFT物品订单不存在", "NFT item order does not exist"),
+    ERR_10019_NFT_IS_MINTING(10019, "NFT物品Mint中", "NFT item is minting"),
+
     // role
     ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN(20001, "角色等级不满十级", "The role level is less than ten"),
     ERR_20002_ROLE_NOT_EXIST(20002, "角色不存在", "The role does not exist"),

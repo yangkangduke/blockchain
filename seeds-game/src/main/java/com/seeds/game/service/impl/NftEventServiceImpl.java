@@ -27,8 +27,10 @@ import com.seeds.game.dto.response.MintSuccessMessageResp;
 import com.seeds.game.dto.response.NftEventEquipmentResp;
 import com.seeds.game.dto.response.NftEventResp;
 import com.seeds.game.entity.*;
+import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
+import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftEventMapper;
 import com.seeds.game.mq.producer.KafkaProducer;
 import com.seeds.game.service.*;
@@ -253,6 +255,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             recordNftEventLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
             nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
             this.updateById(nftEvent);
+            throw new GenericException(GameErrorCodeEnum.ERR_10019_NFT_IS_MINTING);
         }
         JSONObject jsonObject = JSONObject.parseObject(response.body());
         log.info(" mint成功--result:{}", jsonObject);
@@ -267,6 +270,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
             this.updateById(nftEvent);
             recordNftEventLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
+            throw new GenericException(GameErrorCodeEnum.ERR_10019_NFT_IS_MINTING);
         }
 
     }

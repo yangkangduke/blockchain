@@ -4,7 +4,6 @@ import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 
 
@@ -132,5 +131,13 @@ public interface NftMarketPlaceService {
      * @param req 订单信息
      */
     void refundFee(NftRefundFeeReq req);
+
+    /**
+     * 获取托管费
+     * @param price 价格信息
+     * @param duration 持续时间
+     * @return  托管费
+     */
+    BigDecimal custodianFee(BigDecimal price, Long duration);
 
 }
