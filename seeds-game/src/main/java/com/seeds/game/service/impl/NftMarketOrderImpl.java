@@ -6,6 +6,8 @@ import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.INftMarketOrderService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class NftMarketOrderImpl extends ServiceImpl<NftMarketOrderMapper, NftMarketOrderEntity>implements INftMarketOrderService {
 
@@ -14,6 +16,15 @@ public class NftMarketOrderImpl extends ServiceImpl<NftMarketOrderMapper, NftMar
         return getOne(new LambdaQueryWrapper<NftMarketOrderEntity>()
                 .eq(NftMarketOrderEntity::getMintAddress, mintAddress)
                 .eq(NftMarketOrderEntity::getStatus, status));
+    }
+
+    @Override
+    public List<NftMarketOrderEntity> queryUserTradesByAddressAndStatus(String publicAddress, Integer status) {
+        return list(new LambdaQueryWrapper<NftMarketOrderEntity>()
+                .eq(NftMarketOrderEntity::getStatus, status)
+                .eq(NftMarketOrderEntity::getSellerAddress, publicAddress)
+                .or()
+                .eq(NftMarketOrderEntity::getBuyerAddress, publicAddress));
     }
 
     @Override

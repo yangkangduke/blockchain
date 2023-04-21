@@ -1,4 +1,5 @@
 package com.seeds.game.controller;
+import cn.hutool.core.lang.Assert;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.NftBuySuccessReq;
@@ -10,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import java.math.BigDecimal;
 
 @Api(tags = "NFT市场")
 @RestController
@@ -83,6 +85,12 @@ public class NftMarketPlaceController {
     public GenericDto<Object> cancelOffer(@Valid @RequestBody NftCancelOfferReq req) {
         nftMarketPlaceService.cancelOffer(req);
         return GenericDto.success(null);
+    }
+
+    @GetMapping("custodian-fee")
+    @ApiOperation("获取托管费")
+    public GenericDto<BigDecimal> custodianFee(@RequestParam BigDecimal price, @RequestParam(required = false) Long duration) {
+        return GenericDto.success(nftMarketPlaceService.custodianFee(price, duration));
     }
 
 }

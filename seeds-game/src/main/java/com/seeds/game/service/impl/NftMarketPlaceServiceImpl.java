@@ -28,7 +28,6 @@ import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.*;
 import com.seeds.uc.dto.response.UcUserResp;
-import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +37,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
@@ -709,7 +707,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // 调用/api/admin/refundFee，请求NFT托管费退还
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getRefundFee();
         TransferSolMessageDto dto = new TransferSolMessageDto();
-        dto.setAmount(refundFee);
+        dto.setAmount(refundFee.multiply(new BigDecimal(100000000L)));
         dto.setToAddress(sellerAddress);
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT托管费退还开始请求， url:{}， params:{}", url, param);
@@ -741,6 +739,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         nftFeeRecord.setToAddress(sellerAddress);
         nftFeeRecord.setStatus(WhetherEnum.YES.value());
         nftFeeRecordService.saveOrUpdate(nftFeeRecord);
+    }
+
+    @Override
+    public BigDecimal custodianFee(BigDecimal price, Long duration) {
+        duration = duration == null ? 72L : duration;
+        BigDecimal baseFee = price.multiply(new BigDecimal("0.005"));
+        return new BigDecimal(duration / 12L).multiply(baseFee);
     }
 
     @Override

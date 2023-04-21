@@ -9,6 +9,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.TargetSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.*;
+import com.seeds.game.service.UcUserService;
 import com.seeds.uc.exceptions.GenericException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +37,9 @@ public class OpenNftController {
 
     @Autowired
     private RemoteNftService adminRemoteNftService;
+
+    @Autowired
+    private UcUserService ucUserService;
 
     @PostMapping("create")
     @ApiOperation("NFT创建")
@@ -177,6 +181,14 @@ public class OpenNftController {
                     result.getCode());
         }
         return result;
+    }
+
+    @GetMapping("user-trade-times")
+    @ApiOperation("用户交易次数")
+    public GenericDto<Integer> userTradeTimes(@RequestParam String accessKey,
+                                              @RequestParam String signature,
+                                              @RequestParam Long timestamp) {
+        return GenericDto.success(ucUserService.userTradeTimes(UserContext.getCurrentUserId()));
     }
 
     private AccountOperateReq nftDeductGasFee(BigDecimal amount, String currency) {

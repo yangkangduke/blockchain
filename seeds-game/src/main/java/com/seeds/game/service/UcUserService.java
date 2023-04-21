@@ -17,4 +17,11 @@ public interface UcUserService {
      */
     void ownerValidation(String owner);
 
+    /**
+     * 用户交易次数
+     * @param userId 用户id
+     * @return 交易次数
+     */
+    Integer userTradeTimes(Long userId);
+
 }
