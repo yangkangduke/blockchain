@@ -15,4 +15,10 @@ public class NftMarketOrderImpl extends ServiceImpl<NftMarketOrderMapper, NftMar
                 .eq(NftMarketOrderEntity::getMintAddress, mintAddress)
                 .eq(NftMarketOrderEntity::getStatus, status));
     }
+
+    @Override
+    public NftMarketOrderEntity queryByAuctionId(Long auctionId) {
+        return getOne(new LambdaQueryWrapper<NftMarketOrderEntity>()
+                .eq(NftMarketOrderEntity::getAuctionId, auctionId));
+    }
 }

@@ -28,6 +28,7 @@ import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.*;
 import com.seeds.uc.dto.response.UcUserResp;
+import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
@@ -70,6 +72,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Autowired
     private INftAttributeService nftAttributeService;
+
+    @Autowired
+    private INftFeeRecordService nftFeeRecordService;
 
     @Autowired
     private INftEquipmentService nftEquipmentService;
@@ -194,7 +199,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         shelfValidation(nftEquipment);
         // 不能重复上架
         if (WhetherEnum.YES.value() == nftEquipment.getOnSale()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
+            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
         }
 
         //更新背包状态(undeposited => on shelf)
@@ -224,7 +229,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         shelfValidation(nftEquipment);
         // 不能重复上架
         if (WhetherEnum.YES.value() == nftEquipment.getOnSale()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ALREADY_ON_SALE);
+            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
         }
 
         //更新背包状态(undeposited => on auction)
@@ -507,7 +512,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     @Override
     public void view(NftMarketPlaceDetailViewReq req) {
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(req.getNftId());
-        if (req.getUserId() == null || !req.getUserId().equals(publicBackpack.getUserId())){
+        Long userId = null;
+        try {
+            userId = UserContext.getCurrentUserId();
+        } catch (Exception ex) {
+            log.error("当前用户未登录");
+        }
+        if (userId == null || !userId.equals(publicBackpack.getUserId())){
                 // 属性表更新NFT浏览量
                 LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
                         .setSql("`views`=`views`+1")
@@ -630,12 +641,18 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public void refundFee(NftRefundFeeReq req) {
-
         BigDecimal price;
         long duration;
         long placeTime;
+        long endTime;
         String sellerAddress;
+        NftFeeRecordEntity nftFeeRecord;
         if (req.getAuctionId() != null) {
+            nftFeeRecord = nftFeeRecordService.queryByAuctionId(req.getAuctionId());
+            if (nftFeeRecord != null && nftFeeRecord.getRefundFee() !=null && WhetherEnum.YES.value() == nftFeeRecord.getStatus()) {
+                log.info("托管费已退还， auctionId:{}", req.getAuctionId());
+                return;
+            }
             NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(req.getAuctionId());
             if (auctionSetting == null) {
                 throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
@@ -643,15 +660,34 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             price = auctionSetting.getStartPrice();
             duration = auctionSetting.getDuration();
             placeTime = auctionSetting.getStartTime();
-            NftAuctionHouseListing auctionListing = nftAuctionHouseListingService.getById(auctionSetting.getListingId());
-            if (auctionListing == null) {
-                throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+            NftMarketOrderEntity marketOrder = nftMarketOrderService.queryByAuctionId(req.getAuctionId());
+            if (marketOrder == null) {
+                throw new GenericException(GameErrorCodeEnum.ERR_10018_NFT_ITEM_ORDER_NOT_EXIST);
             }
-            sellerAddress = auctionListing.getSeller();
+            sellerAddress = marketOrder.getSellerAddress();
+            if (NftOrderStatusEnum.CANCELED.getCode().equals(marketOrder.getStatus())) {
+                endTime = marketOrder.getCancelTime();
+            } else if (NftOrderStatusEnum.COMPLETED.getCode().equals(marketOrder.getStatus())) {
+                endTime = marketOrder.getFulfillTime();
+            } else {
+                throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
+            }
         } else if (req.getOrderId() != null) {
+            nftFeeRecord = nftFeeRecordService.queryByOrderId(req.getOrderId());
+            if (nftFeeRecord != null && nftFeeRecord.getRefundFee() !=null && WhetherEnum.YES.value() == nftFeeRecord.getStatus()) {
+                log.info("托管费已退还， orderId:{}", req.getOrderId());
+                return;
+            }
             NftMarketOrderEntity order = nftMarketOrderService.getById(req.getOrderId());
             if (order == null) {
                 throw new GenericException(GameErrorCodeEnum.ERR_10018_NFT_ITEM_ORDER_NOT_EXIST);
+            }
+            if (NftOrderStatusEnum.CANCELED.getCode().equals(order.getStatus())) {
+                endTime = order.getCancelTime();
+            } else if (NftOrderStatusEnum.COMPLETED.getCode().equals(order.getStatus())) {
+                endTime = order.getFulfillTime();
+            } else {
+                throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
             }
             price = order.getPrice();
             duration = 72L;
@@ -662,9 +698,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         BigDecimal baseFee = price.multiply(new BigDecimal("0.005"));
         BigDecimal receivableFee = new BigDecimal(duration / 12L).multiply(baseFee);
-        long consumedHours = RelativeDateFormat.toHours(System.currentTimeMillis() - placeTime);
+        long consumedHours = Math.max(RelativeDateFormat.toHours(endTime - placeTime), 12L);
         long base = consumedHours % 12L > 0 ? consumedHours / 12L + 1 : consumedHours / 12L;
         BigDecimal refundFee = receivableFee.subtract(new BigDecimal(base).multiply(baseFee));
+        if (BigDecimal.ZERO.compareTo(refundFee) == 0) {
+            log.info("无需退还托管费， orderId:{}， auctionId:{}", req.getOrderId(), req.getAuctionId());
+            return;
+        }
         // 调用/api/admin/refundFee，请求NFT托管费退还
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getRefundFee();
         TransferSolMessageDto dto = new TransferSolMessageDto();
@@ -672,6 +712,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         dto.setToAddress(sellerAddress);
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT托管费退还开始请求， url:{}， params:{}", url, param);
+        if (nftFeeRecord == null) {
+            nftFeeRecord = new NftFeeRecordEntity();
+        }
         try {
             HttpResponse response = HttpRequest.post(url)
                     .timeout(8 * 1000)
@@ -687,8 +730,16 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             }
         } catch (Exception e) {
             log.error("请求NFT托管费退还接口失败，message：{}", e.getMessage());
-
+            nftFeeRecord.setStatus(WhetherEnum.NO.value());
         }
+        BeanUtils.copyProperties(req, nftFeeRecord);
+        nftFeeRecord.setReceivableFee(receivableFee);
+        nftFeeRecord.setRefundFee(refundFee);
+        nftFeeRecord.setRefundTime(System.currentTimeMillis());
+        nftFeeRecord.setCurrency(CurrencyEnum.SOL.getCode());
+        nftFeeRecord.setToAddress(sellerAddress);
+        nftFeeRecord.setStatus(WhetherEnum.YES.value());
+        nftFeeRecordService.saveOrUpdate(nftFeeRecord);
     }
 
     @Override
