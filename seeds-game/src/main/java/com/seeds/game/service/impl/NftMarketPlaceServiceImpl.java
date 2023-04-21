@@ -511,6 +511,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public void view(NftMarketPlaceDetailViewReq req) {
+        log.info("NftMarketPlaceDetailViewReq--->{}",req);
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(req.getNftId());
         Long userId = null;
         try {
