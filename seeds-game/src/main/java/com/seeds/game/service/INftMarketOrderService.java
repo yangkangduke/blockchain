@@ -12,4 +12,11 @@ public interface INftMarketOrderService extends IService<NftMarketOrderEntity> {
      */
     NftMarketOrderEntity queryByMintAddressAndStatus(String mintAddress, Integer status);
 
+    /**
+     * 通过拍卖id查询NFT订单
+     * @param auctionId 拍卖id
+     * @return NFT订单
+     */
+    NftMarketOrderEntity queryByAuctionId(Long auctionId);
+
 }
