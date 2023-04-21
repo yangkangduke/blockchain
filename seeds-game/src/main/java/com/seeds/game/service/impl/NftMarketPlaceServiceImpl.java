@@ -412,7 +412,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public IPage<NftMarketPlaceSkinResp> skinQueryPage(NftMarketPlaceSkinPageReq skinQuery) {
-
+        log.info("NftMarketPlaceSkinPageReq= {}",skinQuery);
         Page<NftMarketPlaceSkinResp> page = new Page<>();
         page.setCurrent(skinQuery.getCurrent());
         page.setSize(skinQuery.getSize());
