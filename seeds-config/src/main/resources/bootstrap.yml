@@ -15,7 +15,7 @@ spring:
         git:
           uri: https://github.com/yangkangduke/seeds-java
           username: yangkang.duke@gmail.com
-          password: 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
+          password: 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
 #          uri: https://gitee.com/Jiutong123/git-config
 #          username: 15928559050
 #          password: cd530d0aaf83a68e54a523e0c011af4b
