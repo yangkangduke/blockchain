@@ -47,8 +47,7 @@ public class MetadataListener {
         MetadataAttrDto dto = JSONUtil.toBean(msg, MetadataAttrDto.class);
         try {
             EquMetadataDto metadata = this.handleAttr(dto);
-//            String fileName = dto.getTokenId() + ".json";
-            String fileName = "795.json";
+            String fileName = dto.getTokenId() + ".json";
             boolean flag = createJsonFile(JSONUtil.toJsonStr(metadata), FILEPATH, fileName);
             // 上传文件
             if (flag) {
