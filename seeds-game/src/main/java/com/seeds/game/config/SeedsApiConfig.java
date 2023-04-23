@@ -69,4 +69,7 @@ public class SeedsApiConfig {
     @Value("${seeds.api.refundFee:/api/admin/refundFee}")
     private String refundFee;
 
+    @Value("${seeds.api.listReceipt:/api/market/getListReceipt}")
+    private String listReceipt;
+
 }

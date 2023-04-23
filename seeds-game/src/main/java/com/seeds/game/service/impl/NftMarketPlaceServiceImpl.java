@@ -669,12 +669,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 throw new GenericException(GameErrorCodeEnum.ERR_10018_NFT_ITEM_ORDER_NOT_EXIST);
             }
             sellerAddress = marketOrder.getSellerAddress();
-            if (NftOrderStatusEnum.CANCELED.getCode().equals(marketOrder.getStatus())) {
+            if (marketOrder.getCancelTime() != null) {
                 endTime = marketOrder.getCancelTime();
-            } else if (NftOrderStatusEnum.COMPLETED.getCode().equals(marketOrder.getStatus())) {
+            } else if (!marketOrder.getFulfillTime().equals(marketOrder.getCreateTime())) {
                 endTime = marketOrder.getFulfillTime();
             } else {
-                throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
+                endTime = System.currentTimeMillis();
             }
         } else if (req.getOrderId() != null) {
             nftFeeRecord = nftFeeRecordService.queryByOrderId(req.getOrderId());
@@ -686,12 +686,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (order == null) {
                 throw new GenericException(GameErrorCodeEnum.ERR_10018_NFT_ITEM_ORDER_NOT_EXIST);
             }
-            if (NftOrderStatusEnum.CANCELED.getCode().equals(order.getStatus())) {
+            if (order.getCancelTime() != null) {
                 endTime = order.getCancelTime();
-            } else if (NftOrderStatusEnum.COMPLETED.getCode().equals(order.getStatus())) {
+            } else if (!order.getFulfillTime().equals(order.getCreateTime())) {
                 endTime = order.getFulfillTime();
             } else {
-                throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
+                endTime = System.currentTimeMillis();
             }
             price = order.getPrice();
             duration = 72L;
@@ -751,6 +751,30 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         duration = duration == null ? 72L : duration;
         BigDecimal baseFee = price.multiply(new BigDecimal("0.005"));
         return new BigDecimal(duration / 12L).multiply(baseFee);
+    }
+
+    @Override
+    public JSONObject listReceipt(Long orderId) {
+        // 调用/api/market/getListReceipt获取订单收据
+        String params = String.format("orderId=%s", orderId);
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getListReceipt() + "?" + params;
+        log.info("NFT获取订单收据， url:{}， params:{}", url, params);
+        try {
+            HttpResponse response = HttpRequest.get(url)
+                    .timeout(10 * 1000)
+                    .header("Content-Type", "application/json")
+                    .execute();
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            log.info("请求NFT获取订单收据接口返回，  result:{}", jsonObject);
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException("Failed to get list receipt, code:" + code);
+            }
+            return JSONUtil.toBean(jsonObject.getString("data"), JSONObject.class);
+        } catch (Exception e) {
+            log.error("NFT获取订单收据失败，message：{}", e.getMessage());
+            throw new GenericException(e.getMessage());
+        }
     }
 
     @Override

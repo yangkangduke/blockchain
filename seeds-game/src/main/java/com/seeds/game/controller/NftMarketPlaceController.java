@@ -1,4 +1,5 @@
 package com.seeds.game.controller;
+import com.alibaba.fastjson.JSONObject;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.NftBuySuccessReq;
@@ -90,6 +91,12 @@ public class NftMarketPlaceController {
     @ApiOperation("获取托管费")
     public GenericDto<BigDecimal> custodianFee(@RequestParam BigDecimal price, @RequestParam(required = false) Long duration) {
         return GenericDto.success(nftMarketPlaceService.custodianFee(price, duration));
+    }
+
+    @GetMapping("list-receipt/{orderId}")
+    @ApiOperation("获取订单收据")
+    public GenericDto<JSONObject> listReceipt(@PathVariable Long orderId) {
+        return GenericDto.success(nftMarketPlaceService.listReceipt(orderId));
     }
 
 }

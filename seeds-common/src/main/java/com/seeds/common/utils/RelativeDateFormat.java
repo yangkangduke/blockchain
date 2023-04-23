@@ -1,5 +1,6 @@
 package com.seeds.common.utils;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
@@ -40,16 +41,16 @@ public class RelativeDateFormat {
                 if (hour < HOUR_DAY) {
                     return hour + ONE_HOUR_AGO;
                 } else {
-                    long day = hour / HOUR_DAY;
-                    if (day < DAY_MONTH) {
-                        return day + ONE_DAY_AGO;
+                    long betweenYear = DateUtil.betweenYear(startDate, endDate, false);
+                    if (betweenYear > 0) {
+                        return betweenYear + ONE_YEAR_AGO;
                     } else {
-                        long month = day / DAY_MONTH;
-                        if (month < MONTH_YEAR) {
-                            return day + ONE_MONTH_AGO;
+                        long betweenMonth = DateUtil.betweenMonth(startDate, endDate, false);
+                        if (betweenMonth > 0) {
+                            return betweenMonth + ONE_MONTH_AGO;
                         } else {
-                            long year = month / MONTH_YEAR;
-                            return year + ONE_YEAR_AGO;
+                            long betweenDay = DateUtil.betweenDay(startDate, endDate, false);
+                            return betweenDay + ONE_DAY_AGO;
                         }
                     }
                 }

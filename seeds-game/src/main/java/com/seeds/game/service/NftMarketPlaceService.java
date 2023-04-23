@@ -1,4 +1,5 @@
 package com.seeds.game.service;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.game.dto.request.NftBuySuccessReq;
 import com.seeds.game.dto.request.*;
@@ -139,5 +140,12 @@ public interface NftMarketPlaceService {
      * @return  托管费
      */
     BigDecimal custodianFee(BigDecimal price, Long duration);
+
+    /**
+     * 获取订单收据
+     * @param orderId 订单id
+     * @return 订单收据
+     */
+    JSONObject listReceipt(Long orderId);
 
 }
