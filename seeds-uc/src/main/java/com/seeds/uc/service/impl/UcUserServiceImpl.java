@@ -233,7 +233,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), userId.toString(), WhetherEnum.YES.value());
         } else {
             userId = one.getId();
-            inviteCode = one.getInviteCode() == null ? InviteCode.gen(userId) : one.getInviteCode();
+            inviteCode = StringUtils.isEmpty(one.getInviteCode()) ? InviteCode.gen(userId) : one.getInviteCode();
             this.updateById(UcUser.builder()
                     .id(userId)
                     .nonce(genMetamaskAuth.getNonce())
@@ -298,7 +298,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             registerWriteOffsInviteCode(phantomVerifyReq.getInviteCode(), userId.toString(), WhetherEnum.YES.value());
         } else {
             userId = one.getId();
-            inviteCode = one.getInviteCode() == null ? InviteCode.gen(userId) : one.getInviteCode();
+            inviteCode = StringUtils.isEmpty(one.getInviteCode()) ? InviteCode.gen(userId) : one.getInviteCode();
             this.updateById(UcUser.builder()
                     .id(userId)
                     .nonce(genPhantomAuth.getNonce())
@@ -553,7 +553,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         userDto.setAuthType(ClientAuthTypeEnum.EMAIL);
         userDto.setUid(ucUser.getId());
         // 旧用户生成邀请码
-        if (ucUser.getInviteCode() == null) {
+        if (StringUtils.isEmpty(ucUser.getInviteCode())) {
             ucUser.setInviteCode(InviteCode.gen(ucUser.getId()));
             updateById(ucUser);
         }
