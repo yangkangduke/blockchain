@@ -170,14 +170,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 }
                 NftMarketOrderEntity marketOrder = nftMarketOrderService.queryByAuctionId(nftEquipment.getAuctionId());
                 if (marketOrder != null) {
-                    resp.setId(marketOrder.getId());
+                    resp.setOrderId(marketOrder.getId());
                 }
             }
         } else if (NftOrderTypeEnum.BUY_NOW.getCode() == nftEquipment.getOnSale()) {
             // 固定上架
             NftMarketOrderEntity order = nftMarketOrderService.getById(nftEquipment.getOrderId());
             if (order != null) {
-                resp.setId(order.getId());
+                resp.setOrderId(order.getId());
                 resp.setCurrentPrice(order.getPrice());
                 resp.setListReceipt(order.getListReceipt());
             }
