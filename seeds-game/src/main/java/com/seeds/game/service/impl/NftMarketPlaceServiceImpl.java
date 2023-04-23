@@ -263,6 +263,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // 下架前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
         shelfValidation(nftEquipment);
+        Long orderId = Long.valueOf(nftEquipment.getOrderId());
         // 不能重复下架
         if (WhetherEnum.NO.value() == nftEquipment.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10010_NFT_ITEM_HAS_BEEN_REMOVAL);
@@ -288,7 +289,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
-        feeReq.setOrderId(Long.valueOf(nftEquipment.getOrderId()));
+        feeReq.setOrderId(orderId);
         refundFee(feeReq);
     }
 
@@ -297,6 +298,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // 取消拍卖前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
         shelfValidation(nftEquipment);
+        Long auctionId = nftEquipment.getAuctionId();
         // 没有进行中的拍卖
         if (nftEquipment.getAuctionId() <= 0) {
             throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
@@ -337,7 +339,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
-        feeReq.setAuctionId(nftEquipment.getAuctionId());
+        feeReq.setAuctionId(auctionId);
         refundFee(feeReq);
     }
 
@@ -378,7 +380,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // 购买成功前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
         buyValidation(nftEquipment);
-
+        Long orderId = Long.valueOf(nftEquipment.getOrderId());
         //更新背包状态 undeposited  userId,owner
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
         Long userId = UserContext.getCurrentUserId();
@@ -409,7 +411,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
-        feeReq.setOrderId(Long.valueOf(nftEquipment.getOrderId()));
+        feeReq.setOrderId(orderId);
         refundFee(feeReq);
     }
 
@@ -862,6 +864,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (auctionBiding == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
         }
+        Long auctionId = auctionBiding.getAuctionId();
         // 调用/api/auction/saleSuccess通知，拍卖达成交易成功
         String params = String.format("auctionId=%s&bidingId=%s&receipt=%s&sig=%s", auctionBiding.getAuctionId(), req.getBidingId(), req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getSaleSuccess() + "?" + params;
@@ -877,7 +880,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
-        feeReq.setAuctionId(auctionBiding.getAuctionId());
+        feeReq.setAuctionId(auctionId);
         refundFee(feeReq);
     }
 
