@@ -47,7 +47,8 @@ public class MetadataListener {
         MetadataAttrDto dto = JSONUtil.toBean(msg, MetadataAttrDto.class);
         try {
             EquMetadataDto metadata = this.handleAttr(dto);
-            String fileName = dto.getTokenId() + ".json";
+//            String fileName = dto.getTokenId() + ".json";
+            String fileName = "795.json";
             boolean flag = createJsonFile(JSONUtil.toJsonStr(metadata), FILEPATH, fileName);
             // 上传文件
             if (flag) {
@@ -55,10 +56,11 @@ public class MetadataListener {
                 try {
                     File file = new File(FILEPATH + fileName);
                     inputStream = new FileInputStream(file);
-                    String bucketName = properties.getMetadataBucket();
-                    template.putObject(bucketName, fileName, inputStream, CONTENTTYPE);
+                    String bucketName = properties.getMetadata().getBucketName();
+                    String objectName = "metadata/" + fileName;
+                    template.putMetadataObject(bucketName, objectName, inputStream, CONTENTTYPE);
                     // 更新背包表
-                    updateBackpack(dto, metadata, fileName, bucketName);
+                    updateBackpack(dto, metadata, bucketName, objectName);
                     // 先关闭流，否则 删除文件不成功
                     inputStream.close();
                     // 上传成功后删除临时的JSON文件
@@ -75,8 +77,8 @@ public class MetadataListener {
         }
     }
 
-    private void updateBackpack(MetadataAttrDto dto, EquMetadataDto metadata, String fileName, String bucketName) {
-        String viewUrl = properties.getOss().getEndpoint() + "/" + bucketName + "/" + fileName;
+    private void updateBackpack(MetadataAttrDto dto, EquMetadataDto metadata, String bucketName, String objectName) {
+        String viewUrl = properties.getMetadata().getEndpoint() + "/" + bucketName + "/" + objectName;
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
         entity.setMetadata(JSONUtil.toJsonStr(metadata.getAttributes()));
         entity.setMetadataUrl(viewUrl);

@@ -50,6 +50,7 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 	private AmazonS3 gameoss1;
 	private AmazonS3 gameoss2;
 	private AmazonS3 gameoss3;
+	private AmazonS3 medataOSS;
 
 	/**
 	 * 创建bucket
@@ -173,6 +174,12 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		putObject(bucketName, objectName, stream, stream.available(), contextType);
 	}
 
+	@Override
+	public void putMetadataObject(String bucketName, String objectName, InputStream stream,
+								  String contextType) throws Exception {
+		putMetadataObject(bucketName, objectName, stream, stream.available(), contextType);
+	}
+
 	/**
 	 * 上传文件
 	 * @param bucketName bucket名称
@@ -196,8 +203,22 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 		return amazonS3.putObject(bucketName, objectName, byteArrayInputStream, objectMetadata);
 	}
 
+	public PutObjectResult putMetadataObject(String bucketName, String objectName, InputStream stream, long size,
+											 String contextType) throws Exception {
+		// String fileName = getFileName(objectName);
+		byte[] bytes = IOUtils.toByteArray(stream);
+		ObjectMetadata objectMetadata = new ObjectMetadata();
+		objectMetadata.setContentLength(size);
+		objectMetadata.setContentType(contextType);
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+		// 上传
+		return medataOSS.putObject(bucketName, objectName, byteArrayInputStream, objectMetadata);
+
+	}
+
 	/**
 	 * 获取文件信息
+	 *
 	 * @param bucketName bucket名称
 	 * @param objectName 文件名称
 	 * @see <a href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObject">AWS
@@ -238,13 +259,22 @@ public class OssTemplate implements InitializingBean, FileTemplate {
 
 		AwsClientBuilder.EndpointConfiguration endpointConfiguration = new AwsClientBuilder.EndpointConfiguration(
 				properties.getOss().getEndpoint(), properties.getOss().getRegion());
+
+		AwsClientBuilder.EndpointConfiguration metadataEndpoint = new AwsClientBuilder.EndpointConfiguration(
+				properties.getMetadata().getEndpoint(), properties.getMetadata().getRegion());
+
 		AWSCredentials awsCredentials = new BasicAWSCredentials(properties.getOss().getAccessKey(),
 				properties.getOss().getSecretKey());
 		AWSCredentials gameCredentails = new BasicAWSCredentials(properties.getGame().getAccessKey(),
 				properties.getGame().getSecretKey());
 		AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
 		AWSCredentialsProvider awsGameCredentialsProvider = new AWSStaticCredentialsProvider(gameCredentails);
+
 		this.amazonS3 = AmazonS3Client.builder().withEndpointConfiguration(endpointConfiguration)
+				.withClientConfiguration(clientConfiguration).withCredentials(awsCredentialsProvider)
+				.disableChunkedEncoding().withPathStyleAccessEnabled(properties.getOss().getPathStyleAccess()).build();
+
+		this.medataOSS = AmazonS3Client.builder().withEndpointConfiguration(metadataEndpoint)
 				.withClientConfiguration(clientConfiguration).withCredentials(awsCredentialsProvider)
 				.disableChunkedEncoding().withPathStyleAccessEnabled(properties.getOss().getPathStyleAccess()).build();
 
