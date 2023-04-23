@@ -47,6 +47,8 @@ public interface FileTemplate extends InitializingBean {
 	 */
 	void putObject(String bucketName, String objectName, InputStream stream, String contextType) throws Exception;
 
+	void putMetadataObject(String bucketName, String objectName, InputStream stream, String contextType) throws Exception;
+
 	/**
 	 * 上传文件
 	 * @param bucketName bucket名称

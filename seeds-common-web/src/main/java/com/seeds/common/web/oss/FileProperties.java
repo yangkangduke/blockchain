@@ -20,10 +20,6 @@ public class FileProperties {
 	 * 默认的存储桶名称
 	 */
 	private String bucketName = "local";
-	/**
-	 * metadata 的存储桶名称
-	 */
-	private String metadataBucket = "metadata";
 
 	/**
 	 * 本地文件配置信息
@@ -39,4 +35,9 @@ public class FileProperties {
 	 * S3 配置（用于game安装包，游戏视频等）
 	 */
 	private GameOssProperties game;
+
+	/**
+	 * S3 配置（用于nft json文件存储）
+	 */
+	private MetadataProperties metadata;
 }

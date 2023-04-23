@@ -77,6 +77,11 @@ public class LocalFileTemplate implements FileTemplate {
 		FileUtil.writeFromStream(stream, file);
 	}
 
+	@Override
+	public void putMetadataObject(String bucketName, String objectName, InputStream stream, String contextType) throws Exception {
+
+	}
+
 	/**
 	 * 获取文件
 	 * @param bucketName bucket名称
