@@ -233,10 +233,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             registerWriteOffsInviteCode(metamaskVerifyReq.getInviteCode(), userId.toString(), WhetherEnum.YES.value());
         } else {
             userId = one.getId();
-            inviteCode = one.getInviteCode();
+            inviteCode = one.getInviteCode() == null ? InviteCode.gen(userId) : one.getInviteCode();
             this.updateById(UcUser.builder()
                     .id(userId)
                     .nonce(genMetamaskAuth.getNonce())
+                    .inviteCode(inviteCode)
                     .updatedAt(currentTime)
                     .build());
         }
@@ -297,10 +298,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
             registerWriteOffsInviteCode(phantomVerifyReq.getInviteCode(), userId.toString(), WhetherEnum.YES.value());
         } else {
             userId = one.getId();
-            inviteCode = one.getInviteCode();
+            inviteCode = one.getInviteCode() == null ? InviteCode.gen(userId) : one.getInviteCode();
             this.updateById(UcUser.builder()
                     .id(userId)
                     .nonce(genPhantomAuth.getNonce())
+                    .inviteCode(inviteCode)
                     .updatedAt(currentTime)
                     .build());
         }
@@ -550,6 +552,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         BeanUtil.copyProperties(ucUser, userDto);
         userDto.setAuthType(ClientAuthTypeEnum.EMAIL);
         userDto.setUid(ucUser.getId());
+        // 旧用户生成邀请码
+        if (ucUser.getInviteCode() == null) {
+            ucUser.setInviteCode(InviteCode.gen(ucUser.getId()));
+            updateById(ucUser);
+        }
         return userDto;
     }
 
