@@ -713,33 +713,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             log.info("无需退还托管费， orderId:{}， auctionId:{}", req.getOrderId(), req.getAuctionId());
             return;
         }
-        // 调用/api/admin/refundFee，请求NFT托管费退还
-        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getRefundFee();
-        TransferSolMessageDto dto = new TransferSolMessageDto();
-        dto.setAmount(refundFee.multiply(new BigDecimal(100000000L)));
-        dto.setToAddress(sellerAddress);
-        String param = JSONUtil.toJsonStr(dto);
-        log.info("NFT托管费退还开始请求， url:{}， params:{}", url, param);
         if (nftFeeRecord == null) {
             nftFeeRecord = new NftFeeRecordEntity();
         }
-        try {
-            HttpResponse response = HttpRequest.post(url)
-                    .timeout(8 * 1000)
-                    .header("Content-Type", "application/json")
-                    .body(param)
-                    .execute();
-            String body = response.body();
-            log.info("请求NFT托管费退还接口返回，  result:{}", body);
-            JSONObject jsonObject = JSONObject.parseObject(body);
-            Integer code = jsonObject.getInteger("code");
-            if (code == null || code != 200) {
-                throw new GenericException("Failed to refund Fee, message:" + jsonObject.getString("message"));
-            }
-        } catch (Exception e) {
-            log.error("请求NFT托管费退还接口失败，message：{}", e.getMessage());
-            nftFeeRecord.setStatus(WhetherEnum.NO.value());
-        }
+        // 请求NFT托管费退还
+        initRefundFee(refundFee, sellerAddress, nftFeeRecord);
         BeanUtils.copyProperties(req, nftFeeRecord);
         nftFeeRecord.setReceivableFee(receivableFee);
         nftFeeRecord.setRefundFee(refundFee);
@@ -779,6 +757,33 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             log.error("NFT获取订单收据失败，message：{}", e.getMessage());
             throw new GenericException(e.getMessage());
         }
+    }
+
+    @Override
+    public void refundAllFee(NftRefundAllFeeReq req) {
+        NftActivity nftActivity = nftActivityService.queryByMintAddressAndTxHash(req.getMintAddress(), req.getFeeHash());
+        if (nftActivity == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
+        }
+        ucUserService.ownerValidation(nftActivity.getFromAddress());
+        NftFeeRecordEntity nftFeeRecord = nftFeeRecordService.queryByMintAddressAndFeeHash(req.getMintAddress(), req.getFeeHash());
+        if (nftFeeRecord != null && nftFeeRecord.getRefundFee() !=null && WhetherEnum.YES.value() == nftFeeRecord.getStatus()) {
+            log.info("托管费已退还， feeHash:{}， mintAddress:{}", req.getFeeHash(), req.getMintAddress());
+            return;
+        }
+        if (nftFeeRecord == null) {
+            nftFeeRecord = new NftFeeRecordEntity();
+        }
+        // 请求NFT托管费退还
+        initRefundFee(nftActivity.getPrice(), nftActivity.getFromAddress(), nftFeeRecord);
+        BeanUtils.copyProperties(req, nftFeeRecord);
+        nftFeeRecord.setReceivableFee(nftActivity.getPrice());
+        nftFeeRecord.setRefundFee(nftActivity.getPrice());
+        nftFeeRecord.setRefundTime(System.currentTimeMillis());
+        nftFeeRecord.setCurrency(CurrencyEnum.SOL.getCode());
+        nftFeeRecord.setToAddress(nftActivity.getFromAddress());
+        nftFeeRecord.setStatus(WhetherEnum.YES.value());
+        nftFeeRecordService.saveOrUpdate(nftFeeRecord);
     }
 
     @Override
@@ -1008,6 +1013,33 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             }
         }
         return state;
+    }
+
+    private void initRefundFee(BigDecimal amount, String toAddress, NftFeeRecordEntity nftFeeRecord) {
+        // 调用/api/admin/refundFee，请求NFT托管费退还
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getRefundFee();
+        TransferSolMessageDto dto = new TransferSolMessageDto();
+        dto.setAmount(amount.multiply(new BigDecimal(100000000L)));
+        dto.setToAddress(toAddress);
+        String param = JSONUtil.toJsonStr(dto);
+        log.info("NFT托管费退还开始请求， url:{}， params:{}", url, param);
+        try {
+            HttpResponse response = HttpRequest.post(url)
+                    .timeout(8 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+            String body = response.body();
+            log.info("请求NFT托管费退还接口返回，  result:{}", body);
+            JSONObject jsonObject = JSONObject.parseObject(body);
+            Integer code = jsonObject.getInteger("code");
+            if (code == null || code != 200) {
+                throw new GenericException("Failed to refund Fee, message:" + jsonObject.getString("message"));
+            }
+        } catch (Exception e) {
+            log.error("请求NFT托管费退还接口失败，message：{}", e.getMessage());
+            nftFeeRecord.setStatus(WhetherEnum.NO.value());
+        }
     }
 
 }

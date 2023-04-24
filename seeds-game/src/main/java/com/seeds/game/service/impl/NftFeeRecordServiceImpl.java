@@ -19,6 +19,14 @@ import org.springframework.stereotype.Service;
 public class NftFeeRecordServiceImpl extends ServiceImpl<NftFeeRecordMapper, NftFeeRecordEntity>implements INftFeeRecordService {
 
     @Override
+    public NftFeeRecordEntity queryByMintAddressAndFeeHash(String mintAddress, String feeHash) {
+        LambdaQueryWrapper<NftFeeRecordEntity> queryWrap = new QueryWrapper<NftFeeRecordEntity>().lambda()
+                .eq(NftFeeRecordEntity::getMintAddress, mintAddress)
+                .eq(NftFeeRecordEntity::getFeeHash, feeHash);
+        return getOne(queryWrap);
+    }
+
+    @Override
     public NftFeeRecordEntity queryByOrderId(Long orderId) {
         LambdaQueryWrapper<NftFeeRecordEntity> queryWrap = new QueryWrapper<NftFeeRecordEntity>().lambda()
                 .eq(NftFeeRecordEntity::getOrderId, orderId);

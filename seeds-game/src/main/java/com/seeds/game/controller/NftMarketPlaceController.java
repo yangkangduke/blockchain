@@ -93,6 +93,13 @@ public class NftMarketPlaceController {
         return GenericDto.success(nftMarketPlaceService.custodianFee(price, duration));
     }
 
+    @PostMapping("refund-all-fee")
+    @ApiOperation("托管费退还")
+    public GenericDto<Object> refundAllFee(@Valid @RequestBody NftRefundAllFeeReq req) {
+        nftMarketPlaceService.refundAllFee(req);
+        return GenericDto.success(null);
+    }
+
     @GetMapping("list-receipt/{orderId}")
     @ApiOperation("获取订单收据")
     public GenericDto<JSONObject> listReceipt(@PathVariable Long orderId) {

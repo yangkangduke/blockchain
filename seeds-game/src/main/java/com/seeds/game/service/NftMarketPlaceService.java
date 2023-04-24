@@ -148,4 +148,10 @@ public interface NftMarketPlaceService {
      */
     JSONObject listReceipt(Long orderId);
 
+    /**
+     * 托管费全额退回
+     * @param req 订单信息
+     */
+    void refundAllFee(NftRefundAllFeeReq req);
+
 }
