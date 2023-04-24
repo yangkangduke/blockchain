@@ -53,4 +53,10 @@ public class NftFeeRecordEntity implements Serializable {
     @ApiModelProperty("退还地址")
     private String toAddress;
 
+    @ApiModelProperty("托管费hash")
+    private String feeHash;
+
+    @ApiModelProperty("NFT铸造地址")
+    private String mintAddress;
+
 }

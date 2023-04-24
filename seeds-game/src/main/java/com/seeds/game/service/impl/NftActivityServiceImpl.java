@@ -66,4 +66,12 @@ public class NftActivityServiceImpl extends ServiceImpl<NftActivityMapper, NftAc
         }
         return nftActivity.getCreateTime();
     }
+
+    @Override
+    public NftActivity queryByMintAddressAndTxHash(String mintAddress, String txHash) {
+        LambdaQueryWrapper<NftActivity> queryWrap = new QueryWrapper<NftActivity>().lambda()
+                .eq(NftActivity::getMintAddress, mintAddress)
+                .eq(NftActivity::getTxHash, txHash);
+        return getOne(queryWrap);
+    }
 }

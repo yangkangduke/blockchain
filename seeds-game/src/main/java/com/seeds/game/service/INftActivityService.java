@@ -31,4 +31,12 @@ public interface INftActivityService extends IService<NftActivity> {
      */
     Long queryLastUpdateTime(String mintAddress);
 
+    /**
+     * 获取NFT交易记录
+     * @param mintAddress NFT地址
+     * @param txHash 交易hash
+     * @return NFT交易记录
+     */
+    NftActivity queryByMintAddressAndTxHash(String mintAddress, String txHash);
+
 }
