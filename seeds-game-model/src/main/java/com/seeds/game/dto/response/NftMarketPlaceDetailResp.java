@@ -21,7 +21,7 @@ public class NftMarketPlaceDetailResp {
 
     @ApiModelProperty("商品id")
     @JsonSerialize(using= ToStringSerializer.class)
-    private Long id;
+    private Long orderId;
 
     @ApiModelProperty("nft id")
     @JsonSerialize(using= ToStringSerializer.class)
