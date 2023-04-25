@@ -166,7 +166,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 this.distribute(req);
             } catch (Exception e) {
                 num -= 1;
-                log.info("nft 分配失败 autoId:{}", req.getAutoId());
+                log.info("nft 分配失败 autoId:{},error:{}", req.getAutoId(), e.getMessage());
             }
         }
         return num;
@@ -180,7 +180,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 this.takeBack(req);
             } catch (Exception e) {
                 num -= 1;
-                log.info("nft 收回失败 autoId:{}", req.getAutoId());
+                log.info("nft 收回失败 autoId:{},error:{}", req.getAutoId(), e.getMessage());
             }
         }
         return num;
@@ -194,7 +194,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 this.transfer(req);
             } catch (Exception e) {
                 num -= 1;
-                log.info("nft 转移失败 autoId:{}", req.getAutoId());
+                log.info("nft 转移失败 autoId:{},error:{}", req.getAutoId(), e.getMessage());
             }
         }
         return num;
