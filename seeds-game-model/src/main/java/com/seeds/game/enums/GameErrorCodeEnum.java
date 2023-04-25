@@ -50,6 +50,8 @@ public enum GameErrorCodeEnum {
 
     // user
     ERR_40001_FAILED_TO_GET_USER_INFORMATION(40001, "获取用户信息失败", "Failed to get user information"),
+    // game-api
+    ERR_50001_CALL_GAME_INTERFACE_ERROR(50001, "调用游戏接口异常", "Call game interface exception"),
     ;
 
 

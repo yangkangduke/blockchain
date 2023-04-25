@@ -51,6 +51,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.seeds.game.enums.GameErrorCodeEnum.ERR_50001_CALL_GAME_INTERFACE_ERROR;
+
 /**
  * <p>
  * NFT公共背包 服务实现类
@@ -722,7 +724,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(distributeUrl, params, "connect timed out");
-            throw new GenericException("Failed to call game-api to distribute nft,connect timed out");
+            throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR, "Failed to call game-api to distribute nft,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());
@@ -732,7 +734,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(distributeUrl, params, ret);
-            throw new GenericException("Failed to call game-api to distribute nft, ret" + ret);
+            throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR, "Failed to call game-api to distribute nft," + ret);
         }
 
 
@@ -780,7 +782,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(takebackUrl, params, "connect timed out");
-            throw new GenericException("Failed to call game-api to takeback nft,connect timed out");
+            throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR, "Failed to call game-api to takeback nft,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());
@@ -790,7 +792,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(takebackUrl, params, ret);
-            throw new GenericException("Failed to call game-api to takeback nft, ret" + ret);
+            throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR, "Failed to call game-api to takeback nft," + ret);
         }
 
     }
