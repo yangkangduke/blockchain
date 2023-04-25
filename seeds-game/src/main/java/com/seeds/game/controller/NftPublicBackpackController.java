@@ -106,6 +106,11 @@ public class NftPublicBackpackController {
         if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())) {
             throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
         }
+        if (reqs.size() == 1) {
+            NftPublicBackpackDisReq disReq = reqs.get(0);
+            nftPublicBackpackService.distribute(disReq);
+            return GenericDto.success(1);
+        }
         return GenericDto.success(nftPublicBackpackService.distributeBatch(reqs));
     }
 
@@ -118,6 +123,10 @@ public class NftPublicBackpackController {
         if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())) {
             throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
         }
+        if (reqs.size() == 1) {
+            nftPublicBackpackService.takeBack(reqs.get(0));
+            return GenericDto.success(1);
+        }
         return GenericDto.success(nftPublicBackpackService.takeBackBatch(reqs));
     }
 
@@ -128,6 +137,10 @@ public class NftPublicBackpackController {
         // 游戏正在维护中，web端无法操作
         if (!Objects.isNull(gameDetail) && gameDetail.getData().getUpkeep().equals(GameConditionEnum.UNDER_MAINTENANCE.getValue())) {
             throw new GenericException(GameErrorCodeEnum.ERR_30001_GAME_IS_UNDER_MAINTENANCE);
+        }
+        if (reqs.size() == 1) {
+            nftPublicBackpackService.transfer(reqs.get(0));
+            return GenericDto.success(1);
         }
         return GenericDto.success(nftPublicBackpackService.transferBatch(reqs));
     }
