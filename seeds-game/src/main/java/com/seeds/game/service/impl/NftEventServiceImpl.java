@@ -229,7 +229,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     }
 
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = GenericException.class)
     public void mintSuccess(NftMintSuccessReq mintSuccessReq) {
         NftEvent nftEvent = this.getById(mintSuccessReq.getEventId());
         NftEventEquipment equipment = eventEquipmentService
@@ -380,6 +380,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     }
 
     @Override
+    @Transactional(noRollbackFor = GenericException.class)
     public void composeSuccess(ComposeSuccessReq req) {
         NftEvent nftEvent = this.getById(req.getEventId());
         // 调用/api/chainOp/buySuccess通知，购买成功
