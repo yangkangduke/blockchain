@@ -51,7 +51,7 @@ public class SysKolServiceImpl extends ServiceImpl<SysKolMapper, SysKolEntity> i
     @Override
     public IPage<SysKolResp> queryPage(SysKolPageReq query) {
         LambdaQueryWrapper<SysKolEntity> queryWrap = new QueryWrapper<SysKolEntity>().lambda()
-                .eq(query.getEmail() != null, SysKolEntity::getStatus, query.getEmail())
+                .eq(query.getEmail() != null, SysKolEntity::getEmail, query.getEmail())
                 .orderByDesc(SysKolEntity::getCreatedAt);
         Page<SysKolEntity> page = new Page<>(query.getCurrent(), query.getSize());
         List<SysKolEntity> records = page(page, queryWrap).getRecords();
@@ -72,6 +72,7 @@ public class SysKolServiceImpl extends ServiceImpl<SysKolMapper, SysKolEntity> i
         SysKolEntity kol = new SysKolEntity();
         BeanUtils.copyProperties(req, kol);
         kol.setInviteUrl(inviteUrl + invitationCode);
+        save(kol);
     }
 
     @Override
