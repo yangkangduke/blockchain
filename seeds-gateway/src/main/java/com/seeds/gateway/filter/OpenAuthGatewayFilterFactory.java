@@ -32,6 +32,8 @@ public class OpenAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<O
 
     private Mono<Void> success(GatewayFilterChain chain, ServerWebExchange exchange) {
         ServerHttpRequest.Builder builder = exchange.getRequest().mutate();
+        // 通过网关的为外部调用
+        builder.header(HttpHeaders.INNER_REQUEST, Boolean.FALSE.toString());
         builder.header(HttpHeaders.OPEN_AUTH, HttpHeaders.OPEN_AUTH);
         return chain.filter(exchange.mutate().request(builder.build()).build());
     }
