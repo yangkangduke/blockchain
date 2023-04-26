@@ -3,21 +3,18 @@ package com.seeds.uc.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
-import com.seeds.uc.dto.redis.LoginUserDTO;
 import com.seeds.uc.dto.request.AllUserReq;
 import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.response.UcUserResp;
-import com.seeds.uc.dto.response.UserInfoResp;
 import com.seeds.uc.dto.response.UserRegistrationResp;
+import com.seeds.uc.model.UcUser;
 import com.seeds.uc.service.IUcUserService;
 import com.seeds.uc.service.impl.CacheService;
-import com.seeds.uc.util.WebUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -102,6 +99,13 @@ public class InterUserController {
     @GetMapping("/get-by-public-address")
     GenericDto<UcUserResp> getByPublicAddress(@RequestParam String publicAddress) {
         return GenericDto.success(ucUserService.getByPublicAddress(publicAddress));
+    }
+
+    @ApiOperation("通过邮箱获取用户")
+    @Inner
+    @GetMapping("/get-by-email")
+    GenericDto<UcUser> getByEmail(@RequestParam String email) {
+        return GenericDto.success(ucUserService.getByEmail(email));
     }
 
 }

@@ -184,6 +184,14 @@ public interface IUcUserService extends IService<UcUser> {
     Boolean registerCheckEmail(String email);
 
     /**
+     * 通过邮箱获取用户
+     *
+     * @param email 邮箱
+     * @return 用户信息
+     */
+    UcUser getByEmail(String email);
+
+    /**
      * 核销邀请码
      * @param inviteCode 邀请码
      * @param userIdentity 关联用户标识
