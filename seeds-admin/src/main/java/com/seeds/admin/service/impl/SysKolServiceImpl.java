@@ -114,7 +114,7 @@ public class SysKolServiceImpl extends ServiceImpl<SysKolMapper, SysKolEntity> i
         // 校验游戏角色
         List<GaServerRoleEntity> roles = gaServerRoleService.queryByUserId(ucUser.getId());
         if (CollectionUtils.isEmpty(roles)) {
-            throw new GenericException(AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
+            throw new GenericException(AdminErrorCodeEnum.ERR_20003_GAME_ROLE_NOT_EXIST);
         }
         String inviteCode = ucUser.getInviteCode();
         if (StringUtils.isEmpty(inviteCode)) {
