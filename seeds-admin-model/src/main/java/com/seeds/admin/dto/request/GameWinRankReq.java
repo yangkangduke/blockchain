@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -25,6 +26,7 @@ public class GameWinRankReq {
     private Integer startRow = 0;
 
     @ApiModelProperty(value = "表示结束行数（不包含）")
+    @Max(value = 200, message = "endRow:Maximum cannot exceed 200")
     private Integer endRow = 50;
 
 }
