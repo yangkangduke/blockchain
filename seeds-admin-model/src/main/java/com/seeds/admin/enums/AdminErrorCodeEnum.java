@@ -85,6 +85,7 @@ public enum AdminErrorCodeEnum {
     ERR_80003_GAME_TYPE_ALREADY_EXIST(80003, "游戏类别已存在", "NFT game code already exist"),
     ERR_80004_GAME_TYPE_PARENT_ITSELF(80004, "上级游戏类别不能为自身", "Parent game type cannot be for itself"),
     ERR_80005_SUB_GAME_TYPE_EXIST(80005, "存在下级游戏类别", "Subordinate game type exist"),
+    ERR_80006_INVITE_CODE_NOT_EXIST(80006, "邀请码不存在", "Invite code not exist"),
 
 
     // block chain

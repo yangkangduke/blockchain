@@ -22,6 +22,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import com.seeds.uc.model.UcUser;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -115,7 +116,11 @@ public class SysKolServiceImpl extends ServiceImpl<SysKolMapper, SysKolEntity> i
         if (CollectionUtils.isEmpty(roles)) {
             throw new GenericException(AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
         }
-        return ucUser.getInviteCode();
+        String inviteCode = ucUser.getInviteCode();
+        if (StringUtils.isEmpty(inviteCode)) {
+            throw new GenericException(AdminErrorCodeEnum.ERR_80006_INVITE_CODE_NOT_EXIST);
+        }
+        return inviteCode;
     }
 
     @Override
