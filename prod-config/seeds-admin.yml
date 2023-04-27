@@ -21,6 +21,9 @@ admin:
     redis:
       keyExpireAfter: 259200
 
+uc:
+  invite:
+    url: https://theseeds.io/
 
 springfox:
   documentation:

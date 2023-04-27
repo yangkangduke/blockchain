@@ -36,6 +36,7 @@
         <module>seeds-notification-model</module>
         <module>seeds-game</module>
         <module>seeds-game-model</module>
+        <module>seeds-game-api</module>
     </modules>
 
     <properties>

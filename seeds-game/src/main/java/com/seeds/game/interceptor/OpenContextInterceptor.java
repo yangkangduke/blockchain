@@ -7,6 +7,7 @@ import com.seeds.common.constant.redis.RedisKeys;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.HttpHeaders;
 import com.seeds.common.web.context.UserContext;
+import com.seeds.common.web.inner.Inner;
 import com.seeds.common.web.util.HttpHelper;
 import com.seeds.common.web.util.SignatureUtils;
 import com.seeds.common.web.wrapper.BodyReaderHttpServletRequestWrapper;
@@ -22,8 +23,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.lang.Nullable;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -68,6 +69,12 @@ public class OpenContextInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         log.info("path-------->" + request.getServletPath());
+        Inner innerAnnotation = getInnerAnnotation(handler);
+        boolean b = Boolean.parseBoolean(request.getHeader(HttpHeaders.INNER_REQUEST));
+        if (innerAnnotation != null && b) {
+            return true;
+        }
+
         // 来自web端的请求不再校验签名
         if (request.getRequestURI().contains(FROM_WEB)) {
             // 不需要进行登录校验
@@ -198,5 +205,14 @@ public class OpenContextInterceptor implements HandlerInterceptor {
             cache.put(accessKey, secretKey);
         }
         return secretKey;
+    }
+
+    private Inner getInnerAnnotation(Object handler) {
+        if (!(handler instanceof HandlerMethod)) {
+            return null;
+        }
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        Inner inner = handlerMethod.getMethodAnnotation(Inner.class);
+        return inner == null ? handlerMethod.getMethod().getDeclaringClass().getAnnotation(Inner.class) : inner;
     }
 }

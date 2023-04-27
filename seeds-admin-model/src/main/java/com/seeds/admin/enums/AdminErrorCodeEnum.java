@@ -34,6 +34,7 @@ public enum AdminErrorCodeEnum {
     // role
     ERR_20001_ROLE_ALREADY_EXIST(20001, "角色已存在", "Role name already exist"),
     ERR_20002_USER_ROLE_ALREADY_EXIST(20002, "该角色当前用户已存在", "The role already exists for the current user"),
+    ERR_20003_GAME_ROLE_NOT_EXIST(20003, "游戏角色不存在", "The game role not exists"),
 
     // menu
     ERR_30001_MENU_ALREADY_EXIST(30001, "菜单已存在", "menu code already exist"),

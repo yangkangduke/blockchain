@@ -70,10 +70,11 @@ public class GameRankServiceImpl implements GameRankService {
         if (CollectionUtils.isEmpty(servers)) {
             return Collections.emptyList();
         }
-        Set<String> rankUrls = servers.stream().map(p -> p.getInnerHost() + gameWarbladeConfig.getPlayerWinRank()).collect(Collectors.toSet());
+        Map<String, ServerRegionEntity> serverRegionMap = servers.stream().filter(p -> StringUtils.isNotBlank(p.getInnerHost())).collect(Collectors.toMap(ServerRegionEntity::getInnerHost, p -> p, (a, b) -> a));
         List<GameWinRankResp.GameWinRank> rankList = new ArrayList<>();
         try {
-            for (String rankUrl : rankUrls) {
+            for (String innerHost : serverRegionMap.keySet()) {
+                String rankUrl = innerHost + gameWarbladeConfig.getPlayerWinRank();
                 String params = String.format("startRow=%s&endRow=%s", query.getStartRow(), query.getEndRow() * 2);
                 rankUrl = rankUrl + "?" + params;
                 log.info("开始请求游戏胜场排行榜数据， url:{}， params:{}", rankUrl, params);
@@ -92,7 +93,16 @@ public class GameRankServiceImpl implements GameRankService {
                     log.error("Get the win list from game failed");
                     throw new GenericException("Get the win list from game failed");
                 }
-                rankList.addAll(resp.getInfos());
+                List<GameWinRankResp.GameWinRank> infos = resp.getInfos();
+                if (!CollectionUtils.isEmpty(infos)) {
+                    infos.forEach(p -> {
+                        ServerRegionEntity serverRegion = serverRegionMap.get(innerHost);
+                        if (serverRegion != null) {
+                            p.setRegionName(serverRegion.getRegionName());
+                        }
+                    });
+                }
+                rankList.addAll(infos);
             }
             if (CollectionUtils.isEmpty(rankList)) {
                 return Collections.emptyList();
