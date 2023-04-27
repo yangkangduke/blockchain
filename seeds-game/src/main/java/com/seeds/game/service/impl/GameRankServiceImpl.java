@@ -51,18 +51,21 @@ public class GameRankServiceImpl implements GameRankService {
     private IServerRegionService serverRegionService;
 
     @Override
-    public List<GameWinRankResp.GameWinRank> winInfo(GameWinRankReq query) {
+    public List<GameWinRankResp.GameWinRank> winInfo(GameWinRankReq query, Boolean useCache) {
         // 先从redis缓存中拿排行榜数据
-        RBucket<String> bucket = redissonClient.getBucket(UcRedisKeysConstant.getGameWinRankTemplate(query.getGameId().toString(), query.getSortType().toString()));
-        String data = bucket.get();
         GameWinRankResp resp;
+        RBucket<String> bucket = null;
         List<GameWinRankResp.GameWinRank> cacheRankList = new ArrayList<>();
-        if (StringUtils.isNotBlank(data)) {
-            resp = JSONUtil.toBean(data, GameWinRankResp.class);
-            cacheRankList = resp.getInfos();
-            // 判断是否过期
-            if (resp.getExpireTime() > System.currentTimeMillis()) {
-                return cacheRankList;
+        if (useCache) {
+            bucket = redissonClient.getBucket(UcRedisKeysConstant.getGameWinRankTemplate(query.getGameId().toString(), query.getSortType().toString()));
+            String data = bucket.get();
+            if (StringUtils.isNotBlank(data)) {
+                resp = JSONUtil.toBean(data, GameWinRankResp.class);
+                cacheRankList = resp.getInfos();
+                // 判断是否过期
+                if (resp.getExpireTime() > System.currentTimeMillis()) {
+                    return cacheRankList;
+                }
             }
         }
         // 请求游戏方获取排行榜数据
@@ -125,7 +128,7 @@ public class GameRankServiceImpl implements GameRankService {
             rankList = sortBySortType(query.getSortType(), rankMap, query.getEndRow());
 
             // 设置redis排行榜缓存
-            if (!CollectionUtils.isEmpty(rankList)) {
+            if (!CollectionUtils.isEmpty(rankList) && bucket != null) {
                 resp = new GameWinRankResp();
                 resp.setInfos(rankList);
                 resp.setExpireTime(System.currentTimeMillis() + winRankExpireAfter * 60 * 1000);

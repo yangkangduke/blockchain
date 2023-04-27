@@ -35,7 +35,7 @@ public class PublicGameRankController {
     @PostMapping("/win-info")
     @ApiOperation(value = "胜场数据", notes = "胜场数据")
     public GenericDto<List<GameWinRankResp.GameWinRank>> winInfo(@Valid @RequestBody GameWinRankReq query) {
-        return GenericDto.success(gameRankService.winInfo(query));
+        return GenericDto.success(gameRankService.winInfo(query, true));
     }
 
 }
