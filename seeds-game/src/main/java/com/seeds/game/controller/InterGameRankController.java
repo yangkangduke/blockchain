@@ -37,7 +37,7 @@ public class InterGameRankController {
     @ApiOperation(value = "胜场数据", notes = "胜场数据")
     @Inner
     public GenericDto<List<GameWinRankResp.GameWinRank>> winInfo(@Valid @RequestBody GameWinRankReq query) {
-        return GenericDto.success(gameRankService.winInfo(query));
+        return GenericDto.success(gameRankService.winInfo(query, false));
     }
 
 }
