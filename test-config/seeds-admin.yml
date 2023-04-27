@@ -23,7 +23,7 @@ admin:
 
 uc:
   invite:
-    url: http://192.168.6.100:8001/
+    url: http://192.168.6.100:8001/invite/
 
 springfox:
   documentation:

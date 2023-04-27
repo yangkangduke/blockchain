@@ -23,7 +23,7 @@ admin:
 
 uc:
   invite:
-    url: https://theseeds.io/
+    url: https://theseeds.io/invite/
 
 springfox:
   documentation:
