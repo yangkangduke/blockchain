@@ -41,6 +41,18 @@ public class SysKolEntity extends BaseEntity {
 	private String inviteUrl;
 
 	/**
+	 * 邀请编号
+	 */
+	@TableField("invite_no")
+	private String inviteNo;
+
+	/**
+	 * 邀请码
+	 */
+	@TableField("invite_code")
+	private String inviteCode;
+
+	/**
 	 * 状态  0：禁用   1：启用
 	 */
 	@TableField("status")

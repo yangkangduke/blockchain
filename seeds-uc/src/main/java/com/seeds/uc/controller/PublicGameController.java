@@ -7,6 +7,7 @@ import com.seeds.admin.dto.response.SysGameBriefResp;
 import com.seeds.admin.dto.response.SysGameResp;
 import com.seeds.admin.dto.response.SysGameTypeResp;
 import com.seeds.admin.feign.RemoteGameService;
+import com.seeds.admin.feign.RemoteKolService;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +32,9 @@ public class PublicGameController {
 
     @Autowired
     private RemoteGameService remoteGameService;
+
+    @Autowired
+    private RemoteKolService remoteKolService;
 
     @PostMapping("/page")
     @ApiOperation(value = "分页", notes = "分页")
@@ -60,6 +64,12 @@ public class PublicGameController {
     @ApiOperation("游戏类别列表")
     public GenericDto<List<SysGameTypeResp>> typeDropdown() {
         return remoteGameService.ucTypeDropdown();
+    }
+
+    @GetMapping("/invite-code/{inviteNo}")
+    @ApiOperation("获取邀请码")
+    public GenericDto<String> inviteCode(@PathVariable String inviteNo) {
+        return remoteKolService.inviteCode(inviteNo);
     }
 
 }

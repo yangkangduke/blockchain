@@ -1,5 +1,6 @@
 package com.seeds.admin.service.impl;
 
+import cn.hutool.core.lang.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -13,10 +14,11 @@ import com.seeds.admin.entity.GaServerRoleEntity;
 import com.seeds.admin.entity.SysKolEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.enums.SysStatusEnum;
+import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.mapper.SysKolMapper;
 import com.seeds.admin.service.*;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.uc.exceptions.GenericException;
 import com.seeds.uc.feign.UserCenterFeignClient;
 import com.seeds.uc.model.UcUser;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +73,10 @@ public class SysKolServiceImpl extends ServiceImpl<SysKolMapper, SysKolEntity> i
         String invitationCode = check(req.getEmail());
         SysKolEntity kol = new SysKolEntity();
         BeanUtils.copyProperties(req, kol);
-        kol.setInviteUrl(inviteUrl + invitationCode);
+        String inviteNo = UUID.randomUUID().toString().replace("-", "");
+        kol.setInviteUrl(inviteUrl + inviteNo);
+        kol.setInviteNo(inviteNo);
+        kol.setInviteCode(invitationCode);
         save(kol);
     }
 
@@ -103,14 +108,26 @@ public class SysKolServiceImpl extends ServiceImpl<SysKolMapper, SysKolEntity> i
         // 校验邮箱用户
         UcUser ucUser = check.getData();
         if (ucUser == null) {
-            throw new GenericException(AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED.getDescEn());
+            throw new GenericException(AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
         }
         // 校验游戏角色
         List<GaServerRoleEntity> roles = gaServerRoleService.queryByUserId(ucUser.getId());
         if (CollectionUtils.isEmpty(roles)) {
-            throw new GenericException(AdminErrorCodeEnum.ERR_20003_GAME_ROLE_NOT_EXIST.getDescEn());
+            throw new GenericException(AdminErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED);
         }
         return ucUser.getInviteCode();
+    }
+
+    @Override
+    public String inviteCode(String inviteNo) {
+        LambdaQueryWrapper<SysKolEntity> queryWrap = new QueryWrapper<SysKolEntity>().lambda()
+                .eq(SysKolEntity::getInviteNo, inviteNo)
+                .eq(SysKolEntity::getStatus, WhetherEnum.YES.value());
+        SysKolEntity one = getOne(queryWrap);
+        if (one == null) {
+            return null;
+        }
+        return one.getInviteCode();
     }
 }
 

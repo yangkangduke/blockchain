@@ -52,4 +52,11 @@ public interface SysKolService extends IService<SysKolEntity> {
      */
     String check(String email);
 
+    /**
+     * 邀请编号获取邀请码
+     * @param inviteNo 邀请编号
+     * @return 邀请码
+     */
+    String inviteCode(String inviteNo);
+
 }
