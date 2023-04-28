@@ -2,7 +2,6 @@ package com.seeds.game.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.seeds.game.dto.request.OpenServerRolePageReq;
 import com.seeds.game.dto.request.internal.DeleteReq;
 import com.seeds.game.dto.request.internal.ServerRoleCreateUpdateReq;
 import com.seeds.game.dto.request.internal.ServerRolePageReq;

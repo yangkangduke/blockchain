@@ -847,6 +847,11 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
     }
 
     @Override
+    public UcUser getByEmail(String email) {
+        return this.getOne(new QueryWrapper<UcUser>().lambda().eq(UcUser::getEmail, email));
+    }
+
+    @Override
     public void registerWriteOffsInviteCode(String inviteCode, String userIdentity, Integer useFlag) {
         // 邀请码校验开关
         if (!inviteFlag) {

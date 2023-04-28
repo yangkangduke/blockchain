@@ -60,6 +60,9 @@ public class GameWinRankResp {
 		@ApiModelProperty(value = "总胜利场数")
 		private Long winNum = 0L;
 
+		@ApiModelProperty(value = "区服名称")
+		private String regionName;
+
 	}
 
 }

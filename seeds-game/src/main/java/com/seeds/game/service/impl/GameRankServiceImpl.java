@@ -51,18 +51,21 @@ public class GameRankServiceImpl implements GameRankService {
     private IServerRegionService serverRegionService;
 
     @Override
-    public List<GameWinRankResp.GameWinRank> winInfo(GameWinRankReq query) {
+    public List<GameWinRankResp.GameWinRank> winInfo(GameWinRankReq query, Boolean useCache) {
         // 先从redis缓存中拿排行榜数据
-        RBucket<String> bucket = redissonClient.getBucket(UcRedisKeysConstant.getGameWinRankTemplate(query.getGameId().toString(), query.getSortType().toString()));
-        String data = bucket.get();
         GameWinRankResp resp;
+        RBucket<String> bucket = null;
         List<GameWinRankResp.GameWinRank> cacheRankList = new ArrayList<>();
-        if (StringUtils.isNotBlank(data)) {
-            resp = JSONUtil.toBean(data, GameWinRankResp.class);
-            cacheRankList = resp.getInfos();
-            // 判断是否过期
-            if (resp.getExpireTime() > System.currentTimeMillis()) {
-                return cacheRankList;
+        if (useCache) {
+            bucket = redissonClient.getBucket(UcRedisKeysConstant.getGameWinRankTemplate(query.getGameId().toString(), query.getSortType().toString()));
+            String data = bucket.get();
+            if (StringUtils.isNotBlank(data)) {
+                resp = JSONUtil.toBean(data, GameWinRankResp.class);
+                cacheRankList = resp.getInfos();
+                // 判断是否过期
+                if (resp.getExpireTime() > System.currentTimeMillis()) {
+                    return cacheRankList;
+                }
             }
         }
         // 请求游戏方获取排行榜数据
@@ -70,10 +73,11 @@ public class GameRankServiceImpl implements GameRankService {
         if (CollectionUtils.isEmpty(servers)) {
             return Collections.emptyList();
         }
-        Set<String> rankUrls = servers.stream().map(p -> p.getInnerHost() + gameWarbladeConfig.getPlayerWinRank()).collect(Collectors.toSet());
+        Map<String, ServerRegionEntity> serverRegionMap = servers.stream().filter(p -> StringUtils.isNotBlank(p.getInnerHost())).collect(Collectors.toMap(ServerRegionEntity::getInnerHost, p -> p, (a, b) -> a));
         List<GameWinRankResp.GameWinRank> rankList = new ArrayList<>();
         try {
-            for (String rankUrl : rankUrls) {
+            for (String innerHost : serverRegionMap.keySet()) {
+                String rankUrl = innerHost + gameWarbladeConfig.getPlayerWinRank();
                 String params = String.format("startRow=%s&endRow=%s", query.getStartRow(), query.getEndRow() * 2);
                 rankUrl = rankUrl + "?" + params;
                 log.info("开始请求游戏胜场排行榜数据， url:{}， params:{}", rankUrl, params);
@@ -92,7 +96,16 @@ public class GameRankServiceImpl implements GameRankService {
                     log.error("Get the win list from game failed");
                     throw new GenericException("Get the win list from game failed");
                 }
-                rankList.addAll(resp.getInfos());
+                List<GameWinRankResp.GameWinRank> infos = resp.getInfos();
+                if (!CollectionUtils.isEmpty(infos)) {
+                    infos.forEach(p -> {
+                        ServerRegionEntity serverRegion = serverRegionMap.get(innerHost);
+                        if (serverRegion != null) {
+                            p.setRegionName(serverRegion.getRegionName());
+                        }
+                    });
+                }
+                rankList.addAll(infos);
             }
             if (CollectionUtils.isEmpty(rankList)) {
                 return Collections.emptyList();
@@ -115,7 +128,7 @@ public class GameRankServiceImpl implements GameRankService {
             rankList = sortBySortType(query.getSortType(), rankMap, query.getEndRow());
 
             // 设置redis排行榜缓存
-            if (!CollectionUtils.isEmpty(rankList)) {
+            if (!CollectionUtils.isEmpty(rankList) && bucket != null) {
                 resp = new GameWinRankResp();
                 resp.setInfos(rankList);
                 resp.setExpireTime(System.currentTimeMillis() + winRankExpireAfter * 60 * 1000);
