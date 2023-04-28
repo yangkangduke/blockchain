@@ -278,24 +278,23 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Override
     public void mintSuccessCallback(MintSuccessReq req) {
-
         UpdateBackpackErrorLog backpackErrorLog = updateBackpackErrorLogService.queryByMintAddress(req.getMintAddress());
+        if (Objects.nonNull(backpackErrorLog)) {
+            NftEvent nftEvent = this.getById(backpackErrorLog.getEventId());
+            NftEventEquipment equipment = eventEquipmentService
+                    .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
 
-        NftEvent nftEvent = this.getById(backpackErrorLog.getEventId());
-        NftEventEquipment equipment = eventEquipmentService
-                .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
+            NftMintSuccessReq mintSuccessReq = new NftMintSuccessReq();
+            mintSuccessReq.setAutoDeposite(backpackErrorLog.getIsAutoDeposit());
+            mintSuccessReq.setMintAddress(req.getMintAddress());
 
-        NftMintSuccessReq mintSuccessReq = new NftMintSuccessReq();
-        mintSuccessReq.setAutoDeposite(backpackErrorLog.getIsAutoDeposit());
-        mintSuccessReq.setMintAddress(req.getMintAddress());
-
-        MintSuccessMessageResp data = new MintSuccessMessageResp();
-        BeanUtils.copyProperties(req, data);
-        //生成metadata
-        createMetadata(equipment, data.getTokenId());
-        // 通知游戏方，更新本地数据库
-        updateLocalDB(mintSuccessReq.getAutoDeposite(), req.getMintAddress(), nftEvent, equipment, data);
-
+            MintSuccessMessageResp data = new MintSuccessMessageResp();
+            BeanUtils.copyProperties(req, data);
+            //生成metadata
+            createMetadata(equipment, data.getTokenId());
+            // 通知游戏方，更新本地数据库
+            updateLocalDB(mintSuccessReq.getAutoDeposite(), req.getMintAddress(), nftEvent, equipment, data);
+        }
     }
 
     private void recordLog(Long eventId, String mintAddress) {
