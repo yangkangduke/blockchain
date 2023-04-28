@@ -43,4 +43,21 @@ public class GameRankingController {
         gameRankingService.export(gameRankingService.queryList(query), response);
     }
 
+    @PostMapping("export-list")
+    @ApiOperation("导出")
+    @RequiredPermission("sys:gameRank:export")
+    public void export(@Valid @RequestBody List<GameWinRankResp.GameWinRank> records, HttpServletResponse response) {
+        for (GameWinRankResp.GameWinRank record : records) {
+            String accID = record.getAccID().toString();
+            if (accID.startsWith("3001")) {
+                record.setRegionName("OB-Asia");
+            } else if (accID.startsWith("4001")) {
+                record.setRegionName("OB-US");
+            } else if (accID.startsWith("5001")) {
+                record.setRegionName("OB-EU");
+            }
+        }
+        gameRankingService.export(records, response);
+    }
+
 }
