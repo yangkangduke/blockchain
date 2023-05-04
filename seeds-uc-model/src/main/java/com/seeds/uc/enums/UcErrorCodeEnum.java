@@ -15,6 +15,7 @@ public enum UcErrorCodeEnum {
     ERR_500_SYSTEM_BUSY(500, "系统繁忙，请稍后再试...", "system busy, please try again later"),
     ERR_502_ILLEGAL_ARGUMENTS(502, "参数错误", "wrong arguments"),
     ERR_504_MISSING_ARGUMENTS(504, "缺少参数", "missing arguments"),
+    ERR_505_INTERNAL_FAILURE(505, "内部失败", "internal failure"),
 
     // ga
     ERR_14000_GA_VERIFICATION_FAILED(14000, "谷歌验证失败", "Google verification failed"),

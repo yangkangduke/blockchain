@@ -4,6 +4,7 @@ import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.exceptions.InvalidArgumentsException;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.exception.PermissionException;
+import com.seeds.game.enums.GameErrorCodeEnum;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.binding.BindingException;
@@ -30,19 +31,17 @@ public class GameExceptionHandler {
     @ResponseBody
     @ExceptionHandler(Exception.class)
     ResponseEntity<GenericDto<String>> handle(Exception e) {
+        log.error("Exception:", e);
         return new ResponseEntity<>(
-                GenericDto.failure("Internal Error:" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                GenericDto.failure("Internal Error:" + GameErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ResponseBody
     @ExceptionHandler(FeignException.class)
     ResponseEntity<GenericDto<String>> handle(FeignException e) {
-//        String message = e.getMessage().substring(e.getMessage().lastIndexOf('{'), e.getMessage().length() - 1);
-//        return new ResponseEntity<>(
-//                GenericDto.failure(JSONUtil.toBean(message, GenericDto.class).getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
-//                HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(GenericDto.failure(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()), HttpStatus.INTERNAL_SERVER_ERROR);
+        log.error("FeignException:", e);
+        return new ResponseEntity<>(GenericDto.failure(GameErrorCodeEnum.ERR_505_INTERNAL_FAILURE.getDescEn(), HttpStatus.INTERNAL_SERVER_ERROR.value()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ResponseBody

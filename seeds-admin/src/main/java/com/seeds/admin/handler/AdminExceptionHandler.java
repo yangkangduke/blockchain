@@ -1,6 +1,6 @@
 package com.seeds.admin.handler;
 
-import cn.hutool.json.JSONUtil;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.exceptions.InvalidArgumentsException;
 import com.seeds.common.dto.GenericDto;
@@ -31,17 +31,18 @@ public class AdminExceptionHandler {
     @ResponseBody
     @ExceptionHandler(Exception.class)
     ResponseEntity<GenericDto<String>> handle(Exception e) {
+        log.error("Exception:", e);
         return new ResponseEntity<>(
-                GenericDto.failure("Internal Error:" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                GenericDto.failure("Internal Error:" + AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ResponseBody
     @ExceptionHandler(FeignException.class)
     ResponseEntity<GenericDto<String>> handle(FeignException e) {
-        String message = e.getMessage().substring(e.getMessage().lastIndexOf('{'), e.getMessage().length() - 1);
+        log.error("FeignException:", e);
         return new ResponseEntity<>(
-                GenericDto.failure(JSONUtil.toBean(message, GenericDto.class).getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                GenericDto.failure(AdminErrorCodeEnum.ERR_505_INTERNAL_FAILURE.getDescEn(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

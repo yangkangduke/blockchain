@@ -15,9 +15,10 @@ public enum GameErrorCodeEnum {
     ERR_500_SYSTEM_BUSY(500, "系统繁忙，请稍后再试...", "system busy, please try again later"),
     ERR_502_ILLEGAL_ARGUMENTS(502, "参数错误", "wrong arguments"),
     ERR_504_MISSING_ARGUMENTS(504, "缺少参数", "missing arguments"),
-    ERR_505_MISSING_UCTOKEN(505, "缺少ucToken", "missing ucToken"),
+    ERR_505_INTERNAL_FAILURE(505, "内部失败", "internal failure"),
     ERR_506_INVALID_UCTOKEN(506, "无效ucToken", "invalid ucToken"),
     ERR_507_NO_PERMISSION(507, "没有权限", "No permission"),
+
     // nft
     ERR_10001_NFT_ITEM_NOT_EXIST(10001, "NFT物品不存在", "NFT item does not exist"),
     ERR_10002_NFT_ITEM_DOES_NOT_BELONG_TO_CURRENT_USER(10002, "NFT物品不属于当前用户", "NFT item does not belong to current user"),
