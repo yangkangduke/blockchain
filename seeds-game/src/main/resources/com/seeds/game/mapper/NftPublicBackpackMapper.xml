@@ -65,19 +65,19 @@
             and state = 3
         </if>
         <if test="sort != null and sort =='price'">
-            order by t1.price ${sortType}
+            order by t1.price ${sortTypeStr}
         </if>
         <if test="sort != null and sort =='grade'">
-            order by t1.grade ${sortType}
+            order by t1.grade ${sortTypeStr}
         </if>
         <if test="sort != null and sort =='durability'">
-            order by t2.durability ${sortType}
+            order by t2.durability ${sortTypeStr}
         </if>
         <if test="sort != null and sort =='rarity'">
-            order by t2.rarity ${sortType}
+            order by t2.rarity ${sortTypeStr}
         </if>
         <if test="sort != null and sort =='listTime'">
-            order by t3.place_time ${sortType}
+            order by t3.place_time ${sortTypeStr}
         </if>
     </select>
 </mapper>

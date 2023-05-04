@@ -44,7 +44,17 @@ public class NftMarketPlaceEquipPageReq extends PageReq {
     @ApiModelProperty(value = "排序字段")
     private String sort;
 
-    @ApiModelProperty(value = "排序类型 asc:升序 desc:降序")
-    private String sortType;
+    @ApiModelProperty(value = "排序类型 0:升序 1:降序")
+    private Integer sortType;
+
+    private String sortTypeStr;
+
+    public static String convert(Integer sortType) {
+        String str = "desc";
+        if (sortType.equals(0)) {
+            str = "asc";
+        }
+        return str;
+    }
 
 }

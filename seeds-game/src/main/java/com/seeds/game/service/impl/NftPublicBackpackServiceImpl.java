@@ -581,6 +581,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Override
     public List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req) {
+        if (Objects.nonNull(req.getSortType())) {
+            req.setSortTypeStr(NftBackpackWebPageReq.convert(req.getSortType()));
+        }
         List<NftPublicBackpackWebResp> list = baseMapper.getPageForWeb(req);
         list = list.stream().map(p -> {
             NftPublicBackpackWebResp resp = new NftPublicBackpackWebResp();
