@@ -542,7 +542,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .eq(UcUser::getEmail, account));
 
         if (ucUser == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10001_ACCOUNT_YET_NOT_REGISTERED, messageSource.getMessage("ERR_10001_ACCOUNT_YET_NOT_REGISTERED", null, LocaleContextHolder.getLocale()));
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT, messageSource.getMessage("ERR_10013_ACCOUNT_NAME_PASSWORD_INCORRECT", null, LocaleContextHolder.getLocale()));
         }
         String loginPassword = PasswordUtil.getPassword(password, ucUser.getSalt());
         if (!loginPassword.equals(ucUser.getPassword())) {
