@@ -1,7 +1,7 @@
 package com.seeds.admin.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.seeds.admin.enums.AutoIdApplyStateEnum;
+import com.seeds.admin.enums.SkinNftEnums;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -124,8 +124,15 @@ public class SysNftPicEntity extends BaseEntity {
 
     @TableField("apply_state")
     /**
-     * @see AutoIdApplyStateEnum
+     * @see SkinNftEnums.AutoIdApplyStateEnum
      *
      */
     private Integer applyState;
+
+    @TableField("mint_state")
+    /**
+     * @see  SkinNftEnums.SkinMintStateEnum
+     *
+     */
+    private Integer mintState;
 }

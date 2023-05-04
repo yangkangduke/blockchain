@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
@@ -15,30 +14,29 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.config.SeedsAdminApiConfig;
+import com.seeds.admin.dto.SkinNFTAttrDto;
 import com.seeds.admin.dto.SkinNftPushAutoIdReq;
 import com.seeds.admin.dto.SysNFTAttrDto;
-import com.seeds.admin.dto.SysNFTAttrJSONDto;
 import com.seeds.admin.dto.game.GameApplyAutoIdsDto;
-import com.seeds.admin.dto.request.ListReq;
-import com.seeds.admin.dto.request.SysApplyAutoIdsReq;
-import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
-import com.seeds.admin.dto.request.SysNftPicPageReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
-import com.seeds.admin.enums.AutoIdApplyStateEnum;
-import com.seeds.admin.enums.NftAttrEnum;
+import com.seeds.admin.enums.SkinNftEnums;
 import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.mapper.SysNftPicMapper;
 import com.seeds.admin.mq.producer.KafkaProducer;
 import com.seeds.admin.service.SysGameApiService;
 import com.seeds.admin.service.SysNftPicService;
+import com.seeds.admin.service.SysNftSkinAsyncService;
 import com.seeds.admin.utils.CsvUtils;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.web.oss.FileTemplate;
-import com.seeds.uc.exceptions.GenericException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.binding.MapperMethod;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +67,11 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
 
     @Autowired
     private SysGameApiService gameApiService;
+    @Autowired
+    private SeedsAdminApiConfig seedsAdminApiConfig;
 
+    @Autowired
+    private SysNftSkinAsyncService skinAsyncService;
 
     @Override
     public IPage<SysNftPicResp> queryPage(SysNftPicPageReq req) {
@@ -112,18 +114,13 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public Integer upload(MultipartFile file) {
         List<SysNftPicEntity> batchUpdate = new ArrayList<>();
-
         // 解析CSV文件
         List<SysNFTAttrDto> sysNFTAttrDtos = CsvUtils.getCsvData(file, SysNFTAttrDto.class);
         if (!CollectionUtils.isEmpty(sysNFTAttrDtos)) {
             sysNFTAttrDtos.forEach(p -> {
-                if (Objects.nonNull(p.getSymbol()) && p.getSymbol().length() > 10) {
-                    throw new GenericException(" 图片 [" + p.getPictureName() + "]，属性更新失败：" + AdminErrorCodeEnum.ERR_40022_SYMBOL_TOO_LONG.getDescEn());
-                }
                 SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
                 if (!Objects.isNull(one) && one.getPicName().equals(p.getPictureName())) {
                     BeanUtils.copyProperties(p, one);
-                    one.setDescription(p.getDesc());
                     one.setUpdatedAt(System.currentTimeMillis());
                     batchUpdate.add(one);
                 }
@@ -134,7 +131,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             // 批量更新属性
             this.updateBatchById(batchUpdate);
             // 屬性更新成功消息
-            kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(batchUpdate.stream().map(p -> p.getId()).collect(Collectors.toList())));
+            //  kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(batchUpdate.stream().map(p -> p.getId()).collect(Collectors.toList())));
         }
         return batchUpdate.size();
     }
@@ -143,81 +140,122 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     public String getAttr(Long id) {
 
         SysNftPicEntity entity = this.getById(id);
-        SysNFTAttrJSONDto sysNFTAttrJSONDto = this.handelAttr(entity);
-        return JSONUtil.toJsonStr(sysNFTAttrJSONDto);
+        SkinNFTAttrDto attr = this.handleAttr(entity);
+        return JSONUtil.toJsonStr(attr);
     }
 
-    public SysNFTAttrJSONDto handelAttr(SysNftPicEntity entity) {
-        SysNFTAttrJSONDto jsonDto = new SysNFTAttrJSONDto();
+    public SkinNFTAttrDto handleAttr(SysNftPicEntity entity) {
+        SkinNFTAttrDto jsonDto = new SkinNFTAttrDto();
         jsonDto.setName(entity.getName());
-        jsonDto.setSymbol(entity.getSymbol());
-        jsonDto.setDescription(entity.getDescription());
         jsonDto.setImage(entity.getPicName());
 
-        ArrayList<SysNFTAttrJSONDto.Attributes> attributesList = new ArrayList<>();
-        if (!StrUtil.isEmpty(entity.getRarity())) {
-            SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTrait_type(NftAttrEnum.RARITY.getName());
-            attributes.setValue(entity.getRarity());
-            attributesList.add(attributes);
-        }
-        if (!StrUtil.isEmpty(entity.getFeature())) {
-            SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTrait_type(NftAttrEnum.FEATURE.getName());
-            attributes.setValue(entity.getFeature());
-            attributesList.add(attributes);
-        }
-        if (!StrUtil.isEmpty(entity.getColor())) {
-            SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTrait_type(NftAttrEnum.COLOR.getName());
-            attributes.setValue(entity.getColor());
-            attributesList.add(attributes);
-        }
-        if (!StrUtil.isEmpty(entity.getAccessories())) {
-            SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTrait_type(NftAttrEnum.ACCESSORIES.getName());
-            attributes.setValue(entity.getAccessories());
-            attributesList.add(attributes);
-        }
-        if (!StrUtil.isEmpty(entity.getDecorate())) {
-            SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTrait_type(NftAttrEnum.DECORATE.getName());
-            attributes.setValue(entity.getDecorate());
-            attributesList.add(attributes);
-        }
-        if (!StrUtil.isEmpty(entity.getOther())) {
-            SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTrait_type(NftAttrEnum.OTHER.getName());
-            attributes.setValue(entity.getOther());
-            attributesList.add(attributes);
-        }
-        if (!StrUtil.isEmpty(entity.getHero())) {
-            SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTrait_type(NftAttrEnum.HERO.getName());
-            attributes.setValue(entity.getHero());
-            attributesList.add(attributes);
-        }
-        if (!StrUtil.isEmpty(entity.getSkin())) {
-            SysNFTAttrJSONDto.Attributes attributes = new SysNFTAttrJSONDto.Attributes();
-            attributes.setTrait_type(NftAttrEnum.SKIN.getName());
-            attributes.setValue(entity.getSkin());
-            attributesList.add(attributes);
-        }
+        ArrayList<SkinNFTAttrDto.Attributes> attributesList = new ArrayList<>();
+
+        SkinNFTAttrDto.Attributes configId = new SkinNFTAttrDto.Attributes();
+        configId.setTrait_type(SkinNftEnums.NftAttrEnum.CONFIGID.getName());
+        configId.setValue(entity.getRarity());
+        attributesList.add(configId);
+
+        SkinNFTAttrDto.Attributes autoId = new SkinNFTAttrDto.Attributes();
+        autoId.setTrait_type(SkinNftEnums.NftAttrEnum.AUTOID.getName());
+        autoId.setValue(entity.getRarity());
+        attributesList.add(autoId);
+
+        SkinNFTAttrDto.Attributes rarity = new SkinNFTAttrDto.Attributes();
+        rarity.setTrait_type(SkinNftEnums.NftAttrEnum.RARITY.getName());
+        rarity.setValue(entity.getRarity());
+        attributesList.add(rarity);
+
+        SkinNFTAttrDto.Attributes feature = new SkinNFTAttrDto.Attributes();
+        feature.setTrait_type(SkinNftEnums.NftAttrEnum.FEATURE.getName());
+        feature.setValue(entity.getFeature());
+        attributesList.add(feature);
+
+        SkinNFTAttrDto.Attributes color = new SkinNFTAttrDto.Attributes();
+        color.setTrait_type(SkinNftEnums.NftAttrEnum.COLOR.getName());
+        color.setValue(entity.getColor());
+        attributesList.add(color);
+
+        SkinNFTAttrDto.Attributes accessories = new SkinNFTAttrDto.Attributes();
+        accessories.setTrait_type(SkinNftEnums.NftAttrEnum.ACCESSORIES.getName());
+        accessories.setValue(entity.getAccessories());
+        attributesList.add(accessories);
+
+        SkinNFTAttrDto.Attributes decorate = new SkinNFTAttrDto.Attributes();
+        decorate.setTrait_type(SkinNftEnums.NftAttrEnum.DECORATE.getName());
+        decorate.setValue(entity.getDecorate());
+        attributesList.add(decorate);
+
+        SkinNFTAttrDto.Attributes other = new SkinNFTAttrDto.Attributes();
+        other.setTrait_type(SkinNftEnums.NftAttrEnum.OTHER.getName());
+        other.setValue(entity.getOther());
+        attributesList.add(other);
+
+        SkinNFTAttrDto.Attributes hero = new SkinNFTAttrDto.Attributes();
+        hero.setTrait_type(SkinNftEnums.NftAttrEnum.HERO.getName());
+        hero.setValue(entity.getHero());
+        attributesList.add(hero);
+
+        SkinNFTAttrDto.Attributes skin = new SkinNFTAttrDto.Attributes();
+        skin.setTrait_type(SkinNftEnums.NftAttrEnum.SKIN.getName());
+        skin.setValue(entity.getSkin());
+        attributesList.add(skin);
+
+        handleGameAttr(attributesList);
         jsonDto.setAttributes(attributesList);
-        SysNFTAttrJSONDto.Properties.Files files = new SysNFTAttrJSONDto.Properties.Files();
+        SkinNFTAttrDto.Properties.Files files = new SkinNFTAttrDto.Properties.Files();
         files.setType("image/" + entity.getPicName().substring(entity.getPicName().lastIndexOf(".") + 1));
         files.setUri(entity.getPicName());
-        ArrayList<SysNFTAttrJSONDto.Properties.Files> fileList = new ArrayList<>();
+        ArrayList<SkinNFTAttrDto.Properties.Files> fileList = new ArrayList<>();
         fileList.add(files);
-        SysNFTAttrJSONDto.Properties properties = new SysNFTAttrJSONDto.Properties();
+        SkinNFTAttrDto.Properties properties = new SkinNFTAttrDto.Properties();
         properties.setFiles(fileList);
         jsonDto.setProperties(properties);
         return jsonDto;
     }
 
+    private void handleGameAttr(ArrayList<SkinNFTAttrDto.Attributes> attributesList) {
+        SkinNFTAttrDto.Attributes win = new SkinNFTAttrDto.Attributes();
+        win.setTrait_type(SkinNftEnums.NftAttrEnum.WIN.getName());
+        win.setValue("0");
+        attributesList.add(win);
+        SkinNFTAttrDto.Attributes defeat = new SkinNFTAttrDto.Attributes();
+        defeat.setTrait_type(SkinNftEnums.NftAttrEnum.DEFEAT.getName());
+        defeat.setValue("0");
+        attributesList.add(defeat);
+        SkinNFTAttrDto.Attributes seqWin = new SkinNFTAttrDto.Attributes();
+        seqWin.setTrait_type(SkinNftEnums.NftAttrEnum.SEQWIN.getName());
+        seqWin.setValue("0");
+        attributesList.add(seqWin);
+        SkinNFTAttrDto.Attributes seqDefeat = new SkinNFTAttrDto.Attributes();
+        seqDefeat.setTrait_type(SkinNftEnums.NftAttrEnum.SEQDEFEAT.getName());
+        seqDefeat.setValue("0");
+        attributesList.add(seqDefeat);
+        SkinNFTAttrDto.Attributes seqKill = new SkinNFTAttrDto.Attributes();
+        seqKill.setTrait_type(SkinNftEnums.NftAttrEnum.SEQKILL.getName());
+        seqKill.setValue("0");
+        attributesList.add(seqKill);
+        SkinNFTAttrDto.Attributes killPlayer = new SkinNFTAttrDto.Attributes();
+        killPlayer.setTrait_type(SkinNftEnums.NftAttrEnum.KILLPLAYER.getName());
+        killPlayer.setValue("0");
+        attributesList.add(killPlayer);
+        SkinNFTAttrDto.Attributes killNpc = new SkinNFTAttrDto.Attributes();
+        killNpc.setTrait_type(SkinNftEnums.NftAttrEnum.KILLNPC.getName());
+        killNpc.setValue("0");
+        attributesList.add(killNpc);
+        SkinNFTAttrDto.Attributes killedByPlayer = new SkinNFTAttrDto.Attributes();
+        killedByPlayer.setTrait_type(SkinNftEnums.NftAttrEnum.KILLEDBYPLAYER.getName());
+        killedByPlayer.setValue("0");
+        attributesList.add(killedByPlayer);
+        SkinNFTAttrDto.Attributes killByNPC = new SkinNFTAttrDto.Attributes();
+        killByNPC.setTrait_type(SkinNftEnums.NftAttrEnum.KILLEDBYNPC.getName());
+        killByNPC.setValue("0");
+        attributesList.add(killByNPC);
+    }
+
     @Override
     public void updateAttribute(SysNftPicAttributeModifyReq req) {
-        log.info("NftAttributeModifyReq == {}",req);
+        log.info("NftAttributeModifyReq == {}", req);
         SysNftPicEntity sysNftPicEntity = new SysNftPicEntity();
         BeanUtils.copyProperties(req, sysNftPicEntity);
         sysNftPicEntity.setDescription(req.getDesc());
@@ -296,7 +334,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     public void applyAutoIds(SysApplyAutoIdsReq ids) {
         Set<Long> noApplyIds = this.list(new LambdaQueryWrapper<SysNftPicEntity>()
                 .in(SysNftPicEntity::getConfId, ids.getConfigIds())
-                .eq(SysNftPicEntity::getApplyState, AutoIdApplyStateEnum.NO_APPLY.getCode()))
+                .eq(SysNftPicEntity::getApplyState, SkinNftEnums.AutoIdApplyStateEnum.NO_APPLY.getCode()))
                 .stream()
                 .map(p -> p.getConfId())
                 .collect(Collectors.toSet());
@@ -319,7 +357,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                 List<SysNftPicEntity> updateList = noApplyIds.stream().map(p -> {
                     SysNftPicEntity entity = new SysNftPicEntity();
                     entity.setConfId(p);
-                    entity.setApplyState(AutoIdApplyStateEnum.APPLYING.getCode());
+                    entity.setApplyState(SkinNftEnums.AutoIdApplyStateEnum.APPLYING.getCode());
                     return entity;
                 }).collect(Collectors.toList());
                 this.updateBatchByQueryWrapper(updateList, item ->
@@ -345,11 +383,42 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             SysNftPicEntity entity = new SysNftPicEntity();
             entity.setConfId(p);
             entity.setAutoId(req.getAutoIds().get(p));
-            entity.setApplyState(AutoIdApplyStateEnum.APPLIED.getCode());
+            entity.setApplyState(SkinNftEnums.AutoIdApplyStateEnum.APPLIED.getCode());
             return entity;
         }).collect(Collectors.toList());
         this.updateBatchByQueryWrapper(updateList, item ->
                 new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getConfId, item.getConfId()));
+    }
+
+    @Override
+    public void skinMint(SysSkinNftMintReq req) {
+        List<SysNftPicEntity> records = this.listByIds(req.getIds());
+        records.forEach(p -> {
+            if (!p.getApplyState().equals(SkinNftEnums.AutoIdApplyStateEnum.APPLIED.getCode())
+                    || p.getAutoId().equals(Long.valueOf(WhetherEnum.NO.value()))) {
+                throw new GenericException(AdminErrorCodeEnum.ERR_40023_INVALID_RECORD, p.getPicName());
+            }
+            validate(p);
+            p.setMintState(SkinNftEnums.SkinMintStateEnum.MINTING.getCode());
+        });
+        this.updateBatchById(records);
+
+        skinAsyncService.skinMint(req);
+    }
+
+    private void validate(SysNftPicEntity p) {
+        if (StringUtils.isBlank(p.getRarity()) ||
+                StringUtils.isBlank(p.getRarity()) ||
+                StringUtils.isBlank(p.getFeature()) ||
+                StringUtils.isBlank(p.getColor()) ||
+                StringUtils.isBlank(p.getAccessories()) ||
+                StringUtils.isBlank(p.getDecorate()) ||
+                StringUtils.isBlank(p.getHero()) ||
+                StringUtils.isBlank(p.getSkin()) ||
+                p.getConfId().equals(Long.valueOf(WhetherEnum.NO.value()))
+        ) {
+            throw new GenericException(AdminErrorCodeEnum.ERR_40024_MISS_ATTR_RECORD, p.getPicName());
+        }
     }
 
     private void fileToZip(String filePath, ZipOutputStream zipOut) throws IOException {

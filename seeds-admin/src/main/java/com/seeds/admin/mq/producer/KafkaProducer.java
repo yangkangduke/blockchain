@@ -2,6 +2,7 @@ package com.seeds.admin.mq.producer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -33,6 +34,22 @@ public class KafkaProducer {
             public void afterCommit() {
                 log.info("发送消息： topic - {},msg - {}", topic, msg);
                 kafkaTemplate.send(topic, msg);
+            }
+        });
+
+    }
+
+    /**
+     * 发送消息
+     */
+    @Transactional
+    @Async
+    public void sendAsync(String topic, Object obj) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            // 在数据库事务提交之后在发送消息
+            @Override
+            public void afterCommit() {
+                kafkaTemplate.send(topic, obj);
             }
         });
 
