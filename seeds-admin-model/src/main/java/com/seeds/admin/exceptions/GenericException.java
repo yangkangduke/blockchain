@@ -19,4 +19,9 @@ public class GenericException extends RuntimeException {
         super(errorCode.getDescEn());
         this.errorCode = errorCode;
     }
+
+    public GenericException(AdminErrorCodeEnum errorCode, String message) {
+        super(errorCode.getDesc() + message);
+        this.errorCode = errorCode;
+    }
 }

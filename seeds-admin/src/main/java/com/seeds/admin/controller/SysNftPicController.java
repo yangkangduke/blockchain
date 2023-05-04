@@ -1,10 +1,7 @@
 package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.seeds.admin.dto.request.ListReq;
-import com.seeds.admin.dto.request.SysApplyAutoIdsReq;
-import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
-import com.seeds.admin.dto.request.SysNftPicPageReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.service.SysNftPicService;
 import com.seeds.common.dto.GenericDto;
@@ -51,6 +48,13 @@ public class SysNftPicController {
     @ApiOperation("修改内置属性")
     public GenericDto<Object> updateAttribute(@RequestBody @Valid SysNftPicAttributeModifyReq req) {
         sysNftPicService.updateAttribute(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("skin-mint")
+    @ApiOperation("皮肤mint")
+    public GenericDto<Object> skinMint(@RequestBody @Valid SysSkinNftMintReq req) {
+        sysNftPicService.skinMint(req);
         return GenericDto.success(null);
     }
 

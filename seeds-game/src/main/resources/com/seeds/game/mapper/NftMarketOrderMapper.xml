@@ -47,19 +47,19 @@
             and t3.hero_type = #{params.heroType}
         </if>
         <if test="params.minPrice != null">
-            and t1.price &gt;= ${params.minPrice}
+            and t1.price &gt;= #{params.minPrice}
         </if>
         <if test="params.maxPrice != null">
-            and t1.price &lt;= ${params.maxPrice}
+            and t1.price &lt;= #{params.maxPrice}
         </if>
         <if test="params.sort != null and params.sort =='price'">
-            order by t1.price ${params.sortType}
+            order by t1.price ${params.sortTypeStr}
         </if>
         <if test="params.sort != null and params.sort =='rarity'">
-            order by t3.rarity ${params.sortType}
+            order by t3.rarity ${params.sortTypeStr}
         </if>
         <if test="params.sort != null and params.sort =='placeTime'">
-            order by t1.place_time ${params.sortType}
+            order by t1.place_time ${params.sortTypeStr}
         </if>
 
     </select>
@@ -108,28 +108,28 @@
             and t3.grade = #{params.grade}
         </if>
         <if test="params.minDurability != null">
-            and t3.durability &gt;= ${params.minDurability}
+            and t3.durability &gt;= #{params.minDurability}
         </if>
         <if test="params.maxDurability != null">
-            and t3.durability &lt;= ${params.maxDurability}
+            and t3.durability &lt;= #{params.maxDurability}
         </if>
         <if test="params.minPrice != null">
-            and t1.price &gt;= ${params.minPrice}
+            and t1.price &gt;= #{params.minPrice}
         </if>
         <if test="params.maxPrice != null">
-            and t1.price &lt;= ${params.maxPrice}
+            and t1.price &lt;= #{params.maxPrice}
         </if>
         <if test="params.sort != null and params.sort =='price'">
-            order by t1.price ${params.sortType}
+            order by t1.price ${params.sortTypeStr}
         </if>
         <if test="params.sort != null and params.sort =='grade'">
-            order by t3.grade ${params.sortType}
+            order by t3.grade ${params.sortTypeStr}
         </if>
         <if test="params.sort != null and params.sort =='durability'">
-            order by t3.durability ${params.sortType}
+            order by t3.durability ${params.sortTypeStr}
         </if>
         <if test="params.sort != null and params.sort =='placeTime'">
-            order by t1.place_time ${params.sortType}
+            order by t1.place_time ${params.sortTypeStr}
         </if>
 
     </select>
@@ -178,28 +178,28 @@
             and t3.grade = #{params.grade}
         </if>
         <if test="params.minDurability != null">
-            and t3.durability &gt;= ${params.minDurability}
+            and t3.durability &gt;= #{params.minDurability}
         </if>
         <if test="params.maxDurability != null">
-            and t3.durability &lt;= ${params.maxDurability}
+            and t3.durability &lt;= #{params.maxDurability}
         </if>
         <if test="params.minPrice != null">
-            and t1.price &gt;= ${params.minPrice}
+            and t1.price &gt;= #{params.minPrice}
         </if>
         <if test="params.maxPrice != null">
-            and t1.price &lt;= ${params.maxPrice}
+            and t1.price &lt;= #{params.maxPrice}
         </if>
         <if test="params.sort != null and params.sort =='price'">
-            order by t1.price ${params.sortType}
+            order by t1.price ${params.sortTypeStr}
         </if>
         <if test="params.sort != null and params.sort =='grade'">
-            order by t3.grade ${params.sortType}
+            order by t3.grade ${params.sortTypeStr}
         </if>
         <if test="params.sort != null and params.sort =='durability'">
-            order by t3.durability ${params.sortType}
+            order by t3.durability ${params.sortTypeStr}
         </if>
         <if test="params.sort != null and params.sort =='placeTime'">
-            order by t1.place_time ${params.sortType}
+            order by t1.place_time ${params.sortTypeStr}
         </if>
 
     </select>

@@ -9,11 +9,13 @@ import java.util.List;
  * @date 2023/2/20
  */
 @Data
-public class SysNFTAttrJSONDto {
+public class SkinNFTAttrDto {
     private String name;
-    private String symbol;
-    private String description;
+    private String symbol = "SKIN";
+    private String description = "This is the NFT of the Seeds skin.";
+    private int seller_fee_basis_points = 0;
     private String image;
+    private String external_url = "https://www.theseeds.io/";
     private List<Attributes> attributes;
     private Properties properties;
 

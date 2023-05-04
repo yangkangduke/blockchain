@@ -2,11 +2,9 @@ package com.seeds.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.admin.dto.SkinNFTAttrDto;
 import com.seeds.admin.dto.SkinNftPushAutoIdReq;
-import com.seeds.admin.dto.request.ListReq;
-import com.seeds.admin.dto.request.SysApplyAutoIdsReq;
-import com.seeds.admin.dto.request.SysNftPicAttributeModifyReq;
-import com.seeds.admin.dto.request.SysNftPicPageReq;
+import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.entity.SysNftPicEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,4 +26,6 @@ public interface SysNftPicService extends IService<SysNftPicEntity> {
     void applyAutoIds(SysApplyAutoIdsReq ids);
 
     void pushAutoId(SkinNftPushAutoIdReq req);
+
+    void skinMint(SysSkinNftMintReq req);
 }

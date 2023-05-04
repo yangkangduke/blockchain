@@ -108,8 +108,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
             response.setContentType("application/octet-stream; charset=UTF-8");
             response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(objectName.substring(objectName.lastIndexOf("/") + 1), "UTF-8"));
             IoUtil.copy(s3Object.getObjectContent(), response.getOutputStream());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("文件下载失败，objectName={}", objectName);
         }
     }
@@ -117,6 +116,11 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFileEntity
     @Override
     public String getFileUrl(String objectName) {
         return baseUrl + String.format("/admin/public/file/download/%s?objectName=%s", properties.getBucketName(), objectName);
+    }
+
+    @Override
+    public String getNftFileUrl(String bucketName, String objectName) {
+        return baseUrl + String.format("/admin/public/file/download/%s?objectName=%s", bucketName, objectName);
     }
 
     @Override

@@ -73,7 +73,6 @@ public class SysNftPicUpHisServiceImpl extends ServiceImpl<SysNftPicUpHisMapper,
     @Override
     @Transactional
     public void upload(MultipartFile[] files, SysNftPicUpHisReq req) {
-
         // 记录上传历史
         SysNftPicUpHisEntity hisEntity = new SysNftPicUpHisEntity();
         BeanUtils.copyProperties(req, hisEntity);
@@ -82,28 +81,25 @@ public class SysNftPicUpHisServiceImpl extends ServiceImpl<SysNftPicUpHisMapper,
         hisEntity.setUpdatedBy(UserContext.getCurrentAdminUserId());
         hisEntity.setUpdatedAt(System.currentTimeMillis());
         this.save(hisEntity);
-
         List<SysNftPicEntity> picInsert = new ArrayList<>();
         List<SysNftPicEntity> picUpdate = new ArrayList<>();
         for (MultipartFile file : files) {
-            String bucketName = properties.getBucketName();
+            String bucketName = properties.getMetadata().getBucketName();
             String originalFilename = file.getOriginalFilename();
-            String objectName = "NFT_PIC/" + originalFilename;
+            String objectName = "skin/pic/" + originalFilename;
 
             try (InputStream inputStream = file.getInputStream()) {
                 template.putObject(bucketName, objectName, inputStream, file.getContentType());
-
                 // 记录每张图片
                 SysNftPicEntity sysNftPicEntity = new SysNftPicEntity();
                 BeanUtils.copyProperties(req, sysNftPicEntity);
                 sysNftPicEntity.setPicName(originalFilename);
                 sysNftPicEntity.setHisId(hisEntity.getId());
-                sysNftPicEntity.setUrl(sysFileService.getFileUrl(objectName));
+                sysNftPicEntity.setUrl(sysFileService.getNftFileUrl(bucketName, objectName));
                 sysNftPicEntity.setCreatedBy(UserContext.getCurrentAdminUserId());
                 sysNftPicEntity.setCreatedAt(System.currentTimeMillis());
                 sysNftPicEntity.setUpdatedBy(UserContext.getCurrentAdminUserId());
                 sysNftPicEntity.setUpdatedAt(System.currentTimeMillis());
-
                 SysNftPicEntity one = sysNftPicService.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, originalFilename));
                 if (Objects.isNull(one)) {
                     picInsert.add(sysNftPicEntity);
@@ -111,8 +107,6 @@ public class SysNftPicUpHisServiceImpl extends ServiceImpl<SysNftPicUpHisMapper,
                     sysNftPicEntity.setId(one.getId());
                     picUpdate.add(sysNftPicEntity);
                 }
-
-
             } catch (Exception e) {
                 log.error("文件上传失败，fileName={}", originalFilename);
                 throw new GenericException("File upload failed");

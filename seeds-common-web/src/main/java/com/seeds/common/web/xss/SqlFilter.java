@@ -23,6 +23,11 @@ public class SqlFilter {
         str = StringUtils.replace(str, "\"", "");
         str = StringUtils.replace(str, ";", "");
         str = StringUtils.replace(str, "\\", "");
+        str = StringUtils.replace(str, "*", "");
+        str = StringUtils.replace(str, "&", "");
+        str = StringUtils.replace(str, "<", "");
+        str = StringUtils.replace(str, ">", "");
+        str = StringUtils.replace(str, "?", "");
 
         //转换成小写
         str = str.toLowerCase();

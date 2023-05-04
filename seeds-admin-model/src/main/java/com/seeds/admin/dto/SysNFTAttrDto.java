@@ -8,6 +8,11 @@ import lombok.Data;
  */
 @Data
 public class SysNFTAttrDto {
+
+    /**
+     * 游戏方confId
+     */
+    private Long confId;
     /**
      * 图片名字
      */
@@ -38,18 +43,13 @@ public class SysNFTAttrDto {
      * 对应英雄名字
      */
     private String hero;
-
+    /**
+     * 对应皮肤名字
+     */
     private String skin;
 
+    /**
+     * other
+     */
     private String other;
-
-    // nft name
-    private String name;
-    private String symbol;
-    private String desc;
-
-
-    private Long autoId;
-
-    private Long confId;
 }

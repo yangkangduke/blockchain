@@ -52,9 +52,19 @@ public interface SysFileService extends IService<SysFileEntity> {
 
     /**
      * 获取文件url
+     *
      * @param objectName 对象名称
      * @return 文件url
      */
     String getFileUrl(String objectName);
+
+    /**
+     * 获取文件url
+     *
+     * @param bucketName bucket名称
+     * @param objectName 对象名称
+     * @return 文件url
+     */
+    String getNftFileUrl(String bucketName, String objectName);
 
 }
