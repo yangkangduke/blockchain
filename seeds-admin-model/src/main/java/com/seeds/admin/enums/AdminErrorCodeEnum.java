@@ -15,6 +15,7 @@ public enum AdminErrorCodeEnum {
     ERR_500_SYSTEM_BUSY(500, "系统繁忙，请稍后再试...", "system busy, please try again later"),
     ERR_502_ILLEGAL_ARGUMENTS(502, "参数错误", "wrong arguments"),
     ERR_504_MISSING_ARGUMENTS(504, "缺少参数", "missing arguments"),
+    ERR_505_INTERNAL_FAILURE(505, "内部失败", "internal failure"),
 
     // login
     ERR_10001_ACCOUNT_YET_NOT_REGISTERED(10001, "账号尚未注册", "account yet not registered"),
