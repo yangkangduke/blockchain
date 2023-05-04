@@ -15,15 +15,15 @@ import javax.validation.constraints.Pattern;
 public class ShareLinkReq {
 
     @ApiModelProperty(value = "twitter地址")
-    @Pattern(regexp = "/^((?:http:\\/\\/)?|(?:https:\\/\\/)?)?(?:www\\.)?twitter\\.com\\/(\\w+)$/", message = "Invalid Link")
+    @Pattern(regexp = "^https?://(?:www\\.)?twitter\\.com/([a-zA-Z0-9_]+)/?$|^$", message = "Invalid Link")
     private String twitter;
 
     @ApiModelProperty(value = "instagram地址")
-    @Pattern(regexp = "/^((?:http:\\/\\/)?|(?:https:\\/\\/)?)?(?:www\\.)?instagram\\.com\\/(\\w+)$/", message = "Invalid Link")
+    @Pattern(regexp = "^https?://(?:www\\.)?instagram\\.com/([a-zA-Z0-9_.]+)/?$|^$", message = "Invalid Link")
     private String instagram;
 
     @ApiModelProperty(value = "facebook地址")
-    @Pattern(regexp = "/^((?:http:\\/\\/)?|(?:https:\\/\\/)?)?(?:www\\.)?facebook\\.com\\/(\\w+)$/", message = "Invalid Link")
+    @Pattern(regexp = "^https?://(?:www\\.)?facebook\\.com/([a-zA-Z0-9.]+)/?$|^$", message = "Invalid Link")
     private String facebook;
 
 }
