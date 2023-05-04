@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author yk
@@ -21,7 +22,7 @@ public class RegisterReq {
     @NotBlank
     private String code;
     @ApiModelProperty(value = "密码", required = true)
-    @NotBlank
+    @Pattern(regexp = "^(?=.*[0-9].*)(?=.*[A-Z].*)(?=.*[a-z].*).{8,32}$", message = "Incorrect password format")
     private String password;
 
     @ApiModelProperty(value = "邀请码")
