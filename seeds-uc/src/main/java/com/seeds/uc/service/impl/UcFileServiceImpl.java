@@ -14,6 +14,7 @@ import com.seeds.uc.dto.request.UcFileResp;
 import com.seeds.uc.mapper.UcFileMapper;
 import com.seeds.uc.model.UcFile;
 import com.seeds.uc.service.IUcFileService;
+import com.seeds.uc.util.FilesUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,11 +91,12 @@ public class UcFileServiceImpl extends ServiceImpl<UcFileMapper, UcFile> impleme
      */
     @Override
     public GenericDto<UcFileResp> upload(MultipartFile file) {
+        // 校验文件
+        FilesUtil.uploadVerify(file);
         String objectName = IdUtil.simpleUUID() + StrUtil.DOT + FileUtil.extName(file.getOriginalFilename());
         UcFileResp ucFileResp = UcFileResp.builder()
                 .bucketName(properties.getBucketName())
                 .objectName(objectName)
-                .url(String.format("/uc/public/file/%s/%s", properties.getBucketName(), objectName))
                 .build();
 
         try (InputStream inputStream = file.getInputStream()) {
@@ -102,6 +104,7 @@ public class UcFileServiceImpl extends ServiceImpl<UcFileMapper, UcFile> impleme
             // 文件管理数据记录,收集管理追踪文件
             Long id = fileLog(file, objectName);
             ucFileResp.setFileId(id);
+            ucFileResp.setUrl(String.format("/uc/public/file/detail/%s", id));
         }
         catch (Exception e) {
             log.error("上传失败", e);

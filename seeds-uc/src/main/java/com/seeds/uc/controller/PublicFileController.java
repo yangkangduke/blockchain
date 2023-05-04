@@ -1,6 +1,7 @@
 package com.seeds.uc.controller;
 
 
+import com.seeds.uc.model.UcFile;
 import com.seeds.uc.service.IUcFileService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +30,15 @@ public class PublicFileController {
     @ApiOperation(value = "获取文件", notes = "获取文件")
     public void file(@PathVariable String bucket, @PathVariable String objectName, HttpServletResponse response) {
         iUcFileService.getFile(bucket, objectName, response);
+    }
+
+    @GetMapping("detail/{fileId}")
+    @ApiOperation(value = "获取文件", notes = "获取文件")
+    public void file(@PathVariable Long fileId, HttpServletResponse response) {
+        UcFile ucFile = iUcFileService.getById(fileId);
+        if (ucFile != null) {
+            iUcFileService.getFile(ucFile.getBucketName(), ucFile.getObjectName(), response);
+        }
     }
 
 }
