@@ -1,6 +1,7 @@
 package com.seeds.game.dto.request.internal;
 
 import com.seeds.common.dto.PageReq;
+import com.seeds.common.web.xss.SqlFilter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -8,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author: hewei
@@ -35,22 +37,30 @@ public class NftEventPageReq extends PageReq {
         @ApiModelProperty("排序字段")
         private String sort = "created_at";
 
-        @ApiModelProperty("sortType: asc、desc ")
-        private String sortType = "desc";
+        @ApiModelProperty("sortType: 0 asc、1 desc ")
+        private Integer sortType = 1;
     }
 
     public static String getOrderByStatement(List<Sort> sorts) {
         StringBuilder statement = new StringBuilder();
         if (!CollectionUtils.isEmpty(sorts)) {
             for (Sort sort : sorts) {
-                if (StringUtils.isNotBlank(sort.getSort()) && StringUtils.isNotBlank(sort.getSortType())) {
-                    statement.append(sort.getSort());
+                if (StringUtils.isNotBlank(sort.getSort()) && Objects.nonNull(sort.getSortType())) {
+                    statement.append(SqlFilter.sqlInject(sort.getSort()));
                     statement.append(" ");
-                    statement.append(sort.getSortType());
+                    statement.append(convert(sort.getSortType()));
                     statement.append(",");
                 }
             }
         }
         return StringUtils.isNotBlank(statement.toString()) ? " order by " + statement.toString().substring(0, statement.toString().length() - 1) : "";
+    }
+
+    private static String convert(Integer sortType) {
+        String str = "desc";
+        if (sortType.equals(0)) {
+            str = "asc";
+        }
+        return str;
     }
 }
