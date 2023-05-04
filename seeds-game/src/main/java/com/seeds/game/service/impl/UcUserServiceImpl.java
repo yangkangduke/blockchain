@@ -60,7 +60,7 @@ public class UcUserServiceImpl implements UcUserService {
             log.error("内部请求uc获取用户公共地址失败");
         }
         if (publicAddress == null) {
-            throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
+            return 0;
         }
         List<NftMarketOrderEntity> orders = nftMarketOrderService.queryUserTradesByAddressAndStatus(publicAddress, NftOrderStatusEnum.COMPLETED.getCode());
         return orders.size();

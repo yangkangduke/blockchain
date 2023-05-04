@@ -15,6 +15,7 @@ public enum NoticeErrorCodeEnum {
     ERR_500_SYSTEM_BUSY(500, "系统繁忙，请稍后再试...", "system busy, please try again later"),
     ERR_502_ILLEGAL_ARGUMENTS(502, "参数错误", "wrong arguments"),
     ERR_504_MISSING_ARGUMENTS(504, "缺少参数", "missing arguments"),
+    ERR_505_INTERNAL_FAILURE(505, "内部失败", "internal failure"),
 
     ERR_1001_WEBSOCKET_AUTH_FAILED(1001, "websocket认证失败", "websocket authentication failed");
 

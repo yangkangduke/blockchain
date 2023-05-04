@@ -2,8 +2,10 @@ package com.seeds.notification.handler;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.notification.enums.NoticeErrorCodeEnum;
 import com.seeds.notification.exceptions.GenericException;
 import com.seeds.notification.exceptions.InvalidArgumentsException;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.binding.BindingException;
 import org.springframework.http.HttpStatus;
@@ -30,7 +32,16 @@ public class NotificationExceptionHandler {
     ResponseEntity<GenericDto<String>> handle(Exception e) {
         log.error("Exception:", e);
         return new ResponseEntity<>(
-                GenericDto.failure("Internal Error:" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                GenericDto.failure("Internal Error:" + NoticeErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(FeignException.class)
+    ResponseEntity<GenericDto<String>> handle(FeignException e) {
+        log.error("FeignException:", e);
+        return new ResponseEntity<>(
+                GenericDto.failure(NoticeErrorCodeEnum.ERR_505_INTERNAL_FAILURE.getDescEn(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
