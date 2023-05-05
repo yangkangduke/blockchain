@@ -47,12 +47,14 @@ public class GameExceptionHandler {
     @ResponseBody
     @ExceptionHandler(GenericException.class)
     ResponseEntity<GenericDto<String>> handle(GenericException e) {
+        log.error("GenericException:", e);
         return new ResponseEntity<>(GenericDto.failure(e.getMessage(), e.getErrorCode().getCode()), HttpStatus.OK);
     }
 
     @ResponseBody
     @ExceptionHandler(InvalidArgumentsException.class)
     ResponseEntity<GenericDto<String>> handle(InvalidArgumentsException e) {
+        log.error("InvalidArguments Exception:", e);
         return new ResponseEntity<>(
                 GenericDto.failure(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value()),
                 HttpStatus.UNPROCESSABLE_ENTITY);
@@ -62,14 +64,16 @@ public class GameExceptionHandler {
     //实体对象前不加@RequestBody注解,单个对象内属性校验未通过抛出的异常类型
     @ExceptionHandler(BindingException.class)
     public ResponseEntity<GenericDto<String>> handle(BindingException e) {
+        log.error("Binding Exception:", e);
         return new ResponseEntity<>(
-                GenericDto.failure(e.getMessage(), HttpStatus.BAD_REQUEST.value()),
+                GenericDto.failure("Internal Error:" + GameErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
     }
 
     // 唯一键冲突
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<GenericDto<String>> handle(DuplicateKeyException e) {
+        log.error("DuplicateKeyException:", e);
         return new ResponseEntity<>(
                 GenericDto.failure("please do not submit again!", HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.BAD_REQUEST);
