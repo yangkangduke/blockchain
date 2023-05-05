@@ -258,13 +258,13 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public void updateAttribute(SysNftPicAttributeModifyReq req) {
         log.info("NftAttributeModifyReq == {}", req);
+        SysNftPicEntity entity = this.getById(req.getId());
+        if (Objects.nonNull(entity) && entity.getMintState().equals(SkinNftEnums.SkinMintStateEnum.MINTED)) {
+            throw new GenericException(AdminErrorCodeEnum.ERR_40025_CAN_NOT_MODIFY);
+        }
         SysNftPicEntity sysNftPicEntity = new SysNftPicEntity();
         BeanUtils.copyProperties(req, sysNftPicEntity);
-        sysNftPicEntity.setDescription(req.getDesc());
         this.updateById(sysNftPicEntity);
-
-        // 屬性更新成功消息
-        //  kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(CollectionUtil.newArrayList(req.getId())));
     }
 
     @Override
@@ -411,7 +411,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public void listAsset(SysSkinNftListAssetReq req) {
 
-        List<SysNftPicEntity> list = this.list(new LambdaQueryWrapper<SysNftPicEntity>().in(SysNftPicEntity::getId, req.getIds()));
+        List<SysNftPicEntity> list = this.listByIds(req.getIds());
         List<SkinNftListAssetDto> listAssetDto = list.stream().map(p -> {
             SkinNftListAssetDto dto = new SkinNftListAssetDto();
             dto.setNftAddress(p.getTokenAddress());
@@ -434,7 +434,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
 
     @Override
     public void englishV2(SysSkinNftEnglishReq req) {
-        List<SysNftPicEntity> list = this.list(new LambdaQueryWrapper<SysNftPicEntity>().in(SysNftPicEntity::getId, req.getIds()));
+        List<SysNftPicEntity> list = this.listByIds(req.getIds());
         List<SkinNftEnglishDto> englishDtos = list.stream().map(p -> {
             SkinNftEnglishDto dto = new SkinNftEnglishDto();
             BeanUtils.copyProperties(p, dto);
@@ -453,6 +453,13 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         } catch (Exception e) {
             log.info(" 请求skin-english-出错:{}", e.getMessage());
         }
+    }
+
+    @Override
+    public void shadowUploadSuccess(ListReq req) {
+        List<SysNftPicEntity> list = this.list(new LambdaQueryWrapper<SysNftPicEntity>().in(SysNftPicEntity::getId, req.getIds()));
+        list.forEach(p -> p.setMintState(SkinNftEnums.SkinMintStateEnum.MINTED.getCode()));
+        this.updateBatchById(list);
     }
 
     private void validate(SysNftPicEntity p) {

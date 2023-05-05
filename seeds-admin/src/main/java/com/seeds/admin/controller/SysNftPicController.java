@@ -72,6 +72,13 @@ public class SysNftPicController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("shadow-upload-success")
+    @ApiOperation("shadow上传文件成功")
+    public GenericDto<Object> shadowUploadSuccess(@RequestBody @Valid ListReq req) {
+        sysNftPicService.shadowUploadSuccess(req);
+        return GenericDto.success(null);
+    }
+
     /**
      * 打包下载
      *
