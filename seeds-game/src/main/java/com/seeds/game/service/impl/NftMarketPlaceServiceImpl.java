@@ -728,14 +728,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             nftFeeRecord = new NftFeeRecordEntity();
         }
         // 请求NFT托管费退还
-        initRefundFee(refundFee, sellerAddress, nftFeeRecord);
         BeanUtils.copyProperties(req, nftFeeRecord);
+        nftFeeRecord.setStatus(WhetherEnum.YES.value());
+        initRefundFee(refundFee, sellerAddress, nftFeeRecord);
         nftFeeRecord.setReceivableFee(receivableFee);
         nftFeeRecord.setRefundFee(refundFee);
         nftFeeRecord.setRefundTime(System.currentTimeMillis());
         nftFeeRecord.setCurrency(CurrencyEnum.SOL.getCode());
         nftFeeRecord.setToAddress(sellerAddress);
-        nftFeeRecord.setStatus(WhetherEnum.YES.value());
         nftFeeRecordService.saveOrUpdate(nftFeeRecord);
     }
 
@@ -786,14 +786,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             nftFeeRecord = new NftFeeRecordEntity();
         }
         // 请求NFT托管费退还
-        initRefundFee(nftActivity.getPrice(), nftActivity.getFromAddress(), nftFeeRecord);
         BeanUtils.copyProperties(req, nftFeeRecord);
+        nftFeeRecord.setStatus(WhetherEnum.YES.value());
+        initRefundFee(nftActivity.getPrice(), nftActivity.getFromAddress(), nftFeeRecord);
         nftFeeRecord.setReceivableFee(nftActivity.getPrice());
         nftFeeRecord.setRefundFee(nftActivity.getPrice());
         nftFeeRecord.setRefundTime(System.currentTimeMillis());
         nftFeeRecord.setCurrency(CurrencyEnum.SOL.getCode());
         nftFeeRecord.setToAddress(nftActivity.getFromAddress());
-        nftFeeRecord.setStatus(WhetherEnum.YES.value());
         nftFeeRecordService.saveOrUpdate(nftFeeRecord);
     }
 
@@ -1046,6 +1046,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             Integer code = jsonObject.getInteger("code");
             if (code == null || code != 200) {
                 throw new GenericException("Failed to refund Fee, message:" + jsonObject.getString("message"));
+            }
+            String data = jsonObject.getString("data");
+            if (StringUtils.isNotBlank(data)) {
+                JSONObject dataJson = JSONObject.parseObject(data);
+                nftFeeRecord.setTxHash(dataJson.getString("txHash"));
             }
         } catch (Exception e) {
             log.error("请求NFT托管费退还接口失败，message：{}", e.getMessage());
