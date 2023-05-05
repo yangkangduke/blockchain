@@ -9,6 +9,7 @@ import com.seeds.uc.exceptions.InvalidArgumentsException;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.binding.BindingException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -49,6 +50,7 @@ public class UcExceptionHandler {
     @ResponseBody
     @ExceptionHandler(SeedsException.class)
     ResponseEntity<GenericDto<String>> handle(SeedsException e) {
+        log.error("Seeds Exception:", e);
         return new ResponseEntity<>(GenericDto.failure(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()), HttpStatus.OK);
     }
 
@@ -76,7 +78,7 @@ public class UcExceptionHandler {
                     HttpStatus.OK);
         } else {
             return new ResponseEntity<>(
-                    GenericDto.failure("Internal Error：" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                    GenericDto.failure(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS.getDescEn(), HttpStatus.INTERNAL_SERVER_ERROR.value()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -96,8 +98,17 @@ public class UcExceptionHandler {
     public ResponseEntity<GenericDto<String>> handle(BindingException e) {
         log.error("Binding Exception:", e);
         return new ResponseEntity<>(
-                GenericDto.failure(e.getMessage(), HttpStatus.BAD_REQUEST.value()),
+                GenericDto.failure("Internal Error:" + UcErrorCodeEnum.ERR_500_SYSTEM_BUSY.getDescEn(), HttpStatus.BAD_REQUEST.value()),
                 HttpStatus.OK);
+    }
+
+    // 唯一键冲突
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<GenericDto<String>> handle(DuplicateKeyException e) {
+        log.error("DuplicateKeyException:", e);
+        return new ResponseEntity<>(
+                GenericDto.failure("please do not submit again!", HttpStatus.BAD_REQUEST.value()),
+                HttpStatus.BAD_REQUEST);
     }
 
     //spring-context包里面的异常,实体对象前加@RequestBody注解,抛出的异常为该类异常
