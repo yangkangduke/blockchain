@@ -193,11 +193,11 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         eventEquipmentService.saveBatch(equipments);
 
 //        // todo 后期去掉 方便游戏测试直接mint成功
-        NftMintSuccessReq req1 = new NftMintSuccessReq();
-        req1.setEventId(nftEvent.getId());
-        req1.setAutoDeposite(1);
-        req1.setMintAddress(nftEvent.getId() + "token0xabc");
-        asyncNotifyGameService.mintSuccess(req1);
+//        NftMintSuccessReq req1 = new NftMintSuccessReq();
+//        req1.setEventId(nftEvent.getId());
+//        req1.setAutoDeposite(1);
+//        req1.setMintAddress(nftEvent.getId() + "token0xabc");
+//        asyncNotifyGameService.mintSuccess(req1);
     }
 
 
