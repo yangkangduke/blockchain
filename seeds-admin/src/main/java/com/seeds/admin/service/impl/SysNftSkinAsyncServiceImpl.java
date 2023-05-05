@@ -6,10 +6,12 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson2.JSON;
 import com.seeds.admin.config.SeedsAdminApiConfig;
+import com.seeds.admin.dto.SkinNFTAttrDto;
 import com.seeds.admin.dto.SysSkinNftMintDto;
 import com.seeds.admin.dto.SysSkinNftMintSuccessDto;
 import com.seeds.admin.dto.request.SysSkinNftMintReq;
 import com.seeds.admin.entity.SysNftPicEntity;
+import com.seeds.admin.enums.SkinNftEnums;
 import com.seeds.admin.service.SysFileService;
 import com.seeds.admin.service.SysNftPicService;
 import com.seeds.admin.service.SysNftSkinAsyncService;
@@ -55,6 +57,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
     @Override
     @Async
     public void skinMint(SysSkinNftMintReq dto) {
+        List<SysNftPicEntity> nfts = nftPicService.listByIds(dto.getIds());
         String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getMintNft();
         SysSkinNftMintDto mintDto = new SysSkinNftMintDto();
         mintDto.setAmount(dto.getIds().size());
@@ -68,8 +71,11 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
                     .body(param)
                     .execute();
         } catch (Exception e) {
-            //todo mint失败状态
-            log.info(" 请求skin-mint-nft接口--出错啦:{}", e.getMessage());
+            nfts.forEach(p -> {
+                p.setMintState(SkinNftEnums.SkinMintStateEnum.MINT_FAILED.getCode());
+            });
+            nftPicService.updateBatchById(nfts);
+            log.info(" 请求skin-mint-nft接口--出错:{}", e.getMessage());
         }
         JSONObject jsonObject = JSONObject.parseObject(response.body());
         log.info(" 请求skin-mint-nft接口--result:{}", jsonObject);
@@ -78,6 +84,12 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
             List<SysSkinNftMintSuccessDto.SkinNftMintSuccess> mintSuccesses = JSON.parseArray(result, SysSkinNftMintSuccessDto.SkinNftMintSuccess.class);
             //生成metadata
             createMetadata(mintSuccesses, dto.getIds());
+        } else {
+            nfts.forEach(p -> {
+                p.setMintState(SkinNftEnums.SkinMintStateEnum.MINT_FAILED.getCode());
+            });
+            nftPicService.updateBatchById(nfts);
+            log.info(" 请求skin-mint-nft接口--出错:{}", jsonObject.get("message"));
         }
 
     }
@@ -85,10 +97,11 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
     private void createMetadata(List<SysSkinNftMintSuccessDto.SkinNftMintSuccess> dto, List<Long> ids) {
         for (int i = 0; i < ids.size(); i++) {
             SysNftPicEntity entity = nftPicService.getById(ids.get(i));
-            String skinAttr = nftPicService.getAttr(entity.getId());
+            entity.setName(dto.get(i).getName());
+            SkinNFTAttrDto attr = nftPicService.handleAttr(entity);
             String tokenId = dto.get(i).getName().substring(dto.get(i).getName().lastIndexOf("#") + 1);
             String fileName = tokenId + ".json";
-            boolean flag = CreateJsonFileUtil.createJsonFile(skinAttr, TMP_FILE_PATH, fileName);
+            boolean flag = CreateJsonFileUtil.createJsonFile(JSONUtil.toJsonStr(attr), TMP_FILE_PATH, fileName);
             // 上传文件
             if (flag) {
                 InputStream inputStream = null;

@@ -1,6 +1,5 @@
 package com.seeds.admin.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
@@ -32,7 +31,6 @@ import com.seeds.admin.service.SysGameApiService;
 import com.seeds.admin.service.SysNftPicService;
 import com.seeds.admin.service.SysNftSkinAsyncService;
 import com.seeds.admin.utils.CsvUtils;
-import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.web.oss.FileTemplate;
 import lombok.extern.slf4j.Slf4j;
@@ -144,21 +142,23 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         return JSONUtil.toJsonStr(attr);
     }
 
+    @Override
     public SkinNFTAttrDto handleAttr(SysNftPicEntity entity) {
         SkinNFTAttrDto jsonDto = new SkinNFTAttrDto();
         jsonDto.setName(entity.getName());
-        jsonDto.setImage(entity.getPicName());
+        String tokenId = entity.getName().substring(entity.getName().lastIndexOf("#") + 1);
+        jsonDto.setImage(seedsAdminApiConfig.getShadowUrl() + tokenId + ".png");
 
         ArrayList<SkinNFTAttrDto.Attributes> attributesList = new ArrayList<>();
 
         SkinNFTAttrDto.Attributes configId = new SkinNFTAttrDto.Attributes();
         configId.setTrait_type(SkinNftEnums.NftAttrEnum.CONFIGID.getName());
-        configId.setValue(entity.getRarity());
+        configId.setValue(entity.getConfId().toString());
         attributesList.add(configId);
 
         SkinNFTAttrDto.Attributes autoId = new SkinNFTAttrDto.Attributes();
         autoId.setTrait_type(SkinNftEnums.NftAttrEnum.AUTOID.getName());
-        autoId.setValue(entity.getRarity());
+        autoId.setValue(entity.getAutoId().toString());
         attributesList.add(autoId);
 
         SkinNFTAttrDto.Attributes rarity = new SkinNFTAttrDto.Attributes();
@@ -205,7 +205,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         jsonDto.setAttributes(attributesList);
         SkinNFTAttrDto.Properties.Files files = new SkinNFTAttrDto.Properties.Files();
         files.setType("image/" + entity.getPicName().substring(entity.getPicName().lastIndexOf(".") + 1));
-        files.setUri(entity.getPicName());
+        files.setUri(seedsAdminApiConfig.getShadowUrl() + tokenId + ".png");
         ArrayList<SkinNFTAttrDto.Properties.Files> fileList = new ArrayList<>();
         fileList.add(files);
         SkinNFTAttrDto.Properties properties = new SkinNFTAttrDto.Properties();
@@ -262,7 +262,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         this.updateById(sysNftPicEntity);
 
         // 屬性更新成功消息
-        kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(CollectionUtil.newArrayList(req.getId())));
+        //  kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(CollectionUtil.newArrayList(req.getId())));
     }
 
     @Override
