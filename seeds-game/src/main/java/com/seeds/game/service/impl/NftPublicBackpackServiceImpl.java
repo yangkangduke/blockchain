@@ -605,13 +605,15 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         // 如果是withdraw，需要通知游戏方把nft收回到背包
         if (req.getState().equals(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode())) {
             NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, req.getNftId()));
-            // 调用游戏方接口，执行收回
-            this.callGameTakeback(backpackNft);
-            // 更新背包状态
-            backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
-            backpackNft.setServerRoleId(0L);
-            backpackNft.setUpdatedAt(System.currentTimeMillis());
-            this.updateById(backpackNft);
+            if(Objects.nonNull(backpackNft)){
+                // 调用游戏方接口，执行收回
+                this.callGameTakeback(backpackNft);
+                // 更新背包状态
+                backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+                backpackNft.setServerRoleId(0L);
+                backpackNft.setUpdatedAt(System.currentTimeMillis());
+                this.updateById(backpackNft);
+            }
         }
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
         backpackEntity.setState(req.getState());

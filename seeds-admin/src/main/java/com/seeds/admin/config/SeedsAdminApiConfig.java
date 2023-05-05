@@ -21,13 +21,15 @@ public class SeedsAdminApiConfig {
     @Value("${seeds.api.admin.cancelAsset:/api/admin/cancelAsset}")
     private String cancelAsset;
 
-    @Value("${seeds.api.admin..english:/api/admin/english}")
+    @Value("${seeds.api.admin.english:/api/admin/english}")
     private String english;
 
     @Value("${seeds.api.admin.listAsset:/api/admin/listAsset}")
     private String listAsset;
 
-    @Value("${seeds.api.admin..withdrawNft:/api/admin/withdrawNft}")
+    @Value("${seeds.api.admin.withdrawNft:/api/admin/withdrawNft}")
     private String withdrawNft;
 
+    @Value("${seeds.api.admin.shadowUrl:https://shdw-drive.genesysgo.net/GnxQt9ZZHvRAoeD8QcRYJQdtdeC4P5i7PqtoANUoFo3x/}")
+    private String shadowUrl;
 }

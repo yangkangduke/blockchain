@@ -19,6 +19,8 @@ public interface SysNftPicService extends IService<SysNftPicEntity> {
 
     String getAttr(Long id);
 
+    SkinNFTAttrDto handleAttr(SysNftPicEntity entity);
+
     void updateAttribute(SysNftPicAttributeModifyReq req);
 
     void getPackageDownload(HttpServletResponse response, ListReq req);
