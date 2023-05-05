@@ -19,6 +19,8 @@ import com.seeds.admin.dto.SkinNftPushAutoIdReq;
 import com.seeds.admin.dto.SysNFTAttrDto;
 import com.seeds.admin.dto.game.GameApplyAutoIdsDto;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.request.chain.SkinNftEnglishDto;
+import com.seeds.admin.dto.request.chain.SkinNftListAssetDto;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
@@ -404,6 +406,53 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         this.updateBatchById(records);
 
         skinAsyncService.skinMint(req);
+    }
+
+    @Override
+    public void listAsset(SysSkinNftListAssetReq req) {
+
+        List<SysNftPicEntity> list = this.list(new LambdaQueryWrapper<SysNftPicEntity>().in(SysNftPicEntity::getId, req.getIds()));
+        List<SkinNftListAssetDto> listAssetDto = list.stream().map(p -> {
+            SkinNftListAssetDto dto = new SkinNftListAssetDto();
+            dto.setNftAddress(p.getTokenAddress());
+            dto.setPrice(req.getPrice());
+            return dto;
+        }).collect(Collectors.toList());
+        String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getListAsset();
+        String param = JSONUtil.toJsonStr(listAssetDto);
+        log.info("请求skin-list-asset接口， url:{}， params:{}", url, param);
+        try {
+            HttpRequest.post(url)
+                    .timeout(60 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+        } catch (Exception e) {
+            log.info(" 请求skin-list-asset接口--出错:{}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void englishV2(SysSkinNftEnglishReq req) {
+        List<SysNftPicEntity> list = this.list(new LambdaQueryWrapper<SysNftPicEntity>().in(SysNftPicEntity::getId, req.getIds()));
+        List<SkinNftEnglishDto> englishDtos = list.stream().map(p -> {
+            SkinNftEnglishDto dto = new SkinNftEnglishDto();
+            BeanUtils.copyProperties(p, dto);
+            dto.setMintAddress(p.getTokenAddress());
+            return dto;
+        }).collect(Collectors.toList());
+        String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getEnglish();
+        String param = JSONUtil.toJsonStr(englishDtos);
+        log.info("请求skin-english-接口， url:{}， params:{}", url, param);
+        try {
+            HttpRequest.post(url)
+                    .timeout(60 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+        } catch (Exception e) {
+            log.info(" 请求skin-english-出错:{}", e.getMessage());
+        }
     }
 
     private void validate(SysNftPicEntity p) {

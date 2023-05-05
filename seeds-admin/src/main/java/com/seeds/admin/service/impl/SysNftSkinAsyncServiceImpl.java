@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson2.JSON;
 import com.seeds.admin.config.SeedsAdminApiConfig;
 import com.seeds.admin.dto.SkinNFTAttrDto;
-import com.seeds.admin.dto.SysSkinNftMintDto;
+import com.seeds.admin.dto.request.chain.SkinNftMintDto;
 import com.seeds.admin.dto.SysSkinNftMintSuccessDto;
 import com.seeds.admin.dto.request.SysSkinNftMintReq;
 import com.seeds.admin.entity.SysNftPicEntity;
@@ -59,7 +59,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
     public void skinMint(SysSkinNftMintReq dto) {
         List<SysNftPicEntity> nfts = nftPicService.listByIds(dto.getIds());
         String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getMintNft();
-        SysSkinNftMintDto mintDto = new SysSkinNftMintDto();
+        SkinNftMintDto mintDto = new SkinNftMintDto();
         mintDto.setAmount(dto.getIds().size());
         String param = JSONUtil.toJsonStr(mintDto);
         log.info("请求skin-mint-nft接口， url:{}， params:{}", url, param);
@@ -98,6 +98,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
         for (int i = 0; i < ids.size(); i++) {
             SysNftPicEntity entity = nftPicService.getById(ids.get(i));
             entity.setName(dto.get(i).getName());
+            entity.setTokenAddress(dto.get(i).getMintAddress());
             SkinNFTAttrDto attr = nftPicService.handleAttr(entity);
             String tokenId = dto.get(i).getName().substring(dto.get(i).getName().lastIndexOf("#") + 1);
             String fileName = tokenId + ".json";

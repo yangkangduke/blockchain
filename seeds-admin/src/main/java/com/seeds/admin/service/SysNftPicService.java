@@ -30,4 +30,8 @@ public interface SysNftPicService extends IService<SysNftPicEntity> {
     void pushAutoId(SkinNftPushAutoIdReq req);
 
     void skinMint(SysSkinNftMintReq req);
+
+    void listAsset(SysSkinNftListAssetReq req);
+
+    void englishV2(SysSkinNftEnglishReq req);
 }
