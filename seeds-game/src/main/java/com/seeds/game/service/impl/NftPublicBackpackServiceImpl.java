@@ -493,7 +493,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         DepositSuccessMessageDto dto  = new DepositSuccessMessageDto();
         BeanUtils.copyProperties(req, dto);
         dto.setMintAddress(nft.getMintAddress());
-        dto.setTokenAddress("");
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT托管成功，开始通知， url:{}， params:{}", url, param);
         try {
