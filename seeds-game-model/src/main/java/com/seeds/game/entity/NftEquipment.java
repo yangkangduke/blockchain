@@ -56,7 +56,7 @@ public class NftEquipment implements Serializable {
     @ApiModelProperty("更新时间")
     private Long updateTime;
 
-    @ApiModelProperty("是否在售卖  0：下架 1：上架")
+    @ApiModelProperty("是否在售卖: 0 未售, 1 在售, 2 英式拍卖中, 3 取消英式拍卖")
     private Integer onSale;
 
     @ApiModelProperty("订单ID")
