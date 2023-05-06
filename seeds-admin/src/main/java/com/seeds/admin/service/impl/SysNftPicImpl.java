@@ -443,7 +443,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         }).collect(Collectors.toList());
         String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getEnglish();
         String param = JSONUtil.toJsonStr(englishDtos);
-        log.info("请求skin-english-接口， url:{}， params:{}", url, param);
+        log.info("请求skin-englishV2-接口， url:{}， params:{}", url, param);
         try {
             HttpRequest.post(url)
                     .timeout(60 * 1000)
@@ -451,7 +451,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                     .body(param)
                     .execute();
         } catch (Exception e) {
-            log.info(" 请求skin-english-出错:{}", e.getMessage());
+            log.info(" 请求skin-englishV2-出错:{}", e.getMessage());
         }
     }
 
