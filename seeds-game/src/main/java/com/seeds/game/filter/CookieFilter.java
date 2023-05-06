@@ -23,15 +23,6 @@ public class CookieFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         ServletRequest requestWrapper = null;
-        HttpServletResponse resp = (HttpServletResponse) response;
-        resp.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
-        // 设置过期时间
-        resp.setHeader("Access-Control-Max-Age", "3600");
-        resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, client_id, uuid, Authorization");
-        // 支持HTTP 1.1.
-        resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        // 支持HTTP 1.0.
-        resp.setHeader("Pragma", "no-cache");
         if (request != null) {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
             // 遇到post方法才对request进行包装
