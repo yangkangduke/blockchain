@@ -813,7 +813,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             return resp;
         }
         if (auctionSetting.getIsFinished() != null && WhetherEnum.YES.value() == auctionSetting.getIsFinished()) {
-            return resp;
+            NftMarketOrderEntity order = nftMarketOrderService.queryByAuctionId(nftEquipment.getAuctionId());
+            if (order == null || NftStateEnum.IN_SETTLEMENT.getCode() != order.getStatus()) {
+                return resp;
+            }
         }
         req.setAuctionId(auctionSetting.getId());
         req.setPrice(auctionSetting.getStartPrice());
