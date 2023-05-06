@@ -164,4 +164,11 @@ public class NftPublicBackpackController {
         nftPublicBackpackService.unDeposited(req);
         return GenericDto.success(null);
     }
+
+    @PostMapping("skin-un-deposited")
+    @ApiOperation("皮肤取消托管")
+    public GenericDto<Object> skinUnDeposited(@Valid @RequestBody NftUnDepositedReq req) {
+        nftPublicBackpackService.skinUnDeposited(req);
+        return GenericDto.success(null);
+    }
 }

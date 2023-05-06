@@ -860,4 +860,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             sqlSession.update(sqlStatement, param);
         });
     }
+
+    @Override
+    public void skinUnDeposited(NftUnDepositedReq req) {
+
+    }
 }

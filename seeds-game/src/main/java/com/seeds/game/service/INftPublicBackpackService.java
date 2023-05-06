@@ -107,4 +107,5 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
      */
     boolean updateBatchByQueryWrapper(Collection<NftPublicBackpackEntity> entityList, Function<NftPublicBackpackEntity, LambdaQueryWrapper> wrapperFunction);
 
+    void skinUnDeposited(NftUnDepositedReq req);
 }
