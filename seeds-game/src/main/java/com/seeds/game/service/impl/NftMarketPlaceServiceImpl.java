@@ -437,6 +437,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (p.getAuctionId() == 0) {
                 resp.setState(NftStateEnum.ON_SHELF.getCode());
             } else {
+                BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(p.getAuctionId());
+                if (currentPrice != null) {
+                    resp.setPrice(currentPrice);
+                }
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
                 if (NftStateEnum.IN_SETTLEMENT.getCode() == p.getState()) {
                     resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
@@ -491,6 +495,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (p.getAuctionId() == 0) {
                 resp.setState(NftStateEnum.ON_SHELF.getCode());
             } else {
+                BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(p.getAuctionId());
+                if (currentPrice != null) {
+                    resp.setPrice(currentPrice);
+                }
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
                 if (NftStateEnum.IN_SETTLEMENT.getCode() == p.getState()) {
                     resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
@@ -565,6 +573,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (p.getAuctionId() == 0) {
                 resp.setState(NftStateEnum.ON_SHELF.getCode());
             }else {
+                BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(p.getAuctionId());
+                if (currentPrice != null) {
+                    resp.setPrice(currentPrice);
+                }
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
                 if (NftStateEnum.IN_SETTLEMENT.getCode() == p.getState()) {
                     resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
