@@ -611,6 +611,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public void updateState(NftBackpakcUpdateStateReq req) {
 
+        log.info("扫快通知,更新背包状态---->param：{}", JSONUtil.toJsonStr(req));
         // 如果是withdraw，需要通知游戏方把nft收回到背包
         if (req.getState().equals(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode())) {
             NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenAddress, req.getMintAddress()));
@@ -639,10 +640,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     }
 
-    @Override
-    public void insertCallback(MintSuccessReq req) {
-        nftEventService.mintSuccessCallback(req);
-    }
 
     @Override
     public Map<Long, BigDecimal> getTotalPrice(String autoIds) {

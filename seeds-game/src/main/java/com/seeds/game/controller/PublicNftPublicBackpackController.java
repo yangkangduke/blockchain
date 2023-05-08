@@ -1,8 +1,9 @@
 package com.seeds.game.controller;
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.game.dto.request.MintSuccessReq;
+import com.seeds.game.dto.request.MintEquipCallBackReq;
 import com.seeds.game.dto.request.NftBackpakcUpdateStateReq;
+import com.seeds.game.service.INftEventService;
 import com.seeds.game.service.INftPublicBackpackService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +32,9 @@ public class PublicNftPublicBackpackController {
     @Autowired
     private INftPublicBackpackService nftPublicBackpackService;
 
+    @Autowired
+    private INftEventService nftEventService;
+
     @PostMapping("update-state")
     @ApiOperation("更新背包状态，补偿时调用")
     public GenericDto<Object> updateState(@Valid @RequestBody NftBackpakcUpdateStateReq req) {
@@ -38,10 +42,17 @@ public class PublicNftPublicBackpackController {
         return GenericDto.success(null);
     }
 
-    @PostMapping("insert-callback")
-    @ApiOperation("新增回调，补偿时调用")
-    public GenericDto<Object> insertCallback(@RequestBody @Valid MintSuccessReq req) {
-        nftPublicBackpackService.insertCallback(req);
+    @PostMapping("mint-callback")
+    @ApiOperation("mint回调，补偿时调用")
+    public GenericDto<Object> mintCallback(@RequestBody @Valid MintEquipCallBackReq req) {
+        nftEventService.mintCallback(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("compose-callback")
+    @ApiOperation("合成回调，补偿时调用")
+    public GenericDto<Object> composeCallback(@RequestBody @Valid MintEquipCallBackReq req) {
+        nftEventService.composeCallback(req);
         return GenericDto.success(null);
     }
 }

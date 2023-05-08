@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.ComposeSuccessReq;
+import com.seeds.game.dto.request.NftMintEquipReq;
 import com.seeds.game.dto.request.NftMintSuccessReq;
 import com.seeds.game.dto.request.internal.NftEventPageReq;
 import com.seeds.game.dto.response.EventTypeNum;
@@ -68,6 +69,13 @@ public class NftEventController {
     @ApiOperation("mint 操作成功")
     GenericDto<Object> mintSuccess(@RequestBody NftMintSuccessReq mintSuccessReq) {
         nftEventService.mintSuccess(mintSuccessReq);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("mint-equip")
+    @ApiOperation("mintEquip")
+    GenericDto<Object> mintEquip(@RequestBody NftMintEquipReq req) {
+        nftEventService.mintEquip(req);
         return GenericDto.success(null);
     }
 
