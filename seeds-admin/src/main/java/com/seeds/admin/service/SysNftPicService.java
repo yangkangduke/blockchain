@@ -25,7 +25,7 @@ public interface SysNftPicService extends IService<SysNftPicEntity> {
 
     void getPackageDownload(HttpServletResponse response, ListReq req);
 
-    void applyAutoIds(SysApplyAutoIdsReq ids);
+    void applyAutoIds(ListReq ids);
 
     void pushAutoId(SkinNftPushAutoIdReq req);
 

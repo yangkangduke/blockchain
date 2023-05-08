@@ -74,7 +74,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
         HttpResponse response = null;
         try {
             response = HttpRequest.post(url)
-                    .timeout(60 * 1000)
+                    .timeout(60 * 1000 * 2)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();

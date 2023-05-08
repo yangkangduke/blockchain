@@ -135,4 +135,7 @@ public class SysNftPicEntity extends BaseEntity {
      *
      */
     private Integer mintState;
+
+    @TableField("list_state")
+    private Integer listState;
 }

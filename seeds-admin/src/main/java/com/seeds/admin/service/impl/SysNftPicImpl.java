@@ -127,13 +127,10 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                 }
             });
         }
-
         if (!CollectionUtils.isEmpty(batchUpdate)) {
             // 批量更新属性
             this.updateBatchById(batchUpdate);
-            // 屬性更新成功消息
-            //  kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(batchUpdate.stream().map(p -> p.getId()).collect(Collectors.toList())));
-        }
+           }
         return batchUpdate.size();
     }
 
@@ -334,13 +331,14 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     }
 
     @Override
-    public void applyAutoIds(SysApplyAutoIdsReq ids) {
-        Set<Long> noApplyIds = this.list(new LambdaQueryWrapper<SysNftPicEntity>()
-                .in(SysNftPicEntity::getConfId, ids.getConfigIds())
-                .eq(SysNftPicEntity::getApplyState, SkinNftEnums.AutoIdApplyStateEnum.NO_APPLY.getCode()))
+    public void applyAutoIds(ListReq ids) {
+
+        Set<Long> noApplyIds = this.listByIds(ids.getIds())
                 .stream()
+                .filter(i -> i.getApplyState().equals(SkinNftEnums.AutoIdApplyStateEnum.NO_APPLY.getCode()))
                 .map(p -> p.getConfId())
                 .collect(Collectors.toSet());
+
         GameApplyAutoIdsDto dto = new GameApplyAutoIdsDto();
         dto.setConfigIds(noApplyIds);
         List<String> url = gameApiService.queryUrlByGameAndType(1L, ApiType.APPLY_AUTOID.getCode());

@@ -1,4 +1,6 @@
 package com.seeds.admin.dto.response;
+
+import com.seeds.admin.enums.SkinNftEnums;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -73,4 +75,20 @@ public class SysNftPicResp {
 
     @ApiModelProperty("desc")
     private String desc;
+
+    /**
+     * @see SkinNftEnums.AutoIdApplyStateEnum
+     */
+    @ApiModelProperty("autoId申请状态")
+    private Integer applyState;
+
+
+    /**
+     * @see SkinNftEnums.SkinMintStateEnum
+     */
+    @ApiModelProperty("nftMint状态")
+    private Integer mintState;
+
+    @ApiModelProperty("上架状态 0 未上架 1 已上架")
+    private Integer listState;
 }

@@ -106,7 +106,7 @@ public class SysNftPicController {
      */
     @ApiOperation(value = "申请autoIds")
     @PostMapping("/apply-autoIds")
-    public GenericDto<Object> applyAutoIds(@RequestBody SysApplyAutoIdsReq ids) {
+    public GenericDto<Object> applyAutoIds(@RequestBody @Valid ListReq ids) {
         sysNftPicService.applyAutoIds(ids);
         return GenericDto.success(null);
     }
