@@ -223,8 +223,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .header("Content-Type", "application/json")
                     .execute();
             log.info("NFT一口价上架成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("一口价上架成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT listing failure!");
         }
     }
 
@@ -258,8 +264,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .body(param)
                     .execute();
             log.info("NFT英式拍卖上架成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("英式拍卖上架成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("British auction shelf failure!");
         }
     }
 
@@ -289,8 +301,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .header("Content-Type", "application/json")
                     .execute();
             log.info("NFT下架成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("NFT下架成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT downgrade failed!");
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
@@ -335,8 +353,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .body(param)
                     .execute();
             log.info("NFT取消拍卖成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("NFT取消拍卖成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT cancel auction failed!");
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
@@ -371,8 +395,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .header("Content-Type", "application/json")
                     .execute();
             log.info("NFT拍卖出价成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("NFT拍卖出价成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT make offer failed!");
         }
     }
 
@@ -407,8 +437,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .header("Content-Type", "application/json")
                     .execute();
             log.info("NFT购买成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("NFT购买成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT purchase failure!");
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
@@ -544,12 +580,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             log.error("当前用户未登录");
         }
         if (userId == null || !userId.equals(publicBackpack.getUserId())){
-                // 属性表更新NFT浏览量
-                LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
-                        .setSql("`views`=`views`+1")
-                        .eq(NftPublicBackpackEntity::getEqNftId,req.getNftId());
-                nftPublicBackpackService.update(updateWrap);
-            }
+            // 属性表更新NFT浏览量
+            LambdaUpdateWrapper<NftPublicBackpackEntity> updateWrap = new UpdateWrapper<NftPublicBackpackEntity>().lambda()
+                    .setSql("`views`=`views`+1")
+                    .eq(NftPublicBackpackEntity::getEqNftId,req.getNftId());
+            nftPublicBackpackService.update(updateWrap);
+        }
     }
 
     @Override
@@ -910,14 +946,17 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
-            String body = response.body();
-            JSONObject jsonObject = JSONObject.parseObject(body);
+            log.info("请求NFT接受报价成功接口返回，  result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
             String data = jsonObject.getString("data");
-            log.info("请求NFT接受报价成功接口返回，  result:{}", body);
             return JSONUtil.toBean(data, NftOfferDetailResp.class);
         } catch (Exception e) {
             log.error("NFT接受报价成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("Accept offer failed");
+            throw new GenericException("NFT accept offer failed!");
         }
     }
 
@@ -938,8 +977,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .header("Content-Type", "application/json")
                     .execute();
             log.info("NFT拍卖达成交易成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("NFT拍卖达成交易成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT transaction failed!");
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
@@ -964,8 +1009,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     .header("Content-Type", "application/json")
                     .execute();
             log.info("NFT取消出价成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("NFT取消出价成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT cancel offer failed!");
         }
     }
 

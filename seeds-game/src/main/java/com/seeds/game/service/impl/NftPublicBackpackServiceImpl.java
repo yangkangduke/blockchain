@@ -499,8 +499,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                     .body(param)
                     .execute();
             log.info("NFT托管成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("NFT托管成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT Hosting Failure!");
         }
     }
 
@@ -557,8 +563,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                     .body(param)
                     .execute();
             log.info("NFT取回成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("NFT取回成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT retrieval failure");
         }
     }
 
