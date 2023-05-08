@@ -72,6 +72,13 @@ public class SysNftPicController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("cancelAsset")
+    @ApiOperation("取消售卖")
+    public GenericDto<Object> cancelAsset(@RequestBody @Valid SysSkinNftCancelAssetReq req) {
+        sysNftPicService.cancelAsset(req);
+        return GenericDto.success(null);
+    }
+
     @PostMapping("shadow-upload-success")
     @ApiOperation("shadow上传文件成功")
     public GenericDto<Object> shadowUploadSuccess(@RequestBody @Valid ListReq req) {

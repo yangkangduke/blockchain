@@ -36,4 +36,6 @@ public interface SysNftPicService extends IService<SysNftPicEntity> {
     void englishV2(SysSkinNftEnglishReq req);
 
     void shadowUploadSuccess(ListReq req);
+
+    void cancelAsset(SysSkinNftCancelAssetReq req);
 }

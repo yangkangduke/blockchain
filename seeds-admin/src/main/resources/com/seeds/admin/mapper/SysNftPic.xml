@@ -3,4 +3,10 @@
 
 <mapper namespace="com.seeds.admin.mapper.SysNftPicMapper">
 
+    <select id="getListReceiptByMintAddress" resultType="java.lang.String">
+        select list_receipt
+        from z_market_order
+        where status = 1
+          and mint_address = #{tokenAddress}
+    </select>
 </mapper>

@@ -19,6 +19,7 @@ import com.seeds.admin.dto.SkinNftPushAutoIdReq;
 import com.seeds.admin.dto.SysNFTAttrDto;
 import com.seeds.admin.dto.game.GameApplyAutoIdsDto;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.request.chain.SkinNftCancelAssetDto;
 import com.seeds.admin.dto.request.chain.SkinNftEnglishDto;
 import com.seeds.admin.dto.request.chain.SkinNftListAssetDto;
 import com.seeds.admin.dto.response.SysNftPicResp;
@@ -460,6 +461,30 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         List<SysNftPicEntity> list = this.list(new LambdaQueryWrapper<SysNftPicEntity>().in(SysNftPicEntity::getId, req.getIds()));
         list.forEach(p -> p.setMintState(SkinNftEnums.SkinMintStateEnum.MINTED.getCode()));
         this.updateBatchById(list);
+    }
+
+    @Override
+    public void cancelAsset(SysSkinNftCancelAssetReq req) {
+        SysNftPicEntity entity = this.getById(req.getId());
+        if (Objects.nonNull(entity)) {
+            String listReceipt = baseMapper.getListReceiptByMintAddress(entity.getTokenAddress());
+
+            SkinNftCancelAssetDto skinNftCancelAssetDto = new SkinNftCancelAssetDto();
+            skinNftCancelAssetDto.setListReceipt(listReceipt);
+            String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getCancelAsset();
+            String param = JSONUtil.toJsonStr(skinNftCancelAssetDto);
+            log.info("请求skin-cancelAsset-接口， url:{}， params:{}", url, param);
+            try {
+                HttpRequest.post(url)
+                        .timeout(60 * 1000)
+                        .header("Content-Type", "application/json")
+                        .body(param)
+                        .execute();
+            } catch (Exception e) {
+                log.info(" 请求skin-cancelAsset-出错:{}", e.getMessage());
+            }
+        }
+
     }
 
     private void validate(SysNftPicEntity p) {

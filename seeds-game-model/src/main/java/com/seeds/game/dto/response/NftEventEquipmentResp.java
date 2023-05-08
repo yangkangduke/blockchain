@@ -24,6 +24,9 @@ public class NftEventEquipmentResp implements Serializable {
     @ApiModelProperty("是否nft 1是 0 否")
     private Integer isNft;
 
+    @ApiModelProperty("1 装备 2 道具")
+    private Integer itemType;
+
     @ApiModelProperty("mintAddress")
     private String mintAddress;
 
