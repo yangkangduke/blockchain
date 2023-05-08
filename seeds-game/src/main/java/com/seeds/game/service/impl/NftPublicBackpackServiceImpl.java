@@ -26,10 +26,7 @@ import com.seeds.game.dto.request.external.TransferNftMessageDto;
 import com.seeds.game.dto.request.internal.*;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.*;
-import com.seeds.game.enums.GameErrorCodeEnum;
-import com.seeds.game.enums.NFTEnumConstant;
-import com.seeds.game.enums.NftConfigurationEnum;
-import com.seeds.game.enums.NftRarityEnum;
+import com.seeds.game.enums.*;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftPublicBackpackMapper;
 import com.seeds.game.mq.producer.KafkaProducer;
@@ -480,7 +477,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
         }
         // NFT上架中不能托管
-        if (WhetherEnum.YES.value() == nft.getOnSale()) {
+        if (NftOrderTypeEnum.BUY_NOW.getCode() == nft.getOnSale() || NftOrderTypeEnum.ON_AUCTION.getCode() == nft.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
         }
         //更新背包状态 deposited
@@ -605,7 +602,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
         // 如果是withdraw，需要通知游戏方把nft收回到背包
         if (req.getState().equals(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode())) {
-            NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, req.getNftId()));
+            NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenAddress, req.getMintAddress()));
             if(Objects.nonNull(backpackNft)){
                 // 调用游戏方接口，执行收回
                 this.callGameTakeback(backpackNft);
@@ -627,7 +624,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             }
             backpackEntity.setOwner(req.getOwner());
         }
-        this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, req.getNftId()));
+        this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenAddress, req.getMintAddress()));
 
     }
 
@@ -860,5 +857,10 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             param.put(Constants.WRAPPER, wrapperFunction.apply(entity));
             sqlSession.update(sqlStatement, param);
         });
+    }
+
+    @Override
+    public void skinUnDeposited(NftUnDepositedReq req) {
+
     }
 }

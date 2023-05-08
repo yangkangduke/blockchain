@@ -140,11 +140,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             resp.setOwnerId(ucUserResp.getId());
             resp.setOwnerName(ucUserResp.getNickname());
         }
-        NftAuctionHouseSetting auctionSetting = null;
         NftMarketOrderEntity marketOrder = null;
         // 拍卖中
         if (NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()) {
-            auctionSetting = nftAuctionHouseSettingService.getById(nftEquipment.getAuctionId());
+            NftAuctionHouseSetting auctionSetting = nftAuctionHouseSettingService.getById(nftEquipment.getAuctionId());
             if (auctionSetting != null) {
                 BeanUtils.copyProperties(auctionSetting, resp);
                 long time = (auctionSetting.getStartTime() + auctionSetting.getDuration() * 60 * 60 * 1000) - System.currentTimeMillis();
@@ -188,7 +187,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         resp.setOwnerAddress(nftEquipment.getOwner());
         resp.setNftId(nftEquipment.getId());
         resp.setNumber("#" + nftEquipment.getTokenId());
-        resp.setState(convertOrderState(nftEquipment, auctionSetting, marketOrder, isLock));
+        resp.setState(convertOrderState(nftEquipment, marketOrder, isLock));
         Long lastUpdated = nftActivityService.queryLastUpdateTime(nftEquipment.getMintAddress());
         if (lastUpdated != null) {
             resp.setLastUpdated(RelativeDateFormat.convert(new Date(lastUpdated), new Date()));
@@ -205,7 +204,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
         shelfValidation(nftEquipment);
         // 不能重复上架
-        if (WhetherEnum.YES.value() == nftEquipment.getOnSale()) {
+        if (NftOrderTypeEnum.BUY_NOW.getCode() == nftEquipment.getOnSale() || NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
         }
 
@@ -235,7 +234,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
         shelfValidation(nftEquipment);
         // 不能重复上架
-        if (WhetherEnum.YES.value() == nftEquipment.getOnSale()) {
+        if (NftOrderTypeEnum.BUY_NOW.getCode() == nftEquipment.getOnSale() || NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
         }
 
@@ -312,10 +311,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         NftAuctionHouseSetting auction = nftAuctionHouseSettingService.getById(nftEquipment.getAuctionId());
         if (auction == null) {
             throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
-        }
-        // 拍卖已结束或已取消
-        if (auction.getIsFinished() != null && WhetherEnum.NO.value() != auction.getIsFinished()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10012_NFT_ITEM_AUCTION_HAS_ENDED);
         }
 
         // 更新背包状态 undeposited
@@ -443,6 +438,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 resp.setState(NftStateEnum.ON_SHELF.getCode());
             } else {
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
+                if (NftStateEnum.IN_SETTLEMENT.getCode() == p.getState()) {
+                    resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
+                }
             }
 
             // 查询NFT
@@ -494,6 +492,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 resp.setState(NftStateEnum.ON_SHELF.getCode());
             } else {
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
+                if (NftStateEnum.IN_SETTLEMENT.getCode() == p.getState()) {
+                    resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
+                }
             }
 
             // 查询NFT
@@ -565,6 +566,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 resp.setState(NftStateEnum.ON_SHELF.getCode());
             }else {
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
+                if (NftStateEnum.IN_SETTLEMENT.getCode() == p.getState()) {
+                    resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
+                }
             }
 
             // 查询NFT
@@ -809,7 +813,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             return resp;
         }
         if (auctionSetting.getIsFinished() != null && WhetherEnum.YES.value() == auctionSetting.getIsFinished()) {
-            return resp;
+            NftMarketOrderEntity order = nftMarketOrderService.queryByAuctionId(nftEquipment.getAuctionId());
+            if (order == null || NftStateEnum.IN_SETTLEMENT.getCode() != order.getStatus()) {
+                return resp;
+            }
         }
         req.setAuctionId(auctionSetting.getId());
         req.setPrice(auctionSetting.getStartPrice());
@@ -975,11 +982,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
         }
 
-        // 售卖中才能购买成功
-        if (WhetherEnum.NO.value() == nftEquipment.getOnSale()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10010_NFT_ITEM_HAS_BEEN_REMOVAL);
-        }
-
         // 归属人不能购买自己的NFT
         Long currentUserId = UserContext.getCurrentUserId();
         String publicAddress = null;
@@ -995,7 +997,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     }
 
-    private Integer convertOrderState(NftEquipment nftEquipment, NftAuctionHouseSetting auction, NftMarketOrderEntity marketOrder, Boolean isLock) {
+    private Integer convertOrderState(NftEquipment nftEquipment, NftMarketOrderEntity marketOrder, Boolean isLock) {
         int state;
         if (WhetherEnum.YES.value() == nftEquipment.getIsDelete()) {
             return NftStateEnum.BURNED.getCode();
@@ -1010,17 +1012,16 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()) {
                 // 拍卖中
                 state = NftStateEnum.ON_AUCTION.getCode();
+                if (marketOrder != null && NftStateEnum.IN_SETTLEMENT.getCode() == marketOrder.getStatus()) {
+                    // 结算中
+                    state = NftStateEnum.IN_SETTLEMENT.getCode();
+                }
             } else if (NftOrderTypeEnum.BUY_NOW.getCode() == nftEquipment.getOnSale()) {
                 // 固定上架
                 state = NftStateEnum.ON_SHELF.getCode();
             } else {
-                // 拍卖时间到期为结算中
-                if (marketOrder != null && NftOrderStatusEnum.PENDING.getCode().equals(marketOrder.getStatus()) && System.currentTimeMillis() > auction.getStartTime() + auction.getDuration() * 60 * 60 * 1000) {
-                    state = NftStateEnum.IN_SETTLEMENT.getCode();
-                } else {
-                    // 未上架
-                    state = NftStateEnum.UNDEPOSITED.getCode();
-                }
+                // 未上架
+                state = NftStateEnum.UNDEPOSITED.getCode();
             }
         }
         return state;

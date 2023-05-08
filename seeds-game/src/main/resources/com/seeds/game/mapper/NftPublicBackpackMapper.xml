@@ -65,7 +65,7 @@
             and state = 3
         </if>
         <if test="sort != null and sort =='price'">
-            order by t1.price ${sortTypeStr}
+            order by t3.price ${sortTypeStr}
         </if>
         <if test="sort != null and sort =='grade'">
             order by t1.grade ${sortTypeStr}

@@ -171,7 +171,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         req.getEquipments().forEach(p -> {
             try {
                 p.setName(URLDecoder.decode(p.getName(), "UTF-8"));
-                p.setBaseAttrValue(URLDecoder.decode(p.getBaseAttrValue(), "UTF-8"));
+                p.setBaseAttrValue(handleStr(URLDecoder.decode(p.getBaseAttrValue(), "UTF-8")));
                 p.setRarityAttrValue(URLDecoder.decode(p.getRarityAttrValue(), "UTF-8"));
                 p.setSpecialAttrDesc(handleStr(URLDecoder.decode(p.getSpecialAttrDesc(), "UTF-8")));
                 p.setPassiveAttrDesc(removePrefix(URLDecoder.decode(p.getPassiveAttrDesc(), "UTF-8")));

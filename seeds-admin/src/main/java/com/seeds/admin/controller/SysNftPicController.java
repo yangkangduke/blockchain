@@ -58,6 +58,34 @@ public class SysNftPicController {
         return GenericDto.success(null);
     }
 
+    @PostMapping("list-asset")
+    @ApiOperation("固定价格上架")
+    public GenericDto<Object> listAsset(@RequestBody @Valid SysSkinNftListAssetReq req) {
+        sysNftPicService.listAsset(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("englishV2")
+    @ApiOperation("拍卖上架")
+    public GenericDto<Object> englishV2(@RequestBody @Valid SysSkinNftEnglishReq req) {
+        sysNftPicService.englishV2(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("cancelAsset")
+    @ApiOperation("取消售卖")
+    public GenericDto<Object> cancelAsset(@RequestBody @Valid SysSkinNftCancelAssetReq req) {
+        sysNftPicService.cancelAsset(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("shadow-upload-success")
+    @ApiOperation("shadow上传文件成功")
+    public GenericDto<Object> shadowUploadSuccess(@RequestBody @Valid ListReq req) {
+        sysNftPicService.shadowUploadSuccess(req);
+        return GenericDto.success(null);
+    }
+
     /**
      * 打包下载
      *

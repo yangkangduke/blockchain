@@ -67,6 +67,7 @@ public enum AdminErrorCodeEnum {
     ERR_40022_SYMBOL_TOO_LONG(40022, "symbol 长度需小于10", "Symbol exceeds 10 chars"),
     ERR_40023_INVALID_RECORD(40023, "包含未申请autoId的记录，请重新选择!  ", "Note The records that do not apply for auto Id must be selected again!  "),
     ERR_40024_MISS_ATTR_RECORD(40024, "包含缺少属性值的记录，请重新选择!  ", "For records that contain missing attribute values must be selected again!  "),
+    ERR_40025_CAN_NOT_MODIFY(40025, "nft 已经被mint,无法修改属性", "nft has been minted and cannot modify attributes"),
 
     // merchant
     ERR_50001_MERCHANT_ALREADY_EXIST(50001, "商家已存在", "Merchant already exist"),

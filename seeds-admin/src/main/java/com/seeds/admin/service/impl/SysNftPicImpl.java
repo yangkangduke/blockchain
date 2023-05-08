@@ -19,6 +19,9 @@ import com.seeds.admin.dto.SkinNftPushAutoIdReq;
 import com.seeds.admin.dto.SysNFTAttrDto;
 import com.seeds.admin.dto.game.GameApplyAutoIdsDto;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.request.chain.SkinNftCancelAssetDto;
+import com.seeds.admin.dto.request.chain.SkinNftEnglishDto;
+import com.seeds.admin.dto.request.chain.SkinNftListAssetDto;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
@@ -256,13 +259,13 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public void updateAttribute(SysNftPicAttributeModifyReq req) {
         log.info("NftAttributeModifyReq == {}", req);
+        SysNftPicEntity entity = this.getById(req.getId());
+        if (Objects.nonNull(entity) && entity.getMintState().equals(SkinNftEnums.SkinMintStateEnum.MINTED)) {
+            throw new GenericException(AdminErrorCodeEnum.ERR_40025_CAN_NOT_MODIFY);
+        }
         SysNftPicEntity sysNftPicEntity = new SysNftPicEntity();
         BeanUtils.copyProperties(req, sysNftPicEntity);
-        sysNftPicEntity.setDescription(req.getDesc());
         this.updateById(sysNftPicEntity);
-
-        // 屬性更新成功消息
-        //  kafkaProducer.send(KafkaTopic.NFT_PIC_ATTR_UPDATE_SUCCESS, JSONUtil.toJsonStr(CollectionUtil.newArrayList(req.getId())));
     }
 
     @Override
@@ -404,6 +407,84 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         this.updateBatchById(records);
 
         skinAsyncService.skinMint(req);
+    }
+
+    @Override
+    public void listAsset(SysSkinNftListAssetReq req) {
+
+        List<SysNftPicEntity> list = this.listByIds(req.getIds());
+        List<SkinNftListAssetDto> listAssetDto = list.stream().map(p -> {
+            SkinNftListAssetDto dto = new SkinNftListAssetDto();
+            dto.setNftAddress(p.getTokenAddress());
+            dto.setPrice(req.getPrice());
+            return dto;
+        }).collect(Collectors.toList());
+        String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getListAsset();
+        String param = JSONUtil.toJsonStr(listAssetDto);
+        log.info("请求skin-list-asset接口， url:{}， params:{}", url, param);
+        try {
+            HttpRequest.post(url)
+                    .timeout(60 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+        } catch (Exception e) {
+            log.info(" 请求skin-list-asset接口--出错:{}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void englishV2(SysSkinNftEnglishReq req) {
+        List<SysNftPicEntity> list = this.listByIds(req.getIds());
+        List<SkinNftEnglishDto> englishDtos = list.stream().map(p -> {
+            SkinNftEnglishDto dto = new SkinNftEnglishDto();
+            BeanUtils.copyProperties(p, dto);
+            dto.setMintAddress(p.getTokenAddress());
+            return dto;
+        }).collect(Collectors.toList());
+        String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getEnglish();
+        String param = JSONUtil.toJsonStr(englishDtos);
+        log.info("请求skin-englishV2-接口， url:{}， params:{}", url, param);
+        try {
+            HttpRequest.post(url)
+                    .timeout(60 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+        } catch (Exception e) {
+            log.info(" 请求skin-englishV2-出错:{}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void shadowUploadSuccess(ListReq req) {
+        List<SysNftPicEntity> list = this.list(new LambdaQueryWrapper<SysNftPicEntity>().in(SysNftPicEntity::getId, req.getIds()));
+        list.forEach(p -> p.setMintState(SkinNftEnums.SkinMintStateEnum.MINTED.getCode()));
+        this.updateBatchById(list);
+    }
+
+    @Override
+    public void cancelAsset(SysSkinNftCancelAssetReq req) {
+        SysNftPicEntity entity = this.getById(req.getId());
+        if (Objects.nonNull(entity)) {
+            String listReceipt = baseMapper.getListReceiptByMintAddress(entity.getTokenAddress());
+
+            SkinNftCancelAssetDto skinNftCancelAssetDto = new SkinNftCancelAssetDto();
+            skinNftCancelAssetDto.setListReceipt(listReceipt);
+            String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getCancelAsset();
+            String param = JSONUtil.toJsonStr(skinNftCancelAssetDto);
+            log.info("请求skin-cancelAsset-接口， url:{}， params:{}", url, param);
+            try {
+                HttpRequest.post(url)
+                        .timeout(60 * 1000)
+                        .header("Content-Type", "application/json")
+                        .body(param)
+                        .execute();
+            } catch (Exception e) {
+                log.info(" 请求skin-cancelAsset-出错:{}", e.getMessage());
+            }
+        }
+
     }
 
     private void validate(SysNftPicEntity p) {

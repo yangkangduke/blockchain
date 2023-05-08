@@ -7,9 +7,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson2.JSON;
 import com.seeds.admin.config.SeedsAdminApiConfig;
 import com.seeds.admin.dto.SkinNFTAttrDto;
-import com.seeds.admin.dto.SysSkinNftMintDto;
 import com.seeds.admin.dto.SysSkinNftMintSuccessDto;
+import com.seeds.admin.dto.game.SkinNftMintSuccessDto;
 import com.seeds.admin.dto.request.SysSkinNftMintReq;
+import com.seeds.admin.dto.request.chain.SkinNftMintDto;
 import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.SkinNftEnums;
 import com.seeds.admin.service.SysFileService;
@@ -25,8 +26,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author: hewei
@@ -48,6 +53,9 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
     private SeedsAdminApiConfig seedsAdminApiConfig;
 
     @Autowired
+    private AsyncNotifyGameServiceImpl notifyGameService;
+
+    @Autowired
     @Lazy
     private SysNftPicService nftPicService;
 
@@ -59,7 +67,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
     public void skinMint(SysSkinNftMintReq dto) {
         List<SysNftPicEntity> nfts = nftPicService.listByIds(dto.getIds());
         String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getMintNft();
-        SysSkinNftMintDto mintDto = new SysSkinNftMintDto();
+        SkinNftMintDto mintDto = new SkinNftMintDto();
         mintDto.setAmount(dto.getIds().size());
         String param = JSONUtil.toJsonStr(mintDto);
         log.info("请求skin-mint-nft接口， url:{}， params:{}", url, param);
@@ -71,12 +79,11 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
                     .body(param)
                     .execute();
         } catch (Exception e) {
-            nfts.forEach(p -> {
-                p.setMintState(SkinNftEnums.SkinMintStateEnum.MINT_FAILED.getCode());
-            });
+            nfts.forEach(p -> p.setMintState(SkinNftEnums.SkinMintStateEnum.MINT_FAILED.getCode()));
             nftPicService.updateBatchById(nfts);
             log.info(" 请求skin-mint-nft接口--出错:{}", e.getMessage());
         }
+        assert response != null;
         JSONObject jsonObject = JSONObject.parseObject(response.body());
         log.info(" 请求skin-mint-nft接口--result:{}", jsonObject);
         if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
@@ -85,9 +92,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
             //生成metadata
             createMetadata(mintSuccesses, dto.getIds());
         } else {
-            nfts.forEach(p -> {
-                p.setMintState(SkinNftEnums.SkinMintStateEnum.MINT_FAILED.getCode());
-            });
+            nfts.forEach(p -> p.setMintState(SkinNftEnums.SkinMintStateEnum.MINT_FAILED.getCode()));
             nftPicService.updateBatchById(nfts);
             log.info(" 请求skin-mint-nft接口--出错:{}", jsonObject.get("message"));
         }
@@ -98,6 +103,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
         for (int i = 0; i < ids.size(); i++) {
             SysNftPicEntity entity = nftPicService.getById(ids.get(i));
             entity.setName(dto.get(i).getName());
+            entity.setTokenAddress(dto.get(i).getMintAddress());
             SkinNFTAttrDto attr = nftPicService.handleAttr(entity);
             String tokenId = dto.get(i).getName().substring(dto.get(i).getName().lastIndexOf("#") + 1);
             String fileName = tokenId + ".json";
@@ -120,12 +126,11 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
                     inputStream.close();
                     // 上传成功后删除临时的JSON文件
                     file.delete();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
                     try {
+                        assert inputStream != null;
                         inputStream.close();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -134,5 +139,17 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
                 }
             }
         }
+
+        // 通知游戏方，skin mint 成功
+        List<SysNftPicEntity> sysNftPicEntities = nftPicService.listByIds(ids);
+        List<SkinNftMintSuccessDto> notifyDtos = sysNftPicEntities.stream().map(p -> {
+            SkinNftMintSuccessDto notityDto = new SkinNftMintSuccessDto();
+            notityDto.setRarity(p.getRarity());
+            notityDto.setConfigId(p.getConfId());
+            notityDto.setAutoId(p.getAutoId());
+            notityDto.setTokenAddress(p.getTokenAddress());
+            return notityDto;
+        }).collect(Collectors.toList());
+        notifyGameService.skinMintSuccess(notifyDtos);
     }
 }
