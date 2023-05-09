@@ -223,7 +223,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         List<NftPublicBackpackEntity> updateList = equipments1.stream().map(p -> {
             NftPublicBackpackEntity nftBackpack = new NftPublicBackpackEntity();
             nftBackpack.setAutoId(p.getAutoId());
-            nftBackpack.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
+            nftBackpack.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
             return nftBackpack;
         }).collect(Collectors.toList());
         log.info("合成材料标记为deposit状态，param ：{}", JSONUtil.toJsonStr(updateList));
