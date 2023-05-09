@@ -348,6 +348,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                     nftBackpack.setState(NFTEnumConstant.NFTStateEnum.BURNED.getCode());
                     return nftBackpack;
                 }).collect(Collectors.toList());
+                log.info("合成材料标记为销毁状态，param ：{}", JSONUtil.toJsonStr(updateList));
                 nftPublicBackpackService.updateBatchByQueryWrapper(updateList, item ->
                         new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, item.getAutoId()));
             }
