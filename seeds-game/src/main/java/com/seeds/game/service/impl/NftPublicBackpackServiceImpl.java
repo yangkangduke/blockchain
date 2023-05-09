@@ -640,6 +640,10 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     }
 
+    @Override
+    public void insertCallback(MintSuccessReq req) {
+        nftEventService.mintSuccessCallback(req);
+    }
 
     @Override
     public Map<Long, BigDecimal> getTotalPrice(String autoIds) {

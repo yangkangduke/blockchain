@@ -15,10 +15,7 @@ import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.game.config.SeedsApiConfig;
 import com.seeds.game.dto.MetadataAttrDto;
-import com.seeds.game.dto.request.ComposeSuccessReq;
-import com.seeds.game.dto.request.MintEquipCallBackReq;
-import com.seeds.game.dto.request.NftMintEquipReq;
-import com.seeds.game.dto.request.NftMintSuccessReq;
+import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.external.MintSuccessMessageDto;
 import com.seeds.game.dto.request.internal.NftEventAddReq;
 import com.seeds.game.dto.request.internal.NftEventEquipmentReq;
@@ -278,6 +275,28 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     }
 
 
+    @Override
+    public void mintSuccessCallback(MintSuccessReq req) {
+        UpdateBackpackErrorLog backpackErrorLog = updateBackpackErrorLogService.queryByMintAddress(req.getMintAddress());
+        if (Objects.nonNull(backpackErrorLog)) {
+            NftEvent nftEvent = this.getById(backpackErrorLog.getEventId());
+            NftEventEquipment equipment = eventEquipmentService
+                    .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
+
+            NftMintSuccessReq mintSuccessReq = new NftMintSuccessReq();
+            mintSuccessReq.setAutoDeposite(backpackErrorLog.getIsAutoDeposit());
+            mintSuccessReq.setMintAddress(req.getMintAddress());
+
+            MintSuccessMessageResp data = new MintSuccessMessageResp();
+            BeanUtils.copyProperties(req, data);
+            //生成metadata
+            createMetadata(equipment, data.getTokenId());
+            // 通知游戏方，更新本地数据库
+            updateLocalDB(mintSuccessReq.getAutoDeposite(), req.getMintAddress(), nftEvent, equipment, data);
+        }
+    }
+
+
     private void recordLog(Long eventId, String mintAddress) {
         // 记录失败日志
         UpdateBackpackErrorLog backpackErrorLog = new UpdateBackpackErrorLog();
@@ -434,26 +453,6 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             this.updateById(nftEvent);
             throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_LATER);
         }
-    }
-
-    @Override
-    public void mintCallback(MintEquipCallBackReq req) {
-        log.info("mint通知回调-->param:{}", JSONUtil.toJsonStr(req));
-        NftMintEquipReq equipReq = new NftMintEquipReq();
-        equipReq.setToUserAddress(req.getToUserAddress());
-        equipReq.setAutoDeposite(StringUtils.isNotBlank(req.getToUserAddress()) ? WhetherEnum.YES.value() : WhetherEnum.NO.value());
-        equipReq.setFeeHash(req.getFeeHash());
-        equipReq.setEventId(req.getOrderId());
-        this.mintEquip(equipReq);
-    }
-
-    @Override
-    public void composeCallback(MintEquipCallBackReq req) {
-        log.info("合成通知回调-->param:{}", JSONUtil.toJsonStr(req));
-        ComposeSuccessReq composeSuccessReq = new ComposeSuccessReq();
-        composeSuccessReq.setEventId(req.getOrderId());
-        this.composeSuccess(composeSuccessReq);
-
     }
 
 
