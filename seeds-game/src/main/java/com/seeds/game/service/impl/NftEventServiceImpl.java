@@ -7,7 +7,6 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -144,13 +143,19 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     public void toNft(NftEventAddReq req) {
         if (req.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
             // 合成时作为材料的nft标记为临时锁定，
-            NftEventEquipmentReq equipment = req.getEquipments().stream()
+            List<NftEventEquipmentReq> equipmentReqs = req.getEquipments().stream()
                     .filter(p -> p.getIsNft().equals(WhetherEnum.YES.value()) && p.getIsConsume().equals(WhetherEnum.YES.value()))
-                    .collect(Collectors.toList()).get(0);
+                    .collect(Collectors.toList());
 
-            NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
-            entity.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
-            nftPublicBackpackService.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, equipment.getAutoId()));
+            List<NftPublicBackpackEntity> updateList = equipmentReqs.stream().map(p -> {
+                NftPublicBackpackEntity nftBackpack = new NftPublicBackpackEntity();
+                nftBackpack.setAutoId(p.getAutoId());
+                nftBackpack.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
+                return nftBackpack;
+            }).collect(Collectors.toList());
+            log.info("合成材料标记为锁定状态，param ：{}", JSONUtil.toJsonStr(updateList));
+            nftPublicBackpackService.updateBatchByQueryWrapper(updateList, item ->
+                    new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, item.getAutoId()));
         }
         // 记录toNFT请求
         NftEvent nftEvent = new NftEvent();

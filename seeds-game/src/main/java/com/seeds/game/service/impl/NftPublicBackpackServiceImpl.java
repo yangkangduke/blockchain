@@ -495,7 +495,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         log.info("NFT托管成功，开始通知， url:{}， params:{}", url, param);
         try {
             HttpResponse response = HttpRequest.post(url)
-                    .timeout(8 * 1000)
+                    .timeout(15 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
@@ -559,7 +559,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         log.info("NFT取回成功，开始通知， url:{}， params:{}", url, param);
         try {
             HttpResponse response = HttpRequest.post(url)
-                    .timeout(8 * 1000)
+                    .timeout(15 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
