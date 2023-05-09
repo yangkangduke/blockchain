@@ -214,7 +214,21 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Override
     public Boolean cancel(Long id) {
+        List<NftEventEquipment> equipments = eventEquipmentService.list(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id));
+        // 合成时作为材料的nft标记为deposit，
+        List<NftEventEquipment> equipments1 = equipments.stream()
+                .filter(p -> p.getIsNft().equals(WhetherEnum.YES.value()) && p.getIsConsume().equals(WhetherEnum.YES.value()))
+                .collect(Collectors.toList());
 
+        List<NftPublicBackpackEntity> updateList = equipments1.stream().map(p -> {
+            NftPublicBackpackEntity nftBackpack = new NftPublicBackpackEntity();
+            nftBackpack.setAutoId(p.getAutoId());
+            nftBackpack.setState(NFTEnumConstant.NFTStateEnum.LOCK.getCode());
+            return nftBackpack;
+        }).collect(Collectors.toList());
+        log.info("合成材料标记为deposit状态，param ：{}", JSONUtil.toJsonStr(updateList));
+        nftPublicBackpackService.updateBatchByQueryWrapper(updateList, item ->
+                new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, item.getAutoId()));
         NftEvent nftEvent = new NftEvent();
         nftEvent.setId(id);
         nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.CANCELLED.getCode());
