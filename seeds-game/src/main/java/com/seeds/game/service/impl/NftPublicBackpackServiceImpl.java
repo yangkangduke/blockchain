@@ -500,8 +500,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                     .body(param)
                     .execute();
             log.info("NFT托管成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("NFT托管成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT Hosting Failure!");
         }
     }
 
@@ -558,8 +564,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                     .body(param)
                     .execute();
             log.info("NFT取回成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
         } catch (Exception e) {
             log.error("NFT取回成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT retrieval failure");
         }
     }
 
@@ -600,6 +612,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public void updateState(NftBackpakcUpdateStateReq req) {
 
+        log.info("扫快通知,更新背包状态---->param：{}", JSONUtil.toJsonStr(req));
         // 如果是withdraw，需要通知游戏方把nft收回到背包
         if (req.getState().equals(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode())) {
             NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenAddress, req.getMintAddress()));
@@ -628,10 +641,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     }
 
-    @Override
-    public void insertCallback(MintSuccessReq req) {
-        nftEventService.mintSuccessCallback(req);
-    }
 
     @Override
     public Map<Long, BigDecimal> getTotalPrice(String autoIds) {
