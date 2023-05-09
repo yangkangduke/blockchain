@@ -79,6 +79,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     private INftEquipmentService nftEquipmentService;
 
     @Autowired
+    private INftFeeOpLogService nftFeeOpLogService;
+
+    @Autowired
     private INftActivityService nftActivityService;
 
     @Autowired
@@ -782,7 +785,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // 请求NFT托管费退还
         BeanUtils.copyProperties(req, nftFeeRecord);
         nftFeeRecord.setStatus(WhetherEnum.YES.value());
-        initRefundFee(refundFee, sellerAddress, nftFeeRecord);
+        initRefundFee(refundFee.multiply(new BigDecimal(100000000L)), sellerAddress, nftFeeRecord);
         nftFeeRecord.setReceivableFee(receivableFee);
         nftFeeRecord.setRefundFee(refundFee);
         nftFeeRecord.setRefundTime(System.currentTimeMillis());
@@ -824,14 +827,15 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public void refundAllFee(NftRefundAllFeeReq req) {
-        NftActivity nftActivity = nftActivityService.queryByMintAddressAndTxHash(req.getMintAddress(), req.getFeeHash());
-        if (nftActivity == null) {
-            throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
+        NftFeeOpLog nftFeeOpLog = nftFeeOpLogService.queryByTxHash(req.getFeeHash());
+        if (nftFeeOpLog == null) {
+            log.info("没有查询到托管费记录，feeHash:{}， mintAddress:{}", req.getFeeHash(), req.getMintAddress());
+            return;
         }
-        ucUserService.ownerValidation(nftActivity.getFromAddress());
+        ucUserService.ownerValidation(nftFeeOpLog.getFromAddress());
         NftFeeRecordEntity nftFeeRecord = nftFeeRecordService.queryByMintAddressAndFeeHash(req.getMintAddress(), req.getFeeHash());
         if (nftFeeRecord != null && nftFeeRecord.getRefundFee() !=null && WhetherEnum.YES.value() == nftFeeRecord.getStatus()) {
-            log.info("托管费已退还， feeHash:{}， mintAddress:{}", req.getFeeHash(), req.getMintAddress());
+            log.info("托管费已退还，feeHash:{}， mintAddress:{}", req.getFeeHash(), req.getMintAddress());
             return;
         }
         if (nftFeeRecord == null) {
@@ -840,12 +844,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // 请求NFT托管费退还
         BeanUtils.copyProperties(req, nftFeeRecord);
         nftFeeRecord.setStatus(WhetherEnum.YES.value());
-        initRefundFee(nftActivity.getPrice(), nftActivity.getFromAddress(), nftFeeRecord);
-        nftFeeRecord.setReceivableFee(nftActivity.getPrice());
-        nftFeeRecord.setRefundFee(nftActivity.getPrice());
+        initRefundFee(nftFeeOpLog.getAmount(), nftFeeOpLog.getFromAddress(), nftFeeRecord);
+        nftFeeRecord.setReceivableFee(nftFeeOpLog.getAmount());
+        nftFeeRecord.setRefundFee(nftFeeOpLog.getAmount());
         nftFeeRecord.setRefundTime(System.currentTimeMillis());
         nftFeeRecord.setCurrency(CurrencyEnum.SOL.getCode());
-        nftFeeRecord.setToAddress(nftActivity.getFromAddress());
+        nftFeeRecord.setToAddress(nftFeeOpLog.getFromAddress());
         nftFeeRecordService.saveOrUpdate(nftFeeRecord);
     }
 
@@ -1094,7 +1098,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // 调用/api/admin/refundFee，请求NFT托管费退还
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getRefundFee();
         TransferSolMessageDto dto = new TransferSolMessageDto();
-        dto.setAmount(amount.multiply(new BigDecimal(100000000L)));
+        dto.setAmount(amount);
         dto.setToAddress(toAddress);
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT托管费退还开始请求， url:{}， params:{}", url, param);
