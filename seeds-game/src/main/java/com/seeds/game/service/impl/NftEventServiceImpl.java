@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.enums.CurrencyEnum;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.game.config.SeedsApiConfig;
 import com.seeds.game.dto.MetadataAttrDto;
 import com.seeds.game.dto.request.ComposeSuccessReq;
@@ -46,7 +47,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
@@ -407,6 +407,9 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Transactional(noRollbackFor = GenericException.class)
     public void composeSuccess(ComposeSuccessReq req) {
         NftEvent nftEvent = this.getById(req.getEventId());
+        if (null == nftEvent || !nftEvent.getUserId().equals(UserContext.getCurrentUserId())) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_EVENT);
+        }
         // 调用/api/chainOp/buySuccess通知，购买成功
         String params = String.format("nonce=%s&feeHash=%s&isDeposit=%s&mintAddresses=%s&sig=%s&walletAddress=%s", req.getNonce(), req.getFeeHash(), req.getAutoDeposite(), req.getMintAddresses(), req.getSig(), req.getWalletAddress());
         // 调用/api/equipment/compose  合成成功
@@ -447,6 +450,9 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Transactional(noRollbackFor = GenericException.class)
     public void mintEquip(NftMintEquipReq req) {
         NftEvent nftEvent = this.getById(req.getEventId());
+        if (null == nftEvent || !nftEvent.getUserId().equals(UserContext.getCurrentUserId())) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_EVENT);
+        }
         String params = String.format("isDeposit=%s&feeHash=%s&toUserAddress=%s", req.getAutoDeposite(), req.getFeeHash(), req.getToUserAddress());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getMintEquip() + "?" + params;
         log.info("mintEquip， url:{}， params:{}", url, params);

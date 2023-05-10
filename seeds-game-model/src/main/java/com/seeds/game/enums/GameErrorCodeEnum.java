@@ -39,6 +39,7 @@ public enum GameErrorCodeEnum {
     ERR_10017_NFT_ITEM_IN_SETTLEMENT(10017, "NFT物品结算中", "NFT items in settlement"),
     ERR_10018_NFT_ITEM_ORDER_NOT_EXIST(10018, "NFT物品订单不存在", "NFT item order does not exist"),
     ERR_10019_CHECK_LATER(10019, "请求已提交，请稍后查看结果", "The request has been submitted, please check the result later"),
+    ERR_10019_CHECK_EVENT(10020, "无效的请求", "Invalid request"),
 
     // role
     ERR_20001_ROLE_LEVE_IS_LESS_THAN_TEN(20001, "角色等级不满十级", "The role level is less than ten"),
