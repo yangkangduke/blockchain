@@ -44,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -539,7 +540,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             JSONObject jsonObject = JSONObject.parseObject(backpackNft.getAttributes());
             durability = (int) jsonObject.get("durability");
             // 设置参考价
-            backpackNft.setProposedPrice(new BigDecimal(durability));
+            BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
+            backpackNft.setProposedPrice(new BigDecimal(durability).divide(usdRate).setScale(2, RoundingMode.HALF_UP));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -857,7 +859,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             nftAttributeEntity.setDurability(attributesDto.getDurability());
             nftAttributeEntity.setRarityAttr(attributesDto.getRarityAttr());
         }
-        attributeService.update(nftAttributeEntity, new LambdaUpdateWrapper<NftAttributeEntity>().eq(NftAttributeEntity::getEqNftId, backpackEntity.getEqNftId()));
+        NftAttributeEntity one = attributeService.getOne(new LambdaUpdateWrapper<NftAttributeEntity>().eq(NftAttributeEntity::getEqNftId, backpackEntity.getEqNftId()));
+        if (null == one) {
+            attributeService.save(nftAttributeEntity);
+        } else {
+            attributeService.update(nftAttributeEntity, new LambdaUpdateWrapper<NftAttributeEntity>().eq(NftAttributeEntity::getEqNftId, backpackEntity.getEqNftId()));
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

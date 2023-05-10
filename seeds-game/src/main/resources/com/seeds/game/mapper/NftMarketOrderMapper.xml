@@ -26,7 +26,7 @@
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
-        where t2.type = 3 AND t4.is_delete = 0 AND t1.status IN (1,7)
+        where t2.type = 3 AND t4.is_delete = 0 AND t1.status = 1
         <if test="params.name != null and params.name != ''">
             and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')
         </if>
@@ -91,7 +91,7 @@
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
-        where t2.type = 1 AND t4.is_delete = 0 AND t1.status IN (1,7)
+        where t2.type = 1 AND t4.is_delete = 0 AND t1.status = 1
 
         <if test="params.name != null and params.name != ''">
             and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')
@@ -162,7 +162,7 @@
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
-        where t2.type = 2 AND t4.is_delete = 0 AND t1.status IN (1,7)
+        where t2.type = 2 AND t4.is_delete = 0 AND t1.status = 1
 
         <if test="params.name != null and params.name != ''">
             and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')

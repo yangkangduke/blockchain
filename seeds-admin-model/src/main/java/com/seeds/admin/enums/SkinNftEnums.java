@@ -10,6 +10,20 @@ import lombok.Getter;
 public class SkinNftEnums {
 
     @Getter
+    public enum SkinNftListStateEnum {
+        NO_LIST(0, "NO_LIST"),
+        LISTED(1, "LISTED"),
+        ;
+        private final int code;
+        private final String desc;
+        SkinNftListStateEnum(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+    }
+
+    @Getter
     public enum AutoIdApplyStateEnum {
         NO_APPLY(0, "NO_APPLY"),
         APPLYING(1, "APPLYING"),
