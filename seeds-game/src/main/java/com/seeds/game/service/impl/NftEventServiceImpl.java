@@ -419,7 +419,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         HttpResponse response = null;
         try {
             response = HttpRequest.get(url)
-                    .timeout(30 * 1000)
+                    .timeout(60 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
         } catch (Exception e) {
@@ -460,7 +460,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         HttpResponse response = null;
         try {
             response = HttpRequest.get(url)
-                    .timeout(30 * 1000)
+                    .timeout(60 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
         } catch (Exception e) {
