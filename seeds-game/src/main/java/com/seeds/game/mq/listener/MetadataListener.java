@@ -107,12 +107,10 @@ public class MetadataListener {
         durability.setValue(attrDto.getDurability().toString());
         attributesList.add(durability);
 
-        if (!attrDto.getRareAttribute().equals(WhetherEnum.NO.value())) {
-            EquMetadataDto.Attributes rareAttribute = new EquMetadataDto.Attributes();
-            rareAttribute.setTrait_type(NFTEnumConstant.EquMetadataAttrEnum.RAREATTRIBUTE.getName());
-            rareAttribute.setValue(attrDto.getRareAttribute().toString());
-            attributesList.add(rareAttribute);
-        }
+        EquMetadataDto.Attributes rareAttribute = new EquMetadataDto.Attributes();
+        rareAttribute.setTrait_type(NFTEnumConstant.EquMetadataAttrEnum.RAREATTRIBUTE.getName());
+        rareAttribute.setValue(attrDto.getRareAttribute().toString());
+        attributesList.add(rareAttribute);
 
         EquMetadataDto.Attributes quality = new EquMetadataDto.Attributes();
         quality.setTrait_type(NFTEnumConstant.EquMetadataAttrEnum.QUALITY.getName());
