@@ -15,10 +15,10 @@ public class SysSkinNftCancelAssetReq {
     @ApiModelProperty("id")
     private Long id;
 
-    @ApiModelProperty("交易hash")
-    private String sig;
-
-    @ApiModelProperty("上架收据")
-    private String listReceipt;
+//    @ApiModelProperty("交易hash")
+//    private String sig;
+//
+//    @ApiModelProperty("上架收据")
+//    private String listReceipt;
 
 }
