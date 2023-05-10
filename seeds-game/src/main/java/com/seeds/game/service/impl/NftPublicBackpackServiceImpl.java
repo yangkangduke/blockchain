@@ -540,7 +540,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             durability = (int) jsonObject.get("durability");
             // 设置参考价
             BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
-            backpackNft.setProposedPrice(new BigDecimal(durability).divide(usdRate).setScale(2, RoundingMode.HALF_UP));
+            backpackNft.setProposedPrice(new BigDecimal(durability).divide(usdRate,2,BigDecimal.ROUND_HALF_UP));
         } catch (Exception e) {
             e.printStackTrace();
         }
