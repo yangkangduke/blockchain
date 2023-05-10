@@ -19,6 +19,8 @@ import com.seeds.admin.service.SysNftSkinAsyncService;
 import com.seeds.admin.utils.CreateJsonFileUtil;
 import com.seeds.common.web.oss.FileProperties;
 import com.seeds.common.web.oss.FileTemplate;
+import com.seeds.game.entity.NftPublicBackpackEntity;
+import com.seeds.game.feign.RemoteNftBackpackService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +64,9 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
 
     @Autowired
     private SysFileService sysFileService;
+
+    @Autowired
+    private RemoteNftBackpackService backpackService;
 
 
     @Override
@@ -144,7 +150,8 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
         }
 
         //todo 插入公共背包, 属性字段得有稀有度
-
+//        ArrayList<NftPublicBackpackEntity> entities = new ArrayList<>();
+//        backpackService.insertBackpack(entities);
 
         // 通知游戏方，skin mint 成功
         List<SysNftPicEntity> sysNftPicEntities = nftPicService.listByIds(ids);

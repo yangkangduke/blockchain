@@ -44,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -881,5 +880,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public void skinUnDeposited(NftUnDepositedReq req) {
 
+    }
+
+    @Override
+    public void insertBackpack(List<NftPublicBackpackEntity> backpackEntities) {
+        log.info("皮肤mint成功,插入背包表--->：{}", JSONUtil.toJsonStr(backpackEntities));
+        this.saveBatch(backpackEntities);
     }
 }
