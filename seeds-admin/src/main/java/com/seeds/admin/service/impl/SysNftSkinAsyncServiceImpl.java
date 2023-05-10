@@ -62,6 +62,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
     @Autowired
     private SysFileService sysFileService;
 
+
     @Override
     @Async
     public void skinMint(SysSkinNftMintReq dto) {
@@ -104,6 +105,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
             SysNftPicEntity entity = nftPicService.getById(ids.get(i));
             entity.setName(dto.get(i).getName());
             entity.setTokenAddress(dto.get(i).getMintAddress());
+            entity.setMintTime(System.currentTimeMillis());
             SkinNFTAttrDto attr = nftPicService.handleAttr(entity);
             String tokenId = dto.get(i).getName().substring(dto.get(i).getName().lastIndexOf("#") + 1);
             String fileName = tokenId + ".json";
@@ -121,6 +123,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
                     String jsonUrl = sysFileService.getNftFileUrl(bucketName, objectName);
                     entity.setJsonUrl(jsonUrl);
                     entity.setUpdatedAt(System.currentTimeMillis());
+
                     nftPicService.updateById(entity);
                     // 先关闭流，否则 删除文件不成功
                     inputStream.close();
@@ -139,6 +142,9 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
                 }
             }
         }
+
+        //todo 插入公共背包, 属性字段得有稀有度
+
 
         // 通知游戏方，skin mint 成功
         List<SysNftPicEntity> sysNftPicEntities = nftPicService.listByIds(ids);

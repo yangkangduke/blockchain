@@ -2,6 +2,7 @@ package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.admin.dto.request.*;
+import com.seeds.admin.dto.response.SysNftPicMIntedResp;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.service.SysNftPicService;
 import com.seeds.common.dto.GenericDto;
@@ -29,6 +30,12 @@ public class SysNftPicController {
     @ApiOperation("获取分页信息")
     public GenericDto<IPage<SysNftPicResp>> queryPage(@RequestBody SysNftPicPageReq req) {
         return GenericDto.success(sysNftPicService.queryPage(req));
+    }
+
+    @PostMapping("minted-page")
+    @ApiOperation("获取分页信息")
+    public GenericDto<IPage<SysNftPicMIntedResp>> queryMintedPage(@RequestBody SysNftPicMintedPageReq req) {
+        return GenericDto.success(sysNftPicService.queryMintedPage(req));
     }
 
     @PostMapping("uploadCSV")

@@ -1,6 +1,5 @@
 package com.seeds.admin.dto.response;
 
-import com.seeds.admin.enums.SkinNftEnums;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,8 +9,8 @@ import lombok.Data;
  * @date 2023/2/20
  */
 @Data
-@ApiModel(value = "SysNftPicResp", description = "NFT图片管理")
-public class SysNftPicResp {
+@ApiModel(value = "SysNftPicMIntedResp")
+public class SysNftPicMIntedResp {
 
     @ApiModelProperty("id")
     private Long id;
@@ -49,8 +48,6 @@ public class SysNftPicResp {
     @ApiModelProperty("NFT的类型：1:skin , 2:equip")
     private Integer nftType;
 
-    @ApiModelProperty("json文件地址")
-    private String jsonUrl;
 
     @ApiModelProperty("confId")
     private Long confId;
@@ -64,28 +61,12 @@ public class SysNftPicResp {
     @ApiModelProperty("链上地址")
     private String tokenAddress;
 
-    @ApiModelProperty("上传时间")
-    private Long createdAt;
+    @ApiModelProperty("mint时间")
+    private Long mintTime;
 
-    @ApiModelProperty("mint 后的nft名字")
-    private String name;
+    @ApiModelProperty("owner")
+    private String owner;
 
-    @ApiModelProperty("symbol")
-    private String symbol;
-
-    @ApiModelProperty("desc")
-    private String desc;
-
-    /**
-     * @see SkinNftEnums.AutoIdApplyStateEnum
-     */
-    @ApiModelProperty("autoId申请状态")
-    private Integer applyState;
-
-
-    /**
-     * @see SkinNftEnums.SkinMintStateEnum
-     */
-    @ApiModelProperty("nftMint状态")
-    private Integer mintState;
+    @ApiModelProperty("上架状态 0 未上架 1 已上架")
+    private Integer listState;
 }

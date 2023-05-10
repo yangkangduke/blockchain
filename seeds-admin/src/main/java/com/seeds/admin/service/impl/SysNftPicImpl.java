@@ -22,6 +22,7 @@ import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.request.chain.SkinNftCancelAssetDto;
 import com.seeds.admin.dto.request.chain.SkinNftEnglishDto;
 import com.seeds.admin.dto.request.chain.SkinNftListAssetDto;
+import com.seeds.admin.dto.response.SysNftPicMIntedResp;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.AdminErrorCodeEnum;
@@ -34,10 +35,13 @@ import com.seeds.admin.service.SysGameApiService;
 import com.seeds.admin.service.SysNftPicService;
 import com.seeds.admin.service.SysNftSkinAsyncService;
 import com.seeds.admin.utils.CsvUtils;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.web.oss.FileTemplate;
+import com.seeds.game.feign.RemoteNftEquipService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpStatus;
 import org.apache.ibatis.binding.MapperMethod;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +78,9 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Autowired
     private SysNftSkinAsyncService skinAsyncService;
 
+    @Autowired
+    private RemoteNftEquipService remoteNftEquipService;
+
     @Override
     public IPage<SysNftPicResp> queryPage(SysNftPicPageReq req) {
         LambdaQueryWrapper<SysNftPicEntity> queryWrapper = new LambdaQueryWrapper<>();
@@ -108,6 +115,46 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             SysNftPicResp resp = new SysNftPicResp();
             BeanUtils.copyProperties(p, resp);
             resp.setDesc(p.getDescription());
+            return resp;
+        });
+    }
+
+    @Override
+    public IPage<SysNftPicMIntedResp> queryMintedPage(SysNftPicMintedPageReq req) {
+
+        LambdaQueryWrapper<SysNftPicEntity> queryWrapper = new LambdaQueryWrapper<>();
+        long start = 0L;
+        long end = 0L;
+        if (StringUtils.isNotBlank(req.getQueryTime())) {
+            DateTime dateTime = DateUtil.parseDate(req.getQueryTime());
+            start = DateUtil.beginOfDay(dateTime).getTime();
+            end = DateUtil.endOfDay(dateTime).getTime();
+        }
+        queryWrapper.between(StringUtils.isNotBlank(req.getQueryTime()), SysNftPicEntity::getMintTime, start, end)
+                .eq(!Objects.isNull(req.getAutoId()), SysNftPicEntity::getAutoId, req.getAutoId())
+                .eq(!Objects.isNull(req.getConfId()), SysNftPicEntity::getConfId, req.getConfId())
+                .eq(!Objects.isNull(req.getListState()), SysNftPicEntity::getListState, req.getListState())
+                .eq(StringUtils.isNotBlank(req.getTokenAddress()), SysNftPicEntity::getTokenAddress, req.getTokenAddress())
+                .orderByDesc(SysNftPicEntity::getMintTime);
+        Page<SysNftPicEntity> page = new Page<>(req.getCurrent(), req.getSize());
+        List<SysNftPicEntity> records = this.page(page, queryWrapper).getRecords();
+
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        List<String> tokenAddresses = records.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList());
+        Map<String, String> data = null;
+        try {
+            GenericDto<Map<String, String>> result = remoteNftEquipService.getOwnerByMintAddress(tokenAddresses);
+            data = result.getData();
+        } catch (Exception e) {
+            log.error("内部请求game获取tokenAddresses的owner");
+        }
+        Map<String, String> finalData = data;
+        return page.convert(p -> {
+            SysNftPicMIntedResp resp = new SysNftPicMIntedResp();
+            BeanUtils.copyProperties(p, resp);
+            resp.setOwner(null != finalData ? finalData.get(p.getTokenAddress()) : "");
             return resp;
         });
     }
@@ -421,11 +468,18 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         String param = JSONUtil.toJsonStr(listAssetDto);
         log.info("请求skin-list-asset接口， url:{}， params:{}", url, param);
         try {
-            HttpRequest.post(url)
+            HttpResponse response = HttpRequest.post(url)
                     .timeout(60 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            // 更新上架状态
+            log.info(" list-asset 成功--result:{}", jsonObject);
+            if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+                list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.LISTED.getCode()));
+                this.updateBatchById(list);
+            }
         } catch (Exception e) {
             log.info(" 请求skin-list-asset接口--出错:{}", e.getMessage());
         }
@@ -444,11 +498,18 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         String param = JSONUtil.toJsonStr(englishDtos);
         log.info("请求skin-englishV2-接口， url:{}， params:{}", url, param);
         try {
-            HttpRequest.post(url)
+            HttpResponse response = HttpRequest.post(url)
                     .timeout(60 * 1000)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            // 更新上架状态
+            log.info(" englishV2 成功--result:{}", jsonObject);
+            if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+                list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.LISTED.getCode()));
+                this.updateBatchById(list);
+            }
         } catch (Exception e) {
             log.info(" 请求skin-englishV2-出错:{}", e.getMessage());
         }
@@ -484,6 +545,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         }
 
     }
+
 
     private void validate(SysNftPicEntity p) {
         if (StringUtils.isBlank(p.getRarity()) ||
