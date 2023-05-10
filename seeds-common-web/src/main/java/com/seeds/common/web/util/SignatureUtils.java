@@ -2,6 +2,7 @@ package com.seeds.common.web.util;
 
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -12,6 +13,7 @@ import java.util.*;
  * @author hang.yu
  * @date 2022/9/27
  **/
+@Slf4j
 public class SignatureUtils {
 
     /**
@@ -27,6 +29,7 @@ public class SignatureUtils {
         body.remove("signature");
         // 根据APPID查询的密钥进行重签
         String newSign = getSign(body, secretKey);
+        log.info("new Sign:{}", newSign);
 
         // 校验签名是否失效
         long thisTime = System.currentTimeMillis() - body.getLong("timestamp");
@@ -48,6 +51,7 @@ public class SignatureUtils {
         String sortStr = getFormatParams(params);
         // 将密钥key拼接在字典排序后的参数字符串中,得到待签名字符串。
         sortStr += "secretKey=" + secretKey;
+        log.info("------------Str={}", sortStr);
         // 使用md5算法加密待加密字符串并转为大写即为sign
         return SecureUtil.md5(sortStr).toUpperCase();
     }
