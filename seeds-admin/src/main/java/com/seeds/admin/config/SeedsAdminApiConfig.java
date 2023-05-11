@@ -21,6 +21,9 @@ public class SeedsAdminApiConfig {
     @Value("${seeds.api.admin.cancelAsset:/api/admin/cancelAsset}")
     private String cancelAsset;
 
+    @Value("${seeds.api.admin.cancelAuction:/api/admin/cancelAuction}")
+    private String cancelAuction;
+
     @Value("${seeds.api.admin.english:/api/admin/englishV2}")
     private String english;
 

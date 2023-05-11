@@ -82,8 +82,15 @@ public class SysNftPicController {
 
     @PostMapping("cancelAsset")
     @ApiOperation("取消售卖")
-    public GenericDto<Object> cancelAsset(@RequestBody @Valid SysSkinNftCancelAssetReq req) {
+    public GenericDto<Object> cancelAsset(@RequestBody @Valid ListReq req) {
         sysNftPicService.cancelAsset(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("cancelAuction")
+    @ApiOperation("取消售卖")
+    public GenericDto<Object> cancelAuction(@RequestBody @Valid ListReq req) {
+        sysNftPicService.cancelAuction(req);
         return GenericDto.success(null);
     }
 

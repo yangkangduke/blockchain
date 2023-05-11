@@ -139,8 +139,13 @@ public class SysNftPicEntity extends BaseEntity {
      */
     private Integer mintState;
 
+    /**
+     * @see  SkinNftEnums.SkinNftListStateEnum
+     *
+     */
     @TableField("list_state")
     private Integer listState;
+
 
     @TableField("mint_time")
     private Long mintTime;

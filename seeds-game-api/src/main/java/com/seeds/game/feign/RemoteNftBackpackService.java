@@ -6,6 +6,7 @@ import com.seeds.game.feign.impl.RemoteNftBackpackServiceImpl;
 import com.seeds.game.feign.interceptor.GameFeignInnerRequestInterceptor;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,7 @@ public interface RemoteNftBackpackService {
 	@PostMapping("/inter-game/nft/insert-backpack")
 	GenericDto<Object> insertBackpack(@RequestBody List<NftPublicBackpackEntity> backpackEntity);
 
-	@PostMapping("/inter-game/nft/usd-rate/{currency}")
+	@GetMapping("/inter-game/nft/usd-rate/{currency}")
 	@ApiOperation("获取美元汇率")
 	GenericDto<BigDecimal> usdRate(@PathVariable String currency);
 }

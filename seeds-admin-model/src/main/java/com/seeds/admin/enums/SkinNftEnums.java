@@ -26,6 +26,8 @@ public class SkinNftEnums {
     public enum SkinNftListStateEnum {
         NO_LIST(0, "NO_LIST"),
         LISTED(1, "LISTED"),
+        ON_AUCTION(2, "ON_AUCTION"),
+        CANCEL_AUCTION(3, "CANCEL_AUCTION"),
         ;
         private final int code;
         private final String desc;

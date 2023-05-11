@@ -20,6 +20,7 @@ import com.seeds.admin.dto.SysNFTAttrDto;
 import com.seeds.admin.dto.game.GameApplyAutoIdsDto;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.request.chain.SkinNftCancelAssetDto;
+import com.seeds.admin.dto.request.chain.SkinNftCancelAuctionDto;
 import com.seeds.admin.dto.request.chain.SkinNftEnglishDto;
 import com.seeds.admin.dto.request.chain.SkinNftListAssetDto;
 import com.seeds.admin.dto.response.SysNftPicMIntedResp;
@@ -38,6 +39,7 @@ import com.seeds.admin.utils.CsvUtils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.web.oss.FileTemplate;
+import com.seeds.game.entity.NftMarketOrderEntity;
 import com.seeds.game.feign.RemoteNftEquipService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -158,6 +160,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             return resp;
         });
     }
+
 
     @Override
     public Integer upload(MultipartFile file) {
@@ -488,7 +491,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         List<SysNftPicEntity> list = this.listByIds(req.getIds());
         List<SkinNftEnglishDto> englishDtos = list.stream().map(p -> {
             SkinNftEnglishDto dto = new SkinNftEnglishDto();
-            BeanUtils.copyProperties(p, dto);
+            BeanUtils.copyProperties(req, dto);
             dto.setMintAddress(p.getTokenAddress());
             return dto;
         }).collect(Collectors.toList());
@@ -503,9 +506,9 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                     .execute();
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             // 更新上架状态
-            log.info(" englishV2 成功--result:{}", jsonObject);
+            log.info(" englishV2-->result:{}", jsonObject);
             if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
-                list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.LISTED.getCode()));
+                list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.ON_AUCTION.getCode()));
                 this.updateBatchById(list);
             }
         } catch (Exception e) {
@@ -523,25 +526,68 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     }
 
     @Override
-    public void cancelAsset(SysSkinNftCancelAssetReq req) {
-        SysNftPicEntity entity = this.getById(req.getId());
-        if (Objects.nonNull(entity)) {
-            String listReceipt = baseMapper.getListReceiptByMintAddress(entity.getTokenAddress());
+    public void cancelAsset(ListReq req) {
+        List<SysNftPicEntity> list = this.listByIds(req.getIds());
 
+        List<NftMarketOrderEntity> receipts = baseMapper.getListReceiptByMintAddress(list.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList()));
+        Map<String, String> receiptsMap = receipts.stream().collect(Collectors.toMap(NftMarketOrderEntity::getMintAddress, NftMarketOrderEntity::getListReceipt));
+        List<SkinNftCancelAssetDto> dtos = list.stream().map(p -> {
             SkinNftCancelAssetDto skinNftCancelAssetDto = new SkinNftCancelAssetDto();
-            skinNftCancelAssetDto.setListReceipt(listReceipt);
-            String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getCancelAsset();
-            String param = JSONUtil.toJsonStr(skinNftCancelAssetDto);
-            log.info("请求skin-cancelAsset-接口， url:{}， params:{}", url, param);
-            try {
-                HttpRequest.post(url)
-                        .timeout(60 * 1000)
-                        .header("Content-Type", "application/json")
-                        .body(param)
-                        .execute();
-            } catch (Exception e) {
-                log.info(" 请求skin-cancelAsset-出错:{}", e.getMessage());
+            skinNftCancelAssetDto.setListReceipt(receiptsMap.get(p.getTokenAddress()));
+            return skinNftCancelAssetDto;
+        }).collect(Collectors.toList());
+
+        String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getCancelAsset();
+        String param = JSONUtil.toJsonStr(dtos);
+        log.info("请求skin-cancelAsset-接口， url:{}， params:{}", url, param);
+        try {
+            HttpResponse response = HttpRequest.post(url)
+                    .timeout(60 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            // 更新下架状态
+            log.info(" englishV2 成功--result:{}", jsonObject);
+            if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+                list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.NO_LIST.getCode()));
+                this.updateBatchById(list);
             }
+        } catch (Exception e) {
+            log.info(" 请求skin-cancelAsset-出错:{}", e.getMessage());
+        }
+    }
+
+
+    @Override
+    public void cancelAuction(ListReq req) {
+        List<SysNftPicEntity> list = this.listByIds(req.getIds());
+        List<NftMarketOrderEntity> receipts = baseMapper.getAuctionIdByMintAddress(list.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList()));
+        Map<String, Long> receiptsMap = receipts.stream().collect(Collectors.toMap(NftMarketOrderEntity::getMintAddress, NftMarketOrderEntity::getAuctionId));
+        List<SkinNftCancelAuctionDto> dtos = list.stream().map(p -> {
+            SkinNftCancelAuctionDto skinNftCancelAssetDto = new SkinNftCancelAuctionDto();
+            skinNftCancelAssetDto.setAuctionId(receiptsMap.get(p.getTokenAddress()));
+            return skinNftCancelAssetDto;
+        }).collect(Collectors.toList());
+
+        String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getCancelAuction();
+        String param = JSONUtil.toJsonStr(dtos);
+        log.info("请求skin-cancelAuction-接口， url:{}， params:{}", url, param);
+        try {
+            HttpResponse response = HttpRequest.post(url)
+                    .timeout(60 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            // 更新取消拍卖状态
+            log.info(" cancelAuction 成功--result:{}", jsonObject);
+            if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+                list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.CANCEL_AUCTION.getCode()));
+                this.updateBatchById(list);
+            }
+        } catch (Exception e) {
+            log.info(" 请求skin-cancelAsset-出错:{}", e.getMessage());
         }
 
     }
