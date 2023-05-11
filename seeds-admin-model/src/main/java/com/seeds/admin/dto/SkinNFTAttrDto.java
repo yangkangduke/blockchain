@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class SkinNFTAttrDto {
     private String name;
-    private String symbol = "SKIN";
+    private String symbol = "SEEDS";
     private String description = "This is the NFT of the Seeds skin.";
     private int seller_fee_basis_points = 0;
     private String image;

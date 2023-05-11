@@ -3,19 +3,26 @@ package com.seeds.game.service.impl;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.admin.dto.request.GameRankStatisticPageReq;
 import com.seeds.admin.dto.request.GameWinRankReq;
+import com.seeds.admin.dto.response.GameRankStatisticResp;
 import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.game.config.warblade.GameWarbladeConfig;
 import com.seeds.game.entity.ServerRegionEntity;
-import com.seeds.game.service.GameFileService;
-import com.seeds.game.service.GameRankService;
-import com.seeds.game.service.IServerRegionService;
+import com.seeds.game.entity.ServerRoleStatisticsEntity;
+import com.seeds.game.enums.SortTypeEnum;
+import com.seeds.game.service.*;
 import com.seeds.uc.constant.UcRedisKeysConstant;
 import com.seeds.uc.exceptions.GenericException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,10 +52,16 @@ public class GameRankServiceImpl implements GameRankService {
     private GameFileService gameFileService;
 
     @Autowired
+    private IServerRoleService serverRoleService;
+
+    @Autowired
     private GameWarbladeConfig gameWarbladeConfig;
 
     @Autowired
     private IServerRegionService serverRegionService;
+
+    @Autowired
+    private IServerRoleStatisticsService serverRoleStatisticsService;
 
     @Override
     public List<GameWinRankResp.GameWinRank> winInfo(GameWinRankReq query, Boolean useCache) {
@@ -141,6 +154,26 @@ public class GameRankServiceImpl implements GameRankService {
         return rankList;
     }
 
+    @Override
+    public IPage<GameRankStatisticResp> statisticPage(GameRankStatisticPageReq query) {
+        LambdaQueryWrapper<ServerRoleStatisticsEntity> queryWrap = new QueryWrapper<ServerRoleStatisticsEntity>().lambda()
+                .eq(ServerRoleStatisticsEntity::getGameServerId, query.getGameServerId());
+        buildOrderCondition(query.getSortField(), query.getSortType(), queryWrap);
+        Page<ServerRoleStatisticsEntity> page = serverRoleStatisticsService.page(new Page<>(query.getCurrent(), query.getSize()), queryWrap);
+        List<ServerRoleStatisticsEntity> records = page.getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        Set<Long> roleIds = records.stream().map(ServerRoleStatisticsEntity::getRoleId).collect(Collectors.toSet());
+        Map<Long, String> gameRoleMap = serverRoleService.queryNameMapById(roleIds);
+        return page.convert(p -> {
+            GameRankStatisticResp resp = new GameRankStatisticResp();
+            BeanUtils.copyProperties(p, resp);
+            resp.setRoleName(gameRoleMap.get(p.getRoleId()));
+            return resp;
+        });
+    }
+
     List<GameWinRankResp.GameWinRank> sortBySortType(Integer sortType, Map<String, GameWinRankResp.GameWinRank> rankMap, Integer limit) {
         switch (sortType) {
             case 2:
@@ -162,4 +195,53 @@ public class GameRankServiceImpl implements GameRankService {
                         .limit(limit).collect(Collectors.toList());
         }
     }
+
+    void buildOrderCondition(Integer sortField, Integer sortType, LambdaQueryWrapper<ServerRoleStatisticsEntity> queryWrap) {
+        if (SortTypeEnum.ASC.getCode() == sortType) {
+            switch (sortField) {
+                case 2:
+                    queryWrap.orderByAsc(ServerRoleStatisticsEntity::getFightNum);
+                    break;
+                case 3:
+                    queryWrap.orderByAsc(ServerRoleStatisticsEntity::getWinRate);
+                    break;
+                case 4:
+                    queryWrap.orderByAsc(ServerRoleStatisticsEntity::getWinNum);
+                    break;
+                case 5:
+                    queryWrap.orderByAsc(ServerRoleStatisticsEntity::getSeqWinNum);
+                    break;
+                case 6:
+                    queryWrap.orderByAsc(ServerRoleStatisticsEntity::getMaxKillNum);
+                    break;
+                case 1:
+                default:
+                    queryWrap.orderByAsc(ServerRoleStatisticsEntity::getLadderScore);
+                    break;
+            }
+        } else {
+            switch (sortField) {
+                case 2:
+                    queryWrap.orderByDesc(ServerRoleStatisticsEntity::getFightNum);
+                    break;
+                case 3:
+                    queryWrap.orderByDesc(ServerRoleStatisticsEntity::getWinRate);
+                    break;
+                case 4:
+                    queryWrap.orderByDesc(ServerRoleStatisticsEntity::getWinNum);
+                    break;
+                case 5:
+                    queryWrap.orderByDesc(ServerRoleStatisticsEntity::getSeqWinNum);
+                    break;
+                case 6:
+                    queryWrap.orderByDesc(ServerRoleStatisticsEntity::getMaxKillNum);
+                    break;
+                case 1:
+                default:
+                    queryWrap.orderByDesc(ServerRoleStatisticsEntity::getLadderScore);
+                    break;
+            }
+        }
+    }
+
 }

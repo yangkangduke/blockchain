@@ -103,6 +103,9 @@ public class SysNftPicEntity extends BaseEntity {
     @TableField("token_address")
     private String tokenAddress;
 
+    @TableField("token_id")
+    private Long tokenId;
+
 
     /**
      * 未来NFT 发行的平台， 1,Magic Eden  2,Seeds
@@ -136,8 +139,13 @@ public class SysNftPicEntity extends BaseEntity {
      */
     private Integer mintState;
 
+    /**
+     * @see  SkinNftEnums.SkinNftListStateEnum
+     *
+     */
     @TableField("list_state")
     private Integer listState;
+
 
     @TableField("mint_time")
     private Long mintTime;

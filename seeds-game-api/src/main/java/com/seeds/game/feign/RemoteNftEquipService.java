@@ -20,7 +20,6 @@ import java.util.Map;
 public interface RemoteNftEquipService {
 
 	@PostMapping("/inter-game/nft/get-owner-by-mintAddress")
-	@Inner
 	GenericDto<Map<String, String>> getOwnerByMintAddress(@RequestBody List<String> mintAddresses);
 
 }

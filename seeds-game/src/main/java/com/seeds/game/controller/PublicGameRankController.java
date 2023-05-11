@@ -1,6 +1,9 @@
 package com.seeds.game.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.dto.request.GameRankStatisticPageReq;
 import com.seeds.admin.dto.request.GameWinRankReq;
+import com.seeds.admin.dto.response.GameRankStatisticResp;
 import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.service.GameRankService;
@@ -36,6 +39,12 @@ public class PublicGameRankController {
     @ApiOperation(value = "胜场数据", notes = "胜场数据")
     public GenericDto<List<GameWinRankResp.GameWinRank>> winInfo(@Valid @RequestBody GameWinRankReq query) {
         return GenericDto.success(gameRankService.winInfo(query, true));
+    }
+
+    @PostMapping("/statistic-page")
+    @ApiOperation(value = "统计分页", notes = "统计分页")
+    public GenericDto<IPage<GameRankStatisticResp>> statisticPage(@Valid @RequestBody GameRankStatisticPageReq query) {
+        return GenericDto.success(gameRankService.statisticPage(query));
     }
 
 }

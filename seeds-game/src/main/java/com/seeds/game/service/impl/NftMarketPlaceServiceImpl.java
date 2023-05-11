@@ -770,6 +770,8 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         } else {
             throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
         }
+        // 不足12小时按12小时算
+        duration = duration < 12 ? 12L : duration;
         BigDecimal baseFee = price.multiply(new BigDecimal("0.005"));
         BigDecimal receivableFee = new BigDecimal(duration / 12L).multiply(baseFee);
         long consumedHours = Math.max(RelativeDateFormat.toHours(endTime - placeTime), 12L);
@@ -797,6 +799,8 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     @Override
     public BigDecimal custodianFee(BigDecimal price, Long duration) {
         duration = duration == null ? 72L : duration;
+        // 不足12小时按12小时算
+        duration = duration < 12 ? 12L : duration;
         BigDecimal baseFee = price.multiply(new BigDecimal("0.005"));
         return new BigDecimal(duration / 12L).multiply(baseFee);
     }

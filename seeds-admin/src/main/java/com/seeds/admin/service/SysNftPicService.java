@@ -11,6 +11,7 @@ import com.seeds.admin.entity.SysNftPicEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 public interface SysNftPicService extends IService<SysNftPicEntity> {
 
@@ -36,9 +37,11 @@ public interface SysNftPicService extends IService<SysNftPicEntity> {
 
     void englishV2(SysSkinNftEnglishReq req);
 
-    void shadowUploadSuccess(ListReq req);
+    void shadowUploadSuccess(ListStringReq req);
 
-    void cancelAsset(SysSkinNftCancelAssetReq req);
+    void cancelAsset(ListReq req);
 
     IPage<SysNftPicMIntedResp> queryMintedPage(SysNftPicMintedPageReq req);
+
+    void cancelAuction(ListReq req);
 }
