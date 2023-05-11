@@ -19,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -131,5 +129,14 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
                 .eq(ServerRoleEntity::getRegion, region)
                 .eq(ServerRoleEntity::getGameServer, server);
         return getOne(wrapper);
+    }
+
+    @Override
+    public Map<Long, String> queryNameMapById(Collection<Long> ids) {
+        List<ServerRoleEntity> list = listByIds(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(ServerRoleEntity::getId, ServerRoleEntity::getName));
     }
 }

@@ -25,6 +25,9 @@ public class ServerRoleStatisticsEntity extends BaseEntity {
     @ApiModelProperty("游戏角色id")
     private Long roleId;
 
+    @ApiModelProperty("游戏服id")
+        private Long gameServerId;
+
     @ApiModelProperty("血腥积分")
     private BigDecimal killScore;
 
@@ -60,5 +63,11 @@ public class ServerRoleStatisticsEntity extends BaseEntity {
 
     @ApiModelProperty("综合评价")
     private String overallScore;
+
+    @ApiModelProperty("获胜场次")
+    private Long winNum;
+
+    @ApiModelProperty("最大击杀数")
+    private Integer maxKillNum;
 
 }
