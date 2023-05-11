@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
 
 
 @Slf4j
@@ -88,7 +89,7 @@ public class SysNftPicController {
 
     @PostMapping("shadow-upload-success")
     @ApiOperation("shadow上传文件成功")
-    public GenericDto<Object> shadowUploadSuccess(@RequestBody @Valid ListReq req) {
+    public GenericDto<Object> shadowUploadSuccess(@RequestBody @Valid ListStringReq req) {
         sysNftPicService.shadowUploadSuccess(req);
         return GenericDto.success(null);
     }

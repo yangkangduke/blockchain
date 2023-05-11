@@ -88,7 +88,7 @@ public class OpenMatchRecordReq extends OpenSignReq {
 	private String accID;
 
 	@ApiModelProperty("游戏服id")
-	@NotBlank(message = "gameServerId cannot be empty")
-	private String gameServerId;
+	@NotNull(message = "gameServerId cannot be empty")
+	private Long gameServerId;
 
 }

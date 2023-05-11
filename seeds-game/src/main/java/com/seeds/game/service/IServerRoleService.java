@@ -8,7 +8,9 @@ import com.seeds.game.dto.request.internal.ServerRolePageReq;
 import com.seeds.game.dto.response.ServerRoleResp;
 import com.seeds.game.entity.ServerRoleEntity;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -31,5 +33,7 @@ public interface IServerRoleService extends IService<ServerRoleEntity> {
     List<ServerRoleResp> queryList(ServerRolePageReq req);
 
     ServerRoleEntity queryByUserIdAndRegionAndServer(Long userId, Integer region, Integer server);
+
+    Map<Long, String> queryNameMapById(Collection<Long> ids);
 
 }
