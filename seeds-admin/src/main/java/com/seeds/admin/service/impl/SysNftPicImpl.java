@@ -193,9 +193,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     public SkinNFTAttrDto handleAttr(SysNftPicEntity entity) {
         SkinNFTAttrDto jsonDto = new SkinNFTAttrDto();
         jsonDto.setName(entity.getName());
-        String tokenId = entity.getName().substring(entity.getName().lastIndexOf("#") + 1);
-        jsonDto.setImage(seedsAdminApiConfig.getShadowUrl() + tokenId + ".png");
-
+        jsonDto.setImage(seedsAdminApiConfig.getShadowUrl() + entity.getTokenId() + ".png");
         ArrayList<SkinNFTAttrDto.Attributes> attributesList = new ArrayList<>();
 
         SkinNFTAttrDto.Attributes configId = new SkinNFTAttrDto.Attributes();
@@ -251,8 +249,8 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         handleGameAttr(attributesList);
         jsonDto.setAttributes(attributesList);
         SkinNFTAttrDto.Properties.Files files = new SkinNFTAttrDto.Properties.Files();
-        files.setType("image/" + entity.getPicName().substring(entity.getPicName().lastIndexOf(".") + 1));
-        files.setUri(seedsAdminApiConfig.getShadowUrl() + tokenId + ".png");
+        files.setType("image/png");
+        files.setUri(seedsAdminApiConfig.getShadowUrl() + entity.getTokenId() + ".png");
         ArrayList<SkinNFTAttrDto.Properties.Files> fileList = new ArrayList<>();
         fileList.add(files);
         SkinNFTAttrDto.Properties properties = new SkinNFTAttrDto.Properties();
@@ -516,8 +514,10 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     }
 
     @Override
-    public void shadowUploadSuccess(ListReq req) {
-        List<SysNftPicEntity> list = this.list(new LambdaQueryWrapper<SysNftPicEntity>().in(SysNftPicEntity::getId, req.getIds()));
+    public void shadowUploadSuccess(ListStringReq req) {
+        List<Long> tokenIds = req.getFileNames().stream().map(p -> Long.parseLong(p.substring(0, p.indexOf(".")))).
+                collect(Collectors.toList());
+        List<SysNftPicEntity> list = this.list(new LambdaQueryWrapper<SysNftPicEntity>().in(SysNftPicEntity::getTokenId, tokenIds));
         list.forEach(p -> p.setMintState(SkinNftEnums.SkinMintStateEnum.MINTED.getCode()));
         this.updateBatchById(list);
     }

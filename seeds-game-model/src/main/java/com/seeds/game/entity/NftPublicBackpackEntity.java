@@ -43,6 +43,9 @@ public class NftPublicBackpackEntity implements Serializable {
     @ApiModelProperty("图片")
     private String image;
 
+    @ApiModelProperty("皮肤图片shadow地址")
+    private String imageSha;
+
     @ApiModelProperty("类型：1装备 2道具 3英雄")
     private Integer type;
 
@@ -103,7 +106,11 @@ public class NftPublicBackpackEntity implements Serializable {
     @ApiModelProperty("nft元数据，存json")
     private String metadata;
 
+    @ApiModelProperty("nft元数据json文件，中心化存储地址")
     private String metadataUrl;
+
+    @ApiModelProperty("skin nft元数据json文件，shadow存储地址")
+    private String metadataShaUrl;
 
     @ApiModelProperty("nft价格")
     private BigDecimal price;
