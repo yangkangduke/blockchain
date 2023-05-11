@@ -80,6 +80,7 @@ public class NFTEnumConstant {
         }
     }
 
+
     /**
      * nft 状态 地枚举
      */

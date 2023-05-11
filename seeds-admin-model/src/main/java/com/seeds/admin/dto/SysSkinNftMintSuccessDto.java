@@ -15,6 +15,7 @@ public class SysSkinNftMintSuccessDto {
 
     @Data
     public static class SkinNftMintSuccess {
+        private Long id;
         private String mintAddress;
         private String name;
         private String tokenAddress;
