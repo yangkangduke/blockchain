@@ -13,6 +13,7 @@ import com.seeds.admin.dto.response.GameRankStatisticResp;
 import com.seeds.admin.dto.response.GameWinRankResp;
 import com.seeds.game.config.warblade.GameWarbladeConfig;
 import com.seeds.game.entity.ServerRegionEntity;
+import com.seeds.game.entity.ServerRoleEntity;
 import com.seeds.game.entity.ServerRoleStatisticsEntity;
 import com.seeds.game.enums.SortTypeEnum;
 import com.seeds.game.service.*;
@@ -41,6 +42,8 @@ import java.util.stream.Collectors;
 public class GameRankServiceImpl implements GameRankService {
 
     public static final String GAME_WINS_RANKING_FILE = "GameWinsRanking.png";
+
+    public static final String GAME_ROLE_PORTRAIT_FILE = "GameRolePortrait.png";
 
     @Value("${uc.game.win.rank.expire:10}")
     private Integer winRankExpireAfter;
@@ -165,11 +168,15 @@ public class GameRankServiceImpl implements GameRankService {
             return page.convert(p -> null);
         }
         Set<Long> roleIds = records.stream().map(ServerRoleStatisticsEntity::getRoleId).collect(Collectors.toSet());
-        Map<Long, String> gameRoleMap = serverRoleService.queryNameMapById(roleIds);
+        Map<Long, ServerRoleEntity> gameRoleMap = serverRoleService.queryMapById(roleIds);
         return page.convert(p -> {
             GameRankStatisticResp resp = new GameRankStatisticResp();
             BeanUtils.copyProperties(p, resp);
-            resp.setRoleName(gameRoleMap.get(p.getRoleId()));
+            ServerRoleEntity serverRole = gameRoleMap.get(p.getRoleId());
+            if (serverRole != null) {
+                resp.setPortraitUrl(gameFileService.getFileUrl("game/" + serverRole.getPortraitId() + GAME_ROLE_PORTRAIT_FILE));
+                resp.setRoleName(serverRole.getName());
+            }
             return resp;
         });
     }
