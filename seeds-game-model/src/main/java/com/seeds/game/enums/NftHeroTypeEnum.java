@@ -7,7 +7,7 @@ import lombok.Getter;
  */
 @Getter
 public enum NftHeroTypeEnum {
-    Assassin(1, "Assassin2"),
+    ASSASSIN(1, "ASSASSIN"),
     TANK(2, "TANK"),
     ARCHER(3, "ARCHER"),
     WARRIOR(4, "WARRIOR"),

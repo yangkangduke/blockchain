@@ -40,6 +40,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.game.entity.NftMarketOrderEntity;
+import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.feign.RemoteNftEquipService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -195,7 +196,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public SkinNFTAttrDto handleAttr(SysNftPicEntity entity) {
         SkinNFTAttrDto jsonDto = new SkinNFTAttrDto();
-        jsonDto.setName(entity.getName());
+        jsonDto.setName(NFTEnumConstant.TokenNamePreEnum.SEQN.getName() + entity.getTokenId());
         jsonDto.setImage(seedsAdminApiConfig.getShadowUrl() + entity.getTokenId() + ".png");
         ArrayList<SkinNFTAttrDto.Attributes> attributesList = new ArrayList<>();
 
