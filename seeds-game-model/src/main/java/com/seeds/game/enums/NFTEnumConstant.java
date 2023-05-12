@@ -71,7 +71,7 @@ public class NFTEnumConstant {
     @Getter
     public enum NFTDescEnum {
 
-        SEEDS_EQUIP("This is the NFT of the seeds equipment.");
+        SEEDS_EQUIP("This is the NFT of the Seeds equipment.");
 
         private final String desc;
 

@@ -119,10 +119,9 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
             entity.setName(dto.get(i).getName());
             entity.setTokenAddress(dto.get(i).getMintAddress());
             entity.setMintTime(System.currentTimeMillis());
-            String tokenId = dto.get(i).getName().substring(dto.get(i).getName().lastIndexOf("#") + 1);
-            entity.setTokenId(Long.parseLong(tokenId));
+            entity.setTokenId(Long.parseLong(dto.get(i).getTokenId()));
             SkinNFTAttrDto attr = nftPicService.handleAttr(entity);
-            String fileName = tokenId + ".json";
+            String fileName = dto.get(i).getTokenId() + ".json";
             boolean flag = CreateJsonFileUtil.createJsonFile(JSONUtil.toJsonStr(attr), TMP_FILE_PATH, fileName);
             // 上传文件
             if (flag) {
@@ -160,7 +159,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
             }
         }
 
-        //todo 插入公共背包, 属性字段得有稀有度
+        // 插入公共背包
         backpackService.insertBackpack(backpackEntities);
 
         // 通知游戏方，skin mint 成功
@@ -178,7 +177,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
 
     private NftPublicBackpackEntity handleBackpack(SysSkinNftMintSuccessDto.SkinNftMintSuccess skinNft, SysNftPicEntity nftPicEntity, SkinNFTAttrDto attr, String jsonUrl) {
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-        backpackEntity.setEqNftId(skinNft.getId());
+        backpackEntity.setEqNftId(skinNft.getEquipmentId());
         backpackEntity.setTokenName(skinNft.getName());
         backpackEntity.setOwner(skinNft.getOwner());
         backpackEntity.setTokenId(nftPicEntity.getTokenId().toString());

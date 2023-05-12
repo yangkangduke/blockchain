@@ -15,9 +15,10 @@ public class SysSkinNftMintSuccessDto {
 
     @Data
     public static class SkinNftMintSuccess {
-        private Long id;
+        private Long equipmentId;
         private String mintAddress;
         private String name;
+        private String tokenId;
         private String tokenAddress;
         private String signature;
         private String owner;
