@@ -12,7 +12,9 @@ import com.seeds.admin.dto.game.SkinNftMintSuccessDto;
 import com.seeds.admin.dto.request.SysSkinNftMintReq;
 import com.seeds.admin.dto.request.chain.SkinNftMintDto;
 import com.seeds.admin.entity.SysNftPicEntity;
+import com.seeds.admin.enums.AdminErrorCodeEnum;
 import com.seeds.admin.enums.SkinNftEnums;
+import com.seeds.admin.exceptions.GenericException;
 import com.seeds.admin.service.SysFileService;
 import com.seeds.admin.service.SysNftPicService;
 import com.seeds.admin.service.SysNftSkinAsyncService;
@@ -29,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -76,7 +77,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
 
 
     @Override
-    @Async
+    //   @Async   改成同步执行
     public void skinMint(SysSkinNftMintReq dto) {
         List<SysNftPicEntity> nfts = nftPicService.listByIds(dto.getIds());
         String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getMintNft();
@@ -108,6 +109,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
             nfts.forEach(p -> p.setMintState(SkinNftEnums.SkinMintStateEnum.MINT_FAILED.getCode()));
             nftPicService.updateBatchById(nfts);
             log.info(" 请求skin-mint-nft接口--出错:{}", jsonObject.get("message"));
+            throw new GenericException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY);
         }
 
     }
