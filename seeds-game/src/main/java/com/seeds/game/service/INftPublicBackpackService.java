@@ -112,7 +112,7 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     void insertBackpack(List<NftPublicBackpackDto> backpackEntities);
 
-    List<SkinNftType> getSkinNftTypeList();
+    Map<String, List<SkinNftTypeResp>> getSkinNftTypeList(Integer heroType);
 
     List<NftPublicBackpackSkinWebResp> getSkinPageForWeb(NftBackpackWebPageReq req);
 }

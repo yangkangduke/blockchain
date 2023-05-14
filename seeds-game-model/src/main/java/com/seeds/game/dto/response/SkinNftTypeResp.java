@@ -6,7 +6,7 @@ import lombok.Data;
 
 @ApiModel(value = "SkinNftType")
 @Data
-public class SkinNftType {
+public class SkinNftTypeResp {
 
     @ApiModelProperty("职业")
     private String profession;

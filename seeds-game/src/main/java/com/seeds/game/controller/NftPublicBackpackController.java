@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -60,8 +61,8 @@ public class NftPublicBackpackController {
 
     @GetMapping("hero-list")
     @ApiOperation("获取英雄职业皮肤分类列表")
-    public GenericDto<List<SkinNftType>> getSkinNftTypeList() {
-        return GenericDto.success(nftPublicBackpackService.getSkinNftTypeList());
+    public GenericDto<Map<String, List<SkinNftTypeResp>>> getSkinNftTypeList(@RequestParam(value = "heroType", required = false) Integer heroType) {
+        return GenericDto.success(nftPublicBackpackService.getSkinNftTypeList(heroType));
     }
 
     @PostMapping("page")

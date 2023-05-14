@@ -82,11 +82,15 @@
         </if>
     </select>
 
-    <select id="getSkinNftTypeList" resultType="com.seeds.game.dto.response.SkinNftType">
-        select distinct t1.profession, t1.skin
+    <select id="getSkinNftTypeList" resultType="com.seeds.game.dto.response.SkinNftTypeResp">
+        select distinct t1.profession, t1.skin as skinName
         from sys_nft_pic t1
-                 left join ga_nft_public_backpack t2 on t1.id = t2.nft_pic_id
+        left join ga_nft_public_backpack t2 on t1.id = t2.nft_pic_id
+        left join ga_nft_attribute t3 on t2.eq_nft_id = t2.eq_nft_id
         where user_id = #{userId} and state <![CDATA[<>]]> 1
+        <if test="heroType != null">
+            and t3.hero_type = #{heroType}
+        </if>
     </select>
     <select id="getSkinPageForWeb" resultType="com.seeds.game.dto.response.NftPublicBackpackSkinWebResp">
         select

@@ -961,11 +961,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
-    public List<SkinNftType> getSkinNftTypeList() {
+    public Map<String, List<SkinNftTypeResp>> getSkinNftTypeList(Integer heroType) {
         Long userId = UserContext.getCurrentUserId();
 
         // todo 找游戏要每个皮肤的图片
-        return baseMapper.getSkinNftTypeList(userId);
+        List<SkinNftTypeResp> skinNftTypeList = baseMapper.getSkinNftTypeList(userId, heroType);
+        Map<String, List<SkinNftTypeResp>> listMap = skinNftTypeList.stream().collect(Collectors.groupingBy(SkinNftTypeResp::getProfession));
+        return listMap;
+
     }
 
     @Override

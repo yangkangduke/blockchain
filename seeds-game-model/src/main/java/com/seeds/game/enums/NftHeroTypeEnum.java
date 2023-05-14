@@ -1,5 +1,7 @@
 package com.seeds.game.enums;
+
 import lombok.Getter;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
 
@@ -24,10 +26,11 @@ public enum NftHeroTypeEnum {
     }
 
     public static int getCode(String name) {
-        return Arrays.stream(values())
-                .filter(i -> i.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .map(a -> a.getCode())
-                .orElse(null);
+
+            return Arrays.stream(values())
+                    .filter(i -> i.getName().equalsIgnoreCase(name))
+                    .findFirst()
+                    .map(a -> a.getCode())
+                    .orElse(0);
     }
 }
