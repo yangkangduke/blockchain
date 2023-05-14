@@ -1,5 +1,6 @@
 package com.seeds.game.service.impl;
 
+import cn.hutool.extra.cglib.CglibUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
@@ -12,8 +13,10 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.entity.SysGameApiEntity;
+import com.seeds.admin.enums.SkinNftEnums;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteGameService;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.enums.CurrencyEnum;
@@ -850,9 +853,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             nftAttributeEntity.setGoblinKill(attributesDto.getKillNpc());
             nftAttributeEntity.setSlaying(attributesDto.getKilledByPlayer());
             nftAttributeEntity.setGoblin(attributesDto.getKilledByNpc());
-            if (StringUtils.isNotBlank(attributesDto.getRarity())) {
-                nftAttributeEntity.setRarity(NftRarityEnum.codeOfDesc(attributesDto.getRarity()));
-            }
         } else {
             nftAttributeEntity.setDurability(attributesDto.getDurability());
             nftAttributeEntity.setRarityAttr(attributesDto.getRarityAttr());
@@ -879,12 +879,114 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Override
     public void skinUnDeposited(NftUnDepositedReq req) {
+        // NFT锁定中不能取回
+        NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenAddress, req.getMintAddress()));
+        if (backpackNft == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        }
+        NftEquipment nft = nftEquipmentService.getOne(new LambdaQueryWrapper<NftEquipment>().eq(NftEquipment::getMintAddress, req.getMintAddress()));
+        if (nft == null) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        }
+        // NFT已经取回
+        if (WhetherEnum.NO.value() == nft.getIsDeposit()) {
+            throw new GenericException(GameErrorCodeEnum.ERR_10016_NFT_ITEM_HAS_BEEN_RETRIEVED);
+        }
+        // 更改背包状态，通知游戏方NFT收回到背包。
+        // 调用游戏方接口，执行收回
+        if (backpackNft.getServerRoleId().compareTo(new Long(NFTEnumConstant.NFTTransEnum.BACKPACK.getCode())) != 0) {
+            this.callGameTakeback(backpackNft);
+        }
+        // 更新背包状态
+        backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+        backpackNft.setServerRoleId(0L);
+        backpackNft.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        backpackNft.setUpdatedAt(System.currentTimeMillis());
+        this.updateById(backpackNft);
+        // NFT非归属人不能取回
+        ucUserService.ownerValidation(nft.getOwner());
+        // 调用api/admin/withdrawNft通知，取回NFT成功
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getSkinWithdraw();
+        TransferNftMessageDto dto = new TransferNftMessageDto();
+        BeanUtils.copyProperties(req, dto);
+        dto.setMintAddress(nft.getMintAddress());
+        String param = JSONUtil.toJsonStr(dto);
+        log.info("NFT取回成功，开始通知， url:{}， params:{}", url, param);
+        try {
+            HttpResponse response = HttpRequest.post(url)
+                    .timeout(30 * 1000)
+                    .header("Content-Type", "application/json")
+                    .body(param)
+                    .execute();
+            log.info("NFT取回成功通知返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            }
+        } catch (Exception e) {
+            log.error("NFT取回成功通知失败，message：{}", e.getMessage());
+            throw new GenericException("NFT retrieval failure");
+        }
 
+        // 发送皮肤nft withdraw 成功消息
+        NftAttributeEntity attributeEntity = attributeService.getOne(new LambdaQueryWrapper<NftAttributeEntity>().eq(NftAttributeEntity::getEqNftId, backpackNft.getEqNftId()));
+        SkinNftWithdrawDto withdrawDto = new SkinNftWithdrawDto();
+        BeanUtils.copyProperties(attributeEntity, withdrawDto);
+        withdrawDto.setNftPicId(backpackNft.getNftPicId());
+        kafkaProducer.sendAsync(KafkaTopic.SKIN_NFT_WITHDRAW, JSONUtil.toJsonStr(withdrawDto));
     }
 
     @Override
-    public void insertBackpack(List<NftPublicBackpackEntity> backpackEntities) {
-        log.info("皮肤mint成功,插入背包表--->：{}", JSONUtil.toJsonStr(backpackEntities));
-        this.saveBatch(backpackEntities);
+    public void insertBackpack(List<NftPublicBackpackDto> backpackDtos) {
+        log.info("皮肤mint成功,插入背包表--->：{}", JSONUtil.toJsonStr(backpackDtos));
+        BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
+        List<NftPublicBackpackEntity> entities = CglibUtil.copyList(backpackDtos, NftPublicBackpackEntity::new);
+        entities.forEach(p -> {
+            // 设置皮肤参考价
+            p.setProposedPrice(new BigDecimal(SkinNftEnums.SkinNftPrice.SKIN_NFT_PRICE.getPrice()).divide(usdRate, 2, BigDecimal.ROUND_HALF_UP));
+        });
+        this.saveBatch(entities);
+        // 插入属性表
+        List<NftAttributeEntity> attributeEntities = backpackDtos.stream().map(p -> {
+            NftAttributeEntity attributeEntity = new NftAttributeEntity();
+            attributeEntity.setEqNftId(p.getEqNftId());
+            attributeEntity.setTokenId(p.getTokenId());
+            attributeEntity.setMintAddress(p.getTokenAddress());
+            attributeEntity.setHeroType(NftHeroTypeEnum.getCode(p.getProfession()));
+            attributeEntity.setRarity(NftRarityEnum.codeOfDesc(p.getRarity()));
+            return attributeEntity;
+        }).collect(Collectors.toList());
+        attributeService.saveBatch(attributeEntities);
+    }
+
+    @Override
+    public List<SkinNftType> getSkinNftTypeList() {
+        Long userId = UserContext.getCurrentUserId();
+
+        // todo 找游戏要每个皮肤的图片
+        return baseMapper.getSkinNftTypeList(userId);
+    }
+
+    @Override
+    public List<NftPublicBackpackSkinWebResp> getSkinPageForWeb(NftBackpackWebPageReq req) {
+        if (Objects.nonNull(req.getSortType())) {
+            req.setSortTypeStr(NftBackpackWebPageReq.convert(req.getSortType()));
+        }
+        List<NftPublicBackpackSkinWebResp> list = baseMapper.getSkinPageForWeb(req);
+
+        list = list.stream().map(p -> {
+            NftPublicBackpackSkinWebResp resp = new NftPublicBackpackSkinWebResp();
+            BeanUtils.copyProperties(p, resp);
+            if (p.getServerRoleId().compareTo(new Long(NFTEnumConstant.NFTTransEnum.BACKPACK.getCode())) == 0) {
+                resp.setServerName(NFTEnumConstant.NFTTransEnum.BACKPACK.getDesc());
+            }
+            ServerRegionEntity serverRegionEntity = serverRegionService.queryByServerRoleId(p.getServerRoleId());
+            if (Objects.nonNull(serverRegionEntity)) {
+                resp.setServerName(serverRegionEntity.getGameServerName());
+            }
+            return resp;
+        }).collect(Collectors.toList());
+        return list;
     }
 }

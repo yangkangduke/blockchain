@@ -101,6 +101,7 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     /**
      * 根据指定字段批量更新
+     *
      * @param entityList
      * @param wrapperFunction
      * @return
@@ -109,5 +110,9 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
 
     void skinUnDeposited(NftUnDepositedReq req);
 
-    void insertBackpack( List<NftPublicBackpackEntity> backpackEntities);
+    void insertBackpack(List<NftPublicBackpackDto> backpackEntities);
+
+    List<SkinNftType> getSkinNftTypeList();
+
+    List<NftPublicBackpackSkinWebResp> getSkinPageForWeb(NftBackpackWebPageReq req);
 }

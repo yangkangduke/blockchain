@@ -33,37 +33,37 @@ public class NftAttributeEntity extends BaseEntity {
     private Integer heroType;
 
     @ApiModelProperty("token id")
-    private String tokenId;
+    private Long tokenId;
 
     @ApiModelProperty("mintAddress")
     private String mintAddress;
 
     @ApiModelProperty("获胜次数")
-    private Integer victory;
+    private int victory;
 
     @ApiModelProperty("失败次数")
-    private Integer lose;
+    private int lose;
 
     @ApiModelProperty("最大连胜场数")
-    private Integer maxStreak;
+    private int maxStreak;
 
     @ApiModelProperty("最大连败场数")
-    private Integer maxLose;
+    private int maxLose;
 
     @ApiModelProperty("击杀玩家数")
-    private Integer capture;
+    private int capture;
 
     @ApiModelProperty("最大连杀数")
-    private Integer killingSpree;
+    private int killingSpree;
 
     @ApiModelProperty("击杀NPC数")
-    private Integer goblinKill;
+    private int goblinKill;
 
     @ApiModelProperty("被玩家击杀数")
-    private Integer slaying;
+    private int slaying;
 
     @ApiModelProperty("被NPC击杀数")
-    private Integer goblin;
+    private int goblin;
 
     @ApiModelProperty("稀有属性ID")
     private Integer rarityAttr;

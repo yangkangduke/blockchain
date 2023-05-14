@@ -75,4 +75,8 @@ public class SeedsApiConfig {
     @Value("${seeds.api.listReceipt:/api/market/getListReceipt}")
     private String listReceipt;
 
+    // 皮肤withdraw
+    @Value("${seeds.api.listReceipt:/api/admin/withdrawNft}")
+    private String skinWithdraw;
+
 }

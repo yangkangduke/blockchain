@@ -2,6 +2,7 @@ package com.seeds.game.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
+import com.seeds.game.dto.request.internal.NftPublicBackpackDto;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 import com.seeds.game.service.INftPublicBackpackService;
 import com.seeds.game.service.NftMarketPlaceService;
@@ -30,7 +31,7 @@ public class InterNftPublicBackpackController {
 
     @PostMapping("/insert-backpack")
     @Inner
-    public GenericDto<Object> insertBackpack(@RequestBody List<NftPublicBackpackEntity> backpackEntities) {
+    public GenericDto<Object> insertBackpack(@RequestBody List<NftPublicBackpackDto> backpackEntities) {
         backpackService.insertBackpack(backpackEntities);
         return GenericDto.success(null);
     }

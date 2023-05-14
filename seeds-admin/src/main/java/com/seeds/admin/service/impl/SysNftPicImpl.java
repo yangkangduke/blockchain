@@ -39,6 +39,7 @@ import com.seeds.admin.utils.CsvUtils;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.web.oss.FileTemplate;
+import com.seeds.game.dto.request.internal.SkinNftWithdrawDto;
 import com.seeds.game.entity.NftMarketOrderEntity;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.feign.RemoteNftEquipService;
@@ -165,15 +166,19 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
 
     @Override
     public Integer upload(MultipartFile file) {
+
         List<SysNftPicEntity> batchUpdate = new ArrayList<>();
         // 解析CSV文件
         List<SysNFTAttrDto> sysNFTAttrDtos = CsvUtils.getCsvData(file, SysNFTAttrDto.class);
+        List<String> heros = sysNFTAttrDtos.stream().map(p -> p.getHero().toLowerCase()).collect(Collectors.toList());
+        Map<String, String> proHeroMap = baseMapper.selectProfessionByHero(heros);
         if (!CollectionUtils.isEmpty(sysNFTAttrDtos)) {
             sysNFTAttrDtos.forEach(p -> {
                 SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
                 if (!Objects.isNull(one) && one.getPicName().equals(p.getPictureName())) {
                     BeanUtils.copyProperties(p, one);
                     one.setUpdatedAt(System.currentTimeMillis());
+                    one.setProfession(proHeroMap.get(p.getHero()));
                     batchUpdate.add(one);
                 }
             });
@@ -189,12 +194,12 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     public String getAttr(Long id) {
 
         SysNftPicEntity entity = this.getById(id);
-        SkinNFTAttrDto attr = this.handleAttr(entity);
+        SkinNFTAttrDto attr = this.handleAttr(entity, null);
         return JSONUtil.toJsonStr(attr);
     }
 
     @Override
-    public SkinNFTAttrDto handleAttr(SysNftPicEntity entity) {
+    public SkinNFTAttrDto handleAttr(SysNftPicEntity entity, SkinNftWithdrawDto withdrawDto) {
         SkinNFTAttrDto jsonDto = new SkinNFTAttrDto();
         jsonDto.setName(NFTEnumConstant.TokenNamePreEnum.SEQN.getName() + entity.getTokenId());
         jsonDto.setImage(seedsAdminApiConfig.getShadowUrl() + entity.getTokenId() + ".png");
@@ -250,7 +255,8 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         skin.setValue(entity.getSkin());
         attributesList.add(skin);
 
-        handleGameAttr(attributesList);
+        // 处理游戏中的击杀等数据
+        handleGameAttr(attributesList, withdrawDto);
         jsonDto.setAttributes(attributesList);
         SkinNFTAttrDto.Properties.Files files = new SkinNFTAttrDto.Properties.Files();
         files.setType("image/png");
@@ -263,43 +269,63 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         return jsonDto;
     }
 
-    private void handleGameAttr(ArrayList<SkinNFTAttrDto.Attributes> attributesList) {
+    private void handleGameAttr(ArrayList<SkinNFTAttrDto.Attributes> attributesList, SkinNftWithdrawDto withdrawDto) {
         SkinNFTAttrDto.Attributes win = new SkinNFTAttrDto.Attributes();
         win.setTrait_type(SkinNftEnums.NftAttrEnum.WIN.getName());
-        win.setValue("0");
-        attributesList.add(win);
+
         SkinNFTAttrDto.Attributes defeat = new SkinNFTAttrDto.Attributes();
         defeat.setTrait_type(SkinNftEnums.NftAttrEnum.DEFEAT.getName());
-        defeat.setValue("0");
-        attributesList.add(defeat);
+
         SkinNFTAttrDto.Attributes seqWin = new SkinNFTAttrDto.Attributes();
         seqWin.setTrait_type(SkinNftEnums.NftAttrEnum.SEQWIN.getName());
-        seqWin.setValue("0");
-        attributesList.add(seqWin);
+
         SkinNFTAttrDto.Attributes seqDefeat = new SkinNFTAttrDto.Attributes();
         seqDefeat.setTrait_type(SkinNftEnums.NftAttrEnum.SEQDEFEAT.getName());
-        seqDefeat.setValue("0");
-        attributesList.add(seqDefeat);
+
         SkinNFTAttrDto.Attributes seqKill = new SkinNFTAttrDto.Attributes();
         seqKill.setTrait_type(SkinNftEnums.NftAttrEnum.SEQKILL.getName());
-        seqKill.setValue("0");
-        attributesList.add(seqKill);
+
         SkinNFTAttrDto.Attributes killPlayer = new SkinNFTAttrDto.Attributes();
         killPlayer.setTrait_type(SkinNftEnums.NftAttrEnum.KILLPLAYER.getName());
-        killPlayer.setValue("0");
-        attributesList.add(killPlayer);
+
         SkinNFTAttrDto.Attributes killNpc = new SkinNFTAttrDto.Attributes();
         killNpc.setTrait_type(SkinNftEnums.NftAttrEnum.KILLNPC.getName());
-        killNpc.setValue("0");
-        attributesList.add(killNpc);
+
         SkinNFTAttrDto.Attributes killedByPlayer = new SkinNFTAttrDto.Attributes();
         killedByPlayer.setTrait_type(SkinNftEnums.NftAttrEnum.KILLEDBYPLAYER.getName());
-        killedByPlayer.setValue("0");
+
+        SkinNFTAttrDto.Attributes killedByNPC = new SkinNFTAttrDto.Attributes();
+        killedByNPC.setTrait_type(SkinNftEnums.NftAttrEnum.KILLEDBYNPC.getName());
+
+        if (null != withdrawDto) {
+            win.setValue(String.valueOf(withdrawDto.getVictory()));
+            defeat.setValue(String.valueOf(withdrawDto.getLose()));
+            seqWin.setValue(String.valueOf(withdrawDto.getMaxStreak()));
+            seqDefeat.setValue(String.valueOf(withdrawDto.getMaxLose()));
+            seqKill.setValue(String.valueOf(withdrawDto.getKillingSpree()));
+            killPlayer.setValue(String.valueOf(withdrawDto.getCapture()));
+            killNpc.setValue(String.valueOf(withdrawDto.getGoblinKill()));
+            killedByPlayer.setValue(String.valueOf(withdrawDto.getSlaying()));
+            killedByNPC.setValue(String.valueOf(withdrawDto.getGoblin()));
+        } else {
+            win.setValue("0");
+            defeat.setValue("0");
+            seqWin.setValue("0");
+            seqDefeat.setValue("0");
+            seqKill.setValue("0");
+            killPlayer.setValue("0");
+            killNpc.setValue("0");
+            killedByPlayer.setValue("0");
+            killedByNPC.setValue("0");
+        }
+        attributesList.add(win);
+        attributesList.add(defeat);
+        attributesList.add(seqDefeat);
+        attributesList.add(seqKill);
+        attributesList.add(killPlayer);
+        attributesList.add(killNpc);
         attributesList.add(killedByPlayer);
-        SkinNFTAttrDto.Attributes killByNPC = new SkinNFTAttrDto.Attributes();
-        killByNPC.setTrait_type(SkinNftEnums.NftAttrEnum.KILLEDBYNPC.getName());
-        killByNPC.setValue("0");
-        attributesList.add(killByNPC);
+        attributesList.add(killedByNPC);
     }
 
     @Override

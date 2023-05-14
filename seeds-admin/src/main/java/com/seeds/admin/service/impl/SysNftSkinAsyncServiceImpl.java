@@ -19,11 +19,9 @@ import com.seeds.admin.service.SysFileService;
 import com.seeds.admin.service.SysNftPicService;
 import com.seeds.admin.service.SysNftSkinAsyncService;
 import com.seeds.admin.utils.CreateJsonFileUtil;
-import com.seeds.common.dto.GenericDto;
-import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.common.web.oss.FileProperties;
 import com.seeds.common.web.oss.FileTemplate;
-import com.seeds.game.entity.NftPublicBackpackEntity;
+import com.seeds.game.dto.request.internal.NftPublicBackpackDto;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
 import com.seeds.game.feign.RemoteNftBackpackService;
@@ -31,13 +29,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,14 +113,14 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
     }
 
     private void createMetadata(List<SysSkinNftMintSuccessDto.SkinNftMintSuccess> dto, List<Long> ids) {
-        ArrayList<NftPublicBackpackEntity> backpackEntities = new ArrayList<>();
+        ArrayList<NftPublicBackpackDto> backpackEntities = new ArrayList<>();
         for (int i = 0; i < ids.size(); i++) {
             SysNftPicEntity entity = nftPicService.getById(ids.get(i));
             entity.setName(dto.get(i).getName());
             entity.setTokenAddress(dto.get(i).getMintAddress());
             entity.setMintTime(System.currentTimeMillis());
             entity.setTokenId(Long.parseLong(dto.get(i).getTokenId()));
-            SkinNFTAttrDto attr = nftPicService.handleAttr(entity);
+            SkinNFTAttrDto attr = nftPicService.handleAttr(entity, null);
             String fileName = dto.get(i).getTokenId() + ".json";
             boolean flag = CreateJsonFileUtil.createJsonFile(JSONUtil.toJsonStr(attr), TMP_FILE_PATH, fileName);
             // 上传文件
@@ -165,6 +163,11 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
         backpackService.insertBackpack(backpackEntities);
 
         // 通知游戏方，skin mint 成功
+        notifyGameSkinMintSuccess(ids);
+    }
+
+    @Async
+    public void notifyGameSkinMintSuccess(List<Long> ids) {
         List<SysNftPicEntity> sysNftPicEntities = nftPicService.listByIds(ids);
         List<SkinNftMintSuccessDto> notifyDtos = sysNftPicEntities.stream().map(p -> {
             SkinNftMintSuccessDto notityDto = new SkinNftMintSuccessDto();
@@ -177,38 +180,34 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
         notifyGameService.skinMintSuccess(notifyDtos);
     }
 
-    private NftPublicBackpackEntity handleBackpack(SysSkinNftMintSuccessDto.SkinNftMintSuccess skinNft, SysNftPicEntity nftPicEntity, SkinNFTAttrDto attr, String jsonUrl) {
-        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-        backpackEntity.setEqNftId(skinNft.getEquipmentId());
-        backpackEntity.setTokenName(skinNft.getName());
-        backpackEntity.setOwner(skinNft.getOwner());
-        backpackEntity.setTokenId(nftPicEntity.getTokenId().toString());
-        backpackEntity.setMetadata(JSONUtil.toJsonStr(attr.getAttributes()));
-        backpackEntity.setMetadataUrl(jsonUrl);
-        backpackEntity.setMetadataShaUrl(seedsAdminApiConfig.getShadowUrl() + nftPicEntity.getTokenId() + ".json");
-        backpackEntity.setImage(nftPicEntity.getUrl());
-        backpackEntity.setImageSha(seedsAdminApiConfig.getShadowUrl() + nftPicEntity.getTokenId() + ".png");
-        backpackEntity.setTokenAddress(skinNft.getMintAddress());
-        backpackEntity.setCreatedAt(System.currentTimeMillis());
-        backpackEntity.setUpdatedAt(System.currentTimeMillis());
-        backpackEntity.setServerRoleId(0L);
-        backpackEntity.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
-        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
-        backpackEntity.setDesc(NFTEnumConstant.NFTDescEnum.SEEDS_EQUIP.getDesc());
-        backpackEntity.setType(NFTEnumConstant.NftTypeEnum.HERO.getCode());
-        backpackEntity.setItemId(nftPicEntity.getConfId());
-        backpackEntity.setAutoId(nftPicEntity.getAutoId());
+    private NftPublicBackpackDto handleBackpack(SysSkinNftMintSuccessDto.SkinNftMintSuccess skinNft, SysNftPicEntity nftPicEntity, SkinNFTAttrDto attr, String jsonUrl) {
+        NftPublicBackpackDto backpackDto = new NftPublicBackpackDto();
+        backpackDto.setNftPicId(nftPicEntity.getId());
+        backpackDto.setEqNftId(skinNft.getEquipmentId());
+        backpackDto.setName(nftPicEntity.getSkin());
+        backpackDto.setTokenName(skinNft.getName());
+        backpackDto.setOwner(skinNft.getOwner());
+        backpackDto.setTokenId(nftPicEntity.getTokenId());
+        backpackDto.setMetadata(JSONUtil.toJsonStr(attr.getAttributes()));
+        backpackDto.setMetadataUrl(jsonUrl);
+        backpackDto.setMetadataShaUrl(seedsAdminApiConfig.getShadowUrl() + nftPicEntity.getTokenId() + ".json");
+        backpackDto.setImage(nftPicEntity.getUrl());
+        backpackDto.setImageSha(seedsAdminApiConfig.getShadowUrl() + nftPicEntity.getTokenId() + ".png");
+        backpackDto.setTokenAddress(skinNft.getMintAddress());
+        backpackDto.setCreatedAt(System.currentTimeMillis());
+        backpackDto.setUpdatedAt(System.currentTimeMillis());
+        backpackDto.setServerRoleId(0L);
+        backpackDto.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+        backpackDto.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        backpackDto.setDesc(NFTEnumConstant.NFTDescEnum.SEEDS_EQUIP.getDesc());
+        backpackDto.setType(NFTEnumConstant.NftTypeEnum.HERO.getCode());
+        backpackDto.setItemId(nftPicEntity.getConfId());
+        backpackDto.setAutoId(nftPicEntity.getAutoId());
         HashMap<String, String> attribute = new HashMap<>();
         attribute.put("rarity", nftPicEntity.getRarity());
-        backpackEntity.setAttributes(JSONUtil.toJsonStr(attribute));
-        // 设置参考价
-        try {
-            GenericDto<BigDecimal> result = backpackService.usdRate(CurrencyEnum.SOL.getCode());
-            BigDecimal usdRate = result.getData();
-            backpackEntity.setProposedPrice(new BigDecimal(SkinNftEnums.SkinNftPrice.SKIN_NFT_PRICE.getPrice()).divide(usdRate, 2, BigDecimal.ROUND_HALF_UP));
-        } catch (Exception e) {
-            log.error("内部请求game获取 sol 兑美元汇率失败");
-        }
-        return backpackEntity;
+        backpackDto.setAttributes(JSONUtil.toJsonStr(attribute));
+        backpackDto.setProfession(nftPicEntity.getProfession());
+        backpackDto.setRarity(nftPicEntity.getRarity());
+        return backpackDto;
     }
 }

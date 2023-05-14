@@ -80,4 +80,56 @@
             order by t3.place_time ${sortTypeStr}
         </if>
     </select>
+
+    <select id="getSkinNftTypeList" resultType="com.seeds.game.dto.response.SkinNftType">
+        select distinct t1.profession, t1.skin
+        from sys_nft_pic t1
+                 left join ga_nft_public_backpack t2 on t1.id = t2.nft_pic_id
+        where
+        where user_id = #{userId} and state <![CDATA[<>]]> 1
+    </select>
+    <select id="getSkinPageForWeb" resultType="com.seeds.game.dto.response.NftPublicBackpackSkinWebResp">
+        select
+        t1.name,
+        t1.image,
+        t1.image_sha,
+        t1.token_id,
+        t3.price,
+        t1.state,
+        t1.eq_nft_id,
+        t3.place_time as listTime,
+        t1.server_role_id,
+        t2.victory,
+        t2.lose,
+        t2.max_streak,
+        t2.capture,
+        t2.killing_spree,
+        t2.goblin_kill,
+        t2.slaying,
+        t2.goblin
+        from ga_nft_public_backpack t1
+        left join ga_nft_attribute t2 on t1.eq_nft_id = t2.eq_nft_id
+        left join (select price, place_time, mint_address from z_market_order where status = 1) t3
+        on t1.token_address = t3.mint_address
+        where t1.type =3 and t1.user_id = #{userId} and t1.state <![CDATA[<>]]> 1
+        <if test="skin != null and skin!='' ">
+            and t1.name = #{skin}
+        </if>
+        <if test="state != null">
+            and t1.state = #{state}
+        </if>
+        <if test="hero_type != null">
+            and t2.hero_type = #{heroType}
+        </if>
+        <if test="sort != null and sort =='price'">
+            order by t3.price ${sortTypeStr}
+        </if>
+
+        <if test="sort != null and sort =='rarity'">
+            order by t2.rarity ${sortTypeStr}
+        </if>
+        <if test="sort != null and sort =='listTime'">
+            order by t3.place_time ${sortTypeStr}
+        </if>
+    </select>
 </mapper>

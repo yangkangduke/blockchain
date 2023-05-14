@@ -1,9 +1,11 @@
 package com.seeds.game.dto.response;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -30,8 +32,8 @@ public class NftMarketPlaceSkinResp implements Serializable {
      @ApiModelProperty("tokenId")
      private String tokenId;
 
-     @ApiModelProperty("稀有度：1，Common 2，Rare 3，Epic")
-     private Integer rarity;
+     @ApiModelProperty("稀有度：1，Normal 2，Rare 3，Epic")
+     private String rarity;
 
      @ApiModelProperty("NFT图片")
      private String image;

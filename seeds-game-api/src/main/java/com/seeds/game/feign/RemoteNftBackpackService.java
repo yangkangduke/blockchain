@@ -1,6 +1,7 @@
 package com.seeds.game.feign;
 
 import com.seeds.common.dto.GenericDto;
+import com.seeds.game.dto.request.internal.NftPublicBackpackDto;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 import com.seeds.game.feign.impl.RemoteNftBackpackServiceImpl;
 import com.seeds.game.feign.interceptor.GameFeignInnerRequestInterceptor;
@@ -23,7 +24,7 @@ import java.util.List;
 public interface RemoteNftBackpackService {
 
 	@PostMapping("/inter-game/nft/insert-backpack")
-	GenericDto<Object> insertBackpack(@RequestBody List<NftPublicBackpackEntity> backpackEntity);
+	GenericDto<Object> insertBackpack(@RequestBody List<NftPublicBackpackDto> backpackEntity);
 
 	@GetMapping("/inter-game/nft/usd-rate/{currency}")
 	@ApiOperation("获取美元汇率")

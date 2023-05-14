@@ -1,6 +1,8 @@
 package com.seeds.game.enums;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 
 /**
  * NFT 英雄类型枚举
@@ -19,5 +21,13 @@ public enum NftHeroTypeEnum {
     NftHeroTypeEnum(int code, String name) {
         this.code = code;
         this.name = name;
+    }
+
+    public static int getCode(String name) {
+        return Arrays.stream(values())
+                .filter(i -> i.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .map(a -> a.getCode())
+                .orElse(null);
     }
 }

@@ -61,6 +61,11 @@ public class SysNftPicEntity extends BaseEntity {
      */
     @TableField("hero")
     private String hero;
+    /**
+     * 对应职业名字
+     */
+    @TableField("profession")
+    private String profession;
 
     @TableField("other")
     private String other;
