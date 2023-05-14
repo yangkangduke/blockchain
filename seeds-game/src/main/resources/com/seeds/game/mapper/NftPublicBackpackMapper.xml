@@ -86,7 +86,6 @@
         select distinct t1.profession, t1.skin
         from sys_nft_pic t1
                  left join ga_nft_public_backpack t2 on t1.id = t2.nft_pic_id
-        where
         where user_id = #{userId} and state <![CDATA[<>]]> 1
     </select>
     <select id="getSkinPageForWeb" resultType="com.seeds.game.dto.response.NftPublicBackpackSkinWebResp">
