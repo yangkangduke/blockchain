@@ -137,6 +137,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         queryWrapper.between(StringUtils.isNotBlank(req.getQueryTime()), SysNftPicEntity::getMintTime, start, end)
                 .eq(!Objects.isNull(req.getAutoId()), SysNftPicEntity::getAutoId, req.getAutoId())
                 .eq(!Objects.isNull(req.getConfId()), SysNftPicEntity::getConfId, req.getConfId())
+                .eq( SysNftPicEntity::getMintState, SkinNftEnums.SkinMintStateEnum.MINTED.getCode())
                 .eq(!Objects.isNull(req.getListState()), SysNftPicEntity::getListState, req.getListState())
                 .eq(StringUtils.isNotBlank(req.getTokenAddress()), SysNftPicEntity::getTokenAddress, req.getTokenAddress())
                 .orderByDesc(SysNftPicEntity::getMintTime);
@@ -497,7 +498,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         log.info("请求skin-list-asset接口， url:{}， params:{}", url, param);
         try {
             HttpResponse response = HttpRequest.post(url)
-                    .timeout(60 * 1000)
+                    .timeout(60 * 1000 * 2)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
@@ -510,6 +511,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             }
         } catch (Exception e) {
             log.info(" 请求skin-list-asset接口--出错:{}", e.getMessage());
+            throw new GenericException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY);
         }
     }
 
@@ -540,6 +542,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             }
         } catch (Exception e) {
             log.info(" 请求skin-englishV2-出错:{}", e.getMessage());
+            throw new GenericException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY);
         }
     }
 
@@ -582,6 +585,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             }
         } catch (Exception e) {
             log.info(" 请求skin-cancelAsset-出错:{}", e.getMessage());
+            throw new GenericException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY);
         }
     }
 
