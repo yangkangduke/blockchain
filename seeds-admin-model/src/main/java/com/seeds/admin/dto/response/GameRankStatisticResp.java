@@ -38,4 +38,7 @@ public class GameRankStatisticResp {
 	@ApiModelProperty("最大击杀数")
 	private Integer maxKillNum;
 
+	@ApiModelProperty("头像链接")
+	private String portraitUrl;
+
 }

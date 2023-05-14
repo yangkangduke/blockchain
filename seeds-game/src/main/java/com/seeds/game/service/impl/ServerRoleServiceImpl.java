@@ -132,11 +132,11 @@ public class ServerRoleServiceImpl extends ServiceImpl<ServerRoleMapper, ServerR
     }
 
     @Override
-    public Map<Long, String> queryNameMapById(Collection<Long> ids) {
+    public Map<Long, ServerRoleEntity> queryMapById(Collection<Long> ids) {
         List<ServerRoleEntity> list = listByIds(ids);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyMap();
         }
-        return list.stream().collect(Collectors.toMap(ServerRoleEntity::getId, ServerRoleEntity::getName));
+        return list.stream().collect(Collectors.toMap(ServerRoleEntity::getId, p -> p));
     }
 }

@@ -45,6 +45,9 @@ public class ServerRoleEntity implements Serializable {
     @ApiModelProperty("等级")
     private Integer level;
 
+    @ApiModelProperty("头像id")
+    private Integer portraitId;
+
     @ApiModelProperty("version")
     private Long version;
 

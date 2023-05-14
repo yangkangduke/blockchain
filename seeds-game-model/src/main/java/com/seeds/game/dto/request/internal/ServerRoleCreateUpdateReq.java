@@ -37,4 +37,8 @@ public class ServerRoleCreateUpdateReq implements Serializable {
 
     @ApiModelProperty("等级")
     private Integer level;
+
+    @ApiModelProperty("头像id")
+    private Integer portraitId;
+
 }
