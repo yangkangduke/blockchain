@@ -118,7 +118,7 @@
         <if test="state != null">
             and t1.state = #{state}
         </if>
-        <if test="hero_type != null">
+        <if test="heroType != null">
             and t2.hero_type = #{heroType}
         </if>
         <if test="sort != null and sort =='price'">
