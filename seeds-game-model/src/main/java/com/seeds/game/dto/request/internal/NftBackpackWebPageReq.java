@@ -25,7 +25,7 @@ public class NftBackpackWebPageReq {
     private String skin;
 
     @ApiModelProperty(value = "英雄类型（职业） 1ASSASSIN, 2TANK, 3ARCHER,4WARRIOR, 5SUPPORT")
-    private String heroType;
+    private Integer heroType;
 
     @ApiModelProperty(value = "serverRoleId")
     private Long serverRoleId;
