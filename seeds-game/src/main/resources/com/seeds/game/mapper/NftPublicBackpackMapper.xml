@@ -42,6 +42,7 @@
         t3.place_time as listTime,
         t1.server_role_id,
         t2.durability,
+        t2.durability_config,
         t2.base_attr_value as baseAttr,
         t2.rarity_attr_value as rarityAttr,
         t2.special_attr_desc,

@@ -31,6 +31,9 @@ public class NftPublicBackpackWebResp implements Serializable {
     @ApiModelProperty("耐久")
     private Integer durability;
 
+    @ApiModelProperty("最大耐久")
+    private Integer durabilityConfig;
+
     @ApiModelProperty("tokenId")
     private String tokenId;
 

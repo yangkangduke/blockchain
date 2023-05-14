@@ -190,6 +190,14 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         List<NftEventEquipment> equipments = CglibUtil.copyList(req.getEquipments(), NftEventEquipment::new);
 
         equipments.forEach(p -> {
+            int durability = 0;
+            try {
+                JSONObject jsonObject = JSONObject.parseObject(p.getAttributes());
+                durability = (int) jsonObject.get("durability");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            p.setDurability(durability);
             p.setEventId(nftEvent.getId());
             p.setImageUrl(itemImageService.queryImgByItemId(p.getItemId()));
             try {
@@ -492,6 +500,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         attributeEntity.setMintAddress(data.getMintAddress());
         attributeEntity.setGrade(equipment.getLvl());
         attributeEntity.setDurability(durability);
+        attributeEntity.setDurabilityConfig(equipment.getDurabilityConfig());
         attributeEntity.setRarityAttr(rarityAttr);
         attributeEntity.setSpecialAttrDesc(equipment.getSpecialAttrDesc());
         attributeEntity.setPassiveAttrDesc(equipment.getPassiveAttrDesc());

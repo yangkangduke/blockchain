@@ -38,7 +38,7 @@ public class NftMarketPlaceSkinResp implements Serializable {
      @ApiModelProperty("NFT图片")
      private String image;
 
-     @ApiModelProperty("NFT状态： 1:On shelf 2:On auction")
+     @ApiModelProperty("NFT状态：0：UnDeposited  1：Deposited 2:On shelf 3:On auction 4:In settlement 5: Burned")
      private Integer state;
 
      @ApiModelProperty("拍卖NFT(setting id)")

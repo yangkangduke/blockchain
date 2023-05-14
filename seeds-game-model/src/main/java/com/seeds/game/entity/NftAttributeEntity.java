@@ -24,6 +24,9 @@ public class NftAttributeEntity extends BaseEntity {
     @ApiModelProperty("耐久度")
     private Integer durability;
 
+    @ApiModelProperty("当前装备最大耐久度")
+    private Integer durabilityConfig;
+
     @ApiModelProperty("稀有度：1，Normal 2，Rare 3，Epic")
     private Integer rarity;
     /**

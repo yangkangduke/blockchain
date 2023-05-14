@@ -48,8 +48,6 @@ import java.util.Objects;
 @Service
 public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
-    private  static final Integer maxDurability = 20;
-
     @Autowired
     private INftAuctionHouseSettingService nftAuctionHouseSettingService;
 
@@ -566,7 +564,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             } catch (Exception e) {
                 log.error("内部请求uc获取用户公共地址失败");
             }
-            resp.setMaxDurability(maxDurability);
             return resp;
         });
 
@@ -644,7 +641,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             } catch (Exception e) {
                 log.error("内部请求uc获取用户公共地址失败");
             }
-            resp.setMaxDurability(maxDurability);
             return resp;
         });
     }
