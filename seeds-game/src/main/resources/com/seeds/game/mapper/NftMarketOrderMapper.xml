@@ -28,7 +28,7 @@
         left join ga_nft_attribute t3 on t4.id = t3.eq_nft_id
         where t2.type = 3 AND t4.is_delete = 0 AND t1.status = 1
         <if test="params.name != null and params.name != ''">
-            and t4.name LIKE CONCAT('%', #{params.name}, '%') or t1.tokenId = #{params.name}
+            and t4.name LIKE CONCAT('%', #{params.name}, '%') or t1.token_id = #{params.name}
         </if>
         <choose>
             <when test="params.auctionId !=null and params.auctionId != 0">
@@ -88,7 +88,7 @@
         where t2.type = 1 AND t4.is_delete = 0 AND t1.status = 1
 
         <if test="params.name != null and params.name != ''">
-            and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')
+            and t4.name LIKE CONCAT('%', #{params.name}, '%') or t1.token_id = #{params.name}
         </if>
         <choose>
             <when test="params.auctionId !=null and params.auctionId != 0">
@@ -155,7 +155,7 @@
         where t2.type = 2 AND t4.is_delete = 0 AND t1.status = 1
 
         <if test="params.name != null and params.name != ''">
-            and CONCAT(t4.name,t1.token_id) LIKE CONCAT('%', #{params.name}, '%')
+            and t4.name LIKE CONCAT('%', #{params.name}, '%') or t1.token_id = #{params.name}
         </if>
         <choose>
             <when test="params.auctionId !=null and params.auctionId != 0">
