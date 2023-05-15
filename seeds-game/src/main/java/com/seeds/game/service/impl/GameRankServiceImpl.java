@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -172,6 +173,7 @@ public class GameRankServiceImpl implements GameRankService {
         return page.convert(p -> {
             GameRankStatisticResp resp = new GameRankStatisticResp();
             BeanUtils.copyProperties(p, resp);
+            resp.setWinRate(p.getWinRate().scaleByPowerOfTen(2).setScale(0, RoundingMode.HALF_UP) + "%");
             ServerRoleEntity serverRole = gameRoleMap.get(p.getRoleId());
             if (serverRole != null) {
                 resp.setPortraitUrl(gameFileService.getFileUrl("game/" + serverRole.getPortraitId() + GAME_ROLE_PORTRAIT_FILE));
