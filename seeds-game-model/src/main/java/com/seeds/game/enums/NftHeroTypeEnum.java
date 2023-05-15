@@ -36,7 +36,7 @@ public enum NftHeroTypeEnum {
 
     public static String getProfession(String hero) {
         return Arrays.stream(values())
-                .filter(i -> i.getName().equalsIgnoreCase(hero))
+                .filter(i -> i.getHero().equalsIgnoreCase(hero))
                 .findFirst()
                 .map(a -> a.getName())
                 .orElse(null);
