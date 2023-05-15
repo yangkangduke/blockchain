@@ -104,6 +104,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Autowired
     private UserCenterFeignClient userCenterFeignClient;
 
+    @Autowired
+    private GameFileService gameFileService;
+
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
 
@@ -962,13 +965,15 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Override
     public Map<String, List<SkinNftTypeResp>> getSkinNftTypeList(Integer heroType) {
+        String profession = "";
+        if (null != heroType) {
+            profession = NftHeroTypeEnum.getProfessionByCode(heroType);
+        }
         Long userId = UserContext.getCurrentUserId();
-
-        // todo 找游戏要每个皮肤的图片
-        List<SkinNftTypeResp> skinNftTypeList = baseMapper.getSkinNftTypeList(userId, heroType);
+        List<SkinNftTypeResp> skinNftTypeList = baseMapper.getSkinNftTypeList(userId, profession);
+        skinNftTypeList.forEach(p -> p.setImage(gameFileService.getFileUrl("game/skinPic/" + p.getSkinName().toLowerCase() + ".png")));
         Map<String, List<SkinNftTypeResp>> listMap = skinNftTypeList.stream().collect(Collectors.groupingBy(SkinNftTypeResp::getProfession));
         return listMap;
-
     }
 
     @Override
