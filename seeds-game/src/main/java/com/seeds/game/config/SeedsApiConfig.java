@@ -21,7 +21,7 @@ public class SeedsApiConfig {
     @Value("${seeds.api.solTokenAddress:So11111111111111111111111111111111111111112}")
     private String solTokenAddress;
 
-    @Value("${seeds.api.baseDomain:https://seed-api-test.llyc.fun}")
+    @Value("${seeds.api.baseDomain:http://192.168.6.100:8002}")
     private String baseDomain;
 
     @Value("${seeds.api.placeOrder:/api/chainOp/placeOrder}")
