@@ -35,4 +35,7 @@ public class SeedsAdminApiConfig {
 
     @Value("${seeds.api.admin.shadowUrl:https://shdw-drive.genesysgo.net/GnxQt9ZZHvRAoeD8QcRYJQdtdeC4P5i7PqtoANUoFo3x/}")
     private String shadowUrl;
+
+    @Value("${seeds.api.admin.uploadToShadow:http://192.168.6.101:8005/shdw/editFile}")
+    private String uploadToShadow;
 }

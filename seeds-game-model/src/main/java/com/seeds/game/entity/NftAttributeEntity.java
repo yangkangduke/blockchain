@@ -1,5 +1,6 @@
 package com.seeds.game.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.seeds.game.enums.NftHeroTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,59 +24,49 @@ public class NftAttributeEntity extends BaseEntity {
     @ApiModelProperty("耐久度")
     private Integer durability;
 
-    @ApiModelProperty("稀有度：1，Common 2，Rare 3，Epic")
-    private Integer rarity;
+    @ApiModelProperty("当前装备最大耐久度")
+    private Integer durabilityConfig;
 
-    @ApiModelProperty("英雄类型5种：1，DESTIN  2，AILITH  3，AILSA  4，NELA  5，CATHAL")
+    @ApiModelProperty("稀有度：1，Normal 2，Rare 3，Epic")
+    private Integer rarity;
+    /**
+     * @see NftHeroTypeEnum
+     */
+    @ApiModelProperty("英雄类型5种：1,Assassin2,Tank3,Archer4,Warrior5,Support")
     private Integer heroType;
 
     @ApiModelProperty("token id")
-    private String tokenId;
+    private Long tokenId;
 
     @ApiModelProperty("mintAddress")
     private String mintAddress;
 
-    @ApiModelProperty("健康属性值")
-    private Integer health;
-
-    @ApiModelProperty("装备属性值")
-    private Integer armor;
-
-    @ApiModelProperty("怪物属性值")
-    private Integer vsMonster;
-
-    @ApiModelProperty("属性综合介绍")
-    private String passive;
-
-    @ApiModelProperty("blade属性综合介绍")
-    private String bladeBuff;
-
     @ApiModelProperty("获胜次数")
-    private Integer victory;
+    private int victory;
 
     @ApiModelProperty("失败次数")
-    private Integer lose;
+    private int lose;
 
     @ApiModelProperty("最大连胜场数")
-    private Integer maxStreak;
+    private int maxStreak;
 
     @ApiModelProperty("最大连败场数")
-    private Integer maxLose;
+    private int maxLose;
 
     @ApiModelProperty("击杀玩家数")
-    private Integer capture;
+    private int capture;
 
     @ApiModelProperty("最大连杀数")
-    private Integer killingSpree;
+    private int killingSpree;
 
     @ApiModelProperty("击杀NPC数")
-    private Integer goblinKill;
+    private int goblinKill;
 
     @ApiModelProperty("被玩家击杀数")
-    private Integer slaying;
+    private int slaying;
 
     @ApiModelProperty("被NPC击杀数")
-    private Integer goblin;
+    private int goblin;
 
     @ApiModelProperty("稀有属性ID")
     private Integer rarityAttr;

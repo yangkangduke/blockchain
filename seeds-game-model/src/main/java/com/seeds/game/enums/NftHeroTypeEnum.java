@@ -1,5 +1,9 @@
 package com.seeds.game.enums;
+
 import lombok.Getter;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.Arrays;
 
 
 /**
@@ -7,18 +11,26 @@ import lombok.Getter;
  */
 @Getter
 public enum NftHeroTypeEnum {
-    DESTIN(1,"DESTIN"),
-    AILITH(2,"AILITH"),
-    AILSA(3,"AILSA"),
-    NELA(4,"NELA"),
-    CATHAL(5,"CATHAL");
-
+    ASSASSIN(1, "ASSASSIN"),
+    TANK(2, "TANK"),
+    ARCHER(3, "ARCHER"),
+    WARRIOR(4, "WARRIOR"),
+    SUPPORT(5, "SUPPORT");
 
     private final int code;
     private final String name;
 
-    NftHeroTypeEnum(int code, String name){
+    NftHeroTypeEnum(int code, String name) {
         this.code = code;
         this.name = name;
+    }
+
+    public static int getCode(String name) {
+
+            return Arrays.stream(values())
+                    .filter(i -> i.getName().equalsIgnoreCase(name))
+                    .findFirst()
+                    .map(a -> a.getCode())
+                    .orElse(0);
     }
 }

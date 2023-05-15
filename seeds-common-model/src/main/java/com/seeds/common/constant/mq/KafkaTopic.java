@@ -54,4 +54,7 @@ public class KafkaTopic {
 
     // NFT MINT
     public final String NFT_MINT_SUCCESS = "NFT_MINT_SUCCESS";
+
+    // skin NFT withdraw
+    public final String SKIN_NFT_WITHDRAW = "SKIN_NFT_WITHDRAW";
 }

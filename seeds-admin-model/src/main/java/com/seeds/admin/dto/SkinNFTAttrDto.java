@@ -13,7 +13,7 @@ public class SkinNFTAttrDto {
     private String name;
     private String symbol = "SEEDS";
     private String description = "This is the NFT of the Seeds skin.";
-    private int seller_fee_basis_points = 0;
+    private int seller_fee_basis_points = 500;
     private String image;
     private String external_url = "https://www.theseeds.io/";
     private List<Attributes> attributes;

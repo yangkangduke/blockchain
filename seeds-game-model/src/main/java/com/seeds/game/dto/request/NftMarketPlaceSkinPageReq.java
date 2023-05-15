@@ -26,7 +26,7 @@ public class NftMarketPlaceSkinPageReq extends PageReq {
     @ApiModelProperty("由：auction_id判断：0：一口价  大于0：On Auction ")
     private Long auctionId;
 
-    @ApiModelProperty("稀有度：1，Common 2，Rare 3，Epic")
+    @ApiModelProperty("稀有度：1，Normal 2，Rare 3，Epic")
     private Integer rarity;
 
     @ApiModelProperty("最小价格")
@@ -35,7 +35,7 @@ public class NftMarketPlaceSkinPageReq extends PageReq {
     @ApiModelProperty("最大价格")
     private BigDecimal maxPrice;
 
-    @ApiModelProperty("英雄类型5种：1，DESTIN  2，AILITH  3，AILSA  4，NELA  5，CATHAL")
+    @ApiModelProperty("职业： 1ASSASSIN, 2TANK, 3ARCHER,4WARRIOR, 5SUPPORT")
     private Integer heroType;
 
     @ApiModelProperty(value = "排序字段")

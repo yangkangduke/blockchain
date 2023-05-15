@@ -24,7 +24,7 @@ public class GameRankStatisticResp {
 	private BigDecimal ladderScore;
 
 	@ApiModelProperty("胜率")
-	private BigDecimal winRate;
+	private String winRate;
 
 	@ApiModelProperty("最大连胜")
 	private Integer seqWinNum;
@@ -37,5 +37,8 @@ public class GameRankStatisticResp {
 
 	@ApiModelProperty("最大击杀数")
 	private Integer maxKillNum;
+
+	@ApiModelProperty("头像链接")
+	private String portraitUrl;
 
 }

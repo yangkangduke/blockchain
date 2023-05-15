@@ -12,9 +12,7 @@ import com.seeds.game.dto.request.NftUnDepositedReq;
 import com.seeds.game.dto.request.internal.NftBackpackWebPageReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDisReq;
 import com.seeds.game.dto.request.internal.NftPublicBackpackTakeBackReq;
-import com.seeds.game.dto.response.NftPublicBackpackWebResp;
-import com.seeds.game.dto.response.NftType;
-import com.seeds.game.dto.response.NftTypeNum;
+import com.seeds.game.dto.response.*;
 import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.service.INftPublicBackpackService;
@@ -25,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -55,9 +54,15 @@ public class NftPublicBackpackController {
     }
 
     @GetMapping("type-list")
-    @ApiOperation("获取分类列表, type：1装备 2道具 3英雄 ")
+    @ApiOperation("获取分类列表, type：1装备 2道具 ")
     public GenericDto<List<NftType>> getNftTypeList(Integer type) {
         return GenericDto.success(nftPublicBackpackService.getNftTypeList(type));
+    }
+
+    @GetMapping("hero-list")
+    @ApiOperation("获取英雄职业皮肤分类列表")
+    public GenericDto<Map<String, List<SkinNftTypeResp>>> getSkinNftTypeList(@RequestParam(value = "heroType", required = false) Integer heroType) {
+        return GenericDto.success(nftPublicBackpackService.getSkinNftTypeList(heroType));
     }
 
     @PostMapping("page")
@@ -67,35 +72,12 @@ public class NftPublicBackpackController {
         return GenericDto.success(nftPublicBackpackService.getPageForWeb(req));
     }
 
-//    @PostMapping("list")
-//    @ApiOperation("获取列表信息，不分页")
-//    public GenericDto<List<NftPublicBackpackResp>> queryList(@Valid @RequestBody NftPublicBackpackPageReq req) {
-//        req.setUserId(UserContext.getCurrentUserId());
-//        return GenericDto.success(nftPublicBackpackService.queryList(req));
-//    }
-
-
-//    @GetMapping("detail/{autoId}")
-//    @ApiOperation("详细信息")
-//    public GenericDto<NftPublicBackpackResp> detail(@PathVariable Integer autoId) {
-//        return GenericDto.success(nftPublicBackpackService.detail(autoId));
-//    }
-
-//    @PostMapping("create")
-//    @ApiOperation("新增")
-//    public GenericDto<Object> create(@RequestBody @Valid NftPublicBackpackReq req) {
-//        req.setUserId(UserContext.getCurrentUserId());
-//        nftPublicBackpackService.create(req);
-//        return GenericDto.success(null);
-//    }
-//
-//    @PostMapping("update")
-//    @ApiOperation("修改")
-//    public GenericDto<Object> update(@RequestBody @Valid NftPublicBackpackReq req) {
-//        req.setUserId(UserContext.getCurrentUserId());
-//        nftPublicBackpackService.update(req);
-//        return GenericDto.success(null);
-//    }
+    @PostMapping("hero-page")
+    @ApiOperation("获取列表信息")
+    public GenericDto<List<NftPublicBackpackSkinWebResp>> getHeroPage(@Valid @RequestBody NftBackpackWebPageReq req) {
+        req.setUserId(UserContext.getCurrentUserId());
+        return GenericDto.success(nftPublicBackpackService.getSkinPageForWeb(req));
+    }
 
     @PostMapping("distribute")
     @ApiOperation("分配")

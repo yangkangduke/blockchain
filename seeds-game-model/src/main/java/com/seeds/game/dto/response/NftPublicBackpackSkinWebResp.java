@@ -13,26 +13,20 @@ import java.math.BigDecimal;
  * @author hewei
  * @since 2023-01-31
  */
-@ApiModel(value = "NftPublicBackpackWebResp")
+@ApiModel(value = "NftPublicBackpackSkinWebResp")
 @Data
-public class NftPublicBackpackWebResp implements Serializable {
+public class NftPublicBackpackSkinWebResp implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("nft物品名称")
     private String name;
 
-    @ApiModelProperty("图片")
+    @ApiModelProperty("图片（中心化地址）")
     private String image;
 
-    @ApiModelProperty("等级")
-    private Integer grade;
-
-    @ApiModelProperty("耐久")
-    private Integer durability;
-
-    @ApiModelProperty("最大耐久")
-    private Integer durabilityConfig;
+    @ApiModelProperty("shadow图片地址")
+    private String imageSha;
 
     @ApiModelProperty("tokenId")
     private String tokenId;
@@ -40,35 +34,41 @@ public class NftPublicBackpackWebResp implements Serializable {
     @ApiModelProperty("tokenAddress")
     private String tokenAddress;
 
-    @ApiModelProperty("price")
-    private BigDecimal price;
-
-    @ApiModelProperty("状态 1 burn，2 LOCK (作为合成材料被临时锁定)，3 DEPOSITED (托管给平台) 4 UNDEPOSITED (解除托管)  5 on shelf 6 on auction 7 结算中")
-    private Integer state;
-
-    @ApiModelProperty("基础属性")
-    private String baseAttr;
-
-    @ApiModelProperty("稀有属性")
-    private String rarityAttr;
-
     @ApiModelProperty("区服名字")
     private String serverName;
 
     @ApiModelProperty("角色id")
     private Long serverRoleId;
 
-    @ApiModelProperty("nft物品")
-    private Long autoId;
+    @ApiModelProperty("price")
+    private BigDecimal price;
 
-    @ApiModelProperty("被动描述")
-    private String passiveAttrDesc;
+    @ApiModelProperty("状态 1 burn，2 LOCK (作为合成材料被临时锁定)，3 DEPOSITED (托管给平台) 4 UNDEPOSITED (解除托管)  5 on shelf 6 on auction 7 结算中")
+    private Integer state;
 
-    @ApiModelProperty("特殊属性描述")
-    private String specialAttrDesc;
+    @ApiModelProperty("获胜次数")
+    private Integer victory;
 
-    @ApiModelProperty("上架时间")
-    private Long listTime;
+    @ApiModelProperty("失败次数")
+    private Integer lose;
+
+    @ApiModelProperty("最大连胜场数")
+    private Integer maxStreak;
+
+    @ApiModelProperty("击杀玩家数")
+    private Integer capture;
+
+    @ApiModelProperty("最大连杀数")
+    private Integer killingSpree;
+
+    @ApiModelProperty("击杀NPC数")
+    private Integer goblinKill;
+
+    @ApiModelProperty("被玩家击杀数")
+    private Integer slaying;
+
+    @ApiModelProperty("被NPC击杀数")
+    private Integer goblin;
 
     @ApiModelProperty("nftId")
     @JsonSerialize(using = ToStringSerializer.class)

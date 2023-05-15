@@ -115,7 +115,7 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
             backpackEntity.setTokenName(data.getName());
             backpackEntity.setOwner(data.getOwner());
             backpackEntity.setUserId(nftEvent.getUserId());
-            backpackEntity.setTokenId(data.getTokenId().toString());
+            backpackEntity.setTokenId(data.getTokenId());
             backpackEntity.setTokenAddress(data.getMintAddress());
             backpackEntity.setCreatedBy(nftEvent.getUserId());
             backpackEntity.setUpdatedBy(nftEvent.getUserId());

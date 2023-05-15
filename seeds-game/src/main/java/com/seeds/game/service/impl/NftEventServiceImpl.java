@@ -190,6 +190,14 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         List<NftEventEquipment> equipments = CglibUtil.copyList(req.getEquipments(), NftEventEquipment::new);
 
         equipments.forEach(p -> {
+            int durability = 0;
+            try {
+                JSONObject jsonObject = JSONObject.parseObject(p.getAttributes());
+                durability = (int) jsonObject.get("durability");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            p.setDurability(durability);
             p.setEventId(nftEvent.getId());
             p.setImageUrl(itemImageService.queryImgByItemId(p.getItemId()));
             try {
@@ -340,7 +348,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             backpackEntity.setTokenName(data.getName());
             backpackEntity.setOwner(data.getOwner());
             backpackEntity.setUserId(nftEvent.getUserId());
-            backpackEntity.setTokenId(data.getTokenId().toString());
+            backpackEntity.setTokenId(data.getTokenId());
             backpackEntity.setTokenAddress(data.getMintAddress());
             backpackEntity.setCreatedBy(nftEvent.getUserId());
             backpackEntity.setUpdatedBy(nftEvent.getUserId());
@@ -492,6 +500,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         attributeEntity.setMintAddress(data.getMintAddress());
         attributeEntity.setGrade(equipment.getLvl());
         attributeEntity.setDurability(durability);
+        attributeEntity.setDurabilityConfig(equipment.getDurabilityConfig());
         attributeEntity.setRarityAttr(rarityAttr);
         attributeEntity.setSpecialAttrDesc(equipment.getSpecialAttrDesc());
         attributeEntity.setPassiveAttrDesc(equipment.getPassiveAttrDesc());

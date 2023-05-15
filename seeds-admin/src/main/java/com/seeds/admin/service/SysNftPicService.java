@@ -8,10 +8,10 @@ import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftPicMIntedResp;
 import com.seeds.admin.dto.response.SysNftPicResp;
 import com.seeds.admin.entity.SysNftPicEntity;
+import com.seeds.game.dto.request.internal.SkinNftWithdrawDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 public interface SysNftPicService extends IService<SysNftPicEntity> {
 
@@ -21,7 +21,7 @@ public interface SysNftPicService extends IService<SysNftPicEntity> {
 
     String getAttr(Long id);
 
-    SkinNFTAttrDto handleAttr(SysNftPicEntity entity);
+    SkinNFTAttrDto handleAttr(SysNftPicEntity entity, SkinNftWithdrawDto withdrawDto);
 
     void updateAttribute(SysNftPicAttributeModifyReq req);
 

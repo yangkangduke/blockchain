@@ -12,6 +12,7 @@ import java.util.Arrays;
  */
 public class NFTEnumConstant {
 
+    public static final String SEEDS = "Seeds";
 
     /**
      * nft event 类型
@@ -71,7 +72,7 @@ public class NFTEnumConstant {
     @Getter
     public enum NFTDescEnum {
 
-        SEEDS_EQUIP("This is the NFT of the seeds equipment.");
+        SEEDS_EQUIP("This is the NFT of the Seeds equipment.");
 
         private final String desc;
 
@@ -184,7 +185,8 @@ public class NFTEnumConstant {
     @Getter
     public enum TokenNamePreEnum {
 
-        SEQN("Seqn #");
+        SEQN("Seqn #"),
+        SEEDS_SKIN("Seeds Skin #");
         private String name;
 
         TokenNamePreEnum(String name) {

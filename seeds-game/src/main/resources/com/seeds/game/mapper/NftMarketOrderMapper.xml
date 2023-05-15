@@ -20,7 +20,8 @@
         t3.killing_spree,
         t3.goblin_kill,
         t3.slaying,
-        t3.goblin
+        t3.goblin,
+        t3.hero_type
         from z_market_order t1
         join z_equipment_nft t4 on t4.mint_address  = t1.mint_address
         left join ga_nft_public_backpack t2 on t4.id = t2.eq_nft_id
@@ -36,8 +37,6 @@
             <when test="params.auctionId !=null and params.auctionId == 0">
                 and t1.auction_id = 0
             </when>
-            <otherwise>
-            </otherwise>
         </choose>
         <if test="params.rarity != null">
             and t3.rarity = #{params.rarity}
@@ -75,12 +74,8 @@
         t4.name,
         t2.image,
         t3.durability,
+        t3.durability_config as maxDurability,
         t3.grade,
-        t3.health,
-        t3.armor,
-        t3.vs_monster,
-        t3.passive,
-        t3.blade_buff,
         t3.rarity_attr_value,
         t3.base_attr_value,
         t3.special_attr_desc,
@@ -147,11 +142,7 @@
         t2.image,
         t3.grade,
         t3.durability,
-        t3.health,
-        t3.armor,
-        t3.vs_monster,
-        t3.passive,
-        t3.blade_buff,
+        t3.durability_config as maxDurability,
         t3.rarity_attr_value,
         t3.base_attr_value,
         t3.special_attr_desc,

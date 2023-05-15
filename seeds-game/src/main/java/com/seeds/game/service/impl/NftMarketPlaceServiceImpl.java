@@ -48,8 +48,6 @@ import java.util.Objects;
 @Service
 public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
-    private  static final Integer maxDurability = 20;
-
     @Autowired
     private INftAuctionHouseSettingService nftAuctionHouseSettingService;
 
@@ -135,13 +133,16 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         try {
             GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
             ucUserResp = result.getData();
-            resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+            if (null == ucUserResp) {
+                resp.setIsOwner(0);
+                resp.setOwnerName(NFTEnumConstant.SEEDS);
+            } else {
+                resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+                resp.setOwnerId(ucUserResp.getId());
+                resp.setOwnerName(ucUserResp.getNickname());
+            }
         } catch (Exception e) {
             log.error("内部请求uc获取用户公共地址失败");
-        }
-        if (ucUserResp != null) {
-            resp.setOwnerId(ucUserResp.getId());
-            resp.setOwnerName(ucUserResp.getNickname());
         }
         NftMarketOrderEntity marketOrder = null;
         // 拍卖中
@@ -504,7 +505,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             try {
                 GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
                 ucUserResp = result.getData();
-                resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+                if (null == ucUserResp) {
+                    resp.setIsOwner(0);
+                } else {
+                    resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+                }
             } catch (Exception e) {
                 log.error("内部请求uc获取用户公共地址失败");
             }
@@ -562,11 +567,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             try {
                 GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
                 ucUserResp = result.getData();
-                resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+                if (null == ucUserResp) {
+                    resp.setIsOwner(0);
+                } else {
+                    resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+                }
             } catch (Exception e) {
                 log.error("内部请求uc获取用户公共地址失败");
             }
-            resp.setMaxDurability(maxDurability);
             return resp;
         });
 
@@ -640,11 +648,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             try {
                 GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
                 ucUserResp = result.getData();
-                resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+                if (null == ucUserResp) {
+                    resp.setIsOwner(0);
+                } else {
+                    resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+                }
             } catch (Exception e) {
                 log.error("内部请求uc获取用户公共地址失败");
             }
-            resp.setMaxDurability(maxDurability);
             return resp;
         });
     }

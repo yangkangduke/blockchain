@@ -1,10 +1,6 @@
-package com.seeds.game.entity;
+package com.seeds.game.dto.request.internal;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -12,23 +8,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * <p>
- * NFT公共背包
- * </p>
- *
- * @author hewei
- * @since 2023-01-31
+ * @author: hewei
+ * @date 2023/5/13
  */
-@TableName("ga_nft_public_backpack")
-@ApiModel(value = "NftPublicBackpack对象", description = "NFT公共背包")
 @Data
-public class NftPublicBackpackEntity implements Serializable {
+public class NftPublicBackpackDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty("id")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
 
     @ApiModelProperty("名称")
     private String name;
@@ -48,6 +34,9 @@ public class NftPublicBackpackEntity implements Serializable {
 
     @ApiModelProperty("类型：1装备 2道具 3英雄")
     private Integer type;
+
+    @ApiModelProperty("稀有度")
+    private String rarity;
 
     @ApiModelProperty("浏览量")
     private Integer views;
@@ -133,5 +122,6 @@ public class NftPublicBackpackEntity implements Serializable {
     @ApiModelProperty("参考价格")
     private BigDecimal proposedPrice;
 
-
+    @ApiModelProperty("英雄职业")
+    private String profession;
 }

@@ -73,4 +73,7 @@ public class NftEventEquipmentReq implements Serializable {
     @ApiModelProperty("特殊属性描述")
     private String specialAttrDesc;
 
+    @ApiModelProperty("当前装备最大耐久度")
+    private Integer durabilityConfig;
+
 }

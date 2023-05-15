@@ -131,6 +131,8 @@ public class IPUtil {
             return ipInfo;
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            searcher.close();
         }
         return null;
     }

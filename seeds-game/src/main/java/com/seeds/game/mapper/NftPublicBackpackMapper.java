@@ -2,9 +2,7 @@ package com.seeds.game.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.seeds.game.dto.request.internal.NftBackpackWebPageReq;
-import com.seeds.game.dto.response.NftPublicBackpackWebResp;
-import com.seeds.game.dto.response.NftType;
-import com.seeds.game.dto.response.NftTypeNum;
+import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.NftPublicBackpackEntity;
 import org.apache.ibatis.annotations.Param;
 
@@ -25,4 +23,8 @@ public interface NftPublicBackpackMapper extends BaseMapper<NftPublicBackpackEnt
     List<NftType> getNftTypeList(@Param("userId") Long userId, @Param("type") Integer type);
 
     List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req);
+
+    List<SkinNftTypeResp> getSkinNftTypeList(@Param("userId") Long userId, @Param("heroType")Integer heroType);
+
+    List<NftPublicBackpackSkinWebResp> getSkinPageForWeb(NftBackpackWebPageReq req);
 }

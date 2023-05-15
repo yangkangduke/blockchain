@@ -34,6 +34,6 @@ public interface IServerRoleService extends IService<ServerRoleEntity> {
 
     ServerRoleEntity queryByUserIdAndRegionAndServer(Long userId, Integer region, Integer server);
 
-    Map<Long, String> queryNameMapById(Collection<Long> ids);
+    Map<Long, ServerRoleEntity> queryMapById(Collection<Long> ids);
 
 }
