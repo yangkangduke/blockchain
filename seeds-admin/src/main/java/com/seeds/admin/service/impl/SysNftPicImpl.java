@@ -42,6 +42,7 @@ import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.game.dto.request.internal.SkinNftWithdrawDto;
 import com.seeds.game.entity.NftMarketOrderEntity;
 import com.seeds.game.enums.NFTEnumConstant;
+import com.seeds.game.enums.NftHeroTypeEnum;
 import com.seeds.game.feign.RemoteNftEquipService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -172,14 +173,13 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         // 解析CSV文件
         List<SysNFTAttrDto> sysNFTAttrDtos = CsvUtils.getCsvData(file, SysNFTAttrDto.class);
         List<String> heros = sysNFTAttrDtos.stream().map(p -> p.getHero().toLowerCase()).collect(Collectors.toList());
-        Map<String, String> proHeroMap = baseMapper.selectProfessionByHero(heros);
         if (!CollectionUtils.isEmpty(sysNFTAttrDtos)) {
             sysNFTAttrDtos.forEach(p -> {
                 SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
                 if (!Objects.isNull(one) && one.getPicName().equals(p.getPictureName())) {
                     BeanUtils.copyProperties(p, one);
                     one.setUpdatedAt(System.currentTimeMillis());
-                    one.setProfession(proHeroMap.get(p.getHero()));
+                    one.setProfession(NftHeroTypeEnum.getProfession(p.getHero()));
                     batchUpdate.add(one);
                 }
             });
