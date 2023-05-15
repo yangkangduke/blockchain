@@ -24,7 +24,7 @@ public class GameRankStatisticResp {
 	private BigDecimal ladderScore;
 
 	@ApiModelProperty("胜率")
-	private BigDecimal winRate;
+	private String winRate;
 
 	@ApiModelProperty("最大连胜")
 	private Integer seqWinNum;
