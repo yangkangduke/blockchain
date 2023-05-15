@@ -202,7 +202,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     @Override
     public SkinNFTAttrDto handleAttr(SysNftPicEntity entity, SkinNftWithdrawDto withdrawDto) {
         SkinNFTAttrDto jsonDto = new SkinNFTAttrDto();
-        jsonDto.setName(NFTEnumConstant.TokenNamePreEnum.SEQN.getName() + entity.getTokenId());
+        jsonDto.setName(NFTEnumConstant.TokenNamePreEnum.SEEDS_SKIN.getName() + entity.getTokenId());
         jsonDto.setImage(seedsAdminApiConfig.getShadowUrl() + entity.getTokenId() + ".png");
         ArrayList<SkinNFTAttrDto.Attributes> attributesList = new ArrayList<>();
 

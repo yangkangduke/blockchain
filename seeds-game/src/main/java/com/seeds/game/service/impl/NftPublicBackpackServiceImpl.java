@@ -458,7 +458,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             String owner = result.getData();
             entity.setOwner(owner);
         } catch (Exception e) {
-            log.error("内部请求uc获取用户公共地址失败");
+            log.error("nft物品所有权转移，内部请求uc获取用户公共地址失败，userId:{},error:{}", serverRole.getUserId(), e.getMessage());
         }
         this.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
     }

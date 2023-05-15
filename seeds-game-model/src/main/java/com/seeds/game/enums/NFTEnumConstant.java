@@ -12,6 +12,7 @@ import java.util.Arrays;
  */
 public class NFTEnumConstant {
 
+    public static final String SEEDS = "Seeds";
 
     /**
      * nft event 类型
