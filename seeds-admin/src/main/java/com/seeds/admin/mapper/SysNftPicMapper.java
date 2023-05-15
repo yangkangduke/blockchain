@@ -17,6 +17,6 @@ public interface SysNftPicMapper extends BaseMapper<SysNftPicEntity> {
     List<NftMarketOrderEntity> getAuctionIdByMintAddress(@Param("tokenAddresses") List<String> tokenAddresses);
 
     @MapKey("hero")
-    @Select("SELECT hero, profession from ga_hero_pro_mapping where lower(hero) in(heros))")
+    @Select("SELECT hero, profession from ga_hero_pro_mapping where lower(hero) in(heros)")
     Map<String, String> selectProfessionByHero(List<String> heros);
 }
