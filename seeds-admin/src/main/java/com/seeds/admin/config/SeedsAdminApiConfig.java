@@ -33,7 +33,7 @@ public class SeedsAdminApiConfig {
     @Value("${seeds.api.admin.withdrawNft:/api/admin/withdrawNft}")
     private String withdrawNft;
 
-    @Value("${seeds.api.admin.shadowUrl:https://shdw-drive.genesysgo.net/GnxQt9ZZHvRAoeD8QcRYJQdtdeC4P5i7PqtoANUoFo3x/}")
+    @Value("${seeds.api.admin.shadowUrl:https://shdw-drive.genesysgo.net/EbV3SUa9vvvB2UmyrHpXAtwXAQHeFLEGesWJKqwmAbT7/}")
     private String shadowUrl;
 
     @Value("${seeds.api.admin.uploadToShadow:http://192.168.6.101:8005/shdw/editFile}")
