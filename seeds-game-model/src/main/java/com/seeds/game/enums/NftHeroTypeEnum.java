@@ -17,18 +17,26 @@ public enum NftHeroTypeEnum {
     SUPPORT(5, "SUPPORT", "Mogaine");
 
     private final int code;
-    private final String name;
+    private final String profession;
     private final String hero;
 
-    NftHeroTypeEnum(int code, String name, String hero) {
+    NftHeroTypeEnum(int code, String profession, String hero) {
         this.code = code;
-        this.name = name;
+        this.profession = profession;
         this.hero = hero;
     }
 
-    public static int getCode(String name) {
+    public static String getProfessionByCode(int code) {
         return Arrays.stream(values())
-                .filter(i -> i.getName().equalsIgnoreCase(name))
+                .filter(i -> i.getCode() == code)
+                .findFirst()
+                .map(a -> a.getProfession())
+                .orElse(null);
+    }
+
+    public static int getCode(String profession) {
+        return Arrays.stream(values())
+                .filter(i -> i.getProfession().equalsIgnoreCase(profession))
                 .findFirst()
                 .map(a -> a.getCode())
                 .orElse(0);
@@ -38,7 +46,7 @@ public enum NftHeroTypeEnum {
         return Arrays.stream(values())
                 .filter(i -> i.getHero().equalsIgnoreCase(hero))
                 .findFirst()
-                .map(a -> a.getName())
+                .map(a -> a.getProfession())
                 .orElse(null);
     }
 }
