@@ -128,6 +128,8 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         NftAttributeEntity nftAttribute = nftAttributeService.queryByNftId(nftId);
         if (nftAttribute != null) {
             BeanUtils.copyProperties(nftAttribute, resp);
+            resp.setDurability(nftAttribute.getDurability());
+            resp.setMaxDurability(nftAttribute.getDurabilityConfig());
         }
         UcUserResp ucUserResp = null;
         try {
