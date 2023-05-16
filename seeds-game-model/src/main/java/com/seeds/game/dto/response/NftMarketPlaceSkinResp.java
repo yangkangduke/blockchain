@@ -33,7 +33,7 @@ public class NftMarketPlaceSkinResp implements Serializable {
      private String tokenId;
 
      @ApiModelProperty("稀有度：1，Normal 2，Rare 3，Epic")
-     private String rarity;
+     private Integer rarity;
 
      @ApiModelProperty("NFT图片")
      private String image;
