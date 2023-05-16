@@ -649,6 +649,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Override
     public void insertCallback(MintSuccessReq req) {
+        log.info("扫快通知,更新mint事件，插入背包---->param：{}", JSONUtil.toJsonStr(req));
         nftEventService.mintSuccessCallback(req);
     }
 
