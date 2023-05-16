@@ -52,7 +52,7 @@ public class SkinNftWithdrawConsumer {
 
     @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.SKIN_NFT_WITHDRAW})
     public void gameMintNft(String msg) {
-        log.info("收到消息：{}", msg);
+        log.info("收到skin-withdraw消息：{}", msg);
         SkinNftWithdrawDto withdrawDto = JSONUtil.toBean(msg, SkinNftWithdrawDto.class);
         SysNftPicEntity picEntity = nftPicService.getById(withdrawDto.getNftPicId());
 
