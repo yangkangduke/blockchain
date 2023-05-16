@@ -145,5 +145,13 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("托管费")
     private String custodianFee;
 
+    @ApiModelProperty("当前耐久度")
+    private Integer durability;
+
+    @ApiModelProperty("最大耐久度")
+    private Integer maxDurability;
+
+
+
 }
 

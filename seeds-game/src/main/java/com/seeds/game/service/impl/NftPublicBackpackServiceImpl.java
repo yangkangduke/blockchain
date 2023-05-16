@@ -486,10 +486,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (NftOrderTypeEnum.BUY_NOW.getCode() == nft.getOnSale() || NftOrderTypeEnum.ON_AUCTION.getCode() == nft.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
         }
-        //更新背包状态 deposited
-        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
-        this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nft.getId()));
         // NFT非归属人不能托管
         ucUserService.ownerValidation(nft.getOwner());
         // 调用/api/equipment/depositNft通知，托管NFT成功
@@ -510,6 +506,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
                 throw new GenericException(jsonObject.getString("message"));
+            } else {
+                //更新背包状态 deposited
+                NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+                backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
+                this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nft.getId()));
             }
         } catch (Exception e) {
             log.error("NFT托管成功通知失败，message：{}", e.getMessage());
@@ -534,27 +535,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (WhetherEnum.NO.value() == nft.getIsDeposit()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10016_NFT_ITEM_HAS_BEEN_RETRIEVED);
         }
-        // 更改背包状态，通知游戏方NFT收回到背包。
-        // 调用游戏方接口，执行收回
-        if (backpackNft.getServerRoleId().compareTo(new Long(NFTEnumConstant.NFTTransEnum.BACKPACK.getCode())) != 0){
-            this.callGameTakeback(backpackNft);
-        }
-        // 更新背包状态
-        int durability = 0;
-        try {
-            JSONObject jsonObject = JSONObject.parseObject(backpackNft.getAttributes());
-            durability = (int) jsonObject.get("durability");
-            // 设置参考价
-            BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
-            backpackNft.setProposedPrice(new BigDecimal(durability).divide(usdRate,2,BigDecimal.ROUND_HALF_UP));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
-        backpackNft.setServerRoleId(0L);
-        backpackNft.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
-        backpackNft.setUpdatedAt(System.currentTimeMillis());
-        this.updateById(backpackNft);
         // NFT非归属人不能取回
         ucUserService.ownerValidation(nft.getOwner());
         // 调用/api/equipment/withdrawNft通知，取回NFT成功
@@ -575,6 +555,28 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
                 throw new GenericException(jsonObject.getString("message"));
+            } else {
+                // 更改背包状态，通知游戏方NFT收回到背包。
+                // 调用游戏方接口，执行收回
+                if (backpackNft.getServerRoleId().compareTo(new Long(NFTEnumConstant.NFTTransEnum.BACKPACK.getCode())) != 0) {
+                    this.callGameTakeback(backpackNft);
+                }
+                // 更新背包状态
+                int durability = 0;
+                try {
+                    JSONObject attrObject = JSONObject.parseObject(backpackNft.getAttributes());
+                    durability = (int) attrObject.get("durability");
+                    // 设置参考价
+                    BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
+                    backpackNft.setProposedPrice(new BigDecimal(durability).divide(usdRate, 2, BigDecimal.ROUND_HALF_UP));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
+                backpackNft.setServerRoleId(0L);
+                backpackNft.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+                backpackNft.setUpdatedAt(System.currentTimeMillis());
+                this.updateById(backpackNft);
             }
         } catch (Exception e) {
             log.error("NFT取回成功通知失败，message：{}", e.getMessage());
@@ -650,6 +652,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Override
     public void insertCallback(MintSuccessReq req) {
+        log.info("扫快通知,更新mint事件，插入背包---->param：{}", JSONUtil.toJsonStr(req));
         nftEventService.mintSuccessCallback(req);
     }
 

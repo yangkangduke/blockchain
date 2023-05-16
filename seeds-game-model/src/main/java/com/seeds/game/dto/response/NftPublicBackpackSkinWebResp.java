@@ -37,6 +37,9 @@ public class NftPublicBackpackSkinWebResp implements Serializable {
     @ApiModelProperty("区服名字")
     private String serverName;
 
+    @ApiModelProperty("稀有度：1，Normal 2，Rare 3，Epic")
+    private Integer rarity;
+
     @ApiModelProperty("角色id")
     private Long serverRoleId;
 
