@@ -88,6 +88,9 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("NFT动态属性")
     private JSONObject attributes;
 
+    @ApiModelProperty("稀有度(皮肤才有)")
+    private Integer rarity;
+
     @ApiModelProperty("NFT元数据")
     private List<JSONObject> metadata;
 
