@@ -18,7 +18,7 @@ public class SeedsAdminApiConfig {
     @Value("${seeds.api.admin.mintNft:/api/admin/mintNft}")
     private String mintNft;
 
-    @Value("${seeds.api.admin.cancelAsset:/api/admin/cancelAsset}")
+    @Value("${seeds.api.admin.cancelAsset:/api/admin/cancelAssetV2}")
     private String cancelAsset;
 
     @Value("${seeds.api.admin.cancelAuction:/api/admin/cancelAuction}")
