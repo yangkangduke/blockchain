@@ -25,7 +25,7 @@ import javax.validation.Valid;
 @Slf4j
 @Api(tags = "皮肤NFT外部调用开放")
 @RestController
-@RequestMapping("/public/web/skin/nft")
+@RequestMapping("/public/skin/nft")
 public class PublicSkinNftController {
 
 
@@ -44,5 +44,4 @@ public class PublicSkinNftController {
         }
         return result;
     }
-
 }
