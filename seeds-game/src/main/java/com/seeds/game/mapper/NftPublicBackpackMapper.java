@@ -1,6 +1,7 @@
 package com.seeds.game.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.game.dto.request.internal.NftBackpackWebPageReq;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.NftPublicBackpackEntity;
@@ -24,7 +25,9 @@ public interface NftPublicBackpackMapper extends BaseMapper<NftPublicBackpackEnt
 
     List<NftPublicBackpackWebResp> getPageForWeb(NftBackpackWebPageReq req);
 
-    List<SkinNftTypeResp> getSkinNftTypeList(@Param("userId") Long userId, @Param("profession")String profession);
+    List<SkinNftTypeResp> getSkinNftTypeList(@Param("userId") Long userId, @Param("profession") String profession);
 
     List<NftPublicBackpackSkinWebResp> getSkinPageForWeb(NftBackpackWebPageReq req);
+
+    SysNftPicEntity getHeroAndSkin(@Param("nftPicId") Long nftPicId);
 }
