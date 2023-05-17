@@ -15,4 +15,6 @@ public class EquipMintRequestDto {
     private String feeHash;
     // 用户钱包地址：当不需要托管的时候，新mint出来的token需要转移给他
     private String toUserAddress;
+
+    private Integer type =12;
 }
