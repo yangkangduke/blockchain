@@ -1,11 +1,13 @@
 package com.seeds.game.controller;
 
+import com.seeds.admin.dto.game.SkinNftPushAutoIdDto;
 import com.seeds.admin.feign.RemoteSkinNftService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.OpenSkinNftPushAutoIdReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +25,7 @@ import javax.validation.Valid;
 @Slf4j
 @Api(tags = "皮肤NFT外部调用开放")
 @RestController
-@RequestMapping("/public/skin/nft")
+@RequestMapping("/public/web/skin/nft")
 public class PublicSkinNftController {
 
 
@@ -33,7 +35,9 @@ public class PublicSkinNftController {
     @PostMapping("push-autoId")
     @ApiOperation("推送autoId")
     public GenericDto<Object> pushAutoId(@Valid @RequestBody OpenSkinNftPushAutoIdReq req) {
-        GenericDto<Object> result = skinNftService.pushAutoId(req);
+        SkinNftPushAutoIdDto dto = new SkinNftPushAutoIdDto();
+        BeanUtils.copyProperties(req, dto);
+        GenericDto<Object> result = skinNftService.pushAutoId(dto);
         if (!result.isSuccess()) {
             return GenericDto.failure(result.getMessage(),
                     result.getCode());

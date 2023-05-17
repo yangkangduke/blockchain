@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.admin.dto.SkinNFTAttrDto;
 import com.seeds.admin.dto.SkinNftPushAutoIdReq;
+import com.seeds.admin.dto.game.SkinNftPushAutoIdDto;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.response.SysNftPicMIntedResp;
 import com.seeds.admin.dto.response.SysNftPicResp;
@@ -29,7 +30,7 @@ public interface SysNftPicService extends IService<SysNftPicEntity> {
 
     void applyAutoIds(ListReq ids);
 
-    void pushAutoId(SkinNftPushAutoIdReq req);
+    void pushAutoId(SkinNftPushAutoIdDto dto);
 
     void skinMint(SysSkinNftMintReq req);
 

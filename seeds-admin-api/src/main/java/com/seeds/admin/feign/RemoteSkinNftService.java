@@ -1,6 +1,6 @@
 package com.seeds.admin.feign;
 
-import com.seeds.admin.dto.SkinNftPushAutoIdReq;
+import com.seeds.admin.dto.game.SkinNftPushAutoIdDto;
 import com.seeds.admin.feign.interceptor.AdminFeignInnerRequestInterceptor;
 import com.seeds.common.dto.GenericDto;
 import io.swagger.annotations.ApiOperation;
@@ -22,5 +22,5 @@ public interface RemoteSkinNftService {
 	 */
 	@PostMapping("/internal-skin-nft/push-autoId")
 	@ApiOperation("NFT下架")
-	GenericDto<Object> pushAutoId(SkinNftPushAutoIdReq req);
+	GenericDto<Object> pushAutoId(SkinNftPushAutoIdDto req);
 }
