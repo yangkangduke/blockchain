@@ -140,6 +140,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (NftTypeEnum.hero.getCode() == resp.getType()) {
                 HashMap<String, Integer> skinAttr = handleSkinAttr(nftAttribute);
                 resp.setAttributes(JSONUtil.parseObj(JSONUtil.toJsonStr(skinAttr)));
+                resp.setRarity(nftAttribute.getRarity());
             }
         }
         UcUserResp ucUserResp = null;
