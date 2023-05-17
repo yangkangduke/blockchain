@@ -8,6 +8,7 @@
         select list_receipt,mint_address
         from z_market_order
         where status = 1
+        and auction_id &lt; 0
         and mint_address in
         <foreach collection="tokenAddresses" item="tokenAddress" index="index" open="(" close=")" separator=",">
             #{tokenAddress}
@@ -17,6 +18,7 @@
         select auction_id,mint_address
         from z_market_order
         where status = 1
+        and auction_id &gt; 0
         and mint_address in
         <foreach collection="tokenAddresses" item="tokenAddress" index="index" open="(" close=")" separator=",">
             #{tokenAddress}

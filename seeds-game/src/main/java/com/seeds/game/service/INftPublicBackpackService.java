@@ -3,6 +3,7 @@ package com.seeds.game.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.internal.*;
@@ -115,4 +116,6 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     Map<String, List<SkinNftTypeResp>> getSkinNftTypeList(Integer heroType);
 
     List<NftPublicBackpackSkinWebResp> getSkinPageForWeb(NftBackpackWebPageReq req);
+
+    SysNftPicEntity getHeroAndSkin(Long nftPicId);
 }

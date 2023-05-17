@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.entity.SysGameApiEntity;
+import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.SkinNftEnums;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteGameService;
@@ -1000,5 +1001,10 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             return resp;
         }).collect(Collectors.toList());
         return list;
+    }
+
+    @Override
+    public SysNftPicEntity getHeroAndSkin(Long nftPicId) {
+        return baseMapper.getHeroAndSkin(nftPicId);
     }
 }

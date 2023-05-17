@@ -136,4 +136,7 @@
             order by t3.place_time ${sortTypeStr}
         </if>
     </select>
+    <select id="getHeroAndSkin" resultType="com.seeds.admin.entity.SysNftPicEntity">
+        select skin , hero from sys_nft_pic where id = #{nftPicId}
+    </select>
 </mapper>

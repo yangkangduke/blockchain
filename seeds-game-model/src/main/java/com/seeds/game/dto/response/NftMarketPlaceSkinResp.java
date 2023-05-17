@@ -20,7 +20,7 @@ public class NftMarketPlaceSkinResp implements Serializable {
      private static final long serialVersionUID = 1L;
 
      @ApiModelProperty("nft id")
-     @JsonSerialize(using= ToStringSerializer.class)
+     @JsonSerialize(using = ToStringSerializer.class)
      private Long nftId;
 
      @ApiModelProperty("NFT编号")
@@ -28,6 +28,12 @@ public class NftMarketPlaceSkinResp implements Serializable {
 
      @ApiModelProperty("NFT名称")
      private String name;
+
+     @ApiModelProperty("Nft所属皮肤名字")
+     private String skinName;
+
+     @ApiModelProperty("皮肤所属的英雄名字")
+     private String heroName;
 
      @ApiModelProperty("tokenId")
      private String tokenId;

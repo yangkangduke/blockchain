@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.CurrencyEnum;
@@ -40,6 +41,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -120,6 +122,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             resp.setEquipmentName(publicBackpack.getName());
             if (NftTypeEnum.hero.getCode() == resp.getType()) {
                 resp.setContractAddress(solanaConfig.getSkinContractAddress());
+                SysNftPicEntity heroAndSkin = nftPublicBackpackService.getHeroAndSkin(publicBackpack.getNftPicId());
+                if (null != heroAndSkin) {
+                    resp.setHeroName(heroAndSkin.getHero());
+                    resp.setSkinName(heroAndSkin.getSkin());
+                }
             } else {
                 resp.setContractAddress(solanaConfig.getEquipmentContractAddress());
             }
@@ -130,6 +137,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             BeanUtils.copyProperties(nftAttribute, resp);
             resp.setDurability(nftAttribute.getDurability());
             resp.setMaxDurability(nftAttribute.getDurabilityConfig());
+            if (NftTypeEnum.hero.getCode() == resp.getType()) {
+                HashMap<String, Integer> skinAttr = handleSkinAttr(nftAttribute);
+                resp.setAttributes(JSONUtil.parseObj(JSONUtil.toJsonStr(skinAttr)));
+            }
         }
         UcUserResp ucUserResp = null;
         try {
@@ -202,6 +213,20 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         BeanUtils.copyProperties(solanaConfig, resp);
         return resp;
+    }
+
+    private HashMap<String, Integer> handleSkinAttr(NftAttributeEntity nftAttribute) {
+        HashMap<String, Integer> attrMap = new HashMap<>();
+        attrMap.put("victory", nftAttribute.getVictory());
+        attrMap.put("lose", nftAttribute.getLose());
+        attrMap.put("maxStreak", nftAttribute.getMaxStreak());
+        attrMap.put("maxLose", nftAttribute.getMaxLose());
+        attrMap.put("capture", nftAttribute.getCapture());
+        attrMap.put("killingSpree", nftAttribute.getKillingSpree());
+        attrMap.put("goblinKill", nftAttribute.getGoblinKill());
+        attrMap.put("slaying", nftAttribute.getSlaying());
+        attrMap.put("goblin", nftAttribute.getGoblin());
+        return attrMap;
     }
 
     @Override

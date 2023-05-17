@@ -79,6 +79,12 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("NFT拍卖剩余时间")
     private String timeLeft;
 
+    @ApiModelProperty("Nft所属皮肤名字")
+    private String skinName;
+
+    @ApiModelProperty("皮肤所属的英雄名字")
+    private String heroName;
+
     @ApiModelProperty("NFT动态属性")
     private JSONObject attributes;
 
