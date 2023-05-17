@@ -57,4 +57,8 @@ public class KafkaTopic {
 
     // skin NFT withdraw
     public final String SKIN_NFT_WITHDRAW = "SKIN_NFT_WITHDRAW";
+
+    // 装备mint 由原来的调用接口换成走Kafka
+    public final String EQUIP_MINT_REQUEST = "EQUIP_MINT_REQUEST";
+    public final String EQUIP_COMPOSE_REQUEST = "EQUIP_COMPOSE_REQUEST";
 }
