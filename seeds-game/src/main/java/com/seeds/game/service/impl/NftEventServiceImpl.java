@@ -20,6 +20,8 @@ import com.seeds.game.dto.request.ComposeSuccessReq;
 import com.seeds.game.dto.request.MintSuccessReq;
 import com.seeds.game.dto.request.NftMintEquipReq;
 import com.seeds.game.dto.request.NftMintSuccessReq;
+import com.seeds.game.dto.request.external.EquipComposeRequestDto;
+import com.seeds.game.dto.request.external.EquipMintRequestDto;
 import com.seeds.game.dto.request.external.MintSuccessMessageDto;
 import com.seeds.game.dto.request.internal.NftEventAddReq;
 import com.seeds.game.dto.request.internal.NftEventEquipmentReq;
@@ -308,23 +310,15 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     @Override
     public void mintSuccessCallback(MintSuccessReq req) {
-        UpdateBackpackErrorLog backpackErrorLog = updateBackpackErrorLogService.queryByMintAddress(req.getMintAddress());
-        if (Objects.nonNull(backpackErrorLog)) {
-            NftEvent nftEvent = this.getById(backpackErrorLog.getEventId());
-            NftEventEquipment equipment = eventEquipmentService
-                    .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-
-            NftMintSuccessReq mintSuccessReq = new NftMintSuccessReq();
-            mintSuccessReq.setAutoDeposite(backpackErrorLog.getIsAutoDeposit());
-            mintSuccessReq.setMintAddress(req.getMintAddress());
-
-            MintSuccessMessageResp data = new MintSuccessMessageResp();
-            BeanUtils.copyProperties(req, data);
-            //生成metadata
-            createMetadata(equipment, data.getTokenId());
-            // 通知游戏方，更新本地数据库
-            updateLocalDB(mintSuccessReq.getAutoDeposite(), req.getMintAddress(), nftEvent, equipment, data);
-        }
+        NftEvent nftEvent = this.getById(req.getEventId());
+        NftEventEquipment equipment = eventEquipmentService
+                .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
+        MintSuccessMessageResp data = new MintSuccessMessageResp();
+        BeanUtils.copyProperties(req, data);
+        //生成metadata
+        createMetadata(equipment, data.getTokenId());
+        // 通知游戏方，更新本地数据库
+        updateLocalDB(nftEvent.getIsDeposit(), req.getMintAddress(), nftEvent, equipment, data);
     }
 
 
@@ -418,39 +412,56 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         if (null == nftEvent || !nftEvent.getUserId().equals(UserContext.getCurrentUserId())) {
             throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_EVENT);
         }
-        // 调用/api/chainOp/buySuccess通知，购买成功
-        String params = String.format("nonce=%s&feeHash=%s&isDeposit=%s&mintAddresses=%s&sig=%s&walletAddress=%s", req.getNonce(), req.getFeeHash(), req.getAutoDeposite(), req.getMintAddresses(), req.getSig(), req.getWalletAddress());
-        // 调用/api/equipment/compose  合成成功
-        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCompose() + "?" + params;
-        log.info("合成成功，开始通知， url:{}， params:{}", url, params);
-        MintSuccessMessageResp data = null;
-        HttpResponse response = null;
-        try {
-            response = HttpRequest.get(url)
-                    .timeout(60 * 1000)
-                    .header("Content-Type", "application/json")
-                    .execute();
-        } catch (Exception e) {
-            log.error("NFT合成成功通知失败，message：{}", e.getMessage());
-            //   recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
-            nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
-            this.updateById(nftEvent);
-            throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_LATER);
-        }
-        JSONObject jsonObject = JSONObject.parseObject(response.body());
-        log.info(" 合成成功--result:{}", jsonObject);
-        if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
-            data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
-            NftEventEquipment equipment = eventEquipmentService
-                    .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-            updateLocalDB(req.getAutoDeposite(), data.getMintAddress(), nftEvent, equipment, data);
-            //生成metadata
-            createMetadata(equipment, data.getTokenId());
-        } else {
-            nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
-            this.updateById(nftEvent);
-            throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_LATER);
-        }
+
+        EquipComposeRequestDto composeRequestDto = new EquipComposeRequestDto();
+        composeRequestDto.setEventId(req.getEventId());
+        composeRequestDto.setNonce(req.getNonce());
+        composeRequestDto.setFeeHash(req.getFeeHash());
+        composeRequestDto.setIsDeposit(req.getAutoDeposite());
+        composeRequestDto.setSig(req.getSig());
+        composeRequestDto.setMintAddresses(req.getMintAddresses());
+        composeRequestDto.setWalletAddress(req.getWalletAddress());
+        String params = JSONUtil.toJsonStr(composeRequestDto);
+        kafkaProducer.sendAsync(KafkaTopic.EQUIP_COMPOSE_REQUEST, params);
+        log.info("发送compose请求消息成功，params:{}", params);
+
+        nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
+        nftEvent.setIsDeposit(req.getAutoDeposite());
+        this.updateById(nftEvent);
+
+//        // 调用/api/chainOp/buySuccess通知，购买成功
+//        String params = String.format("nonce=%s&feeHash=%s&isDeposit=%s&mintAddresses=%s&sig=%s&walletAddress=%s", req.getNonce(), req.getFeeHash(), req.getAutoDeposite(), req.getMintAddresses(), req.getSig(), req.getWalletAddress());
+//        // 调用/api/equipment/compose  合成成功
+//        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCompose() + "?" + params;
+//        log.info("合成成功，开始通知， url:{}， params:{}", url, params);
+//        MintSuccessMessageResp data = null;
+//        HttpResponse response = null;
+//        try {
+//            response = HttpRequest.get(url)
+//                    .timeout(60 * 1000)
+//                    .header("Content-Type", "application/json")
+//                    .execute();
+//        } catch (Exception e) {
+//            log.error("NFT合成成功通知失败，message：{}", e.getMessage());
+//            //   recordLog(mintSuccessReq.getEventId(), mintSuccessReq.getMintAddress());
+//            nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
+//            this.updateById(nftEvent);
+//            throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_LATER);
+//        }
+//        JSONObject jsonObject = JSONObject.parseObject(response.body());
+//        log.info(" 合成成功--result:{}", jsonObject);
+//        if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+//            data = JSONObject.toJavaObject((JSON) jsonObject.get("data"), MintSuccessMessageResp.class);
+//            NftEventEquipment equipment = eventEquipmentService
+//                    .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
+//            updateLocalDB(req.getAutoDeposite(), data.getMintAddress(), nftEvent, equipment, data);
+//            //生成metadata
+//            createMetadata(equipment, data.getTokenId());
+//        } else {
+//            nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
+//            this.updateById(nftEvent);
+//            throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_LATER);
+//        }
 
     }
 
@@ -461,7 +472,21 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         if (null == nftEvent || !nftEvent.getUserId().equals(UserContext.getCurrentUserId())) {
             throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_EVENT);
         }
-        String params = String.format("isDeposit=%s&feeHash=%s&toUserAddress=%s", req.getAutoDeposite(), req.getFeeHash(), req.getToUserAddress());
+
+        EquipMintRequestDto mintRequestDto = new EquipMintRequestDto();
+        mintRequestDto.setEventId(req.getEventId());
+        mintRequestDto.setIsDeposit(req.getAutoDeposite());
+        mintRequestDto.setFeeHash(req.getFeeHash());
+        mintRequestDto.setToUserAddress(req.getToUserAddress());
+        String params = JSONUtil.toJsonStr(mintRequestDto);
+        kafkaProducer.sendAsync(KafkaTopic.EQUIP_MINT_REQUEST, params);
+        log.info("发送mint请求消息成功，params:{}", params);
+
+        nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
+        nftEvent.setIsDeposit(req.getAutoDeposite());
+        this.updateById(nftEvent);
+
+       /* String params = String.format("isDeposit=%s&feeHash=%s&toUserAddress=%s", req.getAutoDeposite(), req.getFeeHash(), req.getToUserAddress());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getMintEquip() + "?" + params;
         log.info("mintEquip， url:{}， params:{}", url, params);
         MintSuccessMessageResp data = null;
@@ -490,7 +515,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.MINTING.getCode());
             this.updateById(nftEvent);
             throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_LATER);
-        }
+        }*/
     }
 
 

@@ -12,6 +12,11 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 public class MintSuccessReq {
+
+    @NotNull
+    @ApiModelProperty("事件id")
+    private String eventId;
+
     @NotNull
     @ApiModelProperty("nft id")
     private Long id;

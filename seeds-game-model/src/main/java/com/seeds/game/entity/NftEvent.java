@@ -63,4 +63,7 @@ public class NftEvent implements Serializable {
     @ApiModelProperty("修改人")
     private Long updatedBy;
 
+    @ApiModelProperty(value = "是否托管 1 是 0 否")
+    private Integer isDeposit;
+
 }
