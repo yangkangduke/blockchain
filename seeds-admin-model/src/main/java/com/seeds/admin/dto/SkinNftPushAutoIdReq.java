@@ -1,8 +1,11 @@
 package com.seeds.admin.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.seeds.admin.jackson.CustomDeserializer;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -13,5 +16,6 @@ import java.util.Map;
 public class SkinNftPushAutoIdReq {
 
     @NotNull
-    private Map<Long, Long> autoIds;
+    @JsonDeserialize(using = CustomDeserializer.class)
+    private Map<Long, Long> autoIds = new HashMap<>();
 }

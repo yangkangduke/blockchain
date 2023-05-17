@@ -18,6 +18,7 @@ import com.seeds.admin.dto.SkinNFTAttrDto;
 import com.seeds.admin.dto.SkinNftPushAutoIdReq;
 import com.seeds.admin.dto.SysNFTAttrDto;
 import com.seeds.admin.dto.game.GameApplyAutoIdsDto;
+import com.seeds.admin.dto.game.SkinNftPushAutoIdDto;
 import com.seeds.admin.dto.request.*;
 import com.seeds.admin.dto.request.chain.SkinNftCancelAssetDto;
 import com.seeds.admin.dto.request.chain.SkinNftCancelAuctionDto;
@@ -447,8 +448,8 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     }
 
     @Override
-    public void pushAutoId(SkinNftPushAutoIdReq req) {
-        Set<Long> configIds = req.getAutoIds().keySet();
+    public void pushAutoId(SkinNftPushAutoIdDto dto) {
+        Set<Long> configIds = dto.getAutoIds().keySet();
         List<Long> validConfigIds = this.list(new LambdaQueryWrapper<SysNftPicEntity>()
                 .in(SysNftPicEntity::getConfId, configIds)
                 .eq(SysNftPicEntity::getAutoId, WhetherEnum.NO.value()))
@@ -456,10 +457,10 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                 .map(p -> p.getConfId())
                 .collect(Collectors.toList());
 
-        List<SysNftPicEntity> updateList = req.getAutoIds().keySet().stream().filter(i -> validConfigIds.contains(i)).map(p -> {
+        List<SysNftPicEntity> updateList = dto.getAutoIds().keySet().stream().filter(i -> validConfigIds.contains(i)).map(p -> {
             SysNftPicEntity entity = new SysNftPicEntity();
             entity.setConfId(p);
-            entity.setAutoId(req.getAutoIds().get(p));
+            entity.setAutoId(dto.getAutoIds().get(p));
             entity.setApplyState(SkinNftEnums.AutoIdApplyStateEnum.APPLIED.getCode());
             return entity;
         }).collect(Collectors.toList());

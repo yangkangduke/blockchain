@@ -1,6 +1,7 @@
 package com.seeds.admin.controller;
 
 import com.seeds.admin.dto.SkinNftPushAutoIdReq;
+import com.seeds.admin.dto.game.SkinNftPushAutoIdDto;
 import com.seeds.admin.service.SysNftPicService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
@@ -32,8 +33,8 @@ public class InterSkinNftController {
     @PostMapping("push-autoId")
     @ApiOperation("推送autoId")
     @Inner
-    public GenericDto<Object> pushAutoId(@Valid @RequestBody SkinNftPushAutoIdReq req) {
-        nftPicService.pushAutoId(req);
+    public GenericDto<Object> pushAutoId(@Valid @RequestBody SkinNftPushAutoIdDto dto) {
+        nftPicService.pushAutoId(dto);
         return GenericDto.success(null);
     }
 
