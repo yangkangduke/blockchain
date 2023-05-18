@@ -630,9 +630,6 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                 StringUtils.isBlank(p.getRarity()) ||
                 StringUtils.isBlank(p.getFeature()) ||
                 StringUtils.isBlank(p.getColor()) ||
-                StringUtils.isBlank(p.getAccessories()) ||
-                StringUtils.isBlank(p.getDecorate()) ||
-                StringUtils.isBlank(p.getHero()) ||
                 StringUtils.isBlank(p.getSkin()) ||
                 p.getConfId().equals(Long.valueOf(WhetherEnum.NO.value()))
         ) {
