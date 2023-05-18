@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author raowentong
@@ -99,6 +100,13 @@ public class InterUserController {
     @GetMapping("/get-by-public-address")
     GenericDto<UcUserResp> getByPublicAddress(@RequestParam String publicAddress) {
         return GenericDto.success(ucUserService.getByPublicAddress(publicAddress));
+    }
+
+    @ApiOperation("根据用户钱包地址获取用户信息")
+    @Inner
+    @PostMapping("/map-by-public-address")
+    GenericDto<Map<String, UcUser>> mapByPublicAddress(@RequestBody Set<String> publicAddress) {
+        return GenericDto.success(ucUserService.mapByPublicAddress(publicAddress));
     }
 
     @ApiOperation("通过邮箱获取用户")

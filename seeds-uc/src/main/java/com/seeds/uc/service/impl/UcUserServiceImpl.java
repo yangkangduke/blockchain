@@ -528,6 +528,16 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return userResp;
     }
 
+    @Override
+    public Map<String, UcUser> mapByPublicAddress(Set<String> publicAddress) {
+        List<UcUser> list = list(new QueryWrapper<UcUser>().lambda()
+                .in(UcUser::getPublicAddress, publicAddress));
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(UcUser::getPublicAddress, p -> p));
+    }
+
     /**
      * 校验登陆
      * @param loginReq

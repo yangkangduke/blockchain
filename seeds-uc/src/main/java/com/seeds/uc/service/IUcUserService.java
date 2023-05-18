@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -250,6 +251,14 @@ public interface IUcUserService extends IService<UcUser> {
      * @return 用户信息
      */
     UcUserResp getByPublicAddress(String publicAddress);
+
+    /**
+     * 根据用户钱包地址获取用户信息
+     *
+     * @param publicAddress 钱包地址
+     * @return 用户信息
+     */
+    Map<String, UcUser> mapByPublicAddress(Set<String> publicAddress);
 
 }
 
