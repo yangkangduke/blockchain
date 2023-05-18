@@ -11,4 +11,6 @@ import lombok.Data;
 public class SkinNftCancelAssetDto {
     @ApiModelProperty("上架收据")
     private String listReceipt;
+
+    private String auctionHouse;
 }

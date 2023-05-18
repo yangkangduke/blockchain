@@ -67,6 +67,6 @@ public class SysNftPicMIntedResp {
     @ApiModelProperty("owner")
     private String owner;
 
-    @ApiModelProperty("上架状态 0 未上架 1 已上架")
+    @ApiModelProperty("上架状态 0 未上架 1 已上架 2英式拍卖 3 取消拍卖")
     private Integer listState;
 }

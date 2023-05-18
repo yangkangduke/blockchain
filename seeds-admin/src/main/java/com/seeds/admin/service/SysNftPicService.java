@@ -40,7 +40,7 @@ public interface SysNftPicService extends IService<SysNftPicEntity> {
 
     void shadowUploadSuccess(ListStringReq req);
 
-    void cancelAsset(ListReq req);
+    void cancelAsset(SysSkinNftListAssetReq req);
 
     IPage<SysNftPicMIntedResp> queryMintedPage(SysNftPicMintedPageReq req);
 

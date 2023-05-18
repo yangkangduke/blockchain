@@ -94,6 +94,7 @@
     <select id="getSkinPageForWeb" resultType="com.seeds.game.dto.response.NftPublicBackpackSkinWebResp">
         select
         t1.name,
+        t5.hero as heroName,
         t1.image,
         t1.image_sha,
         t1.token_id,
@@ -113,6 +114,7 @@
         t2.goblin
         from ga_nft_public_backpack t1
         left join ga_nft_attribute t2 on t1.eq_nft_id = t2.eq_nft_id
+        left join sys_nft_pic t5 on t1.eq_nft_id = t5.id
         left join (select price, place_time, mint_address from z_market_order where status = 1) t3
         on t1.token_address = t3.mint_address
         where t1.type =3 and t1.user_id = #{userId} and t1.state <![CDATA[<>]]> 1
