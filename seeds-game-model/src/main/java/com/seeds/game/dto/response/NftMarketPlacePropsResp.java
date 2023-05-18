@@ -28,6 +28,9 @@ public class NftMarketPlacePropsResp implements Serializable{
     @ApiModelProperty("NFT名称")
     private String name;
 
+    @ApiModelProperty("道具名称")
+    private String propsName;
+
     @ApiModelProperty("NFT图片")
     private String image;
 

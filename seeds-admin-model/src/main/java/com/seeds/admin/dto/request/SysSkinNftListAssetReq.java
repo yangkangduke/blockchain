@@ -21,4 +21,7 @@ public class SysSkinNftListAssetReq {
 
     @ApiModelProperty("固定价格")
     private BigDecimal price;
+
+    @ApiModelProperty("auctionHouseAddress")
+    private String auctionHouseAddress;
 }

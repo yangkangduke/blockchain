@@ -12,4 +12,5 @@ import java.math.BigDecimal;
 public class SkinNftListAssetDto {
     private String nftAddress;
     private BigDecimal price;
+    private String auctionHouse;
 }
