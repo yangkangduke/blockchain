@@ -943,7 +943,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Override
     public IPage<NftActivityResp> activityPage(NftActivityPageReq req) {
-        NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
+        NftEquipment nftEquipment = nftEquipmentMapper.getById(req.getNftId());
         if (nftEquipment == null) {
             return new Page<>(req.getCurrent(), req.getSize());
         }
