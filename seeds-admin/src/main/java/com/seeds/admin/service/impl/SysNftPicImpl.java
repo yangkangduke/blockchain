@@ -557,7 +557,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     }
 
     @Override
-    public void cancelAsset(ListReq req) {
+    public void cancelAsset(SysSkinNftListAssetReq req) {
         List<SysNftPicEntity> list = this.listByIds(req.getIds());
 
         List<NftMarketOrderEntity> receipts = baseMapper.getListReceiptByMintAddress(list.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList()));
@@ -565,6 +565,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         List<SkinNftCancelAssetDto> dtos = list.stream().map(p -> {
             SkinNftCancelAssetDto skinNftCancelAssetDto = new SkinNftCancelAssetDto();
             skinNftCancelAssetDto.setListReceipt(receiptsMap.get(p.getTokenAddress()));
+            skinNftCancelAssetDto.setAuctionHouse(req.getAuctionHouseAddress());
             return skinNftCancelAssetDto;
         }).collect(Collectors.toList());
 
