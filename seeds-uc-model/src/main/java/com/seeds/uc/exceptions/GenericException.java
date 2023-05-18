@@ -19,6 +19,7 @@ public class GenericException extends RuntimeException {
 
     public GenericException(String message) {
         super(message);
+        this.errorCode = UcErrorCodeEnum.ERR_500_SYSTEM_BUSY;
     }
 
     public GenericException(UcErrorCodeEnum errorCode) {
