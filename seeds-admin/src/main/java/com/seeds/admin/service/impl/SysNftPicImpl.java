@@ -15,7 +15,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.config.SeedsAdminApiConfig;
 import com.seeds.admin.dto.SkinNFTAttrDto;
-import com.seeds.admin.dto.SkinNftPushAutoIdReq;
 import com.seeds.admin.dto.SysNFTAttrDto;
 import com.seeds.admin.dto.game.GameApplyAutoIdsDto;
 import com.seeds.admin.dto.game.SkinNftPushAutoIdDto;
@@ -492,6 +491,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             SkinNftListAssetDto dto = new SkinNftListAssetDto();
             dto.setNftAddress(p.getTokenAddress());
             dto.setPrice(req.getPrice());
+            dto.setAuctionHouse(req.getAuctionHouseAddress());
             return dto;
         }).collect(Collectors.toList());
         String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getListAsset();
