@@ -63,4 +63,7 @@ public class NftEventEquipmentResp implements Serializable {
     @ApiModelProperty("耐久度")
     private Integer durability;
 
+    @ApiModelProperty("装备名字")
+    private String name;
+
 }
