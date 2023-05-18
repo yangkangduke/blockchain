@@ -22,6 +22,9 @@ public class NftPublicBackpackSkinWebResp implements Serializable {
     @ApiModelProperty("nft物品名称")
     private String name;
 
+    @ApiModelProperty("皮肤所属的英雄名字")
+    private String heroName;
+
     @ApiModelProperty("图片（中心化地址）")
     private String image;
 
