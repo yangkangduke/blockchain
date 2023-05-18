@@ -102,7 +102,7 @@
         t1.eq_nft_id,
         t3.place_time as listTime,
         t1.server_role_id,
-        t2.t2.victory,
+        t2.victory,
         t2.rarity,
         t2.lose,
         t2.max_streak,
