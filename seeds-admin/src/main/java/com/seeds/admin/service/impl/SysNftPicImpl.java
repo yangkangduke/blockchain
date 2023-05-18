@@ -499,7 +499,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         log.info("请求skin-list-asset接口， url:{}， params:{}", url, param);
         try {
             HttpResponse response = HttpRequest.post(url)
-                    .timeout(60 * 1000 * 2)
+                    .timeout(60 * 1000 * 10)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
@@ -530,7 +530,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         log.info("请求skin-englishV2-接口， url:{}， params:{}", url, param);
         try {
             HttpResponse response = HttpRequest.post(url)
-                    .timeout(60 * 1000)
+                    .timeout(60 * 1000 * 10)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
@@ -573,7 +573,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         log.info("请求skin-cancelAsset-接口， url:{}， params:{}", url, param);
         try {
             HttpResponse response = HttpRequest.post(url)
-                    .timeout(60 * 1000)
+                    .timeout(60 * 1000 * 10)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
@@ -607,7 +607,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         log.info("请求skin-cancelAuction-接口， url:{}， params:{}", url, param);
         try {
             HttpResponse response = HttpRequest.post(url)
-                    .timeout(60 * 1000)
+                    .timeout(60 * 1000 * 10)
                     .header("Content-Type", "application/json")
                     .body(param)
                     .execute();
