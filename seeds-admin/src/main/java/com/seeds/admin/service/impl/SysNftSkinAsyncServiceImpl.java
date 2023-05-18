@@ -199,7 +199,7 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
         backpackDto.setServerRoleId(0L);
         backpackDto.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
         backpackDto.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
-        backpackDto.setDesc(NFTEnumConstant.NFTDescEnum.SEEDS_EQUIP.getDesc());
+        backpackDto.setDesc(NFTEnumConstant.NFTDescEnum.SEEDS_SKIN.getDesc());
         backpackDto.setType(NFTEnumConstant.NftTypeEnum.HERO.getCode());
         backpackDto.setItemId(nftPicEntity.getConfId());
         backpackDto.setAutoId(nftPicEntity.getAutoId());
