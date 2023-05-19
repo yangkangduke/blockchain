@@ -1,11 +1,13 @@
 package com.seeds.game.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.MintSuccessReq;
 import com.seeds.game.dto.request.NftBackpakcUpdateStateReq;
 import com.seeds.game.service.INftPublicBackpackService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +28,7 @@ import javax.validation.Valid;
 @Api(tags = "NFT公共背包接口，补偿调用")
 @RestController
 @RequestMapping("/public/web/nft-backpack")
+@Slf4j
 public class PublicNftPublicBackpackController {
 
     @Autowired
@@ -41,6 +44,15 @@ public class PublicNftPublicBackpackController {
     @PostMapping("insert-callback")
     @ApiOperation("新增回调，补偿时调用")
     public GenericDto<Object> insertCallback(@RequestBody @Valid MintSuccessReq req) {
+        log.info("正常通知,更新mint事件，插入背包---->param：{}", JSONUtil.toJsonStr(req));
+        nftPublicBackpackService.insertCallback(req);
+        return GenericDto.success(null);
+    }
+
+    @PostMapping("scanner/insert-callback")
+    @ApiOperation("新增回调，扫快补偿时调用")
+    public GenericDto<Object> scannerInsertCallback(@RequestBody @Valid MintSuccessReq req) {
+        log.info("扫快通知,更新mint事件，插入背包---->param：{}", JSONUtil.toJsonStr(req));
         nftPublicBackpackService.insertCallback(req);
         return GenericDto.success(null);
     }

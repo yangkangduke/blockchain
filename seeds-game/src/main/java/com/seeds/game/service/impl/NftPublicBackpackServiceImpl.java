@@ -494,6 +494,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         DepositSuccessMessageDto dto  = new DepositSuccessMessageDto();
         BeanUtils.copyProperties(req, dto);
         dto.setMintAddress(nft.getMintAddress());
+        dto.setType(req.getType());
         String param = JSONUtil.toJsonStr(dto);
         log.info("NFT托管成功，开始通知， url:{}， params:{}", url, param);
         try {
@@ -653,7 +654,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
 
     @Override
     public void insertCallback(MintSuccessReq req) {
-        log.info("扫快通知,更新mint事件，插入背包---->param：{}", JSONUtil.toJsonStr(req));
         nftEventService.mintSuccessCallback(req);
     }
 

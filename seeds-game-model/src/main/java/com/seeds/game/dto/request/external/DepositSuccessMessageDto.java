@@ -25,4 +25,8 @@ public class DepositSuccessMessageDto {
 
     @ApiModelProperty("tokenAddress")
     private String tokenAddress;
+
+    @ApiModelProperty("type 1 装备 2 道具 3英雄")
+    private Integer type;
+
 }
