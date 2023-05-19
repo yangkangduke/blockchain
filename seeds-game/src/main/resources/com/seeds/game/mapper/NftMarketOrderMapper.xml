@@ -267,6 +267,7 @@
         ANY_VALUE(a.victory) AS victory,
         ANY_VALUE(a.lose) AS lose,
         ANY_VALUE(a.max_streak) AS maxStreak,
+        ANY_VALUE(a.capture) AS capture,
         ANY_VALUE(a.killing_spree) AS killingSpree,
         ANY_VALUE(a.goblin_kill) AS goblinKill,
         ANY_VALUE(a.slaying) AS slaying
@@ -282,6 +283,27 @@
         </if>
         <if test="params.sortField == 2">
             order by views ${params.sortTypeStr}
+        </if>
+        <if test="params.sortField == 3">
+            order by slaying ${params.sortTypeStr}
+        </if>
+        <if test="params.sortField == 4">
+            order by goblinKill ${params.sortTypeStr}
+        </if>
+        <if test="params.sortField == 5">
+            order by capture ${params.sortTypeStr}
+        </if>
+        <if test="params.sortField == 6">
+            order by killingSpree ${params.sortTypeStr}
+        </if>
+        <if test="params.sortField == 7">
+            order by maxStreak ${params.sortTypeStr}
+        </if>
+        <if test="params.sortField == 8">
+            order by lose ${params.sortTypeStr}
+        </if>
+        <if test="params.sortField == 9">
+            order by victory ${params.sortTypeStr}
         </if>
     </select>
 </mapper>

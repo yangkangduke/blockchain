@@ -18,7 +18,7 @@ import javax.validation.constraints.NotBlank;
 @ApiModel(value = "GameRankNftPageReq", description = "游戏NFT排名")
 public class GameRankNftPageReq extends PageReq {
 
-    @ApiModelProperty(value = "排序方式 1 Price 2 View")
+    @ApiModelProperty(value = "排序方式 1 price 2 view 3 slaying 4 goblinKill 5 capture 6 killingSpree 7 maxStreak 8 lose 9 victory")
     private Integer sortField = 1;
 
     @ApiModelProperty(value = "排序类型 0 :升序 1:降序")

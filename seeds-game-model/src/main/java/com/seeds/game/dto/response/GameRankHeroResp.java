@@ -47,6 +47,9 @@ public class GameRankHeroResp {
 	@ApiModelProperty("最大连胜场数")
 	private Integer maxStreak;
 
+	@ApiModelProperty("击杀玩家次数")
+	private Integer capture;
+
 	@ApiModelProperty("最大连杀数")
 	private Integer killingSpree;
 
