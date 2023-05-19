@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 /**
  * @author hang.yu
@@ -28,4 +27,7 @@ public class NftDepositedReq {
 
     @ApiModelProperty("用户地址")
     private String owner;
+
+    @ApiModelProperty("type 1 装备 2 道具 3英雄")
+    private Integer type;
 }
