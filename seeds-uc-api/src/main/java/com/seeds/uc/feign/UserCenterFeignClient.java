@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author raowentong
@@ -74,6 +75,14 @@ public interface UserCenterFeignClient {
     @GetMapping("/uc-internal/user/get-by-public-address")
     GenericDto<UcUserResp> getByPublicAddress(@RequestParam String publicAddress);
 
+    /**
+     * 根据用户钱包地址获取用户信息
+     *
+     * @param publicAddress 钱包地址
+     * @return 用户信息
+     */
+    @PostMapping("/uc-internal/user/map-by-public-address")
+    GenericDto<Map<String, UcUser>> mapByPublicAddress(@RequestBody Set<String> publicAddress);
 
     /**
      * 通过邮箱获取用户

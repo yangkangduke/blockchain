@@ -3,6 +3,10 @@ import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.admin.dto.request.GameRankNftPageReq;
+import com.seeds.admin.dto.response.GameRankEquipResp;
+import com.seeds.admin.dto.response.GameRankHeroResp;
+import com.seeds.admin.dto.response.GameRankItemResp;
 import com.seeds.game.dto.request.NftMarketPlaceEquipPageReq;
 import com.seeds.game.dto.request.NftMarketPlacePropsPageReq;
 import com.seeds.game.dto.request.NftMarketPlaceSkinPageReq;
@@ -39,4 +43,30 @@ public interface NftMarketOrderMapper extends BaseMapper<NftMarketOrderEntity> {
      */
     @InterceptorIgnore(tenantLine = "true")
     IPage<NftMarketPlacePropsResp> getPropsPage(Page page,@Param("params") NftMarketPlacePropsPageReq propsQuery);
+
+    /**
+     * 获取装备分页信息
+     * @param page 分页
+     * @param query 查询条件
+     * @return 装备分页信息
+     */
+    IPage<GameRankEquipResp> equipPage(Page<GameRankEquipResp> page, @Param("params") GameRankNftPageReq query);
+
+    /**
+     * 获取道具分页信息
+     * @param page 分页
+     * @param query 查询条件
+     * @return 道具分页信息
+     */
+    IPage<GameRankItemResp> itemPage(Page<GameRankItemResp> page, @Param("params") GameRankNftPageReq query);
+
+    /**
+     * 获取英雄分页信息
+     * @param page 分页
+     * @param query 查询条件
+     * @return 英雄分页信息
+     */
+    IPage<GameRankHeroResp> heroPage(Page<GameRankHeroResp> page, @Param("params") GameRankNftPageReq query);
+
+
 }

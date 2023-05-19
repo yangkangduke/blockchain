@@ -14,6 +14,7 @@ public class GenericException extends RuntimeException {
 
     public GenericException(String message) {
         super(message);
+        this.errorCode = GameErrorCodeEnum.ERR_500_SYSTEM_BUSY;
     }
 
     public GenericException(GameErrorCodeEnum errorCode) {

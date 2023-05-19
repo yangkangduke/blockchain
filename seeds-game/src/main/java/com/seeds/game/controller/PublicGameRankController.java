@@ -1,10 +1,10 @@
 package com.seeds.game.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.seeds.admin.dto.request.GameRankNftPageReq;
 import com.seeds.admin.dto.request.GameRankStatisticPageReq;
 import com.seeds.admin.dto.request.GameWinRankReq;
-import com.seeds.admin.dto.response.GameRankStatisticResp;
-import com.seeds.admin.dto.response.GameWinRankResp;
+import com.seeds.admin.dto.response.*;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.service.GameRankService;
 import io.swagger.annotations.Api;
@@ -45,6 +45,24 @@ public class PublicGameRankController {
     @ApiOperation(value = "统计分页", notes = "统计分页")
     public GenericDto<IPage<GameRankStatisticResp>> statisticPage(@Valid @RequestBody GameRankStatisticPageReq query) {
         return GenericDto.success(gameRankService.statisticPage(query));
+    }
+
+    @PostMapping("/equip-page")
+    @ApiOperation(value = "装备分页", notes = "装备分页")
+    public GenericDto<IPage<GameRankEquipResp>> equipPage(@Valid @RequestBody GameRankNftPageReq query) {
+        return GenericDto.success(gameRankService.equipPage(query));
+    }
+
+    @PostMapping("/item-page")
+    @ApiOperation(value = "道具分页", notes = "道具分页")
+    public GenericDto<IPage<GameRankItemResp>> itemPage(@Valid @RequestBody GameRankNftPageReq query) {
+        return GenericDto.success(gameRankService.itemPage(query));
+    }
+
+    @PostMapping("/hero-page")
+    @ApiOperation(value = "英雄分页", notes = "英雄分页")
+    public GenericDto<IPage<GameRankHeroResp>> heroPage(@Valid @RequestBody GameRankNftPageReq query) {
+        return GenericDto.success(gameRankService.heroPage(query));
     }
 
 }

@@ -7,18 +7,22 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.admin.dto.request.GameRankNftPageReq;
 import com.seeds.admin.dto.request.GameRankStatisticPageReq;
 import com.seeds.admin.dto.request.GameWinRankReq;
-import com.seeds.admin.dto.response.GameRankStatisticResp;
-import com.seeds.admin.dto.response.GameWinRankResp;
+import com.seeds.admin.dto.response.*;
+import com.seeds.common.dto.GenericDto;
 import com.seeds.game.config.warblade.GameWarbladeConfig;
 import com.seeds.game.entity.ServerRegionEntity;
 import com.seeds.game.entity.ServerRoleEntity;
 import com.seeds.game.entity.ServerRoleStatisticsEntity;
 import com.seeds.game.enums.SortTypeEnum;
+import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.*;
 import com.seeds.uc.constant.UcRedisKeysConstant;
 import com.seeds.uc.exceptions.GenericException;
+import com.seeds.uc.feign.UserCenterFeignClient;
+import com.seeds.uc.model.UcUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
@@ -63,6 +67,12 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Autowired
     private IServerRegionService serverRegionService;
+
+    @Autowired
+    private NftMarketOrderMapper nftMarketOrderMapper;
+
+    @Autowired
+    private UserCenterFeignClient userCenterFeignClient;
 
     @Autowired
     private IServerRoleStatisticsService serverRoleStatisticsService;
@@ -183,6 +193,63 @@ public class GameRankServiceImpl implements GameRankService {
         });
     }
 
+    @Override
+    public IPage<GameRankEquipResp> equipPage(GameRankNftPageReq query) {
+        Page<GameRankEquipResp> page = new Page<>(query.getCurrent(), query.getSize());
+        IPage<GameRankEquipResp> equipPage = nftMarketOrderMapper.equipPage(page, query);
+        List<GameRankEquipResp> records = equipPage.getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        Set<String> publicAddress = records.stream().map(GameRankEquipResp::getPublicAddress).collect(Collectors.toSet());
+        Map<String, UcUser> userMap = getUserMap(publicAddress);
+        return page.convert(p -> {
+            UcUser ucUser = userMap.get(p.getPublicAddress());
+            if (ucUser != null) {
+                p.setCollector(ucUser.getNickname());
+            }
+            return p;
+        });
+    }
+
+    @Override
+    public IPage<GameRankItemResp> itemPage(GameRankNftPageReq query) {
+        Page<GameRankItemResp> page = new Page<>(query.getCurrent(), query.getSize());
+        IPage<GameRankItemResp> itemPage = nftMarketOrderMapper.itemPage(page, query);
+        List<GameRankItemResp> records = itemPage.getRecords();
+        if (!CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        Set<String> publicAddress = records.stream().map(GameRankItemResp::getPublicAddress).collect(Collectors.toSet());
+        Map<String, UcUser> userMap = getUserMap(publicAddress);
+        return page.convert(p -> {
+            UcUser ucUser = userMap.get(p.getPublicAddress());
+            if (ucUser != null) {
+                p.setCollector(ucUser.getNickname());
+            }
+            return p;
+        });
+    }
+
+    @Override
+    public IPage<GameRankHeroResp> heroPage(GameRankNftPageReq query) {
+        Page<GameRankHeroResp> page = new Page<>(query.getCurrent(), query.getSize());
+        IPage<GameRankHeroResp> heroPage = nftMarketOrderMapper.heroPage(page, query);
+        List<GameRankHeroResp> records = heroPage.getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        Set<String> publicAddress = records.stream().map(GameRankHeroResp::getPublicAddress).collect(Collectors.toSet());
+        Map<String, UcUser> userMap = getUserMap(publicAddress);
+        return page.convert(p -> {
+            UcUser ucUser = userMap.get(p.getPublicAddress());
+            if (ucUser != null) {
+                p.setCollector(ucUser.getNickname());
+            }
+            return p;
+        });
+    }
+
     List<GameWinRankResp.GameWinRank> sortBySortType(Integer sortType, Map<String, GameWinRankResp.GameWinRank> rankMap, Integer limit) {
         switch (sortType) {
             case 2:
@@ -251,6 +318,17 @@ public class GameRankServiceImpl implements GameRankService {
                     break;
             }
         }
+    }
+
+    private Map<String, UcUser> getUserMap(Set<String> publicAddress) {
+        Map<String, UcUser> map = new HashMap<>(publicAddress.size());
+        try {
+            GenericDto<Map<String, UcUser>> result = userCenterFeignClient.mapByPublicAddress(publicAddress);
+            map = result.getData();
+        } catch (Exception e) {
+            log.error("内部批量请求uc获取用户公共地址失败");
+        }
+        return map;
     }
 
 }
