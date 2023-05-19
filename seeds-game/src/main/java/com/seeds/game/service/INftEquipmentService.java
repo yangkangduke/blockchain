@@ -23,5 +23,5 @@ public interface INftEquipmentService extends IService<NftEquipment> {
      */
     NftEquipment queryByMintAddress(String mintAddress);
 
-    Map<String, String> getOwnerByMintAddress(List<String> mintAddress);
+    Map<String, NftEquipment> getOwnerByMintAddress(List<String> mintAddress);
 }

@@ -2,6 +2,7 @@ package com.seeds.game.controller;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
+import com.seeds.game.entity.NftEquipment;
 import com.seeds.game.service.INftEquipmentService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class InterNftEquipController {
 
     @PostMapping("/get-owner-by-mintAddress")
     @Inner
-    public GenericDto<Map<String, String>> getOwnerByMintAddress(@RequestBody List<String> mintAddresses) {
+    public GenericDto<Map<String, NftEquipment>> getOwnerByMintAddress(@RequestBody List<String> mintAddresses) {
         return GenericDto.success(nftEquipmentService.getOwnerByMintAddress(mintAddresses));
     }
 }

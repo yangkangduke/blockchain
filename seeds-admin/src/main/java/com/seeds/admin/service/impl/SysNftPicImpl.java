@@ -40,6 +40,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.game.dto.request.internal.SkinNftWithdrawDto;
+import com.seeds.game.entity.NftEquipment;
 import com.seeds.game.entity.NftMarketOrderEntity;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftHeroTypeEnum;
@@ -149,18 +150,19 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             return page.convert(p -> null);
         }
         List<String> tokenAddresses = records.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList());
-        Map<String, String> data = null;
+        Map<String, NftEquipment> data = null;
         try {
-            GenericDto<Map<String, String>> result = remoteNftEquipService.getOwnerByMintAddress(tokenAddresses);
+            GenericDto<Map<String, NftEquipment>> result = remoteNftEquipService.getOwnerByMintAddress(tokenAddresses);
             data = result.getData();
         } catch (Exception e) {
             log.error("内部请求game获取tokenAddresses的owner");
         }
-        Map<String, String> finalData = data;
+        Map<String, NftEquipment> finalData = data;
         return page.convert(p -> {
             SysNftPicMIntedResp resp = new SysNftPicMIntedResp();
             BeanUtils.copyProperties(p, resp);
-            resp.setOwner(null != finalData ? finalData.get(p.getTokenAddress()) : "");
+            resp.setOwner(null != finalData ? finalData.get(p.getTokenAddress()).getOwner() : "");
+            resp.setListState(null != finalData ? finalData.get(p.getTokenAddress()).getOnSale() : 0);
             return resp;
         });
     }

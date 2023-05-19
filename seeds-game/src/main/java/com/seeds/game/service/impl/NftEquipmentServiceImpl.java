@@ -29,8 +29,8 @@ public class NftEquipmentServiceImpl extends ServiceImpl<NftEquipmentMapper, Nft
     }
 
     @Override
-    public Map<String, String> getOwnerByMintAddress(List<String> mintAddress) {
-        return this.list(new LambdaQueryWrapper<NftEquipment>().in(NftEquipment::getMintAddress, mintAddress))
-                .stream().collect(Collectors.toMap(NftEquipment::getMintAddress, NftEquipment::getOwner));
+    public Map<String, NftEquipment> getOwnerByMintAddress(List<String> mintAddress) {
+       return this.list(new LambdaQueryWrapper<NftEquipment>().in(NftEquipment::getMintAddress, mintAddress))
+                .stream().collect(Collectors.toMap(NftEquipment::getMintAddress, p -> p));
     }
 }

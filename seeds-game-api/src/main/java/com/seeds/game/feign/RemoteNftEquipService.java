@@ -2,6 +2,7 @@ package com.seeds.game.feign;
 
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.inner.Inner;
+import com.seeds.game.entity.NftEquipment;
 import com.seeds.game.feign.impl.RemoteNftEquipServiceImpl;
 import com.seeds.game.feign.interceptor.GameFeignInnerRequestInterceptor;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -20,6 +21,6 @@ import java.util.Map;
 public interface RemoteNftEquipService {
 
 	@PostMapping("/inter-game/nft/get-owner-by-mintAddress")
-	GenericDto<Map<String, String>> getOwnerByMintAddress(@RequestBody List<String> mintAddresses);
+	GenericDto<Map<String, NftEquipment>> getOwnerByMintAddress(@RequestBody List<String> mintAddresses);
 
 }
