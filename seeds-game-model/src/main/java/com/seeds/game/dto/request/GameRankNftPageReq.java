@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
+
 
 /**
  * @author hang.yu
@@ -21,6 +23,10 @@ public class GameRankNftPageReq extends PageReq {
 
     @ApiModelProperty(value = "排序类型 0 :升序 1:降序")
     private Integer sortType = 1;
+
+    @ApiModelProperty(value = "种类标识")
+    @NotBlank(message = "Item can not be empty!")
+    private String item;
 
     private String sortTypeStr;
 

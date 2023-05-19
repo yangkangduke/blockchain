@@ -17,4 +17,6 @@ public class ItemImage {
     private String imgUrl;
     // 分类id
     private Long itemId;
+    // 类别 1装备 2道具 3英雄
+    private Integer type;
 }

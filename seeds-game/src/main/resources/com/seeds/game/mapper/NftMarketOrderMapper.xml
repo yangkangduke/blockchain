@@ -219,7 +219,7 @@
         left join ga_nft_public_backpack b on b.eq_nft_id = n.id
         left join ga_nft_attribute a on a.eq_nft_id = n.id
         left join z_auction_house_setting s on s.id = o.auction_id
-        where o.status = 2 and b.type = 1
+        where o.status = 2 and b.type = 1 and b.item_type_id = #{params.item}
         GROUP BY o.mint_address
         <if test="params.sortField == 1">
             order by price ${params.sortTypeStr}
@@ -244,7 +244,7 @@
         left join ga_nft_public_backpack b on b.eq_nft_id = n.id
         left join ga_nft_attribute a on a.eq_nft_id = n.id
         left join z_auction_house_setting s on s.id = o.auction_id
-        where o.status = 2 and b.type = 2
+        where o.status = 2 and b.type = 2 and b.item_type_id = #{params.item}
         GROUP BY o.mint_address
         <if test="params.sortField == 1">
             order by price ${params.sortTypeStr}
@@ -275,7 +275,7 @@
         left join ga_nft_public_backpack b on b.eq_nft_id = n.id
         left join ga_nft_attribute a on a.eq_nft_id = n.id
         left join z_auction_house_setting s on s.id = o.auction_id
-        where o.status = 2 and b.type = 3
+        where o.status = 2 and b.type = 3 and b.name = #{params.item}
         GROUP BY o.mint_address
         <if test="params.sortField == 1">
             order by price ${params.sortTypeStr}
