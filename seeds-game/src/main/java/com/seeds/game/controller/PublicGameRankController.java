@@ -1,11 +1,15 @@
 package com.seeds.game.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.seeds.admin.dto.request.GameRankNftPageReq;
-import com.seeds.admin.dto.request.GameRankStatisticPageReq;
+import com.seeds.game.dto.request.GameRankNftPageReq;
+import com.seeds.game.dto.request.GameRankStatisticPageReq;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.response.*;
 import com.seeds.common.dto.GenericDto;
+import com.seeds.game.dto.response.GameRankEquipResp;
+import com.seeds.game.dto.response.GameRankHeroResp;
+import com.seeds.game.dto.response.GameRankItemResp;
+import com.seeds.game.dto.response.GameRankStatisticResp;
 import com.seeds.game.service.GameRankService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

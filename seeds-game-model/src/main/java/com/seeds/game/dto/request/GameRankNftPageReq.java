@@ -1,11 +1,10 @@
-package com.seeds.admin.dto.request;
+package com.seeds.game.dto.request;
 
+import com.seeds.admin.dto.request.PageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import javax.validation.constraints.NotNull;
 
 
 /**
@@ -23,8 +22,14 @@ public class GameRankNftPageReq extends PageReq {
     @ApiModelProperty(value = "排序类型 0 :升序 1:降序")
     private Integer sortType = 1;
 
-    @ApiModelProperty("NFT类型 1 Equip 2 Item 3 Hero")
-    @NotNull(message = "NFT type cannot be empty")
-    private Integer nftType;
+    private String sortTypeStr;
+
+    public static String convert(Integer sortType) {
+        String str = "desc";
+        if (sortType.equals(0)) {
+            str = "asc";
+        }
+        return str;
+    }
 
 }

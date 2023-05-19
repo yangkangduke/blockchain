@@ -1,4 +1,4 @@
-package com.seeds.admin.dto.response;
+package com.seeds.game.dto.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -37,5 +37,8 @@ public class GameRankItemResp {
 
 	@ApiModelProperty("浏览量")
 	private Integer views;
+
+	@ApiModelProperty("成交时间")
+	private Long fulfillTime;
 
 }

@@ -1,10 +1,14 @@
 package com.seeds.game.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.seeds.admin.dto.request.GameRankNftPageReq;
-import com.seeds.admin.dto.request.GameRankStatisticPageReq;
+import com.seeds.game.dto.request.GameRankNftPageReq;
+import com.seeds.game.dto.request.GameRankStatisticPageReq;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.response.*;
+import com.seeds.game.dto.response.GameRankEquipResp;
+import com.seeds.game.dto.response.GameRankHeroResp;
+import com.seeds.game.dto.response.GameRankItemResp;
+import com.seeds.game.dto.response.GameRankStatisticResp;
 
 import java.util.List;
 

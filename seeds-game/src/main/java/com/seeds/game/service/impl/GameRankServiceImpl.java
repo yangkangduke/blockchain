@@ -7,12 +7,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.admin.dto.request.GameRankNftPageReq;
-import com.seeds.admin.dto.request.GameRankStatisticPageReq;
+import com.seeds.game.dto.request.GameRankNftPageReq;
+import com.seeds.game.dto.request.GameRankStatisticPageReq;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.response.*;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.config.warblade.GameWarbladeConfig;
+import com.seeds.game.dto.response.GameRankEquipResp;
+import com.seeds.game.dto.response.GameRankHeroResp;
+import com.seeds.game.dto.response.GameRankItemResp;
+import com.seeds.game.dto.response.GameRankStatisticResp;
 import com.seeds.game.entity.ServerRegionEntity;
 import com.seeds.game.entity.ServerRoleEntity;
 import com.seeds.game.entity.ServerRoleStatisticsEntity;
@@ -195,6 +199,7 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Override
     public IPage<GameRankEquipResp> equipPage(GameRankNftPageReq query) {
+        query.setSortTypeStr(GameRankNftPageReq.convert(query.getSortType()));
         Page<GameRankEquipResp> page = new Page<>(query.getCurrent(), query.getSize());
         IPage<GameRankEquipResp> equipPage = nftMarketOrderMapper.equipPage(page, query);
         List<GameRankEquipResp> records = equipPage.getRecords();
@@ -214,10 +219,11 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Override
     public IPage<GameRankItemResp> itemPage(GameRankNftPageReq query) {
+        query.setSortTypeStr(GameRankNftPageReq.convert(query.getSortType()));
         Page<GameRankItemResp> page = new Page<>(query.getCurrent(), query.getSize());
         IPage<GameRankItemResp> itemPage = nftMarketOrderMapper.itemPage(page, query);
         List<GameRankItemResp> records = itemPage.getRecords();
-        if (!CollectionUtils.isEmpty(records)) {
+        if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
         Set<String> publicAddress = records.stream().map(GameRankItemResp::getPublicAddress).collect(Collectors.toSet());
@@ -233,6 +239,7 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Override
     public IPage<GameRankHeroResp> heroPage(GameRankNftPageReq query) {
+        query.setSortTypeStr(GameRankNftPageReq.convert(query.getSortType()));
         Page<GameRankHeroResp> page = new Page<>(query.getCurrent(), query.getSize());
         IPage<GameRankHeroResp> heroPage = nftMarketOrderMapper.heroPage(page, query);
         List<GameRankHeroResp> records = heroPage.getRecords();

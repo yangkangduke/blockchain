@@ -1,4 +1,4 @@
-package com.seeds.admin.dto.response;
+package com.seeds.game.dto.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -55,5 +55,8 @@ public class GameRankHeroResp {
 
 	@ApiModelProperty("被玩家击杀数")
 	private Integer slaying;
+
+	@ApiModelProperty("成交时间")
+	private Long fulfillTime;
 
 }

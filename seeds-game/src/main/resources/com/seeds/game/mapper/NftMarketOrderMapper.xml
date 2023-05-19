@@ -201,4 +201,87 @@
         </if>
 
     </select>
+
+    <select id="equipPage" resultType="com.seeds.game.dto.response.GameRankEquipResp"
+            parameterType="com.seeds.game.dto.request.GameRankNftPageReq">
+        select
+        max(o.fulfill_time) AS fulfillTime,
+        ANY_VALUE(b.`name`) AS `name`,
+        ANY_VALUE(b.image) AS image,
+        ANY_VALUE(b.grade) AS grade,
+        ANY_VALUE(b.views) AS views,
+        CONCAT('#', ANY_VALUE(o.token_id)) AS number,
+        ANY_VALUE(n.`owner`) AS publicAddress,
+        ANY_VALUE(a.durability) AS durability,
+        IF(ANY_VALUE(o.auction_id) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price
+        from z_market_order o
+        join z_equipment_nft n on n.mint_address  = o.mint_address
+        left join ga_nft_public_backpack b on b.eq_nft_id = n.id
+        left join ga_nft_attribute a on a.eq_nft_id = n.id
+        left join z_auction_house_setting s on s.id = o.auction_id
+        where o.status = 2 and b.type = 1
+        GROUP BY o.mint_address
+        <if test="params.sortField == 1">
+            order by price ${params.sortTypeStr}
+        </if>
+        <if test="params.sortField == 2">
+            order by views ${params.sortTypeStr}
+        </if>
+    </select>
+
+    <select id="itemPage" resultType="com.seeds.game.dto.response.GameRankItemResp"
+            parameterType="com.seeds.game.dto.request.GameRankNftPageReq">
+        select
+        max(o.fulfill_time) AS fulfillTime,
+        ANY_VALUE(b.`name`) AS `name`,
+        ANY_VALUE(b.image) AS image,
+        ANY_VALUE(b.views) AS views,
+        CONCAT('#', ANY_VALUE(o.token_id)) AS number,
+        ANY_VALUE(n.`owner`) AS publicAddress,
+        IF(ANY_VALUE(o.auction_id) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price
+        from z_market_order o
+        join z_equipment_nft n on n.mint_address  = o.mint_address
+        left join ga_nft_public_backpack b on b.eq_nft_id = n.id
+        left join ga_nft_attribute a on a.eq_nft_id = n.id
+        left join z_auction_house_setting s on s.id = o.auction_id
+        where o.status = 2 and b.type = 2
+        GROUP BY o.mint_address
+        <if test="params.sortField == 1">
+            order by price ${params.sortTypeStr}
+        </if>
+        <if test="params.sortField == 2">
+            order by views ${params.sortTypeStr}
+        </if>
+    </select>
+
+    <select id="heroPage" resultType="com.seeds.game.dto.response.GameRankHeroResp"
+            parameterType="com.seeds.game.dto.request.GameRankNftPageReq">
+        select
+        max(o.fulfill_time) AS fulfillTime,
+        ANY_VALUE(b.`name`) AS `name`,
+        ANY_VALUE(b.image) AS image,
+        ANY_VALUE(b.views) AS views,
+        CONCAT('#', ANY_VALUE(o.token_id)) AS number,
+        ANY_VALUE(n.`owner`) AS publicAddress,
+        IF(ANY_VALUE(o.auction_id) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price,
+        ANY_VALUE(a.victory) AS victory,
+        ANY_VALUE(a.lose) AS lose,
+        ANY_VALUE(a.max_streak) AS maxStreak,
+        ANY_VALUE(a.killing_spree) AS killingSpree,
+        ANY_VALUE(a.goblin_kill) AS goblinKill,
+        ANY_VALUE(a.slaying) AS slaying
+        from z_market_order o
+        join z_equipment_nft n on n.mint_address  = o.mint_address
+        left join ga_nft_public_backpack b on b.eq_nft_id = n.id
+        left join ga_nft_attribute a on a.eq_nft_id = n.id
+        left join z_auction_house_setting s on s.id = o.auction_id
+        where o.status = 2 and b.type = 3
+        GROUP BY o.mint_address
+        <if test="params.sortField == 1">
+            order by price ${params.sortTypeStr}
+        </if>
+        <if test="params.sortField == 2">
+            order by views ${params.sortTypeStr}
+        </if>
+    </select>
 </mapper>
