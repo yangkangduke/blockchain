@@ -12,4 +12,8 @@ public class SkinNftCancelAuctionDto {
 
     @ApiModelProperty("拍卖id")
     private Long auctionId;
+
+    @ApiModelProperty("nftId")
+    private Long nftId;
+
 }

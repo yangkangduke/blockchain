@@ -24,4 +24,12 @@
             #{tokenAddress}
         </foreach>
     </select>
+    <select id="getNftIdByMintAddress" resultType="com.seeds.game.entity.NftEquipment">
+        select id,mint_address
+        from z_equipment_nft
+        where  mint_address in
+        <foreach collection="tokenAddresses" item="tokenAddress" index="index" open="(" close=")" separator=",">
+            #{tokenAddress}
+        </foreach>
+    </select>
 </mapper>

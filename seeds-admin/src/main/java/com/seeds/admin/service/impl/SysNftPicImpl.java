@@ -598,10 +598,13 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     public void cancelAuction(ListReq req) {
         List<SysNftPicEntity> list = this.listByIds(req.getIds());
         List<NftMarketOrderEntity> receipts = baseMapper.getAuctionIdByMintAddress(list.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList()));
+        List<NftEquipment> nftEquipments = baseMapper.getNftIdByMintAddress(list.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList()));
         Map<String, Long> receiptsMap = receipts.stream().collect(Collectors.toMap(NftMarketOrderEntity::getMintAddress, NftMarketOrderEntity::getAuctionId));
+        Map<String, Long> nftIdMap = nftEquipments.stream().collect(Collectors.toMap(NftEquipment::getMintAddress, NftEquipment::getId));
         List<SkinNftCancelAuctionDto> dtos = list.stream().map(p -> {
             SkinNftCancelAuctionDto skinNftCancelAssetDto = new SkinNftCancelAuctionDto();
             skinNftCancelAssetDto.setAuctionId(receiptsMap.get(p.getTokenAddress()));
+            skinNftCancelAssetDto.setNftId(nftIdMap.get(p.getTokenAddress()));
             return skinNftCancelAssetDto;
         }).collect(Collectors.toList());
 
