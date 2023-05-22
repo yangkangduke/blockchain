@@ -377,8 +377,12 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             }
             backpackEntity.setAttributes(equipment.getAttributes());
             // 设置参考价
-            BigDecimal usdRate = marketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
-            backpackEntity.setProposedPrice(new BigDecimal(durability).divide(usdRate,2,BigDecimal.ROUND_HALF_UP));
+            try {
+                BigDecimal usdRate = marketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
+                backpackEntity.setProposedPrice(new BigDecimal(durability).divide(usdRate,2,BigDecimal.ROUND_HALF_UP));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             nftPublicBackpackService.save(backpackEntity);
             // 如果是合成，作为合成材料的nft标记为销毁的状态
             if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
