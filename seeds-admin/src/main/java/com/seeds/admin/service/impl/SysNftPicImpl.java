@@ -487,7 +487,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
 
     @Override
     public void listAsset(SysSkinNftListAssetReq req) {
-
+        log.info("list-asset， params:{}", req);
         List<SysNftPicEntity> list = this.listByIds(req.getIds());
         List<SkinNftListAssetDto> listAssetDto = list.stream().map(p -> {
             SkinNftListAssetDto dto = new SkinNftListAssetDto();
@@ -582,7 +582,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                     .execute();
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             // 更新下架状态
-            log.info(" englishV2 成功--result:{}", jsonObject);
+            log.info(" cancelAsset 成功--result:{}", jsonObject);
             if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
                 list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.NO_LIST.getCode()));
                 this.updateBatchById(list);
