@@ -1007,4 +1007,16 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     public SysNftPicEntity getHeroAndSkin(Long nftPicId) {
         return baseMapper.getHeroAndSkin(nftPicId);
     }
+
+    @Override
+    public Map<Long, NftPublicBackpackEntity> queryMapByEqNftIds(Collection<Long> eqNftIds) {
+        if (CollectionUtils.isEmpty(eqNftIds)) {
+            return Collections.emptyMap();
+        }
+        List<NftPublicBackpackEntity> list = list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getEqNftId, eqNftIds));
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(NftPublicBackpackEntity::getEqNftId, p -> p));
+    }
 }

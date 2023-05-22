@@ -2,13 +2,11 @@ package com.seeds.game.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.game.dto.request.GameRankNftPageReq;
+import com.seeds.game.dto.request.GameRankNftSkinReq;
 import com.seeds.game.dto.request.GameRankStatisticPageReq;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.response.*;
-import com.seeds.game.dto.response.GameRankEquipResp;
-import com.seeds.game.dto.response.GameRankHeroResp;
-import com.seeds.game.dto.response.GameRankItemResp;
-import com.seeds.game.dto.response.GameRankStatisticResp;
+import com.seeds.game.dto.response.*;
 
 import java.util.List;
 
@@ -53,5 +51,12 @@ public interface GameRankService {
      * @return 游戏英雄排行
      */
     IPage<GameRankHeroResp> heroPage(GameRankNftPageReq query);
+
+    /**
+     * 获取游戏NFT皮肤总榜
+     * @param query 查询条件
+     * @return NFT皮肤总榜
+     */
+    List<GameRankNftSkinResp.GameRankNftSkin> nftSkin(GameRankNftSkinReq query);
 
 }

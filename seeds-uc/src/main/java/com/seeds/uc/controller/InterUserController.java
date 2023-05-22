@@ -109,6 +109,13 @@ public class InterUserController {
         return GenericDto.success(ucUserService.mapByPublicAddress(publicAddress));
     }
 
+    @ApiOperation("根据用户id获取用户信息")
+    @Inner
+    @PostMapping("/map-by-ids")
+    GenericDto<Map<Long, UcUser>> mapByIds(@RequestBody Set<Long> ids) {
+        return GenericDto.success(ucUserService.mapByIds(ids));
+    }
+
     @ApiOperation("通过邮箱获取用户")
     @Inner
     @GetMapping("/get-by-email")

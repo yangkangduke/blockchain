@@ -8,18 +8,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seeds.game.dto.request.GameRankNftPageReq;
+import com.seeds.game.dto.request.GameRankNftSkinReq;
 import com.seeds.game.dto.request.GameRankStatisticPageReq;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.response.*;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.config.warblade.GameWarbladeConfig;
-import com.seeds.game.dto.response.GameRankEquipResp;
-import com.seeds.game.dto.response.GameRankHeroResp;
-import com.seeds.game.dto.response.GameRankItemResp;
-import com.seeds.game.dto.response.GameRankStatisticResp;
-import com.seeds.game.entity.ServerRegionEntity;
-import com.seeds.game.entity.ServerRoleEntity;
-import com.seeds.game.entity.ServerRoleStatisticsEntity;
+import com.seeds.game.dto.response.*;
+import com.seeds.game.entity.*;
 import com.seeds.game.enums.SortTypeEnum;
 import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.*;
@@ -70,6 +66,9 @@ public class GameRankServiceImpl implements GameRankService {
     private GameWarbladeConfig gameWarbladeConfig;
 
     @Autowired
+    private INftAttributeService nftAttributeService;
+
+    @Autowired
     private IServerRegionService serverRegionService;
 
     @Autowired
@@ -77,6 +76,9 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Autowired
     private UserCenterFeignClient userCenterFeignClient;
+
+    @Autowired
+    private INftPublicBackpackService nftPublicBackpackService;
 
     @Autowired
     private IServerRoleStatisticsService serverRoleStatisticsService;
@@ -207,7 +209,7 @@ public class GameRankServiceImpl implements GameRankService {
             return page.convert(p -> null);
         }
         Set<String> publicAddress = records.stream().map(GameRankEquipResp::getPublicAddress).collect(Collectors.toSet());
-        Map<String, UcUser> userMap = getUserMap(publicAddress);
+        Map<String, UcUser> userMap = getUserMapByAddress(publicAddress);
         return page.convert(p -> {
             UcUser ucUser = userMap.get(p.getPublicAddress());
             if (ucUser != null) {
@@ -227,7 +229,7 @@ public class GameRankServiceImpl implements GameRankService {
             return page.convert(p -> null);
         }
         Set<String> publicAddress = records.stream().map(GameRankItemResp::getPublicAddress).collect(Collectors.toSet());
-        Map<String, UcUser> userMap = getUserMap(publicAddress);
+        Map<String, UcUser> userMap = getUserMapByAddress(publicAddress);
         return page.convert(p -> {
             UcUser ucUser = userMap.get(p.getPublicAddress());
             if (ucUser != null) {
@@ -247,7 +249,7 @@ public class GameRankServiceImpl implements GameRankService {
             return page.convert(p -> null);
         }
         Set<String> publicAddress = records.stream().map(GameRankHeroResp::getPublicAddress).collect(Collectors.toSet());
-        Map<String, UcUser> userMap = getUserMap(publicAddress);
+        Map<String, UcUser> userMap = getUserMapByAddress(publicAddress);
         return page.convert(p -> {
             UcUser ucUser = userMap.get(p.getPublicAddress());
             if (ucUser != null) {
@@ -255,6 +257,86 @@ public class GameRankServiceImpl implements GameRankService {
             }
             return p;
         });
+    }
+
+    @Override
+    public List<GameRankNftSkinResp.GameRankNftSkin> nftSkin(GameRankNftSkinReq query) {
+        // 先从redis缓存中拿排行榜数据
+        RBucket<String> bucket = redissonClient.getBucket(UcRedisKeysConstant.UC_GAME_NFT_SKIN_RANK_TEMPLATE);
+        String data = bucket.get();
+        Map<Long, Integer> scoreMap = new HashMap<>();
+        if (StringUtils.isNotBlank(data)) {
+            GameRankNftSkinResp resp = JSONUtil.toBean(data, GameRankNftSkinResp.class);
+            List<GameRankNftSkinResp.GameRankNftSkin> cacheList = resp.getInfos();
+            // 判断是否过期
+            if (resp.getExpireTime() > System.currentTimeMillis()) {
+                return cacheList;
+            }
+            scoreMap = cacheList.stream().collect(Collectors.toMap(GameRankNftSkinResp.GameRankNftSkin::getNftId, GameRankNftSkinResp.GameRankNftSkin::getScore));
+        }
+        Map<Long, GameRankNftSkinResp.GameRankNftSkin> map = new HashMap<>();
+        Integer number = query.getEndRow();
+        // victory子榜单 系数1 积分200
+        List<NftAttributeEntity> victoryRank = nftAttributeService.querySkinRankVictory(number);
+        nftAttributeService.calculateSkinRankScore(victoryRank, map, 200, -1);
+        // lose子榜单 系数-1 积分-200
+        List<NftAttributeEntity> loseRank = nftAttributeService.querySkinRankLose(number);
+        nftAttributeService.calculateSkinRankScore(loseRank, map, -200, 1);
+        // max streak子榜单 系数2 积分400
+        List<NftAttributeEntity> maxStreakRank = nftAttributeService.querySkinRankMaxStreak(number);
+        nftAttributeService.calculateSkinRankScore(maxStreakRank, map, 400, -1);
+        // capture子榜单 系数0.5 积分100
+        List<NftAttributeEntity> captureRank = nftAttributeService.querySkinRankCapture(number);
+        nftAttributeService.calculateSkinRankScore(captureRank, map, 100, -1);
+        // killing spree子榜单 系数1 积分200
+        List<NftAttributeEntity> killingSpreeRank = nftAttributeService.querySkinRankKillingSpree(number);
+        nftAttributeService.calculateSkinRankScore(killingSpreeRank, map, 200, -1);
+        // goblin kill子榜单 系数0.5 积分100
+        List<NftAttributeEntity> goblinKillRank = nftAttributeService.querySkinRankGoblinKill(number);
+        nftAttributeService.calculateSkinRankScore(goblinKillRank, map, 100, -1);
+        // death by slaying子榜单 系数-0.5 积分-100
+        List<NftAttributeEntity> slayingRank = nftAttributeService.querySkinRankSlaying(number);
+        nftAttributeService.calculateSkinRankScore(slayingRank, map, -100, 1);
+        // death by goblin子榜单 系数-0.5 积分-100
+        List<NftAttributeEntity> goblinRank = nftAttributeService.querySkinRankGoblin(number);
+        nftAttributeService.calculateSkinRankScore(goblinRank, map, -100, 1);
+        Set<Long> nftIds = new HashSet<>();
+        Collection<GameRankNftSkinResp.GameRankNftSkin> values = map.values();
+        if (CollectionUtils.isEmpty(values)) {
+            return Collections.emptyList();
+        }
+        List<GameRankNftSkinResp.GameRankNftSkin> respList = values.stream().filter(p -> p.getScore() > 0)
+                .sorted(Comparator.comparing(GameRankNftSkinResp.GameRankNftSkin::getScore).reversed())
+                .limit(number).peek(p -> nftIds.add(p.getNftId())).collect(Collectors.toList());
+        Map<Long, NftPublicBackpackEntity> backpackMap = nftPublicBackpackService.queryMapByEqNftIds(nftIds);
+        Set<Long> userIds = backpackMap.values().stream().map(NftPublicBackpackEntity::getUserId).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<Long, UcUser> userMap = getUserMapByIds(userIds);
+        for (GameRankNftSkinResp.GameRankNftSkin nftSkin : respList) {
+            NftPublicBackpackEntity backpack = backpackMap.get(nftSkin.getNftId());
+            if (backpack != null) {
+                nftSkin.setName(backpack.getName());
+                nftSkin.setImage(backpack.getImage());
+                nftSkin.setNumber("#" + backpack.getTokenId());
+                UcUser ucUser = userMap.get(backpack.getUserId());
+                if (ucUser != null) {
+                    nftSkin.setCollector(ucUser.getNickname());
+                    nftSkin.setPublicAddress(ucUser.getPublicAddress());
+                }
+            }
+            Integer lastScore = scoreMap.get(nftSkin.getNftId());
+            if (lastScore != null) {
+                nftSkin.setTrend(nftSkin.getScore() > lastScore ? 1 : 2);
+            }
+        }
+
+        // 设置redis排行榜缓存
+        if (!CollectionUtils.isEmpty(respList)) {
+            GameRankNftSkinResp resp = new GameRankNftSkinResp();
+            resp.setInfos(respList);
+            resp.setExpireTime(System.currentTimeMillis() + winRankExpireAfter * 60 * 1000);
+            bucket.set(JSONUtil.toJsonStr(resp), winRankExpireAfter, TimeUnit.HOURS);
+        }
+        return respList;
     }
 
     List<GameWinRankResp.GameWinRank> sortBySortType(Integer sortType, Map<String, GameWinRankResp.GameWinRank> rankMap, Integer limit) {
@@ -327,10 +409,21 @@ public class GameRankServiceImpl implements GameRankService {
         }
     }
 
-    private Map<String, UcUser> getUserMap(Set<String> publicAddress) {
+    private Map<String, UcUser> getUserMapByAddress(Set<String> publicAddress) {
         Map<String, UcUser> map = new HashMap<>(publicAddress.size());
         try {
             GenericDto<Map<String, UcUser>> result = userCenterFeignClient.mapByPublicAddress(publicAddress);
+            map = result.getData();
+        } catch (Exception e) {
+            log.error("内部批量请求uc获取用户公共地址失败");
+        }
+        return map;
+    }
+
+    private Map<Long, UcUser> getUserMapByIds(Set<Long> ids) {
+        Map<Long, UcUser> map = new HashMap<>(ids.size());
+        try {
+            GenericDto<Map<Long, UcUser>> result = userCenterFeignClient.mapByIds(ids);
             map = result.getData();
         } catch (Exception e) {
             log.error("内部批量请求uc获取用户公共地址失败");

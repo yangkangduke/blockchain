@@ -260,5 +260,13 @@ public interface IUcUserService extends IService<UcUser> {
      */
     Map<String, UcUser> mapByPublicAddress(Set<String> publicAddress);
 
+    /**
+     * 根据用户id获取用户信息
+     *
+     * @param ids 用户id
+     * @return 用户信息
+     */
+    Map<Long, UcUser> mapByIds(Set<Long> ids);
+
 }
 

@@ -85,6 +85,15 @@ public interface UserCenterFeignClient {
     GenericDto<Map<String, UcUser>> mapByPublicAddress(@RequestBody Set<String> publicAddress);
 
     /**
+     * 根据用户id获取用户信息
+     *
+     * @param ids 用户id
+     * @return 用户信息
+     */
+    @PostMapping("/uc-internal/user/map-by-ids")
+    GenericDto<Map<Long, UcUser>> mapByIds(@RequestBody Set<Long> ids);
+
+    /**
      * 通过邮箱获取用户
      *
      * @param email 邮箱

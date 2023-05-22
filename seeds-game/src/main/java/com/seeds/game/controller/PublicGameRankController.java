@@ -2,14 +2,12 @@ package com.seeds.game.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.game.dto.request.GameRankNftPageReq;
+import com.seeds.game.dto.request.GameRankNftSkinReq;
 import com.seeds.game.dto.request.GameRankStatisticPageReq;
 import com.seeds.admin.dto.request.GameWinRankReq;
 import com.seeds.admin.dto.response.*;
 import com.seeds.common.dto.GenericDto;
-import com.seeds.game.dto.response.GameRankEquipResp;
-import com.seeds.game.dto.response.GameRankHeroResp;
-import com.seeds.game.dto.response.GameRankItemResp;
-import com.seeds.game.dto.response.GameRankStatisticResp;
+import com.seeds.game.dto.response.*;
 import com.seeds.game.service.GameRankService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -69,4 +67,9 @@ public class PublicGameRankController {
         return GenericDto.success(gameRankService.heroPage(query));
     }
 
+    @PostMapping("/nft-skin")
+    @ApiOperation(value = "NFT皮肤总榜", notes = "NFT皮肤总榜")
+    public GenericDto<List<GameRankNftSkinResp.GameRankNftSkin>> nftSkin(@Valid @RequestBody GameRankNftSkinReq query) {
+        return GenericDto.success(gameRankService.nftSkin(query));
+    }
 }

@@ -538,6 +538,15 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         return list.stream().collect(Collectors.toMap(UcUser::getPublicAddress, p -> p));
     }
 
+    @Override
+    public Map<Long, UcUser> mapByIds(Set<Long> ids) {
+        List<UcUser> list = listByIds(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(UcUser::getId, p -> p));
+    }
+
     /**
      * 校验登陆
      * @param loginReq

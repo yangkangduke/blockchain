@@ -79,6 +79,8 @@ public class UcRedisKeysConstant {
 
     public final String UC_USD_RATE_TEMPLATE = UC_KEY_PREFIX + "usd:rate:%s";
 
+    public final String UC_GAME_NFT_SKIN_RANK_TEMPLATE = UC_KEY_PREFIX + "game:nft:skin:rank";
+
     /**
      * return uc:token:{uid} as redis key in login
      */

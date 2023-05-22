@@ -118,4 +118,12 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
     List<NftPublicBackpackSkinWebResp> getSkinPageForWeb(NftBackpackWebPageReq req);
 
     SysNftPicEntity getHeroAndSkin(Long nftPicId);
+
+    /**
+     * 通过NFT编号集合获取背包数据
+     * @param eqNftIds NFT编号集合
+     * @return 背包数据
+     */
+    Map<Long, NftPublicBackpackEntity> queryMapByEqNftIds(Collection<Long> eqNftIds);
+
 }
