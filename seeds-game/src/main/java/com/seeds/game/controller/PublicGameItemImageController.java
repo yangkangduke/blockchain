@@ -1,7 +1,7 @@
 package com.seeds.game.controller;
 
 import com.seeds.common.dto.GenericDto;
-import com.seeds.game.entity.ItemImage;
+import com.seeds.game.dto.response.GameItemImageResp;
 import com.seeds.game.service.ItemImageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,8 +29,8 @@ public class PublicGameItemImageController {
 
     @GetMapping("/list")
     @ApiOperation(value = "列表", notes = "列表")
-    public GenericDto<List<ItemImage>> winInfo() {
-        return GenericDto.success(itemImageService.list());
+    public GenericDto<List<GameItemImageResp>> winInfo() {
+        return GenericDto.success(itemImageService.treeList());
     }
 
 }

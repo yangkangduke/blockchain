@@ -18,5 +18,7 @@ public class ItemImage {
     // 分类id
     private Long itemId;
     // 类别 1装备 2道具 3英雄
-    private Integer type;
+    private Integer itemType;
+    // 职业名称
+    private String careerName;
 }
