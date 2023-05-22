@@ -487,7 +487,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
 
     @Override
     public void listAsset(SysSkinNftListAssetReq req) {
-
+        log.info("list-asset， params:{}", req);
         List<SysNftPicEntity> list = this.listByIds(req.getIds());
         List<SkinNftListAssetDto> listAssetDto = list.stream().map(p -> {
             SkinNftListAssetDto dto = new SkinNftListAssetDto();
@@ -582,7 +582,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                     .execute();
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             // 更新下架状态
-            log.info(" englishV2 成功--result:{}", jsonObject);
+            log.info(" cancelAsset 成功--result:{}", jsonObject);
             if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
                 list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.NO_LIST.getCode()));
                 this.updateBatchById(list);
@@ -598,10 +598,13 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
     public void cancelAuction(ListReq req) {
         List<SysNftPicEntity> list = this.listByIds(req.getIds());
         List<NftMarketOrderEntity> receipts = baseMapper.getAuctionIdByMintAddress(list.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList()));
+        List<NftEquipment> nftEquipments = baseMapper.getNftIdByMintAddress(list.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList()));
         Map<String, Long> receiptsMap = receipts.stream().collect(Collectors.toMap(NftMarketOrderEntity::getMintAddress, NftMarketOrderEntity::getAuctionId));
+        Map<String, Long> nftIdMap = nftEquipments.stream().collect(Collectors.toMap(NftEquipment::getMintAddress, NftEquipment::getId));
         List<SkinNftCancelAuctionDto> dtos = list.stream().map(p -> {
             SkinNftCancelAuctionDto skinNftCancelAssetDto = new SkinNftCancelAuctionDto();
             skinNftCancelAssetDto.setAuctionId(receiptsMap.get(p.getTokenAddress()));
+            skinNftCancelAssetDto.setNftId(nftIdMap.get(p.getTokenAddress()));
             return skinNftCancelAssetDto;
         }).collect(Collectors.toList());
 

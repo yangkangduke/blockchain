@@ -950,10 +950,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         log.info("皮肤mint成功,插入背包表--->：{}", JSONUtil.toJsonStr(backpackDtos));
         BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
         List<NftPublicBackpackEntity> entities = CglibUtil.copyList(backpackDtos, NftPublicBackpackEntity::new);
-        entities.forEach(p -> {
-            // 设置皮肤参考价
-            p.setProposedPrice(new BigDecimal(SkinNftEnums.SkinNftPrice.SKIN_NFT_PRICE.getPrice()).divide(usdRate, 2, BigDecimal.ROUND_HALF_UP));
-        });
+        try {
+            entities.forEach(p -> {
+                // 设置皮肤参考价
+                p.setProposedPrice(new BigDecimal(SkinNftEnums.SkinNftPrice.SKIN_NFT_PRICE.getPrice()).divide(usdRate, 2, BigDecimal.ROUND_HALF_UP));
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         this.saveBatch(entities);
         // 插入属性表
         List<NftAttributeEntity> attributeEntities = backpackDtos.stream().map(p -> {
