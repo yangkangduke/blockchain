@@ -516,7 +516,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             }
         } catch (Exception e) {
             log.error("NFT托管成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT Hosting Failure!");
+            throw new GenericException("NFT deposit Failure!");
         }
     }
 
