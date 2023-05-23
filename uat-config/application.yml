@@ -4,7 +4,7 @@ spring:
       max-file-size: 5GB
       max-request-size: 5GB
   kafka:
-    bootstrap-servers: 35.76.116.54:9092
+    bootstrap-servers: 34.84.153.188:9092
     producer:
       retries: 3  # 生产者发送失败时，重试次数
       batch-size: 16384
@@ -21,7 +21,7 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 redis:
-  host: 35.76.116.54
+  host: 34.84.153.188
   port: 6379
   password: Seeds123!
 
@@ -43,7 +43,7 @@ file:
   bucketName: seeds # 上文创建的桶名称
   oss:
     enable: true
-    endpoint: http://35.76.116.54:9000
+    endpoint: http://34.84.153.188:9000
     access-key: seeds123!
     secret-key: seeds123!
   game:
@@ -61,6 +61,9 @@ file:
       bucketName: game3
       region: cn-north-1 #北京
       cdn: game3.s3.cn-north-1.amazonaws.com.cn
+  metadata:
+    bucketName: seedsnft
+    endpoint: http://34.84.153.188:9000
 
 email:
   enable: false
@@ -70,7 +73,7 @@ email:
   pass: BLz0TmjXCpgIrNSvgAIH4IZJWznP1yoEiJV5NTCeSVY2
 
 zookeeper:
-  address: 35.76.116.54:2181
+  address: 34.84.153.188:2181
 
 login:
   twofa: false
@@ -83,4 +86,4 @@ service:
     wallet: http://127.0.0.1:10104
     notification: http://127.0.0.1:10105
     game: http://127.0.0.1:10106
-    gateway: http://35.76.116.54:9999
+    gateway: https://uat-gw.seedslabs.io
