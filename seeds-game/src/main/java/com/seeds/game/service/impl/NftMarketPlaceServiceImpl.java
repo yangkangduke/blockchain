@@ -828,7 +828,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         // 请求NFT托管费退还
         BeanUtils.copyProperties(req, nftFeeRecord);
         nftFeeRecord.setStatus(WhetherEnum.YES.value());
-        initRefundFee(refundFee.multiply(new BigDecimal(100000000L)), sellerAddress, nftFeeRecord);
+        initRefundFee(refundFee.multiply(new BigDecimal(1000000000L)), sellerAddress, nftFeeRecord);
         nftFeeRecord.setReceivableFee(receivableFee);
         nftFeeRecord.setRefundFee(refundFee);
         nftFeeRecord.setRefundTime(System.currentTimeMillis());
