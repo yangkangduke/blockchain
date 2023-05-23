@@ -20,7 +20,9 @@ admin:
   sso:
     redis:
       keyExpireAfter: 259200
-
+uc:
+  invite:
+    url: http://34.84.153.188:8001/invite/
 
 springfox:
   documentation:
