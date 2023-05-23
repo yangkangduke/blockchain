@@ -18,7 +18,7 @@ feign:
 elasticjob:
   # zk地址，命名空间
   regCenter:
-    serverLists: 35.76.116.54:2181
+    serverLists: 34.84.153.188:2181
     namespace: seeds-account-job
   jobs:
     # 自动创建空闲地址，每分钟运行一次
