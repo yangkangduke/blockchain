@@ -56,6 +56,8 @@ public class GameRankNftSkinResp {
 		@JsonSerialize(using= ToStringSerializer.class)
 		private Long nftId;
 
+		private Integer rank;
+
 	}
 
 }

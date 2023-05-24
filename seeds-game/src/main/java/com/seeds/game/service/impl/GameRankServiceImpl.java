@@ -272,7 +272,7 @@ public class GameRankServiceImpl implements GameRankService {
             if (resp.getExpireTime() > System.currentTimeMillis()) {
                 return cacheList;
             }
-            scoreMap = cacheList.stream().collect(Collectors.toMap(GameRankNftSkinResp.GameRankNftSkin::getNftId, GameRankNftSkinResp.GameRankNftSkin::getScore));
+            scoreMap = cacheList.stream().collect(Collectors.toMap(GameRankNftSkinResp.GameRankNftSkin::getNftId, GameRankNftSkinResp.GameRankNftSkin::getRank));
         }
         Map<Long, GameRankNftSkinResp.GameRankNftSkin> map = new HashMap<>();
         Integer number = query.getEndRow();
@@ -311,7 +311,9 @@ public class GameRankServiceImpl implements GameRankService {
         Map<Long, NftPublicBackpackEntity> backpackMap = nftPublicBackpackService.queryMapByEqNftIds(nftIds);
         Set<Long> userIds = backpackMap.values().stream().map(NftPublicBackpackEntity::getUserId).filter(Objects::nonNull).collect(Collectors.toSet());
         Map<Long, UcUser> userMap = getUserMapByIds(userIds);
+        int rank = 1;
         for (GameRankNftSkinResp.GameRankNftSkin nftSkin : respList) {
+            nftSkin.setRank(rank);
             NftPublicBackpackEntity backpack = backpackMap.get(nftSkin.getNftId());
             if (backpack != null) {
                 nftSkin.setName(backpack.getName());
@@ -323,10 +325,15 @@ public class GameRankServiceImpl implements GameRankService {
                     nftSkin.setPublicAddress(ucUser.getPublicAddress());
                 }
             }
-            Integer lastScore = scoreMap.get(nftSkin.getNftId());
-            if (lastScore != null) {
-                nftSkin.setTrend(nftSkin.getScore() > lastScore ? 1 : 2);
+            Integer cacheRank = scoreMap.get(nftSkin.getNftId());
+            if (cacheRank != null) {
+                if (nftSkin.getRank() > cacheRank) {
+                    nftSkin.setTrend(2);
+                } else if (nftSkin.getRank() < cacheRank) {
+                    nftSkin.setTrend(1);
+                }
             }
+            rank = rank + 1;
         }
 
         // 设置redis排行榜缓存
