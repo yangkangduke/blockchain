@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -24,4 +25,8 @@ public class SysSkinNftListAssetReq {
 
     @ApiModelProperty("auctionHouseAddress")
     private String auctionHouseAddress;
+
+    @ApiModelProperty("uuid")
+    @NotBlank
+    private String uuid;
 }

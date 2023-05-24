@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.admin.config.RedisCacheConfig;
 import com.seeds.admin.config.SeedsAdminApiConfig;
 import com.seeds.admin.dto.SkinNFTAttrDto;
 import com.seeds.admin.dto.SysNFTAttrDto;
@@ -49,6 +50,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.ibatis.binding.MapperMethod;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,8 +73,9 @@ import java.util.zip.ZipOutputStream;
 public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity> implements SysNftPicService {
 
     private String zipFilePath = "fileStorage/package";
+
     @Autowired
-    private KafkaProducer kafkaProducer;
+    private RedissonClient redissonClient;
 
     @Autowired
     private FileTemplate template;
@@ -139,7 +143,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         queryWrapper.between(StringUtils.isNotBlank(req.getQueryTime()), SysNftPicEntity::getMintTime, start, end)
                 .eq(!Objects.isNull(req.getAutoId()), SysNftPicEntity::getAutoId, req.getAutoId())
                 .eq(!Objects.isNull(req.getConfId()), SysNftPicEntity::getConfId, req.getConfId())
-                .eq( SysNftPicEntity::getMintState, SkinNftEnums.SkinMintStateEnum.MINTED.getCode())
+                .eq(SysNftPicEntity::getMintState, SkinNftEnums.SkinMintStateEnum.MINTED.getCode())
                 .eq(!Objects.isNull(req.getListState()), SysNftPicEntity::getListState, req.getListState())
                 .eq(StringUtils.isNotBlank(req.getTokenAddress()), SysNftPicEntity::getTokenAddress, req.getTokenAddress())
                 .orderByDesc(SysNftPicEntity::getMintTime);
@@ -189,7 +193,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         if (!CollectionUtils.isEmpty(batchUpdate)) {
             // 批量更新属性
             this.updateBatchById(batchUpdate);
-           }
+        }
         return batchUpdate.size();
     }
 
@@ -487,35 +491,51 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
 
     @Override
     public void listAsset(SysSkinNftListAssetReq req) {
-        log.info("list-asset， params:{}", req);
-        List<SysNftPicEntity> list = this.listByIds(req.getIds());
-        List<SkinNftListAssetDto> listAssetDto = list.stream().map(p -> {
-            SkinNftListAssetDto dto = new SkinNftListAssetDto();
-            dto.setNftAddress(p.getTokenAddress());
-            dto.setPrice(req.getPrice());
-            dto.setAuctionHouse(req.getAuctionHouseAddress());
-            return dto;
-        }).collect(Collectors.toList());
-        String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getListAsset();
-        String param = JSONUtil.toJsonStr(listAssetDto);
-        log.info("请求skin-list-asset接口， url:{}， params:{}", url, param);
+        String lockName = "listLock:" + req.getUuid();
+        RLock lock = redissonClient.getLock(lockName);
         try {
-            HttpResponse response = HttpRequest.post(url)
-                    .timeout(60 * 1000 * 10)
-                    .header("Content-Type", "application/json")
-                    .body(param)
-                    .execute();
-            JSONObject jsonObject = JSONObject.parseObject(response.body());
-            // 更新上架状态
-            log.info(" list-asset 成功--result:{}", jsonObject);
-            if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
-                list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.LISTED.getCode()));
-                this.updateBatchById(list);
+            boolean lockAcquired = lock.tryLock();
+            if (lockAcquired) {
+                log.info("list-asset， params:{}", req);
+                List<SysNftPicEntity> list = this.listByIds(req.getIds());
+                List<SkinNftListAssetDto> listAssetDto = list.stream().map(p -> {
+                    SkinNftListAssetDto dto = new SkinNftListAssetDto();
+                    dto.setNftAddress(p.getTokenAddress());
+                    dto.setPrice(req.getPrice());
+                    dto.setAuctionHouse(req.getAuctionHouseAddress());
+                    return dto;
+                }).collect(Collectors.toList());
+                String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getListAsset();
+                String param = JSONUtil.toJsonStr(listAssetDto);
+                log.info("请求skin-list-asset接口， url:{}， params:{}", url, param);
+                try {
+                    HttpResponse response = HttpRequest.post(url)
+                            .timeout(60 * 1000 * 10)
+                            .header("Content-Type", "application/json")
+                            .body(param)
+                            .execute();
+                    JSONObject jsonObject = JSONObject.parseObject(response.body());
+                    // 更新上架状态
+                    log.info(" list-asset 成功--result:{}", jsonObject);
+                    if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+                        list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.LISTED.getCode()));
+                        this.updateBatchById(list);
+                    }
+                } catch (Exception e) {
+                    log.info(" 请求skin-list-asset接口--出错:{}", e.getMessage());
+                    throw new GenericException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY);
+                }
+            } else {
+                // 如果锁已被其他请求占用，则认为是重复提交
+                log.info("重复请求，直接丢掉");
             }
-        } catch (Exception e) {
-            log.info(" 请求skin-list-asset接口--出错:{}", e.getMessage());
-            throw new GenericException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY);
+        } finally {
+            if (lock.isHeldByCurrentThread()){
+                lock.unlock();
+            }
         }
+
+
     }
 
     @Override
@@ -560,36 +580,49 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
 
     @Override
     public void cancelAsset(SysSkinNftListAssetReq req) {
-        List<SysNftPicEntity> list = this.listByIds(req.getIds());
-
-        List<NftMarketOrderEntity> receipts = baseMapper.getListReceiptByMintAddress(list.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList()));
-        Map<String, String> receiptsMap = receipts.stream().collect(Collectors.toMap(NftMarketOrderEntity::getMintAddress, NftMarketOrderEntity::getListReceipt));
-        List<SkinNftCancelAssetDto> dtos = list.stream().map(p -> {
-            SkinNftCancelAssetDto skinNftCancelAssetDto = new SkinNftCancelAssetDto();
-            skinNftCancelAssetDto.setListReceipt(receiptsMap.get(p.getTokenAddress()));
-            skinNftCancelAssetDto.setAuctionHouse(req.getAuctionHouseAddress());
-            return skinNftCancelAssetDto;
-        }).collect(Collectors.toList());
-
-        String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getCancelAsset();
-        String param = JSONUtil.toJsonStr(dtos);
-        log.info("请求skin-cancelAsset-接口， url:{}， params:{}", url, param);
+        String lockName = "listLock:" + req.getUuid();
+        RLock lock = redissonClient.getLock(lockName);
         try {
-            HttpResponse response = HttpRequest.post(url)
-                    .timeout(60 * 1000 * 10)
-                    .header("Content-Type", "application/json")
-                    .body(param)
-                    .execute();
-            JSONObject jsonObject = JSONObject.parseObject(response.body());
-            // 更新下架状态
-            log.info(" cancelAsset 成功--result:{}", jsonObject);
-            if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
-                list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.NO_LIST.getCode()));
-                this.updateBatchById(list);
+            boolean lockAcquired = lock.tryLock();
+            if (lockAcquired) {
+                List<SysNftPicEntity> list = this.listByIds(req.getIds());
+
+                List<NftMarketOrderEntity> receipts = baseMapper.getListReceiptByMintAddress(list.stream().map(SysNftPicEntity::getTokenAddress).collect(Collectors.toList()));
+                Map<String, String> receiptsMap = receipts.stream().collect(Collectors.toMap(NftMarketOrderEntity::getMintAddress, NftMarketOrderEntity::getListReceipt));
+                List<SkinNftCancelAssetDto> dtos = list.stream().map(p -> {
+                    SkinNftCancelAssetDto skinNftCancelAssetDto = new SkinNftCancelAssetDto();
+                    skinNftCancelAssetDto.setListReceipt(receiptsMap.get(p.getTokenAddress()));
+                    skinNftCancelAssetDto.setAuctionHouse(req.getAuctionHouseAddress());
+                    return skinNftCancelAssetDto;
+                }).collect(Collectors.toList());
+
+                String url = seedsAdminApiConfig.getBaseDomain() + seedsAdminApiConfig.getCancelAsset();
+                String param = JSONUtil.toJsonStr(dtos);
+                log.info("请求skin-cancelAsset-接口， url:{}， params:{}", url, param);
+                try {
+                    HttpResponse response = HttpRequest.post(url)
+                            .timeout(60 * 1000 * 10)
+                            .header("Content-Type", "application/json")
+                            .body(param)
+                            .execute();
+                    JSONObject jsonObject = JSONObject.parseObject(response.body());
+                    // 更新下架状态
+                    log.info(" cancelAsset 成功--result:{}", jsonObject);
+                    if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
+                        list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.NO_LIST.getCode()));
+                        this.updateBatchById(list);
+                    }
+                } catch (Exception e) {
+                    log.info(" 请求skin-cancelAsset-出错:{}", e.getMessage());
+                    throw new GenericException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY);
+                }
+            } else {
+                log.info("重复请求了");
             }
-        } catch (Exception e) {
-            log.info(" 请求skin-cancelAsset-出错:{}", e.getMessage());
-            throw new GenericException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY);
+        } finally {
+            if (lock.isHeldByCurrentThread()){
+                lock.unlock();
+            }
         }
     }
 
