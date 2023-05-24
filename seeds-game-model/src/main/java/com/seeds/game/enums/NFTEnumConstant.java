@@ -187,7 +187,7 @@ public class NFTEnumConstant {
     public enum TokenNamePreEnum {
 
         SEQN("Seqn #"),
-        SEEDS_SKIN("Seeds Skin #");
+        SEEDS_SKIN("BladeChamp #");
         private String name;
 
         TokenNamePreEnum(String name) {

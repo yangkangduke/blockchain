@@ -11,8 +11,8 @@ import java.util.List;
 @Data
 public class SkinNFTAttrDto {
     private String name;
-    private String symbol = "SEEDS";
-    private String description = "This is the NFT of the Seeds skin.";
+    private String symbol = "BLADEC";
+    private String description = "Introducing the genesis BladeChamp NFT Series! Immerse yourself in Bladerite with this exclusive collection featuring the five legendary heroes. Hold it to unlock the Loot Mode. Step into the thrilling battlefield and snatch rewarding pattern NFTs.";
     private int seller_fee_basis_points = 500;
     private String image;
     private String external_url = "https://www.theseeds.io/";
