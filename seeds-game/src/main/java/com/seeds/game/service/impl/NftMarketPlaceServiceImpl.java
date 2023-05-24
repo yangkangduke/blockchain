@@ -371,7 +371,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         //shelfValidation(nftEquipment);
         Long auctionId = nftEquipment.getAuctionId();
         NftAuctionHouseSetting auction = nftAuctionHouseSettingService.getById(nftEquipment.getAuctionId());
-        if (auction == null || auction.getCancelTime() != null) {
+        if (auction == null) {
+            return;
+        }
+        if (auction.getCancelTime() != null && auction.getCancelTime() != 0) {
             return;
         }
         // 调用/api/chainOp/cancelOrder通知，取消拍卖成功
@@ -800,7 +803,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 throw new GenericException(GameErrorCodeEnum.ERR_10018_NFT_ITEM_ORDER_NOT_EXIST);
             }
             sellerAddress = marketOrder.getSellerAddress();
-            if (marketOrder.getCancelTime() != null) {
+            if (marketOrder.getCancelTime() != null && marketOrder.getCancelTime() != 0) {
                 endTime = marketOrder.getCancelTime();
             } else if (!marketOrder.getFulfillTime().equals(marketOrder.getCreateTime())) {
                 endTime = marketOrder.getFulfillTime();
@@ -817,7 +820,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (order == null) {
                 throw new GenericException(GameErrorCodeEnum.ERR_10018_NFT_ITEM_ORDER_NOT_EXIST);
             }
-            if (order.getCancelTime() != null) {
+            if (order.getCancelTime() != null && order.getCancelTime() != 0) {
                 endTime = order.getCancelTime();
             } else if (!order.getFulfillTime().equals(order.getCreateTime())) {
                 endTime = order.getFulfillTime();
@@ -951,7 +954,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         List<NftOfferResp.NftOffer> records = nftOfferPage.getRecords();
         if (!CollectionUtils.isEmpty(records)) {
             for (NftOfferResp.NftOffer nftOffer : records) {
-                if (nftOffer.getCancelTime() == null) {
+                if (nftOffer.getCancelTime() == null || nftOffer.getCancelTime() == 0) {
                     resp.setHighestOffer(nftOffer.getPrice());
                     break;
                 }
@@ -1073,7 +1076,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     @Override
     public void cancelOffer(NftCancelOfferReq req) {
         NftAuctionHouseBiding auctionBiding = nftAuctionHouseBidingService.getById(req.getBidingId());
-        if (auctionBiding == null || auctionBiding.getCancelTime() != null) {
+        if (auctionBiding == null) {
+            return;
+        }
+        if (auctionBiding.getCancelTime() != null  && auctionBiding.getCancelTime() != 0) {
             return;
         }
         // offer归属人验证

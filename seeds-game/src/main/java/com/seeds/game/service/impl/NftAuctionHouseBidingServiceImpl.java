@@ -62,7 +62,7 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
                 resp.setDifference(difference.abs() + "% below");
             }
             resp.setStatus(NftOfferStatusEnum.BIDDING.getDescEn());
-            if (record.getCancelTime() != null) {
+            if (record.getCancelTime() != null && record.getCancelTime() != 0) {
                 resp.setStatus(NftOfferStatusEnum.CANCELLED.getDescEn());
             }
             resp.setIsBidder(WhetherEnum.NO.value());
