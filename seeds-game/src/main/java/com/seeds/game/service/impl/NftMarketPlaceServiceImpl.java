@@ -234,10 +234,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     public void fixedPriceShelf(NftFixedPriceShelfReq req) {
         // 上架前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
-        shelfValidation(nftEquipment);
+        //shelfValidation(nftEquipment);
         // 不能重复上架
-        if (NftOrderTypeEnum.BUY_NOW.getCode() == nftEquipment.getOnSale() || NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
+        if (nftEquipment == null
+                || NftOrderTypeEnum.BUY_NOW.getCode() == nftEquipment.getOnSale()
+                || NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()
+                || WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
+            return;
         }
 
         // 调用/api/chainOp/placeOrder通知，链上上架成功
@@ -270,10 +273,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     public void britishAuctionShelf(NftBritishAuctionShelfReq req) {
         // 上架前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
-        shelfValidation(nftEquipment);
+        //shelfValidation(nftEquipment);
         // 不能重复上架
-        if (NftOrderTypeEnum.BUY_NOW.getCode() == nftEquipment.getOnSale() || NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
+        if (nftEquipment == null
+                ||NftOrderTypeEnum.BUY_NOW.getCode() == nftEquipment.getOnSale()
+                || NftOrderTypeEnum.ON_AUCTION.getCode() == nftEquipment.getOnSale()
+                || WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
+            return;
         }
 
         // 调用/api/auction/english通知，链上英式拍卖上架成功
@@ -311,12 +317,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     public void shelved(NftShelvedReq req) {
         // 下架前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
-        shelfValidation(nftEquipment);
-        Long orderId = Long.valueOf(nftEquipment.getOrderId());
+        //shelfValidation(nftEquipment);
         // 不能重复下架
-        if (WhetherEnum.NO.value() == nftEquipment.getOnSale()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10010_NFT_ITEM_HAS_BEEN_REMOVAL);
+        if (nftEquipment == null
+                || WhetherEnum.NO.value() == nftEquipment.getOnSale()
+                || WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
+            return;
         }
+        Long orderId = Long.valueOf(nftEquipment.getOrderId());
 
         // 调用/api/chainOp/cancelOrder通知，下架成功
         String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
@@ -354,15 +362,17 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     public void cancelAuction(NftCancelAuctionReq req) {
         // 取消拍卖前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
-        shelfValidation(nftEquipment);
-        Long auctionId = nftEquipment.getAuctionId();
         // 没有进行中的拍卖
-        if (nftEquipment.getAuctionId() <= 0) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+        if (nftEquipment == null
+                || nftEquipment.getAuctionId() <= 0
+                || WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
+            return;
         }
+        //shelfValidation(nftEquipment);
+        Long auctionId = nftEquipment.getAuctionId();
         NftAuctionHouseSetting auction = nftAuctionHouseSettingService.getById(nftEquipment.getAuctionId());
-        if (auction == null) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+        if (auction == null || auction.getCancelTime() != null) {
+            return;
         }
         // 调用/api/chainOp/cancelOrder通知，取消拍卖成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionCancel();
@@ -405,18 +415,23 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     public void makeOffer(NftMakeOfferReq req) {
         // 出价成功前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
-        buyValidation(nftEquipment);
+        //buyValidation(nftEquipment);
         // 拍卖结束不能出价
-        NftAuctionHouseSetting auction = nftAuctionHouseSettingService.getById(req.getAuctionId());
-        if (auction == null) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
-        }
+        //NftAuctionHouseSetting auction = nftAuctionHouseSettingService.getById(req.getAuctionId());
+        //if (auction == null) {
+        //    throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+        //}
         // 拍卖到期不能出价
-        if (System.currentTimeMillis() > auction.getStartTime() + auction.getDuration() * 60 * 60 * 1000) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10017_NFT_ITEM_IN_SETTLEMENT);
-        }
-        if (auction.getIsFinished() != null && WhetherEnum.NO.value() != auction.getIsFinished()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10012_NFT_ITEM_AUCTION_HAS_ENDED);
+        //if (System.currentTimeMillis() > auction.getStartTime() + auction.getDuration() * 60 * 60 * 1000) {
+        //    throw new GenericException(GameErrorCodeEnum.ERR_10017_NFT_ITEM_IN_SETTLEMENT);
+        //}
+        //if (auction.getIsFinished() != null && WhetherEnum.NO.value() != auction.getIsFinished()) {
+        //    throw new GenericException(GameErrorCodeEnum.ERR_10012_NFT_ITEM_AUCTION_HAS_ENDED);
+        //}
+        if (nftEquipment == null
+                || NftOrderTypeEnum.ON_AUCTION.getCode() != nftEquipment.getOnSale()
+                || WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
+            return;
         }
         // 调用/api/auction/bid通知，出价成功
         String params = String.format("auctionId=%s&receipt=%s&sig=%s", req.getAuctionId(), req.getReceipt(), req.getSig());
@@ -443,7 +458,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     public void buySuccess(NftBuySuccessReq req) {
         // 购买成功前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());
-        buyValidation(nftEquipment);
+        //buyValidation(nftEquipment);
+        if (nftEquipment == null
+                || NftOrderTypeEnum.BUY_NOW.getCode() != nftEquipment.getOnSale()
+                || WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
+            return;
+        }
         Long orderId = Long.valueOf(nftEquipment.getOrderId());
         //更新背包状态 undeposited  userId,owner
         NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
@@ -955,18 +975,20 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     public NftOfferDetailResp acceptOffer(NftAcceptOfferReq req) {
         NftAuctionHouseBiding auctionBiding = nftAuctionHouseBidingService.getById(req.getBidingId());
         if (auctionBiding == null) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+            return null;
         }
         NftEquipment nftEquipment = nftEquipmentService.queryByMintAddress(auctionBiding.getMintAddress());
-        if (nftEquipment == null) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10001_NFT_ITEM_NOT_EXIST);
+        if (nftEquipment == null
+                || !auctionBiding.getAuctionId().equals(nftEquipment.getAuctionId())
+                || WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
+            return null;
         }
         // 归属人验证
-        ucUserService.ownerValidation(nftEquipment.getOwner());
+        //ucUserService.ownerValidation(nftEquipment.getOwner());
         // 已托管不能接受报价
-        if (WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
-        }
+        //if (WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
+        //    throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
+        //}
 
         // 调用/api/auction/endAuction通知，接受报价成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getEndAuction();
@@ -1014,9 +1036,15 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     public void auctionSuccess(NftSaleSuccessReq req) {
         NftAuctionHouseBiding auctionBiding = nftAuctionHouseBidingService.getById(req.getBidingId());
         if (auctionBiding == null) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);
+            return;
         }
         Long auctionId = auctionBiding.getAuctionId();
+        NftEquipment nftEquipment = nftEquipmentService.queryByMintAddress(auctionBiding.getMintAddress());
+        if (nftEquipment == null
+                || !auctionBiding.getAuctionId().equals(nftEquipment.getAuctionId())
+                || WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
+            return;
+        }
         // 调用/api/auction/saleSuccess通知，拍卖达成交易成功
         String params = String.format("auctionId=%s&bidingId=%s&receipt=%s&sig=%s", auctionBiding.getAuctionId(), req.getBidingId(), req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getSaleSuccess() + "?" + params;
@@ -1045,10 +1073,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     @Override
     public void cancelOffer(NftCancelOfferReq req) {
         NftAuctionHouseBiding auctionBiding = nftAuctionHouseBidingService.getById(req.getBidingId());
-        if (auctionBiding == null) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST);}
+        if (auctionBiding == null || auctionBiding.getCancelTime() != null) {
+            return;
+        }
         // offer归属人验证
-        ucUserService.ownerValidation(auctionBiding.getBuyer());
+        //ucUserService.ownerValidation(auctionBiding.getBuyer());
         // 调用/api/auction/cancelBid通知，取消出价成功
         String params = String.format("bidingId=%s&receipt=%s&signature=%s", req.getBidingId(), auctionBiding.getReceipt(), req.getSignature());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionCancelBid() + "?" + params;
