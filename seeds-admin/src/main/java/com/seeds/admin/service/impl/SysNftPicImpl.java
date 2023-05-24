@@ -520,6 +520,9 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                     if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
                         list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.LISTED.getCode()));
                         this.updateBatchById(list);
+                    }else {
+                        log.info(" 请求skin-list-asset接口--出错:{}", jsonObject.get("message"));
+                        throw new GenericException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY);
                     }
                 } catch (Exception e) {
                     log.info(" 请求skin-list-asset接口--出错:{}", e.getMessage());
@@ -611,6 +614,9 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                     if (jsonObject.get("code").equals(HttpStatus.SC_OK)) {
                         list.forEach(p -> p.setListState(SkinNftEnums.SkinNftListStateEnum.NO_LIST.getCode()));
                         this.updateBatchById(list);
+                    }else {
+                        log.info(" 请求skin-list-asset接口--出错:{}", jsonObject.get("message"));
+                        throw new GenericException(AdminErrorCodeEnum.ERR_500_SYSTEM_BUSY);
                     }
                 } catch (Exception e) {
                     log.info(" 请求skin-cancelAsset-出错:{}", e.getMessage());
