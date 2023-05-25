@@ -37,6 +37,7 @@ import com.seeds.game.mq.producer.KafkaProducer;
 import com.seeds.game.service.*;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.binding.MapperMethod;
@@ -491,7 +492,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         ucUserService.ownerValidation(nft.getOwner());
         // 调用/api/equipment/depositNft通知，托管NFT成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getDepositNft();
-        DepositSuccessMessageDto dto  = new DepositSuccessMessageDto();
+        DepositSuccessMessageDto dto = new DepositSuccessMessageDto();
         BeanUtils.copyProperties(req, dto);
         dto.setMintAddress(nft.getMintAddress());
         dto.setType(req.getType());
@@ -596,7 +597,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public List<NftType> getNftTypeList(Integer type) {
         Long userId = UserContext.getCurrentUserId();
-        return baseMapper.getNftTypeList(userId,type);
+        return baseMapper.getNftTypeList(userId, type);
     }
 
     @Override
@@ -627,7 +628,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         // 如果是withdraw，需要通知游戏方把nft收回到背包
         if (req.getState().equals(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode())) {
             NftPublicBackpackEntity backpackNft = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getTokenAddress, req.getMintAddress()));
-            if(Objects.nonNull(backpackNft) && backpackNft.getServerRoleId() != 0){
+            if (Objects.nonNull(backpackNft) && backpackNft.getServerRoleId() != 0) {
                 // 调用游戏方接口，执行收回
                 this.callGameTakeback(backpackNft);
                 // 更新背包状态
@@ -1022,5 +1023,31 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             return Collections.emptyMap();
         }
         return list.stream().collect(Collectors.toMap(NftPublicBackpackEntity::getEqNftId, p -> p));
+    }
+
+    @Override
+    public String getTokenAddress(String mintAddress, String ownerAddress) {
+        String tokenAddress = "";
+        String params = String.format("mintAddress=%s&ownerAddress=%s", mintAddress, ownerAddress);
+        String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getTokenAddress() + "?" + params;
+        log.info("获取tokenAddress， url:{}， params:{}", url, params);
+        try {
+            HttpResponse response = HttpRequest.get(url)
+                    .timeout(60 * 1000)
+                    .header("Content-Type", "application/json")
+                    .execute();
+            log.info("获取tokenAddress返回，result:{}", response.body());
+            JSONObject jsonObject = JSONObject.parseObject(response.body());
+            String code = jsonObject.getString("code");
+            if (!"200".equalsIgnoreCase(code)) {
+                throw new GenericException(jsonObject.getString("message"));
+            } else {
+                tokenAddress = jsonObject.getString("data");
+            }
+        } catch (Exception e) {
+            log.error("获取tokenAddress返回，message：{}", e.getMessage());
+            throw new GenericException("get tokenAddress failure");
+        }
+        return tokenAddress;
     }
 }
