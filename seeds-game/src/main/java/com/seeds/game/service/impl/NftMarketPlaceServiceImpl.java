@@ -721,7 +721,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             String usdRate = gameCacheService.getUsdRate(currency);
             if (StringUtils.isBlank(usdRate)) {
                 // 调用/market/token获取美元汇率
-                String url = seedsApiConfig.getSolToUsdApi() + seedsApiConfig.getSolTokenAddress();
+                String url = seedsApiConfig.getSolToUsdApi()
+                        + "?inputMint=" + seedsApiConfig.getSolTokenAddress()
+                        + "&outputMint=" + seedsApiConfig.getSolToken()
+                        + "&amount=" + 1000000000;
                 log.info("获取美元汇率， url:{}， params:{}", url, currency);
                 try {
                     HttpResponse response = HttpRequest.get(url)
@@ -730,9 +733,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                             .header("token", seedsApiConfig.getSolToken())
                             .execute();
                     String body = response.body();
-                    SolToUsdRateResp resp = JSONUtil.toBean(body, SolToUsdRateResp.class);
-                    rate = resp.getPriceUsdt();
-                    gameCacheService.putUsdRate(currency, rate.toString());
+                    JSONObject jsonObject = JSONObject.parseObject(body);
+                    String data = jsonObject.getString("outAmount");
+                    if (StringUtils.isNotBlank(data)) {
+                        rate = new BigDecimal(data).divide(new BigDecimal(1000000), 2 , RoundingMode.HALF_UP);
+                        gameCacheService.putUsdRate(currency, rate.toString());
+                    }
                 } catch (Exception e) {
                     log.error("获取美元汇率失败，message：{}", e.getMessage());
                 }
