@@ -1039,14 +1039,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             log.info("获取tokenAddress返回，result:{}", response.body());
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
-            if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
-            } else {
+            if ("200".equalsIgnoreCase(code)) {
                 tokenAddress = jsonObject.getString("data");
             }
         } catch (Exception e) {
             log.error("获取tokenAddress返回，message：{}", e.getMessage());
-            throw new GenericException("get tokenAddress failure");
         }
         return tokenAddress;
     }
