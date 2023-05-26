@@ -644,6 +644,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             try {
                 GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(req.getOwner());
                 backpackEntity.setUserId(result.getData().getId());
+                log.info("update backpack getUserInfoByPublicAddress,param:{},result:{}", req.getOwner(), result);
             } catch (Exception e) {
                 log.error("内部请求uc获取用户信息失败");
             }

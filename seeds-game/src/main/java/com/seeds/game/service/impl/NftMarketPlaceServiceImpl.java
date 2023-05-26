@@ -147,6 +147,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         try {
             GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
             ucUserResp = result.getData();
+            log.info("getUserInfoByPublicAddress,param:{},result:{}", nftEquipment.getOwner(), result);
             if (null == ucUserResp) {
                 resp.setIsOwner(0);
                 resp.setOwnerName(NFTEnumConstant.SEEDS);
@@ -558,6 +559,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             try {
                 GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
                 ucUserResp = result.getData();
+                log.info("getUserInfoByPublicAddress,param:{},result:{}", nftEquipment.getOwner(), result);
                 if (null == ucUserResp) {
                     resp.setIsOwner(0);
                 } else {
@@ -620,6 +622,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             try {
                 GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
                 ucUserResp = result.getData();
+                log.info("getUserInfoByPublicAddress,param:{},result:{}", nftEquipment.getOwner(), result);
                 if (null == ucUserResp) {
                     resp.setIsOwner(0);
                 } else {
@@ -701,6 +704,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             try {
                 GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
                 ucUserResp = result.getData();
+                log.info("getUserInfoByPublicAddress,param:{},result:{}", nftEquipment.getOwner(), result);
                 if (null == ucUserResp) {
                     resp.setIsOwner(0);
                 } else {
@@ -1025,6 +1029,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
                 try {
                     GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(auctionBiding.getBuyer());
+                    log.info("acceptOffer update backpack getUserInfoByPublicAddress,param:{},result:{}", auctionBiding.getBuyer(), result);
                     backpackEntity.setUserId(result.getData().getId());
                     backpackEntity.setOwner(auctionBiding.getBuyer());
                 } catch (Exception e) {
