@@ -152,7 +152,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 resp.setIsOwner(0);
                 resp.setOwnerName(NFTEnumConstant.SEEDS);
             } else {
-                resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
+                resp.setIsOwner(ucUserResp.getId().equals(UserContext.getCurrentUserIdNoThrow()) ? 1 : 0);
                 resp.setOwnerId(ucUserResp.getId());
                 resp.setOwnerName(ucUserResp.getNickname());
             }

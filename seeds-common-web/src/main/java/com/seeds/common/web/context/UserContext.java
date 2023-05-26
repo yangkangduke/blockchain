@@ -22,6 +22,10 @@ public class UserContext {
         return userId;
     }
 
+    public Long getCurrentUserIdNoThrow() {
+        return USER_ID_THREAD_LOCAL.get();
+    }
+
     public void removeCurrentUserId() {
         USER_ID_THREAD_LOCAL.remove();
     }
