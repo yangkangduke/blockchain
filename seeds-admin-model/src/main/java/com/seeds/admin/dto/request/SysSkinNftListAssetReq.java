@@ -25,8 +25,8 @@ public class SysSkinNftListAssetReq {
 
     @ApiModelProperty("auctionHouseAddress")
     private String auctionHouseAddress;
-
-    @ApiModelProperty("uuid")
-    @NotBlank
-    private String uuid;
+//
+//    @ApiModelProperty("uuid")
+//    @NotBlank
+//    private String uuid;
 }
