@@ -79,4 +79,7 @@ public class SeedsApiConfig {
     @Value("${seeds.api.listReceipt:/api/admin/withdrawNft}")
     private String skinWithdraw;
 
+    @Value("${seeds.api.tokenAddress:/api/address/tokenAddress}")
+    private String tokenAddress;
+
 }

@@ -133,6 +133,13 @@ public class NftPublicBackpackController {
         return nftPublicBackpackService.depositCheck(req);
     }
 
+    @GetMapping("get-token-address")
+    @ApiOperation("获取tokenAddress")
+    public GenericDto<String> getTokenAddress(@RequestParam(value = "mintAddress") String mintAddress,
+                                              @RequestParam(value = "ownerAddress") String ownerAddress) {
+        return GenericDto.success(nftPublicBackpackService.getTokenAddress(mintAddress,ownerAddress));
+    }
+
     @PostMapping("deposited")
     @ApiOperation("托管")
     public GenericDto<Object> deposited(@Valid @RequestBody NftDepositedReq req) {
