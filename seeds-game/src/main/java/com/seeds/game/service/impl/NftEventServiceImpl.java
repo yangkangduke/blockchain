@@ -311,14 +311,16 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Override
     public void mintSuccessCallback(MintSuccessReq req) {
         NftEvent nftEvent = this.getById(req.getEventId());
-        NftEventEquipment equipment = eventEquipmentService
-                .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-        MintSuccessMessageResp data = new MintSuccessMessageResp();
-        BeanUtils.copyProperties(req, data);
-        //生成metadata
-        createMetadata(equipment, data.getTokenId());
-        // 通知游戏方，更新本地数据库
-        updateLocalDB(nftEvent.getIsDeposit(), req.getMintAddress(), nftEvent, equipment, data);
+        if (nftEvent.getStatus().equals(NFTEnumConstant.NFTEventStatus.MINTING)){
+            NftEventEquipment equipment = eventEquipmentService
+                    .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
+            MintSuccessMessageResp data = new MintSuccessMessageResp();
+            BeanUtils.copyProperties(req, data);
+            //生成metadata
+            createMetadata(equipment, data.getTokenId());
+            // 通知游戏方，更新本地数据库
+            updateLocalDB(nftEvent.getIsDeposit(), req.getMintAddress(), nftEvent, equipment, data);
+        }
     }
 
 
