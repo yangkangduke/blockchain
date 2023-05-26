@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SeedsApiConfig {
 
-    @Value("${seeds.api.solToUsd:https://public-api.solscan.io/market/token/}")
+    @Value("${seeds.api.solToUsd:https://quote-api.jup.ag/v5/quote}")
     private String solToUsdApi;
 
-    @Value("${seeds.api.solToken:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE2Nzk1NTE4MTgyNzksImVtYWlsIjoieWFuZ2thbmcuZHVrZUBnbWFpbC5jb20iLCJhY3Rpb24iOiJ0b2tlbi1hcGkiLCJpYXQiOjE2Nzk1NTE4MTh9.qi-dd5Kh0r3s-cegzhwUbVNpkhl8XhYHvCfrJ-zxaV8}")
+    @Value("${seeds.api.solToken:Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB}")
     private String solToken;
 
     @Value("${seeds.api.solTokenAddress:So11111111111111111111111111111111111111112}")
