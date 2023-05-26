@@ -13,4 +13,6 @@ public class SkinNftCancelAssetDto {
     private String listReceipt;
 
     private String auctionHouse;
+
+    private Long id;
 }

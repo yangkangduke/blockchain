@@ -28,6 +28,8 @@ public class SkinNftEnums {
         LISTED(1, "LISTED"),
         ON_AUCTION(2, "ON_AUCTION"),
         CANCEL_AUCTION(3, "CANCEL_AUCTION"),
+        LISTING(4, "LISTING"),
+        CANCEL_LISTING(5, "CANCEL_LISTING"),
         ;
         private final int code;
         private final String desc;

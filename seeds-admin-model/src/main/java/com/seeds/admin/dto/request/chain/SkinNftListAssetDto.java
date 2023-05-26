@@ -13,4 +13,5 @@ public class SkinNftListAssetDto {
     private String nftAddress;
     private BigDecimal price;
     private String auctionHouse;
+    private Long id;
 }
