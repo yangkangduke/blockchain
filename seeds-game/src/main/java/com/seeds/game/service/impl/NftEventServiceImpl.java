@@ -311,7 +311,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Override
     public void mintSuccessCallback(MintSuccessReq req) {
         NftEvent nftEvent = this.getById(req.getEventId());
-        if (nftEvent.getStatus().equals(NFTEnumConstant.NFTEventStatus.MINTING)){
+        if (nftEvent.getStatus().equals(NFTEnumConstant.NFTEventStatus.MINTING.getCode())){
             NftEventEquipment equipment = eventEquipmentService
                     .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
             MintSuccessMessageResp data = new MintSuccessMessageResp();
