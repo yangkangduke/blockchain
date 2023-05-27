@@ -93,4 +93,13 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
         }
         return list.get(0).getPrice();
     }
+
+    @Override
+    public long countByAddressAndPrice(String publicAddress, String auctionId, BigDecimal price) {
+        LambdaQueryWrapper<NftAuctionHouseBiding> queryWrap = new QueryWrapper<NftAuctionHouseBiding>().lambda()
+                .eq(NftAuctionHouseBiding::getBuyer, publicAddress)
+                .eq(NftAuctionHouseBiding::getAuctionId, auctionId)
+                .eq(NftAuctionHouseBiding::getPrice, price);
+        return count(queryWrap);
+    }
 }

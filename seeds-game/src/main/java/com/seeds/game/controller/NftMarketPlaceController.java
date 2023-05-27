@@ -21,7 +21,6 @@ public class NftMarketPlaceController {
     @Autowired
     private NftMarketPlaceService nftMarketPlaceService;
 
-
     @Autowired
     private INftAttributeService nftAttributeService;
 
@@ -58,6 +57,12 @@ public class NftMarketPlaceController {
     public GenericDto<Object> makeOffer(@Valid @RequestBody NftMakeOfferReq req) {
         nftMarketPlaceService.makeOffer(req);
         return GenericDto.success(null);
+    }
+
+    @GetMapping("make-offer-validate/{auctionId}/{price}")
+    @ApiOperation("拍卖出价验证")
+    public GenericDto<Boolean> makeOfferValidate(@PathVariable String auctionId, @PathVariable BigDecimal price) {
+        return GenericDto.success(nftMarketPlaceService.makeOfferValidate(auctionId, price));
     }
 
     @PostMapping("buy-success")

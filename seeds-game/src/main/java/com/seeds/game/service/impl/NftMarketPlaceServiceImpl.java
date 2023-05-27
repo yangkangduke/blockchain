@@ -459,6 +459,21 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
+    public boolean makeOfferValidate(String auctionId, BigDecimal price) {
+        String publicAddress = null;
+        try {
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(UserContext.getCurrentUserId());
+            publicAddress = result.getData();
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
+        if (StringUtils.isEmpty(publicAddress)) {
+            return false;
+        }
+        return nftAuctionHouseBidingService.countByAddressAndPrice(publicAddress, auctionId, price) > 0;
+    }
+
+    @Override
     public void buySuccess(NftBuySuccessReq req) {
         // 购买成功前的校验
         NftEquipment nftEquipment = nftEquipmentService.getById(req.getNftId());

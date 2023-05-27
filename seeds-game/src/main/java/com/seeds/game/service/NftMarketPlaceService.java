@@ -48,6 +48,14 @@ public interface NftMarketPlaceService {
     void makeOffer(NftMakeOfferReq req);
 
     /**
+     * nft拍卖出价验证
+     * @param auctionId 拍卖id
+     * @param price 价格
+     * @return 是否可以出价
+     */
+    boolean makeOfferValidate(String auctionId, BigDecimal price);
+
+    /**
      * 购买nft成功
      * @param req 收据
      */
