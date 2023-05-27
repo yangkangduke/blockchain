@@ -18,6 +18,7 @@ public class RegisterReq {
     @ApiModelProperty(value = "email", required = true)
     @Email
     private String email;
+    private String nickname;
     @ApiModelProperty(value = "验证码", required = true)
     @NotBlank
     private String code;

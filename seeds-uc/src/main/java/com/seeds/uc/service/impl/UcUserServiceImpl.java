@@ -124,7 +124,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
                 .updatedAt(currentTime)
                 .createdAt(currentTime)
                 .salt(salt)
-                .nickname(email)
+                .nickname(registerReq.getNickname())
                 .build();
         this.save(ucUser);
         Long id = ucUser.getId();
