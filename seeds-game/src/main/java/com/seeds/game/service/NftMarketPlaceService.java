@@ -61,7 +61,7 @@ public interface NftMarketPlaceService {
      * @return 我的nft拍卖出价
      *
      */
-    IPage<NftMyOfferResp> myOfferPage(NftOfferPageReq req);
+    IPage<NftMyOfferResp> myOfferPage(NftMyOfferPageReq req);
 
     /**
      * 购买nft成功

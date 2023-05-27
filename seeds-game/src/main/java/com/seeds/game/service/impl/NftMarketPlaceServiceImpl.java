@@ -475,7 +475,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
-    public IPage<NftMyOfferResp> myOfferPage(NftOfferPageReq req) {
+    public IPage<NftMyOfferResp> myOfferPage(NftMyOfferPageReq req) {
         String publicAddress = null;
         try {
             GenericDto<String> result = userCenterFeignClient.getPublicAddress(UserContext.getCurrentUserId());

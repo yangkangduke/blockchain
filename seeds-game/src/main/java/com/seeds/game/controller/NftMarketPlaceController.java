@@ -69,7 +69,7 @@ public class NftMarketPlaceController {
 
     @PostMapping("my-offer-page")
     @ApiOperation("我的拍卖出价分页")
-    public GenericDto<IPage<NftMyOfferResp>> myOfferPage(@Valid @RequestBody NftOfferPageReq req) {
+    public GenericDto<IPage<NftMyOfferResp>> myOfferPage(@Valid @RequestBody NftMyOfferPageReq req) {
         return GenericDto.success(nftMarketPlaceService.myOfferPage(req));
     }
 

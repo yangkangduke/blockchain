@@ -2,6 +2,7 @@ package com.seeds.game.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.seeds.game.dto.request.NftMyOfferPageReq;
 import com.seeds.game.dto.request.NftOfferPageReq;
 import com.seeds.game.dto.response.NftOfferResp;
 import com.seeds.game.entity.NftAuctionHouseBiding;
@@ -30,7 +31,7 @@ public interface INftAuctionHouseBidingService extends IService<NftAuctionHouseB
      * @param req 分页查询条件
      * @return NFT拍卖出价信息
      */
-    IPage<NftAuctionHouseBiding> queryMyPage(NftOfferPageReq req);
+    IPage<NftAuctionHouseBiding> queryMyPage(NftMyOfferPageReq req);
 
     /**
      * 获取NFT拍卖当前出价
