@@ -812,6 +812,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (marketOrder == null) {
                 throw new GenericException(GameErrorCodeEnum.ERR_10018_NFT_ITEM_ORDER_NOT_EXIST);
             }
+            if (seedsApiConfig.getAdminSkinAddress().equals(marketOrder.getSellerAddress())) {
+                log.info("管理员账户不用退还， auctionId:{}", req.getAuctionId());
+                return;
+            }
             sellerAddress = marketOrder.getSellerAddress();
             if (marketOrder.getCancelTime() != null && marketOrder.getCancelTime() != 0) {
                 endTime = marketOrder.getCancelTime();
@@ -829,6 +833,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             NftMarketOrderEntity order = nftMarketOrderService.getById(req.getOrderId());
             if (order == null) {
                 throw new GenericException(GameErrorCodeEnum.ERR_10018_NFT_ITEM_ORDER_NOT_EXIST);
+            }
+            if (seedsApiConfig.getAdminSkinAddress().equals(order.getSellerAddress())) {
+                log.info("管理员账户不用退还， orderId:{}", req.getOrderId());
+                return;
             }
             if (order.getCancelTime() != null && order.getCancelTime() != 0) {
                 endTime = order.getCancelTime();

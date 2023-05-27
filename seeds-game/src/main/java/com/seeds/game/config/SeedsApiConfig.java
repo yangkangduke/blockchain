@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SeedsApiConfig {
 
+    @Value("${seeds.api.admin.skin.address:skifVG2pkEzbuu4AYeQZx4aKAtE4J1bjEn4UYYxMNiA}")
+    private String adminSkinAddress;
+
     @Value("${seeds.api.solToUsd:https://quote-api.jup.ag/v5/quote}")
     private String solToUsdApi;
 
