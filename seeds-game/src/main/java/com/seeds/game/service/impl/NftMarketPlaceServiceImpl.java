@@ -470,7 +470,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (StringUtils.isEmpty(publicAddress)) {
             return false;
         }
-        return nftAuctionHouseBidingService.countByAddressAndPrice(publicAddress, auctionId, price) > 0;
+        return nftAuctionHouseBidingService.countByAddressAndPrice(publicAddress, auctionId, price) == 0;
     }
 
     @Override

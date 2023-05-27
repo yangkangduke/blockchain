@@ -85,7 +85,7 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
     public BigDecimal queryAuctionCurrentPrice(Long auctionId) {
         LambdaQueryWrapper<NftAuctionHouseBiding> queryWrap = new QueryWrapper<NftAuctionHouseBiding>().lambda()
                 .eq(NftAuctionHouseBiding::getAuctionId, auctionId)
-                .isNull(NftAuctionHouseBiding::getCancelTime)
+                .isNull(NftAuctionHouseBiding::getCancelTime).or(p -> p.eq(NftAuctionHouseBiding::getCancelTime, 0))
                 .orderByDesc(NftAuctionHouseBiding::getPrice);
         List<NftAuctionHouseBiding> list = list(queryWrap);
         if (CollectionUtils.isEmpty(list)) {
@@ -99,7 +99,8 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
         LambdaQueryWrapper<NftAuctionHouseBiding> queryWrap = new QueryWrapper<NftAuctionHouseBiding>().lambda()
                 .eq(NftAuctionHouseBiding::getBuyer, publicAddress)
                 .eq(NftAuctionHouseBiding::getAuctionId, auctionId)
-                .eq(NftAuctionHouseBiding::getPrice, price);
+                .eq(NftAuctionHouseBiding::getPrice, price)
+                .isNull(NftAuctionHouseBiding::getCancelTime).or(p -> p.eq(NftAuctionHouseBiding::getCancelTime, 0));
         return count(queryWrap);
     }
 }
