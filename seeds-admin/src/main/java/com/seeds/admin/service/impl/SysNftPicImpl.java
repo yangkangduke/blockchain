@@ -170,7 +170,6 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
             SysNftPicMIntedResp resp = new SysNftPicMIntedResp();
             BeanUtils.copyProperties(p, resp);
             resp.setOwner(null != finalData ? finalData.get(p.getTokenAddress()).getOwner() : "");
-            resp.setListState(null != finalData ? finalData.get(p.getTokenAddress()).getOnSale() : 0);
             return resp;
         });
     }
