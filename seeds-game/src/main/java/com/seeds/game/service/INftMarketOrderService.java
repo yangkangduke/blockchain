@@ -2,7 +2,9 @@ package com.seeds.game.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.game.entity.NftMarketOrderEntity;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface INftMarketOrderService extends IService<NftMarketOrderEntity> {
 
@@ -28,5 +30,12 @@ public interface INftMarketOrderService extends IService<NftMarketOrderEntity> {
      * @return NFT订单
      */
     NftMarketOrderEntity queryByAuctionId(Long auctionId);
+
+    /**
+     * 通过拍卖id查询NFT订单
+     * @param auctionIds 拍卖id
+     * @return NFT订单
+     */
+    Map<Long, NftMarketOrderEntity> queryMapByAuctionIds(Collection<Long> auctionIds);
 
 }

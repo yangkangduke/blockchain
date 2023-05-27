@@ -3,7 +3,7 @@ package com.seeds.game.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.game.entity.NftEquipment;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -23,7 +23,11 @@ public interface INftEquipmentService extends IService<NftEquipment> {
      */
     NftEquipment queryByMintAddress(String mintAddress);
 
+    /**
+     * 通过nft地址查询nft装备
+     * @param mintAddresses nft地址
+     * @return nft装备
+     */
+    Map<String, NftEquipment> queryMapByMintAddresses(Collection<String> mintAddresses);
 
-
-    Map<String, NftEquipment> getOwnerByMintAddress(List<String> mintAddress);
 }

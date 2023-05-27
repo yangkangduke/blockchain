@@ -1,5 +1,7 @@
 package com.seeds.game.service.impl;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
@@ -13,6 +15,7 @@ import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.CurrencyEnum;
+import com.seeds.game.enums.NftOfferStatusEnum;
 import com.seeds.common.utils.RelativeDateFormat;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.config.SeedsApiConfig;
@@ -40,10 +43,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -471,6 +472,62 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             return false;
         }
         return nftAuctionHouseBidingService.countByAddressAndPrice(publicAddress, auctionId, price) == 0;
+    }
+
+    @Override
+    public IPage<NftMyOfferResp> myOfferPage(NftOfferPageReq req) {
+        String publicAddress = null;
+        try {
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(UserContext.getCurrentUserId());
+            publicAddress = result.getData();
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
+        if (StringUtils.isEmpty(publicAddress)) {
+            return new Page<>();
+        }
+        req.setPublicAddress(publicAddress);
+        IPage<NftAuctionHouseBiding> page = nftAuctionHouseBidingService.queryMyPage(req);
+        List<NftAuctionHouseBiding> records = page.getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        Set<Long> auctionIds = records.stream().map(NftAuctionHouseBiding::getAuctionId).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<Long, NftAuctionHouseSetting> auctionMap = nftAuctionHouseSettingService.queryMapByIds(auctionIds);
+        Set<String> mintAddresses = records.stream().map(NftAuctionHouseBiding::getMintAddress).filter(StringUtils::isNotBlank).collect(Collectors.toSet());
+        Map<String, NftPublicBackpackEntity> backpackMap = nftPublicBackpackService.queryMapByMintAddress(mintAddresses);
+        Map<Long, NftMarketOrderEntity> orderMap = nftMarketOrderService.queryMapByAuctionIds(auctionIds);
+        return page.convert(p -> {
+            NftMyOfferResp resp = new NftMyOfferResp();
+            resp.setBidingId(p.getId());
+            resp.setOfferTime(DateUtil.format(new Date(p.getCreateTime()), DatePattern.NORM_DATETIME_MINUTE_FORMAT));
+            resp.setPrice(p.getPrice());
+            NftAuctionHouseSetting auction = auctionMap.get(p.getAuctionId());
+            if (auction != null) {
+                BigDecimal difference = p.getPrice().subtract(auction.getStartPrice())
+                        .divide(auction.getStartPrice(), 4, RoundingMode.HALF_UP)
+                        .multiply(new BigDecimal(100))
+                        .setScale(0, RoundingMode.HALF_UP);
+                if (p.getPrice().compareTo(auction.getStartPrice()) > 0) {
+                    resp.setDifference(difference + "% above");
+                } else {
+                    resp.setDifference(difference.abs() + "% below");
+                }
+                resp.setStatus(NftOfferStatusEnum.from(auction.getIsFinished()).getDescEn());
+                if (NftOfferStatusEnum.FINISHED.getCode() == auction.getIsFinished()) {
+                    NftMarketOrderEntity order = orderMap.get(auction.getId());
+                    if (order != null && NftStateEnum.IN_SETTLEMENT.getCode() != order.getStatus()) {
+                        resp.setStatus(NftOfferStatusEnum.SETTLEMENT.getDescEn());
+                    }
+                }
+            }
+            NftPublicBackpackEntity backpack = backpackMap.get(p.getMintAddress());
+            if (backpack != null) {
+                resp.setNftImage(backpack.getImage());
+                resp.setNftNo("#" + backpack.getTokenId());
+            }
+            return resp;
+        });
     }
 
     @Override
@@ -965,7 +1022,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (auctionSetting == null) {
             return resp;
         }
-        if (auctionSetting.getIsFinished() != null && WhetherEnum.YES.value() == auctionSetting.getIsFinished()) {
+        if (auctionSetting.getIsFinished() != null && NftOfferStatusEnum.FINISHED.getCode() == auctionSetting.getIsFinished()) {
             NftMarketOrderEntity order = nftMarketOrderService.queryByAuctionId(nftEquipment.getAuctionId());
             if (order == null || NftStateEnum.IN_SETTLEMENT.getCode() != order.getStatus()) {
                 return resp;

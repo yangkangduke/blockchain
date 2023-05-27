@@ -3,6 +3,9 @@ package com.seeds.game.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.game.entity.NftAuctionHouseSetting;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
  * <p>
  * nft拍卖配置
@@ -19,5 +22,12 @@ public interface INftAuctionHouseSettingService extends IService<NftAuctionHouse
      * @return 拍卖配置
      */
     NftAuctionHouseSetting queryByListingId(Long listingId);
+
+    /**
+     * 根据拍卖id查询拍卖上架记录
+     * @param ids 拍卖id
+     * @return 拍卖上架记录
+     */
+    Map<Long, NftAuctionHouseSetting> queryMapByIds(Collection<Long> ids);
 
 }

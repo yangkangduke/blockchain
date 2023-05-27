@@ -56,6 +56,14 @@ public interface NftMarketPlaceService {
     boolean makeOfferValidate(String auctionId, BigDecimal price);
 
     /**
+     * 我的nft拍卖出价
+     * @param req 查询条件
+     * @return 我的nft拍卖出价
+     *
+     */
+    IPage<NftMyOfferResp> myOfferPage(NftOfferPageReq req);
+
+    /**
      * 购买nft成功
      * @param req 收据
      */

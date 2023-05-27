@@ -1,8 +1,10 @@
 package com.seeds.game.controller;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.NftBuySuccessReq;
+import com.seeds.game.dto.response.NftMyOfferResp;
 import com.seeds.game.dto.response.NftOfferDetailResp;
 import com.seeds.game.service.INftAttributeService;
 import com.seeds.game.service.NftMarketPlaceService;
@@ -63,6 +65,12 @@ public class NftMarketPlaceController {
     @ApiOperation("拍卖出价验证")
     public GenericDto<Boolean> makeOfferValidate(@PathVariable String auctionId, @PathVariable BigDecimal price) {
         return GenericDto.success(nftMarketPlaceService.makeOfferValidate(auctionId, price));
+    }
+
+    @PostMapping("my-offer-page")
+    @ApiOperation("我的拍卖出价分页")
+    public GenericDto<IPage<NftMyOfferResp>> myOfferPage(@Valid @RequestBody NftOfferPageReq req) {
+        return GenericDto.success(nftMarketPlaceService.myOfferPage(req));
     }
 
     @PostMapping("buy-success")

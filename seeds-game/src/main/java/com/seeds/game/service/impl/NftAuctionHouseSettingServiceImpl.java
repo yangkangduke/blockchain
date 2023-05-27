@@ -6,6 +6,13 @@ import com.seeds.game.entity.NftAuctionHouseSetting;
 import com.seeds.game.mapper.NftAuctionHouseSettingMapper;
 import com.seeds.game.service.INftAuctionHouseSettingService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -21,5 +28,17 @@ public class NftAuctionHouseSettingServiceImpl extends ServiceImpl<NftAuctionHou
     @Override
     public NftAuctionHouseSetting queryByListingId(Long listingId) {
         return getOne(new LambdaQueryWrapper<NftAuctionHouseSetting>().eq(NftAuctionHouseSetting::getListingId, listingId));
+    }
+
+    @Override
+    public Map<Long, NftAuctionHouseSetting> queryMapByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        List<NftAuctionHouseSetting> list = listByIds(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(NftAuctionHouseSetting::getId, p -> p));
     }
 }

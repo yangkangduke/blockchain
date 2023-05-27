@@ -1028,6 +1028,18 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
+    public Map<String, NftPublicBackpackEntity> queryMapByMintAddress(Collection<String> mintAddresses) {
+        if (CollectionUtils.isEmpty(mintAddresses)) {
+            return Collections.emptyMap();
+        }
+        List<NftPublicBackpackEntity> list = list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getTokenAddress, mintAddresses));
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(NftPublicBackpackEntity::getTokenAddress, p -> p));
+    }
+
+    @Override
     public String getTokenAddress(String mintAddress, String ownerAddress) {
         String tokenAddress = "";
         String params = String.format("mintAddress=%s&ownerAddress=%s", mintAddress, ownerAddress);

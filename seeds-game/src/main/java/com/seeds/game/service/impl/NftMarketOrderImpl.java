@@ -5,8 +5,13 @@ import com.seeds.game.entity.NftMarketOrderEntity;
 import com.seeds.game.mapper.NftMarketOrderMapper;
 import com.seeds.game.service.INftMarketOrderService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class NftMarketOrderImpl extends ServiceImpl<NftMarketOrderMapper, NftMarketOrderEntity>implements INftMarketOrderService {
@@ -31,5 +36,18 @@ public class NftMarketOrderImpl extends ServiceImpl<NftMarketOrderMapper, NftMar
     public NftMarketOrderEntity queryByAuctionId(Long auctionId) {
         return getOne(new LambdaQueryWrapper<NftMarketOrderEntity>()
                 .eq(NftMarketOrderEntity::getAuctionId, auctionId));
+    }
+
+    @Override
+    public Map<Long, NftMarketOrderEntity> queryMapByAuctionIds(Collection<Long> auctionIds) {
+        if (CollectionUtils.isEmpty(auctionIds)) {
+            return Collections.emptyMap();
+        }
+        List<NftMarketOrderEntity> list = list(new LambdaQueryWrapper<NftMarketOrderEntity>()
+                .in(NftMarketOrderEntity::getAuctionId, auctionIds));
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(NftMarketOrderEntity::getAuctionId, p -> p));
     }
 }

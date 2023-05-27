@@ -26,6 +26,13 @@ public interface INftAuctionHouseBidingService extends IService<NftAuctionHouseB
     IPage<NftOfferResp.NftOffer> queryPage(NftOfferPageReq req);
 
     /**
+     * 分页获取我的NFT拍卖出价信息
+     * @param req 分页查询条件
+     * @return NFT拍卖出价信息
+     */
+    IPage<NftAuctionHouseBiding> queryMyPage(NftOfferPageReq req);
+
+    /**
      * 获取NFT拍卖当前出价
      * @param auctionId 拍卖id
      * @return NFT拍卖当前出价

@@ -7,7 +7,7 @@ import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.service.INftEquipmentService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -29,8 +29,8 @@ public class NftEquipmentServiceImpl extends ServiceImpl<NftEquipmentMapper, Nft
     }
 
     @Override
-    public Map<String, NftEquipment> getOwnerByMintAddress(List<String> mintAddress) {
-       return this.list(new LambdaQueryWrapper<NftEquipment>().in(NftEquipment::getMintAddress, mintAddress))
+    public Map<String, NftEquipment> queryMapByMintAddresses(Collection<String> mintAddresses) {
+       return this.list(new LambdaQueryWrapper<NftEquipment>().in(NftEquipment::getMintAddress, mintAddresses))
                 .stream().collect(Collectors.toMap(NftEquipment::getMintAddress, p -> p));
     }
 }
