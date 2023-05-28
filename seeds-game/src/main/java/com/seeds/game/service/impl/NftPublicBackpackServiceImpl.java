@@ -393,6 +393,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         equipment.setAutoId(nftItem.getAutoId());
         equipment.setAttributes(nftItem.getAttributes());
         equipment.setItemType(nftItem.getType());
+        equipment.setLvl(nftItem.getGrade());
         nftEventEquipmentService.save(equipment);
     }
 
