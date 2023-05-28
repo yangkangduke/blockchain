@@ -95,4 +95,11 @@ public class PublicNftMarketPlaceController {
         nftMarketPlaceService.refundFee(req);
         return GenericDto.success(null);
     }
+
+    @GetMapping("getTransaction")
+    @ApiOperation("getTransaction")
+    public GenericDto<TransactionMessageRespDto> getTransaction(@RequestParam("transaction") String transaction) {
+        return GenericDto.success(nftMarketPlaceService.getTransaction(transaction));
+    }
+
 }
