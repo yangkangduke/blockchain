@@ -497,6 +497,8 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         Set<String> mintAddresses = records.stream().map(NftAuctionHouseBiding::getMintAddress).filter(StringUtils::isNotBlank).collect(Collectors.toSet());
         Map<String, NftPublicBackpackEntity> backpackMap = nftPublicBackpackService.queryMapByMintAddress(mintAddresses);
         Map<Long, NftMarketOrderEntity> orderMap = nftMarketOrderService.queryMapByAuctionIds(auctionIds);
+        Set<Long> nftIds = backpackMap.values().stream().map(NftPublicBackpackEntity::getEqNftId).collect(Collectors.toSet());
+        Map<Long, NftAttributeEntity> attributeMap = nftAttributeService.queryMapByNftIds(nftIds);
         return page.convert(p -> {
             NftMyOfferResp resp = new NftMyOfferResp();
             resp.setBidingId(p.getId());
@@ -525,6 +527,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (backpack != null) {
                 resp.setNftImage(backpack.getImage());
                 resp.setNftNo("#" + backpack.getTokenId());
+                NftAttributeEntity nftAttribute = attributeMap.get(backpack.getEqNftId());
+                if (nftAttribute != null) {
+                    resp.setGrade(nftAttribute.getGrade());
+                    resp.setRarityAttrValue(nftAttribute.getRarityAttrValue());
+                }
             }
             return resp;
         });

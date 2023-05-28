@@ -3,6 +3,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.seeds.game.dto.response.GameRankNftSkinResp;
 import com.seeds.game.entity.NftAttributeEntity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,13 @@ public interface INftAttributeService extends IService<NftAttributeEntity> {
     NftAttributeEntity detailForMintAddress(String mintAddress);
 
     NftAttributeEntity queryByNftId(Long nftId);
+
+    /**
+     * 通过NFT的id获取NFT属性
+     * @param nftIds NFT的id
+     * @return NFT属性
+     */
+    Map<Long, NftAttributeEntity> queryMapByNftIds(Collection<Long> nftIds);
 
     /**
      * 获取NFT皮肤排行

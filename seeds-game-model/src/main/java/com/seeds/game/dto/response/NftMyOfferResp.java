@@ -40,4 +40,10 @@ public class NftMyOfferResp {
     @ApiModelProperty("状态")
     private String status;
 
+    @ApiModelProperty("NFT等级")
+    private Integer grade;
+
+    @ApiModelProperty("稀有属性值")
+    private String rarityAttrValue;
+
 }

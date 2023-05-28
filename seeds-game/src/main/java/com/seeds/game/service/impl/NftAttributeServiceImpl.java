@@ -12,8 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, NftAttributeEntity>implements INftAttributeService {
@@ -35,6 +38,18 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
     @Override
     public NftAttributeEntity queryByNftId(Long nftId) {
         return this.getOne(new LambdaQueryWrapper<NftAttributeEntity>().eq(NftAttributeEntity::getEqNftId, nftId));
+    }
+
+    @Override
+    public Map<Long, NftAttributeEntity> queryMapByNftIds(Collection<Long> nftIds) {
+        if (CollectionUtils.isEmpty(nftIds)) {
+            return Collections.emptyMap();
+        }
+        List<NftAttributeEntity> list = this.list(new LambdaQueryWrapper<NftAttributeEntity>().in(NftAttributeEntity::getEqNftId, nftIds));
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(NftAttributeEntity::getEqNftId, p -> p));
     }
 
     @Override
