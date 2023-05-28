@@ -38,7 +38,7 @@ public class NftMyOfferResp {
     private String nftNo;
 
     @ApiModelProperty("状态")
-    private String status;
+    private Integer status;
 
     @ApiModelProperty("NFT等级")
     private Integer grade;

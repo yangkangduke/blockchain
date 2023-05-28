@@ -15,7 +15,7 @@ import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.CurrencyEnum;
-import com.seeds.game.enums.NftOfferStatusEnum;
+import com.seeds.game.enums.NftAuctionStatusEnum;
 import com.seeds.common.utils.RelativeDateFormat;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.config.SeedsApiConfig;
@@ -515,11 +515,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 } else {
                     resp.setDifference(difference.abs() + "% below");
                 }
-                resp.setStatus(NftOfferStatusEnum.from(auction.getIsFinished()).getDescEn());
-                if (NftOfferStatusEnum.FINISHED.getCode() == auction.getIsFinished()) {
+                resp.setStatus(NftAuctionStatusEnum.from(auction.getIsFinished()).getCode());
+                if (NftAuctionStatusEnum.FINISHED.getCode() == auction.getIsFinished()) {
                     NftMarketOrderEntity order = orderMap.get(auction.getId());
                     if (order != null && NftStateEnum.IN_SETTLEMENT.getCode() != order.getStatus()) {
-                        resp.setStatus(NftOfferStatusEnum.SETTLEMENT.getDescEn());
+                        resp.setStatus(NftAuctionStatusEnum.SETTLEMENT.getCode());
                     }
                 }
             }
@@ -1029,7 +1029,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (auctionSetting == null) {
             return resp;
         }
-        if (auctionSetting.getIsFinished() != null && NftOfferStatusEnum.FINISHED.getCode() == auctionSetting.getIsFinished()) {
+        if (auctionSetting.getIsFinished() != null && NftAuctionStatusEnum.FINISHED.getCode() == auctionSetting.getIsFinished()) {
             NftMarketOrderEntity order = nftMarketOrderService.queryByAuctionId(nftEquipment.getAuctionId());
             if (order == null || NftStateEnum.IN_SETTLEMENT.getCode() != order.getStatus()) {
                 return resp;

@@ -11,10 +11,10 @@ import lombok.Getter;
  * @date 2023/05/27
  */
 @Getter
-public enum NftOfferStatusEnum {
+public enum NftAuctionStatusEnum {
 
     @JsonProperty("0")
-    OFFERING(0, "Offering","竞价中"),
+    AUCTIONING(0, "On Auction","拍卖中"),
     @JsonProperty("1")
     FINISHED(1,"Finished","已结束"),
     @JsonProperty("2")
@@ -29,22 +29,22 @@ public enum NftOfferStatusEnum {
     private String descEn;
     private String desc;
 
-    NftOfferStatusEnum(int code, String descEn, String desc) {
+    NftAuctionStatusEnum(int code, String descEn, String desc) {
         this.code = code;
         this.desc = desc;
         this.descEn = descEn;
     }
 
-    public static NftOfferStatusEnum from(int code) {
+    public static NftAuctionStatusEnum from(int code) {
         switch (code) {
             case 0:
-                return NftOfferStatusEnum.OFFERING;
+                return NftAuctionStatusEnum.AUCTIONING;
             case 1:
-                return NftOfferStatusEnum.FINISHED;
+                return NftAuctionStatusEnum.FINISHED;
             case 2:
-                return NftOfferStatusEnum.CANCELLED;
+                return NftAuctionStatusEnum.CANCELLED;
             case 3:
-                return NftOfferStatusEnum.SETTLEMENT;
+                return NftAuctionStatusEnum.SETTLEMENT;
             default:
                 throw new SeedsException("NftOfferStatusEnum - no such enum for code: " + code);
         }
