@@ -501,6 +501,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         Map<Long, NftAttributeEntity> attributeMap = nftAttributeService.queryMapByNftIds(nftIds);
         return page.convert(p -> {
             NftMyOfferResp resp = new NftMyOfferResp();
+            if (p.getCancelTime() != null && p.getCancelTime() > 0) {
+                resp.setCancelFlag(WhetherEnum.NO.value());
+            }
+            resp.setReceipt(p.getReceipt());
             resp.setBidingId(p.getId());
             resp.setOfferTime(DateUtil.format(new Date(p.getCreateTime()), DatePattern.NORM_DATETIME_MINUTE_FORMAT));
             resp.setPrice(p.getPrice());
@@ -520,6 +524,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     NftMarketOrderEntity order = orderMap.get(auction.getId());
                     if (order != null && NftStateEnum.IN_SETTLEMENT.getCode() != order.getStatus()) {
                         resp.setStatus(NftAuctionStatusEnum.SETTLEMENT.getCode());
+                        resp.setCancelFlag(WhetherEnum.NO.value());
                     }
                 }
             }

@@ -37,8 +37,14 @@ public class NftMyOfferResp {
     @ApiModelProperty("NFT编号")
     private String nftNo;
 
+    @ApiModelProperty("收据")
+    private String receipt;
+
     @ApiModelProperty("状态")
     private Integer status;
+
+    @ApiModelProperty("是否可以取消 0 不能 1 能")
+    private Integer cancelFlag = 1;
 
     @ApiModelProperty("NFT等级")
     private Integer grade;
