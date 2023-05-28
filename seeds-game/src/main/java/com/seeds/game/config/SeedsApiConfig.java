@@ -85,4 +85,7 @@ public class SeedsApiConfig {
     @Value("${seeds.api.tokenAddress:/api/address/tokenAddress}")
     private String tokenAddress;
 
+    @Value("${seeds.api.getTransaction:/api/address/getTransaction}")
+    private String getTransaction;
+
 }

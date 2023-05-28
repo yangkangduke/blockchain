@@ -241,6 +241,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         log.info("合成材料标记为deposit状态，param ：{}", JSONUtil.toJsonStr(updateList));
         nftPublicBackpackService.updateBatchByQueryWrapper(updateList, item ->
                 new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, item.getAutoId()));
+
         NftEvent nftEvent = new NftEvent();
         nftEvent.setId(id);
         nftEvent.setStatus(NFTEnumConstant.NFTEventStatus.CANCELLED.getCode());

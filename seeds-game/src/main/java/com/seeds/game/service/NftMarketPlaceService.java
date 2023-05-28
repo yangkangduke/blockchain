@@ -170,4 +170,5 @@ public interface NftMarketPlaceService {
      */
     void refundAllFee(NftRefundAllFeeReq req);
 
+    TransactionMessageRespDto getTransaction(String transaction);
 }
