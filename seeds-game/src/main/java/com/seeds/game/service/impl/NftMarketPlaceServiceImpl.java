@@ -172,7 +172,8 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 if (auctionListing != null) {
                     resp.setListReceipt(auctionListing.getReceipt());
                 }
-                resp.setCurrentPrice(auctionSetting.getStartPrice());
+                BigDecimal startPrice = auctionSetting.getStartPrice();
+                resp.setCurrentPrice(startPrice);
 
                 BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(nftEquipment.getAuctionId());
                 if (currentPrice != null) {
@@ -180,15 +181,18 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     resp.setHighPrice(currentPrice);
                 }
 
-                BigDecimal difference = resp.getCurrentPrice().subtract(auctionSetting.getStartPrice())
-                        .divide(auctionSetting.getStartPrice(), 4, RoundingMode.HALF_UP)
-                        .multiply(new BigDecimal(100))
-                        .setScale(0, RoundingMode.HALF_UP);
-                if (resp.getCurrentPrice().compareTo(auctionSetting.getStartPrice()) > 0) {
-                    resp.setPriceDifference(difference + "% above");
-                } else {
-                    resp.setPriceDifference(difference.abs() + "% below");
+                if (startPrice.compareTo(BigDecimal.ZERO) > 0) {
+                    BigDecimal difference = resp.getCurrentPrice().subtract(startPrice)
+                            .divide(startPrice, 4, RoundingMode.HALF_UP)
+                            .multiply(new BigDecimal(100))
+                            .setScale(0, RoundingMode.HALF_UP);
+                    if (resp.getCurrentPrice().compareTo(startPrice) > 0) {
+                        resp.setPriceDifference(difference + "% above");
+                    } else {
+                        resp.setPriceDifference(difference.abs() + "% below");
+                    }
                 }
+
                 marketOrder = nftMarketOrderService.queryByAuctionId(nftEquipment.getAuctionId());
                 if (marketOrder != null) {
                     resp.setOrderId(marketOrder.getId());
