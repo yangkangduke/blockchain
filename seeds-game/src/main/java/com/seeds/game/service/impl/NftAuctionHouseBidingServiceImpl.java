@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.common.enums.NftOfferStatusEnum;
 import com.seeds.game.dto.request.NftMyOfferPageReq;
-import com.seeds.game.enums.NftAuctionStatusEnum;
 import com.seeds.game.dto.request.NftOfferPageReq;
 import com.seeds.game.dto.response.NftOfferResp;
 import com.seeds.game.entity.NftAuctionHouseBiding;
@@ -62,9 +62,9 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
             } else {
                 resp.setDifference(difference.abs() + "% below");
             }
-            resp.setStatus(NftAuctionStatusEnum.AUCTIONING.getDescEn());
+            resp.setStatus(NftOfferStatusEnum.BIDDING.getDescEn());
             if (record.getCancelTime() != null && record.getCancelTime() != 0) {
-                resp.setStatus(NftAuctionStatusEnum.CANCELLED.getDescEn());
+                resp.setStatus(NftOfferStatusEnum.CANCELLED.getDescEn());
             }
             resp.setIsBidder(WhetherEnum.NO.value());
             if (record.getBuyer().equals(req.getPublicAddress())) {
