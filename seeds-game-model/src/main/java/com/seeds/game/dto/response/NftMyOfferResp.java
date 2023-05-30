@@ -22,6 +22,10 @@ public class NftMyOfferResp {
     @JsonSerialize(using= ToStringSerializer.class)
     private Long bidingId;
 
+    @ApiModelProperty("NFt的Id")
+    @JsonSerialize(using= ToStringSerializer.class)
+    private Long nftId;
+
     @ApiModelProperty("出价时间")
     private String offerTime;
 
