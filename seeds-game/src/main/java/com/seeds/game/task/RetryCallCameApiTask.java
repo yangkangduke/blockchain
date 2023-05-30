@@ -38,6 +38,8 @@ public class RetryCallCameApiTask {
     }
 
     private void postRequest(CallGameApiErrorLogEntity errorLogEntity) {
+        errorLogEntity.setRetryNum(errorLogEntity.getRetryNum() + 1);
+        gameApiLogService.updateById(errorLogEntity);
         try {
             HttpResponse response = HttpRequest.post(errorLogEntity.getUrl())
                     .timeout(5 * 1000)
@@ -52,8 +54,6 @@ public class RetryCallCameApiTask {
             }
         } catch (HttpException e) {
             log.info("重试调用游戏方请求错误，URL：{},  result:{}", errorLogEntity.getUrl(), e.getMessage());
-            errorLogEntity.setRetryNum(errorLogEntity.getRetryNum() + 1);
-            gameApiLogService.updateById(errorLogEntity);
         }
     }
 
