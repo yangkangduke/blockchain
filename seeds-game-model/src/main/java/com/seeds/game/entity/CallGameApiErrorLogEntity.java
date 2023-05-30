@@ -19,5 +19,8 @@ public class CallGameApiErrorLogEntity {
     private String method;
     private String params;
     private String msg;
+    // 重试次数
+    private Integer retryNum;
+    private Integer maxRetryNum;
     private Long callTime;
 }

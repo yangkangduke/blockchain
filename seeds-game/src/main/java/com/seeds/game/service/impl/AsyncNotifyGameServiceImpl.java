@@ -209,8 +209,8 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
                     .execute();
         } catch (Exception e) {
             // 记录调用错误日志
-            errorLog(notifyUrl, params, "connect timed out");
-            throw new GenericException("Failed to call game-api to notify,connect timed out");
+            errorLog(notifyUrl, params, e.getMessage());
+          //  throw new GenericException("Failed to call game-api to notify,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());
