@@ -534,6 +534,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             }
             NftPublicBackpackEntity backpack = backpackMap.get(p.getMintAddress());
             if (backpack != null) {
+                resp.setNftId(backpack.getEqNftId());
                 resp.setNftImage(backpack.getImage());
                 resp.setNftNo("#" + backpack.getTokenId());
                 NftAttributeEntity nftAttribute = attributeMap.get(backpack.getEqNftId());
