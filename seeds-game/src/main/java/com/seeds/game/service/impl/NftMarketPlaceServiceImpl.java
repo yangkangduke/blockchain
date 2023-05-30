@@ -526,7 +526,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 resp.setStatus(NftAuctionStatusEnum.from(auction.getIsFinished()).getCode());
                 if (NftAuctionStatusEnum.FINISHED.getCode() == auction.getIsFinished()) {
                     NftMarketOrderEntity order = orderMap.get(auction.getId());
-                    if (order != null && NftStateEnum.IN_SETTLEMENT.getCode() != order.getStatus()) {
+                    if (order != null && NftStateEnum.IN_SETTLEMENT.getCode() == order.getStatus()) {
                         resp.setStatus(NftAuctionStatusEnum.SETTLEMENT.getCode());
                         resp.setCancelFlag(WhetherEnum.NO.value());
                     }
