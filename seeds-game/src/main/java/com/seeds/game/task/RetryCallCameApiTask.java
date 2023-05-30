@@ -4,6 +4,7 @@ import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seeds.game.entity.CallGameApiErrorLogEntity;
 import com.seeds.game.service.CallGameApiLogService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +29,10 @@ public class RetryCallCameApiTask {
     @Scheduled(cron = "3 * * * * ?")
     public void retryCall() {
         log.info("定时任务，请求调用游戏方超时的接口------>");
-        List<CallGameApiErrorLogEntity> errorRecord = gameApiLogService.list();
+        List<CallGameApiErrorLogEntity> errorRecord = gameApiLogService.list(new LambdaQueryWrapper<CallGameApiErrorLogEntity>()
+                .like(CallGameApiErrorLogEntity::getParams, "timed out"));
         List<CallGameApiErrorLogEntity> retryList = errorRecord.stream()
-                .filter(p -> p.getMsg().contains("timed out") && p.getRetryNum() < p.getMaxRetryNum())
+                .filter(p -> p.getRetryNum() < p.getMaxRetryNum())
                 .collect(Collectors.toList());
         retryList.forEach(p -> {
             this.postRequest(p);
