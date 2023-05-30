@@ -58,6 +58,9 @@ public class NftOfferResp {
         @ApiModelProperty("状态")
         private String status;
 
+        @ApiModelProperty("签名")
+        private String signature;
+
         @ApiModelProperty("是否是出价人，0 否 1 是")
         private Integer isBidder;
 
