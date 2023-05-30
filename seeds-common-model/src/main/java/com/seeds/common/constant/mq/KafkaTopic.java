@@ -58,7 +58,7 @@ public class KafkaTopic {
     // skin NFT withdraw
     public final String SKIN_NFT_WITHDRAW = "SKIN_NFT_WITHDRAW";
 
-    public final String NFT_TRANSFER_SUCCESS = "NFT_TRANSFER_SUCCESS";
+    public final String NFT_TRANSFER_SUCCESS_BY_PHANTOM = "NFT_TRANSFER_SUCCESS_BY_PHANTOM";
 
     public final String SKIN_NFT_LIST_ASSET= "SKIN_NFT_LIST_ASSET";
     public final String SKIN_NFT_CANCEL_ASSET= "SKIN_NFT_CANCEL_ASSET";

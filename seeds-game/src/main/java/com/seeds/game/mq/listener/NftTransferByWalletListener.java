@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
+ * 处理用户通过亲宝合租那个会议
  * @author: he.wei
  * @date 2023/5/30
  */
@@ -30,7 +31,7 @@ public class NftTransferByWalletListener {
     @Resource
     private UserCenterFeignClient userCenterFeignClient;
 
-    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.NFT_TRANSFER_SUCCESS})
+    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.NFT_TRANSFER_SUCCESS_BY_PHANTOM})
     public void nftTransferSuccess(String msg) {
         log.info("收到nft transfer消息，msg:{}", msg);
         NftTransferByWalletDto nftTransferByWalletDto = JSONUtil.toBean(msg, NftTransferByWalletDto.class);
