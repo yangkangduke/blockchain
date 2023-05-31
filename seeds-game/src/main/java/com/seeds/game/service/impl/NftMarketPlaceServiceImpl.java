@@ -6,7 +6,6 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -510,7 +509,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             }
             resp.setReceipt(p.getReceipt());
             resp.setBidingId(p.getId());
-            resp.setOfferTime(DateUtil.format(new Date(p.getCreateTime()), DatePattern.NORM_DATETIME_MINUTE_FORMAT));
+            resp.setOfferTime(p.getCreateTime());
             resp.setPrice(p.getPrice());
             NftAuctionHouseSetting auction = auctionMap.get(p.getAuctionId());
             if (auction != null) {
@@ -613,6 +612,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
+        String publicAddress = getUserById(UserContext.getCurrentUserId());
         return page.convert(p -> {
             NftMarketPlaceSkinResp resp = new NftMarketPlaceSkinResp();
             BeanUtils.copyProperties(p, resp);
@@ -620,43 +620,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             if (p.getAuctionId() == 0) {
                 resp.setState(NftStateEnum.ON_SHELF.getCode());
             } else {
-                BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(p.getAuctionId());
-                if (currentPrice != null) {
-                    resp.setPrice(currentPrice);
-                }
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
                 if (NftStateEnum.IN_SETTLEMENT.getCode() == p.getState()) {
                     resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
                 }
             }
-
-            // 查询NFT
-            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getNftId());
-            // 获取当前nftId 下的mintAddress
-            String mintAddress = nftEquipment.getMintAddress();
-            LambdaQueryWrapper<NftMarketOrderEntity> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(NftMarketOrderEntity::getStatus, 2)
-                    .eq(NftMarketOrderEntity::getMintAddress, mintAddress)
-                    .orderByDesc(NftMarketOrderEntity::getFulfillTime)
-                    .last("limit 1");
-
-            NftMarketOrderEntity one = nftMarketOrderService.getOne(queryWrapper);
-            if (one != null) {
-                resp.setLastSale(one.getPrice());
-            }
-            UcUserResp ucUserResp = null;
-            try {
-                GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
-                ucUserResp = result.getData();
-                log.info("getUserInfoByPublicAddress,param:{},result:{}", nftEquipment.getOwner(), result);
-                if (null == ucUserResp) {
-                    resp.setIsOwner(0);
-                } else {
-                    resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
-                }
-            } catch (Exception e) {
-                log.error("内部请求uc获取用户公共地址失败");
-            }
+            resp.setIsOwner(p.getOwner().equals(publicAddress) ? 1 : 0);
             return resp;
         });
 
@@ -676,49 +645,19 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
+        String publicAddress = getUserById(UserContext.getCurrentUserId());
         return page.convert(p -> {
             NftMarketPlaceEqiupmentResp resp = new NftMarketPlaceEqiupmentResp();
             BeanUtils.copyProperties(p, resp);
+            resp.setIsOwner(p.getOwner().equals(publicAddress) ? 1 : 0);
             resp.setNumber("#" + p.getTokenId());
             if (p.getAuctionId() == 0) {
                 resp.setState(NftStateEnum.ON_SHELF.getCode());
             } else {
-                BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(p.getAuctionId());
-                if (currentPrice != null) {
-                    resp.setPrice(currentPrice);
-                }
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
                 if (NftStateEnum.IN_SETTLEMENT.getCode() == p.getState()) {
                     resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
                 }
-            }
-
-            // 查询NFT
-            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getNftId());
-            // 获取当前nftId 下的mintAddress
-            String mintAddress = nftEquipment.getMintAddress();
-            LambdaQueryWrapper<NftMarketOrderEntity> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(NftMarketOrderEntity::getStatus, 2)
-                    .eq(NftMarketOrderEntity::getMintAddress, mintAddress)
-                    .orderByDesc(NftMarketOrderEntity::getFulfillTime)
-                    .last("limit 1");
-
-            NftMarketOrderEntity one = nftMarketOrderService.getOne(queryWrapper);
-            if (one != null) {
-                resp.setLastSale(one.getPrice());
-            }
-            UcUserResp ucUserResp = null;
-            try {
-                GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
-                ucUserResp = result.getData();
-                log.info("getUserInfoByPublicAddress,param:{},result:{}", nftEquipment.getOwner(), result);
-                if (null == ucUserResp) {
-                    resp.setIsOwner(0);
-                } else {
-                    resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
-                }
-            } catch (Exception e) {
-                log.error("内部请求uc获取用户公共地址失败");
             }
             return resp;
         });
@@ -758,50 +697,21 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
+        String publicAddress = getUserById(UserContext.getCurrentUserId());
         return page.convert(p -> {
             NftMarketPlacePropsResp resp = new NftMarketPlacePropsResp();
             BeanUtils.copyProperties(p, resp);
             resp.setNumber("#" + p.getTokenId());
+            resp.setIsOwner(p.getOwner().equals(publicAddress) ? 1 : 0);
             if (p.getAuctionId() == 0) {
                 resp.setState(NftStateEnum.ON_SHELF.getCode());
             } else {
-                BigDecimal currentPrice = nftAuctionHouseBidingService.queryAuctionCurrentPrice(p.getAuctionId());
-                if (currentPrice != null) {
-                    resp.setPrice(currentPrice);
-                }
                 resp.setState(NftStateEnum.ON_AUCTION.getCode());
                 if (NftStateEnum.IN_SETTLEMENT.getCode() == p.getState()) {
                     resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
                 }
             }
 
-            // 查询NFT
-            NftEquipment nftEquipment = nftEquipmentMapper.getById(p.getNftId());
-            // 获取当前nftId 下的mintAddress
-            String mintAddress = nftEquipment.getMintAddress();
-            LambdaQueryWrapper<NftMarketOrderEntity> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(NftMarketOrderEntity::getStatus, 2)
-                    .eq(NftMarketOrderEntity::getMintAddress, mintAddress)
-                    .orderByDesc(NftMarketOrderEntity::getFulfillTime)
-                    .last("limit 1");
-
-            NftMarketOrderEntity one = nftMarketOrderService.getOne(queryWrapper);
-            if (one != null) {
-                resp.setLastSale(one.getPrice());
-            }
-            UcUserResp ucUserResp = null;
-            try {
-                GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(nftEquipment.getOwner());
-                ucUserResp = result.getData();
-                log.info("getUserInfoByPublicAddress,param:{},result:{}", nftEquipment.getOwner(), result);
-                if (null == ucUserResp) {
-                    resp.setIsOwner(0);
-                } else {
-                    resp.setIsOwner(UserContext.getCurrentUserId().equals(ucUserResp.getId()) ? 1 : 0);
-                }
-            } catch (Exception e) {
-                log.error("内部请求uc获取用户公共地址失败");
-            }
             return resp;
         });
     }
@@ -1338,6 +1248,17 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             log.error("请求NFT托管费退还接口失败，message：{}", e.getMessage());
             nftFeeRecord.setStatus(WhetherEnum.NO.value());
         }
+    }
+
+    private String getUserById(Long userId) {
+        String publicAddress = null;
+        try {
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(userId);
+            publicAddress = result.getData();
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败");
+        }
+        return publicAddress;
     }
 
 }

@@ -77,4 +77,7 @@ public class NftMarketPlaceEqiupmentResp implements Serializable {
 
     @ApiModelProperty("是否是拥有者，0 否 1 是")
     private Integer isOwner = 0;
+
+    private String owner;
+
 }
