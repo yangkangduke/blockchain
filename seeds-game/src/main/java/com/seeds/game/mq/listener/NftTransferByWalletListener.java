@@ -47,12 +47,9 @@ public class NftTransferByWalletListener {
                 } catch (Exception e) {
                     log.error("内部请求uc获取用户信息失败.{}", e.getMessage());
                 }
-                if (Objects.nonNull(userResp)) {
-                    Long toUserId = userResp.getId();
-                    one.setOwner(nftTransferByWalletDto.getToAddress());
-                    one.setUserId(toUserId);
-                    nftPublicBackpackService.updateById(one);
-                }
+                one.setUserId(Objects.nonNull(userResp) ? userResp.getId() : 0L);
+                one.setOwner(nftTransferByWalletDto.getToAddress());
+                nftPublicBackpackService.updateById(one);
             }
         }
     }
