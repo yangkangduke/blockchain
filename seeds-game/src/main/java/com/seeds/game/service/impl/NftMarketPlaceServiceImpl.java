@@ -1223,7 +1223,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT取消出价成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpResponse response = HttpRequest.get(url)
-                    .timeout(8 * 1000)
+                    .timeout(10 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
             log.info("NFT取消出价成功通知返回，result:{}", response.body());
