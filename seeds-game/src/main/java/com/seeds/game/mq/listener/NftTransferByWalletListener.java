@@ -32,9 +32,9 @@ public class NftTransferByWalletListener {
     @Resource
     private UserCenterFeignClient userCenterFeignClient;
 
-    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.NFT_TRANSFER_SUCCESS_BY_PHANTOM})
+    @KafkaListener(groupId = "nft-transfer-by-wallet", topics = {KafkaTopic.NFT_TRANSFER_SUCCESS_BY_PHANTOM})
     public void nftTransferSuccess(String msg) {
-        log.info("收到nft transfer消息，msg:{}", msg);
+        log.info("收到nft transfer by wallet消息，msg:{}", msg);
         NftTransferByWalletDto nftTransferByWalletDto = JSONUtil.toBean(msg, NftTransferByWalletDto.class);
         if (Objects.nonNull(nftTransferByWalletDto)) {
             NftPublicBackpackEntity one = nftPublicBackpackService.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>()

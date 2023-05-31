@@ -41,7 +41,7 @@ public class MetadataListener {
     @Autowired
     private INftPublicBackpackService backpackService;
 
-    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.NFT_MINT_SUCCESS})
+    @KafkaListener(groupId = "nft-mint-success", topics = {KafkaTopic.NFT_MINT_SUCCESS})
     public void uploadJsonFile(String msg) {
         log.info("收到【NFT-MINT-SUCCESS】消息：{}", msg);
         MetadataAttrDto dto = JSONUtil.toBean(msg, MetadataAttrDto.class);

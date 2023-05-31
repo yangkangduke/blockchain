@@ -22,7 +22,7 @@ public class SendNotificationListener {
     @Resource
     private NotificationService notificationService;
 
-    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.SEND_NOTIFICATION})
+    @KafkaListener(groupId = "send-notification", topics = {KafkaTopic.SEND_NOTIFICATION})
     public void sendNotice(String msg) {
         log.info("收到消息：{}", msg);
         NotificationReq notificationReq = JSONUtil.toBean(msg, NotificationReq.class);

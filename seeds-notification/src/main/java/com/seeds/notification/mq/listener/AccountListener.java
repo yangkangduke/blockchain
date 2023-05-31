@@ -30,7 +30,7 @@ public class AccountListener {
     @Resource
     private RemotePermissionService remotePermissionService;
 
-    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.TOPIC_ACCOUNT_UPDATE})
+    @KafkaListener(groupId = "account-update", topics = {KafkaTopic.TOPIC_ACCOUNT_UPDATE})
     public void receiveNotice(String msg) {
         log.info("收到消息：{}", msg);
         NotificationReq notificationReq = JSONUtil.toBean(msg, NotificationReq.class);
@@ -47,7 +47,7 @@ public class AccountListener {
         }
     }
 
-    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.TOPIC_ACCOUNT_AUDIT})
+    @KafkaListener(groupId = "account-audit", topics = {KafkaTopic.TOPIC_ACCOUNT_AUDIT})
     public void receiveAuditNotice(String msg) {
         log.info("收到消息：{}", msg);
         NotificationReq notificationReq = JSONUtil.toBean(msg, NotificationReq.class);

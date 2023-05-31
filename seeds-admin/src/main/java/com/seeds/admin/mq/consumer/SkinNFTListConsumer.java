@@ -25,7 +25,7 @@ public class SkinNFTListConsumer {
     @Autowired
     private SysNftPicService nftPicService;
 
-    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.SKIN_NFT_LIST_ASSET_SUCCESS})
+    @KafkaListener(groupId = "skin-nft-list-success", topics = {KafkaTopic.SKIN_NFT_LIST_ASSET_SUCCESS})
     public void skinListSuccess(String msg) {
         log.info("收到skin-nft-list-success消息：{}", msg);
         JSONArray objects = JSONUtil.parseArray(msg);
@@ -35,7 +35,7 @@ public class SkinNFTListConsumer {
         nftPicService.updateBatchById(list);
     }
 
-    @KafkaListener(groupId = "#{groupIdGenerator.randomId()}", topics = {KafkaTopic.SKIN_NFT_CANCEL_ASSET_SUCCESS})
+    @KafkaListener(groupId = "skin-nft-cancel-list-success", topics = {KafkaTopic.SKIN_NFT_CANCEL_ASSET_SUCCESS})
     public void skinCancelList(String msg) {
         log.info("收到skin-nft-cancel-list-success消息：{}", msg);
         JSONArray objects = JSONUtil.parseArray(msg);
