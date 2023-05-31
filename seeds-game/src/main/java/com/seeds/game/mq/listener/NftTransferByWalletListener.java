@@ -17,7 +17,8 @@ import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
- * 处理用户通过亲宝合租那个会议
+ * 处理用户通过钱包转移NFT的消息
+ *
  * @author: he.wei
  * @date 2023/5/30
  */
