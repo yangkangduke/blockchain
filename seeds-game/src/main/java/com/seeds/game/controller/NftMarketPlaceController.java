@@ -61,10 +61,10 @@ public class NftMarketPlaceController {
         return GenericDto.success(null);
     }
 
-    @GetMapping("make-offer-validate/{auctionId}/{price}")
+    @GetMapping("make-offer-validate/{auctionId}")
     @ApiOperation("拍卖出价验证")
-    public GenericDto<Boolean> makeOfferValidate(@PathVariable String auctionId, @PathVariable BigDecimal price) {
-        return GenericDto.success(nftMarketPlaceService.makeOfferValidate(auctionId, price));
+    public GenericDto<Boolean> makeOfferValidate(@PathVariable String auctionId) {
+        return GenericDto.success(nftMarketPlaceService.makeOfferValidate(auctionId));
     }
 
     @PostMapping("my-offer-page")

@@ -44,9 +44,8 @@ public interface INftAuctionHouseBidingService extends IService<NftAuctionHouseB
      * 根据地址和价格统计拍卖次数
      * @param publicAddress 用户地址
      * @param auctionId 拍卖id
-     * @param price 价格
      * @return 出价次数
      */
-    long countByAddressAndPrice(String publicAddress, String auctionId, BigDecimal price);
+    long countByAddressAndPrice(String publicAddress, String auctionId);
 
 }

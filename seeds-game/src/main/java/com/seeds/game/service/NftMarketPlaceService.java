@@ -50,10 +50,9 @@ public interface NftMarketPlaceService {
     /**
      * nft拍卖出价验证
      * @param auctionId 拍卖id
-     * @param price 价格
      * @return 是否可以出价
      */
-    boolean makeOfferValidate(String auctionId, BigDecimal price);
+    boolean makeOfferValidate(String auctionId);
 
     /**
      * 我的nft拍卖出价
