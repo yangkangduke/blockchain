@@ -27,7 +27,7 @@ public class NftMyOfferResp {
     private Long nftId;
 
     @ApiModelProperty("出价时间")
-    private String offerTime;
+    private Long offerTime;
 
     @ApiModelProperty("出价价格")
     private BigDecimal price;
