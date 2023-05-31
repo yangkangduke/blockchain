@@ -530,6 +530,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                         resp.setCancelFlag(WhetherEnum.NO.value());
                     }
                 }
+                if (p.getId().equals(auction.getBidingId())) {
+                    resp.setCancelFlag(WhetherEnum.NO.value());
+                }
             }
             NftPublicBackpackEntity backpack = backpackMap.get(p.getMintAddress());
             if (backpack != null) {
