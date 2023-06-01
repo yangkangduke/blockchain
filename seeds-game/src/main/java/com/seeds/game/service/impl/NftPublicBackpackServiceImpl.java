@@ -490,6 +490,10 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         if (NftOrderTypeEnum.BUY_NOW.getCode() == nft.getOnSale() || NftOrderTypeEnum.ON_AUCTION.getCode() == nft.getOnSale()) {
             throw new GenericException(GameErrorCodeEnum.ERR_10007_NFT_ITEM_IS_ON_SALE);
         }
+        //更新背包状态 deposited
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
+        this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nft.getId()));
         // NFT非归属人不能托管
         ucUserService.ownerValidation(nft.getOwner());
         // 调用/api/equipment/depositNft通知，托管NFT成功
@@ -511,11 +515,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
                 throw new GenericException(jsonObject.getString("message"));
-            } else {
-                //更新背包状态 deposited
-                NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-                backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
-                this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nft.getId()));
             }
         } catch (Exception e) {
             log.error("NFT托管成功通知失败，message：{}", e.getMessage());
@@ -753,7 +752,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(distributeUrl, params, e.getMessage());
-         //   throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR, "Failed to call game-api to distribute nft,connect timed out");
+            //   throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR, "Failed to call game-api to distribute nft,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());
@@ -811,7 +810,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(takebackUrl, params, e.getMessage());
-          //  throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR, "Failed to call game-api to takeback nft,connect timed out");
+            //  throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR, "Failed to call game-api to takeback nft,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());

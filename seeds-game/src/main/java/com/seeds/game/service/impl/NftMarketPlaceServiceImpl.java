@@ -248,6 +248,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             return;
         }
 
+        //更新背包状态(undeposited => on shelf)
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.ON_SHELF.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
+
         // 调用/api/chainOp/placeOrder通知，链上上架成功
         String params = String.format("feeHash=%s&receipt=%s&sig=%s", req.getFeeHash(), req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getPlaceOrderApi() + "?" + params;
@@ -262,11 +267,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
                 throw new GenericException(jsonObject.getString("message"));
-            } else {
-                //更新背包状态(undeposited => on shelf)
-                NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-                backpackEntity.setState(NFTEnumConstant.NFTStateEnum.ON_SHELF.getCode());
-                nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
             }
         } catch (Exception e) {
             log.error("一口价上架成功通知失败，message：{}", e.getMessage());
@@ -286,6 +286,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 || WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
             return;
         }
+        //更新背包状态(undeposited => on auction)
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.ON_ACTION.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
 
         // 调用/api/auction/english通知，链上英式拍卖上架成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getEnglishOrderApi();
@@ -306,11 +310,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
                 throw new GenericException(jsonObject.getString("message"));
-            } else {
-                //更新背包状态(undeposited => on auction)
-                NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-                backpackEntity.setState(NFTEnumConstant.NFTStateEnum.ON_ACTION.getCode());
-                nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
             }
         } catch (Exception e) {
             log.error("英式拍卖上架成功通知失败，message：{}", e.getMessage());
@@ -345,13 +344,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
                 throw new GenericException(jsonObject.getString("message"));
-            } else {
-
-                //更新背包状态 undeposited
-                NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-                backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
-                nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
-
             }
         } catch (Exception e) {
             log.error("NFT下架成功通知失败，message：{}", e.getMessage());
@@ -382,6 +374,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (auction.getCancelTime() != null && auction.getCancelTime() != 0) {
             return;
         }
+        // 更新背包状态 undeposited
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
         // 调用/api/chainOp/cancelOrder通知，取消拍卖成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getAuctionCancel();
         EndAuctionMessageDto dto = new EndAuctionMessageDto();
@@ -403,11 +399,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
                 throw new GenericException(jsonObject.getString("message"));
-            } else {
-                // 更新背包状态 undeposited
-                NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-                backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
-                nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
             }
         } catch (Exception e) {
             log.error("NFT取消拍卖成功通知失败，message：{}", e.getMessage());
@@ -571,7 +562,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         } catch (Exception e) {
             log.error("内部请求uc获取用户公共地址失败");
         }
-
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        backpackEntity.setUserId(userId);
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
         // 调用/api/chainOp/buySuccess通知，购买成功
         String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getBuySuccess() + "?" + params;
@@ -586,10 +579,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
                 throw new GenericException(jsonObject.getString("message"));
-            } else {
-                backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
-                backpackEntity.setUserId(userId);
-                nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
             }
         } catch (Exception e) {
             log.error("NFT购买成功通知失败，message：{}", e.getMessage());
@@ -922,7 +911,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         ucUserService.ownerValidation(nftFeeOpLog.getFromAddress());
         NftFeeRecordEntity nftFeeRecord = nftFeeRecordService.queryByMintAddressAndFeeHash(req.getMintAddress(), req.getFeeHash());
-        if (nftFeeRecord != null && nftFeeRecord.getRefundFee() !=null && WhetherEnum.YES.value() == nftFeeRecord.getStatus()) {
+        if (nftFeeRecord != null && nftFeeRecord.getRefundFee() != null && WhetherEnum.YES.value() == nftFeeRecord.getStatus()) {
             log.info("托管费已退还，feeHash:{}， mintAddress:{}", req.getFeeHash(), req.getMintAddress());
             return;
         }
@@ -1038,6 +1027,19 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         //    throw new GenericException(GameErrorCodeEnum.ERR_10008_NFT_ITEM_IS_DEPOSIT);
         //}
 
+        //更新背包状态 undeposited  userId,owner
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        try {
+            GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(auctionBiding.getBuyer());
+            log.info("acceptOffer update backpack getUserInfoByPublicAddress,param:{},result:{}", auctionBiding.getBuyer(), result);
+            backpackEntity.setUserId(result.getData().getId());
+            backpackEntity.setOwner(auctionBiding.getBuyer());
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户信息失败");
+        }
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
+
         // 调用/api/auction/endAuction通知，接受报价成功
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getEndAuction();
         EndAuctionMessageDto dto = new EndAuctionMessageDto();
@@ -1059,19 +1061,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
                 throw new GenericException(jsonObject.getString("message"));
-            } else {
-                //更新背包状态 undeposited  userId,owner
-                NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
-                try {
-                    GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(auctionBiding.getBuyer());
-                    log.info("acceptOffer update backpack getUserInfoByPublicAddress,param:{},result:{}", auctionBiding.getBuyer(), result);
-                    backpackEntity.setUserId(result.getData().getId());
-                    backpackEntity.setOwner(auctionBiding.getBuyer());
-                } catch (Exception e) {
-                    log.error("内部请求uc获取用户信息失败");
-                }
-                backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
-                nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
             }
             String data = jsonObject.getString("data");
             return JSONUtil.toBean(data, NftOfferDetailResp.class);
