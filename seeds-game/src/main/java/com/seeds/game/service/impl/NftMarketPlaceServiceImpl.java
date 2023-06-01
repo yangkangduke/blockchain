@@ -328,8 +328,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 || WhetherEnum.YES.value() == nftEquipment.getIsDeposit()) {
             return;
         }
-        Long orderId = Long.valueOf(nftEquipment.getOrderId());
+        //更新背包状态 undeposited
+        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
+        nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
 
+        Long orderId = Long.valueOf(nftEquipment.getOrderId());
         // 调用/api/chainOp/cancelOrder通知，下架成功
         String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
         String url = seedsApiConfig.getBaseDomain() + seedsApiConfig.getCancelOrderApi() + "?" + params;
