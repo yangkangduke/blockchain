@@ -615,7 +615,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
-        String publicAddress = getUserById(UserContext.getCurrentUserId());
+        String publicAddress = getUserById(UserContext.getCurrentUserIdNoThrow());
         return page.convert(p -> {
             NftMarketPlaceSkinResp resp = new NftMarketPlaceSkinResp();
             BeanUtils.copyProperties(p, resp);
@@ -648,7 +648,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
-        String publicAddress = getUserById(UserContext.getCurrentUserId());
+        String publicAddress = getUserById(UserContext.getCurrentUserIdNoThrow());
         return page.convert(p -> {
             NftMarketPlaceEqiupmentResp resp = new NftMarketPlaceEqiupmentResp();
             BeanUtils.copyProperties(p, resp);
@@ -700,7 +700,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
-        String publicAddress = getUserById(UserContext.getCurrentUserId());
+        String publicAddress = getUserById(UserContext.getCurrentUserIdNoThrow());
         return page.convert(p -> {
             NftMarketPlacePropsResp resp = new NftMarketPlacePropsResp();
             BeanUtils.copyProperties(p, resp);
