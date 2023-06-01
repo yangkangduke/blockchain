@@ -52,7 +52,7 @@
         left join (
             select if(
                 n.auction_id > 0 and (select count(*) from z_auction_house_biding z where z.auction_id = n.auction_id and (z.cancel_time is null or z.cancel_time = 0)> 0
-                    ), (select max(m.price) from z_auction_house_biding m where m.auction_id = n.auction_id and (m.cancel_time is null or m.cancel_time = 0)), n.price) price,n.place_time,n.mint_address from z_market_order n where n.status = 1) t3
+                    ), (select max(m.price) from z_auction_house_biding m where m.auction_id = n.auction_id and (m.cancel_time is null or m.cancel_time = 0)), n.price) price,n.place_time,n.mint_address from z_market_order n where n.status = 1 or n.status = 7) t3
         on t1.token_address = t3.mint_address
         where t1.user_id = #{userId} and t1.state <![CDATA[<>]]> 1
         <if test="state != null">
@@ -121,7 +121,7 @@
         left join (
         select if(
         n.auction_id > 0 and (select count(*) from z_auction_house_biding z where z.auction_id = n.auction_id and (z.cancel_time is null or z.cancel_time = 0)> 0
-        ), (select max(m.price) from z_auction_house_biding m where m.auction_id = n.auction_id and (m.cancel_time is null or m.cancel_time = 0)), n.price) price,n.place_time,n.mint_address from z_market_order n where n.status = 1) t3
+        ), (select max(m.price) from z_auction_house_biding m where m.auction_id = n.auction_id and (m.cancel_time is null or m.cancel_time = 0)), n.price) price,n.place_time,n.mint_address from z_market_order n where n.status = 1 or n.status = 7) t3
         on t1.token_address = t3.mint_address
         where t1.type =3 and t1.user_id = #{userId} and t1.state <![CDATA[<>]]> 1
         <if test="skin != null and skin!='' ">
