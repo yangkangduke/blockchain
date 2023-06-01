@@ -617,6 +617,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
                 }
             }
+            if (p.getIsBlindBox().equals(WhetherEnum.YES.value())) {
+                p.setHeroName("");
+                p.setImage("");
+                p.setSkinName("");
+                p.setRarity(0);
+            }
             resp.setIsOwner(p.getOwner().equals(publicAddress) ? 1 : 0);
             return resp;
         });

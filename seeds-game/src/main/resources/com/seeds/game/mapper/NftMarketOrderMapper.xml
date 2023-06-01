@@ -24,6 +24,7 @@
         t3.goblin,
         t3.hero_type,
         t4.owner,
+        t5.is_blind_box,
 
         (select ANY_VALUE(max(price)) from z_market_order where status = 2 and mint_address = t1.mint_address) as last_sale,
         (select IF(ANY_VALUE(max(price)) > 0, ANY_VALUE(max(price)), t1.price) from z_auction_house_biding where auction_id = t4.auction_id and (cancel_time is null or cancel_time = 0)) as price

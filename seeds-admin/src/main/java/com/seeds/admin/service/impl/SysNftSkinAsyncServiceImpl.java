@@ -122,7 +122,8 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
             entity.setTokenId(Long.parseLong(dto.get(i).getTokenId()));
             SkinNFTAttrDto attr = nftPicService.handleAttr(entity, null);
             String fileName = dto.get(i).getTokenId() + ".json";
-            boolean flag = CreateJsonFileUtil.createJsonFile(JSONUtil.toJsonStr(attr), TMP_FILE_PATH, fileName);
+            //boolean flag = CreateJsonFileUtil.createJsonFile(JSONUtil.toJsonStr(attr), TMP_FILE_PATH, fileName);
+            boolean flag = CreateJsonFileUtil.createJsonFile("none", TMP_FILE_PATH, fileName);
             // 上传文件
             if (flag) {
                 InputStream inputStream = null;
