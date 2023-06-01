@@ -73,7 +73,7 @@ public class NFTEnumConstant {
     public enum NFTDescEnum {
 
         SEEDS_EQUIP("This is the NFT of the Seeds equipment."),
-        SEEDS_SKIN("This is the NFT of the Seeds skin.");
+        SEEDS_SKIN("Introducing the genesis BladeChamp NFT Series! Immerse yourself in Bladerite with this exclusive collection featuring the five legendary heroes. Hold it to unlock the Loot Mode. Step into the thrilling battlefield and snatch rewarding pattern NFTs.");
 
         private final String desc;
 
