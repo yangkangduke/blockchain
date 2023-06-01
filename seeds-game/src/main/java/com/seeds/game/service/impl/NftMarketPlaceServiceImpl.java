@@ -259,7 +259,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT一口价上架成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpResponse response = HttpRequest.get(url)
-                    .timeout(8 * 1000)
+                    .timeout(30 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
             log.info("NFT一口价上架成功通知返回，result:{}", response.body());
@@ -340,7 +340,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         log.info("NFT下架成功，开始通知， url:{}， params:{}", url, params);
         try {
             HttpResponse response = HttpRequest.get(url)
-                    .timeout(8 * 1000)
+                    .timeout(30 * 1000)
                     .header("Content-Type", "application/json")
                     .execute();
             log.info("NFT下架成功通知返回，result:{}", response.body());
