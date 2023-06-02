@@ -458,7 +458,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     }
 
     @Override
-    public boolean makeOfferValidate(String auctionId) {
+    public boolean makeOfferValidate(String mintAddress) {
         String publicAddress = null;
         try {
             GenericDto<String> result = userCenterFeignClient.getPublicAddress(UserContext.getCurrentUserId());
@@ -469,7 +469,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (StringUtils.isEmpty(publicAddress)) {
             return false;
         }
-        return nftAuctionHouseBidingService.countByAddressAndPrice(publicAddress, auctionId) == 0;
+        return nftAuctionHouseBidingService.countByAddressAndPrice(publicAddress, mintAddress) == 0;
     }
 
     @Override

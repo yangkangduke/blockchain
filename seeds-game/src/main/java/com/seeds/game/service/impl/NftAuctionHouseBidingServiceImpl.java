@@ -104,10 +104,10 @@ public class NftAuctionHouseBidingServiceImpl extends ServiceImpl<NftAuctionHous
     }
 
     @Override
-    public long countByAddressAndPrice(String publicAddress, String auctionId) {
+    public long countByAddressAndPrice(String publicAddress, String mintAddress) {
         LambdaQueryWrapper<NftAuctionHouseBiding> queryWrap = new QueryWrapper<NftAuctionHouseBiding>().lambda()
                 .eq(NftAuctionHouseBiding::getBuyer, publicAddress)
-                .eq(NftAuctionHouseBiding::getAuctionId, auctionId)
+                .eq(NftAuctionHouseBiding::getMintAddress, mintAddress)
                 .isNull(NftAuctionHouseBiding::getCancelTime).or(p -> p.eq(NftAuctionHouseBiding::getCancelTime, 0));
         return count(queryWrap);
     }
