@@ -469,7 +469,21 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (StringUtils.isEmpty(publicAddress)) {
             return false;
         }
-        return nftAuctionHouseBidingService.countByAddressAndPrice(publicAddress, mintAddress) == 0;
+        List<NftAuctionHouseBiding> bids = nftAuctionHouseBidingService.queryByAddressAndMintAddress(publicAddress, mintAddress);
+        if (CollectionUtils.isEmpty(bids)) {
+            return true;
+        }
+        Set<Long> bidingIds = bids.stream().map(NftAuctionHouseBiding::getId).collect(Collectors.toSet());
+        Set<Long> auctionIds = bids.stream().map(NftAuctionHouseBiding::getAuctionId).collect(Collectors.toSet());
+        List<NftAuctionHouseSetting> list = nftAuctionHouseSettingService.listByIds(auctionIds);
+        if (CollectionUtils.isEmpty(list)) {
+            return true;
+        }
+        list = list.stream().filter(p -> bidingIds.contains(p.getBidingId())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(list)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
