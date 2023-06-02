@@ -479,7 +479,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         if (CollectionUtils.isEmpty(list)) {
             return true;
         }
-        list = list.stream().filter(p -> bidingIds.contains(p.getBidingId())).collect(Collectors.toList());
+        list = list.stream().filter(p -> !bidingIds.contains(p.getBidingId())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(list)) {
             return true;
         }
