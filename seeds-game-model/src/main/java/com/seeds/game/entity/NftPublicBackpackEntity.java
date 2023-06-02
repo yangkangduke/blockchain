@@ -133,5 +133,6 @@ public class NftPublicBackpackEntity implements Serializable {
     @ApiModelProperty("参考价格")
     private BigDecimal proposedPrice;
 
-
+    @ApiModelProperty("是否买卖过 1是 0否")
+    private Integer isTraded;
 }

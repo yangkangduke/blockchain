@@ -564,6 +564,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         }
         backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
         backpackEntity.setUserId(userId);
+        backpackEntity.setIsTraded(WhetherEnum.YES.value());
         nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
         // 调用/api/chainOp/buySuccess通知，购买成功
         String params = String.format("receipt=%s&sig=%s", req.getReceipt(), req.getSig());
@@ -1043,6 +1044,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         } catch (Exception e) {
             log.error("内部请求uc获取用户信息失败");
         }
+        backpackEntity.setIsTraded(WhetherEnum.YES.value());
         backpackEntity.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
         nftPublicBackpackService.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getEqNftId, nftEquipment.getId()));
 

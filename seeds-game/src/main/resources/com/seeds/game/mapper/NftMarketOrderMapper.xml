@@ -13,6 +13,7 @@
         t5.hero   as heroName,
         t5.skin   as skinName,
         t2.image,
+        t2.is_tread,
         t3.rarity,
         t3.victory,
         t3.lose,
