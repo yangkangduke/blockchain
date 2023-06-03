@@ -6,6 +6,7 @@ import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.game.dto.request.external.NftTransferByWalletDto;
 import com.seeds.game.entity.NftPublicBackpackEntity;
+import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.service.INftPublicBackpackService;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
@@ -49,6 +50,7 @@ public class NftTransferByWalletListener {
                 }
                 one.setUserId(Objects.nonNull(userResp) ? userResp.getId() : 0L);
                 one.setOwner(nftTransferByWalletDto.getToAddress());
+                one.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
                 nftPublicBackpackService.updateById(one);
             }
         }
