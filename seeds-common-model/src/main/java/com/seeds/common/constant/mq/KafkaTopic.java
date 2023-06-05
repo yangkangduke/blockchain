@@ -58,14 +58,16 @@ public class KafkaTopic {
     // skin NFT withdraw
     public final String SKIN_NFT_WITHDRAW = "SKIN_NFT_WITHDRAW";
 
+    // 皮肤NFT首次购买成功
+    public final String SKIN_NFT_BUY_SUCCESS_FIRST = "SKIN_NFT_BUY_SUCCESS_FIRST";
+
     public final String NFT_TRANSFER_SUCCESS_BY_PHANTOM = "NFT_TRANSFER_SUCCESS_BY_PHANTOM";
 
-    public final String SKIN_NFT_LIST_ASSET= "SKIN_NFT_LIST_ASSET";
-    public final String SKIN_NFT_CANCEL_ASSET= "SKIN_NFT_CANCEL_ASSET";
+    public final String SKIN_NFT_LIST_ASSET = "SKIN_NFT_LIST_ASSET";
+    public final String SKIN_NFT_CANCEL_ASSET = "SKIN_NFT_CANCEL_ASSET";
 
-    public final String SKIN_NFT_LIST_ASSET_SUCCESS= "SKIN_NFT_LIST_ASSET_SUCCESS";
-    public final String SKIN_NFT_CANCEL_ASSET_SUCCESS= "SKIN_NFT_CANCEL_ASSET_SUCCESS";
-
+    public final String SKIN_NFT_LIST_ASSET_SUCCESS = "SKIN_NFT_LIST_ASSET_SUCCESS";
+    public final String SKIN_NFT_CANCEL_ASSET_SUCCESS = "SKIN_NFT_CANCEL_ASSET_SUCCESS";
 
 
     // 装备mint 由原来的调用接口换成走Kafka

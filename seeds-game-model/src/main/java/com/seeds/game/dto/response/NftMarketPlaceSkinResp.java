@@ -92,5 +92,7 @@ public class NftMarketPlaceSkinResp implements Serializable {
 
     @ApiModelProperty("是否盲盒：1是 0 否")
     private Integer isBlindBox;
+    @ApiModelProperty("是否买卖过：1是 0 否")
+    private Integer isTread;
 
 }

@@ -6,14 +6,19 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.admin.entity.SysFileEntity;
 import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.WhetherEnum;
+import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.CurrencyEnum;
+import com.seeds.game.dto.request.internal.SkinNftFirstBuySuccessDto;
+import com.seeds.game.dto.request.internal.SkinNftWithdrawDto;
 import com.seeds.game.enums.NftAuctionStatusEnum;
 import com.seeds.common.utils.RelativeDateFormat;
 import com.seeds.common.web.context.UserContext;
@@ -29,6 +34,7 @@ import com.seeds.game.enums.*;
 import com.seeds.game.exception.GenericException;
 import com.seeds.game.mapper.NftEquipmentMapper;
 import com.seeds.game.mapper.NftMarketOrderMapper;
+import com.seeds.game.mq.producer.KafkaProducer;
 import com.seeds.game.service.*;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
@@ -40,6 +46,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -101,6 +108,8 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
     @Autowired
     private NftMarketOrderMapper nftMarketOrderMapper;
+    @Resource
+    private KafkaProducer kafkaProducer;
 
     @Override
     public NftMarketPlaceDetailResp detail(Long nftId) {
@@ -555,8 +564,17 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             return;
         }
         Long orderId = Long.valueOf(nftEquipment.getOrderId());
+
+        NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.queryByEqNftId(nftEquipment.getId());
+        if (backpackEntity.getType().equals(NFTEnumConstant.NftTypeEnum.HERO.getCode())
+                && backpackEntity.getIsTraded().equals(WhetherEnum.NO.value())) {
+            // 发送皮肤nft 首次购买 成功消息
+            SkinNftFirstBuySuccessDto dto = new SkinNftFirstBuySuccessDto();
+            dto.setNftPicId(backpackEntity.getNftPicId());
+            kafkaProducer.sendAsync(KafkaTopic.SKIN_NFT_BUY_SUCCESS_FIRST, JSONUtil.toJsonStr(dto));
+        }
+
         //更新背包状态 undeposited  userId,owner
-        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
         Long userId = UserContext.getCurrentUserId();
         backpackEntity.setUserId(userId);
         try {
@@ -622,7 +640,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
                 }
             }
-            if (p.getIsBlindBox().equals(WhetherEnum.YES.value())) {
+            if (p.getIsBlindBox().equals(WhetherEnum.YES.value()) && p.getIsTread().equals(WhetherEnum.NO.value())) {
                 p.setHeroName("");
                 p.setImage("");
                 p.setSkinName("");
@@ -1039,7 +1057,14 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
         //}
 
         //更新背包状态 undeposited  userId,owner
-        NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
+        NftPublicBackpackEntity backpackEntity = nftPublicBackpackService.queryByEqNftId(nftEquipment.getId());
+        if (backpackEntity.getType().equals(NFTEnumConstant.NftTypeEnum.HERO.getCode())
+                && backpackEntity.getIsTraded().equals(WhetherEnum.NO.value())) {
+            // 发送皮肤nft 首次购买 成功消息
+            SkinNftFirstBuySuccessDto dto = new SkinNftFirstBuySuccessDto();
+            dto.setNftPicId(backpackEntity.getNftPicId());
+            kafkaProducer.sendAsync(KafkaTopic.SKIN_NFT_BUY_SUCCESS_FIRST, JSONUtil.toJsonStr(dto));
+        }
         try {
             GenericDto<UcUserResp> result = userCenterFeignClient.getByPublicAddress(auctionBiding.getBuyer());
             log.info("acceptOffer update backpack getUserInfoByPublicAddress,param:{},result:{}", auctionBiding.getBuyer(), result);
