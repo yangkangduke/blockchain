@@ -49,10 +49,10 @@ public interface NftMarketPlaceService {
 
     /**
      * nft拍卖出价验证
-     * @param auctionId 拍卖id
+     * @param mintAddress NFT地址
      * @return 是否可以出价
      */
-    boolean makeOfferValidate(String auctionId);
+    boolean makeOfferValidate(String mintAddress);
 
     /**
      * 我的nft拍卖出价

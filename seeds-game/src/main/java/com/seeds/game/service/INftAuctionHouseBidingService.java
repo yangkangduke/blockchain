@@ -8,6 +8,7 @@ import com.seeds.game.dto.response.NftOfferResp;
 import com.seeds.game.entity.NftAuctionHouseBiding;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -41,11 +42,11 @@ public interface INftAuctionHouseBidingService extends IService<NftAuctionHouseB
     BigDecimal queryAuctionCurrentPrice(Long auctionId);
 
     /**
-     * 根据地址和价格统计拍卖次数
+     * 根据地址和价格查询拍卖
      * @param publicAddress 用户地址
-     * @param auctionId 拍卖id
-     * @return 出价次数
+     * @param mintAddress NFT地址
+     * @return 拍卖列表
      */
-    long countByAddressAndPrice(String publicAddress, String auctionId);
+    List<NftAuctionHouseBiding> queryByAddressAndMintAddress(String publicAddress, String mintAddress);
 
 }
