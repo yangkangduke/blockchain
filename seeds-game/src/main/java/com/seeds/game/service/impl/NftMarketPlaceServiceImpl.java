@@ -1,25 +1,18 @@
 package com.seeds.game.service.impl;
 
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seeds.admin.entity.SysFileEntity;
 import com.seeds.admin.entity.SysNftPicEntity;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.CurrencyEnum;
-import com.seeds.game.dto.request.internal.SkinNftFirstBuySuccessDto;
-import com.seeds.game.dto.request.internal.SkinNftWithdrawDto;
-import com.seeds.game.enums.NftAuctionStatusEnum;
 import com.seeds.common.utils.RelativeDateFormat;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.config.SeedsApiConfig;
@@ -28,6 +21,7 @@ import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.request.external.EndAuctionMessageDto;
 import com.seeds.game.dto.request.external.EnglishAuctionReqDto;
 import com.seeds.game.dto.request.external.TransferSolMessageDto;
+import com.seeds.game.dto.request.internal.SkinNftFirstBuySuccessDto;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.*;
@@ -57,6 +51,8 @@ import java.util.stream.Collectors;
 @Service
 public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
 
+    private static String BLIND_BOX_IMG = "game/blindBox/blind_box.jpeg";
+
     @Autowired
     private INftAuctionHouseSettingService nftAuctionHouseSettingService;
 
@@ -69,6 +65,9 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
     @Autowired
     @Lazy
     private INftPublicBackpackService nftPublicBackpackService;
+
+    @Autowired
+    private GameFileService gameFileService;
 
     @Autowired
     private INftMarketOrderService nftMarketOrderService;
@@ -656,7 +655,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             }
             if (p.getIsBlindBox().equals(WhetherEnum.YES.value()) && p.getIsTread().equals(WhetherEnum.NO.value())) {
                 p.setHeroName("");
-                p.setImage("");
+                p.setImage(gameFileService.getFileUrl(BLIND_BOX_IMG));
                 p.setSkinName("");
                 p.setRarity(0);
             }
