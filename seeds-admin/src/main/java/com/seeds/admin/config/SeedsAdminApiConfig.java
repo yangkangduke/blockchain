@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SeedsAdminApiConfig {
 
-    @Value("${seeds.api.baseDomain:http://192.168.6.100:8002}")
+    @Value("${seeds.api.baseDomain:http://192.168.6.101:8002}")
     private String baseDomain;
 
     @Value("${seeds.api.admin.mintNft:/api/admin/mintNft}")
@@ -36,6 +36,6 @@ public class SeedsAdminApiConfig {
     @Value("${seeds.api.admin.shadowUrl:https://shdw-drive.genesysgo.net/EbV3SUa9vvvB2UmyrHpXAtwXAQHeFLEGesWJKqwmAbT7/}")
     private String shadowUrl;
 
-    @Value("${seeds.api.admin.uploadToShadow:http://192.168.6.100:8005/shdw/editFile}")
+    @Value("${seeds.api.admin.uploadToShadow:http://192.168.6.101:8005/shdw/editFile}")
     private String uploadToShadow;
 }
