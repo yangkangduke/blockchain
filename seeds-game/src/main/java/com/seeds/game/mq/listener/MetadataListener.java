@@ -58,6 +58,7 @@ public class MetadataListener {
                     String bucketName = properties.getMetadata().getBucketName();
                     String objectName = "metadata/" + fileName;
                     template.putMetadataObject(bucketName, objectName, inputStream, CONTENTTYPE);
+                    log.info("上传JSON文件成功：{}",fileName);
                     // 更新背包表
                     updateBackpack(dto, metadata, bucketName, objectName);
                     // 先关闭流，否则 删除文件不成功
@@ -81,6 +82,7 @@ public class MetadataListener {
         NftPublicBackpackEntity entity = new NftPublicBackpackEntity();
         entity.setMetadata(JSONUtil.toJsonStr(metadata.getAttributes()));
         entity.setMetadataUrl(viewUrl);
+        log.info("更新metadata：{}", entity);
         backpackService.update(entity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, dto.getAutoId()));
     }
 
