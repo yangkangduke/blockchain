@@ -119,6 +119,29 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             return resp;
         }
         NftPublicBackpackEntity publicBackpack = nftPublicBackpackService.queryByEqNftId(nftId);
+        Boolean isLock = Boolean.FALSE;
+        SysNftPicEntity nftPicEntity = null;
+        if (publicBackpack != null) {
+            BeanUtils.copyProperties(publicBackpack, resp);
+            resp.setAttributes(JSONUtil.parseObj(publicBackpack.getAttributes()));
+            resp.setMetadata(JSONUtil.toList(publicBackpack.getMetadata(), cn.hutool.json.JSONObject.class));
+            resp.setReferencePrice(publicBackpack.getProposedPrice());
+            resp.setServerRoleId(publicBackpack.getServerRoleId());
+            resp.setAutoId(publicBackpack.getAutoId());
+            resp.setEquipmentName(publicBackpack.getName());
+
+            if (NftTypeEnum.hero.getCode() == resp.getType()) {
+                resp.setContractAddress(solanaConfig.getSkinContractAddress());
+                nftPicEntity = nftPublicBackpackService.getHeroAndSkin(publicBackpack.getNftPicId());
+                if (null != nftPicEntity) {
+                    resp.setHeroName(nftPicEntity.getHero());
+                    resp.setSkinName(nftPicEntity.getSkin());
+                }
+            } else {
+                resp.setContractAddress(solanaConfig.getEquipmentContractAddress());
+            }
+            isLock = publicBackpack.getState() == NFTEnumConstant.NFTStateEnum.LOCK.getCode() ? Boolean.TRUE : Boolean.FALSE;
+        }
         NftAttributeEntity nftAttribute = nftAttributeService.queryByNftId(nftId);
         if (nftAttribute != null) {
             BeanUtils.copyProperties(nftAttribute, resp);
@@ -193,38 +216,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 resp.setListReceipt(marketOrder.getListReceipt());
             }
         }
-        Boolean isLock = Boolean.FALSE;
-        if (publicBackpack != null) {
-            BeanUtils.copyProperties(publicBackpack, resp);
-            resp.setAttributes(JSONUtil.parseObj(publicBackpack.getAttributes()));
-            resp.setMetadata(JSONUtil.toList(publicBackpack.getMetadata(), cn.hutool.json.JSONObject.class));
-            resp.setReferencePrice(publicBackpack.getProposedPrice());
-            resp.setServerRoleId(publicBackpack.getServerRoleId());
-            resp.setAutoId(publicBackpack.getAutoId());
-            resp.setEquipmentName(publicBackpack.getName());
-            if (NftTypeEnum.hero.getCode() == resp.getType()) {
-                resp.setContractAddress(solanaConfig.getSkinContractAddress());
-                SysNftPicEntity nftPicEntity = nftPublicBackpackService.getHeroAndSkin(publicBackpack.getNftPicId());
-                if (null != nftPicEntity) {
-                    if (publicBackpack.getIsTraded().equals(WhetherEnum.NO.value())
-                            && nftPicEntity.getIsBlindBox().equals(WhetherEnum.YES.value())) {
-                        resp.setHeroName("");
-                        resp.setSkinName("");
-                        resp.setImage(gameFileService.getFileUrl(BLIND_BOX_IMG));
-                        resp.setMetadata(null);
-                        resp.setAttributes(null);
-                        resp.setRarity(0);
-                        resp.setMintAddress("");
-                    } else {
-                        resp.setHeroName(nftPicEntity.getHero());
-                        resp.setSkinName(nftPicEntity.getSkin());
-                    }
-                }
-            } else {
-                resp.setContractAddress(solanaConfig.getEquipmentContractAddress());
-            }
-            isLock = publicBackpack.getState() == NFTEnumConstant.NFTStateEnum.LOCK.getCode() ? Boolean.TRUE : Boolean.FALSE;
-        }
         BeanUtils.copyProperties(nftEquipment, resp);
         resp.setOwnerAddress(nftEquipment.getOwner());
         resp.setNftId(nftEquipment.getId());
@@ -237,6 +228,18 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             resp.setLastUpdated(RelativeDateFormat.convert(new Date(nftEquipment.getUpdateTime()), new Date()));
         }
         BeanUtils.copyProperties(solanaConfig, resp);
+        // 皮肤，盲盒形式，并且没有买卖过
+        if (NftTypeEnum.hero.getCode() == resp.getType()
+                && publicBackpack.getIsTraded().equals(WhetherEnum.NO.value())
+                && nftPicEntity.getIsBlindBox().equals(WhetherEnum.YES.value())) {
+            resp.setHeroName("");
+            resp.setSkinName("");
+            resp.setImage(gameFileService.getFileUrl(BLIND_BOX_IMG));
+            resp.setMetadata(null);
+            resp.setAttributes(null);
+            resp.setRarity(0);
+            resp.setMintAddress("");
+        }
         return resp;
     }
 
