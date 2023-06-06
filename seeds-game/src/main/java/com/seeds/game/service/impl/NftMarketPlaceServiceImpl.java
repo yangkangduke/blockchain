@@ -228,7 +228,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             resp.setLastUpdated(RelativeDateFormat.convert(new Date(nftEquipment.getUpdateTime()), new Date()));
         }
         BeanUtils.copyProperties(solanaConfig, resp);
-        // 皮肤，盲盒形式，并且没有买卖过
+        // 皮肤，盲盒形式，并且没有买卖过。nft的一些关键信息设置为空。
         if (NftTypeEnum.hero.getCode() == resp.getType()
                 && publicBackpack.getIsTraded().equals(WhetherEnum.NO.value())
                 && nftPicEntity.getIsBlindBox().equals(WhetherEnum.YES.value())) {
@@ -237,8 +237,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             resp.setImage(gameFileService.getFileUrl(BLIND_BOX_IMG));
             resp.setMetadata(null);
             resp.setAttributes(null);
+            resp.setEquipmentName("");
             resp.setRarity(0);
             resp.setMintAddress("");
+            resp.setMintTrx("");
+            resp.setOwnerAddress("");
         }
         return resp;
     }
