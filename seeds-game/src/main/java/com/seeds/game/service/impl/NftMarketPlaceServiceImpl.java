@@ -654,10 +654,10 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 }
             }
             if (p.getIsBlindBox().equals(WhetherEnum.YES.value()) && p.getIsTraded().equals(WhetherEnum.NO.value())) {
-                p.setHeroName("");
-                p.setImage(gameFileService.getFileUrl(BLIND_BOX_IMG));
-                p.setSkinName("");
-                p.setRarity(0);
+                resp.setHeroName("");
+                resp.setImage(gameFileService.getFileUrl(BLIND_BOX_IMG));
+                resp.setSkinName("");
+                resp.setRarity(0);
             }
             resp.setIsOwner(p.getOwner().equals(publicAddress) ? 1 : 0);
             return resp;
