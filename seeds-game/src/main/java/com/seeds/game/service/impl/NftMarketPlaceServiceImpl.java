@@ -653,7 +653,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                     resp.setState(NftStateEnum.IN_SETTLEMENT.getCode());
                 }
             }
-            if (p.getIsBlindBox().equals(WhetherEnum.YES.value()) && p.getIsTread().equals(WhetherEnum.NO.value())) {
+            if (p.getIsBlindBox().equals(WhetherEnum.YES.value()) && p.getIsTraded().equals(WhetherEnum.NO.value())) {
                 p.setHeroName("");
                 p.setImage(gameFileService.getFileUrl(BLIND_BOX_IMG));
                 p.setSkinName("");
