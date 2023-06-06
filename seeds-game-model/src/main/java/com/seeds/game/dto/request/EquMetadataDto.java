@@ -14,7 +14,7 @@ import java.util.List;
 public class EquMetadataDto {
     private String name;
     private String symbol = "SEQN";
-    private String description = "This is the NFT of the seeds equipment.";
+    private String description = "This is the NFT of the Seeds equipment.";
     private int seller_fee_basis_points = 500;
     private String image;
     private String external_url = "https://www.theseeds.io/";
