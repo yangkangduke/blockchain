@@ -26,14 +26,14 @@ public class RetryCallCameApiTask {
     @Autowired
     private CallGameApiLogService gameApiLogService;
 
-    @Scheduled(cron = "3 * * * * ?")
+    @Scheduled(cron = "0/10 * * * * ?")
     public void retryCall() {
-        log.info("定时任务，请求调用游戏方超时的接口------>");
         List<CallGameApiErrorLogEntity> errorRecord = gameApiLogService.list(new LambdaQueryWrapper<CallGameApiErrorLogEntity>()
                 .like(CallGameApiErrorLogEntity::getParams, "timed out"));
         List<CallGameApiErrorLogEntity> retryList = errorRecord.stream()
                 .filter(p -> p.getRetryNum() < p.getMaxRetryNum())
                 .collect(Collectors.toList());
+        log.info("定时任务，请求调用游戏方超时的接口------>待执行任务数：{}", errorRecord.size());
         retryList.forEach(p -> {
             this.postRequest(p);
         });
