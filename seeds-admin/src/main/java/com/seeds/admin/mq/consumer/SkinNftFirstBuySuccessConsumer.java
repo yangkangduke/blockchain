@@ -70,19 +70,19 @@ public class SkinNftFirstBuySuccessConsumer {
             try {
                 String bucketName = properties.getMetadata().getBucketName();
                 String objectName = "skin/metadata/" + jsonName;
-                File file = new File(TMP_FILE_PATH + jsonName);
-                inputStream = new FileInputStream(file);
+                File jsonFile = new File(TMP_FILE_PATH + jsonName);
+                inputStream = new FileInputStream(jsonFile);
                 template.putObject(bucketName, objectName, inputStream);
 
                 File img = new File(TMP_IMG_FILE_PATH + imgName);
                 // json文件上传shadow
-                uploadFileToShadow(file, jsonName);
+                editShadow(jsonFile, jsonName);
                 // 图片文件上传shadow
                 uploadFileToShadow(img, imgName);
                 // 先关闭流，否则 删除文件不成功
                 inputStream.close();
                 // 上传成功后删除临时的JSON文件
-                file.delete();
+                jsonFile.delete();
                 img.delete();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -98,8 +98,8 @@ public class SkinNftFirstBuySuccessConsumer {
         }
     }
 
-    private void uploadFileToShadow(File file, String fileName) {
-        String uploadUrl = seedsAdminApiConfig.getUploadToShadow();
+    private void editShadow(File file, String fileName) {
+        String uploadUrl = seedsAdminApiConfig.getEditShadow();
         try {
             HttpRequest.post(uploadUrl)
                     .timeout(30 * 1000)
@@ -107,7 +107,19 @@ public class SkinNftFirstBuySuccessConsumer {
                     .execute();
         } catch (Exception e) {
             // 文件上传失败
-            log.info("withdraw 更新 Metadata 文件失败：{},error:{}", fileName, e.getMessage());
+            log.info("皮肤首次购买 更新 Metadata 文件失败：{},error:{}", fileName, e.getMessage());
+        }
+    }
+    private void uploadFileToShadow(File file, String fileName) {
+        String uploadUrl = seedsAdminApiConfig.getUploadShadow();
+        try {
+            HttpRequest.post(uploadUrl)
+                    .timeout(30 * 1000)
+                    .form("file", file)
+                    .execute();
+        } catch (Exception e) {
+            // 文件上传失败
+            log.info("皮肤首次购买，上传图片失败：{},error:{}", fileName, e.getMessage());
         }
     }
 

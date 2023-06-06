@@ -90,7 +90,7 @@ public class SkinNftWithdrawConsumer {
     }
 
     private void uploadFileToShadow(File file, String fileName) {
-        String uploadUrl = seedsAdminApiConfig.getUploadToShadow();
+        String uploadUrl = seedsAdminApiConfig.getEditShadow();
         try {
             HttpRequest.post(uploadUrl)
                     .timeout(30 * 1000)
