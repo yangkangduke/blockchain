@@ -2,6 +2,7 @@ package com.seeds.admin.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.seeds.admin.enums.SkinNftEnums;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -154,4 +155,8 @@ public class SysNftPicEntity extends BaseEntity {
 
     @TableField("mint_time")
     private Long mintTime;
+
+    @ApiModelProperty("是否盲盒：1是 0 否")
+    @TableField("is_blind_box")
+    private Integer isBlindBox;
 }

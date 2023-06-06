@@ -149,7 +149,7 @@
         </if>
     </select>
     <select id="getHeroAndSkin" resultType="com.seeds.admin.entity.SysNftPicEntity">
-        select skin, hero
+        select skin, hero,is_blind_box
         from sys_nft_pic
         where id = #{nftPicId}
     </select>
