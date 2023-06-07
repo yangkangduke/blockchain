@@ -11,15 +11,14 @@ import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.web.oss.FileProperties;
 import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.game.dto.request.internal.SkinNftFirstBuySuccessDto;
-import com.seeds.game.dto.request.internal.SkinNftWithdrawDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * @author: hewei
@@ -53,14 +52,14 @@ public class SkinNftFirstBuySuccessConsumer {
     private SysNftPicService nftPicService;
 
     @KafkaListener(groupId = "skin-nft-first-buy-success", topics = {KafkaTopic.SKIN_NFT_BUY_SUCCESS_FIRST})
-    public void gameMintNft(String msg) {
+    public void gameMintNft(String msg) throws IOException {
         log.info("收到skin-nft-first-buy-success消息：{}", msg);
         SkinNftFirstBuySuccessDto dto = JSONUtil.toBean(msg, SkinNftFirstBuySuccessDto.class);
         SysNftPicEntity picEntity = nftPicService.getById(dto.getNftPicId());
         SkinNFTAttrDto attr = nftPicService.handleAttr(picEntity, null);
 
         String imgName = picEntity.getTokenId() + ".png";
-        this.download(picEntity.getUrl(), imgName, TMP_IMG_FILE_PATH);
+        downloadImage(picEntity.getUrl(), TMP_IMG_FILE_PATH, imgName);
 
         String jsonName = picEntity.getTokenId() + ".json";
         boolean flag = CreateJsonFileUtil.createJsonFile(JSONUtil.toJsonStr(attr), TMP_FILE_PATH, jsonName);
@@ -110,6 +109,7 @@ public class SkinNftFirstBuySuccessConsumer {
             log.info("皮肤首次购买 更新 Metadata 文件失败：{},error:{}", fileName, e.getMessage());
         }
     }
+
     private void uploadFileToShadow(File file, String fileName) {
         String uploadUrl = seedsAdminApiConfig.getUploadShadow();
         try {
@@ -126,28 +126,34 @@ public class SkinNftFirstBuySuccessConsumer {
 
     /**
      * 下载文件
-     *
-     * @param urlStr   文件的URL地址
-     * @param fileName 文件名
-     * @param savePath 文件保存路径
      */
-    public void download(String urlStr, String fileName, String savePath) {
-        try {
-            URL url = new URL(urlStr);
-            URLConnection conn = url.openConnection();
-            InputStream in = conn.getInputStream();
-            FileOutputStream out = new FileOutputStream(savePath + "\\" + fileName);
-            byte[] buffer = new byte[1024];
-            int numRead;
-            while ((numRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, numRead);
-            }
-            out.close();
-            in.close();
-            log.info("文件{}下载成功。", fileName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    public void downloadImage(String imageUrl, String saveDir, String fileName) throws IOException {
+        URL url = new URL(imageUrl);
+        HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+        int responseCode = httpConn.getResponseCode();
 
+        // 检查HTTP响应代码是否为HTTP_OK (200)
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            InputStream inputStream = httpConn.getInputStream();
+            // 创建保存文件的目录
+            File dir = new File(saveDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            // 保存文件的完整路径
+            String saveFilePath = saveDir + File.separator + fileName;
+            // 创建文件输出流并将输入流中的数据写入输出流中
+            FileOutputStream outputStream = new FileOutputStream(saveFilePath);
+            byte[] buffer = new byte[4096];
+            int bytesRead = -1;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            outputStream.close();
+            inputStream.close();
+
+            System.out.println("图片已下载到：" + saveFilePath);
+        }
+        httpConn.disconnect();
+    }
 }

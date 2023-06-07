@@ -181,11 +181,12 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
         List<SysNftPicEntity> batchUpdate = new ArrayList<>();
         // 解析CSV文件
         List<SysNFTAttrDto> sysNFTAttrDtos = CsvUtils.getCsvData(file, SysNFTAttrDto.class);
-        List<String> heros = sysNFTAttrDtos.stream().map(p -> p.getHero().toLowerCase()).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(sysNFTAttrDtos)) {
             sysNFTAttrDtos.forEach(p -> {
                 SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
-                if (!Objects.isNull(one) && one.getPicName().equals(p.getPictureName())) {
+                if (!Objects.isNull(one)
+                        && one.getPicName().equals(p.getPictureName())
+                        && !one.getMintState().equals(SkinNftEnums.SkinMintStateEnum.MINTED.getCode())) {
                     BeanUtils.copyProperties(p, one);
                     one.setUpdatedAt(System.currentTimeMillis());
                     one.setProfession(NftHeroTypeEnum.getProfession(p.getHero()));
