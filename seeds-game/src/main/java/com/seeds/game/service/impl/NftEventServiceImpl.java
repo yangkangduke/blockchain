@@ -129,6 +129,10 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 List<NftEventEquipmentResp> equipmentResps = CglibUtil.copyList(equipments, NftEventEquipmentResp::new);
                 equipmentResps.forEach(i -> {
                     i.setMintAddress(autoIdTokneAddressMap.get(i.getAutoId()));
+                    if (p.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())
+                            && i.getIsConsume().equals(WhetherEnum.NO.value())) {
+                        i.setBaseAttrValue("");
+                    }
                 });
                 resp.setEventEquipments(equipmentResps);
             }
@@ -312,7 +316,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     @Override
     public void mintSuccessCallback(MintSuccessReq req) {
         NftEvent nftEvent = this.getById(req.getEventId());
-        if (nftEvent.getStatus().equals(NFTEnumConstant.NFTEventStatus.MINTING.getCode())){
+        if (nftEvent.getStatus().equals(NFTEnumConstant.NFTEventStatus.MINTING.getCode())) {
             NftEventEquipment equipment = eventEquipmentService
                     .getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, nftEvent.getId()).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
             MintSuccessMessageResp data = new MintSuccessMessageResp();
@@ -336,7 +340,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     private void updateLocalDB(Integer autoDeposit, String mintAddress, NftEvent nftEvent, NftEventEquipment equipment, MintSuccessMessageResp data) {
         // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
-         asyncNotifyGameService.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, NFTEnumConstant.NftEventOptEnum.SUCCESS.getCode(), mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+        asyncNotifyGameService.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, NFTEnumConstant.NftEventOptEnum.SUCCESS.getCode(), mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
         //  插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         if (Objects.nonNull(data)) {
             NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
@@ -382,7 +386,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             // 设置参考价
             try {
                 BigDecimal usdRate = marketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
-                backpackEntity.setProposedPrice(new BigDecimal(durability).divide(usdRate,2,BigDecimal.ROUND_HALF_UP));
+                backpackEntity.setProposedPrice(new BigDecimal(durability).divide(usdRate, 2, BigDecimal.ROUND_HALF_UP));
             } catch (Exception e) {
                 e.printStackTrace();
             }
