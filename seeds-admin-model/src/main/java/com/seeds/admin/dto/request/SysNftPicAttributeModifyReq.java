@@ -39,4 +39,7 @@ public class SysNftPicAttributeModifyReq {
 
     @ApiModelProperty("对应皮肤的名字")
     private String skin;
+
+    @ApiModelProperty("confId")
+    private Long confId;
 }
