@@ -18,6 +18,9 @@ public class SysNftPicMIntedResp {
     @ApiModelProperty("文件名")
     private String picName;
 
+    @ApiModelProperty("tokenName")
+    private String name;
+
     @ApiModelProperty("预览")
     private String url;
 
