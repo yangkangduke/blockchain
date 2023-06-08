@@ -186,7 +186,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                 SysNftPicEntity one = this.getOne(new LambdaQueryWrapper<SysNftPicEntity>().eq(SysNftPicEntity::getPicName, p.getPictureName()));
                 if (!Objects.isNull(one)
                         && one.getPicName().equals(p.getPictureName())
-                        && !one.getMintState().equals(SkinNftEnums.SkinMintStateEnum.MINTED.getCode())) {
+                        && !one.getMintState().equals(SkinNftEnums.SkinMintStateEnum.PENDING.getCode())) {
                     BeanUtils.copyProperties(p, one);
                     one.setUpdatedAt(System.currentTimeMillis());
                     one.setProfession(NftHeroTypeEnum.getProfession(p.getHero()));
