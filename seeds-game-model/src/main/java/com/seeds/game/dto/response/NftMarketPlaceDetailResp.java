@@ -160,7 +160,9 @@ public class NftMarketPlaceDetailResp {
     @ApiModelProperty("最大耐久度")
     private Integer maxDurability;
 
-
-
+    @ApiModelProperty("是否盲盒：1是 0 否")
+    private Integer isBlindBox;
+    @ApiModelProperty("是否买卖过：1是 0 否")
+    private Integer isTraded;
 }
 

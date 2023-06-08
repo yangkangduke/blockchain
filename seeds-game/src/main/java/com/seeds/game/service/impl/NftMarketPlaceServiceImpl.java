@@ -136,6 +136,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
                 if (null != nftPicEntity) {
                     resp.setHeroName(nftPicEntity.getHero());
                     resp.setSkinName(nftPicEntity.getSkin());
+                    resp.setIsBlindBox(nftPicEntity.getIsBlindBox());
                 }
             } else {
                 resp.setContractAddress(solanaConfig.getEquipmentContractAddress());
