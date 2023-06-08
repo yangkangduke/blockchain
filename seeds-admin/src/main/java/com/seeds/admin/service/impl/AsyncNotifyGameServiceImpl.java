@@ -4,11 +4,14 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import com.seeds.admin.dto.game.SkinNftMintSuccessDto;
+import com.seeds.admin.service.CallGameApiLogService;
 import com.seeds.admin.service.IAsyncNotifyGameService;
 import com.seeds.admin.service.SysGameApiService;
 import com.seeds.common.enums.ApiType;
+import com.seeds.game.entity.CallGameApiErrorLogEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,9 @@ import java.util.List;
 public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
     @Autowired
     private SysGameApiService gameApiService;
+
+    @Autowired
+    private CallGameApiLogService callGameApiLogService;
 
     @Override
     @Async
@@ -40,7 +46,18 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
                     .execute();
             log.info("调用游戏方接口 通知皮肤nft mint成功,接口返回result:{}", response.body());
         } catch (Exception e) {
+            errorLog(notifyUrl, param, e.getMessage());
             log.error("调用游戏方接口 通知皮肤nft mint失败，message：{}", e.getMessage());
         }
+    }
+
+    private void errorLog(String url, String params, String msg) {
+        CallGameApiErrorLogEntity errorLog = new CallGameApiErrorLogEntity();
+        errorLog.setCallTime(System.currentTimeMillis());
+        errorLog.setUrl(url);
+        errorLog.setMethod(HttpMethod.POST.name());
+        errorLog.setParams(params);
+        errorLog.setMsg(msg);
+        callGameApiLogService.save(errorLog);
     }
 }

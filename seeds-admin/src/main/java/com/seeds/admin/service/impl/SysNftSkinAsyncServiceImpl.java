@@ -167,7 +167,6 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
         notifyGameSkinMintSuccess(ids);
     }
 
-    @Async
     public void notifyGameSkinMintSuccess(List<Long> ids) {
         List<SysNftPicEntity> sysNftPicEntities = nftPicService.listByIds(ids);
         List<SkinNftMintSuccessDto> notifyDtos = sysNftPicEntities.stream().map(p -> {
