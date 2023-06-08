@@ -57,10 +57,10 @@
         <!-- 盲盒且没有买卖过的nft才进行职业筛选 -->
         </if>
         <if test="params.minPrice != null">
-            and price &gt;= #{params.minPrice}
+            and (select IF(ANY_VALUE(max(price)) > 0, ANY_VALUE(max(price)), t1.price) from z_auction_house_biding where auction_id = t4.auction_id and (cancel_time is null or cancel_time = 0)) &gt;= #{params.minPrice}
         </if>
         <if test="params.maxPrice != null">
-            and price &lt;= #{params.maxPrice}
+            and (select IF(ANY_VALUE(max(price)) > 0, ANY_VALUE(max(price)), t1.price) from z_auction_house_biding where auction_id = t4.auction_id and (cancel_time is null or cancel_time = 0)) &lt;= #{params.maxPrice}
         </if>
         <if test="params.sort != null and params.sort =='price'">
             order by price ${params.sortTypeStr}
@@ -125,10 +125,10 @@
             and t3.durability &lt;= #{params.maxDurability}
         </if>
         <if test="params.minPrice != null">
-            and price &gt;= #{params.minPrice}
+            and (select IF(ANY_VALUE(max(price)) > 0, ANY_VALUE(max(price)), t1.price) from z_auction_house_biding where auction_id = t4.auction_id and (cancel_time is null or cancel_time = 0)) &gt;= #{params.minPrice}
         </if>
         <if test="params.maxPrice != null">
-            and price &lt;= #{params.maxPrice}
+            and (select IF(ANY_VALUE(max(price)) > 0, ANY_VALUE(max(price)), t1.price) from z_auction_house_biding where auction_id = t4.auction_id and (cancel_time is null or cancel_time = 0)) &lt;= #{params.maxPrice}
         </if>
         <if test="params.sort != null and params.sort =='price'">
             order by price ${params.sortTypeStr}
@@ -196,10 +196,10 @@
             and t3.durability &lt;= #{params.maxDurability}
         </if>
         <if test="params.minPrice != null">
-            and price &gt;= #{params.minPrice}
+            and (select IF(ANY_VALUE(max(price)) > 0, ANY_VALUE(max(price)), t1.price) from z_auction_house_biding where auction_id = t4.auction_id and (cancel_time is null or cancel_time = 0)) &gt;= #{params.minPrice}
         </if>
         <if test="params.maxPrice != null">
-            and price &lt;= #{params.maxPrice}
+            and (select IF(ANY_VALUE(max(price)) > 0, ANY_VALUE(max(price)), t1.price) from z_auction_house_biding where auction_id = t4.auction_id and (cancel_time is null or cancel_time = 0)) &lt;= #{params.maxPrice}
         </if>
         <if test="params.sort != null and params.sort =='price'">
             order by price ${params.sortTypeStr}
