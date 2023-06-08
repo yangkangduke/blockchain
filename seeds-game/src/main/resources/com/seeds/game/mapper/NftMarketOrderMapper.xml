@@ -50,9 +50,11 @@
         <if test="params.rarity != null">
             and t3.rarity = #{params.rarity}
         </if>
-
         <if test="params.heroType != null">
             and t3.hero_type = #{params.heroType}
+            and t5.is_blind_box = 1
+            and t2.is_traded = 0
+        <!-- 盲盒且没有买卖过的nft才进行职业筛选 -->
         </if>
         <if test="params.minPrice != null">
             and price &gt;= #{params.minPrice}
