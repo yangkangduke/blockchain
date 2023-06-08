@@ -239,9 +239,6 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             resp.setAttributes(null);
             resp.setEquipmentName("");
             resp.setRarity(0);
-            resp.setMintAddress("");
-            resp.setMintTrx("");
-            resp.setOwnerAddress("");
         }
         return resp;
     }
