@@ -99,6 +99,7 @@
         t1.name,
         t5.hero as heroName,
         t1.image,
+        t1.auto_id,
         t1.image_sha,
         t1.token_id,
         IF(t3.price is null, t1.proposed_price, t3.price) AS price,
