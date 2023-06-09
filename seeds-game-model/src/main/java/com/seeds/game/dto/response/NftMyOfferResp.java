@@ -56,4 +56,7 @@ public class NftMyOfferResp {
     @ApiModelProperty("稀有属性值")
     private String rarityAttrValue;
 
+    @ApiModelProperty("1 装备 2 道具 3 英雄")
+    private Integer itemType;
+
 }
