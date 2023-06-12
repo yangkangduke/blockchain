@@ -253,7 +253,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
         // 通知游戏方事件取消
         NftEvent event = this.getById(id);
         NftEventEquipment equipment = eventEquipmentService.getOne(new LambdaQueryWrapper<NftEventEquipment>().eq(NftEventEquipment::getEventId, id).eq(NftEventEquipment::getIsConsume, WhetherEnum.NO.value()));
-        asyncNotifyGameService.callGameNotify(event.getServerRoleId(), WhetherEnum.NO.value(), NFTEnumConstant.NftEventOptEnum.CANCEL.getCode(), "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId());
+        asyncNotifyGameService.callGameNotify(event.getServerRoleId(), WhetherEnum.NO.value(), NFTEnumConstant.NftEventOptEnum.CANCEL.getCode(), "", equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), event.getServerRoleId(),equipment.getAttributes());
         // 更新本地数据库
         return this.updateById(nftEvent);
     }
@@ -340,7 +340,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
 
     private void updateLocalDB(Integer autoDeposit, String mintAddress, NftEvent nftEvent, NftEventEquipment equipment, MintSuccessMessageResp data) {
         // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
-        asyncNotifyGameService.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, NFTEnumConstant.NftEventOptEnum.SUCCESS.getCode(), mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+        asyncNotifyGameService.callGameNotify(nftEvent.getServerRoleId(), autoDeposit, NFTEnumConstant.NftEventOptEnum.SUCCESS.getCode(), mintAddress, equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId(),equipment.getAttributes());
         //  插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         if (Objects.nonNull(data)) {
             NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();

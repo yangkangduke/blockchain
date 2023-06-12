@@ -26,4 +26,8 @@ public class NftEventNotifyReq {
     private Integer type;
     // 3 托管  4 未托管
     private Integer state;
+    /**
+     * NFT参考价格
+     */
+    private String price;
 }

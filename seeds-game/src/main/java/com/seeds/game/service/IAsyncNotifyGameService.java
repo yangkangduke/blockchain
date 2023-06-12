@@ -19,7 +19,7 @@ public interface IAsyncNotifyGameService {
      * @param configId
      * @param accId
      */
-    void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenAddress, Integer itemType, Long autoId, Long configId, Long accId);
+    void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenAddress, Integer itemType, Long autoId, Long configId, Long accId,String attributes);
 
     void mintSuccess(NftMintSuccessReq req);
 }

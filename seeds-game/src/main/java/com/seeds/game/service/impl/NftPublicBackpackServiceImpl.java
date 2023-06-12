@@ -724,6 +724,8 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             log.info("rpc all seeds-admin ,queryGameApi error {}", e.getMessage());
         }
 
+        BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
+
         String distributeUrl = "http://" + serverRegion.getInnerHost() + dto.getData();
 
         NftDistributeReq distributeReq = new NftDistributeReq();
@@ -737,6 +739,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         distributeReq.setTokenAddress(nftItem.getTokenAddress());
         distributeReq.setServerName(serverRegion.getGameServerName());
         distributeReq.setRegionName(serverRegion.getRegionName());
+        distributeReq.setPrice((nftItem.getProposedPrice().divide(usdRate, 2, BigDecimal.ROUND_HALF_UP).toString()));
 
         String params = JSONUtil.toJsonStr(distributeReq);
 

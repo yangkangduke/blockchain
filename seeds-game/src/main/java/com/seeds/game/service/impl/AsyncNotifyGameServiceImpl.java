@@ -9,6 +9,7 @@ import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.admin.feign.RemoteGameService;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
+import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.game.dto.request.NftMintSuccessReq;
 import com.seeds.game.dto.request.internal.NftEventNotifyReq;
 import com.seeds.game.dto.response.MintSuccessMessageResp;
@@ -61,6 +62,9 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
     @Lazy
     private INftPublicBackpackService nftPublicBackpackService;
 
+    @Autowired
+    private NftMarketPlaceService marketPlaceService;
+
     @Async
     @Override
     public void mintSuccess(NftMintSuccessReq mintSuccessReq) {
@@ -96,7 +100,7 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
 //        }
 
         // 通知游戏mint或者合成成功   // optType 1 mint成功,2取消
-        this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getMintAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId());
+        this.callGameNotify(nftEvent.getServerRoleId(), mintSuccessReq.getAutoDeposite(), 1, mintSuccessReq.getMintAddress(), equipment.getItemType(), equipment.getAutoId(), equipment.getConfigId(), nftEvent.getServerRoleId(), equipment.getAttributes());
 
         MintSuccessMessageResp data = new MintSuccessMessageResp();
         data.setId(nftEvent.getId());
@@ -173,7 +177,7 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
     // nft 操作通知  // optType 1 mint成功,2取消
     @Async
     @Override
-    public void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenAddress, Integer itemType, Long autoId, Long configId, Long accId) {
+    public void callGameNotify(Long serverRoleId, Integer autoDeposite, Integer optType, String tokenAddress, Integer itemType, Long autoId, Long configId, Long accId, String attribute) {
 
         ServerRegionEntity serverRegion = serverRegionService.queryByServerRoleId(serverRoleId);
 
@@ -196,6 +200,7 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
             notifyReq.setServerName(serverRegion.getGameServerName());
             notifyReq.setState(autoDeposite.equals(WhetherEnum.YES.value()) ? NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode() : NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
             notifyReq.setTokenAddress(tokenAddress);
+            notifyReq.setPrice(getPrice(attribute));
         }
         String params = JSONUtil.toJsonStr(notifyReq);
 
@@ -210,7 +215,7 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
         } catch (Exception e) {
             // 记录调用错误日志
             errorLog(notifyUrl, params, e.getMessage());
-          //  throw new GenericException("Failed to call game-api to notify,connect timed out");
+            //  throw new GenericException("Failed to call game-api to notify,connect timed out");
         }
 
         JSONObject jsonObject = JSONObject.parseObject(response.body());
@@ -222,6 +227,25 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
             throw new GenericException("Failed to call game-api to notify, " + ret);
         }
 
+    }
+
+    private String getPrice(String attribute) {
+        String price = "0";
+        int durability = 0;
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(attribute);
+            durability = (int) jsonObject.get("durability");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // 设置参考价
+        try {
+            BigDecimal usdRate = marketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
+            price = new BigDecimal(durability).divide(usdRate, 2, BigDecimal.ROUND_HALF_UP).toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return price;
     }
 
     private void errorLog(String url, String params, String msg) {
