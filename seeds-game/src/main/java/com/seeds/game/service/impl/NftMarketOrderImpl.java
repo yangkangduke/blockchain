@@ -27,9 +27,7 @@ public class NftMarketOrderImpl extends ServiceImpl<NftMarketOrderMapper, NftMar
     public List<NftMarketOrderEntity> queryUserTradesByAddressAndStatus(String publicAddress, Integer status) {
         return list(new LambdaQueryWrapper<NftMarketOrderEntity>()
                 .eq(NftMarketOrderEntity::getStatus, status)
-                .eq(NftMarketOrderEntity::getSellerAddress, publicAddress)
-                .or()
-                .eq(NftMarketOrderEntity::getBuyerAddress, publicAddress));
+                .and(p -> p.eq(NftMarketOrderEntity::getSellerAddress, publicAddress).or().eq(NftMarketOrderEntity::getBuyerAddress, publicAddress)));
     }
 
     @Override

@@ -56,7 +56,7 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
     public List<NftAttributeEntity> querySkinRankVictory(Integer number) {
         LambdaQueryWrapper<NftAttributeEntity> queryWrap = new QueryWrapper<NftAttributeEntity>().lambda()
                 .ne(NftAttributeEntity::getHeroType, 0)
-                .ne(NftAttributeEntity::getVictory, 0).or(p -> p.ne(NftAttributeEntity::getLose, 0))
+                .and(p -> p.ne(NftAttributeEntity::getVictory, 0).or().ne(NftAttributeEntity::getLose, 0))
                 .orderByDesc(NftAttributeEntity::getVictory);
         queryWrap.last(" limit " + number);
         return list(queryWrap);
@@ -66,7 +66,7 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
     public List<NftAttributeEntity> querySkinRankLose(Integer number) {
         LambdaQueryWrapper<NftAttributeEntity> queryWrap = new QueryWrapper<NftAttributeEntity>().lambda()
                 .ne(NftAttributeEntity::getHeroType, 0)
-                .ne(NftAttributeEntity::getVictory, 0).or(p -> p.ne(NftAttributeEntity::getLose, 0))
+                .and(p -> p.ne(NftAttributeEntity::getVictory, 0).or().ne(NftAttributeEntity::getLose, 0))
                 .orderByDesc(NftAttributeEntity::getLose);
         queryWrap.last(" limit " + number);
         return list(queryWrap);
@@ -76,7 +76,7 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
     public List<NftAttributeEntity> querySkinRankMaxStreak(Integer number) {
         LambdaQueryWrapper<NftAttributeEntity> queryWrap = new QueryWrapper<NftAttributeEntity>().lambda()
                 .ne(NftAttributeEntity::getHeroType, 0)
-                .ne(NftAttributeEntity::getVictory, 0).or(p -> p.ne(NftAttributeEntity::getLose, 0))
+                .and(p -> p.ne(NftAttributeEntity::getVictory, 0).or().ne(NftAttributeEntity::getLose, 0))
                 .orderByDesc(NftAttributeEntity::getMaxStreak);
         queryWrap.last(" limit " + number);
         return list(queryWrap);
@@ -86,7 +86,7 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
     public List<NftAttributeEntity> querySkinRankCapture(Integer number) {
         LambdaQueryWrapper<NftAttributeEntity> queryWrap = new QueryWrapper<NftAttributeEntity>().lambda()
                 .ne(NftAttributeEntity::getHeroType, 0)
-                .ne(NftAttributeEntity::getVictory, 0).or(p -> p.ne(NftAttributeEntity::getLose, 0))
+                .and(p -> p.ne(NftAttributeEntity::getVictory, 0).or().ne(NftAttributeEntity::getLose, 0))
                 .orderByDesc(NftAttributeEntity::getCapture);
         queryWrap.last(" limit " + number);
         return list(queryWrap);
@@ -96,7 +96,7 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
     public List<NftAttributeEntity> querySkinRankKillingSpree(Integer number) {
         LambdaQueryWrapper<NftAttributeEntity> queryWrap = new QueryWrapper<NftAttributeEntity>().lambda()
                 .ne(NftAttributeEntity::getHeroType, 0)
-                .ne(NftAttributeEntity::getVictory, 0).or(p -> p.ne(NftAttributeEntity::getLose, 0))
+                .and(p -> p.ne(NftAttributeEntity::getVictory, 0).or().ne(NftAttributeEntity::getLose, 0))
                 .orderByDesc(NftAttributeEntity::getKillingSpree);
         queryWrap.last(" limit " + number);
         return list(queryWrap);
@@ -106,7 +106,7 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
     public List<NftAttributeEntity> querySkinRankGoblinKill(Integer number) {
         LambdaQueryWrapper<NftAttributeEntity> queryWrap = new QueryWrapper<NftAttributeEntity>().lambda()
                 .ne(NftAttributeEntity::getHeroType, 0)
-                .ne(NftAttributeEntity::getVictory, 0).or(p -> p.ne(NftAttributeEntity::getLose, 0))
+                .and(p -> p.ne(NftAttributeEntity::getVictory, 0).or().ne(NftAttributeEntity::getLose, 0))
                 .orderByDesc(NftAttributeEntity::getGoblinKill);
         queryWrap.last(" limit " + number);
         return list(queryWrap);
@@ -116,7 +116,7 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
     public List<NftAttributeEntity> querySkinRankSlaying(Integer number) {
         LambdaQueryWrapper<NftAttributeEntity> queryWrap = new QueryWrapper<NftAttributeEntity>().lambda()
                 .ne(NftAttributeEntity::getHeroType, 0)
-                .ne(NftAttributeEntity::getVictory, 0).or(p -> p.ne(NftAttributeEntity::getLose, 0))
+                .and(p -> p.ne(NftAttributeEntity::getVictory, 0).or().ne(NftAttributeEntity::getLose, 0))
                 .orderByDesc(NftAttributeEntity::getSlaying);
         queryWrap.last(" limit " + number);
         return list(queryWrap);
@@ -126,7 +126,7 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
     public List<NftAttributeEntity> querySkinRankGoblin(Integer number) {
         LambdaQueryWrapper<NftAttributeEntity> queryWrap = new QueryWrapper<NftAttributeEntity>().lambda()
                 .ne(NftAttributeEntity::getHeroType, 0)
-                .ne(NftAttributeEntity::getVictory, 0).or(p -> p.ne(NftAttributeEntity::getLose, 0))
+                .and(p -> p.ne(NftAttributeEntity::getVictory, 0).or().ne(NftAttributeEntity::getLose, 0))
                 .orderByDesc(NftAttributeEntity::getGoblin);
         queryWrap.last(" limit " + number);
         return list(queryWrap);

@@ -61,6 +61,8 @@ public class GameRankNftSkinResp {
 
 		private Integer rank;
 
+		private Long userId;
+
 	}
 
 }

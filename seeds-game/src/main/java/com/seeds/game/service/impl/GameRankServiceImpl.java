@@ -99,6 +99,9 @@ public class GameRankServiceImpl implements GameRankService {
                 cacheRankList = resp.getInfos();
                 // 判断是否过期
                 if (resp.getExpireTime() > System.currentTimeMillis()) {
+                    cacheRankList.forEach(p -> {
+                        p.setIsOwner(p.getUserId().equals(currentUser) ? 1 : 0);
+                    });
                     return cacheRankList;
                 }
             }
@@ -151,6 +154,7 @@ public class GameRankServiceImpl implements GameRankService {
             for (GameWinRankResp.GameWinRank rank : rankList) {
                 ServerRoleEntity serverRole = gameRoleMap.get(rank.getAccID());
                 if (serverRole != null) {
+                    rank.setUserId(serverRole.getUserId());
                     rank.setIsOwner(serverRole.getUserId().equals(currentUser) ? 1 : 0);
                 }
                 String key = rank.getAccName();
@@ -286,6 +290,9 @@ public class GameRankServiceImpl implements GameRankService {
             List<GameRankNftSkinResp.GameRankNftSkin> cacheList = resp.getInfos();
             // 判断是否过期
             if (resp.getExpireTime() > System.currentTimeMillis()) {
+                cacheList.forEach(p -> {
+                    p.setIsOwner(p.getUserId().equals(currentUser) ? 1 : 0);
+                });
                 return cacheList;
             }
             scoreMap = cacheList.stream().collect(Collectors.toMap(GameRankNftSkinResp.GameRankNftSkin::getNftId, GameRankNftSkinResp.GameRankNftSkin::getRank));
@@ -337,6 +344,7 @@ public class GameRankServiceImpl implements GameRankService {
                 nftSkin.setNumber("#" + backpack.getTokenId());
                 UcUser ucUser = userMap.get(backpack.getUserId());
                 if (ucUser != null) {
+                    nftSkin.setUserId(ucUser.getId());
                     nftSkin.setIsOwner(ucUser.getId().equals(currentUser) ? 1 : 0);
                     nftSkin.setCollector(ucUser.getNickname());
                     nftSkin.setPublicAddress(ucUser.getPublicAddress());
