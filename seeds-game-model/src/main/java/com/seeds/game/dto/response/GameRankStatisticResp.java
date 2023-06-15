@@ -41,4 +41,7 @@ public class GameRankStatisticResp {
 	@ApiModelProperty("头像链接")
 	private String portraitUrl;
 
+	@ApiModelProperty("是否是拥有者，0 否 1 是")
+	private Integer isOwner = 0;
+
 }

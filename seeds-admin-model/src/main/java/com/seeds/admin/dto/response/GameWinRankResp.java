@@ -63,6 +63,9 @@ public class GameWinRankResp {
 		@ApiModelProperty(value = "区服名称")
 		private String regionName;
 
+		@ApiModelProperty("是否是拥有者，0 否 1 是")
+		private Integer isOwner = 0;
+
 	}
 
 }

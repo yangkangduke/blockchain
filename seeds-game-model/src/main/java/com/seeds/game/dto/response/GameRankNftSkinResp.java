@@ -53,6 +53,9 @@ public class GameRankNftSkinResp {
 		@ApiModelProperty("积分")
 		private Integer score;
 
+		@ApiModelProperty("是否是拥有者，0 否 1 是")
+		private Integer isOwner = 0;
+
 		@JsonSerialize(using= ToStringSerializer.class)
 		private Long nftId;
 

@@ -62,4 +62,7 @@ public class GameRankHeroResp {
 	@ApiModelProperty("成交时间")
 	private Long fulfillTime;
 
+	@ApiModelProperty("是否是拥有者，0 否 1 是")
+	private Integer isOwner = 0;
+
 }

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.GameRankNftPageReq;
 import com.seeds.game.dto.request.GameRankNftSkinReq;
 import com.seeds.game.dto.request.GameRankStatisticPageReq;
@@ -85,6 +86,7 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Override
     public List<GameWinRankResp.GameWinRank> winInfo(GameWinRankReq query, Boolean useCache) {
+        Long currentUser = UserContext.getCurrentUserIdNoThrow();
         // 先从redis缓存中拿排行榜数据
         GameWinRankResp resp;
         RBucket<String> bucket = null;
@@ -143,8 +145,14 @@ public class GameRankServiceImpl implements GameRankService {
             if (CollectionUtils.isEmpty(rankList)) {
                 return Collections.emptyList();
             }
+            Set<Long> roleIds = rankList.stream().map(GameWinRankResp.GameWinRank::getAccID).collect(Collectors.toSet());
+            Map<Long, ServerRoleEntity> gameRoleMap = serverRoleService.queryMapById(roleIds);
             Map<String, GameWinRankResp.GameWinRank> rankMap = new HashMap<>(rankList.size());
             for (GameWinRankResp.GameWinRank rank : rankList) {
+                ServerRoleEntity serverRole = gameRoleMap.get(rank.getAccID());
+                if (serverRole != null) {
+                    rank.setIsOwner(serverRole.getUserId().equals(currentUser) ? 1 : 0);
+                }
                 String key = rank.getAccName();
                 GameWinRankResp.GameWinRank mapRank = rankMap.get(key);
                 // 头像url
@@ -176,6 +184,7 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Override
     public IPage<GameRankStatisticResp> statisticPage(GameRankStatisticPageReq query) {
+        Long currentUser = UserContext.getCurrentUserIdNoThrow();
         LambdaQueryWrapper<ServerRoleStatisticsEntity> queryWrap = new QueryWrapper<ServerRoleStatisticsEntity>().lambda()
                 .eq(ServerRoleStatisticsEntity::getGameServerId, query.getGameServerId());
         buildOrderCondition(query.getSortField(), query.getSortType(), queryWrap);
@@ -192,6 +201,7 @@ public class GameRankServiceImpl implements GameRankService {
             resp.setWinRate(p.getWinRate().scaleByPowerOfTen(2).setScale(0, RoundingMode.HALF_UP) + "%");
             ServerRoleEntity serverRole = gameRoleMap.get(p.getRoleId());
             if (serverRole != null) {
+                resp.setIsOwner(serverRole.getUserId().equals(currentUser) ? 1 : 0);
                 resp.setPortraitUrl(gameFileService.getFileUrl("game/" + serverRole.getPortraitId() + GAME_ROLE_PORTRAIT_FILE));
                 resp.setRoleName(serverRole.getName());
             }
@@ -201,6 +211,7 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Override
     public IPage<GameRankEquipResp> equipPage(GameRankNftPageReq query) {
+        Long currentUser = UserContext.getCurrentUserIdNoThrow();
         query.setSortTypeStr(GameRankNftPageReq.convert(query.getSortType()));
         Page<GameRankEquipResp> page = new Page<>(query.getCurrent(), query.getSize());
         IPage<GameRankEquipResp> equipPage = nftMarketOrderMapper.equipPage(page, query);
@@ -213,6 +224,7 @@ public class GameRankServiceImpl implements GameRankService {
         return page.convert(p -> {
             UcUser ucUser = userMap.get(p.getPublicAddress());
             if (ucUser != null) {
+                p.setIsOwner(ucUser.getId().equals(currentUser) ? 1 : 0);
                 p.setCollector(ucUser.getNickname());
             }
             return p;
@@ -221,6 +233,7 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Override
     public IPage<GameRankItemResp> itemPage(GameRankNftPageReq query) {
+        Long currentUser = UserContext.getCurrentUserIdNoThrow();
         query.setSortTypeStr(GameRankNftPageReq.convert(query.getSortType()));
         Page<GameRankItemResp> page = new Page<>(query.getCurrent(), query.getSize());
         IPage<GameRankItemResp> itemPage = nftMarketOrderMapper.itemPage(page, query);
@@ -234,6 +247,7 @@ public class GameRankServiceImpl implements GameRankService {
             UcUser ucUser = userMap.get(p.getPublicAddress());
             if (ucUser != null) {
                 p.setCollector(ucUser.getNickname());
+                p.setIsOwner(ucUser.getId().equals(currentUser) ? 1 : 0);
             }
             return p;
         });
@@ -241,6 +255,7 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Override
     public IPage<GameRankHeroResp> heroPage(GameRankNftPageReq query) {
+        Long currentUser = UserContext.getCurrentUserIdNoThrow();
         query.setSortTypeStr(GameRankNftPageReq.convert(query.getSortType()));
         Page<GameRankHeroResp> page = new Page<>(query.getCurrent(), query.getSize());
         IPage<GameRankHeroResp> heroPage = nftMarketOrderMapper.heroPage(page, query);
@@ -248,11 +263,11 @@ public class GameRankServiceImpl implements GameRankService {
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
-        Set<String> publicAddress = records.stream().map(GameRankHeroResp::getPublicAddress).collect(Collectors.toSet());
-        Map<String, UcUser> userMap = getUserMapByAddress(publicAddress);
+        Map<String, UcUser> userMap = getUserMapByAddress(records.stream().map(GameRankHeroResp::getPublicAddress).collect(Collectors.toSet()));
         return page.convert(p -> {
             UcUser ucUser = userMap.get(p.getPublicAddress());
             if (ucUser != null) {
+                p.setIsOwner(ucUser.getId().equals(currentUser) ? 1 : 0);
                 p.setCollector(ucUser.getNickname());
             }
             return p;
@@ -261,6 +276,7 @@ public class GameRankServiceImpl implements GameRankService {
 
     @Override
     public List<GameRankNftSkinResp.GameRankNftSkin> nftSkin(GameRankNftSkinReq query) {
+        Long currentUser = UserContext.getCurrentUserIdNoThrow();
         // 先从redis缓存中拿排行榜数据
         RBucket<String> bucket = redissonClient.getBucket(UcRedisKeysConstant.UC_GAME_NFT_SKIN_RANK_TEMPLATE);
         String data = bucket.get();
@@ -321,6 +337,7 @@ public class GameRankServiceImpl implements GameRankService {
                 nftSkin.setNumber("#" + backpack.getTokenId());
                 UcUser ucUser = userMap.get(backpack.getUserId());
                 if (ucUser != null) {
+                    nftSkin.setIsOwner(ucUser.getId().equals(currentUser) ? 1 : 0);
                     nftSkin.setCollector(ucUser.getNickname());
                     nftSkin.setPublicAddress(ucUser.getPublicAddress());
                 }

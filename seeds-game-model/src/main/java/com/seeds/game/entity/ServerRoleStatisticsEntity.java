@@ -26,7 +26,7 @@ public class ServerRoleStatisticsEntity extends BaseEntity {
     private Long roleId;
 
     @ApiModelProperty("游戏服id")
-        private Long gameServerId;
+    private Long gameServerId;
 
     @ApiModelProperty("血腥积分")
     private BigDecimal killScore;
