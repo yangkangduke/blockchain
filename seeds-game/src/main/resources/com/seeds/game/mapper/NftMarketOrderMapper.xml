@@ -249,9 +249,11 @@
         max(o.fulfill_time) AS fulfillTime,
         ANY_VALUE(b.`name`) AS `name`,
         ANY_VALUE(b.image) AS image,
+        ANY_VALUE(b.grade) AS grade,
         ANY_VALUE(b.views) AS views,
         CONCAT('#', ANY_VALUE(o.token_id)) AS number,
         ANY_VALUE(n.`owner`) AS publicAddress,
+        ANY_VALUE(a.durability) AS durability,
         IF(ANY_VALUE(o.auction_id) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price
         from z_market_order o
         join z_equipment_nft n on n.mint_address  = o.mint_address

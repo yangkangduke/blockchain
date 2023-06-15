@@ -32,6 +32,12 @@ public class GameRankItemResp {
 	@ApiModelProperty("拥有者")
 	private String collector;
 
+	@ApiModelProperty("等级")
+	private Integer grade;
+
+	@ApiModelProperty("耐久")
+	private Integer durability;
+
 	@ApiModelProperty("价格")
 	private BigDecimal price;
 
