@@ -100,7 +100,9 @@ public class GameRankServiceImpl implements GameRankService {
                 // 判断是否过期
                 if (resp.getExpireTime() > System.currentTimeMillis()) {
                     cacheRankList.forEach(p -> {
-                        p.setIsOwner(p.getUserId().equals(currentUser) ? 1 : 0);
+                        if (p.getUserId() != null) {
+                            p.setIsOwner(p.getUserId().equals(currentUser) ? 1 : 0);
+                        }
                     });
                     return cacheRankList;
                 }
@@ -291,7 +293,9 @@ public class GameRankServiceImpl implements GameRankService {
             // 判断是否过期
             if (resp.getExpireTime() > System.currentTimeMillis()) {
                 cacheList.forEach(p -> {
-                    p.setIsOwner(p.getUserId().equals(currentUser) ? 1 : 0);
+                    if (p.getUserId() != null) {
+                        p.setIsOwner(p.getUserId().equals(currentUser) ? 1 : 0);
+                    }
                 });
                 return cacheList;
             }
