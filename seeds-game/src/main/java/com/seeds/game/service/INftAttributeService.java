@@ -80,9 +80,9 @@ public interface INftAttributeService extends IService<NftAttributeEntity> {
      * 计算NFT皮肤排行积分
      * @param rankList 数据
      * @param map 结果集
-     * @param score 初始积分
+     * @param factor 系数
      * @param change 积分变化量
      */
-    void calculateSkinRankScore(List<NftAttributeEntity> rankList, Map<Long, GameRankNftSkinResp.GameRankNftSkin> map, int score, int change);
+    void calculateSkinRankScore(List<NftAttributeEntity> rankList, Map<Long, GameRankNftSkinResp.GameRankNftSkin> map, double factor, int change);
 
 }

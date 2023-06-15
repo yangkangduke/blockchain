@@ -294,28 +294,28 @@ public class GameRankServiceImpl implements GameRankService {
         Integer number = query.getEndRow();
         // victory子榜单 系数1 积分200
         List<NftAttributeEntity> victoryRank = nftAttributeService.querySkinRankVictory(number);
-        nftAttributeService.calculateSkinRankScore(victoryRank, map, 200, -1);
+        nftAttributeService.calculateSkinRankScore(victoryRank, map, 1, -1);
         // lose子榜单 系数-1 积分-200
         List<NftAttributeEntity> loseRank = nftAttributeService.querySkinRankLose(number);
-        nftAttributeService.calculateSkinRankScore(loseRank, map, -200, 1);
+        nftAttributeService.calculateSkinRankScore(loseRank, map, -1, 1);
         // max streak子榜单 系数2 积分400
         List<NftAttributeEntity> maxStreakRank = nftAttributeService.querySkinRankMaxStreak(number);
-        nftAttributeService.calculateSkinRankScore(maxStreakRank, map, 400, -1);
+        nftAttributeService.calculateSkinRankScore(maxStreakRank, map, 2, -1);
         // capture子榜单 系数0.5 积分100
         List<NftAttributeEntity> captureRank = nftAttributeService.querySkinRankCapture(number);
-        nftAttributeService.calculateSkinRankScore(captureRank, map, 100, -1);
+        nftAttributeService.calculateSkinRankScore(captureRank, map, 0.5, -1);
         // killing spree子榜单 系数1 积分200
         List<NftAttributeEntity> killingSpreeRank = nftAttributeService.querySkinRankKillingSpree(number);
-        nftAttributeService.calculateSkinRankScore(killingSpreeRank, map, 200, -1);
+        nftAttributeService.calculateSkinRankScore(killingSpreeRank, map, 1, -1);
         // goblin kill子榜单 系数0.5 积分100
         List<NftAttributeEntity> goblinKillRank = nftAttributeService.querySkinRankGoblinKill(number);
-        nftAttributeService.calculateSkinRankScore(goblinKillRank, map, 100, -1);
+        nftAttributeService.calculateSkinRankScore(goblinKillRank, map, 0.5, -1);
         // death by slaying子榜单 系数-0.5 积分-100
         List<NftAttributeEntity> slayingRank = nftAttributeService.querySkinRankSlaying(number);
-        nftAttributeService.calculateSkinRankScore(slayingRank, map, -100, 1);
+        nftAttributeService.calculateSkinRankScore(slayingRank, map, -0.5, 1);
         // death by goblin子榜单 系数-0.5 积分-100
         List<NftAttributeEntity> goblinRank = nftAttributeService.querySkinRankGoblin(number);
-        nftAttributeService.calculateSkinRankScore(goblinRank, map, -100, 1);
+        nftAttributeService.calculateSkinRankScore(goblinRank, map, -0.5, 1);
         Set<Long> nftIds = new HashSet<>();
         Collection<GameRankNftSkinResp.GameRankNftSkin> values = map.values();
         if (CollectionUtils.isEmpty(values)) {

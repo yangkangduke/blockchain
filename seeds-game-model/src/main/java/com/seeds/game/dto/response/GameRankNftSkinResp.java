@@ -51,7 +51,7 @@ public class GameRankNftSkinResp {
 		private String occupation;
 
 		@ApiModelProperty("积分")
-		private Integer score;
+		private Double score;
 
 		@ApiModelProperty("是否是拥有者，0 否 1 是")
 		private Integer isOwner = 0;

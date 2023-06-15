@@ -133,18 +133,20 @@ public class NftAttributeServiceImpl extends ServiceImpl<NftAttributeMapper, Nft
     }
 
     @Override
-    public void calculateSkinRankScore(List<NftAttributeEntity> rankList, Map<Long, GameRankNftSkinResp.GameRankNftSkin> map, int score, int change) {
+    public void calculateSkinRankScore(List<NftAttributeEntity> rankList, Map<Long, GameRankNftSkinResp.GameRankNftSkin> map, double factor, int change) {
         if (CollectionUtils.isEmpty(rankList)) {
             return;
         }
+        double score = 200;
         for (NftAttributeEntity lose : rankList) {
             GameRankNftSkinResp.GameRankNftSkin resp = new GameRankNftSkinResp.GameRankNftSkin();
             resp.setOccupation(NftHeroTypeEnum.getProfessionByCode(lose.getHeroType()));
             resp.setNftId(lose.getEqNftId());
-            resp.setScore(score);
+            double realScore = score * factor;
+            resp.setScore(realScore);
             GameRankNftSkinResp.GameRankNftSkin rank = map.get(resp.getNftId());
             if (rank != null) {
-                resp.setScore(rank.getScore() + score);
+                resp.setScore(rank.getScore() + realScore);
             }
             map.put(resp.getNftId(), resp);
             score = score + change;
