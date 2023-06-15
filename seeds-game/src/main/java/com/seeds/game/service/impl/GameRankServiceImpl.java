@@ -297,7 +297,7 @@ public class GameRankServiceImpl implements GameRankService {
         nftAttributeService.calculateSkinRankScore(victoryRank, map, 1, -1);
         // lose子榜单 系数-1 积分-200
         List<NftAttributeEntity> loseRank = nftAttributeService.querySkinRankLose(number);
-        nftAttributeService.calculateSkinRankScore(loseRank, map, -1, 1);
+        nftAttributeService.calculateSkinRankScore(loseRank, map, -1, -1);
         // max streak子榜单 系数2 积分400
         List<NftAttributeEntity> maxStreakRank = nftAttributeService.querySkinRankMaxStreak(number);
         nftAttributeService.calculateSkinRankScore(maxStreakRank, map, 2, -1);
@@ -312,10 +312,10 @@ public class GameRankServiceImpl implements GameRankService {
         nftAttributeService.calculateSkinRankScore(goblinKillRank, map, 0.5, -1);
         // death by slaying子榜单 系数-0.5 积分-100
         List<NftAttributeEntity> slayingRank = nftAttributeService.querySkinRankSlaying(number);
-        nftAttributeService.calculateSkinRankScore(slayingRank, map, -0.5, 1);
+        nftAttributeService.calculateSkinRankScore(slayingRank, map, -0.5, -1);
         // death by goblin子榜单 系数-0.5 积分-100
         List<NftAttributeEntity> goblinRank = nftAttributeService.querySkinRankGoblin(number);
-        nftAttributeService.calculateSkinRankScore(goblinRank, map, -0.5, 1);
+        nftAttributeService.calculateSkinRankScore(goblinRank, map, -0.5, -1);
         Set<Long> nftIds = new HashSet<>();
         Collection<GameRankNftSkinResp.GameRankNftSkin> values = map.values();
         if (CollectionUtils.isEmpty(values)) {
