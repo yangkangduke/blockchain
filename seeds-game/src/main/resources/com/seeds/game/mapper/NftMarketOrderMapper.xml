@@ -227,12 +227,13 @@
         CONCAT('#', ANY_VALUE(o.token_id)) AS number,
         ANY_VALUE(n.`owner`) AS publicAddress,
         ANY_VALUE(a.durability) AS durability,
-        IF(SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price
+        IF(SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1) > 0,
+        (select end_price from z_auction_house_setting where id = SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1)),
+        ANY_VALUE(o.price)) AS price
         from z_market_order o
         join z_equipment_nft n on n.mint_address  = o.mint_address
         left join ga_nft_public_backpack b on b.eq_nft_id = n.id
         left join ga_nft_attribute a on a.eq_nft_id = n.id
-        left join z_auction_house_setting s on s.id = o.auction_id
         where o.status = 2 and b.type = 1 and n.is_delete = 0 and b.item_type_id = #{params.item}
         GROUP BY o.mint_address
         <if test="params.sortField == 1">
@@ -254,12 +255,13 @@
         CONCAT('#', ANY_VALUE(o.token_id)) AS number,
         ANY_VALUE(n.`owner`) AS publicAddress,
         ANY_VALUE(a.durability) AS durability,
-        IF(SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price
+        IF(SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1) > 0,
+        (select end_price from z_auction_house_setting where id = SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1)),
+        ANY_VALUE(o.price)) AS price
         from z_market_order o
         join z_equipment_nft n on n.mint_address  = o.mint_address
         left join ga_nft_public_backpack b on b.eq_nft_id = n.id
         left join ga_nft_attribute a on a.eq_nft_id = n.id
-        left join z_auction_house_setting s on s.id = o.auction_id
         where o.status = 2 and b.type = 2 and n.is_delete = 0 and b.item_type_id = #{params.item}
         GROUP BY o.mint_address
         <if test="params.sortField == 1">
@@ -279,7 +281,9 @@
         ANY_VALUE(b.views) AS views,
         CONCAT('#', ANY_VALUE(o.token_id)) AS number,
         ANY_VALUE(n.`owner`) AS publicAddress,
-        IF(SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price,
+        IF(SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1) > 0,
+        (select end_price from z_auction_house_setting where id = SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1)),
+        ANY_VALUE(o.price)) AS price,
         ANY_VALUE(a.victory) AS victory,
         ANY_VALUE(a.lose) AS lose,
         ANY_VALUE(a.max_streak) AS maxStreak,
@@ -291,7 +295,6 @@
         join z_equipment_nft n on n.mint_address  = o.mint_address
         left join ga_nft_public_backpack b on b.eq_nft_id = n.id
         left join ga_nft_attribute a on a.eq_nft_id = n.id
-        left join z_auction_house_setting s on s.id = o.auction_id
         where o.status = 2 and b.type = 3 and n.is_delete = 0 and b.name = #{params.item}
         GROUP BY o.mint_address
         <if test="params.sortField == 1">
