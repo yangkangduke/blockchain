@@ -12,6 +12,8 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+  messages:
+    basename: i18n/messages
 
 mybatis:
   type-aliases-package*: com.seeds.game.entity
