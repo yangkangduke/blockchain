@@ -19,6 +19,8 @@ spring:
       auto-commit-interval: 100
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  messages:
+    basename: i18n/messages
 redis:
   host: 192.168.6.101
   port: 6379
