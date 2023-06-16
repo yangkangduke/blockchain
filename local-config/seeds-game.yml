@@ -5,6 +5,8 @@ spring:
     username: root
     password: Seeds123!
     driver-class-name: com.mysql.cj.jdbc.Driver
+  messages:
+    basename: i18n/messages
 
   mvc:
     pathmatch:
