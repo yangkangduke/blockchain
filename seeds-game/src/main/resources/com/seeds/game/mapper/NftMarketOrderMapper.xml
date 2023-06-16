@@ -227,7 +227,7 @@
         CONCAT('#', ANY_VALUE(o.token_id)) AS number,
         ANY_VALUE(n.`owner`) AS publicAddress,
         ANY_VALUE(a.durability) AS durability,
-        IF(ANY_VALUE(o.auction_id) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price
+        IF(SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price
         from z_market_order o
         join z_equipment_nft n on n.mint_address  = o.mint_address
         left join ga_nft_public_backpack b on b.eq_nft_id = n.id
@@ -254,7 +254,7 @@
         CONCAT('#', ANY_VALUE(o.token_id)) AS number,
         ANY_VALUE(n.`owner`) AS publicAddress,
         ANY_VALUE(a.durability) AS durability,
-        IF(ANY_VALUE(o.auction_id) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price
+        IF(SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price
         from z_market_order o
         join z_equipment_nft n on n.mint_address  = o.mint_address
         left join ga_nft_public_backpack b on b.eq_nft_id = n.id
@@ -279,7 +279,7 @@
         ANY_VALUE(b.views) AS views,
         CONCAT('#', ANY_VALUE(o.token_id)) AS number,
         ANY_VALUE(n.`owner`) AS publicAddress,
-        IF(ANY_VALUE(o.auction_id) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price,
+        IF(SUBSTRING_INDEX(GROUP_CONCAT(o.auction_id order by o.fulfill_time desc),',',1) > 0, ANY_VALUE(s.end_price), ANY_VALUE(o.price)) AS price,
         ANY_VALUE(a.victory) AS victory,
         ANY_VALUE(a.lose) AS lose,
         ANY_VALUE(a.max_streak) AS maxStreak,
