@@ -53,7 +53,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.seeds.game.enums.GameErrorCodeEnum.ERR_50001_CALL_GAME_INTERFACE_ERROR;
+import static com.seeds.game.enums.GameErrorCodeEnum.*;
 
 /**
  * <p>
@@ -514,11 +514,11 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
         } catch (Exception e) {
             log.error("NFT托管成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT deposit Failure!");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
     }
 
@@ -558,7 +558,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             } else {
                 // 更改背包状态，通知游戏方NFT收回到背包。
                 // 调用游戏方接口，执行收回
@@ -584,7 +584,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             }
         } catch (Exception e) {
             log.error("NFT取回成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT retrieval failure");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
     }
 
