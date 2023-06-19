@@ -289,11 +289,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
         } catch (Exception e) {
             log.error("一口价上架成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT listing failure!");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
     }
 
@@ -332,11 +332,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
         } catch (Exception e) {
             log.error("英式拍卖上架成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("British auction shelf failure!");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
     }
 
@@ -370,11 +370,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
         } catch (Exception e) {
             log.error("NFT下架成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT downgrade failed!");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
@@ -425,11 +425,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
         } catch (Exception e) {
             log.error("NFT取消拍卖成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT cancel auction failed!");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
@@ -472,11 +472,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
         } catch (Exception e) {
             log.error("NFT拍卖出价成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT make offer failed!");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
     }
 
@@ -630,11 +630,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
         } catch (Exception e) {
             log.error("NFT购买成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT purchase failure!");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
@@ -827,12 +827,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException("Failed to get nonce, code:" + code);
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
             return jsonObject.getString("data");
         } catch (Exception e) {
             log.error("NFT获取交易顺序失败，message：{}", e.getMessage());
-            throw new GenericException(e.getMessage());
+            throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
         }
     }
 
@@ -951,12 +951,12 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             log.info("请求NFT获取订单收据接口返回，  result:{}", jsonObject);
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException("Failed to get list receipt, code:" + code);
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
             return JSONUtil.toBean(jsonObject.getString("data"), JSONObject.class);
         } catch (Exception e) {
             log.error("NFT获取订单收据失败，message：{}", e.getMessage());
-            throw new GenericException(e.getMessage());
+            throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
         }
     }
 
@@ -1126,13 +1126,13 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
             String data = jsonObject.getString("data");
             return JSONUtil.toBean(data, NftOfferDetailResp.class);
         } catch (Exception e) {
             log.error("NFT接受报价成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT accept offer failed!");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
     }
 
@@ -1162,11 +1162,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
         } catch (Exception e) {
             log.error("NFT拍卖达成交易成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT transaction failed!");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
         // 退还托管费
         NftRefundFeeReq feeReq = new NftRefundFeeReq();
@@ -1198,11 +1198,11 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(response.body());
             String code = jsonObject.getString("code");
             if (!"200".equalsIgnoreCase(code)) {
-                throw new GenericException(jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
         } catch (Exception e) {
             log.error("NFT取消出价成功通知失败，message：{}", e.getMessage());
-            throw new GenericException("NFT cancel offer failed!");
+            throw new GenericException(GameErrorCodeEnum.ERR_10021_NFT_OPERATION_FAILED);
         }
     }
 
@@ -1295,7 +1295,7 @@ public class NftMarketPlaceServiceImpl implements NftMarketPlaceService {
             JSONObject jsonObject = JSONObject.parseObject(body);
             Integer code = jsonObject.getInteger("code");
             if (code == null || code != 200) {
-                throw new GenericException("Failed to refund Fee, message:" + jsonObject.getString("message"));
+                throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
             }
             String data = jsonObject.getString("data");
             if (StringUtils.isNotBlank(data)) {

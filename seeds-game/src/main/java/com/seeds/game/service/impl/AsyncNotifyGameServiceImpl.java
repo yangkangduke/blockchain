@@ -14,6 +14,7 @@ import com.seeds.game.dto.request.NftMintSuccessReq;
 import com.seeds.game.dto.request.internal.NftEventNotifyReq;
 import com.seeds.game.dto.response.MintSuccessMessageResp;
 import com.seeds.game.entity.*;
+import com.seeds.game.enums.GameErrorCodeEnum;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
 import com.seeds.game.exception.GenericException;
@@ -224,7 +225,7 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
         if (!"ok".equalsIgnoreCase(ret)) {
             // 记录调用错误日志
             errorLog(notifyUrl, params, ret);
-            throw new GenericException("Failed to call game-api to notify, " + ret);
+            throw new GenericException(GameErrorCodeEnum.ERR_500_SYSTEM_BUSY);
         }
 
     }

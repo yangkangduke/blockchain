@@ -765,7 +765,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.UNASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(distributeUrl, params, ret);
-            throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR, "Failed to call game-api to distribute nft," + ret);
+            throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR);
         }
 
 
@@ -823,7 +823,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             updateConfig(nftItem, NftConfigurationEnum.ASSIGNED.getCode());
             // 记录调用错误日志
             errorLog(takebackUrl, params, ret);
-            throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR, "Failed to call game-api to takeback nft," + ret);
+            throw new GenericException(ERR_50001_CALL_GAME_INTERFACE_ERROR);
         }
 
     }

@@ -1,7 +1,7 @@
 package com.seeds.game.exception;
 
+import com.seeds.common.web.util.I18nUtil;
 import com.seeds.game.enums.GameErrorCodeEnum;
-import com.seeds.uc.enums.UcErrorCodeEnum;
 import lombok.Getter;
 
 /**
@@ -18,7 +18,7 @@ public class GenericException extends RuntimeException {
     }
 
     public GenericException(GameErrorCodeEnum errorCode) {
-        super(errorCode.getDescEn());
+        super(I18nUtil.getMessage(errorCode.name()));
         this.errorCode = errorCode;
     }
 

@@ -421,7 +421,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     public void composeSuccess(ComposeSuccessReq req) {
         NftEvent nftEvent = this.getById(req.getEventId());
         if (null == nftEvent || !nftEvent.getUserId().equals(UserContext.getCurrentUserId())) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_EVENT);
+            throw new GenericException(GameErrorCodeEnum.ERR_10020_CHECK_EVENT);
         }
 
         EquipComposeRequestDto composeRequestDto = new EquipComposeRequestDto();
@@ -481,7 +481,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     public void mintEquip(NftMintEquipReq req) {
         NftEvent nftEvent = this.getById(req.getEventId());
         if (null == nftEvent || !nftEvent.getUserId().equals(UserContext.getCurrentUserId())) {
-            throw new GenericException(GameErrorCodeEnum.ERR_10019_CHECK_EVENT);
+            throw new GenericException(GameErrorCodeEnum.ERR_10020_CHECK_EVENT);
         }
 
         EquipMintRequestDto mintRequestDto = new EquipMintRequestDto();
