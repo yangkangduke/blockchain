@@ -6,6 +6,7 @@ import com.seeds.uc.dto.request.MetamaskVerifyReq;
 import com.seeds.uc.dto.request.VerifyAuthTokenReq;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.dto.response.UserRegistrationResp;
+import com.seeds.uc.feign.interceptor.UcFeignInnerRequestInterceptor;
 import com.seeds.uc.model.UcUser;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -23,7 +24,7 @@ import java.util.Set;
  * @email antilaw@yahoo.com
  * @date 2020/8/26
  */
-@FeignClient(name = "userCenterFeignClient", url = "${service.url.uc}")
+@FeignClient(name = "userCenterFeignClient", url = "${service.url.uc}", configuration = {UcFeignInnerRequestInterceptor.class})
 public interface UserCenterFeignClient {
 
     @PostMapping("/uc-internal/token/verify")
