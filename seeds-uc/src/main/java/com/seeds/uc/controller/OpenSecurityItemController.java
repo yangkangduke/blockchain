@@ -35,6 +35,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +53,8 @@ import javax.validation.Valid;
 @RequestMapping("/security/item")
 public class OpenSecurityItemController {
 
+    @Autowired
+    private MessageSource messageSource;
     @Autowired
     private IUcUserService ucUserService;
     @Autowired
@@ -75,13 +79,13 @@ public class OpenSecurityItemController {
                 cacheService.getAuthTokenDetailWithToken(securityItemReq.getGaToken(), ClientAuthTypeEnum.GA);
         if (gaAuthToken == null
                 || StringUtils.isBlank(gaAuthToken.getSecret())) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE, messageSource.getMessage("ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE", null, LocaleContextHolder.getLocale()));
         }
 
         SecurityAuth securityAuth =
                 cacheService.getSecurityAuthWithToken(securityItemReq.getAuthToken());
         if (securityAuth == null) {
-            throw new SecuritySettingException(UcErrorCodeEnum.ERR_10210_SECURITY_VERIFY_ERROR);
+            throw new SecuritySettingException(UcErrorCodeEnum.ERR_10210_SECURITY_VERIFY_ERROR, messageSource.getMessage("ERR_10210_SECURITY_VERIFY_ERROR", null, LocaleContextHolder.getLocale()));
         }
 
         Long uid = UserContext.getCurrentUserId();
@@ -131,7 +135,7 @@ public class OpenSecurityItemController {
         // 验证邮箱和验证码是否正确
         AuthCodeDTO authCode = cacheService.getAuthCode(ucUser.getEmail(), AuthCodeUseTypeEnum.RESET_GA, ClientAuthTypeEnum.EMAIL);
         if (authCode == null || !emailCode.equals(authCode.getCode())) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED, messageSource.getMessage("ERR_17000_EMAIL_VERIFICATION_FAILED", null, LocaleContextHolder.getLocale()));
         }
 
         // 清空ga信息
@@ -153,19 +157,19 @@ public class OpenSecurityItemController {
         // 验证authToken
         AuthTokenDTO authTokenDTO = cacheService.getAuthTokenDetailWithToken(authToken, ClientAuthTypeEnum.PHANTOM);
         if (authTokenDTO == null) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_17004_PHANTOM_VERIFY_EXPIRED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_17004_PHANTOM_VERIFY_EXPIRED, messageSource.getMessage("ERR_17004_PHANTOM_VERIFY_EXPIRED", null, LocaleContextHolder.getLocale()));
         }
         UcUser ucUser = ucUserService.getById(currentUserId);
         // 验证emailCode
         AuthCodeDTO authCode = cacheService.getAuthCode(ucUser.getEmail(), AuthCodeUseTypeEnum.BIND_PHANTOM, ClientAuthTypeEnum.EMAIL);
         if (authCode == null || !emailCode.equals(authCode.getCode())) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED, messageSource.getMessage("ERR_17000_EMAIL_VERIFICATION_FAILED", null, LocaleContextHolder.getLocale()));
         }
         // 校验是否已经绑定过了
         if (null != ucUserService.getOne(new LambdaQueryWrapper<UcUser>()
                 .eq(UcUser::getPublicAddress, authTokenDTO.getAccountName()))) {
 
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_10029_PHANTOM_EXIST);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10029_PHANTOM_EXIST, messageSource.getMessage("ERR_10029_PHANTOM_EXIST", null, LocaleContextHolder.getLocale()));
         }
         // 绑定
         ucUserService.bindPhantom(authTokenDTO, currentUserId);
@@ -186,19 +190,19 @@ public class OpenSecurityItemController {
         // 验证authToken
         AuthTokenDTO authTokenDTO = cacheService.getAuthTokenDetailWithToken(authToken, ClientAuthTypeEnum.METAMASK);
         if (authTokenDTO == null) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_16004_METAMASK_VERIFY_EXPIRED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_16004_METAMASK_VERIFY_EXPIRED, messageSource.getMessage("ERR_16004_METAMASK_VERIFY_EXPIRED", null, LocaleContextHolder.getLocale()));
         }
         UcUser ucUser = ucUserService.getById(currentUserId);
         // 验证emailCode
         AuthCodeDTO authCode = cacheService.getAuthCode(ucUser.getEmail(), AuthCodeUseTypeEnum.BIND_METAMASK, ClientAuthTypeEnum.EMAIL);
         if (authCode == null || !emailCode.equals(authCode.getCode())) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_17000_EMAIL_VERIFICATION_FAILED, messageSource.getMessage("ERR_17000_EMAIL_VERIFICATION_FAILED", null, LocaleContextHolder.getLocale()));
         }
         // 校验是否已经绑定过了
         if (null != ucUserService.getOne(new LambdaQueryWrapper<UcUser>()
                 .eq(UcUser::getPublicAddress, authTokenDTO.getAccountName()))) {
 
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_10029_METAMASK_EXIST);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10029_METAMASK_EXIST, messageSource.getMessage("ERR_10029_METAMASK_EXIST", null, LocaleContextHolder.getLocale()));
         }
         // 绑定
         ucUserService.bindMetamask(authTokenDTO, currentUserId);
@@ -218,13 +222,13 @@ public class OpenSecurityItemController {
         AuthTokenDTO emailAuthToken = cacheService.getAuthTokenDetailWithToken(emailToken, ClientAuthTypeEnum.EMAIL);
         if (emailAuthToken == null
                 || StringUtils.isBlank(emailAuthToken.getAccountName())) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE, messageSource.getMessage("ERR_10033_WRONG_EMAIL_CODE", null, LocaleContextHolder.getLocale()));
         }
 
         // 验证authToken
         AuthTokenDTO authTokenDTO = cacheService.getAuthTokenDetailWithToken(authToken, ClientAuthTypeEnum.PHANTOM);
         if (authTokenDTO == null) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_17004_PHANTOM_VERIFY_EXPIRED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_17004_PHANTOM_VERIFY_EXPIRED, messageSource.getMessage("ERR_17004_PHANTOM_VERIFY_EXPIRED", null, LocaleContextHolder.getLocale()));
         }
 
         String accountName = emailAuthToken.getAccountName();
@@ -233,7 +237,7 @@ public class OpenSecurityItemController {
         UcUser checkUser = ucUserService.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getEmail, accountName));
         if (checkUser != null) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED, messageSource.getMessage("ERR_10061_EMAIL_ALREADY_BEEN_USED", null, LocaleContextHolder.getLocale()));
         }
         String salt = RandomUtil.getRandomSalt();
         String password = PasswordUtil.getPassword(securityItemReq.getPassword(), salt);
@@ -271,14 +275,14 @@ public class OpenSecurityItemController {
         UcUser ucUser = ucUserService.getById(loginUser.getUserId());
         AuthTokenDTO authTokenDTO = cacheService.getAuthTokenDetailWithToken(authToken, ClientAuthTypeEnum.EMAIL);
         if (authTokenDTO == null || authTokenDTO.getAccountName() == null) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE, messageSource.getMessage("ERR_10033_WRONG_EMAIL_CODE", null, LocaleContextHolder.getLocale()));
         }
         if (!googleAuthService.verifyUserCode(ucUser.getId(), gaCode)) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE, messageSource.getMessage("ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE", null, LocaleContextHolder.getLocale()));
         }
         // 判断是否已经存在该邮箱账号
         if (null != ucUserService.getOne(new LambdaQueryWrapper<UcUser>().eq(UcUser::getEmail, authTokenDTO.getAccountName()))) {
-            throw new SecurityItemException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED);
+            throw new SecurityItemException(UcErrorCodeEnum.ERR_10061_EMAIL_ALREADY_BEEN_USED, messageSource.getMessage("ERR_10061_EMAIL_ALREADY_BEEN_USED", null, LocaleContextHolder.getLocale()));
         }
 
         // 修改邮箱

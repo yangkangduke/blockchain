@@ -10,4 +10,8 @@ public class SecuritySettingException extends GenericException {
     public SecuritySettingException(UcErrorCodeEnum errorCode) {
         super(errorCode);
     }
+
+    public SecuritySettingException(UcErrorCodeEnum errorCode, String message) {
+        super(errorCode, message);
+    }
 }

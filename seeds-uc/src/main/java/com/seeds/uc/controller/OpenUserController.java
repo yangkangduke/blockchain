@@ -25,6 +25,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +45,8 @@ import javax.validation.Valid;
 @Slf4j
 public class OpenUserController {
 
+    @Autowired
+    private MessageSource messageSource;
     @Autowired
     private IUcUserService ucUserService;
     @Autowired
@@ -167,7 +171,7 @@ public class OpenUserController {
         UcUser user = ucUserService.getById(loginUser.getUserId());
         // 判断原密码是否正确
         if (!user.getPassword().equals(PasswordUtil.getPassword(oldPassword, user.getSalt()))) {
-            throw new PasswordException(UcErrorCodeEnum.ERR_10043_WRONG_OLD_PASSWORD);
+            throw new PasswordException(UcErrorCodeEnum.ERR_10043_WRONG_OLD_PASSWORD, messageSource.getMessage("ERR_10043_WRONG_OLD_PASSWORD", null, LocaleContextHolder.getLocale()));
         }
 
         // 判断code是否正确
@@ -176,10 +180,10 @@ public class OpenUserController {
 
         } else if (authType.equals(ClientAuthTypeEnum.GA)) {
             if (!googleAuthService.verify(changePasswordReq.getCode(), user.getGaSecret())) {
-                throw new LoginException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+                throw new LoginException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE, messageSource.getMessage("ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE", null, LocaleContextHolder.getLocale()));
             }
         } else {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_504_MISSING_ARGUMENTS);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_504_MISSING_ARGUMENTS, messageSource.getMessage("ERR_504_MISSING_ARGUMENTS", null, LocaleContextHolder.getLocale()));
         }
         // 修改密码
         return GenericDto.success(ucUserService.updatePassword(user.getId(), password));

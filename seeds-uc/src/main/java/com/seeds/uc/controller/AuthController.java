@@ -225,7 +225,7 @@ public class AuthController {
             } else if (AuthCodeUseTypeEnum.EMAIL_NEED_LOGIN_READ_DB_SET.contains(sendReq.getUseType())) {
                 sendCodeService.sendEmailWithUseType(user.getEmail(), sendReq.getUseType());
             } else {
-                throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS);
+                throw new SendAuthCodeException(UcErrorCodeEnum.ERR_502_ILLEGAL_ARGUMENTS, messageSource.getMessage("ERR_502_ILLEGAL_ARGUMENTS", null, LocaleContextHolder.getLocale()));
             }
 
         }

@@ -11,4 +11,8 @@ public class SecurityItemException extends GenericException {
     public SecurityItemException(UcErrorCodeEnum errorCode) {
         super(errorCode);
     }
+
+    public SecurityItemException(UcErrorCodeEnum errorCode, String message) {
+        super(errorCode, message);
+    }
 }

@@ -8,6 +8,8 @@ import com.seeds.uc.service.IGoogleAuthService;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,8 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
 
     @Autowired
     UcUserMapper userMapper;
+    @Autowired
+    MessageSource messageSource;
 
 
     @Override
@@ -44,7 +48,7 @@ public class GoogleAuthServiceImpl implements IGoogleAuthService {
             GoogleAuthenticator googleAuthenticator = new GoogleAuthenticator();
             authorize = googleAuthenticator.authorize(userSecret, Integer.parseInt(userInputCode.replaceFirst("0*", "")));
         } catch (Exception e) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_GA_VERIFICATION_FAILED);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_14000_GA_VERIFICATION_FAILED, messageSource.getMessage("ERR_14000_GA_VERIFICATION_FAILED", null, LocaleContextHolder.getLocale()));
         }
         return authorize;
     }

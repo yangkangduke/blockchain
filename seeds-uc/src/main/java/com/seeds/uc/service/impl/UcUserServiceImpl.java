@@ -944,7 +944,7 @@ public class UcUserServiceImpl extends ServiceImpl<UcUserMapper, UcUser> impleme
         }
         UcUser user = getById(userId);
         if (user == null || StringUtils.isEmpty(user.getEmail())) {
-            throw new GenericException("Game account not exits!");
+            throw new GenericException(messageSource.getMessage("GAME_ACCOUNT_NOT_EXITS", null, LocaleContextHolder.getLocale()));
         }
         // 先从redis缓存中拿个人概括数据
         String data = cacheService.getProfileInfo(userId.toString(), gameId.toString());

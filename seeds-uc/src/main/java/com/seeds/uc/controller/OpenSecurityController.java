@@ -29,6 +29,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,6 +46,8 @@ import java.util.stream.Collectors;
 @Api(tags = "安全策略")
 @RequestMapping("/security")
 public class OpenSecurityController {
+    @Autowired
+    MessageSource messageSource;
     @Autowired
     IUcUserService userService;
     @Autowired
@@ -122,7 +126,7 @@ public class OpenSecurityController {
         if (AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_BIND_GA.equals(securitySettingReq.getUseType())) {
             // 必须要绑定了email
             if (!emailStrategy.isPresent()) {
-                throw new SecuritySettingException(UcErrorCodeEnum.ERR_10210_SECURITY_VERIFY_ERROR);
+                throw new SecuritySettingException(UcErrorCodeEnum.ERR_10210_SECURITY_VERIFY_ERROR, messageSource.getMessage("ERR_10210_SECURITY_VERIFY_ERROR", null, LocaleContextHolder.getLocale()));
             }
 
             if (emailStrategy.isPresent() && emailStrategy.get().getNeedAuth()) {
@@ -134,7 +138,7 @@ public class OpenSecurityController {
                 if (emailAuthCode == null
                         || StringUtils.isBlank(emailAuthCode.getCode())
                         || !securitySettingReq.getEmailCode().equals(emailAuthCode.getCode())) {
-                    throw new SecuritySettingException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+                    throw new SecuritySettingException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE, messageSource.getMessage("ERR_10033_WRONG_EMAIL_CODE", null, LocaleContextHolder.getLocale()));
                 }
             }
 
@@ -142,7 +146,7 @@ public class OpenSecurityController {
         } else if (AuthCodeUseTypeEnum.VERIFY_SETTING_POLICY_WITHDRAW.equals(securitySettingReq.getUseType())) {
             // 必须要绑定了email和GA
             if (!gaStrategy.isPresent() || !emailStrategy.isPresent()) {
-                throw new SecuritySettingException(UcErrorCodeEnum.ERR_10210_SECURITY_VERIFY_ERROR);
+                throw new SecuritySettingException(UcErrorCodeEnum.ERR_10210_SECURITY_VERIFY_ERROR, messageSource.getMessage("ERR_10210_SECURITY_VERIFY_ERROR", null, LocaleContextHolder.getLocale()));
             }
 
             if (emailStrategy.isPresent() && emailStrategy.get().getNeedAuth()) {
@@ -154,7 +158,7 @@ public class OpenSecurityController {
                 if (emailAuthCode == null
                         || StringUtils.isBlank(emailAuthCode.getCode())
                         || !securitySettingReq.getEmailCode().equals(emailAuthCode.getCode())) {
-                    throw new SecuritySettingException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+                    throw new SecuritySettingException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE, messageSource.getMessage("ERR_10033_WRONG_EMAIL_CODE", null, LocaleContextHolder.getLocale()));
                 }
             }
 
@@ -162,11 +166,11 @@ public class OpenSecurityController {
                 && (StringUtils.isBlank(securitySettingReq.getGaCode())
                 || !googleAuthService.verifyUserCode(uid, securitySettingReq.getGaCode()))) {
 
-                throw new SecuritySettingException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+                throw new SecuritySettingException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE, messageSource.getMessage("ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE", null, LocaleContextHolder.getLocale()));
             }
 
         } else {
-            throw new SecuritySettingException(UcErrorCodeEnum.ERR_10210_SECURITY_VERIFY_ERROR);
+            throw new SecuritySettingException(UcErrorCodeEnum.ERR_10210_SECURITY_VERIFY_ERROR, messageSource.getMessage("ERR_10210_SECURITY_VERIFY_ERROR", null, LocaleContextHolder.getLocale()));
         }
 
         String authToken = RandomUtil.genRandomToken(uid.toString());

@@ -22,6 +22,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +41,8 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/code")
 public class OpenCodeController {
 
+    @Autowired
+    private MessageSource messageSource;
     @Autowired
     private CacheService cacheService;
     @Autowired
@@ -67,7 +71,7 @@ public class OpenCodeController {
                             .token(authToken)
                             .build());
         }
-        throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE);
+        throw new SecurityItemException(UcErrorCodeEnum.ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE, messageSource.getMessage("ERR_10088_WRONG_GOOGLE_AUTHENTICATOR_CODE", null, LocaleContextHolder.getLocale()));
     }
 
     @ApiOperation(value = "email验证", notes = "email验证")

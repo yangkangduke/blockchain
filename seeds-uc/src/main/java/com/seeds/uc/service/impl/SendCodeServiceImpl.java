@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
@@ -35,6 +37,8 @@ import org.thymeleaf.context.Context;
 @Service
 public class SendCodeServiceImpl implements SendCodeService {
 
+    @Autowired
+    private MessageSource messageSource;
     @Autowired
     private CacheService cacheService;
     @Autowired
@@ -95,7 +99,7 @@ public class SendCodeServiceImpl implements SendCodeService {
         // 取出之前login时放入二次验证redis的dto拿到详细信息
         TwoFactorAuth twoFactorAuth = cacheService.get2FAInfoWithToken(token);
         if (twoFactorAuth == null) {
-            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED);
+            throw new InvalidArgumentsException(UcErrorCodeEnum.ERR_10023_TOKEN_EXPIRED, messageSource.getMessage("ERR_10023_TOKEN_EXPIRED", null, LocaleContextHolder.getLocale()));
         }
         UcUser user = ucUserMapper.selectById(twoFactorAuth.getUserId());
         UserDto userDto = new UserDto();
@@ -114,7 +118,7 @@ public class SendCodeServiceImpl implements SendCodeService {
             cacheService.putAuthToken(token, null, address, ClientAuthTypeEnum.EMAIL);
             return token;
         }
-        throw new GenericException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE);
+        throw new GenericException(UcErrorCodeEnum.ERR_10033_WRONG_EMAIL_CODE, messageSource.getMessage("ERR_10033_WRONG_EMAIL_CODE", null, LocaleContextHolder.getLocale()));
     }
 
     // 调用send sms 和send email 方便调试
@@ -122,7 +126,7 @@ public class SendCodeServiceImpl implements SendCodeService {
         if (userDto == null
                 || userDto.getAuthType() == null
                 || !ClientAuthTypeEnum.NEED_SEND_CODE.contains(userDto.getAuthType())) {
-            throw new IllegalArgumentException("invalid send code arguments");
+            throw new IllegalArgumentException(messageSource.getMessage("INVALID_SEND_CODE_ARGUMENTS", null, LocaleContextHolder.getLocale()));
         }
 
         if (ClientAuthTypeEnum.EMAIL.equals(userDto.getAuthType()) && StringUtils.isNotBlank(userDto.getEmail())) {

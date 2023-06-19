@@ -11,4 +11,8 @@ public class PasswordException extends GenericException {
     public PasswordException(UcErrorCodeEnum errorCode) {
         super(errorCode);
     }
+
+    public PasswordException(UcErrorCodeEnum errorCode, String message) {
+        super(errorCode, message);
+    }
 }
