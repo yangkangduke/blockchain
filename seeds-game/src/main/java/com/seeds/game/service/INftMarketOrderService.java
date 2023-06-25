@@ -38,4 +38,12 @@ public interface INftMarketOrderService extends IService<NftMarketOrderEntity> {
      */
     Map<Long, NftMarketOrderEntity> queryMapByAuctionIds(Collection<Long> auctionIds);
 
+    /**
+     * 查询用户交易记录
+     * @param fulfillTime 交易完成时间
+     * @param status 订单状态
+     * @return 交易记录
+     */
+    List<NftMarketOrderEntity> queryByGtFulfillTimeAndStatus(Long fulfillTime, Integer status);
+
 }

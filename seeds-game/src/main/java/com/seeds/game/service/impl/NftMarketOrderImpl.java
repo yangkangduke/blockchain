@@ -48,4 +48,11 @@ public class NftMarketOrderImpl extends ServiceImpl<NftMarketOrderMapper, NftMar
         }
         return list.stream().collect(Collectors.toMap(NftMarketOrderEntity::getAuctionId, p -> p));
     }
+
+    @Override
+    public List<NftMarketOrderEntity> queryByGtFulfillTimeAndStatus(Long fulfillTime, Integer status) {
+        return list(new LambdaQueryWrapper<NftMarketOrderEntity>()
+                .gt(fulfillTime != null, NftMarketOrderEntity::getFulfillTime, fulfillTime)
+                .eq(NftMarketOrderEntity::getStatus, status));
+    }
 }
