@@ -45,6 +45,7 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
     @Override
     public IPage<SysGameVideosResp> queryPage(SysGameVideosReq req) {
         LambdaQueryWrapper<SysGameVideosEntity> wrapper = new LambdaQueryWrapper<SysGameVideosEntity>()
+                .eq(SysGameVideosEntity::getIsDeleted,WhetherEnum.NO.value())
                 .like(StringUtils.isNotBlank(req.getTitle()), SysGameVideosEntity::getTitle, req.getTitle())
                 .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTagName, req.getTag());
 
@@ -115,6 +116,7 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
     @Override
     public List<SysGameVideosResp> getTopVideos() {
         LambdaQueryWrapper<SysGameVideosEntity> wrapper = new QueryWrapper<SysGameVideosEntity>().lambda()
+                .eq(SysGameVideosEntity::getIsDeleted,WhetherEnum.NO.value())
                 .eq(SysGameVideosEntity::getIsTop, WhetherEnum.YES.value());
         List<SysGameVideosEntity> list = list(wrapper);
         return list.stream().map(p -> {
@@ -126,6 +128,7 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
 
     private long getTopVideoNum() {
         LambdaQueryWrapper<SysGameVideosEntity> wrapper = new QueryWrapper<SysGameVideosEntity>().lambda()
+                .eq(SysGameVideosEntity::getIsDeleted,WhetherEnum.NO.value())
                 .eq(SysGameVideosEntity::getIsTop, WhetherEnum.YES.value());
         return count(wrapper);
     }
