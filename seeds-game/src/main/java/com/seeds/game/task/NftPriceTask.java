@@ -9,6 +9,7 @@ import com.seeds.game.service.INftPublicBackpackService;
 import com.seeds.game.service.INftReferencePriceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,9 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class NftPriceTask {
+
+    @Value("${game.nft.reference.price.times:5}")
+    private Integer averagePriceTimes;
 
     @Autowired
     private INftMarketOrderService nftMarketOrderService;
@@ -108,11 +112,14 @@ public class NftPriceTask {
                     nftPrice.setTotalPrice(totalPrice);
                     nftPrice.setCreateTime(endTime);
                     nftPrice.setUpdateTime(endTime);
+                    priceMap.put(itemId, nftPrice);
                 } else {
-                    nftPrice.setDealNum(nftPrice.getDealNum() + 1);
-                    nftPrice.setTotalPrice(nftPrice.getTotalPrice().add(totalPrice));
+                    if (nftPrice.getDealNum() < averagePriceTimes) {
+                        nftPrice.setDealNum(nftPrice.getDealNum() + 1);
+                        nftPrice.setTotalPrice(nftPrice.getTotalPrice().add(totalPrice));
+                        priceMap.put(itemId, nftPrice);
+                    }
                 }
-                priceMap.put(itemId, nftPrice);
             }
             Set<Long> itemIdSet = priceMap.keySet();
             Map<Long, NftReferencePrice> referencePriceMap = nftReferencePriceService.queryMapByIds(itemIdSet);
