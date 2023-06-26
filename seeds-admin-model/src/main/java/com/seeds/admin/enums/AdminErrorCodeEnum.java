@@ -90,7 +90,7 @@ public enum AdminErrorCodeEnum {
     ERR_80004_GAME_TYPE_PARENT_ITSELF(80004, "上级游戏类别不能为自身", "Parent game type cannot be for itself"),
     ERR_80005_SUB_GAME_TYPE_EXIST(80005, "存在下级游戏类别", "Subordinate game type exist"),
     ERR_80006_INVITE_CODE_NOT_EXIST(80006, "邀请码不存在", "Invite code not exist"),
-
+    ERR_80007_NUMBER_EXCEEDS_THE_TOP(80007, "超过置顶数量，请取消其它视频置顶后再尝试", "the number exceeds the top, please untop other videos and try again"),
 
     // block chain
 
