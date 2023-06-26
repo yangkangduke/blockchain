@@ -12,7 +12,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seeds.admin.enums.WhetherEnum;
 import com.seeds.common.constant.mq.KafkaTopic;
-import com.seeds.common.enums.CurrencyEnum;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.config.SeedsApiConfig;
 import com.seeds.game.dto.MetadataAttrDto;
@@ -86,10 +85,10 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
     private IUpdateBackpackErrorLogService updateBackpackErrorLogService;
 
     @Autowired
-    private NftMarketPlaceService marketPlaceService;
+    private KafkaProducer kafkaProducer;
 
     @Autowired
-    private KafkaProducer kafkaProducer;
+    private INftReferencePriceService nftReferencePriceService;
 
     @Autowired
     private IAsyncNotifyGameService asyncNotifyGameService;
@@ -383,13 +382,10 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
                 e.printStackTrace();
             }
             backpackEntity.setAttributes(equipment.getAttributes());
+            // 获取参考单价
+            BigDecimal unitPrice = nftReferencePriceService.queryLowGradeAveragePrice(backpackEntity.getItemId());
             // 设置参考价
-            try {
-                BigDecimal usdRate = marketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
-                backpackEntity.setProposedPrice(new BigDecimal(durability).divide(usdRate, 2, BigDecimal.ROUND_HALF_UP));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            backpackEntity.setProposedPrice(unitPrice.subtract(new BigDecimal(durability)));
             nftPublicBackpackService.save(backpackEntity);
             // 如果是合成，作为合成材料的nft标记为销毁的状态
             if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {

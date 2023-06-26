@@ -50,9 +50,19 @@ public class NftMarketOrderImpl extends ServiceImpl<NftMarketOrderMapper, NftMar
     }
 
     @Override
-    public List<NftMarketOrderEntity> queryByGtFulfillTimeAndStatus(Long fulfillTime, Integer status) {
+    public List<NftMarketOrderEntity> queryByTimeIntervalAndStatus(Long startTime, Long endTime, Integer status) {
         return list(new LambdaQueryWrapper<NftMarketOrderEntity>()
-                .gt(fulfillTime != null, NftMarketOrderEntity::getFulfillTime, fulfillTime)
+                .gt(NftMarketOrderEntity::getFulfillTime, startTime)
+                .le(NftMarketOrderEntity::getFulfillTime, endTime)
                 .eq(NftMarketOrderEntity::getStatus, status));
     }
+
+    @Override
+    public NftMarketOrderEntity queryByStatusEarliest(Integer status) {
+        return getOne(new LambdaQueryWrapper<NftMarketOrderEntity>()
+                .eq(NftMarketOrderEntity::getStatus, status)
+                .orderByDesc(NftMarketOrderEntity::getFulfillTime)
+                .last("limit 1"));
+    }
+
 }

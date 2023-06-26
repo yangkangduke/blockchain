@@ -6,6 +6,14 @@ import com.seeds.game.entity.NftReferencePrice;
 import com.seeds.game.mapper.NftReferencePriceMapper;
 import com.seeds.game.service.INftReferencePriceService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -24,5 +32,58 @@ public class NftReferencePriceServiceImpl extends ServiceImpl<NftReferencePriceM
         return getOne(new LambdaQueryWrapper<NftReferencePrice>()
                 .orderByDesc(NftReferencePrice::getUpdateTime)
                 .last(" limit 1"));
+    }
+
+    @Override
+    public List<NftReferencePrice> queryByTypeAndHighGradeNoAvg(Long typeId, Integer grade) {
+        return list(new LambdaQueryWrapper<NftReferencePrice>()
+                .eq(NftReferencePrice::getTypeId, typeId)
+                .gt(NftReferencePrice::getGrade, grade)
+                .isNull(NftReferencePrice::getAveragePrice));
+    }
+
+    @Override
+    public BigDecimal queryLowGradeAveragePrice(Long itemId) {
+        NftReferencePrice one = getById(itemId);
+        if (one != null) {
+            return one.getAveragePrice() == null ? one.getReferencePrice() : one.getAveragePrice();
+        }
+        Long typeId = Long.valueOf(itemId.toString().substring(0, 4));
+        Integer grade = Integer.valueOf(itemId.toString().substring(4, 6));
+        String number = itemId.toString().substring(6);
+        List<NftReferencePrice> list = list(new LambdaQueryWrapper<NftReferencePrice>()
+                .eq(NftReferencePrice::getTypeId, typeId)
+                .le(NftReferencePrice::getGrade, grade)
+                .isNotNull(NftReferencePrice::getAveragePrice)
+                .orderByDesc(NftReferencePrice::getGrade));
+        NftReferencePrice price = list.get(0);
+        for (NftReferencePrice referencePrice : list) {
+            if (!referencePrice.getGrade().equals(price.getGrade())) {
+                break;
+            }
+            if (price.getAveragePrice().compareTo(referencePrice.getAveragePrice()) > 0) {
+                price = referencePrice;
+            }
+        }
+        one = new NftReferencePrice();
+        long currentTimeMillis = System.currentTimeMillis();
+        one.setId(itemId);
+        one.setTypeId(typeId);
+        one.setGrade(grade);
+        one.setNumber(number);
+        one.setCreateTime(currentTimeMillis);
+        one.setUpdateTime(currentTimeMillis);
+        one.setReferencePrice(price.getAveragePrice());
+        save(one);
+        return price.getAveragePrice();
+    }
+
+    @Override
+    public Map<Long, NftReferencePrice> queryMapByIds(Collection<Long> ids) {
+        List<NftReferencePrice> list = listByIds(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.stream().collect(Collectors.toMap(NftReferencePrice::getId, p -> p));
     }
 }

@@ -109,6 +109,9 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Autowired
     private GameFileService gameFileService;
 
+    @Autowired
+    private INftReferencePriceService nftReferencePriceService;
+
     @Override
     public IPage<NftPublicBackpackResp> queryPage(NftPublicBackpackPageReq req) {
 
@@ -400,7 +403,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     @Override
     public List<NftPublicBackpackResp> queryList(NftPublicBackpackPageReq req) {
         List<NftPublicBackpackResp> respList = new ArrayList<>();
-        BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
         LambdaQueryWrapper<NftPublicBackpackEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(!Objects.isNull(req.getIsConfiguration()), NftPublicBackpackEntity::getIsConfiguration, req.getIsConfiguration())
                 .like(!Objects.isNull(req.getName()), NftPublicBackpackEntity::getName, req.getName())
@@ -412,7 +414,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             respList = list.stream().map(p -> {
                 NftPublicBackpackResp resp = new NftPublicBackpackResp();
                 BeanUtils.copyProperties(p, resp);
-                resp.setPrice((p.getProposedPrice().divide(usdRate, 2, BigDecimal.ROUND_HALF_UP).toString()));
+                resp.setPrice(p.getProposedPrice().toString());
                 return resp;
             }).filter(i -> {
                 if (!i.getType().equals(NFTEnumConstant.NftTypeEnum.HERO.getCode())) {
@@ -566,16 +568,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                     this.callGameTakeback(backpackNft);
                 }
                 // 更新背包状态
-                int durability = 0;
-                try {
-                    JSONObject attrObject = JSONObject.parseObject(backpackNft.getAttributes());
-                    durability = (int) attrObject.get("durability");
-                    // 设置参考价
-                    BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
-                    backpackNft.setProposedPrice(new BigDecimal(durability).divide(usdRate, 2, BigDecimal.ROUND_HALF_UP));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                JSONObject attrObject = JSONObject.parseObject(backpackNft.getAttributes());
+                int durability = (int) attrObject.get("durability");
+                // 获取参考单价
+                BigDecimal unitPrice = nftReferencePriceService.queryLowGradeAveragePrice(backpackNft.getItemId());
+                // 设置参考价
+                backpackNft.setProposedPrice(unitPrice.subtract(new BigDecimal(durability)));
                 backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
                 backpackNft.setServerRoleId(0L);
                 backpackNft.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
@@ -724,8 +722,6 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             log.info("rpc all seeds-admin ,queryGameApi error {}", e.getMessage());
         }
 
-        BigDecimal usdRate = nftMarketPlaceService.usdRate(CurrencyEnum.SOL.getCode());
-
         String distributeUrl = "http://" + serverRegion.getInnerHost() + dto.getData();
 
         NftDistributeReq distributeReq = new NftDistributeReq();
@@ -739,7 +735,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         distributeReq.setTokenAddress(nftItem.getTokenAddress());
         distributeReq.setServerName(serverRegion.getGameServerName());
         distributeReq.setRegionName(serverRegion.getRegionName());
-        distributeReq.setPrice((nftItem.getProposedPrice().divide(usdRate, 2, BigDecimal.ROUND_HALF_UP).toString()));
+        distributeReq.setPrice((nftItem.getProposedPrice().toString()));
 
         String params = JSONUtil.toJsonStr(distributeReq);
 
@@ -870,6 +866,12 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
         } else {
             nftAttributeEntity.setDurability(attributesDto.getDurability());
             nftAttributeEntity.setRarityAttr(attributesDto.getRarityAttr());
+
+            // 获取参考单价
+            BigDecimal unitPrice = nftReferencePriceService.queryLowGradeAveragePrice(backpackEntity.getItemId());
+            // 设置参考价
+            backpackEntity.setProposedPrice(unitPrice.subtract(new BigDecimal(nftAttributeEntity.getDurability())));
+            updateById(backpackEntity);
         }
         NftAttributeEntity one = attributeService.getOne(new LambdaUpdateWrapper<NftAttributeEntity>().eq(NftAttributeEntity::getEqNftId, backpackEntity.getEqNftId()));
         if (null == one) {
@@ -1043,6 +1045,14 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
+    public List<NftPublicBackpackEntity> queryByMintAddress(Collection<String> mintAddresses) {
+        if (CollectionUtils.isEmpty(mintAddresses)) {
+            return Collections.emptyList();
+        }
+        return list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getTokenAddress, mintAddresses));
+    }
+
+    @Override
     public String getTokenAddress(String mintAddress, String ownerAddress) {
         String tokenAddress = "";
         String params = String.format("mintAddress=%s&ownerAddress=%s", mintAddress, ownerAddress);
@@ -1063,5 +1073,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             log.error("获取tokenAddress返回，message：{}", e.getMessage());
         }
         return tokenAddress;
+    }
+
+    @Override
+    public List<NftPublicBackpackEntity> queryByItemIds(Collection<Long> itemIds) {
+        if (CollectionUtils.isEmpty(itemIds)) {
+            return Collections.emptyList();
+        }
+        return list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getItemId, itemIds));
     }
 }

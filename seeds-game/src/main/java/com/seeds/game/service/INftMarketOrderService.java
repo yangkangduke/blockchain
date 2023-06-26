@@ -40,10 +40,18 @@ public interface INftMarketOrderService extends IService<NftMarketOrderEntity> {
 
     /**
      * 查询用户交易记录
-     * @param fulfillTime 交易完成时间
+     * @param startTime 开始时间
+     * @param endTime 结束时间
      * @param status 订单状态
      * @return 交易记录
      */
-    List<NftMarketOrderEntity> queryByGtFulfillTimeAndStatus(Long fulfillTime, Integer status);
+    List<NftMarketOrderEntity> queryByTimeIntervalAndStatus(Long startTime, Long endTime, Integer status);
+
+    /**
+     * 查询最早的交易记录
+     * @param status 订单状态
+     * @return 最早的交易记录
+     */
+    NftMarketOrderEntity queryByStatusEarliest(Integer status);
 
 }

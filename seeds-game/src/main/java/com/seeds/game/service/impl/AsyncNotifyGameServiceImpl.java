@@ -27,8 +27,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -65,6 +63,9 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
 
     @Autowired
     private NftMarketPlaceService marketPlaceService;
+
+    @Autowired
+    private INftReferencePriceService nftReferencePriceService;
 
     @Async
     @Override
@@ -112,6 +113,7 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
 
         //   插入公共背包（作为合成材料的nft标记为被消耗）、插入属性表、更新event事件状态、通知游戏
         if (Objects.nonNull(data)) {
+            long currentTimeMillis = System.currentTimeMillis();
             NftPublicBackpackEntity backpackEntity = new NftPublicBackpackEntity();
             backpackEntity.setEqNftId(data.getId());
             backpackEntity.setName(nftEvent.getName());
@@ -122,8 +124,8 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
             backpackEntity.setTokenAddress(data.getMintAddress());
             backpackEntity.setCreatedBy(nftEvent.getUserId());
             backpackEntity.setUpdatedBy(nftEvent.getUserId());
-            backpackEntity.setCreatedAt(System.currentTimeMillis());
-            backpackEntity.setUpdatedAt(System.currentTimeMillis());
+            backpackEntity.setCreatedAt(currentTimeMillis);
+            backpackEntity.setUpdatedAt(currentTimeMillis);
             if (mintSuccessReq.getAutoDeposite().equals(WhetherEnum.YES.value())) {
                 // 自动托管
                 backpackEntity.setServerRoleId(nftEvent.getServerRoleId());
@@ -152,8 +154,10 @@ public class AsyncNotifyGameServiceImpl implements IAsyncNotifyGameService {
                 e.printStackTrace();
             }
             backpackEntity.setAttributes(equipment.getAttributes());
-            // 设置参考价，TODO  根据规则来设置  先设置成固定值
-            backpackEntity.setProposedPrice(new BigDecimal(durability));
+            // 获取参考单价
+            BigDecimal unitPrice = nftReferencePriceService.queryLowGradeAveragePrice(backpackEntity.getItemId());
+            // 设置参考价
+            backpackEntity.setProposedPrice(unitPrice.subtract(new BigDecimal(durability)));
             nftPublicBackpackService.save(backpackEntity);
 
             // 如果是合成，作为合成材料的nft标记为销毁的状态
