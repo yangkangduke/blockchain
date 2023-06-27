@@ -18,7 +18,7 @@ public class SysGameVideosReq extends PageReq {
     @ApiModelProperty(value = "视频标题")
     private String title;
 
-    @ApiModelProperty(value = "视频标签")
+    @ApiModelProperty(value = "视频标签  1,Assassin 2,Tank 3,Archer 4,Warrior 5,Support")
     private String tag;
 
     @ApiModelProperty(value = "是否上架")

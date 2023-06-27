@@ -49,7 +49,7 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
                 .eq(Objects.nonNull(req.getOnShelves()), SysGameVideosEntity::getOnShelves, req.getOnShelves())
                 .eq(Objects.nonNull(req.getIsTop()), SysGameVideosEntity::getIsTop, req.getIsTop())
                 .like(StringUtils.isNotBlank(req.getTitle()), SysGameVideosEntity::getTitle, req.getTitle())
-                .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTagName, req.getTag())
+                .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTag, req.getTag())
                 .orderByDesc(SysGameVideosEntity::getUpdatedAt);
 
         Page<SysGameVideosEntity> page = new Page<>(req.getCurrent(), req.getSize());
