@@ -52,7 +52,7 @@ public class SysGameVideosResp implements Serializable {
     private Integer isTop;
 
     @ApiModelProperty("是否删除 1 是 0 否")
-    private Integer isDeleted;
+    private Integer onShelves;
 
     @ApiModelProperty("创建时间")
     private Long createdAt;
