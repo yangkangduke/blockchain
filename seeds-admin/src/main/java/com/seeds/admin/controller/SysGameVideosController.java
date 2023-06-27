@@ -1,7 +1,6 @@
 package com.seeds.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.seeds.admin.dto.request.ListReq;
 import com.seeds.admin.dto.request.SysGameVideoAddOrModifyReq;
 import com.seeds.admin.dto.request.SysGameVideosReq;
 import com.seeds.admin.dto.response.SysGameVideosResp;
@@ -39,7 +38,7 @@ public class SysGameVideosController {
 
     @PostMapping("add")
     @ApiOperation("添加")
-    public GenericDto<Object> add(@Validated @RequestBody SysGameVideoAddOrModifyReq req) {
+    public GenericDto<Object> add(@RequestBody SysGameVideoAddOrModifyReq req) {
         gameVideosService.add(req);
         return GenericDto.success(null);
     }
@@ -52,15 +51,22 @@ public class SysGameVideosController {
 
     @PutMapping("modify")
     @ApiOperation("编辑")
-    public GenericDto<Object> modify(@Valid @RequestBody SysGameVideoAddOrModifyReq req) {
+    public GenericDto<Object> modify(@RequestBody SysGameVideoAddOrModifyReq req) {
         gameVideosService.modify(req);
         return GenericDto.success(null);
     }
 
-    @DeleteMapping("delete")
-    @ApiOperation("删除")
-    public GenericDto<Object> delete(@Valid @RequestBody ListReq req) {
-        gameVideosService.delete(req);
+    @DeleteMapping("onShelves")
+    @ApiOperation("上下架")
+    public GenericDto<Object> onShelves(@RequestBody SysGameVideoAddOrModifyReq req) {
+        gameVideosService.onShelves(req);
+        return GenericDto.success(null);
+    }
+
+    @DeleteMapping("top")
+    @ApiOperation("置顶/取消置顶")
+    public GenericDto<Object> top(@RequestBody SysGameVideoAddOrModifyReq req) {
+        gameVideosService.top(req);
         return GenericDto.success(null);
     }
 

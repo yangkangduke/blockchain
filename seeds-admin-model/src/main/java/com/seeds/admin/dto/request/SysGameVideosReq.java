@@ -20,4 +20,11 @@ public class SysGameVideosReq extends PageReq {
 
     @ApiModelProperty(value = "视频标签")
     private String tag;
+
+    @ApiModelProperty(value = "是否上架")
+    private Integer onShelves;
+
+    @ApiModelProperty(value = "是否置顶")
+    private Integer isTop;
+
 }
