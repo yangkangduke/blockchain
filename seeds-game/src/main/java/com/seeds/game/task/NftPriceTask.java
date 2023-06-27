@@ -92,13 +92,17 @@ public class NftPriceTask {
             for (NftPublicBackpackEntity backpack : backpacks) {
                 List<NftMarketOrderEntity> orderList = orderMap.get(backpack.getTokenAddress());
                 BigDecimal totalPrice = BigDecimal.ZERO;
+                JSONObject attrObject = JSONObject.parseObject(backpack.getAttributes());
+                int durability = (int) attrObject.get("durability");
                 for (NftMarketOrderEntity order : orderList) {
                     NftAuctionHouseSetting auction = auctionMap.get(order.getAuctionId());
+                    BigDecimal unitPrice;
                     if (auction != null) {
-                        totalPrice = totalPrice.add(auction.getEndPrice());
+                        unitPrice = auction.getEndPrice().divide(new BigDecimal(durability), 4, RoundingMode.HALF_UP);
                     } else {
-                        totalPrice = totalPrice.add(order.getPrice());
+                        unitPrice = order.getPrice().divide(new BigDecimal(durability), 4, RoundingMode.HALF_UP);
                     }
+                    totalPrice = totalPrice.add(unitPrice);
                 }
                 Long itemId = backpack.getItemId();
                 NftReferencePrice nftPrice = priceMap.get(itemId);

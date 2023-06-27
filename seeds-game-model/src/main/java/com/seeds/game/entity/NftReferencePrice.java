@@ -31,7 +31,7 @@ public class NftReferencePrice implements Serializable {
     @ApiModelProperty("游戏道具类型id")
     private Long typeId;
 
-    @ApiModelProperty("登记")
+    @ApiModelProperty("等级")
     private Integer grade;
 
     @ApiModelProperty("编号")
