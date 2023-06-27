@@ -27,11 +27,10 @@ public interface INftReferencePriceService extends IService<NftReferencePrice> {
 
     /**
      * 通过类型和编号查询高等级的记录
-     * @param typeId 类型
-     * @param grade 等级
+     * @param itemId 道具id
      * @return 高等级的记录
      */
-    List<NftReferencePrice> queryByTypeAndHighGradeNoAvg(Long typeId, Integer grade);
+    List<NftReferencePrice> queryByTypeAndHighGradeNoAvg(Long itemId);
 
     /**
      * 通过类型和编号查询低等级的记录

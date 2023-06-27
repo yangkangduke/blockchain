@@ -88,47 +88,15 @@ public class NftPriceTask {
             }
             List<NftPublicBackpackEntity> backpacks = nftPublicBackpackService.queryByMintAddress(mintAddresses);
             Map<Long, NftAuctionHouseSetting> auctionMap = nftAuctionHouseSettingService.queryMapByIds(auctionIds);
-            Map<Long, NftReferencePrice> priceMap = new HashMap<>(backpacks.size());
-            for (NftPublicBackpackEntity backpack : backpacks) {
-                List<NftMarketOrderEntity> orderList = orderMap.get(backpack.getTokenAddress());
-                BigDecimal totalPrice = BigDecimal.ZERO;
-                JSONObject attrObject = JSONObject.parseObject(backpack.getAttributes());
-                int durability = (int) attrObject.get("durability");
-                for (NftMarketOrderEntity order : orderList) {
-                    NftAuctionHouseSetting auction = auctionMap.get(order.getAuctionId());
-                    BigDecimal unitPrice;
-                    if (auction != null) {
-                        unitPrice = auction.getEndPrice().divide(new BigDecimal(durability), 4, RoundingMode.HALF_UP);
-                    } else {
-                        unitPrice = order.getPrice().divide(new BigDecimal(durability), 4, RoundingMode.HALF_UP);
-                    }
-                    totalPrice = totalPrice.add(unitPrice);
-                }
-                Long itemId = backpack.getItemId();
-                NftReferencePrice nftPrice = priceMap.get(itemId);
-                if (nftPrice == null) {
-                    nftPrice = new NftReferencePrice();
-                    nftPrice.setId(itemId);
-                    nftPrice.setTypeId(Long.valueOf(itemId.toString().substring(0, 4)));
-                    nftPrice.setGrade(Integer.valueOf(itemId.toString().substring(4, 6)));
-                    nftPrice.setNumber(itemId.toString().substring(6));
-                    nftPrice.setDealNum(1);
-                    nftPrice.setTotalPrice(totalPrice);
-                    nftPrice.setCreateTime(endTime);
-                    nftPrice.setUpdateTime(endTime);
-                    priceMap.put(itemId, nftPrice);
-                } else {
-                    if (nftPrice.getDealNum() < averagePriceTimes) {
-                        nftPrice.setDealNum(nftPrice.getDealNum() + 1);
-                        nftPrice.setTotalPrice(nftPrice.getTotalPrice().add(totalPrice));
-                        priceMap.put(itemId, nftPrice);
-                    }
-                }
-            }
+            // 计算总单价
+            Map<Long, NftReferencePrice> priceMap = calculateTotalPrice(backpacks, orderMap, auctionMap, endTime);
             Set<Long> itemIdSet = priceMap.keySet();
             Map<Long, NftReferencePrice> referencePriceMap = nftReferencePriceService.queryMapByIds(itemIdSet);
             Map<Long, BigDecimal> packPriceMap = new HashMap<>(itemIdSet.size());
-            for (Long key : itemIdSet) {
+            // 从低等级往高等级更新
+            List<Long> itemIds = new ArrayList<>(itemIdSet);
+            itemIds = itemIds.stream().sorted(Comparator.comparing(p -> Integer.valueOf(p.toString().substring(4, 6)))).collect(Collectors.toList());
+            for (Long key : itemIds) {
                 NftReferencePrice nftReferencePrice = priceMap.get(key);
                 BigDecimal averagePrice = nftReferencePrice.getTotalPrice()
                         .divide(new BigDecimal(nftReferencePrice.getDealNum()), 4, RoundingMode.HALF_UP);
@@ -139,13 +107,57 @@ public class NftPriceTask {
                 } else {
                     nftReferencePriceService.updateById(nftReferencePrice);
                 }
+                packPriceMap.put(key, averagePrice);
                 // 关联更新高等级的参考单价
                 updateHighGradeReferencePrice(nftReferencePrice, averagePrice, packPriceMap);
-                packPriceMap.put(key, averagePrice);
             }
             // 关联更新背包中的参考价格数据
             updateProposedPrice(packPriceMap);
         }
+    }
+
+    private Map<Long, NftReferencePrice> calculateTotalPrice(List<NftPublicBackpackEntity> backpacks, Map<String, List<NftMarketOrderEntity>> orderMap, Map<Long, NftAuctionHouseSetting> auctionMap, Long endTime) {
+        Map<Long, NftReferencePrice> priceMap = new HashMap<>(backpacks.size());
+        for (NftPublicBackpackEntity backpack : backpacks) {
+            List<NftMarketOrderEntity> orderList = orderMap.get(backpack.getTokenAddress());
+            JSONObject attrObject = JSONObject.parseObject(backpack.getAttributes());
+            int durability = (int) attrObject.get("durability");
+            BigDecimal totalPrice = BigDecimal.ZERO;
+            if (CollectionUtils.isEmpty(orderList)) {
+                continue;
+            }
+            for (NftMarketOrderEntity order : orderList) {
+                NftAuctionHouseSetting auction = auctionMap.get(order.getAuctionId());
+                BigDecimal unitPrice;
+                if (auction != null) {
+                    unitPrice = auction.getEndPrice().divide(new BigDecimal(durability), 4, RoundingMode.HALF_UP);
+                } else {
+                    unitPrice = order.getPrice().divide(new BigDecimal(durability), 4, RoundingMode.HALF_UP);
+                }
+                totalPrice = totalPrice.add(unitPrice);
+            }
+            Long itemId = backpack.getItemId();
+            NftReferencePrice nftPrice = priceMap.get(itemId);
+            if (nftPrice == null) {
+                nftPrice = new NftReferencePrice();
+                nftPrice.setId(itemId);
+                nftPrice.setTypeId(Long.valueOf(itemId.toString().substring(0, 4)));
+                nftPrice.setGrade(Integer.valueOf(itemId.toString().substring(4, 6)));
+                nftPrice.setNumber(itemId.toString().substring(6));
+                nftPrice.setDealNum(1);
+                nftPrice.setTotalPrice(totalPrice);
+                nftPrice.setCreateTime(endTime);
+                nftPrice.setUpdateTime(endTime);
+                priceMap.put(itemId, nftPrice);
+            } else {
+                if (nftPrice.getDealNum() < averagePriceTimes) {
+                    nftPrice.setDealNum(nftPrice.getDealNum() + 1);
+                    nftPrice.setTotalPrice(nftPrice.getTotalPrice().add(totalPrice));
+                    priceMap.put(itemId, nftPrice);
+                }
+            }
+        }
+        return priceMap;
     }
 
     private void initReferencePrice() {
@@ -192,15 +204,13 @@ public class NftPriceTask {
 
     private void updateHighGradeReferencePrice(NftReferencePrice nftReferencePrice, BigDecimal averagePrice, Map<Long, BigDecimal> packPriceMap) {
         Integer grade = nftReferencePrice.getGrade();
-        List<NftReferencePrice> highGrades = nftReferencePriceService.queryByTypeAndHighGradeNoAvg(nftReferencePrice.getTypeId(), grade);
+        List<NftReferencePrice> highGrades = nftReferencePriceService.queryByTypeAndHighGradeNoAvg(nftReferencePrice.getId());
         if (!CollectionUtils.isEmpty(highGrades)) {
             for (NftReferencePrice highGrade : highGrades) {
                 BigDecimal referencePrice = new BigDecimal((highGrade.getGrade() - grade)).subtract(averagePrice);
-                if (referencePrice.compareTo(highGrade.getReferencePrice()) < 0) {
-                    highGrade.setReferencePrice(referencePrice);
-                    nftReferencePriceService.updateById(highGrade);
-                    packPriceMap.put(highGrade.getId(), referencePrice);
-                }
+                highGrade.setReferencePrice(referencePrice);
+                nftReferencePriceService.updateById(highGrade);
+                packPriceMap.put(highGrade.getId(), referencePrice);
             }
         }
     }

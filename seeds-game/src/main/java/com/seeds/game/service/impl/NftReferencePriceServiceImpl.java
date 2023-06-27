@@ -35,10 +35,14 @@ public class NftReferencePriceServiceImpl extends ServiceImpl<NftReferencePriceM
     }
 
     @Override
-    public List<NftReferencePrice> queryByTypeAndHighGradeNoAvg(Long typeId, Integer grade) {
+    public List<NftReferencePrice> queryByTypeAndHighGradeNoAvg(Long itemId) {
+        Long typeId = Long.valueOf(itemId.toString().substring(0, 4));
+        Integer grade = Integer.valueOf(itemId.toString().substring(4, 6));
+        String number = itemId.toString().substring(6);
         return list(new LambdaQueryWrapper<NftReferencePrice>()
                 .eq(NftReferencePrice::getTypeId, typeId)
-                .gt(NftReferencePrice::getGrade, grade)
+                .ge(NftReferencePrice::getGrade, grade)
+                .ne(NftReferencePrice::getNumber, number)
                 .isNull(NftReferencePrice::getAveragePrice));
     }
 
