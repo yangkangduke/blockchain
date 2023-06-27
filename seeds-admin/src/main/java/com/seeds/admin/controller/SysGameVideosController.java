@@ -56,14 +56,14 @@ public class SysGameVideosController {
         return GenericDto.success(null);
     }
 
-    @DeleteMapping("onShelves")
+    @PutMapping("onShelves")
     @ApiOperation("上下架")
     public GenericDto<Object> onShelves(@RequestBody SysGameVideoAddOrModifyReq req) {
         gameVideosService.onShelves(req);
         return GenericDto.success(null);
     }
 
-    @DeleteMapping("top")
+    @PutMapping("top")
     @ApiOperation("置顶/取消置顶")
     public GenericDto<Object> top(@RequestBody SysGameVideoAddOrModifyReq req) {
         gameVideosService.top(req);
