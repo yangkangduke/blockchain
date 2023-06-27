@@ -20,6 +20,8 @@ import java.util.List;
  */
 public interface ISysGameVideosService extends IService<SysGameVideosEntity> {
 
+    IPage<SysGameVideosResp> queryPageForUc(SysGameVideosReq req);
+
     IPage<SysGameVideosResp> queryPage(SysGameVideosReq req);
 
     void add(SysGameVideoAddOrModifyReq req);
