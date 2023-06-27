@@ -45,6 +45,9 @@ public class SysGameVideosResp implements Serializable {
     @ApiModelProperty("视频标签名称")
     private String videoTagName;
 
+    @ApiModelProperty("视频标签")
+    private String videoTag;
+
     @ApiModelProperty("是否置顶：1是 0 否")
     private Integer isTop;
 
