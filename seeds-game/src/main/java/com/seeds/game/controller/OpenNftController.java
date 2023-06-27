@@ -9,16 +9,21 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.TargetSource;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.*;
+import com.seeds.game.dto.response.NftReferencePriceResp;
+import com.seeds.game.entity.NftReferencePrice;
+import com.seeds.game.service.INftReferencePriceService;
 import com.seeds.game.service.UcUserService;
 import com.seeds.uc.exceptions.GenericException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,6 +39,9 @@ public class OpenNftController {
 
     @Autowired
     private RemoteAccountTradeService remoteAccountTradeService;
+
+    @Autowired
+    private INftReferencePriceService nftReferencePriceService;
 
     @Autowired
     private RemoteNftService adminRemoteNftService;
@@ -189,6 +197,42 @@ public class OpenNftController {
                                               @RequestParam String signature,
                                               @RequestParam Long timestamp) {
         return GenericDto.success(ucUserService.userTradeTimes(UserContext.getCurrentUserId()));
+    }
+
+    @GetMapping("get-unit-price")
+    @ApiOperation("根据itemId查询参考单价")
+    public GenericDto<NftReferencePriceResp> getUnitPrice(@RequestParam String accessKey,
+                                                          @RequestParam String signature,
+                                                          @RequestParam Long timestamp,
+                                                          @RequestParam Long itemId) {
+        NftReferencePriceResp resp = new NftReferencePriceResp();
+        NftReferencePrice referencePrice = nftReferencePriceService.getById(itemId);
+        if (referencePrice == null) {
+            return GenericDto.success(resp);
+        }
+        resp.setUnitPrice(referencePrice.getAveragePrice() == null ? referencePrice.getReferencePrice() : referencePrice.getAveragePrice());
+        resp.setId(referencePrice.getId());
+        resp.setUpdateTime(referencePrice.getUpdateTime());
+        return GenericDto.success(resp);
+    }
+
+    @GetMapping("unit-price-list")
+    @ApiOperation("用户交易次数")
+    public GenericDto<List<NftReferencePriceResp>> unitPriceList(@RequestParam String accessKey,
+                                              @RequestParam String signature,
+                                              @RequestParam Long timestamp) {
+        List<NftReferencePriceResp> respList = new ArrayList<>();
+        List<NftReferencePrice> list = nftReferencePriceService.list();
+        if (CollectionUtils.isEmpty(list)) {
+            return GenericDto.success(respList);
+        }
+        list.forEach(p -> {
+            NftReferencePriceResp resp = new NftReferencePriceResp();
+            resp.setUnitPrice(p.getAveragePrice() == null ? p.getReferencePrice() : p.getAveragePrice());
+            resp.setId(p.getId());
+            resp.setUpdateTime(p.getUpdateTime());
+        });
+        return GenericDto.success(respList);
     }
 
     private AccountOperateReq nftDeductGasFee(BigDecimal amount, String currency) {
