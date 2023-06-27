@@ -35,7 +35,7 @@ public class InterSysGameVideosController {
     @ApiOperation("分页")
     @Inner
     public GenericDto<IPage<SysGameVideosResp>> queryPage(@RequestBody SysGameVideosReq req) {
-        return GenericDto.success(gameVideosService.queryPage(req));
+        return GenericDto.success(gameVideosService.queryPageForUc(req));
     }
 
     @PostMapping("top-videos")

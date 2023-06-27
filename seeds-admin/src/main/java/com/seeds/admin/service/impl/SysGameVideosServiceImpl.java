@@ -44,13 +44,32 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
     private ISysGameVideosTagsService videosTagsService;
 
     @Override
+    public IPage<SysGameVideosResp> queryPageForUc(SysGameVideosReq req) {
+        LambdaQueryWrapper<SysGameVideosEntity> wrapper = new LambdaQueryWrapper<SysGameVideosEntity>()
+                .eq(SysGameVideosEntity::getOnShelves, WhetherEnum.YES.value())
+                .eq(SysGameVideosEntity::getIsTop, WhetherEnum.NO.value())
+                .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTag, req.getTag())
+                .orderByDesc(SysGameVideosEntity::getUpdatedAt);
+
+        Page<SysGameVideosEntity> page = new Page<>(req.getCurrent(), req.getSize());
+        List<SysGameVideosEntity> records = page(page, wrapper).getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            return page.convert(p -> null);
+        }
+        return page.convert(p -> {
+            SysGameVideosResp resp = new SysGameVideosResp();
+            BeanUtils.copyProperties(p, resp);
+            return resp;
+        });
+    }
+
+    @Override
     public IPage<SysGameVideosResp> queryPage(SysGameVideosReq req) {
         LambdaQueryWrapper<SysGameVideosEntity> wrapper = new LambdaQueryWrapper<SysGameVideosEntity>()
                 .eq(Objects.nonNull(req.getOnShelves()), SysGameVideosEntity::getOnShelves, req.getOnShelves())
                 .eq(Objects.nonNull(req.getIsTop()), SysGameVideosEntity::getIsTop, req.getIsTop())
                 .like(StringUtils.isNotBlank(req.getTitle()), SysGameVideosEntity::getTitle, req.getTitle())
-                .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTag, req.getTag())
-                .orderByDesc(SysGameVideosEntity::getUpdatedAt);
+                .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTag, req.getTag());
 
         Page<SysGameVideosEntity> page = new Page<>(req.getCurrent(), req.getSize());
         List<SysGameVideosEntity> records = page(page, wrapper).getRecords();
