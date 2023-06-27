@@ -573,7 +573,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
                 // 获取参考单价
                 BigDecimal unitPrice = nftReferencePriceService.queryLowGradeAveragePrice(backpackNft.getItemId());
                 // 设置参考价
-                backpackNft.setProposedPrice(unitPrice.subtract(new BigDecimal(durability)));
+                backpackNft.setProposedPrice(unitPrice.multiply(new BigDecimal(durability)));
                 backpackNft.setIsConfiguration(NftConfigurationEnum.UNASSIGNED.getCode());
                 backpackNft.setServerRoleId(0L);
                 backpackNft.setState(NFTEnumConstant.NFTStateEnum.UNDEPOSITED.getCode());
@@ -870,7 +870,7 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             // 获取参考单价
             BigDecimal unitPrice = nftReferencePriceService.queryLowGradeAveragePrice(backpackEntity.getItemId());
             // 设置参考价
-            backpackEntity.setProposedPrice(unitPrice.subtract(new BigDecimal(nftAttributeEntity.getDurability())));
+            backpackEntity.setProposedPrice(unitPrice.multiply(new BigDecimal(nftAttributeEntity.getDurability())));
             updateById(backpackEntity);
         }
         NftAttributeEntity one = attributeService.getOne(new LambdaUpdateWrapper<NftAttributeEntity>().eq(NftAttributeEntity::getEqNftId, backpackEntity.getEqNftId()));
@@ -1045,11 +1045,13 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
     }
 
     @Override
-    public List<NftPublicBackpackEntity> queryByMintAddress(Collection<String> mintAddresses) {
+    public List<NftPublicBackpackEntity> queryItemsByMintAddress(Collection<String> mintAddresses) {
         if (CollectionUtils.isEmpty(mintAddresses)) {
             return Collections.emptyList();
         }
-        return list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getTokenAddress, mintAddresses));
+        return list(new LambdaQueryWrapper<NftPublicBackpackEntity>()
+                .in(NftPublicBackpackEntity::getTokenAddress, mintAddresses)
+                .in(NftPublicBackpackEntity::getType, 1, 2));
     }
 
     @Override

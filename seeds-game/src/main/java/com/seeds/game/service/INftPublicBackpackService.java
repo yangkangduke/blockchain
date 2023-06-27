@@ -138,7 +138,7 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
      * @param mintAddresses NFT地址集合
      * @return 背包数据
      */
-    List<NftPublicBackpackEntity> queryByMintAddress(Collection<String> mintAddresses);
+    List<NftPublicBackpackEntity> queryItemsByMintAddress(Collection<String> mintAddresses);
 
     String getTokenAddress(String mintAddress, String ownerAddress);
 

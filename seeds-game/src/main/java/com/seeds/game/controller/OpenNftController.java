@@ -217,7 +217,7 @@ public class OpenNftController {
     }
 
     @GetMapping("unit-price-list")
-    @ApiOperation("用户交易次数")
+    @ApiOperation("查询参考单价列表")
     public GenericDto<List<NftReferencePriceResp>> unitPriceList(@RequestParam String accessKey,
                                               @RequestParam String signature,
                                               @RequestParam Long timestamp) {
