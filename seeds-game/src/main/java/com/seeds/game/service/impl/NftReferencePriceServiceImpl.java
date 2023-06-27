@@ -84,6 +84,9 @@ public class NftReferencePriceServiceImpl extends ServiceImpl<NftReferencePriceM
 
     @Override
     public Map<Long, NftReferencePrice> queryMapByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
         List<NftReferencePrice> list = listByIds(ids);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyMap();

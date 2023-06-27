@@ -1,6 +1,7 @@
 package com.seeds.game.task;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seeds.game.entity.*;
 import com.seeds.game.enums.NftOrderStatusEnum;
 import com.seeds.game.service.INftAuctionHouseSettingService;
@@ -56,7 +57,7 @@ public class NftPriceTask {
         Long startTime = referencePrice.getUpdateTime();
         if (startTime == 0) {
             // 初始化历史数据参考单价
-            initReferencePrice();
+            startTime = initReferencePrice();
         }
         long endTime = startTime + 24 * 60 * 60 * 1000;
         // 每24h算一次参考价格
@@ -86,7 +87,10 @@ public class NftPriceTask {
                 list.add(order);
                 orderMap.put(order.getMintAddress(), list);
             }
-            List<NftPublicBackpackEntity> backpacks = nftPublicBackpackService.queryByMintAddress(mintAddresses);
+            List<NftPublicBackpackEntity> backpacks = nftPublicBackpackService.queryItemsByMintAddress(mintAddresses);
+            if (CollectionUtils.isEmpty(backpacks)) {
+                return;
+            }
             Map<Long, NftAuctionHouseSetting> auctionMap = nftAuctionHouseSettingService.queryMapByIds(auctionIds);
             // 计算总单价
             Map<Long, NftReferencePrice> priceMap = calculateTotalPrice(backpacks, orderMap, auctionMap, endTime);
@@ -160,36 +164,44 @@ public class NftPriceTask {
         return priceMap;
     }
 
-    private void initReferencePrice() {
+    private long initReferencePrice() {
         List<NftReferencePrice> list = nftReferencePriceService.list();
         Map<Long, NftReferencePrice> map = list.stream().collect(Collectors.toMap(NftReferencePrice::getTypeId, p -> p));
-        List<NftPublicBackpackEntity> backpacks = nftPublicBackpackService.list();
+        List<NftPublicBackpackEntity> backpacks = nftPublicBackpackService
+                .list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getType, 1, 2));
         NftMarketOrderEntity order = nftMarketOrderService.queryByStatusEarliest(NftOrderStatusEnum.COMPLETED.getCode());
         long fulfillTime = order == null ? System.currentTimeMillis() : order.getFulfillTime();
         LocalDate localDate = new Date(fulfillTime).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         long initTime = LocalDateTime.of(localDate, LocalTime.MIDNIGHT).toInstant(ZoneOffset.UTC).toEpochMilli();
+        Map<Long, BigDecimal> itemIdMap = new HashMap<>(backpacks.size());
         if (!CollectionUtils.isEmpty(backpacks)) {
             for (NftPublicBackpackEntity backpack : backpacks) {
                 Long itemId = backpack.getItemId();
                 Long typeId = Long.valueOf(itemId.toString().substring(0, 4));
                 Integer grade = Integer.valueOf(itemId.toString().substring(4, 6));
                 NftReferencePrice referencePrice = map.get(typeId);
-                BigDecimal unitPrice = new BigDecimal((grade - referencePrice.getGrade())).subtract(referencePrice.getAveragePrice());
-                NftReferencePrice reference = new NftReferencePrice();
-                reference.setId(itemId);
-                reference.setTypeId(typeId);
-                reference.setGrade(grade);
-                reference.setNumber(itemId.toString().substring(6));
-                reference.setCreateTime(initTime);
-                reference.setUpdateTime(initTime);
-                reference.setReferencePrice(unitPrice);
-                nftReferencePriceService.save(reference);
+                int difference = grade - referencePrice.getGrade() == 0 ? 1 : grade - referencePrice.getGrade();
+                BigDecimal unitPrice = new BigDecimal(difference).multiply(referencePrice.getAveragePrice());
+                BigDecimal price = itemIdMap.get(itemId);
+                if (price == null) {
+                    NftReferencePrice reference = new NftReferencePrice();
+                    reference.setId(itemId);
+                    reference.setTypeId(typeId);
+                    reference.setGrade(grade);
+                    reference.setNumber(itemId.toString().substring(6));
+                    reference.setCreateTime(initTime);
+                    reference.setUpdateTime(initTime);
+                    reference.setReferencePrice(unitPrice);
+                    nftReferencePriceService.save(reference);
+                    itemIdMap.put(itemId, unitPrice);
+                }
                 JSONObject attrObject = JSONObject.parseObject(backpack.getAttributes());
                 int durability = (int) attrObject.get("durability");
-                backpack.setProposedPrice(unitPrice.subtract(new BigDecimal(durability)));
+                backpack.setProposedPrice(unitPrice.multiply(new BigDecimal(durability)));
                 nftPublicBackpackService.updateById(backpack);
             }
         }
+        return initTime;
     }
 
     private void updateProposedPrice(Map<Long, BigDecimal> packPriceMap) {
@@ -197,7 +209,7 @@ public class NftPriceTask {
         for (NftPublicBackpackEntity backpack : backpacks) {
             JSONObject attrObject = JSONObject.parseObject(backpack.getAttributes());
             int durability = (int) attrObject.get("durability");
-            backpack.setProposedPrice(packPriceMap.get(backpack.getItemId()).subtract(new BigDecimal(durability)));
+            backpack.setProposedPrice(packPriceMap.get(backpack.getItemId()).multiply(new BigDecimal(durability)));
             nftPublicBackpackService.updateById(backpack);
         }
     }
@@ -207,7 +219,8 @@ public class NftPriceTask {
         List<NftReferencePrice> highGrades = nftReferencePriceService.queryByTypeAndHighGradeNoAvg(nftReferencePrice.getId());
         if (!CollectionUtils.isEmpty(highGrades)) {
             for (NftReferencePrice highGrade : highGrades) {
-                BigDecimal referencePrice = new BigDecimal((highGrade.getGrade() - grade)).subtract(averagePrice);
+                int difference = highGrade.getGrade() - grade == 0 ? 1 : highGrade.getGrade() - grade;
+                BigDecimal referencePrice = new BigDecimal(difference).multiply(averagePrice);
                 highGrade.setReferencePrice(referencePrice);
                 nftReferencePriceService.updateById(highGrade);
                 packPriceMap.put(highGrade.getId(), referencePrice);

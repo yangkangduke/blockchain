@@ -385,7 +385,7 @@ public class NftEventServiceImpl extends ServiceImpl<NftEventMapper, NftEvent> i
             // 获取参考单价
             BigDecimal unitPrice = nftReferencePriceService.queryLowGradeAveragePrice(backpackEntity.getItemId());
             // 设置参考价
-            backpackEntity.setProposedPrice(unitPrice.subtract(new BigDecimal(durability)));
+            backpackEntity.setProposedPrice(unitPrice.multiply(new BigDecimal(durability)));
             nftPublicBackpackService.save(backpackEntity);
             // 如果是合成，作为合成材料的nft标记为销毁的状态
             if (nftEvent.getType().equals(NFTEnumConstant.NFTEventType.COMPOUND.getCode())) {
