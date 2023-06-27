@@ -38,6 +38,9 @@ public class SysGameVideoAddOrModifyReq {
     @ApiModelProperty("视频标签名称")
     private String videoTagName;
 
+    @ApiModelProperty("是否上架：1是 0 否")
+    private Integer onShelves;
+
     @ApiModelProperty("是否置顶：1是 0 否")
     private Integer isTop;
 }

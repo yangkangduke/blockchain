@@ -26,6 +26,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,9 +46,11 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
     @Override
     public IPage<SysGameVideosResp> queryPage(SysGameVideosReq req) {
         LambdaQueryWrapper<SysGameVideosEntity> wrapper = new LambdaQueryWrapper<SysGameVideosEntity>()
-                .eq(SysGameVideosEntity::getIsDeleted,WhetherEnum.NO.value())
+                .eq(Objects.nonNull(req.getOnShelves()), SysGameVideosEntity::getOnShelves, req.getOnShelves())
+                .eq(Objects.nonNull(req.getIsTop()), SysGameVideosEntity::getIsTop, req.getIsTop())
                 .like(StringUtils.isNotBlank(req.getTitle()), SysGameVideosEntity::getTitle, req.getTitle())
-                .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTagName, req.getTag());
+                .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTag, req.getTag())
+                .orderByDesc(SysGameVideosEntity::getUpdatedAt);
 
         Page<SysGameVideosEntity> page = new Page<>(req.getCurrent(), req.getSize());
         List<SysGameVideosEntity> records = page(page, wrapper).getRecords();
@@ -63,10 +66,6 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
 
     @Override
     public void add(SysGameVideoAddOrModifyReq req) {
-        long topVideos = getTopVideoNum();
-        if (topVideos >= 5) {
-            throw new GenericException(AdminErrorCodeEnum.ERR_80007_NUMBER_EXCEEDS_THE_TOP);
-        }
         SysGameVideosEntity entity = new SysGameVideosEntity();
         if (StringUtils.isNotBlank(req.getVideoTagName())) {
             String videoTags = saveTag(req);
@@ -92,10 +91,6 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
 
     @Override
     public void modify(SysGameVideoAddOrModifyReq req) {
-        long topVideos = getTopVideoNum();
-        if (topVideos >= 5) {
-            throw new GenericException(AdminErrorCodeEnum.ERR_80007_NUMBER_EXCEEDS_THE_TOP);
-        }
         SysGameVideosEntity entity = new SysGameVideosEntity();
         if (StringUtils.isNotBlank(req.getVideoTagName())) {
             String videoTags = saveTag(req);
@@ -104,6 +99,9 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
         BeanUtils.copyProperties(req, entity);
         entity.setUpdatedAt(System.currentTimeMillis());
         entity.setUpdatedBy(UserContext.getCurrentAdminUserId());
+        if (req.getOnShelves().equals(WhetherEnum.NO.value())) {
+            entity.setIsTop(WhetherEnum.NO.value());
+        }
         this.updateById(entity);
     }
 
@@ -116,7 +114,7 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
     @Override
     public List<SysGameVideosResp> getTopVideos() {
         LambdaQueryWrapper<SysGameVideosEntity> wrapper = new QueryWrapper<SysGameVideosEntity>().lambda()
-                .eq(SysGameVideosEntity::getIsDeleted,WhetherEnum.NO.value())
+                .eq(SysGameVideosEntity::getOnShelves, WhetherEnum.YES.value())
                 .eq(SysGameVideosEntity::getIsTop, WhetherEnum.YES.value());
         List<SysGameVideosEntity> list = list(wrapper);
         return list.stream().map(p -> {
@@ -126,9 +124,39 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public void onShelves(SysGameVideoAddOrModifyReq req) {
+        SysGameVideosEntity entity = new SysGameVideosEntity();
+        entity.setOnShelves(req.getOnShelves());
+        entity.setUpdatedAt(System.currentTimeMillis());
+        entity.setUpdatedBy(UserContext.getCurrentAdminUserId());
+        if (req.getOnShelves().equals(WhetherEnum.NO.value())) {
+            entity.setIsTop(WhetherEnum.NO.value());
+        }
+        this.updateById(entity);
+    }
+
+    @Override
+    public void top(SysGameVideoAddOrModifyReq req) {
+        if (req.getIsTop().equals(WhetherEnum.YES.value())) {
+            long topVideos = getTopVideoNum();
+            if (topVideos >= 5) {
+                throw new GenericException(AdminErrorCodeEnum.ERR_80007_NUMBER_EXCEEDS_THE_TOP);
+            }
+        }
+        SysGameVideosEntity entity = new SysGameVideosEntity();
+        entity.setIsTop(req.getIsTop());
+        if (req.getIsTop().equals(WhetherEnum.YES.value())) {
+            entity.setOnShelves(WhetherEnum.YES.value());
+        }
+        entity.setUpdatedAt(System.currentTimeMillis());
+        entity.setUpdatedBy(UserContext.getCurrentAdminUserId());
+        this.updateById(entity);
+    }
+
     private long getTopVideoNum() {
         LambdaQueryWrapper<SysGameVideosEntity> wrapper = new QueryWrapper<SysGameVideosEntity>().lambda()
-                .eq(SysGameVideosEntity::getIsDeleted,WhetherEnum.NO.value())
+                .eq(SysGameVideosEntity::getOnShelves, WhetherEnum.YES.value())
                 .eq(SysGameVideosEntity::getIsTop, WhetherEnum.YES.value());
         return count(wrapper);
     }

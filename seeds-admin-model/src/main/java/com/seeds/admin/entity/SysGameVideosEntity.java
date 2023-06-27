@@ -60,8 +60,8 @@ public class SysGameVideosEntity implements Serializable {
     @ApiModelProperty("是否置顶：1是 0 否")
     private Integer isTop;
 
-    @ApiModelProperty("是否删除 1 是 0 否")
-    private Integer isDeleted;
+    @ApiModelProperty("是否上架 1 是 0 否")
+    private Integer onShelves;
 
     @ApiModelProperty("创建者")
     private Long createdBy;

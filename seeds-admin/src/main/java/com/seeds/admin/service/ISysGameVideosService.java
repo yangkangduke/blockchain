@@ -31,4 +31,8 @@ public interface ISysGameVideosService extends IService<SysGameVideosEntity> {
     void delete(ListReq req);
 
     List<SysGameVideosResp> getTopVideos();
+
+    void onShelves(SysGameVideoAddOrModifyReq req);
+
+    void top(SysGameVideoAddOrModifyReq req);
 }
