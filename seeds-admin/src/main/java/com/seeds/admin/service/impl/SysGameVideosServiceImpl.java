@@ -127,6 +127,7 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
     @Override
     public void onShelves(SysGameVideoAddOrModifyReq req) {
         SysGameVideosEntity entity = new SysGameVideosEntity();
+        entity.setId(req.getId());
         entity.setOnShelves(req.getOnShelves());
         entity.setUpdatedAt(System.currentTimeMillis());
         entity.setUpdatedBy(UserContext.getCurrentAdminUserId());
@@ -145,6 +146,7 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
             }
         }
         SysGameVideosEntity entity = new SysGameVideosEntity();
+        entity.setId(req.getId());
         entity.setIsTop(req.getIsTop());
         if (req.getIsTop().equals(WhetherEnum.YES.value())) {
             entity.setOnShelves(WhetherEnum.YES.value());
