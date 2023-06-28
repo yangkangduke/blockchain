@@ -109,11 +109,12 @@ public class NftPriceTask {
                 if (oldPrice == null) {
                     nftReferencePriceService.save(nftReferencePrice);
                 } else {
+                    nftReferencePrice.setUpdateTime(endTime);
                     nftReferencePriceService.updateById(nftReferencePrice);
                 }
                 packPriceMap.put(key, averagePrice);
                 // 关联更新高等级的参考单价
-                updateHighGradeReferencePrice(nftReferencePrice, averagePrice, packPriceMap);
+                updateHighGradeReferencePrice(nftReferencePrice, averagePrice, packPriceMap, endTime);
             }
             // 关联更新背包中的参考价格数据
             updateProposedPrice(packPriceMap);
@@ -214,7 +215,7 @@ public class NftPriceTask {
         }
     }
 
-    private void updateHighGradeReferencePrice(NftReferencePrice nftReferencePrice, BigDecimal averagePrice, Map<Long, BigDecimal> packPriceMap) {
+    private void updateHighGradeReferencePrice(NftReferencePrice nftReferencePrice, BigDecimal averagePrice, Map<Long, BigDecimal> packPriceMap, Long endTime) {
         Integer grade = nftReferencePrice.getGrade();
         List<NftReferencePrice> highGrades = nftReferencePriceService.queryByTypeAndHighGradeNoAvg(nftReferencePrice.getId());
         if (!CollectionUtils.isEmpty(highGrades)) {
@@ -222,6 +223,7 @@ public class NftPriceTask {
                 double difference = Math.pow(3, highGrade.getGrade() - grade);
                 BigDecimal referencePrice = new BigDecimal(difference).multiply(averagePrice);
                 highGrade.setReferencePrice(referencePrice);
+                highGrade.setUpdateTime(endTime);
                 nftReferencePriceService.updateById(highGrade);
                 packPriceMap.put(highGrade.getId(), referencePrice);
             }
