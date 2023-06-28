@@ -33,7 +33,7 @@ public enum GameErrorCodeEnum {
     ERR_10011_NFT_ITEM_AUCTION_NOT_EXIST(10011, "该NFT拍卖不存在", "This NFT item auction not exist"),
     ERR_10012_NFT_ITEM_AUCTION_HAS_ENDED(10012, "该NFT拍卖已经结束", "This NFT item auction has ended"),
     ERR_10013_NFT_ITEM_ALREADY_HAS(10013, "已拥有该NFT", "Already have this NFT item"),
-    ERR_10014_NFT_ITEM_OFFER_NOT_BELONG_TO_CURRENT_USER(10014, "NFT出价不属于当前用户", "Already have this NFT item"),
+    ERR_10014_NFT_ITEM_OFFER_NOT_BELONG_TO_CURRENT_USER(10014, "NFT出价不属于当前用户", "This offer does not belong to you"),
     ERR_10015_NFT_ITEM_HAS_NOT_BEEN_DEPOSITED(10015, "NFT物品未托管，请托管后再试", "NFT items are not deposited, please try again after deposit"),
     ERR_10016_NFT_ITEM_HAS_BEEN_RETRIEVED(10016, "NFT物品已经取回", "NFT items has been retrieved"),
     ERR_10017_NFT_ITEM_IN_SETTLEMENT(10017, "NFT物品结算中", "NFT items in settlement"),
