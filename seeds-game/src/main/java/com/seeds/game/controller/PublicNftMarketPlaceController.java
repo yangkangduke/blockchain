@@ -9,6 +9,7 @@ import com.seeds.game.dto.request.NftMarketPlaceSkinPageReq;
 import com.seeds.game.dto.response.*;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.service.NftMarketPlaceService;
+import com.seeds.game.task.NftPriceTask;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,9 @@ public class PublicNftMarketPlaceController {
 
     @Autowired
     private NftMarketPlaceService nftMarketPlaceService;
+
+    @Autowired
+    private NftPriceTask nftPriceTask;
 
     @GetMapping("detail/{nftId}")
     @ApiOperation("详细信息")
@@ -100,6 +104,13 @@ public class PublicNftMarketPlaceController {
     @ApiOperation("getTransaction")
     public GenericDto<TransactionMessageRespDto> getTransaction(@RequestParam("transaction") String transaction) {
         return GenericDto.success(nftMarketPlaceService.getTransaction(transaction));
+    }
+
+    @GetMapping("test-task")
+    @ApiOperation("测试参考单价任务")
+    public GenericDto<NftMarketPlaceDetailResp> detail() {
+        nftPriceTask.referencePrice();
+        return GenericDto.success(null);
     }
 
 }
