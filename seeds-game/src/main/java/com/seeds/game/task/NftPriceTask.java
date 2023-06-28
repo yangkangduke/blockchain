@@ -128,6 +128,7 @@ public class NftPriceTask {
             JSONObject attrObject = JSONObject.parseObject(backpack.getAttributes());
             int durability = (int) attrObject.get("durability");
             BigDecimal totalPrice = BigDecimal.ZERO;
+            int dealNum = 0;
             if (CollectionUtils.isEmpty(orderList)) {
                 continue;
             }
@@ -140,6 +141,7 @@ public class NftPriceTask {
                     unitPrice = order.getPrice().divide(new BigDecimal(order.getDurability() == null ? durability : order.getDurability()), 4, RoundingMode.HALF_UP);
                 }
                 totalPrice = totalPrice.add(unitPrice);
+                dealNum = dealNum + 1;
             }
             Long itemId = backpack.getItemId();
             NftReferencePrice nftPrice = priceMap.get(itemId);
@@ -149,7 +151,7 @@ public class NftPriceTask {
                 nftPrice.setTypeId(Long.valueOf(itemId.toString().substring(0, 4)));
                 nftPrice.setGrade(Integer.valueOf(itemId.toString().substring(4, 6)));
                 nftPrice.setNumber(itemId.toString().substring(6));
-                nftPrice.setDealNum(1);
+                nftPrice.setDealNum(dealNum);
                 nftPrice.setTotalPrice(totalPrice);
                 nftPrice.setCreateTime(endTime);
                 nftPrice.setUpdateTime(endTime);
