@@ -135,9 +135,9 @@ public class NftPriceTask {
                 NftAuctionHouseSetting auction = auctionMap.get(order.getAuctionId());
                 BigDecimal unitPrice;
                 if (auction != null) {
-                    unitPrice = auction.getEndPrice().divide(new BigDecimal(durability), 4, RoundingMode.HALF_UP);
+                    unitPrice = auction.getEndPrice().divide(new BigDecimal(order.getDurability() == null ? durability : order.getDurability()), 4, RoundingMode.HALF_UP);
                 } else {
-                    unitPrice = order.getPrice().divide(new BigDecimal(durability), 4, RoundingMode.HALF_UP);
+                    unitPrice = order.getPrice().divide(new BigDecimal(order.getDurability() == null ? durability : order.getDurability()), 4, RoundingMode.HALF_UP);
                 }
                 totalPrice = totalPrice.add(unitPrice);
             }

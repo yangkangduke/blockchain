@@ -70,4 +70,7 @@ public class NftMarketOrderEntity {
     @ApiModelProperty("交易顺序")
     private Long nonce;
 
+    @ApiModelProperty(value = "耐久值")
+    private Integer durability;
+
 }
