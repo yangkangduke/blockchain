@@ -61,7 +61,7 @@ public class NftMarketOrderImpl extends ServiceImpl<NftMarketOrderMapper, NftMar
     public NftMarketOrderEntity queryByStatusEarliest(Integer status) {
         return getOne(new LambdaQueryWrapper<NftMarketOrderEntity>()
                 .eq(NftMarketOrderEntity::getStatus, status)
-                .orderByDesc(NftMarketOrderEntity::getFulfillTime)
+                .orderByAsc(NftMarketOrderEntity::getFulfillTime)
                 .last("limit 1"));
     }
 

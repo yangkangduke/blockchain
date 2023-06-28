@@ -180,7 +180,7 @@ public class NftPriceTask {
                 Long typeId = Long.valueOf(itemId.toString().substring(0, 4));
                 Integer grade = Integer.valueOf(itemId.toString().substring(4, 6));
                 NftReferencePrice referencePrice = map.get(typeId);
-                int difference = grade - referencePrice.getGrade() == 0 ? 1 : grade - referencePrice.getGrade();
+                int difference = grade - referencePrice.getGrade() == 0 ? 1 : (grade - referencePrice.getGrade()) * 3;
                 BigDecimal unitPrice = new BigDecimal(difference).multiply(referencePrice.getAveragePrice());
                 BigDecimal price = itemIdMap.get(itemId);
                 if (price == null) {
@@ -219,7 +219,7 @@ public class NftPriceTask {
         List<NftReferencePrice> highGrades = nftReferencePriceService.queryByTypeAndHighGradeNoAvg(nftReferencePrice.getId());
         if (!CollectionUtils.isEmpty(highGrades)) {
             for (NftReferencePrice highGrade : highGrades) {
-                int difference = highGrade.getGrade() - grade == 0 ? 1 : highGrade.getGrade() - grade;
+                int difference = highGrade.getGrade() - grade == 0 ? 1 : (highGrade.getGrade() - grade) * 3;
                 BigDecimal referencePrice = new BigDecimal(difference).multiply(averagePrice);
                 highGrade.setReferencePrice(referencePrice);
                 nftReferencePriceService.updateById(highGrade);
