@@ -61,7 +61,7 @@ public class NftPriceTask {
         }
         long endTime = startTime + 24 * 60 * 60 * 1000;
         // 每24h算一次参考价格
-        while (startTime < System.currentTimeMillis()) {
+        while (startTime <= System.currentTimeMillis()) {
             updateReferencePrice(startTime, endTime);
             startTime = endTime;
             endTime = startTime + 24 * 60 * 60 * 1000;
