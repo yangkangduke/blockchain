@@ -77,7 +77,9 @@ public class NftReferencePriceServiceImpl extends ServiceImpl<NftReferencePriceM
         one.setNumber(number);
         one.setCreateTime(currentTimeMillis);
         one.setUpdateTime(currentTimeMillis);
-        one.setReferencePrice(price.getAveragePrice());
+        double difference = Math.pow(3, grade - price.getGrade());
+        BigDecimal unitPrice = new BigDecimal(difference).multiply(price.getAveragePrice());
+        one.setReferencePrice(unitPrice);
         save(one);
         return price.getAveragePrice();
     }
