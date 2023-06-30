@@ -223,6 +223,9 @@ public class NftPriceTask {
         List<NftReferencePrice> highGrades = nftReferencePriceService.queryByTypeAndHighGradeNoAvg(nftReferencePrice.getId());
         if (!CollectionUtils.isEmpty(highGrades)) {
             for (NftReferencePrice highGrade : highGrades) {
+                if (nftReferencePrice.getId().equals(highGrade.getId())) {
+                    continue;
+                }
                 double difference = Math.pow(3, highGrade.getGrade() - grade);
                 BigDecimal referencePrice = new BigDecimal(difference).multiply(averagePrice);
                 highGrade.setReferencePrice(referencePrice);
