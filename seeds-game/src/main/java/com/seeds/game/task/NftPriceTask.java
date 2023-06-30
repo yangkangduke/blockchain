@@ -109,6 +109,7 @@ public class NftPriceTask {
                 if (oldPrice == null) {
                     nftReferencePriceService.save(nftReferencePrice);
                 } else {
+                    nftReferencePrice.setCreateTime(oldPrice.getCreateTime());
                     nftReferencePrice.setUpdateTime(endTime);
                     nftReferencePriceService.updateById(nftReferencePrice);
                 }
