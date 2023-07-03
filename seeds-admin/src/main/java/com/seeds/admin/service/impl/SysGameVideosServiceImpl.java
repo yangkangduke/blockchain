@@ -47,7 +47,6 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
     public IPage<SysGameVideosResp> queryPageForUc(SysGameVideosReq req) {
         LambdaQueryWrapper<SysGameVideosEntity> wrapper = new LambdaQueryWrapper<SysGameVideosEntity>()
                 .eq(SysGameVideosEntity::getOnShelves, WhetherEnum.YES.value())
-                .eq(SysGameVideosEntity::getIsTop, WhetherEnum.NO.value())
                 .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTag, req.getTag())
                 .orderByDesc(SysGameVideosEntity::getUpdatedAt);
 
