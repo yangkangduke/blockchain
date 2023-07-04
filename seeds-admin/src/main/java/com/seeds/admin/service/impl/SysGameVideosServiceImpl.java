@@ -26,7 +26,6 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,16 +41,17 @@ import java.util.stream.Collectors;
 public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, SysGameVideosEntity> implements ISysGameVideosService {
     @Resource
     private ISysGameVideosTagsService videosTagsService;
+    @Resource
+    private SysGameVideosMapper gameVideosMapper;
 
     @Override
     public IPage<SysGameVideosResp> queryPageForUc(SysGameVideosReq req) {
-        LambdaQueryWrapper<SysGameVideosEntity> wrapper = new LambdaQueryWrapper<SysGameVideosEntity>()
-                .eq(SysGameVideosEntity::getOnShelves, WhetherEnum.YES.value())
-                .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTag, req.getTag())
-                .orderByDesc(SysGameVideosEntity::getUpdatedAt);
-
-        Page<SysGameVideosEntity> page = new Page<>(req.getCurrent(), req.getSize());
-        List<SysGameVideosEntity> records = page(page, wrapper).getRecords();
+        Page<SysGameVideosResp> page = new Page<>();
+        page.setCurrent(req.getCurrent());
+        page.setSize(req.getSize());
+        req.setOnShelves(WhetherEnum.YES.value());
+        IPage<SysGameVideosResp> result = gameVideosMapper.getPage(page, req);
+        List<SysGameVideosResp> records = result.getRecords();
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
@@ -64,14 +64,11 @@ public class SysGameVideosServiceImpl extends ServiceImpl<SysGameVideosMapper, S
 
     @Override
     public IPage<SysGameVideosResp> queryPage(SysGameVideosReq req) {
-        LambdaQueryWrapper<SysGameVideosEntity> wrapper = new LambdaQueryWrapper<SysGameVideosEntity>()
-                .eq(Objects.nonNull(req.getOnShelves()), SysGameVideosEntity::getOnShelves, req.getOnShelves())
-                .eq(Objects.nonNull(req.getIsTop()), SysGameVideosEntity::getIsTop, req.getIsTop())
-                .like(StringUtils.isNotBlank(req.getTitle()), SysGameVideosEntity::getTitle, req.getTitle())
-                .like(StringUtils.isNotBlank(req.getTag()), SysGameVideosEntity::getVideoTag, req.getTag());
-
-        Page<SysGameVideosEntity> page = new Page<>(req.getCurrent(), req.getSize());
-        List<SysGameVideosEntity> records = page(page, wrapper).getRecords();
+        Page<SysGameVideosResp> page = new Page<>();
+        page.setCurrent(req.getCurrent());
+        page.setSize(req.getSize());
+        IPage<SysGameVideosResp> result = gameVideosMapper.getPage(page, req);
+        List<SysGameVideosResp> records = result.getRecords();
         if (CollectionUtils.isEmpty(records)) {
             return page.convert(p -> null);
         }
