@@ -30,4 +30,5 @@ public interface NftPublicBackpackMapper extends BaseMapper<NftPublicBackpackEnt
     List<NftPublicBackpackSkinWebResp> getSkinPageForWeb(NftBackpackWebPageReq req);
 
     SysNftPicEntity getHeroAndSkin(@Param("nftPicId") Long nftPicId);
+    SysNftPicEntity getSkinNFT(@Param("nftPicId") Long nftPicId);
 }

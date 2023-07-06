@@ -5,6 +5,7 @@ import com.seeds.common.dto.GenericDto;
 import com.seeds.common.web.context.UserContext;
 import com.seeds.game.dto.request.*;
 import com.seeds.game.dto.response.NftPublicBackpackResp;
+import com.seeds.game.dto.response.OpenNftBuySuccessResp;
 import com.seeds.game.dto.response.OpenNftPublicBackpackDisResp;
 import com.seeds.game.service.INftPublicBackpackService;
 import io.swagger.annotations.Api;
@@ -100,6 +101,13 @@ public class OpenNftPublicBackpackController {
     public GenericDto<Map<Long, BigDecimal>> getTotalPrice(@RequestBody OpenGetNFTPriceReq req) {
 
         return GenericDto.success(nftPublicBackpackService.getTotalPrice(req.getAutoIds()));
+    }
+
+    @PostMapping("buy-notify")
+    @ApiOperation("游戏内金币购买成功通知")
+    public GenericDto<OpenNftBuySuccessResp> buyNotify(@Valid @RequestBody OpenNftOwnershipTransferReq req) {
+
+        return GenericDto.success(nftPublicBackpackService.buyNotify(req));
     }
 
 }

@@ -114,7 +114,7 @@ public class SysNftPicEntity extends BaseEntity {
 
 
     /**
-     * 未来NFT 发行的平台， 1,Magic Eden  2,Seeds
+     * 未来NFT 发行的平台， 1,Magic Eden  2,Seeds 3,game (游戏内)
      */
     @TableField("platform")
     private Integer platform;

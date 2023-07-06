@@ -41,11 +41,13 @@ import com.seeds.common.constant.mq.KafkaTopic;
 import com.seeds.common.dto.GenericDto;
 import com.seeds.common.enums.ApiType;
 import com.seeds.common.web.oss.FileTemplate;
+import com.seeds.game.dto.request.NftMarketPlaceDetailViewReq;
 import com.seeds.game.dto.request.internal.SkinNftWithdrawDto;
 import com.seeds.game.entity.NftEquipment;
 import com.seeds.game.entity.NftMarketOrderEntity;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftHeroTypeEnum;
+import com.seeds.game.enums.PatformEnum;
 import com.seeds.game.feign.RemoteNftEquipService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -150,6 +152,7 @@ public class SysNftPicImpl extends ServiceImpl<SysNftPicMapper, SysNftPicEntity>
                 .eq(SysNftPicEntity::getMintState, SkinNftEnums.SkinMintStateEnum.MINTED.getCode())
                 .eq(!Objects.isNull(req.getListState()), SysNftPicEntity::getListState, req.getListState())
                 .eq(StringUtils.isNotBlank(req.getTokenAddress()), SysNftPicEntity::getTokenAddress, req.getTokenAddress())
+                .ne(SysNftPicEntity::getPlatform, PatformEnum.GAME.getCode())
                 .orderByDesc(SysNftPicEntity::getMintTime);
         Page<SysNftPicEntity> page = new Page<>(req.getCurrent(), req.getSize());
         List<SysNftPicEntity> records = this.page(page, queryWrapper).getRecords();

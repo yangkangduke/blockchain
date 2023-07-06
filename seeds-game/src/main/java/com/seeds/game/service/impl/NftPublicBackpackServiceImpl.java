@@ -37,7 +37,6 @@ import com.seeds.game.mq.producer.KafkaProducer;
 import com.seeds.game.service.*;
 import com.seeds.uc.dto.response.UcUserResp;
 import com.seeds.uc.feign.UserCenterFeignClient;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.binding.MapperMethod;
@@ -53,7 +52,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.seeds.game.enums.GameErrorCodeEnum.*;
+import static com.seeds.game.enums.GameErrorCodeEnum.ERR_50001_CALL_GAME_INTERFACE_ERROR;
 
 /**
  * <p>
@@ -1083,5 +1082,40 @@ public class NftPublicBackpackServiceImpl extends ServiceImpl<NftPublicBackpackM
             return Collections.emptyList();
         }
         return list(new LambdaQueryWrapper<NftPublicBackpackEntity>().in(NftPublicBackpackEntity::getItemId, itemIds));
+    }
+
+    @Override
+    public OpenNftBuySuccessResp buyNotify(OpenNftOwnershipTransferReq req) {
+
+        NftPublicBackpackEntity backpackEntity = this.getOne(new LambdaQueryWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
+        if (backpackEntity.getType().equals(NFTEnumConstant.NftTypeEnum.HERO.getCode())
+                && backpackEntity.getIsTraded().equals(WhetherEnum.NO.value())) {
+            // 发送皮肤nft 首次购买 成功消息,属性上链
+            SkinNftFirstBuySuccessDto dto = new SkinNftFirstBuySuccessDto();
+            dto.setNftPicId(backpackEntity.getNftPicId());
+            kafkaProducer.sendAsync(KafkaTopic.SKIN_NFT_BUY_SUCCESS_FIRST, JSONUtil.toJsonStr(dto));
+        }
+        //更新背包
+        backpackEntity.setState(NFTEnumConstant.NFTStateEnum.DEPOSITED.getCode());
+        backpackEntity.setIsTraded(WhetherEnum.YES.value());
+        BeanUtils.copyProperties(req, backpackEntity);
+        ServerRoleEntity serverRole = serverRoleService.getById(req.getServerRoleId());
+        if (Objects.isNull(serverRole)) {
+            throw new GenericException(GameErrorCodeEnum.ERR_20002_ROLE_NOT_EXIST);
+        }
+        backpackEntity.setUserId(serverRole.getUserId());
+        try {
+            GenericDto<String> result = userCenterFeignClient.getPublicAddress(serverRole.getUserId());
+            String owner = result.getData();
+            backpackEntity.setOwner(owner);
+        } catch (Exception e) {
+            log.error("内部请求uc获取用户公共地址失败，userId:{},error:{}", serverRole.getUserId(), e.getMessage());
+        }
+        this.update(backpackEntity, new LambdaUpdateWrapper<NftPublicBackpackEntity>().eq(NftPublicBackpackEntity::getAutoId, req.getAutoId()));
+        OpenNftBuySuccessResp resp = new OpenNftBuySuccessResp();
+        SysNftPicEntity skinNFT = baseMapper.getSkinNFT(backpackEntity.getNftPicId());
+        BeanUtils.copyProperties(skinNFT, resp);
+        resp.setImgUrl(skinNFT.getUrl());
+        return resp;
     }
 }

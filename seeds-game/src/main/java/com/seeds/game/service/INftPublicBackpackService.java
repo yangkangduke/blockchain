@@ -149,4 +149,5 @@ public interface INftPublicBackpackService extends IService<NftPublicBackpackEnt
      */
     List<NftPublicBackpackEntity> queryByItemIds(Collection<Long> itemIds);
 
+    OpenNftBuySuccessResp buyNotify(OpenNftOwnershipTransferReq req);
 }

@@ -154,4 +154,10 @@
         from sys_nft_pic
         where id = #{nftPicId}
     </select>
+
+    <select id="getSkinNFT" resultType="com.seeds.admin.entity.SysNftPicEntity">
+        select *
+        from sys_nft_pic
+        where id = #{nftPicId}
+    </select>
 </mapper>

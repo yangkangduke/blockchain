@@ -24,6 +24,7 @@ import com.seeds.common.web.oss.FileTemplate;
 import com.seeds.game.dto.request.internal.NftPublicBackpackDto;
 import com.seeds.game.enums.NFTEnumConstant;
 import com.seeds.game.enums.NftConfigurationEnum;
+import com.seeds.game.enums.PatformEnum;
 import com.seeds.game.feign.RemoteNftBackpackService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
@@ -175,6 +176,9 @@ public class SysNftSkinAsyncServiceImpl implements SysNftSkinAsyncService {
             notityDto.setConfigId(p.getConfId());
             notityDto.setAutoId(p.getAutoId());
             notityDto.setTokenAddress(p.getTokenAddress());
+            if (p.getPlatform().equals(PatformEnum.GAME.getCode())) {
+                notityDto.setShop(true);
+            }
             return notityDto;
         }).collect(Collectors.toList());
         notifyGameService.skinMintSuccess(notifyDtos);

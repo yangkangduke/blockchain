@@ -12,4 +12,5 @@ public class SkinNftMintSuccessDto {
     private Long configId;
     private String tokenAddress;
     private String rarity;
+    private boolean isShop;
 }
