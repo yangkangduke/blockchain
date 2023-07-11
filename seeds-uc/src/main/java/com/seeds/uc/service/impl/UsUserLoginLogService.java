@@ -3,6 +3,7 @@ package com.seeds.uc.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seeds.common.web.config.LoginProperties;
 import com.seeds.uc.mapper.UcUserLoginLogMapper;
 import com.seeds.uc.model.UcUser;
 import com.seeds.uc.model.UcUserLoginLog;
@@ -22,6 +23,8 @@ public class UsUserLoginLogService extends ServiceImpl<UcUserLoginLogMapper, UcU
     @Autowired
     @Lazy
     private IUcUserService ucUserService;
+    @Autowired
+    private LoginProperties loginProperties;
 
     @Override
     public void recordLog(Long ucUserId, String email, String clientIp) {
@@ -35,6 +38,10 @@ public class UsUserLoginLogService extends ServiceImpl<UcUserLoginLogMapper, UcU
 
     @Override
     public boolean checkNeed2FA(String email, String clientIp) {
+        if (!loginProperties.getTwofa()) {
+            return true;
+        }
+
         UcUser ucUser = ucUserService.getOne(new QueryWrapper<UcUser>().lambda()
                 .eq(UcUser::getEmail, email));
         if (ucUser == null) {
