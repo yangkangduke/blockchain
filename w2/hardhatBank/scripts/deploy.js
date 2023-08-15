@@ -1,26 +1,14 @@
-const { ethers, network, artifacts } = require("hardhat");
-
-
-
 async function main() {
-  // await hre.run('compile');
-  const Bank = await ethers.getContractFactory("Bank");
+  // 获得将要部署的合约
+  const Greeter = await ethers.getContractFactory("Bank");
+  const greeter = await Greeter.deploy();
 
-  const bank = await Bank.deploy();
-
-  await bank.deployed();
-
-  console.log("Bank deployed to:", bank.address);
-
+  console.log("Greeter deployed to:", greeter.address);
 }
-
+// goerli网络合约地址：0x9925a314E8083c1D9C96878BE732Cd8ce81aAB6c
 main()
   .then(() => process.exit(0))
-  .catch((error) => {
+  .catch(error => {
     console.error(error);
     process.exit(1);
   });
-
-
-
-
