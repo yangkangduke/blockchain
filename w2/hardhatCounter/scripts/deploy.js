@@ -40,7 +40,7 @@
 //   process.exitCode = 1;
 // });
 async function main() {
-  const contractFactory = await ethers.getContractFactory("Counter");
+  const BankFactory = await ethers.getContractFactory("Bank");
   const contract = await contractFactory.deploy();
   await contract.deployed();
 
