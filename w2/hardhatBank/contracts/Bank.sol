@@ -13,6 +13,7 @@ contract Bank {
     emit Deposit(msg.sender,msg.value);
   }
 
+
   // 提取
   function withdraw() external {
     uint256 amount = balances[msg.sender];
