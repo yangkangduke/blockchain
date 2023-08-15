@@ -7,7 +7,7 @@ contract Bank {
   event Withdrawal(address indexed account, uint256 amount);
 
   // 充值
-  function deposit() external payable {
+  receive() external payable {
     require(msg.value > 0,"Amount must be greater than zero");
     balances[msg.sender] += msg.value;
     emit Deposit(msg.sender,msg.value);
