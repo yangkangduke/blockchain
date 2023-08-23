@@ -3,8 +3,8 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract MyToken is ERC20 {
-     constructor(uint256 initialSupply) ERC20("YANGKANGToken", "yk") {
-        _mint(msg.sender, initialSupply);
+contract YKERC20 is ERC20 {
+     constructor() ERC20("YK", "yk") {
+        _mint(msg.sender, 10e18);
     }
 }

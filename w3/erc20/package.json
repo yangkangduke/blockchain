@@ -1,7 +1,8 @@
 {
   "name": "hardhat-project",
   "dependencies": {
-    "@openzeppelin/contracts-upgradeable": "^4.9.3"
+    "@openzeppelin/contracts-upgradeable": "^4.9.3",
+    "ethers": "^6.7.1"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-etherscan": "^3.1.7",
