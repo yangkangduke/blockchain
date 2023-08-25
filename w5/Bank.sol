@@ -37,8 +37,8 @@ contract Bank {
 
 
     function collect() external {
-        if(IERC20(token).balanceOf(address(this) )> 5e18) {
-            SafeERC20.safeTransfer(IERC20(token), owner, 5e18);    
+        if(IERC20(token).balanceOf(address(this) )> 100e18) {
+            SafeERC20.safeTransfer(IERC20(token), owner, 5018);    
         }
     }
 

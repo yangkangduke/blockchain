@@ -21,7 +21,7 @@ contract AutoCollectUpKeep is AutomationCompatible {
   function checkUpkeep(bytes calldata checkData) external view override returns (bool upkeepNeeded, bytes memory performData) {
     // upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
     
-    if(IERC20(token).balanceOf(bank) > 5e18) {
+    if(IERC20(token).balanceOf(bank) > 100e18) {
       upkeepNeeded = true;
     }
 
@@ -30,7 +30,7 @@ contract AutoCollectUpKeep is AutomationCompatible {
 
 
   function performUpkeep(bytes calldata performData) external override {
-    if(IERC20(token).balanceOf(bank) > 5e18) {
+    if(IERC20(token).balanceOf(bank) > 100e18) {
       IBank(bank).collect();
     }
   }
